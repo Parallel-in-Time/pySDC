@@ -19,7 +19,7 @@ from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 # Problem parameters
 tEnd = 2*np.pi
 nonLinear = False
-epsilon = 1
+epsilon = 1e-1
 
 pName = "PROTHERO-ROBINSON"+(nonLinear)*"-NL"
 
@@ -48,8 +48,8 @@ qDeltaList = [
 nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
 nSweepList = [1, 2, 3, 4]
 
-qDeltaList = ['RK4', 'ESDIRK43', 'LU']
-# nSweepList = [4]
+# qDeltaList = ['RK4', 'ESDIRK43', 'LU']
+nSweepList = [4]
 
 
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10

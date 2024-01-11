@@ -12,8 +12,8 @@ from utils import solutionExact, getParamsRK, solutionSDC, getParamsSDC
 
 script = __file__.split('/')[-1].split('.')[0]
 
-tEnd = 10
-nSteps = 10
+tEnd = 50
+nSteps = 50
 
 useRK = True
 if useRK:
@@ -32,7 +32,7 @@ periodic = False
 pParams  = {
     "periodic": periodic,
     "nvars": 2**11 - (not periodic),
-    "epsilon": 0.08,
+    "epsilon": 0.04,
     }
 
 tVals = np.linspace(0, tEnd, nSteps+1)
