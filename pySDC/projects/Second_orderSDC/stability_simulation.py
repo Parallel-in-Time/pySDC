@@ -5,6 +5,8 @@ from pySDC.core.Step import step
 
 from pySDC.projects.Second_orderSDC.plot_helper import set_fixed_plot_params
 from tabulate import tabulate
+
+
 class StabilityImplementation:
     """
     Routine to compute the stability domains of different configurations of SDC
@@ -209,11 +211,17 @@ class StabilityImplementation:
         self.plot_stability(region_RKN.T, title='RKN-4 stability region')
 
 
-def compute_and_check_stability(description,
-    point, compute_interval=False, save_interval_file=False, interval_filename='./data/stab_interval.txt',
-    check_stability=False, store_results=False, results_filename='./data/stab_results.txt', quadrature_list=['GAUSS', 'LOBATTO']
+def compute_and_check_stability(
+    description,
+    point,
+    compute_interval=False,
+    save_interval_file=False,
+    interval_filename='./data/stab_interval.txt',
+    check_stability=False,
+    store_results=False,
+    results_filename='./data/stab_results.txt',
+    quadrature_list=['GAUSS', 'LOBATTO'],
 ):
-
     # Storage for stability interval and stability check
     interval_data = []
     results_data = []
@@ -229,14 +237,13 @@ def compute_and_check_stability(description,
 
                 # Create Stability_implementation instance for stability check
 
-                stab_model = StabilityImplementation(description, kappa_max=point[0], mu_max=point[1], Num_iter=description['helper_params']['Num_iter'])
+                stab_model = StabilityImplementation(
+                    description, kappa_max=point[0], mu_max=point[1], Num_iter=description['helper_params']['Num_iter']
+                )
                 if compute_interval:
-
-
                     # Extract the values where SDC is less than or equal to 1
                     mask = stab_model.picard <= 1 + 1e-14
                     for ii in range(len(mask)):
-
                         if mask[ii]:
                             kappa_max_interval = stab_model.lambda_kappa[ii]
                         else:
@@ -246,8 +253,6 @@ def compute_and_check_stability(description,
                     interval_data.append([quad_type, num_nodes, max_iter, kappa_max_interval])
 
                 if check_stability:
-
-
                     # Check stability and print results
                     if stab_model.SDC[-1, -1] <= 1:
                         stability_result = "Stable"
@@ -255,9 +260,9 @@ def compute_and_check_stability(description,
                         stability_result = "Unstable. Increase M or K"
 
                     # Add row to the results data
-                    results_data.append([
-                        quad_type, num_nodes, max_iter, point, stability_result, stab_model.SDC[-1, -1]
-                    ])
+                    results_data.append(
+                        [quad_type, num_nodes, max_iter, point, stability_result, stab_model.SDC[-1, -1]]
+                    )
 
     # Define column names for interval data
     interval_headers = ["Quad Type", "Num Nodes", "Max Iter", 'kappa_max']

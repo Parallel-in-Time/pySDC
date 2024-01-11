@@ -6,13 +6,16 @@ from pySDC.projects.Second_orderSDC.penningtrap_HookClass import particles_outpu
 from pySDC.implementations.sweeper_classes.Runge_Kutta_Nystrom import RKN, Velocity_Verlet
 from pySDC.projects.Second_orderSDC.plot_helper import PlotManager
 
+
 class ComputeError(PlotManager):
     """
     This class generates data for plots and computations for Second-order SDC
     """
 
     def __init__(self, controller_params, description, time_iter=3, K_iter=(1, 2, 3), Tend=2, axes=(1,), cwd=''):
-        super().__init__(controller_params, description, time_iter=time_iter, K_iter=K_iter, Tend=Tend, axes=axes, cwd='')
+        super().__init__(
+            controller_params, description, time_iter=time_iter, K_iter=K_iter, Tend=Tend, axes=axes, cwd=''
+        )
 
     def run_local_error(self):
         """
@@ -138,7 +141,7 @@ class ComputeError(PlotManager):
                         "Time_steps/Work_counter | Order_pos | Abs_error_position | Order_vel | Abs_error_velocity\n"
                     )
 
-                cont = 2 if self.time_iter == 3 else 2**abs(3 - self.time_iter)
+                cont = 2 if self.time_iter == 3 else 2 ** abs(3 - self.time_iter)
                 cont = cont if not Picard else dt_cont
 
                 for ii in range(0, self.time_iter):
@@ -153,7 +156,7 @@ class ComputeError(PlotManager):
 
                     t0, Tend = 0.0, self.Tend
                     P = controller.MS[0].levels[0].prob
-                    uinit =P.u_init()
+                    uinit = P.u_init()
                     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
                     func_eval = P.work_counters['Boris_solver'].niter + P.work_counters['rhs'].niter

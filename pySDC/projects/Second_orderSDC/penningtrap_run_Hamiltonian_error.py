@@ -99,7 +99,7 @@ def plot_Hamiltonian_error(K, M, dt):  # pragma: no cover
     """
     set_fixed_plot_params()
     # Define final time
-    time = 1e+6
+    time = 1e6
     tn = dt
     # Find time nodes
     t = np.arange(0, time + tn, tn)

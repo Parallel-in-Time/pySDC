@@ -3,7 +3,6 @@ from pySDC.implementations.problem_classes.HarmonicOscillator import harmonic_os
 from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
 
 
-
 def harmonic_oscillator_params():
     """
     Routine to compute modules of the stability function
