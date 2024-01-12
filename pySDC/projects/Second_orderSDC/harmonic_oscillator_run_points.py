@@ -2,14 +2,15 @@ import numpy as np
 from pySDC.projects.Second_orderSDC.harmonic_oscillator_params import get_default_harmonic_oscillator_description
 from pySDC.projects.Second_orderSDC.stability_simulation import compute_and_generate_table
 
-'''
-This script generates table for the given points to compare in what quadrature type,
-number of nodes and number of iterations the SDC iteration is stable or not.
-Additional parameter:
-    To save the table set: save_points_table=True
-    Change filename: points_table_filename='FILENAME' by default: './data/point_table.txt'
-'''
+
 if __name__ == '__main__':
+    '''
+    This script generates table for the given points to compare in what quadrature type,
+    number of nodes and number of iterations the SDC iteration is stable or not.
+    Additional parameter:
+        To save the table set: save_points_table=True
+        Change filename: points_table_filename='FILENAME' by default: './data/point_table.txt'
+    '''
     # Get default parameters for the harmonic osicillator problem
     description = get_default_harmonic_oscillator_description()
     # Additonal params to compute stability points

@@ -2,16 +2,17 @@ import numpy as np
 from pySDC.projects.Second_orderSDC.harmonic_oscillator_params import get_default_harmonic_oscillator_description
 from pySDC.projects.Second_orderSDC.stability_simulation import compute_and_generate_table
 
-'''
-To compute maximum stable values for SDC and Picard iterations for the purely oscillatory case with
-no damping (mu=0)
-Additional parameter:
-    To save the table set: save_interval_file=True
-    Change filename: interval_filename='FILENAME' by default: './data/stab_interval.txt'
-Output:
-    it generates to compare with different values of M (number of nodes) and K (maximal number of iterations)
-'''
+
 if __name__ == '__main__':
+    '''
+    To compute maximum stable values for SDC and Picard iterations for the purely oscillatory case with
+    no damping (mu=0)
+    Additional parameter:
+        To save the table set: save_interval_file=True
+        Change filename: interval_filename='FILENAME' by default: './data/stab_interval.txt'
+    Output:
+        it generates to compare with different values of M (number of nodes) and K (maximal number of iterations)
+    '''
     # Ger default parameters
     description = get_default_harmonic_oscillator_description()
     # Additional parameters to compute stability interval on the kappa
