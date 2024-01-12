@@ -768,7 +768,6 @@ class WSCC9BusSystem(ptype_dae):
         nvars = 11 * m + 2 * m + 2 * n
         # invoke super init, passing number of dofs
         super().__init__(nvars=(11 * m, 2 * n + 2 * m), newton_tol=newton_tol)
-        self._makeAttributeAndRegister('newton_tol', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister('m', 'n', localVars=locals())
         self.mpc = WSCC9Bus()
 

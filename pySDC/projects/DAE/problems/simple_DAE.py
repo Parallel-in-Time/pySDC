@@ -158,7 +158,6 @@ class simple_dae_1(ptype_dae):
     def __init__(self, newton_tol=1e-10):
         """Initialization routine"""
         super().__init__(nvars=(2, 1), newton_tol=newton_tol)
-        self._makeAttributeAndRegister('newton_tol', localVars=locals())
 
     def eval_f(self, u, du, t):
         r"""
@@ -247,7 +246,6 @@ class problematic_f(ptype_dae):
     def __init__(self, newton_tol, eta=1):
         """Initialization routine"""
         super().__init__(nvars=2, newton_tol=newton_tol)
-        self._makeAttributeAndRegister('eta', localVars=locals())
 
     def eval_f(self, u, du, t):
         r"""

@@ -7,10 +7,6 @@ class error_hook(hooks):
     each time step.
     """
 
-    def __init__(self):
-        """Initialization routine"""
-        super().__init__()
-
     def post_step(self, step, level_number):
         r"""
         Default routine called after each step.
