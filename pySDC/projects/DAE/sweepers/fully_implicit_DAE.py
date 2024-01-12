@@ -113,7 +113,6 @@ class fully_implicit_DAE(generic_implicit):
                     params_mesh = P.dtype_f(P.init)
                     params_mesh[:] = params
 
-
                 # build parameters to pass to implicit function
                 local_u_approx = P.dtype_f(u_approx)
 

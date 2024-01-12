@@ -78,6 +78,6 @@ class ptype_dae(ptype):
                 method='hybr',
                 tol=self.newton_tol,
             )
-            me[:] = opt.x    
+            me[:] = opt.x
         self.work_counters['newton'].niter += opt.nfev
         return me

@@ -270,7 +270,7 @@ class problematic_f(ptype_dae):
         f = self.dtype_f(self.init)
         f[:] = (
             u[0] + self.eta * t * u[1] - np.sin(t),
-            du[0] + self.eta * t * du[1] + (1 + self.eta) * u[1] - np.cos(t),    
+            du[0] + self.eta * t * du[1] + (1 + self.eta) * u[1] - np.cos(t),
         )
         self.work_counters['rhs']()
         return f
