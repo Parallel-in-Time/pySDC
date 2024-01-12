@@ -1,8 +1,12 @@
 from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.implementations.datatype_classes.mesh import mesh
+import numpy as np
+import scipy.sparse as sp
+from scipy.sparse.linalg import splu as _splu
 
 
 # noinspection PyUnusedLocal
-class testequation0dXPU(ptype):
+class testequation0d(ptype):
     r"""
     This class implements the simple test equation of the form
 
@@ -10,9 +14,6 @@ class testequation0dXPU(ptype):
         \frac{d u(t)}{dt} = A u(t)
 
     for :math:`A = diag(\lambda_1, .. ,\lambda_n)`.
-
-    It is compatible with both CPU and GPU, but requires setting class attributes to select the corresponding numerical
-    library. Use the classmethod `get_XPU_version` to get a runnable problem class.
 
     Parameters
     ----------
@@ -27,34 +28,33 @@ class testequation0dXPU(ptype):
         Diagonal matrix containing :math:`\lambda_1,..,\lambda_n`.
     """
 
+    xp = np
+    xsp = sp
+    dtype_u = mesh
+    dtype_f = mesh
+    splu = staticmethod(_splu)
+
     @classmethod
-    def get_XPU_version(cls, version='CPU'):
+    def setup_GPU(cls):
         """
-        Get a runnable version for either CPU or GPU by specifying this as `version`.
-
-        Parameters
-        ----------
-        version : str
-            Supply "GPU" or "CPU" to obtain the desired implementation
-
-        Returns
-        -------
-        pySDC.Problem
-            A problem class implementing the desired implementation
+        Switch to GPU modules
         """
-        if version == 'CPU':
-            return testequation0d
-        elif version == 'GPU':
-            from pySDC.implementations.problem_classes.TestEquation_0D_GPU import testequation0dGPU
+        from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
+        import cupy as cp
+        import cupyx.scipy.sparse as csp
+        from cupyx.scipy.sparse.linalg import splu as _splu
 
-            return testequation0dGPU
-        else:
-            from pySDC.core.Errors import ParameterError
+        cls.xp = cp
+        cls.xsp = csp
+        cls.dtype_u = cupy_mesh
+        cls.dtype_f = cupy_mesh
+        cls.splu = staticmethod(_splu)
 
-            raise ParameterError(f'Don\'t know version {version}! Please choose \'CPU\' or \'GPU\'!')
-
-    def __init__(self, lambdas=None, u0=0.0):
+    def __init__(self, lambdas=None, u0=0.0, useGPU=False):
         """Initialization routine"""
+        if useGPU:
+            self.setup_GPU()
+
         if lambdas is None:
             re = self.xp.linspace(-30, 19, 50)
             im = self.xp.linspace(-50, 49, 50)
@@ -71,7 +71,7 @@ class testequation0dXPU(ptype):
 
         lambdas = self.xp.array(lambdas)
         self.A = self.__get_A(lambdas, self.xsp)
-        self._makeAttributeAndRegister('nvars', 'lambdas', 'u0', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister('nvars', 'lambdas', 'u0', 'useGPU', localVars=locals(), readOnly=True)
         self.work_counters['rhs'] = WorkCounter()
 
     @staticmethod
@@ -166,18 +166,3 @@ class testequation0dXPU(ptype):
         me = self.dtype_u(self.init)
         me[:] = u_init * self.xp.exp((t - t_init) * self.lambdas)
         return me
-
-
-class testequation0d(testequation0dXPU):
-    """
-    CPU implementation of `testequation0dXPU`
-    """
-
-    from pySDC.implementations.datatype_classes.mesh import mesh
-    import numpy as xp
-    import scipy.sparse as xsp
-    from scipy.sparse.linalg import splu as _splu
-
-    dtype_u = mesh
-    dtype_f = mesh
-    splu = staticmethod(_splu)
