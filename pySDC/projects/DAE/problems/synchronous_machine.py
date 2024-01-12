@@ -243,7 +243,6 @@ class synchronous_machine_infinite_bus(ptype_dae):
         v_d = np.real(V_comp) * np.sin(delta_r) - np.imag(V_comp) * np.cos(delta_r)
         v_q = np.real(V_comp) * np.cos(delta_r) + np.imag(V_comp) * np.sin(delta_r)
 
-        # differential generator
         f.diff[:] = (
             -dpsi_d + self.omega_b * (v_d - self.R_s * i_d + omega_m * psi_q),
             -dpsi_q + self.omega_b * (v_q - self.R_s * i_q - omega_m * psi_d),
@@ -255,7 +254,6 @@ class synchronous_machine_infinite_bus(ptype_dae):
             -domega_m
             + 1 / (2 * self.H_) * (self.T_m - (psi_q * i_d - psi_d * i_q) - self.K_D * self.omega_b * (omega_m - 1)),
         )
-        # algebraic generator
         f.alg[:] = (
             -psi_d + self.L_d * i_d + self.L_md * i_F + self.L_md * i_D,
             -psi_q + self.L_q * i_q + self.L_mq * i_Q1 + self.L_mq * i_Q2,
