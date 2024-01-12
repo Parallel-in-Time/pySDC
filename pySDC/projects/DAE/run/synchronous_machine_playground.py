@@ -6,7 +6,7 @@ import statistics
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.DAE.problems.synchronous_machine import synchronous_machine_infinite_bus
 from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-from pySDC.projects.DAE.misc.HookClass_DAE import error_hook
+from pySDC.projects.DAE.misc.HookClass_DAE import LogGlobalErrorPostStepDifferentialVariable
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.helpers.stats_helper import filter_stats
 from pySDC.implementations.hooks.log_solution import LogSolution
@@ -38,7 +38,7 @@ def main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = [error_hook, LogSolution]
+    controller_params['hook_class'] = [LogGlobalErrorPostStepDifferentialVariable, LogSolution]
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -66,7 +66,7 @@ def main():
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # check error (only available if reference solution was provided)
-    # err = get_sorted(stats, type='error_post_step', sortby='time')
+    # err = get_sorted(stats, type='e_global_differential_post_step', sortby='time')
     # err = np.linalg.norm([err[i][1] for i in range(len(err))], np.inf)
     # print(f"Error is {err}")
 

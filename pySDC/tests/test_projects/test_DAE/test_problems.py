@@ -56,7 +56,6 @@ def test_pendulum_main():
     from pySDC.projects.DAE.problems.simple_DAE import pendulum_2d
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-    from pySDC.projects.DAE.misc.HookClass_DAE import error_hook
 
     # initialize level parameters
     level_params = dict()
@@ -116,7 +115,6 @@ def test_one_transistor_amplifier_main():
     from pySDC.projects.DAE.problems.transistor_amplifier import one_transistor_amplifier
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-    from pySDC.projects.DAE.misc.HookClass_DAE import error_hook
 
     # initialize level parameters
     level_params = dict()
@@ -139,7 +137,6 @@ def test_one_transistor_amplifier_main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    # controller_params['hook_class'] = error_hook
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -177,7 +174,6 @@ def test_two_transistor_amplifier_main():
     from pySDC.projects.DAE.problems.transistor_amplifier import two_transistor_amplifier
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-    from pySDC.projects.DAE.misc.HookClass_DAE import error_hook
 
     # initialize level parameters
     level_params = dict()
@@ -246,7 +242,6 @@ def test_synchgen_infinite_bus_main():
     from pySDC.projects.DAE.problems.synchronous_machine import synchronous_machine_infinite_bus
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-    from pySDC.projects.DAE.misc.HookClass_DAE import error_hook
 
     # initialize level parameters
     level_params = dict()
@@ -269,7 +264,6 @@ def test_synchgen_infinite_bus_main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    # controller_params['hook_class'] = error_hook
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
