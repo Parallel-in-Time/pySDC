@@ -165,7 +165,7 @@ def test_one_transistor_amplifier_main():
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     uend_ref = P.dtype_u(P.init)
-    uend_ref.diff[:] = (-0.02182035, 3.06674603, 2.89634691, 2.45212382, -2.69727238)
+    uend_ref[:] = (-0.02182035, 3.06674603, 2.89634691, 2.45212382, -2.69727238)
 
     # check error
     err = abs(uend - uend_ref)
@@ -225,7 +225,7 @@ def test_two_transistor_amplifier_main():
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     uend_ref = P.dtype_u(P.init)
-    uend_ref.diff[:] = (
+    uend_ref[:] = (
         -5.52721527e-03,
         3.00630407e00,
         2.84974338e00,

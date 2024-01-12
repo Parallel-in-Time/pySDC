@@ -3,6 +3,7 @@ from scipy import optimize
 
 from pySDC.core.Errors import ParameterError
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+from pySDC.projects.DAE.misc.dae_mesh import DAEMesh
 
 
 class fully_implicit_DAE(generic_implicit):
@@ -106,7 +107,12 @@ class fully_implicit_DAE(generic_implicit):
                     System to be solved as implicit function.
                 """
 
-                params_mesh = P.dtype_f(params)
+                if type(params) == DAEMesh:
+                    params_mesh = P.dtype_f(params)
+                else:
+                    params_mesh = P.dtype_f(P.init)
+                    params_mesh[:] = params
+
 
                 # build parameters to pass to implicit function
                 local_u_approx = P.dtype_f(u_approx)
