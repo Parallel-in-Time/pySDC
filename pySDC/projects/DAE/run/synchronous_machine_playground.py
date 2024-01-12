@@ -6,10 +6,10 @@ import statistics
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.DAE.problems.synchronous_machine import synchronous_machine_infinite_bus
 from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-from pySDC.projects.DAE.misc.HookClass_DAE import approx_solution_hook
 from pySDC.projects.DAE.misc.HookClass_DAE import error_hook
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.helpers.stats_helper import filter_stats
+from pySDC.implementations.hooks.log_solution import LogSolution
 
 
 def main():
@@ -38,7 +38,7 @@ def main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = [error_hook, approx_solution_hook]
+    controller_params['hook_class'] = [error_hook, LogSolution]
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -93,7 +93,7 @@ def main():
     assert np.isclose(err, 0, atol=1e-4), "Error too large."
 
     # store results
-    sol = get_sorted(stats, type='approx_solution', sortby='time')
+    sol = get_sorted(stats, type='u', sortby='time')
     sol_dt = np.array([sol[i][0] for i in range(len(sol))])
     sol_data = np.array(
         [
