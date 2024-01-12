@@ -1,7 +1,5 @@
 import numpy as np
 from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
-from pySDC.projects.DAE.misc.dae_mesh import DAEMesh
-from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.core.Errors import ParameterError
 
 
@@ -764,9 +762,9 @@ class WSCC9BusSystem(ptype_dae):
        for Power Systems Research and Education. IEEE Transactions on Power Systems. Vol. 26, No. 1, pp. 12–19 (2011).
     """
 
-    def __init__(self, newton_tol=1e-10, m=3, n=9):
+    def __init__(self, newton_tol=1e-10):
         """Initialization routine"""
-
+        m, n = 3, 9
         nvars = 11 * m + 2 * m + 2 * n
         # invoke super init, passing number of dofs
         super().__init__(nvars=(11 * m, 2 * n + 2 * m), newton_tol=newton_tol)
