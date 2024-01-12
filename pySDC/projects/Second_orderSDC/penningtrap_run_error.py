@@ -1,5 +1,5 @@
 from pySDC.projects.Second_orderSDC.penningtrap_params import penningtrap_params
-from pySDC.projects.Second_orderSDC.penningtrap_Simulation import compute_error
+from pySDC.projects.Second_orderSDC.penningtrap_Simulation import ComputeError
 
 if __name__ == '__main__':
     """
@@ -25,7 +25,7 @@ if __name__ == '__main__':
     description['sweeper_params']['num_nodes'] = 4
     ## =============================================================================
     # Give the parameters to the class
-    conv = compute_error(controller_params, description, time_iter=3, K_iter=(1, 2, 3, 10), axes=(2,))
+    conv = ComputeError(controller_params, description, time_iter=3, K_iter=(1, 2, 3, 10), axes=(2,))
     # Run local convergence order
     # conv.run_local_error()
     # Run global convergence order
