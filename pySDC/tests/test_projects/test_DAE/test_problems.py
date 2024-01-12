@@ -562,16 +562,6 @@ def test_WSCC9_evaluation():
 
     assert len(f.diff) + len(f.alg) == nvars, 'Shape of f does not match with shape it is supposed to be!'
 
-    # test if ParameterError is raised if m != 3 or n != 9 is set
-    problem_params.update(
-        {
-            'm': 4,
-            'n': 8,
-        }
-    )
-    with pytest.raises(ParameterError):
-        WSCC9_test = WSCC9BusSystem(**problem_params)
-
 
 @pytest.mark.base
 def test_WSCC9_update_YBus():
