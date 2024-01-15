@@ -63,7 +63,7 @@
         \"errors\" the recommended way now is to run `black` before
         submission.
 
--   December 13, 2021: Version 4.2 brings compatibility with Python 3.9,
+- December 13, 2021: Version 4.2 brings compatibility with Python 3.9,
     including some code cleanup. The CI test suite seems to run faster
     now, since sorting out the dependencies is faster. Tested
     [mamba](https://github.com/mamba-org/mamba), which for now makes the
@@ -73,7 +73,7 @@
     different platforms. And finally, a LaTeX installation is no longer
     needed use plotting (but recommended).
 
--   August 11, 2021: Version 4.1 has some more changes under the hood,
+- August 11, 2021: Version 4.1 has some more changes under the hood,
     most of them with no significant impact to users. The CI pipeline
     has been completely rewritten, porting the code to [Github
     Actions](https://github.com/features/actions) (away from [Travis
@@ -84,7 +84,7 @@
     the PETSc data structures are now much easier, removing a lot of
     unnecessary boilerplate code.
 
--   May 4, 2021: Long time, no see, but this major release 4.0 marks
+- May 4, 2021: Long time, no see, but this major release 4.0 marks
     some improvements under the hood:
 
     -   **Rewrote `mesh` and `particle` data type**:
