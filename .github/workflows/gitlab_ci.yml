@@ -9,7 +9,14 @@ on:
 jobs:
   check_permission:
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'Parallel-in-Time'
+    if: >-
+        (github.repository_owner == 'Parallel-in-Time') &&
+        ((github.event_name == 'push') ||
+         (github.event_name == 'schedule') ||
+         ((github.event_name == 'pull_request_target') &&
+          (contains(github.event.pull_request.labels.*.name, 'gitlab-mirror'))
+         )
+        )
     steps:
       - name: Query permissions of triggering actor
         id: query_permission_triggering_actor
@@ -24,7 +31,15 @@ jobs:
         run: |
           echo "Current permission level is ${{ steps.query_permission_triggering_actor.outputs.user-permission }}"
           echo "Job originally triggered by ${{ github.actor }}"
-          exit !steps.query_permission_triggering_actor.outputs.require-result
+          echo "Checking permission returned ${{ steps.query_permission_triggering_actor.outputs.require-result }}"
+          if ${{ steps.query_permission_triggering_actor.outputs.require-result }}
+            then
+              echo 'Permissions granted'
+              exit 0
+            else
+              echo 'Not enough permissions'
+              exit 1
+          fi
       - name: Pass if workflow from push or schedule
         if: >-
           (github.event_name == 'push') ||
@@ -39,14 +54,22 @@ jobs:
 
   mirror_to_gitlab:
     runs-on: ubuntu-latest
-    if: ${{ github.repository_owner == 'Parallel-in-Time'}}
+    if: >-
+        (github.repository_owner == 'Parallel-in-Time') &&
+        ((github.event_name == 'push') ||
+         (github.event_name == 'schedule') ||
+         ((github.event_name == 'pull_request_target') &&
+          (contains(github.event.pull_request.labels.*.name, 'gitlab-mirror'))
+         )
+        )
     needs:
       - check_permission
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: "${{ github.event.pull_request.merge_commit_sha }}"
+          persist-credentials: false
       - name: Mirror and wait for Gitlab-CI
         uses: jakob-fritz/github2lab_action@Iss35_mirror_pr
         env:
@@ -56,4 +79,3 @@ jobs:
           GITLAB_HOSTNAME: "gitlab.jsc.fz-juelich.de"
           GITLAB_PROJECT_ID: "6029"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
