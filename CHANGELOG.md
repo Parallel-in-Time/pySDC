@@ -22,17 +22,17 @@
   invisible ones. Some of those break the existing API, but if you are
   using tests, you should be fine. Major changes include:
 
-    -   **New convergence controllers**: Checking whether a step has
+  - **New convergence controllers**: Checking whether a step has
         converged can be tricky, so we made separate modules out of
         these checks. This makes features like adaptivity easier to
         implement. Also, the controllers have been streamlined a bit to
         make them more readable/digestible. Thanks to
         [\@brownbaerchen](https://github.com/brownbaerchen)!
-    -   **Adaptivity and error estimators**: SDC now comes with
+  - **Adaptivity and error estimators**: SDC now comes with
         adaptivity and error estimation, leveraging the new convergence
         controllers out of the box. Thanks to
         [\@brownbaerchen](https://github.com/brownbaerchen)!
-    -   **New collocation classes**: We completely rewrote the way
+  - **New collocation classes**: We completely rewrote the way
         collocation nodes and weights are computed. It is now faster,
         more reliable, shorter, better. But: this **breaks the API**,
         since the old collocation classes do not exist anymore. The
@@ -40,7 +40,7 @@
         adapted, so have a look over there to see [what to
         change](https://github.com/Parallel-in-Time/pySDC/commit/01ffabf71a8d71d33b74809271e8ad5a7b03ac5e#diff-adf74297b6c64d320f4da0f1d5528eda6229803a6615baf5d54c418032543681).
         Thanks to [\@tlunet](https://github.com/tlunet)!
-    -   **New projects**: Resilience and energy grid simulations are
+  - **New projects**: Resilience and energy grid simulations are
         ready to play with and are waiting for more ideas! We used this
         effort to condense and clean up the problem classes a bit,
         reducing the number of files and classes with only marginal
@@ -48,15 +48,15 @@
         code**, too, if you rely on any of those affected ones. Thanks
         to [\@brownbaerchen](https://github.com/brownbaerchen) and
         [\@lisawim](https://github.com/lisawim)!
-    -   **Toward GPU computing**: We included a new data type based on
+  - **Toward GPU computing**: We included a new data type based on
         [CuPy](https://cupy.dev/) making GPU computing possible. Thanks
         to [\@timo2705](https://github.com/timo2705)!
-    -   **Better testing**: The CI pipeline got a complete overhaul
+  - **Better testing**: The CI pipeline got a complete overhaul
         (again), now enabling simultaneous tests, faster/earlier
         linting, benchmarking (at least, in principal), separate
         environments and so on. The code is tested under Ubuntu and
         MacOS.
-    -   **Better code formatting**: `pySDC` now uses
+  - **Better code formatting**: `pySDC` now uses
         [black](https://black.readthedocs.io) and
         [flakeheaven](https://flakeheaven.readthedocs.io) for cleaner
         source code. After complaints here and there about linting
