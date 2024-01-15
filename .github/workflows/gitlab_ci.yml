@@ -70,7 +70,6 @@ jobs:
         with:
           ref: "${{ github.event.pull_request.head.sha }}"
           persist-credentials: false
-          fetch-depth: 0
       - name: Mirror and wait for Gitlab-CI
         uses: jakob-fritz/github2lab_action@Iss35_mirror_pr
         env:
