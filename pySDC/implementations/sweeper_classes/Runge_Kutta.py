@@ -278,7 +278,7 @@ class RungeKutta(sweeper):
             # implicit solve with prefactor stemming from the diagonal of Qd, use previous stage as initial guess
             if self.coll.implicit:
                 lvl.u[m + 1][:] = prob.solve_system(
-                    rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m], lvl.time + lvl.dt * self.coll.nodes[m]
+                    rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m], lvl.time + lvl.dt * self.coll.nodes[m + 1]
                 )
             else:
                 lvl.u[m + 1][:] = rhs[:]
@@ -434,7 +434,7 @@ class RungeKuttaIMEX(RungeKutta):
 
             # implicit solve with prefactor stemming from the diagonal of Qd, use previous stage as initial guess
             lvl.u[m + 1][:] = prob.solve_system(
-                rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m], lvl.time + lvl.dt * self.coll.nodes[m]
+                rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m], lvl.time + lvl.dt * self.coll.nodes[m + 1]
             )
 
             # update function values (we don't usually need to evaluate the RHS at the solution of the step)
