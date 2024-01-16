@@ -285,7 +285,7 @@ class RungeKutta(sweeper):
 
             # update function values (we don't usually need to evaluate the RHS at the solution of the step)
             if m < M - self.coll.num_solution_stages or self.params.eval_rhs_at_right_boundary:
-                lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m])
+                lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m + 1])
 
         # indicate presence of new values at this level
         lvl.status.updated = True
@@ -439,7 +439,7 @@ class RungeKuttaIMEX(RungeKutta):
 
             # update function values (we don't usually need to evaluate the RHS at the solution of the step)
             if m < M - self.coll.num_solution_stages or self.params.eval_rhs_at_right_boundary:
-                lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m])
+                lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m + 1])
 
         # indicate presence of new values at this level
         lvl.status.updated = True
