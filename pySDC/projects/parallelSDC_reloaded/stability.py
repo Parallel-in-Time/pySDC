@@ -13,7 +13,7 @@ SCRIPT = __file__.split('/')[-1].split('.')[0]
 
 # Script parameters
 useRK = False
-zoom = 2
+zoom = 20
 reLims = -4.5*zoom, 0.5*zoom
 imLims = -3.5*zoom, 3.5*zoom
 nVals = 251
@@ -28,8 +28,9 @@ nodeType = "LEGENDRE"
 quadType = "RADAU-RIGHT"
 
 # SDC parameters
-nSweeps = 3
-qDeltaType = "MIN3"
+nSweeps = 6
+qDeltaType = "HOUWEN-SOMMEIJER"
+collUpdate = False
 
 
 # -----------------------------------------------------------------------------
@@ -40,7 +41,8 @@ qDeltaType = "MIN3"
 if useRK:
     params = getParamsRK(rkScheme)
 else:
-    params = getParamsSDC(quadType, nNodes, qDeltaType, nSweeps, nodeType)
+    params = getParamsSDC(
+        quadType, nNodes, qDeltaType, nSweeps, nodeType, collUpdate)
 
 # Problem instanciation
 reVals = np.linspace(*reLims, num=nVals)

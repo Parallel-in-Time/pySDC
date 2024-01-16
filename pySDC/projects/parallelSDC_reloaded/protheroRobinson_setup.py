@@ -14,7 +14,7 @@ script = __file__.split('/')[-1].split('.')[0]
 
 tEnd = 2*np.pi
 nSteps = 100
-epsilon = 1e-3
+epsilon = np.inf
 rkScheme = "ESDIRK53"
 
 tVals = np.linspace(0, tEnd, nSteps+1)

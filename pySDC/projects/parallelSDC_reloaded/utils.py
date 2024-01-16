@@ -43,7 +43,7 @@ plt.rcParams['figure.max_open_warning'] = 100
 
 def getParamsSDC(
         quadType="RADAU-RIGHT", numNodes=4, qDeltaI="IE", nSweeps=3,
-        nodeType="LEGENDRE"):
+        nodeType="LEGENDRE", collUpdate=False):
 
     description = {
         # Sweeper and its parameters
@@ -53,6 +53,7 @@ def getParamsSDC(
             "num_nodes": numNodes,
             "node_type": nodeType,
             "initial_guess": 'spread',
+            "do_coll_update": collUpdate,
             "QI": qDeltaI,
             'skip_residual_computation':
                 ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
@@ -72,6 +73,8 @@ def getParamsSDC(
 
 
 RK_SWEEPERS = {
+    "BE": rk.BackwardEuler,
+    "FE": rk.ForwardEuler,
     "RK4": rk.RK4,
     "DIRK43": rk.DIRK43,
     "ESDIRK53": rk.ESDIRK53,

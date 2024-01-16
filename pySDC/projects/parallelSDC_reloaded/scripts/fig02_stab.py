@@ -52,6 +52,11 @@ lambdas = reVals[None, :] + 1j*imVals[:, None]
 
 # Scheme instanciation
 for qDeltaType in config:
+    if qDeltaType == "HOUWEN-SOMMEIJER":
+        reVals *= 5
+        imVals *= 5
+        lambdas *= 5
+
     for nSweeps in [1, 2, 3, 4]:
 
         params = getParamsSDC(quadType, nNodes, qDeltaType, nSweeps, nodeType)
