@@ -110,7 +110,7 @@ def setupProblem(name, description, dt, **kwargs):
 
     # Common newton tolerance and max number of iterations
     description["problem_params"] = {
-        'newton_tol': 1e-08,
+        'newton_tol': 1e-13,
         'newton_maxiter': 300,
         }
     # Level parameters

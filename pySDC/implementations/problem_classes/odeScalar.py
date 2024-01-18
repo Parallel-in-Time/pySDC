@@ -130,7 +130,7 @@ class ProtheroRobinson(ptype):
         u0 : dtype_u
             Initial guess for the iterative solver.
         t : float
-            Current time (e.g. for time-dependent BCs).
+            Time of the updated solution (e.g. for time-dependent BCs).
 
         Returns
         -------
@@ -145,7 +145,7 @@ class ProtheroRobinson(ptype):
         while n < self.newton_maxiter:
 
             # form the function g with g(u) = 0
-            g = u - dt * self.f(u, t+dt) - rhs
+            g = u - dt * self.f(u, t) - rhs
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
@@ -153,7 +153,7 @@ class ProtheroRobinson(ptype):
                 break
 
             # assemble dg/du
-            dg = 1 - dt*self.jac(u, t+dt)
+            dg = 1 - dt*self.jac(u, t)
 
             # newton update: u1 = u0 - g/dg
             u -= dg**(-1) * g

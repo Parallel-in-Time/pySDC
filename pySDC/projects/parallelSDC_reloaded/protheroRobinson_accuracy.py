@@ -19,7 +19,7 @@ from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 # Problem parameters
 tEnd = 2*np.pi
 nonLinear = True
-epsilon = 1e-6
+epsilon = np.inf
 
 pName = "PROTHERO-ROBINSON"+(nonLinear)*"-NL"
 
@@ -34,22 +34,22 @@ def getCost(counters):
     return nNewton + nRHS
 
 # Base variable parameters
-nNodes = 4
+nNodes = 3
 quadType = 'RADAU-RIGHT'
 nodeType = 'LEGENDRE'
-parEfficiency = 0.8
+parEfficiency = 1/nNodes
 
 qDeltaList = [
-    'RK4', "ESDIRK43", 'HOUWEN-SOMMEIJER',
+    'RK4', "ESDIRK43", 'ESDIRK53',
     # 'IE', 'LU', 'IEpar', 'PIC',
-    'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX', "PIC",
+    # 'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX', "PIC",
     # "MIN3",
-][:5]
-nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000])
-nSweepList = [1, 2, 3, 4]
+]
+nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
+nSweepList = [1]
 
-# qDeltaList = ['RK4', 'ESDIRK43', 'LU']
-nSweepList = [4]
+qDeltaList = ['PIC', "EE", "IE", 'RK4', 'BE', 'ESDIRK53', 'ESDIRK43']
+# nSweepList = [4]
 
 
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
@@ -106,7 +106,7 @@ for i in range(2):
     axs[i].set(
         xlabel=r"$\Delta{t}$" if i == 0 else "cost",
         ylabel=r"$L_\infty$ error",
-        ylim=(1e-5, 1e3),
+        # ylim=(1e-5, 1e3),
     )
     axs[i].legend()
     axs[i].grid()
