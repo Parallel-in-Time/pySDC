@@ -38,7 +38,7 @@ def run(use_MPI, num_nodes, quad_type, residual_type, imex, useNCCL):
     problem_params = {}
 
     if useNCCL:
-        from pySDC.core.NCCL_communicator import NCCLComm
+        from pySDC.helpers.NCCL_communicator import NCCLComm
         from mpi4py import MPI
 
         sweeper_params['comm'] = NCCLComm(MPI.COMM_WORLD)
