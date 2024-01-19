@@ -99,8 +99,6 @@ def individual_test(num_nodes, quad_type, residual_type, imex, useNCCL, launch=T
         else:
             import numpy as xp
 
-        imex = False if imex == 'False' else True
-        useNCCL = False if useNCCL == 'False' else True
         MPI = run(
             use_MPI=True,
             num_nodes=int(num_nodes),
@@ -115,7 +113,7 @@ def individual_test(num_nodes, quad_type, residual_type, imex, useNCCL, launch=T
             quad_type=quad_type,
             residual_type=residual_type,
             imex=imex,
-            useNCCL=useNCCL,
+            useNCCL=False,
         )
 
         assert xp.allclose(MPI.uend, nonMPI.uend, atol=1e-14), 'Got different solutions at end point!'
@@ -166,4 +164,6 @@ if __name__ == '__main__':
     import sys
 
     if '--test_sweeper' in sys.argv:
-        individual_test(sys.argv[-5], sys.argv[-4], sys.argv[-3], sys.argv[-2], sys.argv[-1], launch=False)
+        imex = False if sys.argv[-2] == 'False' else True
+        useNCCL = False if sys.argv[-1] == 'False' else True
+        individual_test(sys.argv[-5], sys.argv[-4], sys.argv[-3], imex=imex, useNCCL=useNCCL, launch=False)
