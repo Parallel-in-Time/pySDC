@@ -7,6 +7,7 @@ Submodules
 .. toctree::
    :maxdepth: 2
 
+   helpers.NCCL_communicator
    helpers.plot_helper
    helpers.problem_helper
    helpers.pysdc_helper

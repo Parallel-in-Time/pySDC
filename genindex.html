@@ -206,6 +206,8 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex">allencahn_temp_imex (class in implementations.problem_classes.AllenCahn_Temp_MPIFFT)</a>
 </li>
+      <li><a href="pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.Allreduce">Allreduce() (NCCLComm method)</a>
+</li>
       <li><a href="pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.AdamsBashforthExplicit1Step.alpha">alpha (AdamsBashforthExplicit1Step attribute)</a>
 
       <ul>
@@ -1401,12 +1403,16 @@
       </ul></li>
       <li><a href="pySDC/core.Controller.html#core.Controller.controller.get_convergence_controllers_as_table">get_convergence_controllers_as_table() (controller method)</a>
 </li>
+      <li><a href="pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.get_count">get_count() (NCCLComm static method)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.generic_ND_FD.html#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.get_default_sweeper_class">get_default_sweeper_class() (GenericNDimFinDiff class method)</a>
 
       <ul>
         <li><a href="pySDC/core.Problem.html#core.Problem.ptype.get_default_sweeper_class">(ptype class method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.get_dtype">get_dtype() (NCCLComm static method)</a>
+</li>
       <li><a href="pySDC/implementations.convergence_controller_classes.estimate_extrapolation_error.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_error">get_extrapolated_error() (EstimateExtrapolationErrorNonMPI method)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.estimate_extrapolation_error.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_solution">get_extrapolated_solution() (EstimateExtrapolationErrorNonMPI method)</a>
@@ -1473,12 +1479,14 @@
       </ul></li>
       <li><a href="pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench.get_non_linear_Jacobian">get_non_linear_Jacobian() (Quench method)</a>
 </li>
-      <li><a href="pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.get_problem_dict">get_problem_dict() (battery_n_capacitors method)</a>
+      <li><a href="pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.get_op">get_op() (NCCLComm method)</a>
 </li>
-      <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_Q_matrix">get_Q_matrix() (RungeKutta class method)</a>
+      <li><a href="pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.get_problem_dict">get_problem_dict() (battery_n_capacitors method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_Q_matrix">get_Q_matrix() (RungeKutta class method)</a>
+</li>
       <li><a href="pySDC/core.Sweeper.html#core.Sweeper.sweeper.get_Qdelta_explicit">get_Qdelta_explicit() (sweeper method)</a>
 </li>
       <li><a href="pySDC/core.Sweeper.html#core.Sweeper.sweeper.get_Qdelta_implicit">get_Qdelta_implicit() (sweeper method)</a>
@@ -1636,6 +1644,13 @@
 
       <ul>
         <li><a href="pySDC/helpers.html#module-helpers">module</a>
+</li>
+      </ul></li>
+      <li>
+    helpers.NCCL_communicator
+
+      <ul>
+        <li><a href="pySDC/helpers.NCCL_communicator.html#module-helpers.NCCL_communicator">module</a>
 </li>
       </ul></li>
       <li>
@@ -2825,6 +2840,8 @@
 </li>
         <li><a href="pySDC/helpers.html#module-helpers">helpers</a>
 </li>
+        <li><a href="pySDC/helpers.NCCL_communicator.html#module-helpers.NCCL_communicator">helpers.NCCL_communicator</a>
+</li>
         <li><a href="pySDC/helpers.plot_helper.html#module-helpers.plot_helper">helpers.plot_helper</a>
 </li>
         <li><a href="pySDC/helpers.problem_helper.html#module-helpers.problem_helper">helpers.problem_helper</a>
@@ -3061,6 +3078,8 @@
       <li><a href="pySDC/implementations.problem_classes.Boussinesq_2D_FD_imex.html#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.N">N (boussinesq_2d_imex attribute)</a>
 </li>
       <li><a href="pySDC/core.Lagrange.html#core.Lagrange.LagrangeApproximation.n">n (LagrangeApproximation property)</a>
+</li>
+      <li><a href="pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm">NCCLComm (class in helpers.NCCL_communicator)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.generic_ND_FD.html#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.ndim">ndim (GenericNDimFinDiff property)</a>
 
@@ -3482,6 +3501,8 @@
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.recv_full">(controller_nonMPI method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.Reduce">Reduce() (NCCLComm method)</a>
+</li>
       <li><a href="pySDC/core.Common.html#core.Common.RegisterParams">RegisterParams (class in core.Common)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI.reset_buffers_nonMPI">reset_buffers_nonMPI() (BasicRestartingNonMPI method)</a>
