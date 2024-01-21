@@ -52,7 +52,7 @@ nStepsList = np.array([2, 5, 10, 20, 50, 100])
 nSweepList = [1, 2, 3, 4, 5, 6]
 
 # qDeltaList = ['MIN-SR-S']
-nSweepList = [5]
+nSweepList = [4]
 
 
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
@@ -85,13 +85,13 @@ for qDelta in qDeltaList:
 
             uRef = solutionExact(tEnd, nSteps, pName, **pParams)
 
-            uSDC, counters = solutionSDC(tEnd, nSteps, params, pName, **pParams)
+            uSDC, counters, parallel = solutionSDC(tEnd, nSteps, params, pName, **pParams)
 
             err = getError(uSDC, uRef)
             errors.append(err)
 
             cost = getCost(counters)
-            if qDelta in ['IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX', 'PIC']:
+            if parallel:
                 cost /= nNodes*parEfficiency
             costs.append(cost)
 

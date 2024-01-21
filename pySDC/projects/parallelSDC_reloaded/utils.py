@@ -110,7 +110,7 @@ def setupProblem(name, description, dt, **kwargs):
 
     # Common newton tolerance and max number of iterations
     description["problem_params"] = {
-        'newton_tol': 1e-13,
+        'newton_tol': 1e-8,
         'newton_maxiter': 300,
         }
     # Level parameters
@@ -119,22 +119,26 @@ def setupProblem(name, description, dt, **kwargs):
     if name == "VANDERPOL":
         description["problem_class"] = vanderpol
         description["problem_params"].update({
+            'newton_tol': 1e-12,
             'mu': kwargs.get("mu", 10),   # vanderpol parameter
             'u0': np.array([2.0, 0]),
             })
     elif name == "LORENZ":
         description["problem_class"] = LorenzAttractor
         description["problem_params"].update({
+            'newton_tol': 1e-12,
             'u0': kwargs.get("u0", (1, 1, 1)),
             })
     elif name == "PROTHERO-ROBINSON":
         description["problem_class"] = ProtheroRobinson
         description["problem_params"].update({
+            'newton_tol': 1e-12,
             'epsilon': kwargs.get("epsilon", 1e-3),
             })
     elif name == "PROTHERO-ROBINSON-NL":
         description["problem_class"] = ProtheroRobinson
         description["problem_params"].update({
+            'newton_tol': 1e-12,
             'epsilon': kwargs.get("epsilon", 1e-3),
             'nonLinear': True,
             })

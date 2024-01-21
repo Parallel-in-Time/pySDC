@@ -40,16 +40,16 @@ nodeType = 'LEGENDRE'
 parEfficiency = 1/nNodes
 
 qDeltaList = [
-    'RK4', 'ESDIRK53', 'DIRK43',
+    'RK4', 'ESDIRK53', 'ESDIRK43', 'PIC',
     # 'IE', 'LU', 'IEpar', 'PIC',
     'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX',
     # "MIN3",
 ]
 nStepsList = np.array([10, 20, 50, 100, 200, 500])
-nSweepList = [1, 2, 3, 4]
+# nSweepList = [1, 2, 3, 4]
 
-qDeltaList = ['RK4', 'MIN-SR-S']
-# nSweepList = [5]
+# qDeltaList = ['RK4', 'ESDIRK43', 'MIN-SR-S']
+nSweepList = [4]
 
 
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10

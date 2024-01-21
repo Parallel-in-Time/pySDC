@@ -35,7 +35,7 @@ nodeType = 'LEGENDRE'
 parEfficiency = 1/nNodes
 
 qDeltaList = [
-    'RK4', 'ESDIRK53', 'DIRK43',
+    'RK4', 'ESDIRK43', 'LU',
     # 'IE', 'LU', 'IEpar', 'PIC',
     'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX'
 ]
@@ -46,7 +46,7 @@ nSweepList = [1, 2, 3, 4, 5, 6]
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
 
 # qDeltaList = ['LU']
-nSweepList = [5]
+nSweepList = [4]
 
 fig, axs = plt.subplots(2, len(muVals))
 
@@ -82,14 +82,14 @@ for j, (mu, tEnd) in enumerate(zip(muVals, tEndVals)):
 
                 uRef = solutionExact(tEnd, nSteps, "VANDERPOL", mu=mu)
 
-                uSDC, counters = solutionSDC(
+                uSDC, counters, parallel = solutionSDC(
                     tEnd, nSteps, params, "VANDERPOL", mu=mu)
 
                 err = getError(uSDC, uRef)
                 errors.append(err)
 
                 cost = getCost(counters)
-                if qDelta in ['IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX', 'PIC']:
+                if parallel:
                     cost /= nNodes*parEfficiency
                 costs.append(cost)
 
