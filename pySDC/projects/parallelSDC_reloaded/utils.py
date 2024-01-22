@@ -15,7 +15,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.problem_classes.Lorenz import LorenzAttractor
 from pySDC.implementations.problem_classes.odeScalar import ProtheroRobinson
-from pySDC.implementations.problem_classes.odeSystem import Kaps, ChemicalReaction3Var, JacobiElliptic
+from pySDC.implementations.problem_classes.odeSystem import ProtheroRobinsonAutonomous, Kaps, ChemicalReaction3Var, JacobiElliptic
 from pySDC.implementations.problem_classes.AllenCahn_1D_FD import allencahn_front_fullyimplicit, allencahn_periodic_fullyimplicit
 from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
 
@@ -43,7 +43,7 @@ plt.rcParams['figure.max_open_warning'] = 100
 
 def getParamsSDC(
         quadType="RADAU-RIGHT", numNodes=4, qDeltaI="IE", nSweeps=3,
-        nodeType="LEGENDRE", collUpdate=False, initType="spread"):
+        nodeType="LEGENDRE", collUpdate=False, initType="copy"):
 
     description = {
         # Sweeper and its parameters
@@ -137,6 +137,19 @@ def setupProblem(name, description, dt, **kwargs):
             })
     elif name == "PROTHERO-ROBINSON-NL":
         description["problem_class"] = ProtheroRobinson
+        description["problem_params"].update({
+            'newton_tol': 1e-12,
+            'epsilon': kwargs.get("epsilon", 1e-3),
+            'nonLinear': True,
+            })
+    elif name == "PROTHERO-ROBINSON-A":
+        description["problem_class"] = ProtheroRobinsonAutonomous
+        description["problem_params"].update({
+            'newton_tol': 1e-12,
+            'epsilon': kwargs.get("epsilon", 1e-3),
+            })
+    elif name == "PROTHERO-ROBINSON-A-NL":
+        description["problem_class"] = ProtheroRobinsonAutonomous
         description["problem_params"].update({
             'newton_tol': 1e-12,
             'epsilon': kwargs.get("epsilon", 1e-3),

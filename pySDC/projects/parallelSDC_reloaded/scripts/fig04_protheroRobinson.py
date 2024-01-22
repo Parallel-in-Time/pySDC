@@ -20,7 +20,6 @@ nNodes = 4
 quadType = 'RADAU-RIGHT'
 nodeType = 'LEGENDRE'
 parEfficiency = 0.8 # 1/nNodes
-nSweeps = 4
 
 epsilon = 1e-3
 
@@ -44,13 +43,13 @@ minPrec = ["MIN-SR-NS", "MIN-SR-S", "MIN-SR-FLEX"]
 
 symList = ['^', '>', '<', 'o', 's', '*', 'p']
 config = [
-    [(*minPrec, "HOUWEN-SOMMEIJER", "ESDIRK43", "LU"), "spread"],
-    [(*minPrec, "HOUWEN-SOMMEIJER", "ESDIRK43", "LU"), "zero"],
+    [(*minPrec, "HOUWEN-SOMMEIJER", "ESDIRK43", "LU"), 4],
+    [(*minPrec, "HOUWEN-SOMMEIJER", "ESDIRK43", "LU"), 6],
 ]
 
 
 i = 0
-for qDeltaList, initType in config:
+for qDeltaList, nSweeps in config:
 
     figNameConv = f"{SCRIPT}_conv_{i}"
     figNameCost = f"{SCRIPT}_cost_{i}"
@@ -64,7 +63,7 @@ for qDeltaList, initType in config:
         except KeyError:
             params = getParamsSDC(
                 quadType=quadType, numNodes=nNodes, nodeType=nodeType,
-                qDeltaI=qDelta, nSweeps=nSweeps, initType=initType)
+                qDeltaI=qDelta, nSweeps=nSweeps)
 
         errors = []
         costs = []
@@ -72,10 +71,10 @@ for qDeltaList, initType in config:
         for nSteps in nStepsList:
 
             uRef = solutionExact(
-                tEnd, nSteps, "PROTHERO-ROBINSON-NL", epsilon=epsilon)
+                tEnd, nSteps, "PROTHERO-ROBINSON", epsilon=epsilon)
 
             uSDC, counters, parallel = solutionSDC(
-                tEnd, nSteps, params, "PROTHERO-ROBINSON-NL", epsilon=epsilon)
+                tEnd, nSteps, params, "PROTHERO-ROBINSON", epsilon=epsilon)
 
             err = getError(uSDC, uRef)
             errors.append(err)

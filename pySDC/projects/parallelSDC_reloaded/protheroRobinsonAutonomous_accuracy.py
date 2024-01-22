@@ -4,7 +4,7 @@
 Created on Tue Dec  5 11:02:39 2023
 
 Script to investigate diagonal SDC on the ProtheroRobinson
-(linear and non-linear) problem :
+(linear and non-linear) problem, using the autonomous formulation.
 
 - error VS time-step
 - error VS computation cost
@@ -18,12 +18,12 @@ from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 
 # Problem parameters
 tEnd = 2*np.pi
-nonLinear = False
-epsilon = 1e-3
+nonLinear = True
+epsilon = 0.001
 collUpdate = False
-initSweep = "copy"
+initSweep = "spread"
 
-pName = "PROTHERO-ROBINSON"+(nonLinear)*"-NL"
+pName = "PROTHERO-ROBINSON-A"+(nonLinear)*"-NL"
 
 
 def getError(uNum, uRef):
@@ -51,7 +51,7 @@ nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
 # nSweepList = [1, 2, 3, 4]
 
 # qDeltaList = ['ESDIRK43', 'ESDIRK53', 'HOUWEN-SOMMEIJER']
-nSweepList = [6]
+nSweepList = [8]
 
 
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
