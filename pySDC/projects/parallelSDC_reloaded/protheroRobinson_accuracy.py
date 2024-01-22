@@ -19,7 +19,9 @@ from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 # Problem parameters
 tEnd = 2*np.pi
 nonLinear = True
-epsilon = 0.1
+epsilon = 0.001
+collUpdate = False
+initSweep = "zero"
 
 pName = "PROTHERO-ROBINSON"+(nonLinear)*"-NL"
 
@@ -40,9 +42,9 @@ nodeType = 'LEGENDRE'
 parEfficiency = 0.8
 
 qDeltaList = [
+    'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX',
     "ESDIRK43", 'LU', 'HOUWEN-SOMMEIJER',
     # 'IE', 'LU', 'IEpar', 'PIC',
-    'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX',
     # "MIN3",
 ]
 nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
@@ -74,7 +76,8 @@ for qDelta in qDeltaList:
         except KeyError:
             params = getParamsSDC(
                 quadType=quadType, numNodes=nNodes, nodeType=nodeType,
-                qDeltaI=qDelta, nSweeps=nSweeps)
+                qDeltaI=qDelta, nSweeps=nSweeps,
+                collUpdate=collUpdate, initType=initSweep)
         print(f'computing for {name} ...')
 
         errors = []

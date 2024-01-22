@@ -43,7 +43,7 @@ plt.rcParams['figure.max_open_warning'] = 100
 
 def getParamsSDC(
         quadType="RADAU-RIGHT", numNodes=4, qDeltaI="IE", nSweeps=3,
-        nodeType="LEGENDRE", collUpdate=False):
+        nodeType="LEGENDRE", collUpdate=False, initType="spread"):
 
     description = {
         # Sweeper and its parameters
@@ -52,7 +52,7 @@ def getParamsSDC(
             "quad_type": quadType,
             "num_nodes": numNodes,
             "node_type": nodeType,
-            "initial_guess": 'spread',
+            "initial_guess": initType,
             "do_coll_update": collUpdate,
             "QI": qDeltaI,
             'skip_residual_computation':
@@ -154,6 +154,7 @@ def setupProblem(name, description, dt, **kwargs):
         description["problem_class"] = allencahn_periodic_fullyimplicit if periodic \
             else allencahn_front_fullyimplicit
         description["problem_params"].update({
+            'newton_tol': 1e-8,
             'nvars': kwargs.get("nvars", 128 if periodic else 127),
             'eps': kwargs.get("epsilon", 0.04),
             })

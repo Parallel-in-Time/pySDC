@@ -13,9 +13,9 @@ from utils import solutionExact, getParamsRK, solutionSDC
 script = __file__.split('/')[-1].split('.')[0]
 
 tEnd = 2*np.pi
-nSteps = 100
+nSteps = 2
 epsilon = np.inf
-rkScheme = "ESDIRK53"
+rkScheme = "ESDIRK43"
 
 tVals = np.linspace(0, tEnd, nSteps+1)
 tValsFine = np.linspace(0, tEnd, nSteps*10+1)

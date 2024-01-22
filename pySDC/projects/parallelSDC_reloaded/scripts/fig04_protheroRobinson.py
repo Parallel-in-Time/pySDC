@@ -22,6 +22,8 @@ nodeType = 'LEGENDRE'
 parEfficiency = 0.8 # 1/nNodes
 nSweeps = 4
 
+epsilon = 1e-3
+
 # -----------------------------------------------------------------------------
 # %% Convergence and error VS cost plots
 # -----------------------------------------------------------------------------
@@ -42,14 +44,13 @@ minPrec = ["MIN-SR-NS", "MIN-SR-S", "MIN-SR-FLEX"]
 
 symList = ['^', '>', '<', 'o', 's', '*', 'p']
 config = [
-    [(*minPrec, "HOUWEN-SOMMEIJER", "ESDIRK43", "RK4", "PIC"), 1e-1],
-    [(*minPrec, "HOUWEN-SOMMEIJER", "ESDIRK43", "LU"), 1e-3],
-    [(*minPrec, "HOUWEN-SOMMEIJER", "ESDIRK43", "LU"), 1e-5],
+    [(*minPrec, "HOUWEN-SOMMEIJER", "ESDIRK43", "LU"), "spread"],
+    [(*minPrec, "HOUWEN-SOMMEIJER", "ESDIRK43", "LU"), "zero"],
 ]
 
 
 i = 0
-for qDeltaList, epsilon in config:
+for qDeltaList, initType in config:
 
     figNameConv = f"{SCRIPT}_conv_{i}"
     figNameCost = f"{SCRIPT}_cost_{i}"
@@ -63,7 +64,7 @@ for qDeltaList, epsilon in config:
         except KeyError:
             params = getParamsSDC(
                 quadType=quadType, numNodes=nNodes, nodeType=nodeType,
-                qDeltaI=qDelta, nSweeps=nSweeps)
+                qDeltaI=qDelta, nSweeps=nSweeps, initType=initType)
 
         errors = []
         costs = []

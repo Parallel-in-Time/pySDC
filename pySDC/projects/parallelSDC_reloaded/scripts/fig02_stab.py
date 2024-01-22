@@ -34,7 +34,6 @@ config = [
     "MIN-SR-NS",
     "MIN-SR-S",
     "MIN-SR-FLEX",
-    "IE",
     "PIC",
     "LU",
     "HOUWEN-SOMMEIJER",

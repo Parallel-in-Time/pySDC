@@ -70,7 +70,7 @@ for qDelta, sym in zip(config, symList):
     figName = f"{SCRIPT}_conv_{qDelta}"
     plt.figure(figName)
 
-    for nSweeps in [1, 2, 3, 4]:
+    for nSweeps in [1, 2, 3, 4, 5]:
 
         params = getParamsSDC(
             quadType=quadType, numNodes=nNodes, nodeType=nodeType,
@@ -93,7 +93,7 @@ for qDelta, sym in zip(config, symList):
         plt.loglog(dtVals, errors, sym+'-', label=f"$K={nSweeps}$")
 
     x = dtVals[4:]
-    for k in [1, 2, 3, 4, 5]:
+    for k in [1, 2, 3, 4, 5, 6]:
         plt.loglog(x, 1e4*x**k, "--", color="gray", linewidth=0.8)
 
     plt.gca().set(
