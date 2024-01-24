@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Spectral Deferred Correction Methods for Second-Order Problems &#8212; pySDC 5.4.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=d250e987"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="core package" href="../pySDC/core.html" />
+    <link rel="prev" title="Compression in pySDC" href="compression.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../pySDC/core.html" title="core package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="compression.html" title="Compression in pySDC"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.4.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Spectral Deferred Correction Methods for Second-Order Problems</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="spectral-deferred-correction-methods-for-second-order-problems">
+<h1>Spectral Deferred Correction Methods for Second-Order Problems<a class="headerlink" href="#spectral-deferred-correction-methods-for-second-order-problems" title="Link to this heading">¶</a></h1>
+<p>Python code for implementing the paper’s plots on Second-order SDC methods.</p>
+<p>You are welcome to use and adapt this code under the terms of the BSD license.
+If you utilize it, either in whole or in part, for a publication, please provide proper citation:</p>
+<div class="highlight-tex notranslate"><div class="highlight"><pre><span></span>@misc<span class="nb">{</span>akramov2023spectral,
+    title=<span class="nb">{</span>Spectral deferred correction methods for second-order problems<span class="nb">}</span>,
+   author=<span class="nb">{</span>Ikrom Akramov and Sebastian Götschel and Michael Minion and Daniel Ruprecht and Robert Speck<span class="nb">}</span>,
+   year=<span class="nb">{</span>2023<span class="nb">}</span>,
+   eprint=<span class="nb">{</span>2310.08352<span class="nb">}</span>,
+   archivePrefix=<span class="nb">{</span>arXiv<span class="nb">}</span>,
+   primaryClass=<span class="nb">{</span>math.NA<span class="nb">}</span>
+</pre></div>
+</div>
+<section id="reproducing-figures-from-the-publication">
+<h2>Reproducing Figures from the Publication<a class="headerlink" href="#reproducing-figures-from-the-publication" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Fig. 1:</strong> Execute <cite>harmonic_oscillator_run_stability.py</cite> while setting <cite>kappa_max=18</cite> and <cite>mu_max=18</cite>.</p></li>
+<li><dl class="simple">
+<dt><strong>Fig. 2:</strong> Run <cite>harmonic_oscillator_run_stability.py</cite> with the following configurations:</dt><dd><ul>
+<li><p>Set <cite>kappa_max=30</cite> and <cite>mu_max=30</cite>.</p></li>
+<li><p>Adjust <cite>maxiter</cite> to 1, 2, 3, or 4 and execute each individually.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Table 1:</strong> Execute <cite>harmonic_socillator_run_stab_interval.py</cite>:</dt><dd><ul>
+<li><p>To save the results set: <cite>save_file=True</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Use the script <cite>harmonic_oscillator_run_points.py</cite> to create a table based on given $(kappa, mu)$ points. This table assists in determining suitable values for <cite>M</cite>, <cite>K</cite>, and <cite>quadrature nodes</cite> to ensure stability in the SDC method.</dt><dd><ul>
+<li><p>To save the results set: <cite>save_file=True</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Fig. 3:</strong> Run <cite>penningtrap_run_error.py</cite> (Run local convergence: <cite>conv.run_local_error()</cite>) with <cite>dt=0.015625/4</cite> and <cite>axes=(0,)</cite>.</p></li>
+<li><p><strong>Fig. 4:</strong> Run <cite>penningtrap_run_error.py</cite> (Run local convergence: <cite>conv.run_local_error()</cite>) using <cite>dt=0.015625*4</cite> and <cite>axes=(2,)</cite>.</p></li>
+<li><dl class="simple">
+<dt><strong>Fig. 5:</strong> Run <cite>penningtrap_run_error.py</cite> (Run global convergence: <cite>conv.run_global_error()</cite>) with <cite>dt=0.015625*2</cite>:</dt><dd><ul>
+<li><p>Note: Perform each run individually: first with <cite>axes=(0,)</cite>, then with <cite>axes=(2,)</cite>.</p></li>
+<li><p>Manually set y-axis limits in <cite>penningtrap_run_error.py</cite>, specifically in lines 147-148.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Table 2:</strong> Execute <cite>penningtrap_run_error.py</cite> (Run global convergence: <cite>conv.run_global_error()</cite>) with the following settings:</dt><dd><ul>
+<li><p>Expected order and approximate order are saved in the file: <cite>data/global_order_vs_approx_order.csv</cite></p></li>
+<li><p>Set: <cite>K_iter=(2, 3, 4, 10)</cite></p></li>
+<li><dl class="simple">
+<dt>For <cite>M=2</cite>:</dt><dd><ul>
+<li><p>Set <cite>dt=0.015625 / 2</cite> and <cite>num_nodes=2</cite> (Both Horizontal and Vertical axes)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>For <cite>M=3</cite>:</dt><dd><ul>
+<li><p>Set <cite>dt=0.015625</cite> and <cite>num_nodes=3</cite> (Both Horizontal and Vertical axes)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>For <cite>M=4</cite>:</dt><dd><ul>
+<li><p>Set <cite>dt=0.015625 * 4</cite> and <cite>num_nodes=4</cite> (Both Horizontal and Vertical axes)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Fig. 6:</strong> Run <cite>penningtrap_run_Hamiltonian_error.py</cite>:</dt><dd><ul>
+<li><p>Note: Execute each computation individually in case of crashes.</p></li>
+<li><p>Data is saved in the data folder.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Fig. 7:</strong> Execute <cite>penningtrap_run_work_precision.py</cite> with the following configurations:</dt><dd><ul>
+<li><p>Set <cite>dt=0.015625*2</cite> and <cite>K_iter=(1, 2, 3)</cite> for <cite>axis=(2,)</cite>.</p></li>
+<li><p>Set <cite>dt=0.015625*4</cite>, and <cite>K_iter=(2, 4, 6)</cite>, and <cite>dt_cont=2</cite> for <cite>axis=(0,)</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="contact">
+<h2>Contact<a class="headerlink" href="#contact" title="Link to this heading">¶</a></h2>
+<p>This code is written by <a href="#id1"><span class="problematic" id="id2">`</span></a>Ikrom Akramov`&lt;<a class="reference external" href="https://www.mat.tuhh.de/home/iakramov/?homepage_id=iakramov)">https://www.mat.tuhh.de/home/iakramov/?homepage_id=iakramov)</a>&gt;_</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Spectral Deferred Correction Methods for Second-Order Problems</a><ul>
+<li><a class="reference internal" href="#reproducing-figures-from-the-publication">Reproducing Figures from the Publication</a></li>
+<li><a class="reference internal" href="#contact">Contact</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="compression.html"
+                          title="previous chapter">Compression in pySDC</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="../pySDC/core.html"
+                          title="next chapter">core package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/projects/second_order.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../pySDC/core.html" title="core package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="compression.html" title="Compression in pySDC"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.4.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Spectral Deferred Correction Methods for Second-Order Problems</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>
