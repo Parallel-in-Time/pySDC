@@ -35,11 +35,11 @@ def test_global_convergence(axis):
 
 def BorisSDC_global_convergence():
     from pySDC.projects.Second_orderSDC.penningtrap_params import penningtrap_params
-    from pySDC.projects.Second_orderSDC.penningtrap_Simulation import compute_error
+    from pySDC.projects.Second_orderSDC.penningtrap_Simulation import ComputeError
 
     controller_params, description = penningtrap_params()
     description['level_params']['dt'] = 0.015625 * 2
-    conv = compute_error(controller_params, description, time_iter=3, K_iter=(1, 2, 3))
+    conv = ComputeError(controller_params, description, time_iter=3, K_iter=(1, 2, 3))
     conv.error_type = 'global'
     conv.compute_global_error_data()
 
@@ -85,13 +85,13 @@ def sort_order(cwd='', filename='data/local_order_vs_approx_order.csv'):
 
 
 def BorisSDC_horizontal_axis():
-    from pySDC.projects.Second_orderSDC.penningtrap_Simulation import compute_error
+    from pySDC.projects.Second_orderSDC.penningtrap_Simulation import ComputeError
     from pySDC.projects.Second_orderSDC.penningtrap_params import penningtrap_params
 
     controller_params, description = penningtrap_params()
-    description['level_params']['dt'] = 0.015625 / 8
+    description['level_params']['dt'] = 0.015625 / 4
 
-    conv = compute_error(controller_params, description, time_iter=3)
+    conv = ComputeError(controller_params, description, time_iter=3)
     conv.compute_local_error_data()
     conv.find_approximate_order()
 
@@ -113,13 +113,13 @@ def test_horizontal_axis(value):
 
 
 def BorisSDC_vertical_axis():
-    from pySDC.projects.Second_orderSDC.penningtrap_Simulation import compute_error
+    from pySDC.projects.Second_orderSDC.penningtrap_Simulation import ComputeError
     from pySDC.projects.Second_orderSDC.penningtrap_params import penningtrap_params
 
     controller_params, description = penningtrap_params()
-    description['level_params']['dt'] = 0.015625 * 8
+    description['level_params']['dt'] = 0.015625 * 4
 
-    conv = compute_error(controller_params, description, time_iter=3)
+    conv = ComputeError(controller_params, description, time_iter=3)
     conv.compute_local_error_data()
     conv.find_approximate_order()
 
@@ -150,7 +150,7 @@ def numerical_order(time_data, error):
 @pytest.mark.parametrize('sweeper_name', METHODS)
 def test_RKN_VV(sweeper_name, cwd=''):
     import numpy as np
-    from pySDC.projects.Second_orderSDC.penningtrap_Simulation import compute_error
+    from pySDC.projects.Second_orderSDC.penningtrap_Simulation import ComputeError
     from pySDC.projects.Second_orderSDC.penningtrap_params import penningtrap_params
 
     controller_params, description = penningtrap_params()
@@ -160,7 +160,7 @@ def test_RKN_VV(sweeper_name, cwd=''):
     time_iter = np.array([1, 1 / 2, 1 / 4])
     time = description['level_params']['dt'] * time_iter
 
-    P = compute_error(controller_params, description, time_iter=3)
+    P = ComputeError(controller_params, description, time_iter=3)
 
     if sweeper_name == 'Velocity_Verlet':
         P.compute_global_error_data(VV=True, work_counter=True)

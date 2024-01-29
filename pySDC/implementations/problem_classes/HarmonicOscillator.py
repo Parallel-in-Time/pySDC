@@ -28,6 +28,7 @@ class harmonic_oscillator(ptype):
         Phase of the oscillation.
     amp : float, optional
         Amplitude of the oscillation.
+    Source: https://beltoforion.de/en/harmonic_oscillator/
     """
 
     dtype_u = particles
