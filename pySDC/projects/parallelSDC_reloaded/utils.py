@@ -297,6 +297,6 @@ def plotStabContour(reVals, imVals, stab, ax=None):
     ax.hlines(0, min(reVals), max(reVals), linestyles='--', colors='black', linewidth=0.5)
     ax.vlines(0, min(imVals), max(imVals), linestyles='--', colors='black', linewidth=0.5)
     ax.set_aspect('equal', 'box')
-    ax.set_xlabel(r"$Re(\lambda)$", labelpad=0, fontsize=10)
-    ax.set_ylabel(r"$Im(\lambda)$", labelpad=0, fontsize=10)
+    ax.set_xlabel(r"$Re(z)$", labelpad=0, fontsize=10)
+    ax.set_ylabel(r"$Im(z)$", labelpad=0, fontsize=10)
     return ax

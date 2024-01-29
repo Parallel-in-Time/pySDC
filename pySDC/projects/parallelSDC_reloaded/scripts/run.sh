@@ -7,11 +7,3 @@ do
     echo "Running ${script} python script ..."
     python "${script}"
 done
-
-# Trim all figures
-echo "------------------------------------------------------------"
-echo "Croping figures ..."
-for fig in *.pdf
-do
-    pdfcrop "${fig}" "${fig}"
-done

@@ -31,11 +31,11 @@ quadType = "RADAU-RIGHT"
 # Configuration
 # (qDeltaType)
 config = [
+    "PIC",
     "MIN-SR-NS",
     "MIN-SR-S",
     "MIN-SR-FLEX",
-    "PIC",
-    "LU",
+    "IE",
     "HOUWEN-SOMMEIJER",
     ]
 
@@ -51,10 +51,11 @@ lambdas = reVals[None, :] + 1j*imVals[:, None]
 
 # Scheme instanciation
 for qDeltaType in config:
-    if qDeltaType == "HOUWEN-SOMMEIJER":
-        reVals *= 5
-        imVals *= 5
-        lambdas *= 5
+    if qDeltaType == "MIN-SR-S":
+        fac = 5
+        reVals *= fac
+        imVals *= fac
+        lambdas *= fac
 
     for nSweeps in [1, 2, 3, 4]:
 
