@@ -16,7 +16,7 @@ from pySDC.helpers.pysdc_helper import FrozenClass
 class _Pars(FrozenClass):
     def __init__(self, pars):
         self.do_coll_update = False
-        self.initial_guess = 'spread'
+        self.initial_guess = 'copy'   # oh God, why is the default value here !?!?!?!?
         self.skip_residual_computation = ()  # gain performance at the cost of correct residual output
 
         for k, v in pars.items():
@@ -59,7 +59,7 @@ class sweeper(object):
             params['collocation_class'] = CollBase
 
         # prepare random generator for initial guess
-        if params.get('initial_guess', 'spread') == 'random':
+        if params.get('initial_guess', 'copy') == 'random':   # aaaahhh ...
             params['random_seed'] = params.get('random_seed', 1984)
             self.rng = np.random.RandomState(params['random_seed'])
 
