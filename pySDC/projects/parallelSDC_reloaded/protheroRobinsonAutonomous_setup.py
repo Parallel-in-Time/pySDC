@@ -9,7 +9,7 @@ using the autonomous formulation
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils import solutionExact, getParamsRK, solutionSDC
+from pySDC.projects.parallelSDC_reloaded.utils import solutionExact, getParamsRK, solutionSDC
 
 script = __file__.split('/')[-1].split('.')[0]
 
@@ -47,6 +47,3 @@ for figName in [f"{script}_linear", f"{script}_nonlinear"]:
     plt.xlabel("time")
     plt.ylabel("solution")
     plt.tight_layout()
-    plt.savefig(f'fig/{figName}.pdf', bbox_inches="tight")
-
-plt.show()

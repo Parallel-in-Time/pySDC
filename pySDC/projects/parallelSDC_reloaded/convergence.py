@@ -6,7 +6,7 @@ Created on Tue Jan  9 14:44:41 2024
 Generate convergence plots on Dahlquist for SDC with given parameters
 """
 import numpy as np
-from utils import getParamsRK, getParamsSDC, solutionSDC, plt
+from pySDC.projects.parallelSDC_reloaded.utils import getParamsRK, getParamsSDC, solutionSDC, plt
 
 SCRIPT = __file__.split('/')[-1].split('.')[0]
 

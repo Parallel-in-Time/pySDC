@@ -8,7 +8,7 @@ Setup script for the JacobianElliptic problem
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils import solutionExact, getParamsRK, getParamsSDC, solutionSDC
+from pySDC.projects.parallelSDC_reloaded.utils import solutionExact, getParamsRK, getParamsSDC, solutionSDC
 
 script = __file__.split('/')[-1].split('.')[0]
 
@@ -36,7 +36,7 @@ tVals = np.linspace(0, tEnd, nSteps + 1)
 print("Computing ODE solution")
 uExact = solutionExact(tEnd, nSteps, pName, **pParams)
 
-uNum, counters = solutionSDC(tEnd, nSteps, params, pName, **pParams)
+uNum, counters, _ = solutionSDC(tEnd, nSteps, params, pName, **pParams)
 
 figName = f"{script}_solution"
 plt.figure(figName)
@@ -51,6 +51,3 @@ plt.legend()
 plt.xlabel("time")
 plt.ylabel("solution")
 plt.tight_layout()
-plt.savefig(f'fig/{figName}.pdf')
-
-plt.show()

@@ -8,7 +8,7 @@ Setup script for the Kaps problem
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils import solutionExact, getParamsRK, solutionSDC
+from pySDC.projects.parallelSDC_reloaded.utils import solutionExact, getParamsRK, solutionSDC
 
 script = __file__.split('/')[-1].split('.')[0]
 
@@ -36,6 +36,3 @@ plt.legend()
 plt.xlabel("time")
 plt.ylabel("solution")
 plt.tight_layout()
-plt.savefig(f'fig/{figName}.pdf')
-
-plt.show()

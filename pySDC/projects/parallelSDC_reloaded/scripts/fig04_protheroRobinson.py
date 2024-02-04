@@ -7,7 +7,7 @@ Figures with experiment on the Prothero-Robinson problem
 """
 import os
 import numpy as np
-from utils import solutionExact, getParamsSDC, solutionSDC, getParamsRK, plt
+from pySDC.projects.parallelSDC_reloaded.utils import solutionExact, getParamsSDC, solutionSDC, getParamsRK, plt
 
 PATH = '/' + os.path.join(*__file__.split('/')[:-1])
 SCRIPT = __file__.split('/')[-1].split('.')[0]

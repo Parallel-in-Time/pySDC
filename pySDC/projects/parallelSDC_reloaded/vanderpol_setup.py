@@ -10,7 +10,7 @@ import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
 
-from utils import solutionExact
+from pySDC.projects.parallelSDC_reloaded.utils import solutionExact
 
 script = __file__.split('/')[-1].split('.')[0]
 
@@ -56,6 +56,3 @@ for figName in [f"{script}_traj", f"{script}_accel", f"{script}_traj_scaled"]:
     plt.xlabel("time (scaled)" if "scaled" in figName else "time")
     plt.ylabel("trajectory" if "traj" in figName else "acceleration")
     plt.tight_layout()
-    plt.savefig(f'fig/{figName}.pdf', bbox_inches="tight")
-
-plt.show()

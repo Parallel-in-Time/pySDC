@@ -8,7 +8,7 @@ Setup script for the Chemical Reaction problem
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils import solutionExact, getParamsRK, solutionSDC
+from pySDC.projects.parallelSDC_reloaded.utils import solutionExact, getParamsRK, solutionSDC
 
 script = __file__.split('/')[-1].split('.')[0]
 
@@ -22,7 +22,7 @@ print("Computing ODE solution")
 uExact = solutionExact(tEnd, nSteps, "CHEMREC")
 
 params = getParamsRK(rkScheme)
-uNum, counters = solutionSDC(tEnd, nSteps, params, 'CHEMREC')
+uNum, counters, _ = solutionSDC(tEnd, nSteps, params, 'CHEMREC')
 
 figName = f"{script}_solution"
 plt.figure(figName)
@@ -37,6 +37,3 @@ plt.legend()
 plt.xlabel("time")
 plt.ylabel("solution")
 plt.tight_layout()
-plt.savefig(f'fig/{figName}.pdf')
-
-plt.show()

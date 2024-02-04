@@ -9,7 +9,7 @@ import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
 
-from utils import solutionExact
+from pySDC.projects.parallelSDC_reloaded.utils import solutionExact
 
 script = __file__.split('/')[-1].split('.')[0]
 
@@ -40,6 +40,3 @@ plt.legend()
 plt.xlabel("time")
 plt.ylabel("trajectory")
 plt.tight_layout()
-plt.savefig(f'fig/{figName}.pdf', bbox_inches="tight")
-
-plt.show()

@@ -5,10 +5,11 @@ Created on Sun Nov 12 18:50:39 2023
 
 Utility functions to investigate parallel SDC on non-linear problems
 """
+import os
 import json
 import numpy as np
 from time import time
-import traceback
+import warnings
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
@@ -31,6 +32,8 @@ from pySDC.implementations.sweeper_classes.generic_implicit import generic_impli
 import pySDC.implementations.sweeper_classes.Runge_Kutta as rk
 
 import matplotlib.pyplot as plt
+
+PATH = '/' + os.path.join(*__file__.split('/')[:-1])
 
 # General matplotlib settings
 plt.rc('font', size=12)
@@ -189,6 +192,7 @@ def setupProblem(name, description, dt, **kwargs):
                 'newton_tol': 1e-8,
                 'nvars': kwargs.get("nvars", 128 if periodic else 127),
                 'eps': kwargs.get("epsilon", 0.04),
+                'stop_at_maxiter': True,
             }
         )
     elif name == "JACELL":
@@ -224,14 +228,16 @@ def solutionSDC(tEnd, nSteps, params, probName, **kwargs):
     tVals = np.linspace(0, tEnd, nSteps + 1)
     tBeg = time()
     print(" -- computing numerical solution with pySDC ...")
+    warnings.filterwarnings("ignore")
     for i in range(nSteps):
         uTmp[:] = uSDC[i]
         try:
             uSDC[i + 1], _ = controller.run(u0=uTmp, t0=tVals[i], Tend=tVals[i + 1])
         except Exception as e:
             print(f" -- exception when running controller : {e}")
-            traceback.print_exc()
+            warnings.resetwarnings()
             return None, (0, 0, 0), False
+    warnings.resetwarnings()
     tComp = time() - tBeg
 
     try:
@@ -268,7 +274,7 @@ def solutionExact(tEnd, nSteps, probName, **kwargs):
 
     # Eventually load already computed solution from local cache
     try:
-        with open(cacheFile, "r") as f:
+        with open(f"{PATH}/{cacheFile}", "r") as f:
             cache = json.load(f)
         if key in cache:
             return np.array(cache[key])
@@ -295,7 +301,7 @@ def solutionExact(tEnd, nSteps, probName, **kwargs):
     try:
         # Save solution in local cache
         cache[key] = uExact.tolist()
-        with open(cacheFile, "w") as f:
+        with open(f"{PATH}/{cacheFile}", "w") as f:
             json.dump(cache, f)
     except UnboundLocalError:
         pass

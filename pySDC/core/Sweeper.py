@@ -369,7 +369,7 @@ class sweeper(object):
             # see if an explicit preconditioner with this name is available
             try:
                 QDmat = self.get_Qdelta_explicit(coll, qd_type)
-                self.logger.warn(f'Using explicit preconditioner \"{qd_type}\" on the left hand side!')
+                self.logger.warning(f'Using explicit preconditioner \"{qd_type}\" on the left hand side!')
             except NotImplementedError:
                 raise NotImplementedError(f'qd_type implicit "{qd_type}" not implemented')
 

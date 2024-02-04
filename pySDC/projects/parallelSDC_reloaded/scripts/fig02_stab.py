@@ -7,7 +7,7 @@ Stability plots (on Dahlquist) for the article
 """
 import os
 import numpy as np
-from utils import getParamsSDC, solutionSDC, plotStabContour, plt
+from pySDC.projects.parallelSDC_reloaded.utils import getParamsSDC, solutionSDC, plotStabContour, plt
 
 PATH = '/' + os.path.join(*__file__.split('/')[:-1])
 SCRIPT = __file__.split('/')[-1].split('.')[0]
@@ -17,10 +17,6 @@ zoom = 2
 reLims = -4.5 * zoom, 0.5 * zoom
 imLims = -3.5 * zoom, 3.5 * zoom
 nVals = 251
-
-
-# RK parameters
-rkScheme = "RK4"
 
 # Collocation parameters
 nNodes = 4

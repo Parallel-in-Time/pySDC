@@ -13,7 +13,7 @@ Note : implementation in progress ...
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
+from pySDC.projects.parallelSDC_reloaded.utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 
 tEnd = 1.24
 
@@ -118,4 +118,3 @@ for i in range(2):
 
 fig.set_size_inches(12, 5)
 fig.tight_layout()
-plt.show()

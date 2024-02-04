@@ -8,7 +8,7 @@ Setup script for the Allen-Cahn problem
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils import solutionExact, getParamsRK, solutionSDC, getParamsSDC
+from pySDC.projects.parallelSDC_reloaded.utils import solutionExact, getParamsRK, solutionSDC, getParamsSDC
 
 script = __file__.split('/')[-1].split('.')[0]
 
@@ -54,6 +54,3 @@ plt.legend()
 plt.xlabel("X")
 plt.ylabel("solution")
 plt.tight_layout()
-plt.savefig(f'fig/{figName}.pdf')
-
-# plt.show()

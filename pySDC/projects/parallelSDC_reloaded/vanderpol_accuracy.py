@@ -14,7 +14,7 @@ Note : implementation in progress ...
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
+from pySDC.projects.parallelSDC_reloaded.utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 
 muVals = [0.1, 2, 10]
 tEndVals = [6.3, 7.6, 18.9]  # tEnd = 1 period for each mu
@@ -117,4 +117,3 @@ for j, (mu, tEnd) in enumerate(zip(muVals, tEndVals)):
 
 fig.set_size_inches(18.2, 10.4)
 fig.tight_layout()
-plt.show()

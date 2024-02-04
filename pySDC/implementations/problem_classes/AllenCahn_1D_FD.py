@@ -70,6 +70,7 @@ class allencahn_front_fullyimplicit(ptype):
         newton_tol=1e-12,
         interval=(-0.5, 0.5),
         stop_at_nan=True,
+        stop_at_maxiter=False,
     ):
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if (nvars + 1) % 2:
@@ -85,6 +86,7 @@ class allencahn_front_fullyimplicit(ptype):
             'newton_tol',
             'interval',
             'stop_at_nan',
+            'stop_at_maxiter',
             localVars=locals(),
             readOnly=True,
         )
@@ -185,7 +187,11 @@ class allencahn_front_fullyimplicit(ptype):
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
         if n == self.newton_maxiter:
-            raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
+            msg = 'Newton did not converge after %i iterations, error is %s' % (n, res)
+            if self.stop_at_maxiter:
+                raise ProblemError(msg)
+            else:
+                self.logger.warning(msg)
 
         me = self.dtype_u(self.init)
         me[:] = u[:]

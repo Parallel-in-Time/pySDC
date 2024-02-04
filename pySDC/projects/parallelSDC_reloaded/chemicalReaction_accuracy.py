@@ -14,7 +14,7 @@ Note : implementation in progress ...
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
+from pySDC.projects.parallelSDC_reloaded.utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 
 # Problem parameters
 tEnd = 300
@@ -41,7 +41,7 @@ parEfficiency = 1 / nNodes
 qDeltaList = [
     'RK4',
     'ESDIRK53',
-    'DIRK43',
+    'ESDIRK43',
     # 'IE', 'LU', 'IEpar', 'PIC',
     'MIN-SR-NS',
     'MIN-SR-S',
@@ -51,8 +51,8 @@ qDeltaList = [
 nStepsList = np.array([2, 5, 10, 20, 50, 100])
 nSweepList = [1, 2, 3, 4, 5, 6]
 
-# qDeltaList = ['MIN-SR-S']
-nSweepList = [5]
+qDeltaList = ['ESDIRK43', 'MIN-SR-S']
+nSweepList = [4]
 
 
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>'] * 10
@@ -85,13 +85,13 @@ for qDelta in qDeltaList:
 
             uRef = solutionExact(tEnd, nSteps, pName)
 
-            uSDC, counters = solutionSDC(tEnd, nSteps, params, pName)
+            uSDC, counters, parallel = solutionSDC(tEnd, nSteps, params, pName)
 
             err = getError(uSDC, uRef)
             errors.append(err)
 
             cost = getCost(counters)
-            if qDelta in ['IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX', 'PIC']:
+            if parallel:
                 cost /= nNodes * parEfficiency
             costs.append(cost)
 
@@ -111,4 +111,3 @@ for i in range(2):
 
 fig.set_size_inches(12, 5)
 fig.tight_layout()
-plt.show()

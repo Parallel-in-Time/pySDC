@@ -7,7 +7,7 @@ Convergence plots (on Dahlquist) for the article
 """
 import os
 import numpy as np
-from utils import getParamsRK, getParamsSDC, solutionSDC, plt
+from pySDC.projects.parallelSDC_reloaded.utils import getParamsRK, getParamsSDC, solutionSDC, plt
 
 PATH = '/' + os.path.join(*__file__.split('/')[:-1])
 SCRIPT = __file__.split('/')[-1].split('.')[0]
