@@ -18,11 +18,71 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 class ProtheroRobinson(ptype):
+    r"""
+    Implement the Prothero-Robinson problem:
+
+    .. math::
+        \frac{du}{dt} = -\frac{u-g(t)}{\epsilon} + \frac{dg}{dt}, \quad u(0) = g(0).,
+
+    with :math:`\epsilon` a stiffness parameter, that makes the problem more stiff
+    the smaller it is (usual taken value is :math:`\epsilon=1e^{-3}`).
+    Exact solution is given by :math:`u(t)=g(t)`, and this implementation uses
+    :math:`g(t)=\cos(t)`.
+
+    Implement also the non-linear form of this problem:
+
+    .. math::
+        \frac{du}{dt} = -\frac{u^3-g(t)^3}{\epsilon} + \frac{dg}{dt}, \quad u(0) = g(0).
+
+    To use an other exact solution, one just have to derivate this class
+    and overload the `g`, `dg` and `dg2` methods. For instance,
+    to use :math:`g(t)=e^{-0.2t}`, define and use the following class:
+
+    >>> class MyProtheroRobinson(ProtheroRobinson):
+    >>>
+    >>>     def g(self, t):
+    >>>         return np.exp(-0.2 * t)
+    >>>
+    >>>     def dg(self, t):
+    >>>         return (-0.2) * np.exp(-0.2 * t)
+    >>>
+    >>>     def dg2(self, t):
+    >>>         return (-0.2) ** 2 * np.exp(-0.2 * t)
+
+    Parameters
+    ----------
+    epsilon : float, optional
+        Stiffness parameter. The default is 1e-3.
+    nonLinear : bool, optional
+        Wether or not to use the non-linear form of the problem. The default is False.
+    newton_maxiter : int, optional
+        Maximum number of Newton iteration in solve_system. The default is 200.
+    newton_tol : float, optional
+        Residuum tolerance for Newton iteration in solve_system. The default is 5e-11.
+    stop_at_nan : bool, optional
+        Wheter to stop or not solve_system when getting NAN. The default is True.
+
+    Reference
+    ---------
+    A. Prothero and A. Robinson, On the stability and accuracy of one-step methods for solving
+    stiff systems of ordinary differential equations, Mathematics of Computation, 28 (1974),
+    pp. 145–162.
+    """
 
     dtype_u = mesh
     dtype_f = mesh
 
     def __init__(self, epsilon=1e-3, nonLinear=False, newton_maxiter=200, newton_tol=5e-11, stop_at_nan=True):
+        """
+
+
+
+
+        Returns
+        -------
+        None.
+
+        """
         nvars = 1
         super().__init__((nvars, None, np.dtype('float64')))
 

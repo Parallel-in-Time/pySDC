@@ -18,6 +18,59 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 class ProtheroRobinsonAutonomous(ptype):
+    r"""
+    Implement the Prothero-Robinson problem into autonomous form:
+
+    .. math::
+        \begin{eqnarray*}
+            \frac{du}{dt} &=& -\frac{u^3-g(v)^3}{\epsilon} + \frac{dg}{dv}, &\quad u(0) = g(0),\\
+            \frac{dv}{dt} &=& 1, &\quad v(0) = 0,
+        \end{eqnarray*}
+
+    with :math:`\epsilon` a stiffness parameter, that makes the problem more stiff
+    the smaller it is (usual taken value is :math:`\epsilon=1e^{-3}`).
+    Exact solution is given by :math:`u(t)=g(t),\;v(t)=t`, and this implementation uses
+    :math:`g(t)=\cos(t)`.
+
+    Implement also the non-linear form of this problem:
+
+    .. math::
+        \frac{du}{dt} = -\frac{u^3-g(v)^3}{\epsilon} + \frac{dg}{dv}, \quad u(0) = g(0).
+
+    To use an other exact solution, one just have to derivate this class
+    and overload the `g`, `dg` and `dg2` methods. For instance,
+    to use :math:`g(t)=e^{-0.2t}`, define and use the following class:
+
+    >>> class MyProtheroRobinson(ProtheroRobinsonAutonomous):
+    >>>
+    >>>     def g(self, t):
+    >>>         return np.exp(-0.2 * t)
+    >>>
+    >>>     def dg(self, t):
+    >>>         return (-0.2) * np.exp(-0.2 * t)
+    >>>
+    >>>     def dg2(self, t):
+    >>>         return (-0.2) ** 2 * np.exp(-0.2 * t)
+
+    Parameters
+    ----------
+    epsilon : float, optional
+        Stiffness parameter. The default is 1e-3.
+    nonLinear : bool, optional
+        Wether or not to use the non-linear form of the problem. The default is False.
+    newton_maxiter : int, optional
+        Maximum number of Newton iteration in solve_system. The default is 200.
+    newton_tol : float, optional
+        Residuum tolerance for Newton iteration in solve_system. The default is 5e-11.
+    stop_at_nan : bool, optional
+        Wheter to stop or not solve_system when getting NAN. The default is True.
+
+    Reference
+    ---------
+    A. Prothero and A. Robinson, On the stability and accuracy of one-step methods for solving
+    stiff systems of ordinary differential equations, Mathematics of Computation, 28 (1974),
+    pp. 145–162.
+    """
 
     dtype_u = mesh
     dtype_f = mesh
@@ -179,6 +232,36 @@ class ProtheroRobinsonAutonomous(ptype):
 
 
 class Kaps(ptype):
+    r"""
+    Implement the Kaps problem:
+
+    .. math::
+        \begin{eqnarray*}
+            \frac{du}{dt} &=& -(2+\epsilon^{-1})u + \frac{v^2}{\epsilon}, &\quad u(0) = 1,\\
+            \frac{dv}{dt} &=& u - v(1+v), &\quad v(0) = 1,
+        \end{eqnarray*}
+
+    with :math:`\epsilon` a stiffness parameter, that makes the problem more stiff
+    the smaller it is (usual taken value is :math:`\epsilon=1e^{-3}`).
+    Exact solution is given by :math:`u(t)=e^{-2t},\;v(t)=e^{-t}`.
+
+    Parameters
+    ----------
+    epsilon : float, optional
+        Stiffness parameter. The default is 1e-3.
+    newton_maxiter : int, optional
+        Maximum number of Newton iteration in solve_system. The default is 200.
+    newton_tol : float, optional
+        Residuum tolerance for Newton iteration in solve_system. The default is 5e-11.
+    stop_at_nan : bool, optional
+        Wheter to stop or not solve_system when getting NAN. The default is True.
+
+    Reference
+    ---------
+    Van der Houwen, P. J., & Sommeijer, B. P. (1991). Iterated Runge–Kutta methods
+    on parallel computers. SIAM journal on scientific and statistical computing,
+    12(5), 1000-1028.
+    """
 
     dtype_u = mesh
     dtype_f = mesh
