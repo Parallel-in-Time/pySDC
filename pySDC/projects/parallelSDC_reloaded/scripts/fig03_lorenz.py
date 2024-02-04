@@ -8,33 +8,32 @@ Figures with experiment on the Lorenz problem
 import os
 import numpy as np
 import scipy as sp
-from utils import solutionExact, getParamsSDC, solutionSDC, getParamsRK, \
-    plt
+from utils import solutionExact, getParamsSDC, solutionSDC, getParamsRK, plt
 
-PATH = '/'+os.path.join(*__file__.split('/')[:-1])
+PATH = '/' + os.path.join(*__file__.split('/')[:-1])
 SCRIPT = __file__.split('/')[-1].split('.')[0]
 
-symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
+symList = ['o', '^', 's', '>', '*', '<', 'p', '>'] * 10
 
 # SDC parameters
 nNodes = 4
 quadType = 'RADAU-RIGHT'
 nodeType = 'LEGENDRE'
-parEfficiency = 0.8 # 1/nNodes
+parEfficiency = 0.8  # 1/nNodes
 
 # -----------------------------------------------------------------------------
 # Trajectories (reference solution)
 # -----------------------------------------------------------------------------
 tEnd = 2
-nSteps = tEnd*50
-tVals = np.linspace(0, tEnd, nSteps+1)
+nSteps = tEnd * 50
+tVals = np.linspace(0, tEnd, nSteps + 1)
 nPeriods = 2
 
 print(f"Computing exact solution up to t={tEnd} ...")
 uExact = solutionExact(tEnd, nSteps, "LORENZ", u0=(5, -5, 20))
 
 z = uExact[:, -1]
-idx = sp.signal.find_peaks(z)[0][nPeriods-1]
+idx = sp.signal.find_peaks(z)[0][nPeriods - 1]
 print(f'tEnd for {nPeriods} periods : {tVals[idx]}')
 
 figName = f"{SCRIPT}_traj"
@@ -56,7 +55,8 @@ plt.savefig(f'{PATH}/{figName}.pdf')
 # -----------------------------------------------------------------------------
 tEnd = 1.24
 nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
-dtVals = tEnd/nStepsList
+dtVals = tEnd / nStepsList
+
 
 def getError(uNum, uRef):
     if uNum is None:
@@ -72,9 +72,7 @@ for qDelta, sym in zip(config, symList):
 
     for nSweeps in [1, 2, 3, 4, 5]:
 
-        params = getParamsSDC(
-            quadType=quadType, numNodes=nNodes, nodeType=nodeType,
-            qDeltaI=qDelta, nSweeps=nSweeps)
+        params = getParamsSDC(quadType=quadType, numNodes=nNodes, nodeType=nodeType, qDeltaI=qDelta, nSweeps=nSweeps)
 
         errors = []
 
@@ -83,18 +81,17 @@ for qDelta, sym in zip(config, symList):
 
             uRef = solutionExact(tEnd, nSteps, "LORENZ", u0=(5, -5, 20))
 
-            uSDC, counters, parallel = solutionSDC(
-                tEnd, nSteps, params, "LORENZ", u0=(5, -5, 20))
+            uSDC, counters, parallel = solutionSDC(tEnd, nSteps, params, "LORENZ", u0=(5, -5, 20))
 
             err = getError(uSDC, uRef)
             errors.append(err)
 
         # error VS dt
-        plt.loglog(dtVals, errors, sym+'-', label=f"$K={nSweeps}$")
+        plt.loglog(dtVals, errors, sym + '-', label=f"$K={nSweeps}$")
 
     x = dtVals[4:]
     for k in [1, 2, 3, 4, 5, 6]:
-        plt.loglog(x, 1e4*x**k, "--", color="gray", linewidth=0.8)
+        plt.loglog(x, 1e4 * x**k, "--", color="gray", linewidth=0.8)
 
     plt.gca().set(
         xlabel=r"$\Delta{t}$",
@@ -106,12 +103,14 @@ for qDelta, sym in zip(config, symList):
     plt.tight_layout()
     plt.savefig(f"{PATH}/{figName}.pdf")
 
+
 # -----------------------------------------------------------------------------
 # %% Error VS cost plots
 # -----------------------------------------------------------------------------
 def getCost(counters):
     nNewton, nRHS, tComp = counters
     return nNewton + nRHS
+
 
 minPrec = ["MIN-SR-NS", "MIN-SR-S", "MIN-SR-FLEX"]
 
@@ -136,8 +135,8 @@ for qDeltaList, nSweeps in config:
             params = getParamsRK(qDelta)
         except KeyError:
             params = getParamsSDC(
-                quadType=quadType, numNodes=nNodes, nodeType=nodeType,
-                qDeltaI=qDelta, nSweeps=nSweeps)
+                quadType=quadType, numNodes=nNodes, nodeType=nodeType, qDeltaI=qDelta, nSweeps=nSweeps
+            )
 
         errors = []
         costs = []
@@ -146,8 +145,7 @@ for qDeltaList, nSweeps in config:
 
             uRef = solutionExact(tEnd, nSteps, "LORENZ", u0=(5, -5, 20))
 
-            uSDC, counters, parallel = solutionSDC(
-                tEnd, nSteps, params, "LORENZ", u0=(5, -5, 20))
+            uSDC, counters, parallel = solutionSDC(tEnd, nSteps, params, "LORENZ", u0=(5, -5, 20))
 
             err = getError(uSDC, uRef)
             errors.append(err)
@@ -155,12 +153,12 @@ for qDeltaList, nSweeps in config:
             cost = getCost(counters)
             if parallel:
                 assert qDelta != "EE", "wait, whaaat ??"
-                cost /= nNodes*parEfficiency
+                cost /= nNodes * parEfficiency
             costs.append(cost)
 
         # error VS dt
         ls = '-' if qDelta.startswith("MIN-SR-") else "--"
-        plt.loglog(costs, errors, sym+ls, label=qDelta)
+        plt.loglog(costs, errors, sym + ls, label=qDelta)
 
     plt.gca().set(
         xlabel="Cost",

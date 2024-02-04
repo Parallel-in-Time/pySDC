@@ -13,13 +13,13 @@ from utils import solutionExact, getParamsRK, solutionSDC
 
 script = __file__.split('/')[-1].split('.')[0]
 
-tEnd = 2*np.pi
+tEnd = 2 * np.pi
 nSteps = 2
 epsilon = 1e-3
 rkScheme = "ESDIRK43"
 
-tVals = np.linspace(0, tEnd, nSteps+1)
-tValsFine = np.linspace(0, tEnd, nSteps*10+1)
+tVals = np.linspace(0, tEnd, nSteps + 1)
+tValsFine = np.linspace(0, tEnd, nSteps * 10 + 1)
 
 for pType in ["linear", "nonlinear"]:
 
@@ -31,10 +31,8 @@ for pType in ["linear", "nonlinear"]:
     uExact = solutionExact(tEnd, nSteps, probName, epsilon=epsilon)
 
     params = getParamsRK(rkScheme)
-    uNum, counters, parallel = solutionSDC(
-        tEnd, nSteps, params, probName, epsilon=epsilon)
-    uNumFine, counters, parallel = solutionSDC(
-        tEnd, nSteps*10, params, probName, epsilon=epsilon)
+    uNum, counters, parallel = solutionSDC(tEnd, nSteps, params, probName, epsilon=epsilon)
+    uNumFine, counters, parallel = solutionSDC(tEnd, nSteps * 10, params, probName, epsilon=epsilon)
 
     figName = f"{script}_{pType}"
     plt.figure(figName)

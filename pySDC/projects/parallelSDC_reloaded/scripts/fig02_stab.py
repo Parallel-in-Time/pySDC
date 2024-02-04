@@ -7,16 +7,15 @@ Stability plots (on Dahlquist) for the article
 """
 import os
 import numpy as np
-from utils import getParamsSDC, solutionSDC, \
-    plotStabContour, plt
+from utils import getParamsSDC, solutionSDC, plotStabContour, plt
 
-PATH = '/'+os.path.join(*__file__.split('/')[:-1])
+PATH = '/' + os.path.join(*__file__.split('/')[:-1])
 SCRIPT = __file__.split('/')[-1].split('.')[0]
 
 # Script parameters
 zoom = 2
-reLims = -4.5*zoom, 0.5*zoom
-imLims = -3.5*zoom, 3.5*zoom
+reLims = -4.5 * zoom, 0.5 * zoom
+imLims = -3.5 * zoom, 3.5 * zoom
 nVals = 251
 
 
@@ -37,7 +36,7 @@ config = [
     "MIN-SR-FLEX",
     "IE",
     "HOUWEN-SOMMEIJER",
-    ]
+]
 
 
 # -----------------------------------------------------------------------------
@@ -47,7 +46,7 @@ config = [
 # Problem instanciation
 reVals = np.linspace(*reLims, num=nVals)
 imVals = np.linspace(*imLims, num=nVals)
-lambdas = reVals[None, :] + 1j*imVals[:, None]
+lambdas = reVals[None, :] + 1j * imVals[:, None]
 
 # Scheme instanciation
 for qDeltaType in config:
@@ -61,8 +60,7 @@ for qDeltaType in config:
 
         params = getParamsSDC(quadType, nNodes, qDeltaType, nSweeps, nodeType)
 
-        uNum, counters, parallel = solutionSDC(
-            1, 1, params, 'DAHLQUIST', lambdas=lambdas.ravel())
+        uNum, counters, parallel = solutionSDC(1, 1, params, 'DAHLQUIST', lambdas=lambdas.ravel())
 
         uEnd = uNum[-1, :].reshape(lambdas.shape)
         stab = np.abs(uEnd)

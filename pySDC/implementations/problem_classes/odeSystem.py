@@ -29,8 +29,7 @@ class ProtheroRobinsonAutonomous(ptype):
         self.f = self.f_NONLIN if nonLinear else self.f_LIN
         self.dgInv = self.dgInv_NONLIN if nonLinear else self.dgInv_LIN
         self._makeAttributeAndRegister(
-            'epsilon', 'nonLinear', 'newton_maxiter', 'newton_tol', 'stop_at_nan',
-            localVars=locals(), readOnly=True
+            'epsilon', 'nonLinear', 'newton_maxiter', 'newton_tol', 'stop_at_nan', localVars=locals(), readOnly=True
         )
         self.work_counters['newton'] = WorkCounter()
         self.work_counters['rhs'] = WorkCounter()
@@ -54,10 +53,10 @@ class ProtheroRobinsonAutonomous(ptype):
         raise NotImplementedError()
 
     def f_LIN(self, u, t):
-        return -self.epsilon**(-1)*(u - self.g(t)) + self.dg(t)
+        return -self.epsilon ** (-1) * (u - self.g(t)) + self.dg(t)
 
     def f_NONLIN(self, u, t):
-        return -self.epsilon**(-1)*(u**3 - self.g(t)**3) + self.dg(t)
+        return -self.epsilon ** (-1) * (u**3 - self.g(t) ** 3) + self.dg(t)
 
     def dgInv(self, u, t):
         raise NotImplementedError()
@@ -65,19 +64,14 @@ class ProtheroRobinsonAutonomous(ptype):
     def dgInv_LIN(self, u, t, dt):
         e = self.epsilon
         g1, g2 = self.dg(t), self.dg2(t)
-        return np.array([
-            [1/(dt/e + 1), (dt*g2 + dt*g1/e)/(dt/e + 1)],
-            [0, 1]
-        ])
+        return np.array([[1 / (dt / e + 1), (dt * g2 + dt * g1 / e) / (dt / e + 1)], [0, 1]])
 
     def dgInv_NONLIN(self, u, t, dt):
         e = self.epsilon
         g, g1, g2 = self.g(t), self.dg(t), self.dg2(t)
-        return np.array([
-            [1/(3*dt*u**2/e + 1), (dt*g2 + 3*dt*g**2*g1/e)/(3*dt*u**2/e + 1)],
-            [0, 1]
-        ])
-
+        return np.array(
+            [[1 / (3 * dt * u**2 / e + 1), (dt * g2 + 3 * dt * g**2 * g1 / e) / (3 * dt * u**2 / e + 1)], [0, 1]]
+        )
 
     # -------------------------------------------------------------------------
     # pySDC required methods
@@ -105,7 +99,6 @@ class ProtheroRobinsonAutonomous(ptype):
         u[1] = t
         return u
 
-
     def eval_f(self, u, t):
         """
         Routine to evaluate the right-hand side of the problem.
@@ -129,7 +122,6 @@ class ProtheroRobinsonAutonomous(ptype):
         f[1] = 1
         self.work_counters['rhs']()
         return f
-
 
     def solve_system(self, rhs, dt, u0, t):
         """
@@ -186,7 +178,6 @@ class ProtheroRobinsonAutonomous(ptype):
         return u
 
 
-
 class Kaps(ptype):
 
     dtype_u = mesh
@@ -197,12 +188,10 @@ class Kaps(ptype):
         super().__init__((nvars, None, np.dtype('float64')))
 
         self._makeAttributeAndRegister(
-            'epsilon', 'newton_maxiter', 'newton_tol', 'stop_at_nan',
-            localVars=locals(), readOnly=True
+            'epsilon', 'newton_maxiter', 'newton_tol', 'stop_at_nan', localVars=locals(), readOnly=True
         )
         self.work_counters['newton'] = WorkCounter()
         self.work_counters['rhs'] = WorkCounter()
-
 
     def u_exact(self, t, u_init=None, t_init=None):
         r"""
@@ -223,9 +212,8 @@ class Kaps(ptype):
             The approximated exact solution.
         """
         u = self.dtype_u(self.init)
-        u[:] = [np.exp(-2*t), np.exp(-t)]
+        u[:] = [np.exp(-2 * t), np.exp(-t)]
         return u
-
 
     def eval_f(self, u, t):
         """
@@ -247,10 +235,9 @@ class Kaps(ptype):
         eps = self.epsilon
         x, y = u
 
-        f[:] = [-(2+1/eps)*x + y**2/eps, x-y*(1+y)]
+        f[:] = [-(2 + 1 / eps) * x + y**2 / eps, x - y * (1 + y)]
         self.work_counters['rhs']()
         return f
-
 
     def solve_system(self, rhs, dt, u0, t):
         """
@@ -281,7 +268,7 @@ class Kaps(ptype):
         while n < self.newton_maxiter:
 
             x, y = u
-            f = np.array([-(2+1/eps)*x + y**2/eps, x-y*(1+y)])
+            f = np.array([-(2 + 1 / eps) * x + y**2 / eps, x - y * (1 + y)])
 
             # form the function g with g(u) = 0
             g = u - dt * f - rhs
@@ -292,11 +279,12 @@ class Kaps(ptype):
                 break
 
             # assemble (dg/du)^(-1)
-            prefactor = 4*dt**2*eps*y + 2*dt**2*eps + dt**2 + 2*dt*eps*y + 3*dt*eps + dt + eps
-            dgInv = 1/prefactor * np.array([
-                [2*dt*eps*y + dt*eps + eps, 2*dt*y],
-                [dt*eps, 2*dt*eps + dt + eps]
-                ])
+            prefactor = 4 * dt**2 * eps * y + 2 * dt**2 * eps + dt**2 + 2 * dt * eps * y + 3 * dt * eps + dt + eps
+            dgInv = (
+                1
+                / prefactor
+                * np.array([[2 * dt * eps * y + dt * eps + eps, 2 * dt * y], [dt * eps, 2 * dt * eps + dt + eps]])
+            )
 
             # newton update: u1 = u0 - g/dg
             u -= dgInv @ g
@@ -323,16 +311,14 @@ class ChemicalReaction3Var(ptype):
 
     def __init__(self, newton_maxiter=200, newton_tol=5e-11, stop_at_nan=True):
         nvars = 3
-        u0 = (0.990731920827, 1.009264413846, -.366532612659e-5)
+        u0 = (0.990731920827, 1.009264413846, -0.366532612659e-5)
         super().__init__((nvars, None, np.dtype('float64')))
 
         self._makeAttributeAndRegister(
-            'u0', 'newton_maxiter', 'newton_tol', 'stop_at_nan',
-            localVars=locals(), readOnly=True
+            'u0', 'newton_maxiter', 'newton_tol', 'stop_at_nan', localVars=locals(), readOnly=True
         )
         self.work_counters['newton'] = WorkCounter()
         self.work_counters['rhs'] = WorkCounter()
-
 
     def u_exact(self, t, u_init=None, t_init=None):
         r"""
@@ -375,7 +361,6 @@ class ChemicalReaction3Var(ptype):
             me[:] = self.u0
         return me
 
-
     def eval_f(self, u, t):
         """
         Routine to evaluate the right-hand side of the problem.
@@ -395,12 +380,9 @@ class ChemicalReaction3Var(ptype):
         f = self.dtype_f(self.init)
         c1, c2, c3 = u
 
-        f[:] = -np.array(
-            [0.013*c1 + 1000*c3*c1, 2500*c3*c2, 0.013*c1 + 1000*c1*c3 + 2500*c2*c3]
-            )
+        f[:] = -np.array([0.013 * c1 + 1000 * c3 * c1, 2500 * c3 * c2, 0.013 * c1 + 1000 * c1 * c3 + 2500 * c2 * c3])
         self.work_counters['rhs']()
         return f
-
 
     def solve_system(self, rhs, dt, u0, t):
         """
@@ -430,9 +412,7 @@ class ChemicalReaction3Var(ptype):
         while n < self.newton_maxiter:
 
             c1, c2, c3 = u
-            f = -np.array(
-                [0.013*c1 + 1000*c3*c1, 2500*c3*c2, 0.013*c1 + 1000*c1*c3 + 2500*c2*c3]
-                )
+            f = -np.array([0.013 * c1 + 1000 * c3 * c1, 2500 * c3 * c2, 0.013 * c1 + 1000 * c1 * c3 + 2500 * c2 * c3])
 
             # form the function g with g(u) = 0
             g = u - dt * f - rhs
@@ -443,7 +423,191 @@ class ChemicalReaction3Var(ptype):
                 break
 
             # assemble (dg/du)^(-1)
-            dgInv = np.array([[(2500000000.0*c1*c3**2*dt**3 + 32500.0*c1*c3*dt**3 + 3500000.0*c1*c3*dt**2 + 13.0*c1*dt**2 + 1000.0*c1*dt + 2500000.0*c2*c3*dt**2 + 32.5*c2*dt**2 + 2500.0*c2*dt + 2500000.0*c3**2*dt**2 + 32.5*c3*dt**2 + 3500.0*c3*dt + 0.013*dt + 1.0)/(2500000000.0*c1*c3**2*dt**3 + 32500.0*c1*c3*dt**3 + 3500000.0*c1*c3*dt**2 + 13.0*c1*dt**2 + 1000.0*c1*dt + 2500000000.0*c2*c3**2*dt**3 + 65000.0*c2*c3*dt**3 + 5000000.0*c2*c3*dt**2 + 0.4225*c2*dt**3 + 65.0*c2*dt**2 + 2500.0*c2*dt + 2500000000.0*c3**3*dt**3 + 65000.0*c3**2*dt**3 + 6000000.0*c3**2*dt**2 + 0.4225*c3*dt**3 + 91.0*c3*dt**2 + 4500.0*c3*dt + 0.000169*dt**2 + 0.026*dt + 1.0), (2500000000.0*c1*c3**2*dt**3 + 32500.0*c1*c3*dt**3 + 2500000.0*c1*c3*dt**2)/(2500000000.0*c1*c3**2*dt**3 + 32500.0*c1*c3*dt**3 + 3500000.0*c1*c3*dt**2 + 13.0*c1*dt**2 + 1000.0*c1*dt + 2500000000.0*c2*c3**2*dt**3 + 65000.0*c2*c3*dt**3 + 5000000.0*c2*c3*dt**2 + 0.4225*c2*dt**3 + 65.0*c2*dt**2 + 2500.0*c2*dt + 2500000000.0*c3**3*dt**3 + 65000.0*c3**2*dt**3 + 6000000.0*c3**2*dt**2 + 0.4225*c3*dt**3 + 91.0*c3*dt**2 + 4500.0*c3*dt + 0.000169*dt**2 + 0.026*dt + 1.0), (-2500000000.0*c1*c3**2*dt**3 - 32500.0*c1*c3*dt**3 - 3500000.0*c1*c3*dt**2 - 13.0*c1*dt**2 - 1000.0*c1*dt)/(2500000000.0*c1*c3**2*dt**3 + 32500.0*c1*c3*dt**3 + 3500000.0*c1*c3*dt**2 + 13.0*c1*dt**2 + 1000.0*c1*dt + 2500000000.0*c2*c3**2*dt**3 + 65000.0*c2*c3*dt**3 + 5000000.0*c2*c3*dt**2 + 0.4225*c2*dt**3 + 65.0*c2*dt**2 + 2500.0*c2*dt + 2500000000.0*c3**3*dt**3 + 65000.0*c3**2*dt**3 + 6000000.0*c3**2*dt**2 + 0.4225*c3*dt**3 + 91.0*c3*dt**2 + 4500.0*c3*dt + 0.000169*dt**2 + 0.026*dt + 1.0)], [(6250000000.0*c2*c3*dt**2 + 81250.0*c2*dt**2)/(6250000000.0*c1*c3*dt**2 + 2500000.0*c1*dt + 6250000000.0*c2*c3*dt**2 + 81250.0*c2*dt**2 + 6250000.0*c2*dt + 6250000000.0*c3**2*dt**2 + 81250.0*c3*dt**2 + 8750000.0*c3*dt + 32.5*dt + 2500.0), (2500000.0*c1*dt + 6250000000.0*c2*c3*dt**2 + 81250.0*c2*dt**2 + 6250000.0*c2*dt + 2500000.0*c3*dt + 32.5*dt + 2500.0)/(6250000000.0*c1*c3*dt**2 + 2500000.0*c1*dt + 6250000000.0*c2*c3*dt**2 + 81250.0*c2*dt**2 + 6250000.0*c2*dt + 6250000000.0*c3**2*dt**2 + 81250.0*c3*dt**2 + 8750000.0*c3*dt + 32.5*dt + 2500.0), (-6250000000.0*c2*c3*dt**2 - 81250.0*c2*dt**2 - 6250000.0*c2*dt)/(6250000000.0*c1*c3*dt**2 + 2500000.0*c1*dt + 6250000000.0*c2*c3*dt**2 + 81250.0*c2*dt**2 + 6250000.0*c2*dt + 6250000000.0*c3**2*dt**2 + 81250.0*c3*dt**2 + 8750000.0*c3*dt + 32.5*dt + 2500.0)], [(-2500000.0*c3**2*dt**2 - 32.5*c3*dt**2 - 1000.0*c3*dt - 0.013*dt)/(2500000.0*c1*c3*dt**2 + 1000.0*c1*dt + 2500000.0*c2*c3*dt**2 + 32.5*c2*dt**2 + 2500.0*c2*dt + 2500000.0*c3**2*dt**2 + 32.5*c3*dt**2 + 3500.0*c3*dt + 0.013*dt + 1.0), (-2500000.0*c3**2*dt**2 - 32.5*c3*dt**2 - 2500.0*c3*dt)/(2500000.0*c1*c3*dt**2 + 1000.0*c1*dt + 2500000.0*c2*c3*dt**2 + 32.5*c2*dt**2 + 2500.0*c2*dt + 2500000.0*c3**2*dt**2 + 32.5*c3*dt**2 + 3500.0*c3*dt + 0.013*dt + 1.0), (2500000.0*c3**2*dt**2 + 32.5*c3*dt**2 + 3500.0*c3*dt + 0.013*dt + 1.0)/(2500000.0*c1*c3*dt**2 + 1000.0*c1*dt + 2500000.0*c2*c3*dt**2 + 32.5*c2*dt**2 + 2500.0*c2*dt + 2500000.0*c3**2*dt**2 + 32.5*c3*dt**2 + 3500.0*c3*dt + 0.013*dt + 1.0)]])
+            dgInv = np.array(
+                [
+                    [
+                        (
+                            2500000000.0 * c1 * c3**2 * dt**3
+                            + 32500.0 * c1 * c3 * dt**3
+                            + 3500000.0 * c1 * c3 * dt**2
+                            + 13.0 * c1 * dt**2
+                            + 1000.0 * c1 * dt
+                            + 2500000.0 * c2 * c3 * dt**2
+                            + 32.5 * c2 * dt**2
+                            + 2500.0 * c2 * dt
+                            + 2500000.0 * c3**2 * dt**2
+                            + 32.5 * c3 * dt**2
+                            + 3500.0 * c3 * dt
+                            + 0.013 * dt
+                            + 1.0
+                        )
+                        / (
+                            2500000000.0 * c1 * c3**2 * dt**3
+                            + 32500.0 * c1 * c3 * dt**3
+                            + 3500000.0 * c1 * c3 * dt**2
+                            + 13.0 * c1 * dt**2
+                            + 1000.0 * c1 * dt
+                            + 2500000000.0 * c2 * c3**2 * dt**3
+                            + 65000.0 * c2 * c3 * dt**3
+                            + 5000000.0 * c2 * c3 * dt**2
+                            + 0.4225 * c2 * dt**3
+                            + 65.0 * c2 * dt**2
+                            + 2500.0 * c2 * dt
+                            + 2500000000.0 * c3**3 * dt**3
+                            + 65000.0 * c3**2 * dt**3
+                            + 6000000.0 * c3**2 * dt**2
+                            + 0.4225 * c3 * dt**3
+                            + 91.0 * c3 * dt**2
+                            + 4500.0 * c3 * dt
+                            + 0.000169 * dt**2
+                            + 0.026 * dt
+                            + 1.0
+                        ),
+                        (2500000000.0 * c1 * c3**2 * dt**3 + 32500.0 * c1 * c3 * dt**3 + 2500000.0 * c1 * c3 * dt**2)
+                        / (
+                            2500000000.0 * c1 * c3**2 * dt**3
+                            + 32500.0 * c1 * c3 * dt**3
+                            + 3500000.0 * c1 * c3 * dt**2
+                            + 13.0 * c1 * dt**2
+                            + 1000.0 * c1 * dt
+                            + 2500000000.0 * c2 * c3**2 * dt**3
+                            + 65000.0 * c2 * c3 * dt**3
+                            + 5000000.0 * c2 * c3 * dt**2
+                            + 0.4225 * c2 * dt**3
+                            + 65.0 * c2 * dt**2
+                            + 2500.0 * c2 * dt
+                            + 2500000000.0 * c3**3 * dt**3
+                            + 65000.0 * c3**2 * dt**3
+                            + 6000000.0 * c3**2 * dt**2
+                            + 0.4225 * c3 * dt**3
+                            + 91.0 * c3 * dt**2
+                            + 4500.0 * c3 * dt
+                            + 0.000169 * dt**2
+                            + 0.026 * dt
+                            + 1.0
+                        ),
+                        (
+                            -2500000000.0 * c1 * c3**2 * dt**3
+                            - 32500.0 * c1 * c3 * dt**3
+                            - 3500000.0 * c1 * c3 * dt**2
+                            - 13.0 * c1 * dt**2
+                            - 1000.0 * c1 * dt
+                        )
+                        / (
+                            2500000000.0 * c1 * c3**2 * dt**3
+                            + 32500.0 * c1 * c3 * dt**3
+                            + 3500000.0 * c1 * c3 * dt**2
+                            + 13.0 * c1 * dt**2
+                            + 1000.0 * c1 * dt
+                            + 2500000000.0 * c2 * c3**2 * dt**3
+                            + 65000.0 * c2 * c3 * dt**3
+                            + 5000000.0 * c2 * c3 * dt**2
+                            + 0.4225 * c2 * dt**3
+                            + 65.0 * c2 * dt**2
+                            + 2500.0 * c2 * dt
+                            + 2500000000.0 * c3**3 * dt**3
+                            + 65000.0 * c3**2 * dt**3
+                            + 6000000.0 * c3**2 * dt**2
+                            + 0.4225 * c3 * dt**3
+                            + 91.0 * c3 * dt**2
+                            + 4500.0 * c3 * dt
+                            + 0.000169 * dt**2
+                            + 0.026 * dt
+                            + 1.0
+                        ),
+                    ],
+                    [
+                        (6250000000.0 * c2 * c3 * dt**2 + 81250.0 * c2 * dt**2)
+                        / (
+                            6250000000.0 * c1 * c3 * dt**2
+                            + 2500000.0 * c1 * dt
+                            + 6250000000.0 * c2 * c3 * dt**2
+                            + 81250.0 * c2 * dt**2
+                            + 6250000.0 * c2 * dt
+                            + 6250000000.0 * c3**2 * dt**2
+                            + 81250.0 * c3 * dt**2
+                            + 8750000.0 * c3 * dt
+                            + 32.5 * dt
+                            + 2500.0
+                        ),
+                        (
+                            2500000.0 * c1 * dt
+                            + 6250000000.0 * c2 * c3 * dt**2
+                            + 81250.0 * c2 * dt**2
+                            + 6250000.0 * c2 * dt
+                            + 2500000.0 * c3 * dt
+                            + 32.5 * dt
+                            + 2500.0
+                        )
+                        / (
+                            6250000000.0 * c1 * c3 * dt**2
+                            + 2500000.0 * c1 * dt
+                            + 6250000000.0 * c2 * c3 * dt**2
+                            + 81250.0 * c2 * dt**2
+                            + 6250000.0 * c2 * dt
+                            + 6250000000.0 * c3**2 * dt**2
+                            + 81250.0 * c3 * dt**2
+                            + 8750000.0 * c3 * dt
+                            + 32.5 * dt
+                            + 2500.0
+                        ),
+                        (-6250000000.0 * c2 * c3 * dt**2 - 81250.0 * c2 * dt**2 - 6250000.0 * c2 * dt)
+                        / (
+                            6250000000.0 * c1 * c3 * dt**2
+                            + 2500000.0 * c1 * dt
+                            + 6250000000.0 * c2 * c3 * dt**2
+                            + 81250.0 * c2 * dt**2
+                            + 6250000.0 * c2 * dt
+                            + 6250000000.0 * c3**2 * dt**2
+                            + 81250.0 * c3 * dt**2
+                            + 8750000.0 * c3 * dt
+                            + 32.5 * dt
+                            + 2500.0
+                        ),
+                    ],
+                    [
+                        (-2500000.0 * c3**2 * dt**2 - 32.5 * c3 * dt**2 - 1000.0 * c3 * dt - 0.013 * dt)
+                        / (
+                            2500000.0 * c1 * c3 * dt**2
+                            + 1000.0 * c1 * dt
+                            + 2500000.0 * c2 * c3 * dt**2
+                            + 32.5 * c2 * dt**2
+                            + 2500.0 * c2 * dt
+                            + 2500000.0 * c3**2 * dt**2
+                            + 32.5 * c3 * dt**2
+                            + 3500.0 * c3 * dt
+                            + 0.013 * dt
+                            + 1.0
+                        ),
+                        (-2500000.0 * c3**2 * dt**2 - 32.5 * c3 * dt**2 - 2500.0 * c3 * dt)
+                        / (
+                            2500000.0 * c1 * c3 * dt**2
+                            + 1000.0 * c1 * dt
+                            + 2500000.0 * c2 * c3 * dt**2
+                            + 32.5 * c2 * dt**2
+                            + 2500.0 * c2 * dt
+                            + 2500000.0 * c3**2 * dt**2
+                            + 32.5 * c3 * dt**2
+                            + 3500.0 * c3 * dt
+                            + 0.013 * dt
+                            + 1.0
+                        ),
+                        (2500000.0 * c3**2 * dt**2 + 32.5 * c3 * dt**2 + 3500.0 * c3 * dt + 0.013 * dt + 1.0)
+                        / (
+                            2500000.0 * c1 * c3 * dt**2
+                            + 1000.0 * c1 * dt
+                            + 2500000.0 * c2 * c3 * dt**2
+                            + 32.5 * c2 * dt**2
+                            + 2500.0 * c2 * dt
+                            + 2500000.0 * c3**2 * dt**2
+                            + 32.5 * c3 * dt**2
+                            + 3500.0 * c3 * dt
+                            + 0.013 * dt
+                            + 1.0
+                        ),
+                    ],
+                ]
+            )
 
             # newton update: u1 = u0 - g/dg
             u -= dgInv @ g
@@ -470,16 +634,14 @@ class JacobiElliptic(ptype):
 
     def __init__(self, newton_maxiter=200, newton_tol=5e-11, stop_at_nan=True):
         nvars = 3
-        u0 = (0., 1., 1.)
+        u0 = (0.0, 1.0, 1.0)
         super().__init__((nvars, None, np.dtype('float64')))
 
         self._makeAttributeAndRegister(
-            'u0', 'newton_maxiter', 'newton_tol', 'stop_at_nan',
-            localVars=locals(), readOnly=True
+            'u0', 'newton_maxiter', 'newton_tol', 'stop_at_nan', localVars=locals(), readOnly=True
         )
         self.work_counters['newton'] = WorkCounter()
         self.work_counters['rhs'] = WorkCounter()
-
 
     def u_exact(self, t, u_init=None, t_init=None):
         r"""
@@ -522,7 +684,6 @@ class JacobiElliptic(ptype):
             me[:] = self.u0
         return me
 
-
     def eval_f(self, u, t):
         """
         Routine to evaluate the right-hand side of the problem.
@@ -542,10 +703,9 @@ class JacobiElliptic(ptype):
         f = self.dtype_f(self.init)
         u1, u2, u3 = u
 
-        f[:] = np.array([u2*u3, -u1*u3, -0.51*u1*u2])
+        f[:] = np.array([u2 * u3, -u1 * u3, -0.51 * u1 * u2])
         self.work_counters['rhs']()
         return f
-
 
     def solve_system(self, rhs, dt, u0, t):
         """
@@ -575,7 +735,7 @@ class JacobiElliptic(ptype):
         while n < self.newton_maxiter:
 
             u1, u2, u3 = u
-            f = np.array([u2*u3, -u1*u3, -0.51*u1*u2])
+            f = np.array([u2 * u3, -u1 * u3, -0.51 * u1 * u2])
 
             # form the function g with g(u) = 0
             g = u - dt * f - rhs
@@ -586,12 +746,28 @@ class JacobiElliptic(ptype):
                 break
 
             # assemble (dg/du)^(-1)
-            dgInv = np.array([
-                [0.51*dt**2*u1**2 - 1.0, 0.51*dt**2*u1*u2 - 1.0*dt*u3, 1.0*dt**2*u1*u3 - 1.0*dt*u2],
-                [-0.51*dt**2*u1*u2 + 1.0*dt*u3, -0.51*dt**2*u2**2 - 1.0, 1.0*dt**2*u2*u3 + 1.0*dt*u1],
-                [-0.51*dt**2*u1*u3 + 0.51*dt*u2, 0.51*dt**2*u2*u3 + 0.51*dt*u1, -1.0*dt**2*u3**2 - 1.0]
-            ])
-            dgInv /= 1.02*dt**3*u1*u2*u3 + 0.51*dt**2*u1**2 - 0.51*dt**2*u2**2 - 1.0*dt**2*u3**2 - 1.0
+            dgInv = np.array(
+                [
+                    [
+                        0.51 * dt**2 * u1**2 - 1.0,
+                        0.51 * dt**2 * u1 * u2 - 1.0 * dt * u3,
+                        1.0 * dt**2 * u1 * u3 - 1.0 * dt * u2,
+                    ],
+                    [
+                        -0.51 * dt**2 * u1 * u2 + 1.0 * dt * u3,
+                        -0.51 * dt**2 * u2**2 - 1.0,
+                        1.0 * dt**2 * u2 * u3 + 1.0 * dt * u1,
+                    ],
+                    [
+                        -0.51 * dt**2 * u1 * u3 + 0.51 * dt * u2,
+                        0.51 * dt**2 * u2 * u3 + 0.51 * dt * u1,
+                        -1.0 * dt**2 * u3**2 - 1.0,
+                    ],
+                ]
+            )
+            dgInv /= (
+                1.02 * dt**3 * u1 * u2 * u3 + 0.51 * dt**2 * u1**2 - 0.51 * dt**2 * u2**2 - 1.0 * dt**2 * u3**2 - 1.0
+            )
 
             # newton update: u1 = u0 - g/dg
             u -= dgInv @ g

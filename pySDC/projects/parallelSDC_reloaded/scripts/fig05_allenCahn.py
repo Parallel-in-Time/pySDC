@@ -7,35 +7,34 @@ Figures with experiments on the Allen-Cahn problem
 """
 import os
 import numpy as np
-from utils import solutionExact, getParamsSDC, solutionSDC, getParamsRK, \
-    plt
+from utils import solutionExact, getParamsSDC, solutionSDC, getParamsRK, plt
 
-PATH = '/'+os.path.join(*__file__.split('/')[:-1])
+PATH = '/' + os.path.join(*__file__.split('/')[:-1])
 SCRIPT = __file__.split('/')[-1].split('.')[0]
 
-symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
+symList = ['o', '^', 's', '>', '*', '<', 'p', '>'] * 10
 
 # SDC parameters
 nNodes = 4
 quadType = 'RADAU-RIGHT'
 nodeType = 'LEGENDRE'
-parEfficiency = 0.8 # 1/nNodes
+parEfficiency = 0.8  # 1/nNodes
 nSweeps = 4
 
 # Problem parameters
 pName = "ALLEN-CAHN"
 tEnd = 50
-pParams  = {
+pParams = {
     "periodic": False,
     "nvars": 2**11 - 1,
     "epsilon": 0.04,
-    }
+}
 
 # -----------------------------------------------------------------------------
 # Trajectories (reference solution)
 # -----------------------------------------------------------------------------
 uExact = solutionExact(tEnd, 1, pName, **pParams)
-x = np.linspace(-0.5, 0.5, 2**11+1)[1:-1]
+x = np.linspace(-0.5, 0.5, 2**11 + 1)[1:-1]
 
 figName = f"{SCRIPT}_solution"
 plt.figure(figName)
@@ -53,16 +52,19 @@ plt.savefig(f"{PATH}/{figName}.pdf")
 # %% Convergence and error VS cost plots
 # -----------------------------------------------------------------------------
 nStepsList = np.array([1, 2, 5, 10, 20, 50, 100, 200, 500])
-dtVals = tEnd/nStepsList
+dtVals = tEnd / nStepsList
+
 
 def getError(uNum, uRef):
     if uNum is None:
         return np.inf
     return np.linalg.norm(uRef[-1, :] - uNum[-1, :], ord=2)
 
+
 def getCost(counters):
     nNewton, nRHS, tComp = counters
-    return 2*nNewton + nRHS
+    return 2 * nNewton + nRHS
+
 
 minPrec = ["MIN-SR-NS", "MIN-SR-S", "MIN-SR-FLEX"]
 
@@ -85,8 +87,8 @@ for qDeltaList in config:
             params = getParamsRK(qDelta)
         except KeyError:
             params = getParamsSDC(
-                quadType=quadType, numNodes=nNodes, nodeType=nodeType,
-                qDeltaI=qDelta, nSweeps=nSweeps)
+                quadType=quadType, numNodes=nNodes, nodeType=nodeType, qDeltaI=qDelta, nSweeps=nSweeps
+            )
 
         errors = []
         costs = []
@@ -95,24 +97,23 @@ for qDeltaList in config:
 
             uRef = solutionExact(tEnd, nSteps, pName, **pParams)
 
-            uSDC, counters, parallel = solutionSDC(
-                tEnd, nSteps, params, pName, **pParams)
+            uSDC, counters, parallel = solutionSDC(tEnd, nSteps, params, pName, **pParams)
 
             err = getError(uSDC, uRef)
             errors.append(err)
 
             cost = getCost(counters)
             if parallel:
-                cost /= nNodes*parEfficiency
+                cost /= nNodes * parEfficiency
             costs.append(cost)
 
         ls = '-' if qDelta.startswith("MIN-SR-") else "--"
 
         plt.figure(figNameConv)
-        plt.loglog(dtVals, errors, sym+ls, label=qDelta)
+        plt.loglog(dtVals, errors, sym + ls, label=qDelta)
 
         plt.figure(figNameCost)
-        plt.loglog(costs, errors, sym+ls, label=qDelta)
+        plt.loglog(costs, errors, sym + ls, label=qDelta)
 
     for figName in [figNameConv, figNameCost]:
         plt.figure(figName)

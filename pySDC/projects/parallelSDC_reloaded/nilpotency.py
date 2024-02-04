@@ -20,9 +20,10 @@ def nilpotencyS(d, Q):
         d = d[1:]
         Q = Q[1:, 1:]
     M = d.size
-    D = np.diag(1/d)
-    K = np.eye(M)- D @ Q
-    return np.linalg.norm( np.linalg.matrix_power(K, M), ord=np.inf)
+    D = np.diag(1 / d)
+    K = np.eye(M) - D @ Q
+    return np.linalg.norm(np.linalg.matrix_power(K, M), ord=np.inf)
+
 
 def nilpotencyNS(d, Q):
     M = d.size
@@ -41,15 +42,11 @@ for m in nNodes:
 
     qDelta = s.get_Qdelta_implicit(s.coll, qd_type="MIN-SR-S")
     d = np.diag(qDelta)[1:]
-    nil_MIN_SR_S.append(
-        [nilpotencyS(d, Q), nilpotencyNS(d, Q)]
-    )
+    nil_MIN_SR_S.append([nilpotencyS(d, Q), nilpotencyNS(d, Q)])
 
     qDelta = s.get_Qdelta_implicit(s.coll, qd_type="MIN-SR-NS")
     d = np.diag(qDelta)[1:]
-    nil_MIN_SR_NS.append(
-        [nilpotencyS(d, Q), nilpotencyNS(d, Q)]
-    )
+    nil_MIN_SR_NS.append([nilpotencyS(d, Q), nilpotencyNS(d, Q)])
 
 nil_MIN_SR_NS = np.array(nil_MIN_SR_NS).T
 nil_MIN_SR_S = np.array(nil_MIN_SR_S).T

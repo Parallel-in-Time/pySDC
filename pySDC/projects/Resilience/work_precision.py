@@ -1109,9 +1109,11 @@ def get_configs(mode, problem):
         configurations[-1] = {
             'strategies': [
                 ERKStrategy(useMPI=True),
-                ARKStrategy(useMPI=True)
-                if problem.__name__ in ['run_Schroedinger', 'run_AC']
-                else ESDIRKStrategy(useMPI=True),
+                (
+                    ARKStrategy(useMPI=True)
+                    if problem.__name__ in ['run_Schroedinger', 'run_AC']
+                    else ESDIRKStrategy(useMPI=True)
+                ),
             ],
             'num_procs': 1,
         }

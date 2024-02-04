@@ -17,13 +17,13 @@ import matplotlib.pyplot as plt
 from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 
 # Problem parameters
-tEnd = 2*np.pi
+tEnd = 2 * np.pi
 nonLinear = True
 epsilon = 0.001
 collUpdate = False
 initSweep = "spread"
 
-pName = "PROTHERO-ROBINSON-A"+(nonLinear)*"-NL"
+pName = "PROTHERO-ROBINSON-A" + (nonLinear) * "-NL"
 
 
 def getError(uNum, uRef):
@@ -31,9 +31,11 @@ def getError(uNum, uRef):
         return np.inf
     return np.linalg.norm(uRef[:, 0] - uNum[:, 0], np.inf)
 
+
 def getCost(counters):
     nNewton, nRHS, tComp = counters
     return nNewton + nRHS
+
 
 # Base variable parameters
 nNodes = 4
@@ -42,8 +44,12 @@ nodeType = 'LEGENDRE'
 parEfficiency = 0.8
 
 qDeltaList = [
-    'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX',
-    "ESDIRK43", 'LU', 'HOUWEN-SOMMEIJER',
+    'MIN-SR-NS',
+    'MIN-SR-S',
+    'MIN-SR-FLEX',
+    "ESDIRK43",
+    'LU',
+    'HOUWEN-SOMMEIJER',
     # 'IE', 'LU', 'IEpar', 'PIC',
     # "MIN3",
 ]
@@ -54,10 +60,10 @@ nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
 nSweepList = [8]
 
 
-symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
+symList = ['o', '^', 's', '>', '*', '<', 'p', '>'] * 10
 fig, axs = plt.subplots(1, 2)
 
-dtVals = tEnd/nStepsList
+dtVals = tEnd / nStepsList
 
 i = 0
 for qDelta in qDeltaList:
@@ -75,9 +81,14 @@ for qDelta in qDeltaList:
 
         except KeyError:
             params = getParamsSDC(
-                quadType=quadType, numNodes=nNodes, nodeType=nodeType,
-                qDeltaI=qDelta, nSweeps=nSweeps,
-                collUpdate=collUpdate, initType=initSweep)
+                quadType=quadType,
+                numNodes=nNodes,
+                nodeType=nodeType,
+                qDeltaI=qDelta,
+                nSweeps=nSweeps,
+                collUpdate=collUpdate,
+                initType=initSweep,
+            )
         print(f'computing for {name} ...')
 
         errors = []
@@ -86,24 +97,22 @@ for qDelta in qDeltaList:
         for nSteps in nStepsList:
             print(f' -- nSteps={nSteps} ...')
 
-            uRef = solutionExact(
-                tEnd, nSteps, pName, epsilon=epsilon)
+            uRef = solutionExact(tEnd, nSteps, pName, epsilon=epsilon)
 
-            uSDC, counters, parallel = solutionSDC(
-                tEnd, nSteps, params, pName, epsilon=epsilon)
+            uSDC, counters, parallel = solutionSDC(tEnd, nSteps, params, pName, epsilon=epsilon)
 
             err = getError(uSDC, uRef)
             errors.append(err)
 
             cost = getCost(counters)
             if parallel:
-                cost /= nNodes*parEfficiency
+                cost /= nNodes * parEfficiency
             costs.append(cost)
 
         # error VS dt
-        axs[0].loglog(dtVals, errors, sym+'-', label=name)
+        axs[0].loglog(dtVals, errors, sym + '-', label=name)
         # error VS cost
-        axs[1].loglog(costs, errors, sym+'-', label=name)
+        axs[1].loglog(costs, errors, sym + '-', label=name)
 
 for i in range(2):
     axs[i].set(

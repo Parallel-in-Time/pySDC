@@ -29,8 +29,7 @@ class ProtheroRobinson(ptype):
         self.f = self.f_NONLIN if nonLinear else self.f_LIN
         self.jac = self.jac_NONLIN if nonLinear else self.jac_LIN
         self._makeAttributeAndRegister(
-            'epsilon', 'nonLinear', 'newton_maxiter', 'newton_tol', 'stop_at_nan',
-            localVars=locals(), readOnly=True
+            'epsilon', 'nonLinear', 'newton_maxiter', 'newton_tol', 'stop_at_nan', localVars=locals(), readOnly=True
         )
         self.work_counters['newton'] = WorkCounter()
         self.work_counters['rhs'] = WorkCounter()
@@ -54,19 +53,19 @@ class ProtheroRobinson(ptype):
         raise NotImplementedError()
 
     def f_LIN(self, u, t):
-        return -self.epsilon**(-1)*(u - self.g(t)) + self.dg(t)
+        return -self.epsilon ** (-1) * (u - self.g(t)) + self.dg(t)
 
     def f_NONLIN(self, u, t):
-        return -self.epsilon**(-1)*(u**3 - self.g(t)**3) + self.dg(t)
+        return -self.epsilon ** (-1) * (u**3 - self.g(t) ** 3) + self.dg(t)
 
     def jac(self, u, t):
         raise NotImplementedError()
 
     def jac_LIN(self, u, t):
-        return -self.epsilon**(-1)
+        return -self.epsilon ** (-1)
 
     def jac_NONLIN(self, u, t):
-        return -self.epsilon**(-1)*3*u**2
+        return -self.epsilon ** (-1) * 3 * u**2
 
     # -------------------------------------------------------------------------
     # pySDC required methods
@@ -93,7 +92,6 @@ class ProtheroRobinson(ptype):
         u[:] = self.g(t)
         return u
 
-
     def eval_f(self, u, t):
         """
         Routine to evaluate the right-hand side of the problem.
@@ -115,7 +113,6 @@ class ProtheroRobinson(ptype):
         f[:] = self.f(u, t)
         self.work_counters['rhs']()
         return f
-
 
     def solve_system(self, rhs, dt, u0, t):
         """
@@ -153,10 +150,10 @@ class ProtheroRobinson(ptype):
                 break
 
             # assemble dg/du
-            dg = 1 - dt*self.jac(u, t)
+            dg = 1 - dt * self.jac(u, t)
 
             # newton update: u1 = u0 - g/dg
-            u -= dg**(-1) * g
+            u -= dg ** (-1) * g
 
             # increase iteration count and work counter
             n += 1

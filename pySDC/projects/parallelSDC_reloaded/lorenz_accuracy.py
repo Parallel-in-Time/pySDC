@@ -17,32 +17,41 @@ from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 
 tEnd = 1.24
 
+
 def getError(uNum, uRef):
     if uNum is None:
         return np.inf
     return np.linalg.norm(np.linalg.norm(uRef - uNum, np.inf, axis=-1), np.inf)
 
+
 def getCost(counters):
     nNewton, nRHS, tComp = counters
     return nNewton + nRHS
+
 
 # Base variable parameters
 nNodes = 4
 quadType = 'RADAU-RIGHT'
 nodeType = 'LEGENDRE'
-parEfficiency = 0.8 # 1/nNodes
+parEfficiency = 0.8  # 1/nNodes
 
 qDeltaList = [
-    'RK4', 'ESDIRK53', 'HOUWEN-SOMMEIJER', 'MIN',
+    'RK4',
+    'ESDIRK53',
+    'HOUWEN-SOMMEIJER',
+    'MIN',
     # 'IE', 'LU', 'IEpar', 'PIC',
-    'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX', "PIC",
+    'MIN-SR-NS',
+    'MIN-SR-S',
+    'MIN-SR-FLEX',
+    "PIC",
     # "MIN3",
 ]
 nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
 nSweepList = [1, 2, 3, 4]
 
 
-symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
+symList = ['o', '^', 's', '>', '*', '<', 'p', '>'] * 10
 
 qDeltaList = ['MIN-SR-S', 'RK4']
 # nSweepList = [4]
@@ -50,7 +59,7 @@ qDeltaList = ['MIN-SR-S', 'RK4']
 fig, axs = plt.subplots(1, 2)
 
 
-dtVals = tEnd/nStepsList
+dtVals = tEnd / nStepsList
 
 i = 0
 for qDelta in qDeltaList:
@@ -67,8 +76,8 @@ for qDelta in qDeltaList:
                 continue
         except KeyError:
             params = getParamsSDC(
-                quadType=quadType, numNodes=nNodes, nodeType=nodeType,
-                qDeltaI=qDelta, nSweeps=nSweeps)
+                quadType=quadType, numNodes=nNodes, nodeType=nodeType, qDeltaI=qDelta, nSweeps=nSweeps
+            )
         print(f'computing for {name} ...')
 
         errors = []
@@ -79,25 +88,24 @@ for qDelta in qDeltaList:
 
             uRef = solutionExact(tEnd, nSteps, "LORENZ", u0=(5, -5, 20))
 
-            uSDC, counters, parallel = solutionSDC(
-                tEnd, nSteps, params, "LORENZ", u0=(5, -5, 20))
+            uSDC, counters, parallel = solutionSDC(tEnd, nSteps, params, "LORENZ", u0=(5, -5, 20))
 
             err = getError(uSDC, uRef)
             errors.append(err)
 
             cost = getCost(counters)
             if parallel:
-                cost /= nNodes*parEfficiency
+                cost /= nNodes * parEfficiency
             costs.append(cost)
 
         # error VS dt
-        axs[0].loglog(dtVals, errors, sym+'-', label=name)
+        axs[0].loglog(dtVals, errors, sym + '-', label=name)
         # error VS cost
-        axs[1].loglog(costs, errors, sym+'-', label=name)
+        axs[1].loglog(costs, errors, sym + '-', label=name)
 
 x = dtVals[4:]
 for k in [1, 2, 3, 4, 5]:
-    axs[0].loglog(x, 1e4*x**k, "--", color="gray", linewidth=0.8)
+    axs[0].loglog(x, 1e4 * x**k, "--", color="gray", linewidth=0.8)
 
 for i in range(2):
     axs[i].set(

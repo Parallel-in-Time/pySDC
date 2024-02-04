@@ -20,7 +20,7 @@ muPeriods = []
 
 tEnd = 20
 nSteps = 200
-tVals = np.linspace(0, tEnd, nSteps+1)
+tVals = np.linspace(0, tEnd, nSteps + 1)
 
 # Compute and plot unscaled solution to determined period for each mu
 for mu in muVals:
@@ -41,12 +41,12 @@ for mu in muVals:
 # Compute and plot solution for each mu on one period, scale time with period
 for mu, tEnd in zip(muVals, muPeriods):
     nSteps = 200
-    tVals = np.linspace(0, tEnd, nSteps+1)
+    tVals = np.linspace(0, tEnd, nSteps + 1)
 
     print(f"Computing exact solution up to t={tEnd:.1f} for mu={mu} ...")
     uExact = solutionExact(tEnd, nSteps, "VANDERPOL", mu=mu)
     plt.figure(f"{script}_traj_scaled")
-    plt.plot(tVals/tEnd, uExact[:, 0], '-', label=f"$\mu={mu}$")
+    plt.plot(tVals / tEnd, uExact[:, 0], '-', label=f"$\mu={mu}$")
     print(' -- done')
 
 # Figure settings

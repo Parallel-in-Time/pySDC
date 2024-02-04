@@ -14,8 +14,8 @@ from utils import solutionExact
 script = __file__.split('/')[-1].split('.')[0]
 
 tEnd = 2
-nSteps = tEnd*50
-tVals = np.linspace(0, tEnd, nSteps+1)
+nSteps = tEnd * 50
+tVals = np.linspace(0, tEnd, nSteps + 1)
 
 nPeriods = 2
 
@@ -23,7 +23,7 @@ print(f"Computing exact solution up to t={tEnd} ...")
 uExact = solutionExact(tEnd, nSteps, "LORENZ", u0=(5, -5, 20))
 
 z = uExact[:, -1]
-idx = sp.signal.find_peaks(z)[0][nPeriods-1]
+idx = sp.signal.find_peaks(z)[0][nPeriods - 1]
 
 
 print(f'tEnd for {nPeriods} periods : {tVals[idx]}')

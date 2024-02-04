@@ -61,7 +61,9 @@ class LorenzAttractor(ptype):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, sigma=10.0, rho=28.0, beta=8.0 / 3.0, u0=(1,1,1), newton_tol=1e-9, newton_maxiter=99, stop_at_nan=True):
+    def __init__(
+        self, sigma=10.0, rho=28.0, beta=8.0 / 3.0, u0=(1, 1, 1), newton_tol=1e-9, newton_maxiter=99, stop_at_nan=True
+    ):
         """Initialization routine"""
 
         nvars = 3

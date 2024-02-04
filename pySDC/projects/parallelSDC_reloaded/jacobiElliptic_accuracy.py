@@ -19,6 +19,7 @@ from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 tEnd = 10
 pName = "JACELL"
 
+
 def getError(uNum, uRef):
     if uNum is None:
         return np.inf
@@ -26,23 +27,30 @@ def getError(uNum, uRef):
     return max(
         np.linalg.norm(uRef[:, 0] - uNum[:, 0], np.inf),
         np.linalg.norm(uRef[:, 1] - uNum[:, 1], np.inf),
-        np.linalg.norm(uRef[:, 2] - uNum[:, 2], np.inf)
-        )
+        np.linalg.norm(uRef[:, 2] - uNum[:, 2], np.inf),
+    )
+
 
 def getCost(counters):
     nNewton, nRHS, tComp = counters
     return nNewton + nRHS
 
+
 # Base variable parameters
 nNodes = 4
 quadType = 'RADAU-RIGHT'
 nodeType = 'LEGENDRE'
-parEfficiency = 1/nNodes
+parEfficiency = 1 / nNodes
 
 qDeltaList = [
-    'RK4', 'ESDIRK53', 'ESDIRK43', 'PIC',
+    'RK4',
+    'ESDIRK53',
+    'ESDIRK43',
+    'PIC',
     # 'IE', 'LU', 'IEpar', 'PIC',
-    'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX',
+    'MIN-SR-NS',
+    'MIN-SR-S',
+    'MIN-SR-FLEX',
     # "MIN3",
 ]
 nStepsList = np.array([10, 20, 50, 100, 200, 500])
@@ -52,10 +60,10 @@ nStepsList = np.array([10, 20, 50, 100, 200, 500])
 nSweepList = [4]
 
 
-symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
+symList = ['o', '^', 's', '>', '*', '<', 'p', '>'] * 10
 fig, axs = plt.subplots(1, 2)
 
-dtVals = tEnd/nStepsList
+dtVals = tEnd / nStepsList
 
 i = 0
 for qDelta in qDeltaList:
@@ -72,8 +80,8 @@ for qDelta in qDeltaList:
                 continue
         except KeyError:
             params = getParamsSDC(
-                quadType=quadType, numNodes=nNodes, nodeType=nodeType,
-                qDeltaI=qDelta, nSweeps=nSweeps)
+                quadType=quadType, numNodes=nNodes, nodeType=nodeType, qDeltaI=qDelta, nSweeps=nSweeps
+            )
         print(f'computing for {name} ...')
 
         errors = []
@@ -91,13 +99,13 @@ for qDelta in qDeltaList:
 
             cost = getCost(counters)
             if parallel:
-                cost /= nNodes*parEfficiency
+                cost /= nNodes * parEfficiency
             costs.append(cost)
 
         # error VS dt
-        axs[0].loglog(dtVals, errors, sym+'-', label=name)
+        axs[0].loglog(dtVals, errors, sym + '-', label=name)
         # error VS cost
-        axs[1].loglog(costs, errors, sym+'-', label=name)
+        axs[1].loglog(costs, errors, sym + '-', label=name)
 
 for i in range(2):
     axs[i].set(

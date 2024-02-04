@@ -29,10 +29,9 @@ else:
 
 pName = "JACELL"
 periodic = False
-pParams  = {
-    }
+pParams = {}
 
-tVals = np.linspace(0, tEnd, nSteps+1)
+tVals = np.linspace(0, tEnd, nSteps + 1)
 
 print("Computing ODE solution")
 uExact = solutionExact(tEnd, nSteps, pName, **pParams)

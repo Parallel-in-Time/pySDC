@@ -19,31 +19,40 @@ from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 tEnd = 50
 pName = "ALLEN-CAHN"
 periodic = False
-pParams  = {
+pParams = {
     "periodic": periodic,
     "nvars": 2**11 - (not periodic),
     "epsilon": 0.04,
-    }
+}
+
 
 def getError(uNum, uRef):
     if uNum is None:
         return np.inf
     return np.linalg.norm(uRef[-1, :] - uNum[-1, :], ord=2)
 
+
 def getCost(counters):
     nNewton, nRHS, tComp = counters
-    return 2*nNewton + nRHS
+    return 2 * nNewton + nRHS
+
 
 # Base variable parameters
 nNodes = 4
 quadType = 'RADAU-RIGHT'
 nodeType = 'LEGENDRE'
-parEfficiency = 1/nNodes
+parEfficiency = 1 / nNodes
 
 qDeltaList = [
-    'RK4', 'ESDIRK53', 'HOUWEN-SOMMEIJER', 'MIN',
+    'RK4',
+    'ESDIRK53',
+    'HOUWEN-SOMMEIJER',
+    'MIN',
     # 'IE', 'LU', 'IEpar', 'PIC',
-    'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX', "PIC",
+    'MIN-SR-NS',
+    'MIN-SR-S',
+    'MIN-SR-FLEX',
+    "PIC",
     # "MIN3",
 ]
 nStepsList = np.array([1, 2, 5, 10, 20, 50, 100, 200, 500])
@@ -53,10 +62,10 @@ nSweepList = [1, 2, 3, 4, 5, 6]
 nSweepList = [4]
 
 
-symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
+symList = ['o', '^', 's', '>', '*', '<', 'p', '>'] * 10
 fig, axs = plt.subplots(1, 2)
 
-dtVals = tEnd/nStepsList
+dtVals = tEnd / nStepsList
 
 i = 0
 for qDelta in qDeltaList:
@@ -71,8 +80,8 @@ for qDelta in qDeltaList:
             name = name[:-3]
         except KeyError:
             params = getParamsSDC(
-                quadType=quadType, numNodes=nNodes, nodeType=nodeType,
-                qDeltaI=qDelta, nSweeps=nSweeps)
+                quadType=quadType, numNodes=nNodes, nodeType=nodeType, qDeltaI=qDelta, nSweeps=nSweeps
+            )
         print(f'computing for {name} ...')
 
         errors = []
@@ -90,13 +99,13 @@ for qDelta in qDeltaList:
 
             cost = getCost(counters)
             if parallel:
-                cost /= nNodes*parEfficiency
+                cost /= nNodes * parEfficiency
             costs.append(cost)
 
         # error VS dt
-        axs[0].loglog(dtVals, errors, sym+'-', label=name)
+        axs[0].loglog(dtVals, errors, sym + '-', label=name)
         # error VS cost
-        axs[1].loglog(costs, errors, sym+'-', label=name)
+        axs[1].loglog(costs, errors, sym + '-', label=name)
 
 for i in range(2):
     axs[i].set(

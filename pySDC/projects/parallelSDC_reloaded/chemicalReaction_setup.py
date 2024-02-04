@@ -16,7 +16,7 @@ tEnd = 300
 nSteps = 10
 rkScheme = "RK4"
 
-tVals = np.linspace(0, tEnd, nSteps+1)
+tVals = np.linspace(0, tEnd, nSteps + 1)
 
 print("Computing ODE solution")
 uExact = solutionExact(tEnd, nSteps, "CHEMREC")

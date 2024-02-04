@@ -29,13 +29,13 @@ else:
 
 pName = "ALLEN-CAHN"
 periodic = False
-pParams  = {
+pParams = {
     "periodic": periodic,
     "nvars": 2**11 - (not periodic),
     "epsilon": 0.04,
-    }
+}
 
-tVals = np.linspace(0, tEnd, nSteps+1)
+tVals = np.linspace(0, tEnd, nSteps + 1)
 
 print("Computing ODE solution")
 uExact = solutionExact(tEnd, nSteps, pName, **pParams)

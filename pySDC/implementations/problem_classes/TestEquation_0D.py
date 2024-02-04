@@ -25,6 +25,7 @@ class testequation0d(ptype):
     A : scipy.sparse.csc_matrix
         Diagonal matrix containing :math:`\lambda_1,..,\lambda_n`.
     """
+
     xp = np
     dtype_u = mesh
     dtype_f = mesh
@@ -36,6 +37,7 @@ class testequation0d(ptype):
         """
         from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
         import cupy as cp
+
         cls.xp = cp
         cls.dtype_u = cupy_mesh
         cls.dtype_f = cupy_mesh
@@ -107,8 +109,8 @@ class testequation0d(ptype):
             The solution as mesh.
         """
         me = self.dtype_u(self.init)
-        L = 1 - factor*self.lambdas
-        L[L == 0] = 1   # to avoid potential divisions by zeros
+        L = 1 - factor * self.lambdas
+        L[L == 0] = 1  # to avoid potential divisions by zeros
         me[:] = rhs
         me /= L
         return me

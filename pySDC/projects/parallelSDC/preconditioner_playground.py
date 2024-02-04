@@ -38,14 +38,14 @@ def main():
     controller_params['logger_level'] = 30
 
     # set up list of Q-delta types and setups
-    #qd_list = ['LU', 'IE', 'IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
+    # qd_list = ['LU', 'IE', 'IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
     qd_list = ['LU', 'MIN-SR-S', 'MIN3', 'MIN-SR-FLEX']
     setup_list = [
         ('heat', 63, [10.0**i for i in range(-3, 3)]),
         ('advection', 64, [10.0**i for i in range(-3, 3)]),
         ('vanderpol', 2, [0.1 * 2**i for i in range(0, 10)]),
         ('fisher', 63, [2**i for i in range(-2, 3)]),
-        ('testequation', 2, [1.2 ** i for i in range(0, 15)])
+        ('testequation', 2, [1.2**i for i in range(0, 15)]),
     ]
 
     # pre-fill results with lists of  setups
@@ -159,7 +159,7 @@ def main():
                 id = ID(setup=setup, qd_type=qd_type, param=param)
                 results[id] = niter
 
-    #assert len(results) == (6 + 6 + 10 + 5) * 7 + 4, 'ERROR: did not get all results, got %s' % len(results)
+    # assert len(results) == (6 + 6 + 10 + 5) * 7 + 4, 'ERROR: did not get all results, got %s' % len(results)
 
     # write out for later visualization
     file = open('data/parallelSDC_iterations_precond.pkl', 'wb')
@@ -188,10 +188,15 @@ def plot_iterations():
     print('Found these type of preconditioners:', qd_type_list)
     print('Found these setups:', setup_list)
 
-    #assert len(qd_type_list) == 7, 'ERROR did not find seven preconditioners, got %s' % qd_type_list
-    #assert len(setup_list) == 5, 'ERROR: did not find five setup, got %s' % setup_list
+    # assert len(qd_type_list) == 7, 'ERROR did not find seven preconditioners, got %s' % qd_type_list
+    # assert len(setup_list) == 5, 'ERROR: did not find five setup, got %s' % setup_list
 
-    qd_type_list = ['LU', 'MIN-SR-S', 'MIN3', 'MIN-SR-FLEX']#['LU', 'MIN-SR-S', 'IEpar', 'MIN', 'MIN3', 'MIN_GT', 'MIN-SR-FLEX']
+    qd_type_list = [
+        'LU',
+        'MIN-SR-S',
+        'MIN3',
+        'MIN-SR-FLEX',
+    ]  # ['LU', 'MIN-SR-S', 'IEpar', 'MIN', 'MIN3', 'MIN_GT', 'MIN-SR-FLEX']
     marker_list = [None, 'X', 's', 'o', '^', 'd', 'x']
     color_list = ['k', 'k', 'r', 'g', 'b', 'c', 'm']
 

@@ -17,14 +17,13 @@ nSteps = 100
 epsilon = 1e-3
 rkScheme = "DIRK43"
 
-tVals = np.linspace(0, tEnd, nSteps+1)
+tVals = np.linspace(0, tEnd, nSteps + 1)
 
 print("Computing ODE solution")
 uExact = solutionExact(tEnd, nSteps, "KAPS", epsilon=epsilon)
 
 params = getParamsRK(rkScheme)
-uNum, counters, parallel = solutionSDC(
-    tEnd, nSteps, params, 'KAPS', epsilon=epsilon)
+uNum, counters, parallel = solutionSDC(tEnd, nSteps, params, 'KAPS', epsilon=epsilon)
 
 figName = f"{script}_solution"
 plt.figure(figName)

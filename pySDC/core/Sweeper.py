@@ -65,7 +65,7 @@ class sweeper(object):
 
         self.params = _Pars(params)
 
-        self.coll:CollBase = params['collocation_class'](**params)
+        self.coll: CollBase = params['collocation_class'](**params)
 
         if not self.coll.right_is_node and not self.params.do_coll_update:
             self.logger.warning(
@@ -302,6 +302,7 @@ class sweeper(object):
                     coeffs = np.diag(Q)
 
                 else:
+
                     def func(coeffs):
                         """Function verifying the nilpotency from given coefficients"""
                         coeffs = np.asarray(coeffs)
@@ -312,7 +313,7 @@ class sweeper(object):
                     if a is None:
                         coeffs0 = nodes / m
                     else:
-                        coeffs0 = a*nodes**b / m
+                        coeffs0 = a * nodes**b / m
 
                     with warnings.catch_warnings():
                         warnings.simplefilter("ignore")
@@ -320,17 +321,19 @@ class sweeper(object):
 
                 # Handle first node equal to zero
                 if quadType in ['LOBATTO', 'RADAU-LEFT']:
-                    coeffs = np.asarray([0.] + list(coeffs))
+                    coeffs = np.asarray([0.0] + list(coeffs))
                     nodes = coll.nodes
 
                 return coeffs, nodes
 
             def fit(coeffs, nodes):
                 """Function fitting given coefficients to a power law"""
+
                 def law(ab):
                     a, b = ab
-                    return np.linalg.norm(a*nodes**b - coeffs)
-                sol = sp.optimize.minimize(law, [1., 1.], method="nelder-mead")
+                    return np.linalg.norm(a * nodes**b - coeffs)
+
+                sol = sp.optimize.minimize(law, [1.0, 1.0], method="nelder-mead")
                 return sol.x
 
             # TODO : put this somewhere as a parameter ...
@@ -340,10 +343,10 @@ class sweeper(object):
                 # Compute incrementaly coefficients
                 a, b = None, None
                 m0 = 2 if quadType in ['LOBATTO', 'RADAU-LEFT'] else 1
-                for m in range(m0, M+1):
+                for m in range(m0, M + 1):
                     coeffs, nodes = computeCoeffs(m, a, b)
                     if m > 1:
-                        a, b = fit(coeffs*m, nodes)
+                        a, b = fit(coeffs * m, nodes)
             else:
                 coeffs, _ = computeCoeffs(M)
 
@@ -355,11 +358,9 @@ class sweeper(object):
             m = QDmat.shape[0] - 1
 
             if m == 4 and coll.node_type == 'LEGENDRE' and coll.quad_type == "RADAU-RIGHT":
-                coeffs = [3055/9532, 531/5956, 1471/8094, 1848/7919]
+                coeffs = [3055 / 9532, 531 / 5956, 1471 / 8094, 1848 / 7919]
             else:
-                raise NotImplementedError(
-                    'no HOUWEN-SOMMEIJER diagonal coefficients for this node configuration'
-                )
+                raise NotImplementedError('no HOUWEN-SOMMEIJER diagonal coefficients for this node configuration')
 
             QDmat[1:, 1:] = np.diag(coeffs)
             self.parallelizable = True
