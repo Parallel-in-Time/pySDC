@@ -54,4 +54,4 @@ Reproducing Figures from the Publication
 
 Contact
 -------
-This code is written by `Ikrom Akramov`<https://www.mat.tuhh.de/home/iakramov/?homepage_id=iakramov)>_
+This code is written by `Ikrom Akramov<https://www.mat.tuhh.de/home/iakramov/?homepage_id=iakramov)>`_

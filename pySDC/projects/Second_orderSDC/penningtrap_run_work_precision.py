@@ -1,4 +1,4 @@
-# It checks whether data folder exicits or not
+# This code checks if the "data" folder exists or not.
 exec(open("check_data_folder.py").read())
 
 from pySDC.projects.Second_orderSDC.penningtrap_Simulation import ComputeError
