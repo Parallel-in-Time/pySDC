@@ -21,7 +21,7 @@ def get_default_harmonic_oscillator_description():
     sweeper_params = {'quad_type': 'GAUSS', 'num_nodes': 3, 'do_coll_update': True, 'picard_mats_sweep': True}
 
     # Initialize step parameters
-    step_params = {'maxiter': 5}
+    step_params = {'maxiter': 50}
 
     # Fill description dictionary for easy step instantiation
     description = {

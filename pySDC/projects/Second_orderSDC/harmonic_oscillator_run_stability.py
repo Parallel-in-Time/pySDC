@@ -15,9 +15,16 @@ if __name__ == '__main__':
         Iteration matrix of Picard method: model_stab.run_Kpicard()
 
     """
+    # This code checks if the "data" folder exists or not.
+    exec(open("check_data_folder.py").read())
     # Execute the stability analysis for the damped harmonic oscillator
     description = get_default_harmonic_oscillator_description()
-    model_stab = StabilityImplementation(description, kappa_max=30, mu_max=30, Num_iter=(200, 200))
+    # =============================================================================
+    #    maxiter can be changed here manually. By default, maxiter is 50
+    description['step_params']['maxiter'] = 50
+    # =============================================================================
+
+    model_stab = StabilityImplementation(description, kappa_max=18, mu_max=18, Num_iter=(200, 200))
 
     model_stab.run_SDC_stability()
     model_stab.run_Picard_stability()

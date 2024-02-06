@@ -14,7 +14,7 @@ If you utilize it, either in whole or in part, for a publication, please provide
        year={2023},
        eprint={2310.08352},
        archivePrefix={arXiv},
-       primaryClass={math.NA}
+       primaryClass={math.NA}}
 
 
 Reproducing Figures from the Publication
@@ -54,4 +54,4 @@ Reproducing Figures from the Publication
 
 Contact
 -------
-This code is written by `Ikrom Akramov`<https://www.mat.tuhh.de/home/iakramov/?homepage_id=iakramov)>_
+This code is written by `Ikrom Akramov <https://www.mat.tuhh.de/home/iakramov/?homepage_id=iakramov)>`_
