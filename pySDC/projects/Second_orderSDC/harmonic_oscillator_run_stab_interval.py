@@ -19,14 +19,14 @@ if __name__ == '__main__':
     description = get_default_harmonic_oscillator_description()
 
     # Additional parameters to compute stability interval on the kappa
-# =============================================================================
-#     To get exactly the same as table in the paper set: 
-#       'Num_iter': (500, 1) for the SDC iteration
-#       'Num_iter': (2000, 1) for the Picard iteration
-# =============================================================================
+    # =============================================================================
+    #     To get exactly the same as table in the paper set:
+    #       'Num_iter': (500, 1) for the SDC iteration
+    #       'Num_iter': (2000, 1) for the Picard iteration
+    # =============================================================================
     helper_params = {
         'quad_type_list': ('GAUSS',),  # Type of quadrature
-        'Num_iter': (500, 1),  # Number of iterations 
+        'Num_iter': (500, 1),  # Number of iterations
         'num_nodes_list': np.arange(2, 7, 1),  # List of number of nodes
         'max_iter_list': np.arange(1, 11, 1),  # List of maximum iterations
     }
