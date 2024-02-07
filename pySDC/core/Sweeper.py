@@ -303,7 +303,7 @@ class sweeper(object):
 
                 else:
 
-                    def func(coeffs):
+                    def nilpotency(coeffs):
                         """Function verifying the nilpotency from given coefficients"""
                         coeffs = np.asarray(coeffs)
                         kMats = [(1 - z) * np.eye(nCoeffs) + z * np.diag(1 / coeffs) @ Q for z in nodes]
@@ -317,7 +317,7 @@ class sweeper(object):
 
                     with warnings.catch_warnings():
                         warnings.simplefilter("ignore")
-                        coeffs = sp.optimize.fsolve(func, coeffs0, xtol=1e-15)
+                        coeffs = sp.optimize.fsolve(nilpotency, coeffs0, xtol=1e-15)
 
                 # Handle first node equal to zero
                 if quadType in ['LOBATTO', 'RADAU-LEFT']:

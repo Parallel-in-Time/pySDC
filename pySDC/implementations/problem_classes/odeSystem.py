@@ -388,6 +388,35 @@ class Kaps(ptype):
 
 
 class ChemicalReaction3Var(ptype):
+    r"""
+    Chemical reaction with three components, modeled by the non-linear system:
+
+    .. math::
+        \frac{d{\bf u}}{dt} =
+        \begin{pmatrix}
+            0.013+1000u_3 & 0 & 0 \\
+            0 & 2500u_3 0 \\
+            0.013 & 0 & 1000u_1 + 2500u_2
+        \end{pmatrix}
+        {\bf u},
+
+    with initial solution :math:`u(0)=(0.990731920827, 1.009264413846, -0.366532612659e-5)`.
+
+    Parameters
+    ----------
+    newton_maxiter : int, optional
+        Maximum number of Newton iteration in solve_system. The default is 200.
+    newton_tol : float, optional
+        Residuum tolerance for Newton iteration in solve_system. The default is 5e-11.
+    stop_at_nan : bool, optional
+        Wheter to stop or not solve_system when getting NAN. The default is True.
+
+    Reference
+    ---------
+    Van der Houwen, P. J., & Sommeijer, B. P. (1991). Iterated Runge–Kutta methods
+    on parallel computers. SIAM journal on scientific and statistical computing,
+    12(5), 1000-1028.
+    """
 
     dtype_u = mesh
     dtype_f = mesh
@@ -711,6 +740,32 @@ class ChemicalReaction3Var(ptype):
 
 
 class JacobiElliptic(ptype):
+    r"""
+    Implement the Jacobi Elliptic non-linear problem:
+
+    .. math::
+        \begin{eqnarray*}
+            \frac{du}{dt} &=& vw, &\quad u(0) = 0,      \\
+            \frac{dv}{dt} &=& -uw, &\quad v(0) = 1,     \\
+            \frac{dw}{dt} &=& -0.51uv, &\quad w(0) = 1.
+        \end{eqnarray*}
+
+    Parameters
+    ----------
+    newton_maxiter : int, optional
+        Maximum number of Newton iteration in solve_system. The default is 200.
+    newton_tol : float, optional
+        Residuum tolerance for Newton iteration in solve_system. The default is 5e-11.
+    stop_at_nan : bool, optional
+        Wheter to stop or not solve_system when getting NAN. The default is True.
+
+    Reference
+    ---------
+    Van Der Houwen, P. J., Sommeijer, B. P., & Van Der Veen, W. A. (1995).
+    Parallel iteration across the steps of high-order Runge-Kutta methods for
+    nonstiff initial value problems. Journal of computational and applied
+    mathematics, 60(3), 309-329.
+    """
 
     dtype_u = mesh
     dtype_f = mesh
