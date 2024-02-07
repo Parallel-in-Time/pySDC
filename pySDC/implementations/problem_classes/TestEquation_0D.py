@@ -62,6 +62,7 @@ class testequation0d(ptype):
         super().__init__(init=(nvars, None, self.xp.dtype('complex128')))
 
         lambdas = self.xp.array(lambdas)
+        self.A = self.xp.diag(lambdas)
         self._makeAttributeAndRegister('nvars', 'lambdas', 'u0', 'useGPU', localVars=locals(), readOnly=True)
         self.work_counters['rhs'] = WorkCounter()
 
