@@ -21,11 +21,11 @@ if __name__ == '__main__':
     controller_params, description = penningtrap_params()
     ## =============================================================================
     ##     dt-timestep and num_nodes can be changed here manually
-    description['level_params']['dt'] = 0.015625 * 4
+    description['level_params']['dt'] = 0.015625 / 4
     description['sweeper_params']['num_nodes'] = 4
     ## =============================================================================
     # Give the parameters to the class
-    conv = ComputeError(controller_params, description, time_iter=3, K_iter=(1, 2, 3, 10), axes=(2,))
+    conv = ComputeError(controller_params, description, time_iter=3, K_iter=(1, 2, 3), axes=(0,))
     # Run local convergence order
     # conv.run_local_error()
     # Run global convergence order
