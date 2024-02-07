@@ -117,7 +117,7 @@ minPrec = ["MIN-SR-NS", "MIN-SR-S", "MIN-SR-FLEX"]
 symList = ['^', '>', '<', 'o', 's', '*']
 config = [
     [(*minPrec, "LU", "EE", "PIC"), 4],
-    [(*minPrec, "HOUWEN-SOMMEIJER", "RK4", "ESDIRK43"), 4],
+    [(*minPrec, "VDHS", "RK4", "ESDIRK43"), 4],
     [(*minPrec, "PIC", "RK4", "ESDIRK43"), 5],
 ]
 

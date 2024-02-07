@@ -353,14 +353,15 @@ class sweeper(object):
             QDmat[1:, 1:] = np.diag(coeffs)
             self.parallelizable = True
 
-        elif qd_type == "HOUWEN-SOMMEIJER":
+        elif qd_type == "VDHS":
+            # coefficients from Van der Houwen & Sommeijer, 1991
 
             m = QDmat.shape[0] - 1
 
             if m == 4 and coll.node_type == 'LEGENDRE' and coll.quad_type == "RADAU-RIGHT":
                 coeffs = [3055 / 9532, 531 / 5956, 1471 / 8094, 1848 / 7919]
             else:
-                raise NotImplementedError('no HOUWEN-SOMMEIJER diagonal coefficients for this node configuration')
+                raise NotImplementedError('no VDHS diagonal coefficients for this node configuration')
 
             QDmat[1:, 1:] = np.diag(coeffs)
             self.parallelizable = True

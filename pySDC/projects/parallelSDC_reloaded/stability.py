@@ -28,7 +28,7 @@ quadType = "RADAU-RIGHT"
 
 # SDC parameters
 nSweeps = 6
-qDeltaType = "HOUWEN-SOMMEIJER"
+qDeltaType = "VDHS"
 collUpdate = False
 
 

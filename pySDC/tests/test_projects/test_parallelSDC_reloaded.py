@@ -70,7 +70,7 @@ def test_script_fig02_stab():
         "MIN-SR-S",
         "MIN-SR-FLEX",
         "IE",
-        "HOUWEN-SOMMEIJER",
+        "VDHS",
     ]
 
 
@@ -82,7 +82,7 @@ def test_script_fig03_lorenz():
     assert minPrec == ["MIN-SR-NS", "MIN-SR-S", "MIN-SR-FLEX"]
     assert fig03_lorenz.config == [
         [(*minPrec, "LU", "EE", "PIC"), 4],
-        [(*minPrec, "HOUWEN-SOMMEIJER", "RK4", "ESDIRK43"), 4],
+        [(*minPrec, "VDHS", "RK4", "ESDIRK43"), 4],
         [(*minPrec, "PIC", "RK4", "ESDIRK43"), 5],
     ]
 
@@ -94,8 +94,8 @@ def test_script_fig04_protheroRobinson():
     minPrec = fig04_protheroRobinson.minPrec
     assert minPrec == ["MIN-SR-NS", "MIN-SR-S", "MIN-SR-FLEX"]
     assert fig04_protheroRobinson.config == [
-        [(*minPrec, "HOUWEN-SOMMEIJER", "ESDIRK43", "LU"), 4],
-        [(*minPrec, "HOUWEN-SOMMEIJER", "ESDIRK43", "LU"), 6],
+        [(*minPrec, "VDHS", "ESDIRK43", "LU"), 4],
+        [(*minPrec, "VDHS", "ESDIRK43", "LU"), 6],
     ]
 
 
@@ -106,5 +106,5 @@ def test_script_fig05_allenCahn():
     minPrec = fig05_allenCahn.minPrec
     assert minPrec == ["MIN-SR-NS", "MIN-SR-S", "MIN-SR-FLEX"]
     assert fig05_allenCahn.config == [
-        (*minPrec, "HOUWEN-SOMMEIJER", "ESDIRK43", "LU"),
+        (*minPrec, "VDHS", "ESDIRK43", "LU"),
     ]

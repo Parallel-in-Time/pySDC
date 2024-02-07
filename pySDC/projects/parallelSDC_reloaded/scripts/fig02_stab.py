@@ -31,7 +31,7 @@ config = [
     "MIN-SR-S",
     "MIN-SR-FLEX",
     "IE",
-    "HOUWEN-SOMMEIJER",
+    "VDHS",
 ]
 
 

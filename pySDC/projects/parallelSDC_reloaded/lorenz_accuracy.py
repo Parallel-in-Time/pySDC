@@ -38,7 +38,7 @@ parEfficiency = 0.8  # 1/nNodes
 qDeltaList = [
     'RK4',
     'ESDIRK53',
-    'HOUWEN-SOMMEIJER',
+    'VDHS',
     'MIN',
     # 'IE', 'LU', 'IEpar', 'PIC',
     'MIN-SR-NS',
