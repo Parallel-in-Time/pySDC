@@ -1,4 +1,4 @@
-# It checks whether data folder exicits or not
+# This code checks if the "data" folder exists or not.
 exec(open("check_data_folder.py").read())
 
 import matplotlib.pyplot as plt
