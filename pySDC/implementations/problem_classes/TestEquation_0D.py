@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.sparse as nsp
 
 from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
@@ -27,6 +28,7 @@ class testequation0d(ptype):
     """
 
     xp = np
+    xsp = nsp
     dtype_u = mesh
     dtype_f = mesh
 
@@ -37,8 +39,10 @@ class testequation0d(ptype):
         """
         from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
         import cupy as cp
+        import cupyx.scipy.sparse as csp
 
         cls.xp = cp
+        cls.xsp = csp
         cls.dtype_u = cupy_mesh
         cls.dtype_f = cupy_mesh
 
@@ -62,7 +66,7 @@ class testequation0d(ptype):
         super().__init__(init=(nvars, None, self.xp.dtype('complex128')))
 
         lambdas = self.xp.array(lambdas)
-        self.A = self.xp.diag(lambdas)
+        self.A = self.xsp.diags(lambdas)
         self._makeAttributeAndRegister('nvars', 'lambdas', 'u0', 'useGPU', localVars=locals(), readOnly=True)
         self.work_counters['rhs'] = WorkCounter()
 
