@@ -336,19 +336,13 @@ class sweeper(object):
                 sol = sp.optimize.minimize(law, [1.0, 1.0], method="nelder-mead")
                 return sol.x
 
-            # TODO : put this somewhere as a parameter ...
-            increment = True
-
-            if increment:
-                # Compute incrementaly coefficients
-                a, b = None, None
-                m0 = 2 if quadType in ['LOBATTO', 'RADAU-LEFT'] else 1
-                for m in range(m0, M + 1):
-                    coeffs, nodes = computeCoeffs(m, a, b)
-                    if m > 1:
-                        a, b = fit(coeffs * m, nodes)
-            else:
-                coeffs, _ = computeCoeffs(M)
+            # Compute incrementaly coefficients
+            a, b = None, None
+            m0 = 2 if quadType in ['LOBATTO', 'RADAU-LEFT'] else 1
+            for m in range(m0, M + 1):
+                coeffs, nodes = computeCoeffs(m, a, b)
+                if m > 1:
+                    a, b = fit(coeffs * m, nodes)
 
             QDmat[1:, 1:] = np.diag(coeffs)
             self.parallelizable = True
