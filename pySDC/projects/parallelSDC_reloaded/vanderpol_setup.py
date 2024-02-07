@@ -7,7 +7,7 @@ Script to numerically determine periods of Van der Pol oscillation for
 different mu parameters.
 """
 import numpy as np
-import scipy as sp
+from scipy import signal
 import matplotlib.pyplot as plt
 
 from pySDC.projects.parallelSDC_reloaded.utils import solutionExact
@@ -33,7 +33,7 @@ for mu in muVals:
     plt.plot(tVals, uExact[:, 1], '-', label=f"$\mu={mu}$")
 
     x = uExact[:, 0]
-    idx = sp.signal.find_peaks(x)[0][0]
+    idx = signal.find_peaks(x)[0][0]
     period = tVals[idx]
     print(f" -- done, found period={period:.1f}")
     muPeriods.append(period)

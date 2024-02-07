@@ -6,7 +6,7 @@ Created on Tue Dec  5 10:08:04 2023
 Script to numerically compute number revolution periods for the Lorenz system
 """
 import numpy as np
-import scipy as sp
+from scipy import signal
 import matplotlib.pyplot as plt
 
 from pySDC.projects.parallelSDC_reloaded.utils import solutionExact
@@ -23,7 +23,7 @@ print(f"Computing exact solution up to t={tEnd} ...")
 uExact = solutionExact(tEnd, nSteps, "LORENZ", u0=(5, -5, 20))
 
 z = uExact[:, -1]
-idx = sp.signal.find_peaks(z)[0][nPeriods - 1]
+idx = signal.find_peaks(z)[0][nPeriods - 1]
 
 
 print(f'tEnd for {nPeriods} periods : {tVals[idx]}')
