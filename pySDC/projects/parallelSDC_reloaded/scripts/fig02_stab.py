@@ -7,7 +7,7 @@ Stability plots (on Dahlquist) for the article
 """
 import os
 import numpy as np
-from pySDC.projects.parallelSDC_reloaded.utils import getParamsSDC, solutionSDC, plotStabContour, plt
+from pySDC.projects.parallelSDC_reloaded.utils import getParamsSDC, solutionSDC, plotStabContour, plt, Data
 
 PATH = '/' + os.path.join(*__file__.split('/')[:-1])
 SCRIPT = __file__.split('/')[-1].split('.')[0]
@@ -30,7 +30,7 @@ config = [
     "MIN-SR-NS",
     "MIN-SR-S",
     "MIN-SR-FLEX",
-    "IE",
+    "LU",
     "VDHS",
 ]
 
@@ -63,10 +63,15 @@ for qDeltaType in config:
 
         figName = f"{qDeltaType}_K{nSweeps}"
         plt.figure(figName)
+
         plotStabContour(reVals, imVals, stab)
+        Data.storeAndCheck(f"{SCRIPT}_{figName}", stab[::5, -50])
+
         plt.xticks(fontsize=8)
         plt.yticks(fontsize=8)
         plt.title(f"$K={nSweeps}$", fontsize=10)
         plt.gcf().set_size_inches(2.5, 2.5)
         plt.tight_layout()
         plt.savefig(f"{PATH}/{SCRIPT}_{figName}.pdf")
+
+Data.writeToJSON()

@@ -8,7 +8,7 @@ Figures with experiment on the Lorenz problem
 import os
 import numpy as np
 import scipy as sp
-from pySDC.projects.parallelSDC_reloaded.utils import solutionExact, getParamsSDC, solutionSDC, getParamsRK, plt
+from pySDC.projects.parallelSDC_reloaded.utils import solutionExact, getParamsSDC, solutionSDC, getParamsRK, plt, Data
 
 PATH = '/' + os.path.join(*__file__.split('/')[:-1])
 SCRIPT = __file__.split('/')[-1].split('.')[0]
@@ -87,7 +87,9 @@ for qDelta, sym in zip(config, symList):
             errors.append(err)
 
         # error VS dt
+        label = f"$K={nSweeps}$"
         plt.loglog(dtVals, errors, sym + '-', label=f"$K={nSweeps}$")
+        Data.storeAndCheck(f"{figName}_{label}", errors)
 
     x = dtVals[4:]
     for k in [1, 2, 3, 4, 5, 6]:
@@ -170,3 +172,5 @@ for qDeltaList, nSweeps in config:
     plt.grid()
     plt.tight_layout()
     plt.savefig(f"{PATH}/{figName}.pdf")
+
+Data.writeToJSON()

@@ -7,7 +7,7 @@ Figures with experiment on the Prothero-Robinson problem
 """
 import os
 import numpy as np
-from pySDC.projects.parallelSDC_reloaded.utils import solutionExact, getParamsSDC, solutionSDC, getParamsRK, plt
+from pySDC.projects.parallelSDC_reloaded.utils import solutionExact, getParamsSDC, solutionSDC, getParamsRK, plt, Data
 
 PATH = '/' + os.path.join(*__file__.split('/')[:-1])
 SCRIPT = __file__.split('/')[-1].split('.')[0]
@@ -87,6 +87,7 @@ for qDeltaList, nSweeps in config:
 
         plt.figure(figNameConv)
         plt.loglog(dtVals, errors, sym + ls, label=qDelta)
+        Data.storeAndCheck(f"{figNameConv}_{qDelta}", errors)
 
         plt.figure(figNameCost)
         plt.loglog(costs, errors, sym + ls, label=qDelta)
@@ -101,3 +102,5 @@ for qDeltaList, nSweeps in config:
         plt.grid(True)
         plt.tight_layout()
         plt.savefig(f"{PATH}/{figName}.pdf")
+
+Data.writeToJSON()
