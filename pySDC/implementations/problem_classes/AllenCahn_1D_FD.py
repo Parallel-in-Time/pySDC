@@ -246,7 +246,7 @@ class allencahn_front_fullyimplicit(ptype):
         Returns
         -------
         me : dtype_u
-            The approximated exact solution.
+            The exact solution (in space and time).
         """
         v = 3.0 * np.sqrt(2) * self.eps * self.dw
         me = self.dtype_u(self.init, val=0.0)
