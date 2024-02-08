@@ -69,7 +69,7 @@ def test_script_fig02_stab():
         "MIN-SR-NS",
         "MIN-SR-S",
         "MIN-SR-FLEX",
-        "IE",
+        "LU",
         "VDHS",
     ]
 
