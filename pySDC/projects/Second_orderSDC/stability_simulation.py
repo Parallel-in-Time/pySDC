@@ -228,7 +228,9 @@ class StabilityImplementation:
         self.plot_stability(region_RKN.T, title='RKN-4 stability region')
 
 
-def check_points_and_interval(description, helper_params, point, compute_interval=False, check_stability_point=False):
+def check_points_and_interval(
+    description, helper_params, point, compute_interval=False, check_stability_point=False, Picard=False
+):
     # Storage for stability interval and stability check
     interval_data = []
     points_data = []
@@ -249,7 +251,10 @@ def check_points_and_interval(description, helper_params, point, compute_interva
                 )
                 if compute_interval:
                     # Extract the values where SDC is less than or equal to 1
-                    mask = stab_model.picard <= 1 + 1e-14
+                    if Picard:
+                        mask = stab_model.picard <= 1 + 1e-14
+                    else:
+                        mask = stab_model.SDC <= 1.0
                     for ii in range(len(mask)):
                         if mask[ii]:
                             kappa_max_interval = stab_model.lambda_kappa[ii]
@@ -287,11 +292,14 @@ def compute_and_generate_table(
     save_points_table=False,
     points_table_filename='./data/point_table.txt',
     quadrature_list=('GAUSS', 'LOBATTO'),
+    Picard=False,
 ):  # pragma: no cover
     from tabulate import tabulate
 
     if compute_interval:
-        interval_data = check_points_and_interval(description, helper_params, point, compute_interval=compute_interval)
+        interval_data = check_points_and_interval(
+            description, helper_params, point, compute_interval=compute_interval, Picard=Picard
+        )
     else:
         points_data = check_points_and_interval(
             description, helper_params, point, check_stability_point=check_stability_point
@@ -316,7 +324,10 @@ def compute_and_generate_table(
         print(f"Stability Results Table saved to {points_table_filename}")
 
     if compute_interval:
-        print("Stability Interval Table:")
+        if Picard:
+            print("Picard stability Interval Table:")
+        else:
+            print("SDC stability Interval Table:")
         print(tabulate(interval_data, headers=interval_headers, tablefmt="grid"))
 
     if check_stability_point:

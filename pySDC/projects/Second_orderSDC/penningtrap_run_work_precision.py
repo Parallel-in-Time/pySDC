@@ -21,8 +21,8 @@ if __name__ == '__main__':
     ## =============================================================================
     ##     dt-timestep and Tend can be changed here manually
     Tend = 128 * 0.015625
-    description['level_params']['dt'] = 0.015625 * 4
-    description['sweeper_params']['initial_guess'] = 'spread'  # 'zero', 'spread'
+    description['level_params']['dt'] = 0.015625 * 2
+    description['sweeper_params']['initial_guess'] = 'spread'  #'random' 'zero', 'spread'
     ## =============================================================================
     work_pre = ComputeError(controller_params, description, time_iter=3, Tend=Tend, K_iter=(1, 2, 3), axes=(2,))
     work_pre.run_work_precision(RK=True)
