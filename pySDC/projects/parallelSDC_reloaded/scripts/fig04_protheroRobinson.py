@@ -11,9 +11,10 @@ import numpy as np
 from pySDC.projects.parallelSDC_reloaded.utils import solutionExact, getParamsSDC, solutionSDC, getParamsRK, plt
 from pySDC.helpers.testing import DataChecker
 
+data = DataChecker(__file__)
+
 PATH = '/' + os.path.join(*__file__.split('/')[:-1])
 SCRIPT = __file__.split('/')[-1].split('.')[0]
-data = DataChecker()
 
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>'] * 10
 
