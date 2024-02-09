@@ -199,7 +199,6 @@ class ProtheroRobinsonAutonomous(ptype):
         # create new mesh object from u0 and set initial values for iteration
         u = self.dtype_u(u0)
 
-
         # start newton iteration
         n, res = 0, np.inf
         while n < self.newton_maxiter:
