@@ -1,7 +1,7 @@
 from mpi4py import MPI
 
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.core.Sweeper import sweeper
+from pySDC.core.Sweeper import sweeper, ParameterError
 import logging
 
 
@@ -137,10 +137,12 @@ class SweeperMPI(sweeper):
             # copy u[0] and RHS evaluation to all collocation nodes
             L.u[m + 1] = P.dtype_u(L.u[0])
             L.f[m + 1] = P.dtype_f(L.f[0])
-        else:
+        elif self.params.initial_guess == 'zero':
             # zeros solution for u and RHS
             L.u[m + 1] = P.dtype_u(init=P.init, val=0.0)
             L.f[m + 1] = P.dtype_f(init=P.init, val=0.0)
+        else:
+            raise ParameterError(f'initial_guess option {self.params.initial_guess} not implemented')
 
         # indicate that this level is now ready for sweeps
         L.status.unlocked = True
