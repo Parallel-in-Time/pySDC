@@ -232,12 +232,12 @@ class allencahn_front_fullyimplicit(ptype):
 
     def u_exact(self, t, u_init=None, t_init=None):
         r"""
-        Routine to return initial conditions or to approximate exact solution using ``SciPy``.
+        Routine to return initial conditions or the exact solution
 
         Parameters
         ----------
         t : float
-            Time at which the approximated exact solution is computed.
+            Time at which the exact solution is computed.
         u_init : pySDC.implementations.problem_classes.Lorenz.dtype_u
             Initial conditions for getting the exact solution.
         t_init : float

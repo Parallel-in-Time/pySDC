@@ -35,8 +35,8 @@ class ProtheroRobinson(ptype):
         \frac{du}{dt} = -\frac{u^3-g(t)^3}{\epsilon} + \frac{dg}{dt}, \quad u(0) = g(0).
 
     To use an other exact solution, one just have to derivate this class
-    and overload the `g`, `dg` and `dg2` methods. For instance,
-    to use :math:`g(t)=e^{-0.2t}`, define and use the following class:
+    and overload the `g` and `dg` methods. For instance,
+    to use :math:`g(t)=e^{-0.2*t}`, define and use the following class:
 
     >>> class MyProtheroRobinson(ProtheroRobinson):
     >>>
@@ -45,9 +45,6 @@ class ProtheroRobinson(ptype):
     >>>
     >>>     def dg(self, t):
     >>>         return (-0.2) * np.exp(-0.2 * t)
-    >>>
-    >>>     def dg2(self, t):
-    >>>         return (-0.2) ** 2 * np.exp(-0.2 * t)
 
     Parameters
     ----------
@@ -73,16 +70,6 @@ class ProtheroRobinson(ptype):
     dtype_f = mesh
 
     def __init__(self, epsilon=1e-3, nonLinear=False, newton_maxiter=200, newton_tol=5e-11, stop_at_nan=True):
-        """
-
-
-
-
-        Returns
-        -------
-        None.
-
-        """
         nvars = 1
         super().__init__((nvars, None, np.dtype('float64')))
 
@@ -95,16 +82,13 @@ class ProtheroRobinson(ptype):
         self.work_counters['rhs'] = WorkCounter()
 
     # -------------------------------------------------------------------------
-    # g function (analytical solution), and its first and second derivative
+    # g function (analytical solution), and its first derivative
     # -------------------------------------------------------------------------
     def g(self, t):
         return np.cos(t)
 
     def dg(self, t):
         return -np.sin(t)
-
-    def dg2(self, t):
-        return -np.cos(t)
 
     # -------------------------------------------------------------------------
     # f(u,t) and Jacobian functions
@@ -132,21 +116,21 @@ class ProtheroRobinson(ptype):
     # -------------------------------------------------------------------------
     def u_exact(self, t, u_init=None, t_init=None):
         r"""
-        Routine to return initial conditions or to approximate exact solution using ``SciPy``.
+        Routine to return initial conditions or exact solution.
 
         Parameters
         ----------
         t : float
-            Time at which the approximated exact solution is computed.
-        u_init : pySDC.implementations.problem_classes.Lorenz.dtype_u
+            Time at which the exact solution is computed.
+        u_init : dtype_u
             Initial conditions for getting the exact solution.
         t_init : float
             The starting time.
 
         Returns
         -------
-        me : dtype_u
-            The approximated exact solution.
+        u : dtype_u
+            The exact solution.
         """
         u = self.dtype_u(self.init)
         u[:] = self.g(t)

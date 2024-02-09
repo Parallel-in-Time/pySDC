@@ -286,34 +286,59 @@ class sweeper(object):
             nodeType = coll.node_type
 
             # Main function to compute coefficients
-            def computeCoeffs(m, a=None, b=None):
-                coll = CollBase(num_nodes=m, node_type=nodeType, quad_type=quadType)
+            def computeCoeffs(M, a=None, b=None):
+                """
+                Compute diagonal coefficients for a given number of nodes M.
+                If `a` and `b` are given, then it uses as initial guess:
 
-                Q = coll.Qmat[1:, 1:]
-                nodes = coll.nodes
+                >>> a * nodes**b / M
 
-                nCoeffs = len(nodes)
+                If `a` is not given, then do not care about `b` and uses as initial guess:
+
+                >>> nodes / M
+
+                Parameters
+                ----------
+                M : int
+                    Number of collocation nodes.
+                a : float, optional
+                    `a` coefficient for the initial guess.
+                b : float, optional
+                    `b` coefficient for the initial guess.
+
+                Returns
+                -------
+                coeffs : array
+                    The diagonal coefficients.
+                nodes : array
+                    The nodes associated to the current coefficients.
+                """
+                collM = CollBase(num_nodes=M, node_type=nodeType, quad_type=quadType)
+
+                QM = collM.Qmat[1:, 1:]
+                nodesM = collM.nodes
+
                 if quadType in ['LOBATTO', 'RADAU-LEFT']:
-                    nCoeffs -= 1
-                    Q = Q[1:, 1:]
-                    nodes = nodes[1:]
+                    QM = QM[1:, 1:]
+                    nodesM = nodesM[1:]
+                nCoeffs = len(nodesM)
 
                 if nCoeffs == 1:
-                    coeffs = np.diag(Q)
+                    coeffs = np.diag(QM)
 
                 else:
 
                     def nilpotency(coeffs):
                         """Function verifying the nilpotency from given coefficients"""
                         coeffs = np.asarray(coeffs)
-                        kMats = [(1 - z) * np.eye(nCoeffs) + z * np.diag(1 / coeffs) @ Q for z in nodes]
+                        kMats = [(1 - z) * np.eye(nCoeffs) + z * np.diag(1 / coeffs) @ QM for z in nodesM]
                         vals = [np.linalg.det(K) - 1 for K in kMats]
                         return np.array(vals)
 
                     if a is None:
-                        coeffs0 = nodes / m
+                        coeffs0 = nodesM / M
                     else:
-                        coeffs0 = a * nodes**b / m
+                        coeffs0 = a * nodesM**b / M
 
                     with warnings.catch_warnings():
                         warnings.simplefilter("ignore")
@@ -322,21 +347,21 @@ class sweeper(object):
                 # Handle first node equal to zero
                 if quadType in ['LOBATTO', 'RADAU-LEFT']:
                     coeffs = np.asarray([0.0] + list(coeffs))
-                    nodes = coll.nodes
+                    nodesM = np.asarray([0.0] + list(nodesM))
 
-                return coeffs, nodes
+                return coeffs, nodesM
 
             def fit(coeffs, nodes):
                 """Function fitting given coefficients to a power law"""
 
-                def law(ab):
+                def lawDiff(ab):
                     a, b = ab
                     return np.linalg.norm(a * nodes**b - coeffs)
 
-                sol = sp.optimize.minimize(law, [1.0, 1.0], method="nelder-mead")
+                sol = sp.optimize.minimize(lawDiff, [1.0, 1.0], method="nelder-mead")
                 return sol.x
 
-            # Compute incrementaly coefficients
+            # Compute coefficients incrementaly
             a, b = None, None
             m0 = 2 if quadType in ['LOBATTO', 'RADAU-LEFT'] else 1
             for m in range(m0, M + 1):

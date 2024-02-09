@@ -131,21 +131,21 @@ class ProtheroRobinsonAutonomous(ptype):
     # -------------------------------------------------------------------------
     def u_exact(self, t, u_init=None, t_init=None):
         r"""
-        Routine to return initial conditions or to approximate exact solution using ``SciPy``.
+        Routine to return initial conditions or exact solutions.
 
         Parameters
         ----------
         t : float
-            Time at which the approximated exact solution is computed.
-        u_init : pySDC.implementations.problem_classes.Lorenz.dtype_u
+            Time at which the exact solution is computed.
+        u_init : dtype_u
             Initial conditions for getting the exact solution.
         t_init : float
             The starting time.
 
         Returns
         -------
-        me : dtype_u
-            The approximated exact solution.
+        u : dtype_u
+            The exact solution.
         """
         u = self.dtype_u(self.init)
         u[0] = self.g(t)
@@ -199,9 +199,15 @@ class ProtheroRobinsonAutonomous(ptype):
         # create new mesh object from u0 and set initial values for iteration
         u = self.dtype_u(u0)
 
+
         # start newton iteration
         n, res = 0, np.inf
         while n < self.newton_maxiter:
+
+            # evaluate RHS
+            f = self.dtype_u(u)
+            f[0] = self.f(*u)
+            f[1] = 1
 
             # form the function g with g(u) = 0
             g = u - dt * self.eval_f(u, t) - rhs
@@ -278,21 +284,21 @@ class Kaps(ptype):
 
     def u_exact(self, t, u_init=None, t_init=None):
         r"""
-        Routine to return initial conditions or to approximate exact solution using ``SciPy``.
+        Routine to return initial conditions or exact solutions.
 
         Parameters
         ----------
         t : float
-            Time at which the approximated exact solution is computed.
-        u_init : pySDC.implementations.problem_classes.Lorenz.dtype_u
+            Time at which the exact solution is computed.
+        u_init : dtype_u
             Initial conditions for getting the exact solution.
         t_init : float
             The starting time.
 
         Returns
         -------
-        me : dtype_u
-            The approximated exact solution.
+        u : dtype_u
+            The exact solution.
         """
         u = self.dtype_u(self.init)
         u[:] = [np.exp(-2 * t), np.exp(-t)]
