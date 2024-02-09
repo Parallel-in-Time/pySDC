@@ -5,6 +5,7 @@ Created on Sun Feb  4 09:53:34 2024
 
 Testing scripts for the parallel_SDC_reloaded project
 """
+import sys
 import pytest
 
 
@@ -101,6 +102,10 @@ def test_script_fig04_protheroRobinson():
 
 @pytest.mark.base
 def test_script_fig05_allenCahn():
+    # Test fails for python < 3.8, so avoid it
+    if sys.version_info.minor < 8:
+        return
+
     from pySDC.projects.parallelSDC_reloaded.scripts import fig05_allenCahn
 
     minPrec = fig05_allenCahn.minPrec

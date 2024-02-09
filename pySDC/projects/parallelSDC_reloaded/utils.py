@@ -356,7 +356,7 @@ class Data:
 
         data = cls.DATA[key]
         ref = cls.DATA_REF[key]
-        assert np.allclose(data, ref, equal_nan=True)
+        assert np.allclose(data, ref, equal_nan=True), f"difference between data:{data} and ref:{ref}"
 
     @classmethod
     def writeToJSON(cls):
