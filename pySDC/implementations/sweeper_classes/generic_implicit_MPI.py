@@ -135,8 +135,8 @@ class SweeperMPI(sweeper):
             L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
         elif self.params.initial_guess == 'copy':
             # copy u[0] and RHS evaluation to all collocation nodes
-            L.u[m] = P.dtype_u(L.u[0])
-            L.f[m] = P.dtype_f(L.f[0])
+            L.u[m + 1] = P.dtype_u(L.u[0])
+            L.f[m + 1] = P.dtype_f(L.f[0])
         else:
             # zeros solution for u and RHS
             L.u[m + 1] = P.dtype_u(init=P.init, val=0.0)
