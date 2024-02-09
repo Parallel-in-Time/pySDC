@@ -8,10 +8,13 @@ Figures with experiment on the Lorenz problem
 import os
 import numpy as np
 import scipy as sp
-from pySDC.projects.parallelSDC_reloaded.utils import solutionExact, getParamsSDC, solutionSDC, getParamsRK, plt, Data
+
+from pySDC.projects.parallelSDC_reloaded.utils import solutionExact, getParamsSDC, solutionSDC, getParamsRK, plt
+from pySDC.helpers.testing import DataChecker
 
 PATH = '/' + os.path.join(*__file__.split('/')[:-1])
 SCRIPT = __file__.split('/')[-1].split('.')[0]
+data = DataChecker()
 
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>'] * 10
 
@@ -89,7 +92,7 @@ for qDelta, sym in zip(config, symList):
         # error VS dt
         label = f"$K={nSweeps}$"
         plt.loglog(dtVals, errors, sym + '-', label=f"$K={nSweeps}$")
-        Data.storeAndCheck(f"{figName}_{label}", errors)
+        data.storeAndCheck(f"{figName}_{label}", errors)
 
     x = dtVals[4:]
     for k in [1, 2, 3, 4, 5, 6]:
@@ -158,9 +161,10 @@ for qDeltaList, nSweeps in config:
                 cost /= nNodes * parEfficiency
             costs.append(cost)
 
-        # error VS dt
+        # error VS cost
         ls = '-' if qDelta.startswith("MIN-SR-") else "--"
         plt.loglog(costs, errors, sym + ls, label=qDelta)
+        data.storeAndCheck(f"{figName}_{qDelta}", errors)
 
     plt.gca().set(
         xlabel="Cost",
@@ -173,4 +177,4 @@ for qDeltaList, nSweeps in config:
     plt.tight_layout()
     plt.savefig(f"{PATH}/{figName}.pdf")
 
-Data.writeToJSON()
+data.writeToJSON()

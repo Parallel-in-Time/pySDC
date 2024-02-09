@@ -40,7 +40,7 @@ def test_script(sName):
         "vanderpol",
     ],
 )
-def test_problem_script(pName, sType):
+def test_playgrounds(pName, sType):
     try:
         exec(f"from pySDC.projects.parallelSDC_reloaded import {pName}_{sType}")
     except Exception as e:

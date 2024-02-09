@@ -28,9 +28,9 @@ for mu in muVals:
     print(f"Computing exact solution up to t={tEnd} for mu={mu} ...")
     uExact = solutionExact(tEnd, nSteps, "VANDERPOL", mu=mu)
     plt.figure(f"{script}_traj")
-    plt.plot(tVals, uExact[:, 0], '-', label=f"$\mu={mu}$")
+    plt.plot(tVals, uExact[:, 0], '-', label=f"$\\mu={mu}$")
     plt.figure(f"{script}_accel")
-    plt.plot(tVals, uExact[:, 1], '-', label=f"$\mu={mu}$")
+    plt.plot(tVals, uExact[:, 1], '-', label=f"$\\mu={mu}$")
 
     x = uExact[:, 0]
     idx = signal.find_peaks(x)[0][0]
@@ -46,7 +46,7 @@ for mu, tEnd in zip(muVals, muPeriods):
     print(f"Computing exact solution up to t={tEnd:.1f} for mu={mu} ...")
     uExact = solutionExact(tEnd, nSteps, "VANDERPOL", mu=mu)
     plt.figure(f"{script}_traj_scaled")
-    plt.plot(tVals / tEnd, uExact[:, 0], '-', label=f"$\mu={mu}$")
+    plt.plot(tVals / tEnd, uExact[:, 0], '-', label=f"$\\mu={mu}$")
     print(' -- done')
 
 # Figure settings

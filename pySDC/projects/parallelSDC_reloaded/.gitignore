@@ -1,3 +1,2 @@
 *.pdf
-_*.json
-!_dataRef.json
+_sol*.json
