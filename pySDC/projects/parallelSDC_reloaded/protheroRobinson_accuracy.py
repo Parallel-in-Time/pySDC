@@ -53,7 +53,7 @@ qDeltaList = [
     # 'IE', 'LU', 'IEpar', 'PIC',
     # "MIN3",
 ]
-nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
+nStepsList = np.array([2, 5, 10, 20, 50, 100, 200])
 # nSweepList = [1, 2, 3, 4]
 
 # qDeltaList = ['ESDIRK43', 'ESDIRK53', 'VDHS']

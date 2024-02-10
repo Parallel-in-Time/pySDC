@@ -53,7 +53,7 @@ qDeltaList = [
     'MIN-SR-FLEX',
     # "MIN3",
 ]
-nStepsList = np.array([10, 20, 50, 100, 200, 500])
+nStepsList = np.array([10, 20, 50, 100, 200])
 # nSweepList = [1, 2, 3, 4]
 
 # qDeltaList = ['RK4', 'ESDIRK43', 'MIN-SR-S']

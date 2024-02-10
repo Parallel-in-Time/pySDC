@@ -165,7 +165,7 @@ for qDeltaList, nSweeps in config:
         # error VS cost
         ls = '-' if qDelta.startswith("MIN-SR-") else "--"
         plt.loglog(costs, errors, sym + ls, label=qDelta)
-        data.storeAndCheck(f"{figName}_{qDelta}", errors[1:])
+        data.storeAndCheck(f"{figName}_{qDelta}", errors[2:])
 
     plt.gca().set(
         xlabel="Cost",
