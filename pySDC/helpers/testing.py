@@ -61,7 +61,7 @@ class DataChecker:
         self._dataFile = os.path.join(path, '_data.json')
         self._dataRefFile = os.path.join(path, '_dataRef.json')
 
-    def storeAndCheck(self, key, data):
+    def storeAndCheck(self, key, data, rtol=1e-5, atol=1e-8):
         """
         Store data into cache, and check with eventual reference data
 
@@ -71,6 +71,10 @@ class DataChecker:
             Unique key (project wide) for the data.
         data : list or array-like
             The data that has to be stored.
+        rtol : float
+            Relative tolerance
+        atol : float
+            Absolute tolerance
         """
         self._data[key] = list(data)
         if self._dataRef is None:
@@ -87,7 +91,7 @@ class DataChecker:
         ref = self._dataRef[key]
 
         assert len(data) == len(ref), f"data with len:{len(data)}) cannot be compared to ref with len:{len(ref)})"
-        assert np.allclose(data, ref, equal_nan=True), f"difference between data:{data} and ref:{ref}"
+        assert np.allclose(data, ref, atol=atol, rtol=rtol, equal_nan=True), f"difference between data:{data} and ref:{ref}"
 
     def writeToJSON(self):
         """Write cached data into a json file"""

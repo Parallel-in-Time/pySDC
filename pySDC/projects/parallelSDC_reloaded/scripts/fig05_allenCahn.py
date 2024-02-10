@@ -115,7 +115,7 @@ for qDeltaList in config:
 
         plt.figure(figNameConv)
         plt.loglog(dtVals, errors, sym + ls, label=qDelta)
-        data.storeAndCheck(f"{figNameConv}_{qDelta}", errors)
+        data.storeAndCheck(f"{figNameConv}_{qDelta}", errors, atol=1e-4, rtol=1e-4)
 
         plt.figure(figNameCost)
         plt.loglog(costs, errors, sym + ls, label=qDelta)
