@@ -91,7 +91,9 @@ class DataChecker:
         ref = self._dataRef[key]
 
         assert len(data) == len(ref), f"data with len:{len(data)}) cannot be compared to ref with len:{len(ref)})"
-        assert np.allclose(data, ref, atol=atol, rtol=rtol, equal_nan=True), f"difference between data:{data} and ref:{ref}"
+        assert np.allclose(
+            data, ref, atol=atol, rtol=rtol, equal_nan=True
+        ), f"difference between data:{data} and ref:{ref}"
 
     def writeToJSON(self):
         """Write cached data into a json file"""
