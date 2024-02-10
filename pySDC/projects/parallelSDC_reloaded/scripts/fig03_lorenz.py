@@ -93,7 +93,7 @@ for qDelta, sym in zip(config, symList):
         # error VS dt
         label = f"$K={nSweeps}$"
         plt.loglog(dtVals, errors, sym + '-', label=f"$K={nSweeps}$")
-        data.storeAndCheck(f"{figName}_{label}", errors)
+        data.storeAndCheck(f"{figName}_{label}", errors[1:])
 
     x = dtVals[4:]
     for k in [1, 2, 3, 4, 5, 6]:
