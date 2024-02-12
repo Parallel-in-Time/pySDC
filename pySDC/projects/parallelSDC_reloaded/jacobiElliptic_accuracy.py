@@ -70,7 +70,7 @@ for qDelta in qDeltaList:
         try:
             params = getParamsRK(qDelta)
             name = name[:-3]
-            if nSweeps != nSweepList[0]:
+            if nSweeps != nSweepList[0]:  # pragma: no cover
                 continue
         except KeyError:
             params = getParamsSDC(
