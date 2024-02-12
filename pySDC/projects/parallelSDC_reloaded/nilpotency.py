@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 from pySDC.core.Sweeper import sweeper
 
-quadType = "RADAU-RIGHT"
+quadType = "LOBATTO"
 nodeType = "LEGENDRE"
 
 

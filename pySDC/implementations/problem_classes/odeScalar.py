@@ -184,7 +184,6 @@ class ProtheroRobinson(ptype):
         # start newton iteration
         n, res = 0, np.inf
         while n < self.newton_maxiter:
-
             # form the function g with g(u) = 0
             g = u - dt * self.f(u, t) - rhs
 
@@ -205,7 +204,7 @@ class ProtheroRobinson(ptype):
 
         if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
-        elif np.isnan(res):
+        elif np.isnan(res):  # pragma: no cover
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
         if n == self.newton_maxiter:

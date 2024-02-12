@@ -19,7 +19,7 @@ tEnd = 1.24
 
 
 def getError(uNum, uRef):
-    if uNum is None:
+    if uNum is None:  # pragma: no cover
         return np.inf
     return np.linalg.norm(np.linalg.norm(uRef - uNum, np.inf, axis=-1), np.inf)
 
@@ -64,7 +64,6 @@ dtVals = tEnd / nStepsList
 i = 0
 for qDelta in qDeltaList:
     for nSweeps in nSweepList:
-
         sym = symList[i]
         i += 1
 

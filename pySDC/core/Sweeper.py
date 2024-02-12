@@ -280,7 +280,6 @@ class sweeper(object):
             self.parallelizable = True
 
         elif qd_type == "MIN-SR-S":
-
             M = QDmat.shape[0] - 1
             quadType = coll.quad_type
             nodeType = coll.node_type

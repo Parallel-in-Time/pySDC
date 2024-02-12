@@ -22,7 +22,7 @@ pName = "CHEMREC"
 
 
 def getError(uNum, uRef):
-    if uNum is None:
+    if uNum is None:  # pragma: no cover
         return np.inf
     return max(np.linalg.norm(uRef[:, 0] - uNum[:, 0], np.inf), np.linalg.norm(uRef[:, 1] - uNum[:, 1], np.inf))
 
@@ -63,7 +63,6 @@ dtVals = tEnd / nStepsList
 i = 0
 for qDelta in qDeltaList:
     for nSweeps in nSweepList:
-
         sym = symList[i]
         i += 1
 

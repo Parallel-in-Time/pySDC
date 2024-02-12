@@ -56,7 +56,6 @@ plt.rcParams['figure.max_open_warning'] = 100
 def getParamsSDC(
     quadType="RADAU-RIGHT", numNodes=4, qDeltaI="IE", nSweeps=3, nodeType="LEGENDRE", collUpdate=False, initType="copy"
 ):
-
     description = {
         # Sweeper and its parameters
         "sweeper_class": generic_implicit,
@@ -94,7 +93,6 @@ RK_SWEEPERS = {
 
 
 def getParamsRK(method="RK4"):
-
     description = {
         # Sweeper and its parameters
         "sweeper_class": RK_SWEEPERS[method],
@@ -248,7 +246,7 @@ def solutionSDC(tEnd, nSteps, params, probName, **kwargs):
     print(f"    done, newton:{nNewton}, rhs:{nRHS}, tComp:{tComp}")
     try:
         parallel = controller.MS[0].levels[0].sweep.parallelizable
-    except AttributeError:
+    except AttributeError:  # pragma: no cover
         parallel = False
 
     return uSDC, (nNewton, nRHS, tComp), parallel

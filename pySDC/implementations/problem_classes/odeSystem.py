@@ -202,7 +202,6 @@ class ProtheroRobinsonAutonomous(ptype):
         # start newton iteration
         n, res = 0, np.inf
         while n < self.newton_maxiter:
-
             # evaluate RHS
             f = self.dtype_u(u)
             f[0] = self.f(*u)
@@ -227,7 +226,7 @@ class ProtheroRobinsonAutonomous(ptype):
 
         if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
-        elif np.isnan(res):
+        elif np.isnan(res):  # pragma: no cover
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
         if n == self.newton_maxiter:
@@ -354,7 +353,6 @@ class Kaps(ptype):
         # start newton iteration
         n, res = 0, np.inf
         while n < self.newton_maxiter:
-
             x, y = u
             f = np.array([-(2 + 1 / eps) * x + y**2 / eps, x - y * (1 + y)])
 
@@ -383,7 +381,7 @@ class Kaps(ptype):
 
         if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
-        elif np.isnan(res):
+        elif np.isnan(res):  # pragma: no cover
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
         if n == self.newton_maxiter:
@@ -527,7 +525,6 @@ class ChemicalReaction3Var(ptype):
         # start newton iteration
         n, res = 0, np.inf
         while n < self.newton_maxiter:
-
             c1, c2, c3 = u
             f = -np.array([0.013 * c1 + 1000 * c3 * c1, 2500 * c3 * c2, 0.013 * c1 + 1000 * c1 * c3 + 2500 * c2 * c3])
 
@@ -580,7 +577,11 @@ class ChemicalReaction3Var(ptype):
                             + 0.026 * dt
                             + 1.0
                         ),
-                        (2500000000.0 * c1 * c3**2 * dt**3 + 32500.0 * c1 * c3 * dt**3 + 2500000.0 * c1 * c3 * dt**2)
+                        (
+                            2500000000.0 * c1 * c3**2 * dt**3
+                            + 32500.0 * c1 * c3 * dt**3
+                            + 2500000.0 * c1 * c3 * dt**2
+                        )
                         / (
                             2500000000.0 * c1 * c3**2 * dt**3
                             + 32500.0 * c1 * c3 * dt**3
@@ -735,7 +736,7 @@ class ChemicalReaction3Var(ptype):
 
         if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
-        elif np.isnan(res):
+        elif np.isnan(res):  # pragma: no cover
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
         if n == self.newton_maxiter:
@@ -876,7 +877,6 @@ class JacobiElliptic(ptype):
         # start newton iteration
         n, res = 0, np.inf
         while n < self.newton_maxiter:
-
             u1, u2, u3 = u
             f = np.array([u2 * u3, -u1 * u3, -0.51 * u1 * u2])
 
@@ -909,7 +909,11 @@ class JacobiElliptic(ptype):
                 ]
             )
             dgInv /= (
-                1.02 * dt**3 * u1 * u2 * u3 + 0.51 * dt**2 * u1**2 - 0.51 * dt**2 * u2**2 - 1.0 * dt**2 * u3**2 - 1.0
+                1.02 * dt**3 * u1 * u2 * u3
+                + 0.51 * dt**2 * u1**2
+                - 0.51 * dt**2 * u2**2
+                - 1.0 * dt**2 * u3**2
+                - 1.0
             )
 
             # newton update: u1 = u0 - g/dg
@@ -921,7 +925,7 @@ class JacobiElliptic(ptype):
 
         if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
-        elif np.isnan(res):
+        elif np.isnan(res):  # pragma: no cover
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
         if n == self.newton_maxiter:

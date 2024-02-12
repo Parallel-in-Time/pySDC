@@ -18,7 +18,7 @@ dtVals = tEnd / nStepsList
 
 
 def getError(uNum, uRef):
-    if uNum is None:
+    if uNum is None:  # pragma: no cover
         return np.inf
     return np.linalg.norm(uRef - uNum[:, 0], np.inf)
 
@@ -47,7 +47,6 @@ styles = [
 # -----------------------------------------------------------------------------
 plt.figure()
 for (qDelta, nSweeps), style in zip(schemes, styles):
-
     if nSweeps is None:
         params = getParamsRK(qDelta)
         label = None
@@ -57,7 +56,6 @@ for (qDelta, nSweeps), style in zip(schemes, styles):
     errors = []
 
     for nSteps in nStepsList:
-
         uNum, counters, parallel = solutionSDC(tEnd, nSteps, params, 'DAHLQUIST', lambdas=np.array([lam]))
 
         tVals = np.linspace(0, tEnd, nSteps + 1)

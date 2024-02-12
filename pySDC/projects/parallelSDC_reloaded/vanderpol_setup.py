@@ -24,7 +24,6 @@ tVals = np.linspace(0, tEnd, nSteps + 1)
 
 # Compute and plot unscaled solution to determined period for each mu
 for mu in muVals:
-
     print(f"Computing exact solution up to t={tEnd} for mu={mu} ...")
     uExact = solutionExact(tEnd, nSteps, "VANDERPOL", mu=mu)
     plt.figure(f"{script}_traj")

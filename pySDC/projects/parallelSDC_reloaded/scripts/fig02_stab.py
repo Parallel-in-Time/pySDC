@@ -57,7 +57,6 @@ for qDeltaType in config:
         lambdas *= fac
 
     for nSweeps in [1, 2, 3, 4]:
-
         params = getParamsSDC(quadType, nNodes, qDeltaType, nSweeps, nodeType)
 
         uNum, counters, parallel = solutionSDC(1, 1, params, 'DAHLQUIST', lambdas=lambdas.ravel())
