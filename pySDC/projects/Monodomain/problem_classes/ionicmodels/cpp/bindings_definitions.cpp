@@ -10,6 +10,7 @@ namespace py = pybind11;
 #include "hodgkinhuxley.h"
 #include "courtemanche.h"
 #include "tentusscher.h"
+#include "bistable.h"
 
 PYBIND11_MODULE(ionicmodels, m)
 {
@@ -62,4 +63,16 @@ PYBIND11_MODULE(ionicmodels, m)
     TenTusscher2006_epiPy.def("f_stiff", &TenTusscher2006_epi::f_stiff);
     TenTusscher2006_epiPy.def("rho_f_expl", &TenTusscher2006_epi::rho_f_expl);
     TenTusscher2006_epiPy.def("rho_f_nonstiff", &TenTusscher2006_epi::rho_f_nonstiff);
+
+    py::class_<BiStable, IonicModel> BiStablePy(m, "BiStable");
+    BiStablePy.def(py::init<const double>());
+    BiStablePy.def("initial_values", &BiStable::initial_values, py::return_value_policy::copy);
+    BiStablePy.def("f", &BiStable::f);
+    BiStablePy.def("f_expl", &BiStable::f_expl);
+    BiStablePy.def("lmbda_exp", &BiStable::lmbda_exp);
+    BiStablePy.def("lmbda_yinf_exp", &BiStable::lmbda_yinf_exp);
+    BiStablePy.def("f_nonstiff", &BiStable::f_nonstiff);
+    BiStablePy.def("f_stiff", &BiStable::f_stiff);
+    BiStablePy.def("rho_f_expl", &BiStable::rho_f_expl);
+    BiStablePy.def("rho_f_nonstiff", &BiStable::rho_f_nonstiff);
 }

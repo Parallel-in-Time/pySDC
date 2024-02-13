@@ -17,7 +17,7 @@ class RequestsList:
 
 
 class VectorOfVectors(object):
-    def __init__(self, init=None, val=0.0, type_sub_vector=None, size=1):
+    def __init__(self, init, val=None, type_sub_vector=None, size=1):
         if isinstance(init, VectorOfVectors):
             self.val_list = [init_k.copy() for init_k in init.val_list]
             self.type_sub_vector = init.type_sub_vector
@@ -31,13 +31,24 @@ class VectorOfVectors(object):
 
         self.size = len(self.val_list)
 
-        self.np_list = [self.val_list[i].numpy_array for i in range(self.size)]
-
     def __getitem__(self, key):
         return self.val_list[key]
 
     def __setitem__(self, key):
         return self.val_list[key]
+
+    @property
+    def np_list(self):
+        return [self.val_list[i].numpy_array for i in range(self.size)]
+
+    def np_array(self, i):
+        return self.val_list[i].numpy_array
+
+    def isnan(self):
+        return np.any([self.val_list[i].isnan() for i in range(self.size)])
+
+    def is_nan_or_inf(self):
+        return np.any([self.val_list[i].is_nan_or_inf() for i in range(self.size)])
 
     def copy(self, other=None):
         if other is None:
@@ -97,6 +108,11 @@ class VectorOfVectors(object):
     def __abs__(self):
         return np.sqrt(np.sum([abs(val) ** 2 for val in self.val_list]) / self.size)
 
+    def rel_norm(self, other):
+        my_norms = np.array([abs(val) for val in self.val_list])
+        other_norms = np.array([abs(val) for val in other.val_list])
+        return np.average(my_norms / other_norms)
+
     def dot(self, other):
         return np.sum([self[i].dot(other[i]) for i in range(self.size)])
 
@@ -130,24 +146,24 @@ class VectorOfVectors(object):
         else:
             self[0].ghostUpdate(addv, mode)
 
-    def interpolate(self, other):
+    def interpolate(self, other, cells=None, nmm_interpolation_data=None):
         if isinstance(other, VectorOfVectors):
             for i in range(self.size):
-                self[i].interpolate(other[i])
+                self[i].interpolate(other[i], cells, nmm_interpolation_data)
         else:
             raise DataError("Type error: cannot interpolate %s to %s" % (type(other), type(self)))
 
-    def restrict(self, other):
+    def restrict(self, other, cells=None, nmm_interpolation_data=None):
         if isinstance(other, VectorOfVectors):
             for i in range(self.size):
-                self[i].restrict(other[i])
+                self[i].restrict(other[i], cells, nmm_interpolation_data)
         else:
             raise DataError("Type error: cannot restrict %s to %s" % (type(other), type(self)))
 
-    def prolong(self, other):
+    def prolong(self, other, cells=None, nmm_interpolation_data=None):
         if isinstance(other, VectorOfVectors):
             for i in range(self.size):
-                self[i].prolong(other[i])
+                self[i].prolong(other[i], cells, nmm_interpolation_data)
         else:
             raise DataError("Type error: cannot prolong %s to %s" % (type(other), type(self)))
 

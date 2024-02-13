@@ -70,19 +70,19 @@ class exponential_multirate_explicit_stabilized(sweeper):
 
         if not hasattr(self, "rho_expl"):
             self.estimated_rho = [0, 0]
-            if hasattr(P.exact, "rho_nonstiff") and callable(P.exact.rho_nonstiff):
-                self.rho_expl = P.exact.rho_nonstiff
+            if hasattr(P, "rho_nonstiff") and callable(P.rho_nonstiff):
+                self.rho_expl = P.rho_nonstiff
             else:
                 self.rho_estimator = rho_estimator(P)
                 self.rho_expl = self.rho_estimator.rho_expl
-            if hasattr(P.exact, "rho_stiff") and callable(P.exact.rho_stiff):
-                self.rho_impl = P.exact.rho_stiff
+            if hasattr(P, "rho_stiff") and callable(P.rho_stiff):
+                self.rho_impl = P.rho_stiff
             else:
                 if not hasattr(self, "rho_estimator"):
                     self.rho_estimator = rho_estimator(P)
                 self.rho_impl = self.rho_estimator.rho_impl
 
-        if self.rho_count % self.params.rho_freq == 0:
+        if self.rho_count % self.rho_freq == 0:
             self.estimated_rho[0] = self.rho_expl(y=L.u[0], t=L.time, fy=L.f[0])
             self.estimated_rho[1] = self.rho_impl(y=L.u[0], t=L.time, fy=L.f[0])
             self.rho_count = 0

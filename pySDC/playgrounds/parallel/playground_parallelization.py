@@ -34,9 +34,9 @@ def set_parameters_ml():
     # initialize problem parameters
     problem_params = dict()
     problem_params['nu'] = 0.1  # diffusion coefficient
-    problem_params['freq'] = (2, 2)  # frequency for the test value
+    problem_params['freq'] = 2  # frequency for the test value
     problem_params['bc'] = 'periodic'  # periodic BCs
-    problem_params['nvars'] = [(256, 256), (128, 128)]  # number of degrees of freedom for each level
+    problem_params['nvars'] = [256, 128]  # number of degrees of freedom for each level
 
     # initialize step parameters
     step_params = dict()
@@ -99,7 +99,6 @@ if __name__ == "__main__":
     size = comm.Get_size()
 
     if rank == 0:
-
         # we'd need to deal with variable file names here (for testing purpose only)
         if len(sys.argv) >= 3:
             fname = sys.argv[2]

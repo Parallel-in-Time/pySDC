@@ -46,20 +46,25 @@ class Parabolic_FEniCSx(RegisterParams):
 
     def define_domain_and_function_space(self):
         self.mesh_fibers_folder = Path(self.meshes_fibers_root_folder) / Path(self.domain_name) / Path(self.mesh_name)
-        self.import_fibers = "cuboid" not in self.domain_name
+        self.import_fibers = "cuboid" not in self.domain_name and "cube" not in self.domain_name
         if self.import_fibers:
             # read mesh from same file as fibers
             with io.XDMFFile(self.comm, self.mesh_fibers_folder / Path("fibers.xdmf"), "r") as xdmf:
                 self.domain = xdmf.read_mesh(name="mesh", xpath="Xdmf/Domain/Grid")
             self.dim = 3
         else:
-            if "small" in self.domain_name:
-                dom_size = [[0.0, 0.0, 0.0], [5.0, 3.0, 1.0]]
-                n_elems = 25 * 2**self.pre_refinements
-            else:
-                dom_size = [[0.0, 0.0, 0.0], [20.0, 7.0, 3.0]]
-                n_elems = 100 * 2**self.pre_refinements
-            self.dim = int(self.domain_name[7])
+            if "cuboid" in self.domain_name:
+                if "small" in self.domain_name:
+                    dom_size = [[0.0, 0.0, 0.0], [5.0, 3.0, 1.0]]
+                    n_elems = 25 * 2**self.pre_refinements
+                else:
+                    dom_size = [[0.0, 0.0, 0.0], [20.0, 7.0, 3.0]]
+                    n_elems = 100 * 2**self.pre_refinements
+                self.dim = int(self.domain_name[7])
+            elif "cube" in self.domain_name:
+                dom_size = [[0.0, 0.0, 0.0], [100.0, 100.0, 100.0]]
+                n_elems = 250 * 2**self.pre_refinements
+                self.dim = int(self.domain_name[5])
 
             d = np.asarray(dom_size[1]) - np.asarray(dom_size[0])
             max_d = np.max(d)
@@ -76,16 +81,14 @@ class Parabolic_FEniCSx(RegisterParams):
             else:
                 raise Exception(f"need dim=1,2,3 to instantiate problem, got dim={self.dim}")
 
-            # with io.XDMFFile(self.comm, self.mesh_fibers_folder / Path("fibers.xdmf"), "r") as xdmf:
-            #     self.domain = xdmf.read_mesh()
-
         for i in range(self.post_refinements):
             self.domain.topology.create_connectivity(self.domain.topology.dim, 1)
             self.domain = mesh.refine(self.domain)
 
         self.dim = self.domain.geometry.dim
         self.V = fem.FunctionSpace(self.domain, (self.family, self.order))
-        self.init = self.V
+        # self.init = self.V
+        self.init = fem.Function(self.V)
 
     def define_coefficients(self):
         self.chi = 140.0  # mm^-1
@@ -94,6 +97,16 @@ class Parabolic_FEniCSx(RegisterParams):
         self.se_l = 0.62  # mS/mm
         self.si_t = 0.019  # mS/mm
         self.se_t = 0.24  # mS/mm
+
+        if "cube" in self.domain_name:
+            # if self.pre_refinements == -1:
+            #     self.si_l *= 0.5
+            #     self.se_l *= 0.5
+            # elif self.pre_refinements == 0:
+            self.si_l *= 0.25
+            self.se_l *= 0.25
+            self.si_t = self.si_l
+            self.se_t = self.se_l
 
         self.sigma_l = self.si_l * self.se_l / (self.si_l + self.se_l)
         self.sigma_t = self.si_t * self.se_t / (self.si_t + self.se_t)
@@ -104,7 +117,8 @@ class Parabolic_FEniCSx(RegisterParams):
         self.x = ufl.SpatialCoordinate(self.domain)
         self.n = ufl.FacetNormal(self.domain)
         self.t = fem.Constant(self.domain, 0.0)
-        self.zero_fun = fem.Constant(self.domain, 0.0)
+        self.zero_fun = FEniCSx_Vector(self.init, val=0.0)
+        self.one_fun = FEniCSx_Vector(self.init, val=1.0)
 
         self.define_fibers()
         if self.fibrosis:
@@ -157,20 +171,8 @@ class Parabolic_FEniCSx(RegisterParams):
         self.diff_form = fem.form(self.diff)
 
     def define_stimulus(self):
-        self.scale_Iion = 0.01  # used to convert currents in uA/cm^2 to uA/mm^2
-        # scale_im is applied to the rhs of the ionic model, so that the rhs is in units of mV/ms
-        self.scale_im = self.scale_Iion / self.Cm
-        self.stim_ufl = self.stim_ufl_expr()
-        if abs(self.scale_im - 1.0) > 1e-10:
-            self.stim_ufl *= self.scale_im
-
+        self.zero_stim_vec = self.zero_fun
         self.stim_vec = FEniCSx_Vector(init=self.init, val=0.0)
-        self.stim_expr = fem.Expression(self.stim_ufl, self.V.element.interpolation_points())
-
-    def Istim(self, t):
-        self.t.value = t
-        self.stim_vec.values.interpolate(self.stim_expr)
-        return self.stim_vec
 
     def assemble_vec_mat(self):
         from dolfinx.fem.petsc import assemble_matrix
@@ -202,7 +204,7 @@ class Parabolic_FEniCSx(RegisterParams):
     def set_solver_options(self):
         # we suppose that the problem is symmetric
         # first set the default options
-        if self.dim <= 2:
+        if self.dim <= 1:
             def_solver_ksp = "preonly"
             def_solver_pc = "cholesky"
         else:
@@ -226,16 +228,22 @@ class Parabolic_FEniCSx(RegisterParams):
         self.solver = PETSc.KSP().create(self.comm)
         self.solver.setType(self.solver_ksp)
         self.solver.getPC().setType(self.solver_pc)
-        if self.solver_ksp != "preonly" and hasattr(self, "solver_rtol") and self.solver_rtol != "default":
-            assert type(self.solver_rtol) is float, 'problem_params["solver_rtol"] must be a float or "default"'
-            self.solver.setTolerances(rtol=self.solver_rtol)
+        if self.solver_ksp != "preonly" and hasattr(self, "lin_solv_rtol") and self.lin_solv_rtol is not None:
+            assert type(self.lin_solv_rtol) is float, 'problem_params["lin_solv_rtol"] must be a float or "None"'
+            self.solver.setTolerances(rtol=self.lin_solv_rtol)
+        if self.solver_ksp != "preonly" and hasattr(self, "lin_solv_max_iter") and self.lin_solv_max_iter is not None:
+            assert type(self.lin_solv_max_iter) is int, 'problem_params["lin_solv_max_iter"] must be a int or "None"'
+            self.solver.setIterationNumber(its=self.lin_solv_max_iter)
 
     def solve_system(self, rhs, factor, u0, t, u_sol):
         if abs(factor - self.prev_factor) > 1e-8 * factor:
             self.prev_factor = factor
             self.solver.setOperators(self.M + factor * self.K)
 
-        self.M.mult(rhs.values.vector, self.tmp1.values.vector)
+        # if self.mass_rhs != "none":
+        #     self.solver.solve(rhs.values.vector, u_sol.values.vector)
+        # else:
+        self.apply_mass_matrix(rhs, self.tmp1)
         self.solver.solve(self.tmp1.values.vector, u_sol.values.vector)
 
         return u_sol
@@ -292,33 +300,61 @@ class Parabolic_FEniCSx(RegisterParams):
         if self.enable_output:
             self.xdmf = io.XDMFFile(self.domain.comm, self.output_folder / Path(self.output_file_name).with_suffix(".xdmf"), "w")
             self.xdmf.write_mesh(self.domain)
+            if self.order > 1:
+                self.V_order_one = fem.FunctionSpace(self.domain, (self.family, 1))
+                self.sol_order_one = fem.Function(self.V_order_one)
 
     def invert_mass_matrix(self, x, y):
-        # solves y = M*y
+        # computes y = M^{-1} x
         if self.mass_lumping:
             y.pointwiseDivide(x, self.ml)
         else:
             self.solver_M.solve(x, y)
 
-    def write_solution(self, V, t):
+    def apply_mass_matrix(self, x, y=None):
+        # computes y = M x
+        if y is None and type(x) is FEniCSx_Vector:
+            y = FEniCSx_Vector(init=self.init, val=0.0)
+        elif y is None:
+            raise Exception("apply_mass_matrix: y is None and x is not a FEniCSx_Vector")
+
+        if type(x) is PETSc.Vec:
+            a, b = x, y
+        elif type(x) is FEniCSx_Vector:
+            a, b = x.values.vector, y.values.vector
+        else:
+            raise Exception("apply_mass_matrix not implemented for this type of x")
+
+        if self.mass_lumping:
+            b.pointwiseMult(a, self.ml)
+        else:
+            self.M.mult(a, b)
+
+        return y
+
+    def write_solution(self, u, t, all):
         if self.enable_output:
             if self.family == "CG":
-                V.values.name = "V"
-                self.xdmf.write_function(V.values, t)
+                if not all:
+                    u[0].values.name = "V"
+                    if self.order == 1:
+                        self.xdmf.write_function(u[0].values, t)
+                    else:
+                        self.sol_order_one.interpolate(
+                            u[0].values,
+                            nmm_interpolation_data=fem.create_nonmatching_meshes_interpolation_data(
+                                self.sol_order_one.function_space.mesh._cpp_object, self.sol_order_one.function_space.element, u[0].values.function_space.mesh._cpp_object
+                            ),
+                        )
+                        self.sol_order_one.vector.ghostUpdate(PETSc.InsertMode.INSERT, PETSc.ScatterMode.FORWARD)
+                        self.sol_order_one.name = "V"
+                        self.xdmf.write_function(self.sol_order_one, t)
+                else:
+                    for i in range(u.size):
+                        u[i].values.name = f"u_{i}"
+                        self.xdmf.write_function(u[i].values, t)
             else:
                 raise Exception("write_solution sol not implemented for DG")
-                # if not hasattr(self, "V_CG"):
-                #     self.V_CG = fem.FunctionSpace(self.domain, ("CG", self.order))
-                #     self.u_CG = fem.Function(self.V_CG)
-                # V.ghostUpdate(PETSc.InsertMode.INSERT, PETSc.ScatterMode.FORWARD, False)
-                # self.u_CG.interpolate(
-                #     V.values,
-                #     nmm_interpolation_data=fem.create_nonmatching_meshes_interpolation_data(
-                #         self.u_CG.function_space.mesh._cpp_object, self.u_CG.function_space.element, V.values.function_space.mesh._cpp_object
-                #     ),
-                # )
-                # self.u_CG.name = "V"
-                # self.xdmf.write_function(self.u_CG, t)
 
     def write_reference_solution(self, uh, indeces):
         [uh[i].ghostUpdate(PETSc.InsertMode.INSERT, PETSc.ScatterMode.FORWARD) for i in indeces]
@@ -333,17 +369,19 @@ class Parabolic_FEniCSx(RegisterParams):
             ref_sol_path = Path(self.output_folder) / Path(ref_file_name)
             if ref_sol_path.with_suffix(".bp").is_dir():
                 mesh_ref = adios4dolfinx.read_mesh(self.domain.comm, ref_sol_path.with_suffix(".bp"), engine="BP4", ghost_mode=mesh.GhostMode.shared_facet)
-                V_ref = fem.FunctionSpace(mesh_ref, (self.family, self.order))
+                if self.order > 1:
+                    print("WARNING: reading reference solution with lower order than current solution.")
+                V_ref = fem.FunctionSpace(mesh_ref, (self.family, 1))
                 ref_sol = fem.Function(V_ref)
+                nmm_interpolation_data = fem.create_nonmatching_meshes_interpolation_data(
+                    uh[indeces[0]].values.function_space.mesh._cpp_object, uh[indeces[0]].values.function_space.element, ref_sol.function_space.mesh._cpp_object
+                )
+                map = self.domain.topology.index_map(self.domain.topology.dim)
+                cells = np.arange(map.size_local + map.num_ghosts, dtype=np.int32)
                 for i in indeces:
                     adios4dolfinx.read_function(ref_sol, Path(self.output_folder) / Path(ref_file_name + "_" + str(i)).with_suffix(".bp"), engine="BP4")
                     ref_sol.vector.ghostUpdate(addv=PETSc.InsertMode.INSERT, mode=PETSc.ScatterMode.FORWARD)
-                    uh[i].values.interpolate(
-                        ref_sol,
-                        nmm_interpolation_data=fem.create_nonmatching_meshes_interpolation_data(
-                            uh[i].values.function_space.mesh._cpp_object, uh[i].values.function_space.element, ref_sol.function_space.mesh._cpp_object
-                        ),
-                    )
+                    uh[i].values.interpolate(ref_sol, cells=cells, nmm_interpolation_data=nmm_interpolation_data)
                     uh[i].ghostUpdate(PETSc.InsertMode.INSERT, PETSc.ScatterMode.FORWARD)
                 return True
             else:
@@ -393,72 +431,19 @@ class Parabolic_FEniCSx(RegisterParams):
         else:
             return None
 
-    def stim_ufl_expr(self):
-        if not hasattr(self, 'istim_dur'):
-            self.istim_dur = -1.0
-        stim_dur = self.istim_dur if self.istim_dur >= 0.0 else 2.0
-        self.stim_intensity = 35.7143  # in uA/cm^2, it is converted later in uA/mm^2 using self.scale_Iion. This is equivalent to the value used in Niederer et al.
+    def stim_region(self, stim_center, stim_radius):
+        coord_inside_stim_box = []
+        for i in range(self.dim):
+            coord_inside_stim_box.append(ufl.lt(abs(self.x[i] - stim_center[i]), stim_radius[i]))
 
-        if 'cuboid' in self.domain_name:
-            stim_centers = [[0.0, 0.0, 0.0]]
-            if "small" in self.domain_name:
-                stim_radius = 0.5
-            else:
-                stim_radius = 1.5
-            self.stim_protocol = [[0.0, stim_dur]]  # list of stim_time, sitm_dur values
-        else:
-            if self.domain_name == "truncated_ellipsoid":
-                stim_centers = [[0.0, 25.689, 46.1041]]
-                stim_radius = 5
-                self.stim_protocol = [[0.0, stim_dur]]
-            elif self.domain_name == "03_fastl_LA":
-                stim_centers = [[51.8816, 35.1259, 21.8025]]  # [[46.7522, 35.9794, 19.7214], [42.8294, 14.5558, 46.8198]]
-                stim_radius = 2.0
-                stim_distances = [280.0, 170.0, 160.0, 155.0, 150.0, 145.0, 140.0, 135.0, 130.0, 126.0, 124.0, 124.0, 124.0, 124.0]
-                self.stim_intensity = 35.7143
-                self.stim_protocol = [[0.0, stim_dur]]
-                for stim_distance in stim_distances:
-                    self.stim_protocol.append([self.stim_protocol[-1][0] + stim_distance, stim_dur])
-            elif self.domain_name == "01_strocchi_LV":
-                stim_centers = [[45.6131, 89.6654, 405.38]]
-                stim_radius = 2.0
-                self.stim_protocol = [[0.0, stim_dur]]
-            else:
-                raise Exception("Define stimulus variables for this domain.")
+        inside_stim_box = coord_inside_stim_box[0]
+        for i in range(1, self.dim):
+            inside_stim_box = ufl.And(inside_stim_box, coord_inside_stim_box[i])
 
-        if self.dim == 1:
-            dists_stim_centers = []
-            for stim_center in stim_centers:
-                dists_stim_centers.append(abs(self.x[0] - stim_center[0]))
-        elif self.dim == 2:
-            dists_stim_centers = []
-            for stim_center in stim_centers:
-                dists_stim_centers.append(ufl.max_value(abs(self.x[0] - stim_center[0]), abs(self.x[1] - stim_center[1])))
-        else:
-            dists_stim_centers = []
-            for stim_center in stim_centers:
-                dists_stim_centers.append(
-                    ufl.max_value(
-                        ufl.max_value(abs(self.x[0] - stim_center[0]), abs(self.x[1] - stim_center[1])),
-                        abs(self.x[2] - stim_center[2]),
-                    )
-                )
-
-        space_conds = []
-        for dist_stim_center in dists_stim_centers:
-            space_conds.append(ufl.lt(dist_stim_center, stim_radius))
-        space_conds_or = space_conds[0]
-        for i in range(1, len(space_conds)):
-            space_conds_or = ufl.Or(space_conds_or, space_conds[i])
-
-        time_conds = []
-        for stim_time, stim_dur in self.stim_protocol:
-            time_conds.append(ufl.And(ufl.gt(self.t, stim_time), ufl.lt(self.t, stim_time + stim_dur)))
-        time_conds_or = time_conds[0]
-        for i in range(1, len(time_conds)):
-            time_conds_or = ufl.Or(time_conds_or, time_conds[i])
-
-        return ufl.conditional(ufl.And(time_conds_or, space_conds_or), self.stim_intensity, self.zero_fun)
+        stim_region_ufl = ufl.conditional(inside_stim_box, self.one_fun.values, self.zero_fun.values)
+        stim_region_expr = fem.Expression(stim_region_ufl, self.V.element.interpolation_points())
+        self.stim_vec.values.interpolate(stim_region_expr)
+        return self.stim_vec
 
     def read_fibrosis(self):
         mesh_fib = adios4dolfinx.read_mesh(self.domain.comm, self.mesh_fibers_folder / Path("fibrosis.bp"), engine="BP4", ghost_mode=mesh.GhostMode.shared_facet)
@@ -547,9 +532,9 @@ class Parabolic_FEniCSx(RegisterParams):
         return uh
 
     def import_fixed_fiber(self, input_folder):
-        self.V_fiber = fem.VectorFunctionSpace(self.domain, ("CG", 1))
-        domain_r = adios4dolfinx.read_mesh(self.domain.comm, input_folder, "BP4", mesh.GhostMode.shared_facet)
         el = ufl.VectorElement("CG", self.domain.ufl_cell(), 1)
+        self.V_fiber = fem.FunctionSpace(self.domain, el)
+        domain_r = adios4dolfinx.read_mesh(self.domain.comm, input_folder, "BP4", mesh.GhostMode.shared_facet)
         V_r = fem.FunctionSpace(domain_r, el)
         fib_r = fem.Function(V_r)
         adios4dolfinx.read_function(fib_r, input_folder, "BP4")

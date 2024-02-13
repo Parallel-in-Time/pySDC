@@ -3,7 +3,7 @@ import numpy as np
 from pySDC.core.Errors import DataError
 
 
-class FD_Vector:
+class myfloat:
     """
     FD Function data type with arbitrary dimensions
 
@@ -12,76 +12,67 @@ class FD_Vector:
     """
 
     def __init__(self, init, val=0.0):
-        if isinstance(init, FD_Vector):
-            self.values = init.values.copy()
-        elif isinstance(init, np.ndarray):
-            self.values = init.copy()
-        elif isinstance(init, int):
-            self.values = np.ndarray(init)
+        if isinstance(init, myfloat):
+            self.values = init.values
+        elif isinstance(init, float):
+            self.values = init
+        elif isinstance(init, int) and init == 1:
             if isinstance(val, float):
-                self.values.fill(val)
+                self.values = val
             elif isinstance(val, str) and val == "random":
-                self.values = np.random.random(init)
+                self.values = np.random.random(init)[0]
             elif val is None:
-                pass  # leave values uninitialized
+                self.values = 0.0
             else:
-                raise DataError(f"Type error: cannot create FD_Vector from val = {val}")
+                raise DataError(f"Type error: cannot create myfloat from val = {val}")
         else:
-            raise DataError(f"Type error: cannot create FD_Vector from init = {init}")
+            raise DataError(f"Type error: cannot create myfloat from init = {init} and val = {val}")
 
     def copy(self, other=None):
         if other is None:  # return a copy of this vector
-            return FD_Vector(self)
+            return myfloat(self)
         elif isinstance(other, type(self)):  # copy the values of other into this vector
-            self.values[:] = other.values[:]
+            self.values = other.values
         else:
             raise DataError("Type error: cannot copy %s to %s" % (type(other), type(self)))
 
     def zero(self):
-        self.values *= 0.0
+        self.values = 0.0
 
     def __abs__(self):
-        return np.linalg.norm(self.values) / np.sqrt(self.values.size)
+        return abs(self.values)
 
     @property
     def n_loc_dofs(self):
-        return self.values.size
+        return 1
 
     @property
     def n_ghost_dofs(self):
         return 0
 
     def getSize(self):
-        return self.values.size
+        return 1
 
     def ghostUpdate(self, addv, mode):
         pass
 
     @property
     def numpy_array(self):
-        return self.values
-
-    def isnan(self):
-        return np.isnan(self.values).any()
-
-    def is_nan_or_inf(self):
-        return np.isnan(self.values).any() or np.isinf(self.values).any()
+        return Exception("numpy_array not implemented")
 
     def isend(self, dest=None, tag=None, comm=None):
-        return comm.Issend(self.values[:], dest=dest, tag=tag)
+        return comm.issend(self.values, dest=dest, tag=tag)
 
     def irecv(self, source=None, tag=None, comm=None):
-        return comm.Irecv(self.values[:], source=source, tag=tag)
+        return comm.irecv(self.values, source=source, tag=tag)
 
     def bcast(self, root=None, comm=None):
-        comm.Bcast(self.values[:], root=root)
+        comm.bcast(self.values, root=root)
         return self
 
     def __add__(self, other):
         if isinstance(other, type(self)):
-            me = FD_Vector(self)
-            me += other
-            return me
+            return myfloat(self.values + other.values)
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
 
@@ -97,9 +88,7 @@ class FD_Vector:
 
     def __sub__(self, other):
         if isinstance(other, type(self)):
-            me = FD_Vector(self)
-            me -= other
-            return me
+            return myfloat(self.values - other.values)
         else:
             raise DataError("Type error: cannot sub %s from %s" % (type(other), type(self)))
 
@@ -107,31 +96,32 @@ class FD_Vector:
         if isinstance(other, type(self)):
             self.values -= other.values
             return self
+        elif isinstance(other, float):
+            self.values -= other
+            return self
         else:
             raise DataError("Type error: cannot isub %s to %s" % (type(other), type(self)))
 
     def __mul__(self, other):
-        if isinstance(other, FD_Vector) or isinstance(other, float):
-            me = FD_Vector(self)
-            me *= other
-            return me
+        if isinstance(other, myfloat):
+            return myfloat(self.values * other.values)
+        elif isinstance(other, float):
+            return myfloat(self.values * other)
         else:
             raise DataError("Type error: cannot rmul %s to %s" % (type(other), type(self)))
 
     def __rmul__(self, other):
         if isinstance(other, float):
-            me = FD_Vector(self)
-            me *= other
-            return me
+            return myfloat(self.values * other)
         else:
             raise DataError("Type error: cannot rmul %s to %s" % (type(other), type(self)))
 
     def __imul__(self, other):
-        if isinstance(other, float):
-            self.values *= other
-            return self
-        elif isinstance(other, FD_Vector):
+        if isinstance(other, myfloat):
             self.values *= other.values
+            return self
+        elif isinstance(other, float):
+            self.values *= other
             return self
         else:
             raise DataError("Type error: cannot imul %s to %s" % (type(other), type(self)))
@@ -152,8 +142,7 @@ class FD_Vector:
         """
 
         if isinstance(x, type(self)):
-            self.values *= a
-            self.values += x.values
+            self.values = a * self.values + x.values
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(x), type(self)))
 
@@ -163,7 +152,52 @@ class FD_Vector:
         """
 
         if isinstance(x, type(self)):
-            self.values *= b
-            self.values += a * x.values
+            self.values = a * x.values + b * self.values
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(x), type(self)))
+
+    def iadd_sub(self, other, indices):
+        if indices == [0]:
+            self += other
+
+    def isub_sub(self, other, indices):
+        if indices == [0]:
+            self -= other
+
+    def imul_sub(self, other, indices):
+        if indices == [0]:
+            self *= other
+
+    def axpby_sub(self, a, b, x, indices):
+        if indices == [0]:
+            self.axpby(a, b, x)
+
+    def axpy_sub(self, a, x, indices):
+        if indices == [0]:
+            self.axpy(a, x)
+
+    def aypx_sub(self, a, x, indices):
+        if indices == [0]:
+            self.aypx(a, x)
+
+    def copy_sub(self, other, indices):
+        if indices == [0]:
+            self.copy(other)
+
+    def zero_sub(self, indices):
+        if indices == [0]:
+            self.zero()
+
+
+class IMEXEXP_myfloat(object):
+    def __init__(self, init=None, val=0.0):
+        if isinstance(init, IMEXEXP_myfloat):
+            self.expl = myfloat(init.expl)
+            self.impl = myfloat(init.impl)
+            self.exp = myfloat(init.exp)
+            self.size = 1
+        else:
+            self.expl = myfloat(init, val)
+            self.impl = myfloat(init, val)
+            self.exp = myfloat(init, val)
+            self.size = 1

@@ -64,13 +64,13 @@ class explicit_stabilized(sweeper):
         M = self.coll.num_nodes
 
         if not hasattr(self, "rho"):
-            if hasattr(P.exact, "rho") and callable(P.exact.rho):
-                self.rho = P.exact.rho
+            if hasattr(P, "rho") and callable(P.rho):
+                self.rho = P.rho
             else:
                 self.rho_estimator = rho_estimator(P)
                 self.rho = self.rho_estimator.rho
 
-        if self.rho_count % self.params.rho_freq == 0:
+        if self.rho_count % self.rho_freq == 0:
             self.estimated_rho = self.rho(y=L.u[0], t=L.time, fy=L.f[0])
             self.rho_count = 0
             self.s = [0] * M

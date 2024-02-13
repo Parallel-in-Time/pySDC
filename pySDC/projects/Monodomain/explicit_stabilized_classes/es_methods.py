@@ -11,7 +11,7 @@ class RKW1:
         paths = os.environ["PYTHONPATH"].split(os.pathsep)
         coeff = None
         for path in paths:
-            coeff_file = path + "/pySDC/projects/ExplicitStabilized/explicit_stabilized_classes/coeff_P.csv"
+            coeff_file = path + "/pySDC/projects/Monodomain/explicit_stabilized_classes/coeff_P.csv"
             if os.path.exists(coeff_file):
                 coeff = np.loadtxt(coeff_file, delimiter=",", dtype=float, skiprows=1)
 

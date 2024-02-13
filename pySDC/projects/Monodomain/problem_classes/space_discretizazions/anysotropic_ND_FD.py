@@ -45,12 +45,12 @@ class AnysotropicNDimFinDiff(RegisterParams):
             diff = (diff[0],) * ndim
 
         # check for correct number of variables
-        if nvars % 2 != 0 and bc == 'periodic':
-            raise ProblemError('the setup requires nvars = 2^p per dimension')
-        if (nvars + 1) % 2 != 0 and bc == 'dirichlet-zero':
-            raise ProblemError('setup requires nvars = 2^p - 1')
-        if (nvars - 1) % 2 != 0 and bc == 'neumann-zero':
-            raise ProblemError('setup requires nvars = 2^p + 1')
+        # if nvars % 2 != 0 and bc == 'periodic':
+        #     raise ProblemError('the setup requires nvars % 2 == 0')
+        # if (nvars + 1) % 2 != 0 and bc == 'dirichlet-zero':
+        #     raise ProblemError('setup requires (nvars + 1) % 2 == 0')
+        # if (nvars - 1) % 2 != 0 and bc == 'neumann-zero':
+        #     raise ProblemError('setup requires (nvars - 1) % 2 == 0')
 
         # get maximal side of the domain
         dom_size_max = max([dom_size[i][1] - dom_size[i][0] for i in range(ndim)])
@@ -85,7 +85,6 @@ class AnysotropicNDimFinDiff(RegisterParams):
             dim=ndim,
             bc=bc,
         )
-        # self.A /= (dom_size[0][1]-dom_size[0][0])**2
 
         self.xvalues = xvalues
         self.dx = dx
@@ -112,17 +111,13 @@ class AnysotropicNDimFinDiff(RegisterParams):
         if self.ndim == 3:
             return x[0][None, None, :], x[1][None, :, None], x[2][:, None, None]
 
-    def get_finite_difference_matrix(self, diff, derivative, order, stencil_type=None, steps=None, dx=None, size=None, dim=None, bc=None, cupy=False):
+    def get_finite_difference_matrix(self, diff, derivative, order, stencil_type=None, steps=None, dx=None, size=None, dim=None, bc=None):
         """
         Build FD matrix from stencils, with boundary conditions
         """
-        if cupy:
-            import cupyx.scipy.sparse as sp
-        else:
-            import scipy.sparse as sp
 
-        if order > 2 and bc != 'periodic':
-            raise NotImplementedError('Higher order allowed only for periodic boundary conditions')
+        if order > 2 and bc == 'dirichlet-zero':
+            raise NotImplementedError('Higher order allowed only for periodic or neumann boundary conditions')
 
         # get stencil
         coeff, steps = problem_helper.get_finite_difference_stencil(derivative=derivative, order=order, stencil_type=stencil_type, steps=steps)
@@ -134,10 +129,16 @@ class AnysotropicNDimFinDiff(RegisterParams):
         elif bc == 'neumann-zero':
             for j in range(dim):
                 A_1d.append(sp.diags(coeff, steps, shape=(size[j], size[j]), format='csc'))
-                A_1d[j][0, 0] = -2
-                A_1d[j][0, 1] = +2
-                A_1d[j][-1, -1] = -2
-                A_1d[j][-1, -2] = +2
+                min_s = steps.min()
+                for i in range(abs(min_s)):
+                    for k in range(len(steps)):
+                        if (i + steps[k]) < 0:
+                            A_1d[j][i, i - steps[k]] = A_1d[j][i, i - steps[k]] + coeff[k]
+                max_s = steps.max()
+                for i in range(abs(max_s)):
+                    for k in range(len(steps)):
+                        if size[j] - 1 - i + steps[k] > size[j] - 1:
+                            A_1d[j][size[j] - 1 - i, size[j] - 1 - i - steps[k]] = A_1d[j][size[j] - 1 - i, size[j] - 1 - i - steps[k]] + coeff[k]
         elif bc == 'periodic':
             for j in range(dim):
                 A_1d.append(0 * sp.eye(size[j], format='csc'))
@@ -163,53 +164,3 @@ class AnysotropicNDimFinDiff(RegisterParams):
             raise NotImplementedError(f'Dimension {dim} not implemented.')
 
         return A
-
-    # def get_finite_difference_matrix(self, diff, derivative, order, stencil_type=None, steps=None, dx=None, size=None, dim=None, bc=None, cupy=False):
-    #     """
-    #     Build FD matrix from stencils, with boundary conditions
-    #     """
-    #     if cupy:
-    #         import cupyx.scipy.sparse as sp
-    #     else:
-    #         import scipy.sparse as sp
-
-    #     if order > 2 and bc != 'periodic':
-    #         raise NotImplementedError('Higher order allowed only for periodic boundary conditions')
-
-    #     # get stencil
-    #     coeff, steps = problem_helper.get_finite_difference_stencil(derivative=derivative, order=order, stencil_type=stencil_type, steps=steps)
-
-    #     dx = dx[0]
-    #     size = size[0]
-
-    #     if bc == 'dirichlet-zero':
-    #         A_1d = sp.diags(coeff, steps, shape=(size, size), format='csc')
-    #     elif bc == 'neumann-zero':
-    #         A_1d = sp.diags(coeff, steps, shape=(size, size), format='csc')
-    #         A_1d[0, 0] = -2
-    #         A_1d[0, 1] = +2
-    #         A_1d[-1, -1] = -2
-    #         A_1d[-1, -2] = +2
-    #     elif bc == 'periodic':
-    #         A_1d = 0 * sp.eye(size, format='csc')
-    #         for i in steps:
-    #             A_1d += coeff[i] * sp.eye(size, k=steps[i])
-    #             if steps[i] > 0:
-    #                 A_1d += coeff[i] * sp.eye(size, k=-size + steps[i])
-    #             if steps[i] < 0:
-    #                 A_1d += coeff[i] * sp.eye(size, k=size + steps[i])
-    #     else:
-    #         raise NotImplementedError(f'Boundary conditions {bc} not implemented.')
-
-    #     if dim == 1:
-    #         A = diff[0] * A_1d
-    #     elif dim == 2:
-    #         A = diff[1] * sp.kron(A_1d, sp.eye(size)) + diff[0] * sp.kron(sp.eye(size), A_1d)
-    #     elif dim == 3:
-    #         A = diff[2] * sp.kron(A_1d, sp.eye(size**2)) + diff[0] * sp.kron(sp.eye(size**2), A_1d) + diff[1] * sp.kron(sp.kron(sp.eye(size), A_1d), sp.eye(size))
-    #     else:
-    #         raise NotImplementedError(f'Dimension {dim} not implemented.')
-
-    #     A /= dx**derivative
-
-    #     return A

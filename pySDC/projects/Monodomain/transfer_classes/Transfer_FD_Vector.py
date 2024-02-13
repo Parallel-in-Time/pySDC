@@ -22,6 +22,8 @@ class FD_to_FD(space_transfer):
             params: parameters for the transfer operators
         """
 
+        # assumes problem has either periodic or neumann-zero boundary conditions
+
         # invoke super initialization
         super(FD_to_FD, self).__init__(fine_prob, coarse_prob, params)
 
@@ -43,21 +45,26 @@ class FD_to_FD(space_transfer):
             if fine_grid.size == coarse_grid.size:
                 self.Rspace = sp.eye(coarse_grid.size)
                 self.Pspace = sp.eye(fine_grid.size)
+                self.Ispace = sp.eye(fine_grid.size)
             else:
                 self.Pspace = self.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.iorder)
                 self.Rspace = self.restriction_matrix_1d(fine_grid, coarse_grid, k=self.params.rorder)
+                self.Ispace = self.injection_matrix_1d(fine_grid, coarse_grid)
 
         # we have an n-d problem
         else:
             Rspace = []
             Pspace = []
+            Ispace = []
             for i in range(ndim):
                 if fine_grid[i].size == coarse_grid[i].size:
-                    Rspace.append(sp.eye(coarse_grid[i].size))
+                    Rspace.append(sp.eye(fine_grid[i].size))
                     Pspace.append(sp.eye(fine_grid[i].size))
+                    Ispace.append(sp.eye(fine_grid[i].size))
                 else:
                     Pspace.append(self.interpolation_matrix_1d(fine_grid[i].flatten(), coarse_grid[i].flatten(), k=self.params.iorder))
                     Rspace.append(self.restriction_matrix_1d(fine_grid[i].flatten(), coarse_grid[i].flatten(), k=self.params.rorder))
+                    Ispace.append(self.injection_matrix_1d(fine_grid[i].flatten(), coarse_grid[i].flatten()))
 
             # kronecker 1-d operators for n-d
             self.Pspace = Pspace[0]
@@ -67,6 +74,10 @@ class FD_to_FD(space_transfer):
             self.Rspace = Rspace[0]
             for i in range(1, len(Rspace)):
                 self.Rspace = sp.kron(Rspace[i], self.Rspace, format='csc')
+
+            self.Ispace = Ispace[0]
+            for i in range(1, len(Ispace)):
+                self.Ispace = sp.kron(Ispace[i], self.Ispace, format='csc')
 
     def interpolation_matrix_1d(self, fine_grid, coarse_grid, k=2):
         n_f = fine_grid.size
@@ -85,24 +96,44 @@ class FD_to_FD(space_transfer):
                 M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
 
         if pad > 0:
-            for i in range(pad):
-                M[:, pad + 1 + i] += M[:, pad - 1 - i]
-                M[:, -pad - 2 - i] += M[:, -pad + i]
+            if self.params.periodic:
+                for i in range(pad):
+                    M[:, pad + i] += M[:, -pad + i]
+                    M[:, -pad - 2 - i + 1] += M[:, pad - 1 - i]
+            else:
+                for i in range(pad):
+                    M[:, pad + 1 + i] += M[:, pad - 1 - i]
+                    M[:, -pad - 2 - i] += M[:, -pad + i]
             M = M[:, pad:-pad]
 
         return sprs.csc_matrix(M)
 
     def restriction_matrix_1d(self, fine_grid, coarse_grid, k=2):
         Rspace = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=k, periodic=False, pad=k // 2, equidist_nested=False).T
+        ratio_grids = (coarse_grid[1] - coarse_grid[0]) / (fine_grid[1] - fine_grid[0])
         if k > 0:
-            Rspace *= 0.5
-        stencil = Rspace[k // 2, 1 : 2 * k].todense()
-        for i in range(1, k // 2 + 1):
-            Rspace[k // 2 - i, : 2 * k - 2 * i] = stencil[0, 2 * i - 1 :]
-            Rspace[k // 2 - i, 1 : 2 * i] += np.flip(stencil[0, : 2 * i - 1])
-            Rspace[-1 - (k // 2 - i), -(2 * k - 2 * i) :] = stencil[0, : -(2 * i - 1)]
-            Rspace[-1 - (k // 2 - i), -2 * i : -1] += np.flip(stencil[0, 1 - 2 * i :])
+            Rspace *= 1 / ratio_grids
+        ratio_grids = np.round(ratio_grids).astype(int)
+        stencil = Rspace[k // 2, 1 : ratio_grids * k].todense()
+        if self.params.periodic:
+            for i in range(1, k // 2 + 1):
+                Rspace[k // 2 - i, : 2 * k - 2 * i] = stencil[0, 2 * i - 1 :]
+                Rspace[k // 2 - i, -(2 * i - 1) :] = stencil[0, : 2 * i - 1]
+                if i > 1:
+                    Rspace[-1 - (k // 2 - i), -(2 * k - 2 * i) - 1 :] = stencil[0, : 2 * (1 - i)]
+                    Rspace[-1 - (k // 2 - i), : 2 * (i - 1)] = stencil[0, 2 * (1 - i) :]
+        else:
+            for i in range(1, k // 2 + 1):
+                Rspace[k // 2 - i, : 2 * k - 2 * i] = stencil[0, 2 * i - 1 :]
+                Rspace[k // 2 - i, 1 : 2 * i] += np.flip(stencil[0, : 2 * i - 1])
+                Rspace[-1 - (k // 2 - i), -(2 * k - 2 * i) :] = stencil[0, : -(2 * i - 1)]
+                Rspace[-1 - (k // 2 - i), -2 * i : -1] += np.flip(stencil[0, 1 - 2 * i :])
+
         return Rspace
+
+    def injection_matrix_1d(self, fine_grid, coarse_grid):
+        Ispace = th.interpolation_matrix_1d(coarse_grid, fine_grid, k=1, periodic=False, pad=0, equidist_nested=False)
+        return Ispace
 
     def restrict(self, F):
         """
@@ -123,3 +154,13 @@ class FD_to_FD(space_transfer):
         F = FD_Vector(self.fine_prob.init)
         F.values[:] = self.Pspace @ G.values
         return F
+
+    def inject(self, F):
+        """
+        Injection implementation
+        Args:
+            F: the fine level data (easier to access than via the fine attribute)
+        """
+        G = FD_Vector(self.coarse_prob.init)
+        G.values[:] = self.Ispace @ F.values
+        return G

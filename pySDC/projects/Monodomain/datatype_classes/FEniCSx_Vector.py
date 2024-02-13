@@ -13,7 +13,7 @@ class FEniCSx_Vector(object):
         values: contains the fenicsx Function
     """
 
-    def __init__(self, init=None, val=0.0):
+    def __init__(self, init, val=None):
         """
         Initialization routine
 
@@ -32,16 +32,17 @@ class FEniCSx_Vector(object):
             self.values = init.values.copy()
         elif isinstance(init, fem.Function):
             self.values = init.copy()
-        elif isinstance(init, fem.FunctionSpace):
-            self.values = fem.Function(init)
+            assert val is not None, "FEniCSx_Vector needs init value"
             if isinstance(val, str) and val == "random":
                 self.values.x.array[:] = np.random.random(self.values.x.array.shape)[:]
             elif isinstance(val, float):
-                self.values.vector.set(val)
-            elif isinstance(val, PETSc.Vec):
-                self.values.vector.setArray(val)
+                self.values.x.array[:] = val
+            elif isinstance(val, np.ndarray):
+                self.values.x.array[:] = val[:]
             else:
                 raise DataError("something went wrong during %s initialization" % type(init))
+        elif isinstance(init, fem.FunctionSpace):
+            raise Exception("Cannot init with function space")
         else:
             raise DataError("something went wrong during %s initialization" % type(init))
 
@@ -49,7 +50,7 @@ class FEniCSx_Vector(object):
         if other is None:  # return a copy of this vector
             return FEniCSx_Vector(self)
         elif isinstance(other, type(self)):  # copy the values of other into this vector
-            self.values.vector.setArray(other.values.vector)
+            self.values.x.array[:] = other.values.x.array[:]
         else:
             raise DataError("Type error: cannot copy %s to %s" % (type(other), type(self)))
 
@@ -57,8 +58,7 @@ class FEniCSx_Vector(object):
         """
         Set to zero.
         """
-        with self.values.vector.localForm() as loc_self:
-            loc_self.set(0.0)
+        self.values.x.array[:] = 0.0
 
     def __abs__(self):
         self.values.vector.normBegin()
@@ -72,22 +72,28 @@ class FEniCSx_Vector(object):
         res = self.values.vector.dotEnd(other.values.vector)
         return res
 
-    def interpolate(self, other):
+    def interpolate(self, other, cells=None, nmm_interpolation_data=None):
         if isinstance(other, FEniCSx_Vector):
-            self.values.interpolate(
-                other.values,
-                nmm_interpolation_data=fem.create_nonmatching_meshes_interpolation_data(
-                    self.values.function_space.mesh._cpp_object, self.values.function_space.element, other.values.function_space.mesh._cpp_object
-                ),
-            )
+            if self.n_loc_dofs == other.n_loc_dofs:
+                self.values.x.array[:] = other.values.x.array[:]
+            else:
+                if cells is None:
+                    domain = self.values.function_space.mesh
+                    map = domain.topology.index_map(domain.topology.dim)
+                    cells = np.arange(map.size_local + map.num_ghosts, dtype=np.int32)
+                if nmm_interpolation_data is None:
+                    nmm_interpolation_data = fem.create_nonmatching_meshes_interpolation_data(
+                        self.values.function_space.mesh._cpp_object, self.values.function_space.element, other.values.function_space.mesh._cpp_object
+                    )
+                self.values.interpolate(other.values, cells=cells, nmm_interpolation_data=nmm_interpolation_data)
         else:
             raise DataError("Type error: cannot interpolate %s to %s" % (type(other), type(self)))
 
-    def restrict(self, other):
-        self.interpolate(other)  # this is bad, should use restriction operator instead
+    def restrict(self, other, cells=None, nmm_interpolation_data=None):
+        self.interpolate(other, cells, nmm_interpolation_data)  # this is bad, should use restriction operator instead
 
-    def prolong(self, other):
-        self.interpolate(other)
+    def prolong(self, other, cells=None, nmm_interpolation_data=None):
+        self.interpolate(other, cells, nmm_interpolation_data)
 
     @property
     def n_loc_dofs(self):
@@ -107,14 +113,23 @@ class FEniCSx_Vector(object):
     def numpy_array(self):
         return self.values.x.array
 
+    def isnan(self):
+        return np.isnan(self.values.x.array).any()
+
+    def is_nan_or_inf(self):
+        return np.isnan(self.values.x.array).any() or np.isinf(self.values.x.array).any()
+
     def isend(self, dest=None, tag=None, comm=None):
         return comm.Issend(self.values.vector.getArray(), dest=dest, tag=tag)
+        # return comm.Issend(self.values.x.array, dest=dest, tag=tag)
 
     def irecv(self, source=None, tag=None, comm=None):
         return comm.Irecv(self.values.vector.getArray(), source=source, tag=tag)
+        # return comm.Irecv(self.values.x.array, source=source, tag=tag)
 
     def bcast(self, root=None, comm=None):
         comm.Bcast(self.values.vector.getArray(), root=root)
+        # comm.Bcast(self.values.x.array, root=root)
         return self
 
     def __add__(self, other):

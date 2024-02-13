@@ -54,7 +54,7 @@ def tuple_to_stats(tup_list, list_str):
 
 
 # noinspection PyShadowingBuiltins
-def show_residual_across_simulation(stats, fname="residuals.png", comm=None):
+def show_residual_across_simulation(stats, fname="residuals.png", comm=None, tend=None):
     """
     Helper routine to visualize the residuals across the simulation (one block of PFASST)
 
@@ -89,7 +89,10 @@ def show_residual_across_simulation(stats, fname="residuals.png", comm=None):
         if not np.any(np.isclose(times - k.time, np.zeros_like(times))):
             times = np.append(times, k.time)
             procs = np.append(procs, k.process)
-    dt = times[1]
+    if times.size > 1:
+        dt = times[1]
+    else:
+        dt = tend
     steps = list(range(times.shape[0]))
     n_steps = steps[-1] + 1
 

@@ -1,32 +1,29 @@
 import numpy as np
-
+import scipy as sp
 from pySDC.core.Common import RegisterParams
-from pySDC.projects.Monodomain.problem_classes.space_discretizazions.anysotropic_ND_FD import AnysotropicNDimFinDiff
-from scipy.sparse.linalg import spsolve, cg
 from pySDC.projects.Monodomain.datatype_classes.FD_Vector import FD_Vector
 from pathlib import Path
 import os
 
 
-class Parabolic_FD(RegisterParams):
+class Parabolic_DCT(RegisterParams):
     def __init__(self, **problem_params):
         self._makeAttributeAndRegister(*problem_params.keys(), localVars=problem_params, readOnly=True)
 
         self.define_domain()
         self.define_coefficients()
-        self.define_Laplacian()
-        self.define_solver()
+        self.define_laplacian()
         self.define_stimulus()
         self.define_eval_points()
 
-        assert self.bc in ['N', 'P'], "bc must be either 'N' or 'P'"
+        assert self.bc == 'N', "bc must be 'N'"
 
     def __del__(self):
         if self.enable_output:
             self.output_file.close()
             with open(self.output_file_path.parent / Path(self.output_file_name + '_txyz').with_suffix(".npy"), 'wb') as f:
                 np.save(f, np.array(self.t_out))
-                xyz = self.NDim_FD.grids
+                xyz = self.grids
                 for i in range(self.dim):
                     np.save(f, xyz[i])
 
@@ -38,30 +35,8 @@ class Parabolic_FD(RegisterParams):
     def mesh_name(self):
         return "ref_" + str(self.pre_refinements)
 
-    def define_domain(self):
-        if "cube" in self.domain_name:
-            self.dom_size = ([0.0, 100.0], [0.0, 100.0], [0.0, 100.0])
-            self.dim = int(self.domain_name[5])
-        else:  # cuboid
-            if "smaller" in self.domain_name:
-                self.dom_size = ([0.0, 10.0], [0.0, 4.5], [0.0, 2.0])
-            elif "small" in self.domain_name:
-                self.dom_size = ([0.0, 5.0], [0.0, 3.0], [0.0, 1.0])
-            elif "very_large" in self.domain_name:
-                self.dom_size = ([0.0, 280.0], [0.0, 112.0], [0.0, 48.0])
-            elif "large" in self.domain_name:
-                self.dom_size = ([0.0, 60.0], [0.0, 21.0], [0.0, 9.0])
-            else:
-                self.dom_size = ([0.0, 20.0], [0.0, 7.0], [0.0, 3.0])
-            self.dim = int(self.domain_name[7])
-
-        self.n_elems = 5.0 * np.max(self.dom_size) * 2**self.pre_refinements + 1
-        self.n_elems = int(np.round(self.n_elems))
-
-        if self.bc == 'P':
-            self.n_elems -= 1
-
-        self.dom_size = self.dom_size[: self.dim]
+    def define_solver(self):
+        pass
 
     def define_coefficients(self):
         self.chi = 140.0  # mm^-1
@@ -93,59 +68,83 @@ class Parabolic_FD(RegisterParams):
         else:
             self.diff = (self.diff_l, self.diff_t, self.diff_t)
 
-    def define_Laplacian(self):
-        self.NDim_FD = AnysotropicNDimFinDiff(
-            dom_size=self.dom_size,
-            nvars=self.n_elems,
-            diff=self.diff,
-            derivative=2,
-            stencil_type='center',
-            order=self.order,
-            bc='neumann-zero' if self.bc == 'N' else 'periodic',
-        )
-        self.n_dofs = self.NDim_FD.A.shape[0]
+    def define_domain(self):
+        if "cube" in self.domain_name:
+            self.dom_size = ([0.0, 100.0], [0.0, 100.0], [0.0, 100.0])
+            self.dim = int(self.domain_name[5])
+        else:  # cuboid
+            if "smaller" in self.domain_name:
+                self.dom_size = ([0.0, 10.0], [0.0, 4.5], [0.0, 2.0])
+            elif "small" in self.domain_name:
+                self.dom_size = ([0.0, 5.0], [0.0, 3.0], [0.0, 1.0])
+            elif "very_large" in self.domain_name:
+                self.dom_size = ([0.0, 280.0], [0.0, 112.0], [0.0, 48.0])
+            elif "large" in self.domain_name:
+                self.dom_size = ([0.0, 60.0], [0.0, 21.0], [0.0, 9.0])
+            else:
+                self.dom_size = ([0.0, 20.0], [0.0, 7.0], [0.0, 3.0])
+            self.dim = int(self.domain_name[7])
+
+        # self.n_elems = 5.0 * np.max(self.dom_size) * 2**self.pre_refinements + 1
+        # self.n_elems = int(np.round(self.n_elems))
+
+        assert self.dim == 1, "only 1D implemented"
+
+        self.dom_size = self.dom_size[: self.dim]
+        if self.dim == 2:
+            assert self.dom_size[0][1] == self.dom_size[1][1], "only cube implemented"
+        if self.dim == 3:
+            assert self.dom_size[0][1] == self.dom_size[1][1] and self.dom_size[0][1] == self.dom_size[2][1], "only cube implemented"
+
+        self.L = self.dom_size[0][1]
+        # self.n_elems = int(2 ** np.round(np.log2(5.0 * self.L * 2**self.pre_refinements)))
+        # x = np.linspace(0, self.L, 2 * self.n_elems + 1)
+        # self.grids = (x[1::2],)
+        self.n_elems, self.grids = self.get_mesh(self.L, self.pre_refinements)
+        self.shape = (self.grids[0].size,)
+        self.n_dofs = int(np.prod(self.shape))
         self.init = self.n_dofs
 
-    @property
-    def grids(self):
-        return self.NDim_FD.grids
+        self.dx = np.max([grid[1] - grid[0] for grid in self.grids])
 
-    @property
-    def dx(self):
-        return np.max(self.NDim_FD.dx)
+        # self.fine_mesh_pre_refinements = 2
+        # self.fine_mesh_n_elems, self.fine_mesh_grids = self.get_mesh(self.L, self.fine_mesh_pre_refinements)
+
+    def define_laplacian(self):
+        self.dct_lap = self.get_dct_laplacian(self.n_elems, self.grids)
+        # self.fine_mesh_dct_lap = self.get_dct_laplacian(self.fine_mesh_n_elems, self.fine_mesh_grids)
 
     def define_stimulus(self):
         self.zero_stim_vec = 0.0
         # all remaining stimulus parameters are set in MonodomainODE
 
-    def define_solver(self):
-        # we suppose that the problem is symmetric
-        # if self.dim <= 1:
-        #     self.solver = lambda mat, vec, guess: spsolve(mat, vec)
-        # else:
-        lin_solv_rtol = self.lin_solv_rtol if self.lin_solv_rtol is not None else 1e-5
-        self.solver = lambda mat, vec, guess: cg(mat, vec, x0=guess, atol=0, tol=lin_solv_rtol, maxiter=self.lin_solv_max_iter)[0]
+    def get_mesh(self, L, pre_refinements):
+        n_elems = int(2 ** np.round(np.log2(5.0 * L * 2**pre_refinements)))
+        x = np.linspace(0, L, 2 * n_elems + 1)
+        grids = (x[1::2],)
+        return n_elems, grids
+
+    def get_dct_laplacian(self, n_elems, grids):
+        x = grids[0]
+        dx = x[1] - x[0]
+        dct_lap = self.diff_l * (2.0 * np.cos(np.pi * np.arange(n_elems) / n_elems) - 2.0) / dx**2
+        return dct_lap
 
     def solve_system(self, rhs, factor, u0, t, u_sol):
-        u_sol.values[:] = self.solver(self.NDim_FD.Id - factor * self.NDim_FD.A, rhs.values, u0.values)
+        rhs_hat = sp.fft.dct(rhs.values)
+        u_sol_hat = rhs_hat / (1.0 - factor * self.dct_lap)
+        u_sol.values[:] = sp.fft.idct(u_sol_hat)
+
+        # rhs_hat = sp.fft.dct(rhs.values)
+        # u_sol_hat = rhs_hat / (1.0 - factor * self.fine_mesh_dct_lap[: self.n_elems])
+        # u_sol.values[:] = sp.fft.idct(u_sol_hat)
 
         return u_sol
 
     def add_disc_laplacian(self, uh, res):
-        res.values += self.NDim_FD.A @ uh.values
+        res.values += sp.fft.idct(self.dct_lap * sp.fft.dct(uh.values))
 
-    def define_eval_points(self):
-        if "small" in self.domain_name:
-            n_pts = 5
-            a = np.array([[0.5, 0.5, 0.5]])
-        else:
-            n_pts = 10
-            a = np.array([[1.5, 1.5, 1.5]])
-        a = a[:, : self.dim]
-        dom_size = np.array(self.dom_size)[:, 1]
-        b = dom_size.reshape((1, self.dim))
-        x = np.reshape(np.linspace(0.0, 1.0, n_pts), (n_pts, 1))
-        self.eval_points = a + (b - a) * x
+        # res.values += sp.fft.idct(self.fine_mesh_dct_lap[: self.n_elems] * sp.fft.dct(uh.values))
 
     def init_output(self, output_folder):
         self.output_folder = output_folder
@@ -161,7 +160,7 @@ class Parabolic_FD(RegisterParams):
     def write_solution(self, u, t, all):
         if self.enable_output:
             if not all:
-                np.save(self.output_file, u[0].values.reshape(self.NDim_FD.shape))
+                np.save(self.output_file, u[0].values.reshape(self.shape))
                 self.t_out.append(t)
             else:
                 raise NotImplementedError("all=True not implemented for Parabolic_FD.write_solution")
@@ -172,7 +171,7 @@ class Parabolic_FD(RegisterParams):
         if not self.output_file_path.parent.is_dir():
             os.makedirs(self.output_file_path.parent)
         with open(self.output_file_path, 'wb') as file:
-            [np.save(file, uh[i].values.reshape(self.NDim_FD.shape)) for i in indeces]
+            [np.save(file, uh[i].values.reshape(self.shape)) for i in indeces]
 
     def read_reference_solution(self, uh, indeces, ref_file_name):
         ref_sol_path = Path(self.output_folder) / Path(ref_file_name).with_suffix(".npy")
@@ -182,14 +181,16 @@ class Parabolic_FD(RegisterParams):
                     uh[i].values[:] = np.load(f).ravel()
             return True
         else:
-            print(f'did not find {ref_sol_path}')
             return False
+
+    def define_eval_points(self):
+        pass
 
     def eval_on_points(self, u):
         return None
 
     def stim_region(self, stim_center, stim_radius):
-        grids = self.NDim_FD.grids
+        grids = self.grids
         coord_inside_stim_box = []
         for i in range(len(grids)):
             coord_inside_stim_box.append(abs(grids[i] - stim_center[i]) < stim_radius[i])
