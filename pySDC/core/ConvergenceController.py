@@ -1,6 +1,5 @@
 import logging
 from pySDC.helpers.pysdc_helper import FrozenClass
-import numpy as np
 
 
 # short helper class to add params as attributes
@@ -355,15 +354,13 @@ class ConvergenceController(object):
         self.logger.debug(f'Step {comm.rank} {"" if blocking else "i"}sends to step {dest} with tag {kwargs["tag"]}')
 
         if blocking:
-            req = comm.send(data_np, dest=dest, **kwargs)
-            # req = comm.Send(data_np, dest=dest, **kwargs)
+            req = comm.send(data, dest=dest, **kwargs)
         else:
-            req = comm.isend(data_np, dest=dest, **kwargs)
-            # raise Exception("Non-blocking send not implemented!")
+            req = comm.isend(data, dest=dest, **kwargs)
 
         return req
 
-    def recv(self, comm, source, blocking=False, **kwargs):
+    def recv(self, comm, source, **kwargs):
         """
         Receive some data
 
@@ -379,22 +376,7 @@ class ConvergenceController(object):
         # log what's happening for debug purposes
         self.logger.debug(f'Step {comm.rank} receives from step {source} with tag {kwargs["tag"]}')
 
-        # data_np = np.empty(3, dtype=bool)
-
-        blocking = True
-
-        # data = comm.recv(source=source, **kwargs)
-        if blocking:
-            data_np = comm.recv(source=source, **kwargs)
-        else:
-            req = comm.irecv(source=source, **kwargs)
-            data_np = req.wait()
-
-        # comm.Recv(data_np, source=source, **kwargs)
-        if data_np[0]:
-            data = (data_np[1], data_np[2])
-        else:
-            data = data_np[1]
+        data = comm.recv(source=source, **kwargs)
 
         return data
 
@@ -414,7 +396,6 @@ class ConvergenceController(object):
         kwargs['tag'] = kwargs.get('tag', abs(self.params.control_order))
 
         # log what's happening for debug purposes
-<<<<<<< HEAD
         self.logger.debug(f'Step {comm.rank} {"" if blocking else "i"}Sends to step {dest} with tag {kwargs["tag"]}')
 
         if blocking:
@@ -441,9 +422,6 @@ class ConvergenceController(object):
         self.logger.debug(f'Step {comm.rank} Receives from step {source} with tag {kwargs["tag"]}')
 
         data = comm.Recv(buffer, source=source, **kwargs)
-=======
-        self.logger.debug(f'Step {comm.rank} leaves receive from step {source}, got data = {data}')
->>>>>>> a69c6aa9a (added many things, cant remember)
 
         return data
 
