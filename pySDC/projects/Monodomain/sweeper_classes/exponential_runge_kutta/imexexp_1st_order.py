@@ -196,22 +196,16 @@ class imexexp_1st_order(sweeper):
                 L.f[m + 1].impl = L.f[m].impl.copy()
                 L.f[m + 1].exp = L.f[m].exp.copy()
 
-        # do the sweep, method 2
-        # for m in range(M):
-        #     rhs = L.u[m] + L.dt * self.delta[m] * phi_one[m] * (L.f[m].exp + lmbda * (L.u[0] - L.u[m]))
-        #     P.eval_f(rhs, L.time + L.dt * self.coll.nodes[m], eval_impl=False, eval_expl=True, eval_exp=False, fh=L.f[m + 1])
-        #     integral[m] -= L.dt * self.delta[m] * (L.f[m + 1].expl + L.f[m + 1].impl) + (rhs - L.u[m])
-        # for m in range(M):
-        #     rhs = L.u[m] + L.dt * self.delta[m] * phi_one[m] * (L.f[m].exp + lmbda * (L.u[0] - L.u[m]))
-
-        #     P.eval_f(rhs, L.time + L.dt * self.coll.nodes[m], eval_impl=False, eval_expl=True, eval_exp=False, fh=L.f[m + 1])
-        #     rhs += L.dt * self.delta[m] * L.f[m + 1].expl + integral[m]
-
-        #     # implicit solve with prefactor stemming from QI
-        #     L.u[m + 1] = P.solve_system(rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
-
-        #     # update function values
-        #     L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
+            # for robustness we check that we are not exploding
+            if (
+                (L.f[m + 1].impl.is_nan_or_inf() or abs(L.f[m + 1].impl) > 1e6 * (abs(L.f[m].impl) + 1))
+                or (L.f[m + 1].expl.is_nan_or_inf() or abs(L.f[m + 1].expl) > 1e6 * (abs(L.f[m].expl) + 1))
+                or (L.f[m + 1].exp.is_nan_or_inf() or abs(L.f[m + 1].exp) > 1e6 * (abs(L.f[m].exp) + 1))
+            ):
+                L.u[m + 1] = L.u[m].copy()
+                L.f[m + 1].expl = L.f[m].expl.copy()
+                L.f[m + 1].impl = L.f[m].impl.copy()
+                L.f[m + 1].exp = L.f[m].exp.copy()
 
         # indicate presence of new values at this level
         L.status.updated = True

@@ -370,8 +370,9 @@ def setup_and_run(
 
     space_transfer_class, space_transfer_params = get_space_tranfer_params(
         problem_params,
-        iorder=6,
-        rorder=2,
+        iorder=16,
+        rorder=8,
+        fine_to_coarse=['restriction', 'restriction'],  # restriction or injection, for voltage and ionic model variables
     )
 
     # Usually do not modify below this line ------------------
@@ -384,6 +385,7 @@ def setup_and_run(
 
     # get PDE data
     t0, Tend, uinit, P = get_P_data(controller, truly_time_parallel)
+
     # print dofs stats (dofs per processor, etc.)
     print_dofs_stats(space_rank, time_rank, controller, P, uinit)
 
