@@ -2,6 +2,8 @@
 
 :arrow_left: [Back to main page](./README.md)
 
+-   January 24, 2024: Version 5.4.0 contains the code for the [second order SDC paper](https://arxiv.org/abs/2310.08352) by [\@ikrom96git](https://github.com/ikrom96git). It also has some changes to the FEniCS
+    part, including correct treatment of boundary conditions and first steps with FEniCS-x.
 -   July 28, 2023: For Version 5.3 a lot of pull requests got merged, thanks to [\@brownbaerchen](https://github.com/brownbaerchen),
     [\@tlunet](https://github.com/tlunet), [\@lisawim](https://github.com/lisawim), [\@ikrom96git](https://github.com/ikrom96git) for all the contributions.
     Besides the usual bugfixing and polishing, `pySDC` now comes with linear multistep methods, classical Runge Kutta methods, DAE sweepers, and more/improved projects.

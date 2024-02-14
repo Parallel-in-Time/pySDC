@@ -47,15 +47,13 @@ To reproduce the plots you need to install pySDC with all packages in the mpi4py
 Then, navigate to this directory, `pySDC/projects/Resilience/` and run the following commands:
 
  
-```bash
+.. code-block:: bash
  
-mpirun -np 4 python work_precision.py
-mpirun -np 4 python fault_stats.py prob run_vdp
-mpirun -np 4 python fault_stats.py prob run_quench
-mpirun -np 4 python fault_stats.py prob run_AC
-mpirun -np 4 python fault_stats.py prob run_Schroedinger
-python paper_plots.py
- 
-```
+    mpirun -np 4 python work_precision.py
+    mpirun -np 4 python fault_stats.py prob run_vdp
+    mpirun -np 4 python fault_stats.py prob run_quench
+    mpirun -np 4 python fault_stats.py prob run_AC
+    mpirun -np 4 python fault_stats.py prob run_Schroedinger
+    python paper_plots.py
 
 Possibly, you need to create some directories in this one to store and load things, if path errors occur.

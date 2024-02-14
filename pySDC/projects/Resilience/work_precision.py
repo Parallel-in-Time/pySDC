@@ -1109,9 +1109,11 @@ def get_configs(mode, problem):
         configurations[-1] = {
             'strategies': [
                 ERKStrategy(useMPI=True),
-                ARKStrategy(useMPI=True)
-                if problem.__name__ in ['run_Schroedinger', 'run_AC']
-                else ESDIRKStrategy(useMPI=True),
+                (
+                    ARKStrategy(useMPI=True)
+                    if problem.__name__ in ['run_Schroedinger', 'run_AC']
+                    else ESDIRKStrategy(useMPI=True)
+                ),
             ],
             'num_procs': 1,
         }
@@ -1272,6 +1274,7 @@ def save_fig(
         ncols=ncols if ncols else 3 if len(handles) % 3 == 0 else 4,
         frameon=False,
         fancybox=True,
+        handlelength=2.2,
     )
 
     path = f'{base_path}/wp-{name}-{work_key}-{precision_key}.{format}'

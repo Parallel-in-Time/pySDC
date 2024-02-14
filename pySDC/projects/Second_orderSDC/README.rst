@@ -1,45 +1,35 @@
-# Spectral Deferred Correction Methods for Second-Order Problems
-
-**Title:** Spectral Deferred Correction Methods for Second-order Problems
- 
-**Authors:** Ikrom Akramov, Sebastian Götschel, Michael Minion, Daniel Ruprecht, and Robert Speck.
-
+Spectral Deferred Correction Methods for Second-Order Problems
+==============================================================
 
 Python code for implementing the paper's plots on Second-order SDC methods.
 
-## Attribution
 You are welcome to use and adapt this code under the terms of the BSD license.
 If you utilize it, either in whole or in part, for a publication, please provide proper citation:
 
+.. code-block:: tex
+
+    @misc{akramov2023spectral,
+        title={Spectral deferred correction methods for second-order problems},
+       author={Ikrom Akramov and Sebastian Götschel and Michael Minion and Daniel Ruprecht and Robert Speck},
+       year={2023},
+       eprint={2310.08352},
+       archivePrefix={arXiv},
+       primaryClass={math.NA}}
 
 
-   **BibTeX formatted citation:**
-
-          @misc{akramov2023spectral,
-                title={Spectral deferred correction methods for second-order problems}, 
-               author={Ikrom Akramov and Sebastian Götschel and Michael Minion and Daniel Ruprecht and Robert Speck},
-               year={2023},
-               eprint={2310.08352},
-               archivePrefix={arXiv},
-               primaryClass={math.NA}
-
-    
-
-
-
-[![arXiv](https://img.shields.io/badge/arXiv-2310.08352-b31b1b.svg)](https://arxiv.org/abs/2310.08352)
-
-## Reproducing Figures from the Publication
+Reproducing Figures from the Publication
+----------------------------------------
 
 - **Fig. 1:** Execute `harmonic_oscillator_run_stability.py` while setting `kappa_max=18` and `mu_max=18`.
 - **Fig. 2:** Run `harmonic_oscillator_run_stability.py` with the following configurations:
    - Set `kappa_max=30` and `mu_max=30`.
    - Adjust `maxiter` to 1, 2, 3, or 4 and execute each individually.
-- **Table 1:** Execute `harmonic_socillator_run_stab_interval.py`:
-   - To save the results set: `save_file=True`
+- **Table 1:** Execute `harmonic_oscillator_run_stab_interval.py`:
+   - For the Picard iteration set: `Picard=True`
+   - To save the results set: `save_interval_file=True`
 
 - Use the script `harmonic_oscillator_run_points.py` to create a table based on given $(\kappa, \mu)$ points. This table assists in determining suitable values for `M`, `K`, and `quadrature nodes` to ensure stability in the SDC method.
-   - To save the results set: `save_file=True`
+   - To save the results set: `save_points_file=True`
 
 - **Fig. 3:** Run `penningtrap_run_error.py` (Run local convergence: `conv.run_local_error()`) with `dt=0.015625/4` and `axes=(0,)`.
 - **Fig. 4:** Run `penningtrap_run_error.py` (Run local convergence: `conv.run_local_error()`) using `dt=0.015625*4` and `axes=(2,)`.
@@ -63,6 +53,6 @@ If you utilize it, either in whole or in part, for a publication, please provide
    - Set `dt=0.015625*4`, and `K_iter=(2, 4, 6)`, and `dt_cont=2` for `axis=(0,)`.
 
 
-## Who do I talk to?
-
-This code is written by [Ikrom Akramov](https://www.mat.tuhh.de/home/iakramov/?homepage_id=iakramov).
+Contact
+-------
+This code is written by `Ikrom Akramov <https://www.mat.tuhh.de/home/iakramov/?homepage_id=iakramov)>`_

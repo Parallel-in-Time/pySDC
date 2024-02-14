@@ -85,9 +85,6 @@ class SweeperMPI(sweeper):
             L.status.residual = 0.0 if L.status.residual is None else L.status.residual
             return None
 
-        # check if there are new values (e.g. from a sweep)
-        # assert L.status.updated
-
         # compute the residual for each node
 
         # build QF(u)
