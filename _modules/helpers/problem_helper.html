@@ -4,12 +4,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>helpers.problem_helper &#8212; pySDC 5.4.1 documentation</title>
+    <title>helpers.problem_helper &#8212; pySDC 5.4.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
     
-    <script src="../../_static/documentation_options.js?v=76286d9e"></script>
+    <script src="../../_static/documentation_options.js?v=41d0e7f4"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
@@ -25,7 +25,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.4.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.4.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">helpers.problem_helper</a></li> 
       </ul>
@@ -203,7 +203,7 @@
 
             <span class="c1"># -- boundary condition parameters</span>
             <span class="n">bc_params</span><span class="p">[</span><span class="n">iS</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">bc_params_defaults</span><span class="p">,</span> <span class="o">**</span><span class="n">bc_params</span><span class="p">[</span><span class="n">iS</span><span class="p">]}</span>
-            <span class="n">par</span> <span class="o">=</span> <span class="n">bc_params</span><span class="p">[</span><span class="n">iS</span><span class="p">]</span>
+            <span class="n">par</span> <span class="o">=</span> <span class="n">bc_params</span><span class="p">[</span><span class="n">iS</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
             <span class="c1"># -- extract parameters and raise an error if additionals</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;val&#39;</span><span class="p">)</span>
@@ -349,7 +349,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.4.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.4.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">helpers.problem_helper</a></li> 
       </ul>
