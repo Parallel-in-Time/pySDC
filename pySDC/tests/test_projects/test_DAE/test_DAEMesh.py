@@ -24,9 +24,9 @@ def testInitialization():
 
         assert len(mesh.components) == len(mesh), 'ERROR: Mesh does not contain two component arrays!'
 
-    assert np.allclose(mesh.diff, mesh2.diff) and np.allclose(
-        mesh.alg, mesh2.alg
-    ), 'ERROR: Components in initialzed meshes do not match!'
+    assert np.allclose(mesh1.diff, mesh2.diff) and np.allclose(
+        mesh1.alg, mesh2.alg
+    ), 'ERROR: Components in initialized meshes do not match!'
 
 
 @pytest.mark.base
