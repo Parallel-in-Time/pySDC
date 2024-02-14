@@ -767,7 +767,7 @@ class WSCC9BusSystem(ptype_dae):
         m, n = 3, 9
         nvars = 11 * m + 2 * m + 2 * n
         # invoke super init, passing number of dofs
-        super().__init__(nvars=(11 * m, 2 * n + 2 * m), newton_tol=newton_tol)
+        super().__init__(nvars=nvars, newton_tol=newton_tol)
         self._makeAttributeAndRegister('m', 'n', localVars=locals())
         self.mpc = WSCC9Bus()
 
@@ -1144,8 +1144,8 @@ class WSCC9BusSystem(ptype_dae):
         eqs.append(-QL2[self.m : self.n] - sum4)  # (17)
         eqs_flatten = [item for sublist in eqs for item in sublist]
 
-        f.diff[:] = eqs_flatten[0 : 11 * self.m]
-        f.alg[:] = eqs_flatten[11 * self.m :]
+        f.diff[: 11 * self.m] = eqs_flatten[0 : 11 * self.m]
+        f.alg[: 2 * self.n + 2 * self.m] = eqs_flatten[11 * self.m :]
         return f
 
     def u_exact(self, t):
@@ -1182,7 +1182,7 @@ class WSCC9BusSystem(ptype_dae):
         me.alg[2 * self.m + self.n : 2 * self.m + 2 * self.n] = self.TH0
         return me
 
-    def get_switching_info(self, u, t, du=None):
+    def get_switching_info(self, u, t):
         r"""
         Provides information about the state function of the problem. When the state function changes its sign,
         typically an event occurs. So the check for an event should be done in the way that the state function

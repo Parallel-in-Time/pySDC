@@ -3,9 +3,9 @@ import numpy as np
 import pickle
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1  # problematic_f
+from pySDC.projects.DAE.problems.simple_DAE import problematic_f
 from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-from pySDC.projects.DAE.misc.HookClass_DAE import LogGlobalErrorPostStepDifferentialVariable
+from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostStep
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.hooks.log_solution import LogSolution
 
@@ -26,7 +26,7 @@ def main():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['newton_tol'] = 1e-12  # tollerance for implicit solver
+    problem_params['newton_tol'] = 1e-12
 
     # initialize step parameters
     step_params = dict()
@@ -35,11 +35,11 @@ def main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = [LogSolution, LogGlobalErrorPostStepDifferentialVariable]
+    controller_params['hook_class'] = [LogSolution, LogGlobalErrorPostStep]
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = simple_dae_1  # problematic_f
+    description['problem_class'] = problematic_f
     description['problem_params'] = problem_params
     description['sweeper_class'] = fully_implicit_DAE
     description['sweeper_params'] = sweeper_params
@@ -63,7 +63,7 @@ def main():
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # check error
-    err = get_sorted(stats, type='e_global_differential_post_step', sortby='time')
+    err = get_sorted(stats, type='e_global_post_step', sortby='time')
     err = np.linalg.norm([err[i][1] for i in range(len(err))], np.inf)
     print(f"Error is {err}")
     assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
@@ -71,12 +71,7 @@ def main():
     # store results
     sol = get_sorted(stats, type='u', sortby='time')
     sol_dt = np.array([sol[i][0] for i in range(len(sol))])
-    sol_data = np.array(
-        [
-            [(sol[j][1].diff[id], sol[j][1].alg[ia]) for j in range(len(sol))]
-            for id, ia in zip(range(len(uend.diff)), range(len(uend.alg)))
-        ]
-    )
+    sol_data = np.array([[sol[j][1][i] for j in range(len(sol))] for i in range(P.nvars)])
 
     data = dict()
     data['dt'] = sol_dt

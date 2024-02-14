@@ -49,7 +49,7 @@ class pendulum_2d(ptype_dae):
 
     def __init__(self, newton_tol):
         """Initialization routine"""
-        super().__init__(nvars=(4, 1), newton_tol=newton_tol)
+        super().__init__(nvars=5, newton_tol=newton_tol)
         # load reference solution
         # data file must be generated and stored under misc/data and self.t_end = t[-1]
         # data = np.load(r'pySDC/projects/DAE/misc/data/pendulum.npy')
@@ -80,13 +80,13 @@ class pendulum_2d(ptype_dae):
         # The last element of u is a Lagrange multiplier. Not sure if this needs to be time dependent, but must model the
         # weight somehow
         f = self.dtype_f(self.init)
-        f.diff[:] = (
+        f.diff[:4] = (
             du.diff[0] - u.diff[2],
             du.diff[1] - u.diff[3],
             du.diff[2] + u.alg[0] * u.diff[0],
             du.diff[3] + u.alg[0] * u.diff[1] + g,
         )
-        f.alg[:] = u.diff[0] ** 2 + u.diff[1] ** 2 - 1
+        f.alg[0] = u.diff[0] ** 2 + u.diff[1] ** 2 - 1
         self.work_counters['rhs']()
         return f
 
@@ -106,14 +106,16 @@ class pendulum_2d(ptype_dae):
         """
         me = self.dtype_u(self.init)
         if t == 0:
-            me.diff[:] = (-1, 0, 0, 0)
-            me.alg[:] = 0
+            me.diff[:4] = (-1, 0, 0, 0)
+            me.alg[0] = 0
         elif t < self.t_end:
-            me[:] = self.u_ref(t)
+            u_ref = self.u_ref(t)
+            me.diff[:4] = u_ref[:4]
+            me.alg[0] = u_ref[5]
         else:
             self.logger.warning("Requested time exceeds domain of the reference solution. Returning zero.")
-            me.diff[:] = (0, 0, 0, 0)
-            me.alg[:] = 0
+            me.diff[:4] = (0, 0, 0, 0)
+            me.alg[0] = 0
         return me
 
 
@@ -157,7 +159,7 @@ class simple_dae_1(ptype_dae):
 
     def __init__(self, newton_tol=1e-10):
         """Initialization routine"""
-        super().__init__(nvars=(2, 1), newton_tol=newton_tol)
+        super().__init__(nvars=3, newton_tol=newton_tol)
 
     def eval_f(self, u, du, t):
         r"""
@@ -181,11 +183,11 @@ class simple_dae_1(ptype_dae):
         a = 10.0
         f = self.dtype_f(self.init)
 
-        f.diff[:] = (
+        f.diff[:2] = (
             -du.diff[0] + (a - 1 / (2 - t)) * u.diff[0] + (2 - t) * a * u.alg[0] + (3 - t) / (2 - t) * np.exp(t),
             -du.diff[1] + (1 - a) / (t - 2) * u.diff[0] - u.diff[1] + (a - 1) * u.alg[0] + 2 * np.exp(t),
         )
-        f.alg[:] = (t + 2) * u.diff[0] + (t**2 - 4) * u.diff[1] - (t**2 + t - 2) * np.exp(t)
+        f.alg[0] = (t + 2) * u.diff[0] + (t**2 - 4) * u.diff[1] - (t**2 + t - 2) * np.exp(t)
         self.work_counters['rhs']()
         return f
 
@@ -204,8 +206,8 @@ class simple_dae_1(ptype_dae):
             The reference solution as mesh object containing three components.
         """
         me = self.dtype_u(self.init)
-        me.diff[:] = (np.exp(t), np.exp(t))
-        me.alg[:] = -np.exp(t) / (2 - t)
+        me.diff[:2] = (np.exp(t), np.exp(t))
+        me.alg[0] = -np.exp(t) / (2 - t)
         return me
 
 
@@ -246,6 +248,7 @@ class problematic_f(ptype_dae):
     def __init__(self, newton_tol, eta=1):
         """Initialization routine"""
         super().__init__(nvars=2, newton_tol=newton_tol)
+        self._makeAttributeAndRegister('eta', localVars=locals())
 
     def eval_f(self, u, du, t):
         r"""

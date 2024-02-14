@@ -2,7 +2,6 @@ import numpy as np
 
 from pySDC.core.Problem import WorkCounter
 from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
-from pySDC.projects.DAE.misc.dae_mesh import DAEMesh
 
 
 class DiscontinuousTestDAE(ptype_dae):
@@ -59,7 +58,7 @@ class DiscontinuousTestDAE(ptype_dae):
 
     def __init__(self, newton_tol=1e-12):
         """Initialization routine"""
-        super().__init__(nvars=(1, 1), newton_tol=newton_tol)
+        super().__init__(nvars=2, newton_tol=newton_tol)
 
         self.t_switch_exact = np.arccosh(50)
         self.t_switch = None
@@ -85,8 +84,8 @@ class DiscontinuousTestDAE(ptype_dae):
             The right-hand side of f (contains two components).
         """
 
-        y, z = u.diff, u.alg
-        dy = du.diff
+        y, z = u.diff[0], u.alg[0]
+        dy = du.diff[0]
 
         t_switch = np.inf if self.t_switch is None else self.t_switch
 
@@ -94,11 +93,11 @@ class DiscontinuousTestDAE(ptype_dae):
         f = self.dtype_f(self.init)
 
         if h >= 0 or t >= t_switch:
-            f.diff[:] = dy
-            f.alg[:] = y**2 - z**2 - 1
+            f.diff[0] = dy
+            f.alg[0] = y**2 - z**2 - 1
         else:
-            f.diff[:] = dy - z
-            f.alg[:] = y**2 - z**2 - 1
+            f.diff[0] = dy - z
+            f.alg[0] = y**2 - z**2 - 1
         self.work_counters['rhs']()
         return f
 
@@ -122,11 +121,11 @@ class DiscontinuousTestDAE(ptype_dae):
 
         me = self.dtype_u(self.init)
         if t <= self.t_switch_exact:
-            me.diff[:] = np.cosh(t)
-            me.alg[:] = np.sinh(t)
+            me.diff[0] = np.cosh(t)
+            me.alg[0] = np.sinh(t)
         else:
-            me.diff[:] = np.cosh(self.t_switch_exact)
-            me.alg[:] = np.sinh(self.t_switch_exact)
+            me.diff[0] = np.cosh(self.t_switch_exact)
+            me.alg[0] = np.sinh(self.t_switch_exact)
         return me
 
     def get_switching_info(self, u, t):
@@ -161,14 +160,14 @@ class DiscontinuousTestDAE(ptype_dae):
         m_guess = -100
 
         for m in range(1, len(u)):
-            h_prev_node = 2 * u[m - 1].diff - 100
-            h_curr_node = 2 * u[m].diff - 100
+            h_prev_node = 2 * u[m - 1].diff[0] - 100
+            h_curr_node = 2 * u[m].diff[0] - 100
             if h_prev_node < 0 and h_curr_node >= 0:
                 switch_detected = True
                 m_guess = m - 1
                 break
 
-        state_function = [2 * u[m].diff - 100 for m in range(len(u))]
+        state_function = [2 * u[m].diff[0] - 100 for m in range(len(u))]
         return switch_detected, m_guess, state_function
 
     def count_switches(self):

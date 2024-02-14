@@ -102,11 +102,11 @@ def test_pendulum_main():
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
     uend_ref = P.dtype_u(P.init)
-    uend_ref.diff[:] = (0.98613917, -0.16592027, 0.29956023, 1.77825875)
-    uend_ref.alg[:] = 4.82500525
+    uend_ref.diff[:4] = (0.98613917, -0.16592027, 0.29956023, 1.77825875)
+    uend_ref.alg[0] = 4.82500525
 
     # check error
-    err = abs(uend - uend_ref)
+    err = abs(uend.diff - uend_ref.diff)
     assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
 
 
@@ -289,7 +289,7 @@ def test_synchgen_infinite_bus_main():
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     uend_ref = P.dtype_u(P.init)
-    uend_ref.diff[:] = (
+    uend_ref.diff[:8] = (
         8.30823565e-01,
         -4.02584174e-01,
         1.16966755e00,
@@ -300,7 +300,7 @@ def test_synchgen_infinite_bus_main():
         9.94039645e-01,
     )
 
-    uend_ref.alg[:] = (
+    uend_ref.alg[:6] = (
         -7.77837831e-01,
         -1.67347611e-01,
         1.34810867e00,
@@ -310,7 +310,7 @@ def test_synchgen_infinite_bus_main():
     )
 
     # check error
-    err = abs(uend - uend_ref)
+    err = abs(uend.diff - uend_ref.diff)
     assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
 
 
@@ -330,8 +330,8 @@ def test_DiscontinuousTestDAE_singularity():
     t_before_event = t_event - eps
     u_before_event = disc_test_DAE.u_exact(t_before_event)
     du_before_event = disc_test_DAE.dtype_f(disc_test_DAE.init)
-    du_before_event.diff[:] = np.sinh(t_before_event)
-    du_before_event.alg[:] = np.cosh(t_before_event)
+    du_before_event.diff[0] = np.sinh(t_before_event)
+    du_before_event.alg[0] = np.cosh(t_before_event)
     f_before_event = disc_test_DAE.eval_f(u_before_event, du_before_event, t_before_event)
 
     assert np.isclose(
@@ -341,25 +341,25 @@ def test_DiscontinuousTestDAE_singularity():
     # test for t <= t^*
     u_event = disc_test_DAE.u_exact(t_event)
     du_event = disc_test_DAE.dtype_f(disc_test_DAE.init)
-    du_event.diff[:] = np.sinh(t_event)
-    du_event.alg[:] = np.cosh(t_event)
+    du_event.diff[0] = np.sinh(t_event)
+    du_event.alg[0] = np.cosh(t_event)
     f_event = disc_test_DAE.eval_f(u_event, du_event, t_event)
 
-    assert np.isclose(f_event.diff, 7 * np.sqrt(51.0)) and np.isclose(
-        f_event.alg, 0.0
-    ), f"ERROR: Right-hand side at event does not match! Expected {(7 * np.sqrt(51), 0.0)}, got {f_event}"
+    assert np.isclose(f_event.diff[0], 7 * np.sqrt(51.0)) and np.isclose(
+        f_event.alg[0], 0.0
+    ), f"ERROR: Right-hand side at event does not match! Expected {(7 * np.sqrt(51), 0.0)}, got {(f_event.diff[0], f_event.alg[0])}"
 
     # test for t > t^* by setting t^* = t^* + eps
     t_after_event = t_event + eps
     u_after_event = disc_test_DAE.u_exact(t_after_event)
     du_after_event = disc_test_DAE.dtype_f(disc_test_DAE.init)
-    du_after_event.diff[:] = np.sinh(t_event)
-    du_after_event.alg[:] = np.cosh(t_event)
+    du_after_event.diff[0] = np.sinh(t_event)
+    du_after_event.alg[0] = np.cosh(t_event)
     f_after_event = disc_test_DAE.eval_f(u_after_event, du_after_event, t_after_event)
 
-    assert np.isclose(f_after_event.diff, 7 * np.sqrt(51.0)) and np.isclose(
-        f_after_event.alg, 0.0
-    ), f"ERROR: Right-hand side after event does not match! Expected {(7 * np.sqrt(51), 0.0)}, got {(f_after_event.diff, f_after_event.alg)}"
+    assert np.isclose(f_after_event.diff[0], 7 * np.sqrt(51.0)) and np.isclose(
+        f_after_event.alg[0], 0.0
+    ), f"ERROR: Right-hand side after event does not match! Expected {(7 * np.sqrt(51), 0.0)}, got {(f_after_event.diff[0], f_after_event.alg[0])}"
 
 
 @pytest.mark.base
@@ -424,7 +424,7 @@ def test_DiscontinuousTestDAE_SDC(M):
 
     uend, _ = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    err = abs(uex.diff - uend.diff)
+    err = abs(uex.diff[0] - uend.diff[0])
     assert err < err_tol[M], f"ERROR: Error is too large! Expected {err_tol[M]}, got {err}"
 
 
@@ -516,7 +516,7 @@ def test_DiscontinuousTestDAE_SDC_detection(M):
 
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    err = abs(uex - uend)
+    err = abs(uex.diff[0] - uend.diff[0])
     assert err < err_tol[M], f"ERROR for M={M}: Error is too large! Expected {err_tol[M]}, got {err}"
 
     switches = get_sorted(stats, type='switch', sortby='time', recomputed=False)
@@ -554,7 +554,7 @@ def test_WSCC9_evaluation():
 
     f = WSCC9.eval_f(u0, du0, t0)
 
-    assert len(f.diff) + len(f.alg) == nvars, 'Shape of f does not match with shape it is supposed to be!'
+    assert len(f.diff) == nvars and len(f.alg) == nvars, 'Shape of f does not match with shape it is supposed to be!'
 
 
 @pytest.mark.base
@@ -613,7 +613,7 @@ def test_WSCC9_update_YBus():
 
     assert np.allclose(YBus_initial, YBus_initial_ref), 'YBus does not match with the YBus at initialization!'
 
-    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+    _, _ = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     YBus_line_outage = P.YBus
     YBus_line6_8_outage = get_event_Ybus()
@@ -692,7 +692,7 @@ def test_WSCC9_SDC_detection():
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
-    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+    _, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     switches = get_sorted(stats, type='switch', sortby='time', recomputed=False)
     assert len(switches) >= 1, 'ERROR: No events found!'

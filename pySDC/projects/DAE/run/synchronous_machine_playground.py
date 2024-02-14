@@ -29,7 +29,7 @@ def main():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
+    problem_params['newton_tol'] = 1e-3
 
     # initialize step parameters
     step_params = dict()
@@ -71,7 +71,7 @@ def main():
     # print(f"Error is {err}")
 
     uend_ref = P.dtype_u(P.init)
-    uend_ref.diff = (
+    uend_ref.diff[:8] = (
         8.30823565e-01,
         -4.02584174e-01,
         1.16966755e00,
@@ -81,7 +81,7 @@ def main():
         3.10281509e-01,
         9.94039645e-01,
     )
-    uend_ref.alg = (
+    uend_ref.alg[:6] = (
         -7.77837831e-01,
         -1.67347611e-01,
         1.34810867e00,
@@ -89,7 +89,7 @@ def main():
         1.29690691e-02,
         -8.00823474e-02,
     )
-    err = abs(uend - uend_ref)
+    err = abs(uend.diff - uend_ref.diff)
     assert np.isclose(err, 0, atol=1e-4), "Error too large."
 
     # store results

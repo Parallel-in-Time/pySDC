@@ -99,10 +99,10 @@ def test_residual_main():
     # set reference values
     u = P.dtype_u(P.init)
     du = P.dtype_u(P.init)
-    u.diff[:] = (5, 5)
-    u.alg[:] = 5
-    du.diff[:] = (0, 0)
-    du.alg[:] = 0
+    u.diff[:2] = (5, 5)
+    u.alg[0] = 5
+    du.diff[:2] = (0, 0)
+    du.alg[0] = 0
     # set initial time in the status of the level
     L.status.time = 0.0
     L.u[0] = u
