@@ -149,74 +149,33 @@ class mesh(np.ndarray):
         return self
 
 
-class imex_mesh(object):
-    """
-    RHS data type for meshes with implicit and explicit components
+class MultiComponentMesh(mesh):
+    components = []
 
-    This data type can be used to have RHS with 2 components (here implicit and explicit)
-
-    Attributes:
-        impl (mesh.mesh): implicit part
-        expl (mesh.mesh): explicit part
-    """
-
-    def __init__(self, init, val=0.0):
-        """
-        Initialization routine
-
-        Args:
-            init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)
-                  or another imex_mesh object
-            val (float): an initial number (default: 0.0)
-        Raises:
-            DataError: if init is none of the types above
-        """
-
-        if isinstance(init, type(self)):
-            self.impl = mesh(init.impl)
-            self.expl = mesh(init.expl)
-        elif (
-            isinstance(init, tuple)
-            and (init[1] is None or isinstance(init[1], MPI.Intracomm))
-            and isinstance(init[2], np.dtype)
-        ):
-            self.impl = mesh(init, val=val)
-            self.expl = mesh(init, val=val)
-        # something is wrong, if none of the ones above hit
+    def __new__(cls, init, *args, **kwargs):
+        if isinstance(init, tuple):
+            shape = (init[0],) if type(init[0]) is int else init[0]
+            obj = super().__new__(cls, ((len(cls.components), *shape), *init[1:]), *args, **kwargs)
         else:
-            raise DataError('something went wrong during %s initialization' % type(self))
+            obj = super().__new__(cls, init, *args, **kwargs)
+
+        for comp, i in zip(cls.components, range(len(cls.components))):
+            obj.__dict__[comp] = obj[i]
+        return obj
+
+    def __array_ufunc__(self, *args, **kwargs):
+        results = super().__array_ufunc__(*args, **kwargs).view(type(self))
+
+        if type(self) == type(results) and self.flags['OWNDATA']:
+            for comp, i in zip(self.components, range(len(self.components))):
+                results.__dict__[comp] = results[i]
+
+        return results
 
 
-class comp2_mesh(object):
-    """
-    RHS data type for meshes with 2 components
+class imex_mesh(MultiComponentMesh):
+    components = ['impl', 'expl']
 
-    Attributes:
-        comp1 (mesh.mesh): first part
-        comp2 (mesh.mesh): second part
-    """
 
-    def __init__(self, init, val=0.0):
-        """
-        Initialization routine
-
-        Args:
-            init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)
-                  or another comp2_mesh object
-        Raises:
-            DataError: if init is none of the types above
-        """
-
-        if isinstance(init, type(self)):
-            self.comp1 = mesh(init.comp1)
-            self.comp2 = mesh(init.comp2)
-        elif (
-            isinstance(init, tuple)
-            and (init[1] is None or isinstance(init[1], MPI.Intracomm))
-            and isinstance(init[2], np.dtype)
-        ):
-            self.comp1 = mesh(init, val=val)
-            self.comp2 = mesh(init, val=val)
-        # something is wrong, if none of the ones above hit
-        else:
-            raise DataError('something went wrong during %s initialization' % type(self))
+class comp2_mesh(MultiComponentMesh):
+    components = ['comp1', 'comp2']
