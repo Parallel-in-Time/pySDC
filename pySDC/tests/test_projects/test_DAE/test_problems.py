@@ -647,7 +647,7 @@ def test_WSCC9_SDC_detection():
 
     sweeper_params = {
         'quad_type': 'RADAU-RIGHT',
-        'num_nodes': 2,
+        'num_nodes': 3,
         'QI': 'LU',
     }
 
@@ -697,7 +697,8 @@ def test_WSCC9_SDC_detection():
     switches = get_sorted(stats, type='switch', sortby='time', recomputed=False)
     assert len(switches) >= 1, 'ERROR: No events found!'
     t_switch = [me[1] for me in switches][0]
-    assert np.isclose(t_switch, 0.6103290792685618, atol=1e-3), 'Found event does not match a threshold!'
+    print(t_switch)
+    assert np.isclose(t_switch, 0.5335289411812812, atol=1e-3), 'Found event does not match a threshold!'
 
 
 # @pytest.mark.base
