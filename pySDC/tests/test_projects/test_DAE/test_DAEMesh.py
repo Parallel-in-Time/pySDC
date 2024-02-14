@@ -8,7 +8,7 @@ def testInitialization():
     """
 
     import numpy as np
-    from pySDC.projects.DAE.misc.dae_mesh import DAEMesh
+    from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
 
     init = (6, None, np.dtype('float64'))
     mesh1 = DAEMesh(init)
@@ -36,7 +36,7 @@ def testArrayUFuncOperator():
     """
 
     import numpy as np
-    from pySDC.projects.DAE.misc.dae_mesh import DAEMesh
+    from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
 
     init = (6, None, np.dtype('float64'))
     mesh = DAEMesh(init)

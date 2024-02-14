@@ -3,7 +3,7 @@ from scipy import optimize
 
 from pySDC.core.Errors import ParameterError
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.projects.DAE.misc.dae_mesh import DAEMesh
+from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
 
 
 class fully_implicit_DAE(generic_implicit):
