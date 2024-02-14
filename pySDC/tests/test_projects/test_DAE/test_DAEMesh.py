@@ -10,17 +10,26 @@ def testInitialization():
     import numpy as np
     from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
 
-    init = (6, None, np.dtype('float64'))
+    nvars_1d = 6
+    init = (nvars_1d, None, np.dtype('float64'))
     mesh1 = DAEMesh(init)
     mesh1.diff[:] = np.arange(6)
     mesh1.alg[:] = np.arange(6, 12)
+
     mesh2 = DAEMesh(mesh1)
 
-    for mesh in [mesh1, mesh2]:
+    nvars_multi = (4, 6)
+    init_multi = (nvars_multi, None, np.dtype('float64'))
+    mesh_multi = DAEMesh(init_multi)
+
+    for nvar, mesh in zip([nvars_1d, nvars_1d, nvars_multi], [mesh1, mesh2, mesh_multi]):
         assert 'diff' in dir(mesh), 'ERROR: DAEMesh does not have a diff attribute!'
         assert 'alg' in dir(mesh), 'ERROR: DAEMesh does not have a diff attribute!'
 
-        assert len(mesh.diff) == 6 and len(mesh.alg) == 6, 'ERROR: Components does not have the desired length!'
+        if isinstance(nvar, int):
+            assert np.shape(mesh.diff)[0] == nvar and np.shape(mesh.alg)[0] == nvar, 'ERROR: Components does not have the desired length!'
+        else:
+            assert np.shape(mesh.diff) == nvar and np.shape(mesh.alg) == nvar, 'ERROR: Components does not have the desired length!'
 
         assert len(mesh.components) == len(mesh), 'ERROR: Mesh does not contain two component arrays!'
 
@@ -29,6 +38,7 @@ def testInitialization():
     ), 'ERROR: Components in initialized meshes do not match!'
 
 
+testInitialization()
 @pytest.mark.base
 def testArrayUFuncOperator():
     """
