@@ -14,7 +14,7 @@ If you utilize it, either in whole or in part, for a publication, please provide
        year={2023},
        eprint={2310.08352},
        archivePrefix={arXiv},
-       primaryClass={math.NA}
+       primaryClass={math.NA}}
 
 
 Reproducing Figures from the Publication
@@ -24,11 +24,12 @@ Reproducing Figures from the Publication
 - **Fig. 2:** Run `harmonic_oscillator_run_stability.py` with the following configurations:
    - Set `kappa_max=30` and `mu_max=30`.
    - Adjust `maxiter` to 1, 2, 3, or 4 and execute each individually.
-- **Table 1:** Execute `harmonic_socillator_run_stab_interval.py`:
-   - To save the results set: `save_file=True`
+- **Table 1:** Execute `harmonic_oscillator_run_stab_interval.py`:
+   - For the Picard iteration set: `Picard=True`
+   - To save the results set: `save_interval_file=True`
 
 - Use the script `harmonic_oscillator_run_points.py` to create a table based on given $(\kappa, \mu)$ points. This table assists in determining suitable values for `M`, `K`, and `quadrature nodes` to ensure stability in the SDC method.
-   - To save the results set: `save_file=True`
+   - To save the results set: `save_points_file=True`
 
 - **Fig. 3:** Run `penningtrap_run_error.py` (Run local convergence: `conv.run_local_error()`) with `dt=0.015625/4` and `axes=(0,)`.
 - **Fig. 4:** Run `penningtrap_run_error.py` (Run local convergence: `conv.run_local_error()`) using `dt=0.015625*4` and `axes=(2,)`.
@@ -54,4 +55,4 @@ Reproducing Figures from the Publication
 
 Contact
 -------
-This code is written by `Ikrom Akramov`<https://www.mat.tuhh.de/home/iakramov/?homepage_id=iakramov)>_
+This code is written by `Ikrom Akramov <https://www.mat.tuhh.de/home/iakramov/?homepage_id=iakramov)>`_

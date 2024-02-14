@@ -76,6 +76,7 @@ class GenericNDimFinDiff(ptype):
     xvalues : np.1darray
         Values of spatial grid.
     """
+
     dtype_u = mesh
     dtype_f = mesh
 

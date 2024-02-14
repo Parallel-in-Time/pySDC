@@ -19,9 +19,7 @@ class generalized_fisher_jac(generalized_fisher):
         """
 
         # noinspection PyTypeChecker
-        dfdu = self.A[1:-1, 1:-1] + sp.diags(
-            self.lambda0**2 - self.lambda0**2 * (self.nu + 1) * u**self.nu, offsets=0
-        )
+        dfdu = self.A[1:-1, 1:-1] + sp.diags(self.lambda0**2 - self.lambda0**2 * (self.nu + 1) * u**self.nu, offsets=0)
 
         return dfdu
 

@@ -5,7 +5,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 # from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import fenics_heat_mass
 from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
 # from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
-from pySDC.playgrounds.FEniCSx.HeatEquation_1D_FEniCSx_matrix_forced import fenicsx_heat, fenicsx_heat_mass
+from pySDC.playgrounds.FEniCSx.HeatEquation_1D_FEniCSx_matrix_forced_2 import fenicsx_heat_mass
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 from pySDC.playgrounds.FEniCSx.HookClass_FEniCS_output import fenics_output
@@ -40,6 +40,7 @@ def run_simulation(ml=None, mass=None):
     problem_params['nelems'] = [128]
     problem_params['family'] = 'CG'
     problem_params['order'] = [4]
+    problem_params['c'] = [1.0]
     if ml:
         problem_params['refinements'] = [1, 0]
     else:
@@ -195,7 +196,7 @@ def visualize():
 
 if __name__ == "__main__":
 
-    errors_sdc_noM, _ = run_simulation(ml=False, mass=False)
+    # errors_sdc_noM, _ = run_simulation(ml=False, mass=False)
     errors_sdc_M, _ = run_simulation(ml=False, mass=True)
     # errors_mlsdc_noM, _ = run_simulation(ml=True, mass=False)
     # errors_mlsdc_M, _ = run_simulation(ml=True, mass=True)
