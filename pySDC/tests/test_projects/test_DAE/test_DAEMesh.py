@@ -14,7 +14,7 @@ def testInitialization():
     mesh1 = DAEMesh(init)
     mesh1.diff[:] = np.arange(6)
     mesh1.alg[:] = np.arange(6, 12)
-    mesh2 = DAEMesh(mesh)
+    mesh2 = DAEMesh(mesh1)
 
     for mesh in [mesh1, mesh2]:
         assert 'diff' in dir(mesh), 'ERROR: DAEMesh does not have a diff attribute!'
