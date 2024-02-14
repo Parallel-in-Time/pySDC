@@ -1272,6 +1272,7 @@ def save_fig(
         ncols=ncols if ncols else 3 if len(handles) % 3 == 0 else 4,
         frameon=False,
         fancybox=True,
+        handlelength=2.2,
     )
 
     path = f'{base_path}/wp-{name}-{work_key}-{precision_key}.{format}'
