@@ -36,6 +36,17 @@ def test_MultiComponentMesh(shape):
     assert np.allclose((A + B).a, a + b)
     assert np.allclose((A + B).b, zero)
 
+    C = A - B
+    assert np.allclose(C.a, a - b)
+    assert np.allclose(C.b, zero)
+    assert not np.shares_memory(A, C)
+    assert not np.shares_memory(B, C)
+
+    D = np.exp(A)
+    assert type(D) == TestMesh
+    assert np.allclose(D.a, np.exp(a))
+    assert not np.shares_memory(A, D)
+
     B *= A
     assert np.allclose(B.a, a * b)
     assert np.allclose(A.a, a)
@@ -46,3 +57,7 @@ def test_MultiComponentMesh(shape):
     A /= 10.0
     assert np.allclose(A.a, a / 10)
     assert np.allclose(A.b, zero)
+
+
+if __name__ == '__main__':
+    test_MultiComponentMesh(1)
