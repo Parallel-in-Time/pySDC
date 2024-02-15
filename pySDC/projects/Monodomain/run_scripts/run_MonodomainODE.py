@@ -17,6 +17,9 @@ from pySDC.helpers.stats_helper import get_sorted
 from pySDC.projects.Monodomain.transfer_classes.my_BaseTransfer_mass import my_base_transfer_mass
 from pySDC.projects.Monodomain.transfer_classes.my_BaseTransfer import my_base_transfer
 
+# from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+# from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+
 from pySDC.projects.Monodomain.controller_classes.my_controller_MPI import my_controller_MPI as controller_MPI
 from pySDC.projects.Monodomain.controller_classes.my_controller_nonMPI import my_controller_nonMPI as controller_nonMPI
 
@@ -202,13 +205,15 @@ def get_level_params(dt, nsweeps, restol):
     return level_params
 
 
-def get_sweeper_params(num_nodes):
+def get_sweeper_params(num_nodes, skip_residual_computation):
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params["initial_guess"] = "spread"
     sweeper_params["quad_type"] = "RADAU-RIGHT"
     sweeper_params["num_nodes"] = num_nodes
     sweeper_params["QI"] = "IE"
+    if skip_residual_computation:
+        sweeper_params["skip_residual_computation"] = ("IT_FINE", "IT_COARSE", "IT_DOWN", "IT_UP")
     # specific for explicit stabilized methods
     # sweeper_params["es_class"] = "RKW1"
     # sweeper_params["es_class_outer"] = "RKW1"
@@ -301,6 +306,7 @@ def get_problem_params(
 def setup_and_run(
     integrator,
     num_nodes,
+    skip_residual_computation,
     num_sweeps,
     max_iter,
     space_disc,
@@ -332,7 +338,7 @@ def setup_and_run(
     # set maximum number of iterations in SDC/ESDC/MLSDC/etc
     step_params = get_step_params(maxiter=max_iter)
     # set number of collocation nodes in each level
-    sweeper_params = get_sweeper_params(num_nodes=num_nodes)
+    sweeper_params = get_sweeper_params(num_nodes=num_nodes, skip_residual_computation=skip_residual_computation)
     # set step size, number of sweeps per iteration, and residual tolerance for the stopping criterion
     level_params = get_level_params(
         dt=dt,
@@ -468,7 +474,7 @@ def main():
     # define sweeper parameters
     # integrator = "IMEXEXP"
     integrator = "IMEXEXP_EXPRK"
-    num_nodes = [6, 4]
+    num_nodes = [6, 4, 2]
     num_sweeps = [1]
 
     # set step parameters
@@ -498,6 +504,7 @@ def main():
     ref_sol = "ref_sol"
     mass_lumping = True
     mass_rhs = "none"
+    skip_residual_computation = False
 
     # set time parallelism to True or emulated (False)
     truly_time_parallel = False
@@ -507,6 +514,7 @@ def main():
     err, rel_err = setup_and_run(
         integrator,
         num_nodes,
+        skip_residual_computation,
         num_sweeps,
         max_iter,
         space_disc,

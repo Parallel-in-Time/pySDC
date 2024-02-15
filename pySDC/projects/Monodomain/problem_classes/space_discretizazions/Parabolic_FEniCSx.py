@@ -204,6 +204,8 @@ class Parabolic_FEniCSx(RegisterParams):
     def set_solver_options(self):
         # we suppose that the problem is symmetric
         # first set the default options
+        self.prev_factors = []
+        self.solvers = []
         if self.dim <= 1:
             def_solver_ksp = "preonly"
             def_solver_pc = "cholesky"
@@ -224,32 +226,44 @@ class Parabolic_FEniCSx(RegisterParams):
             self.solver_M.getPC().setType(self.solver_pc)
 
     def define_solver(self):
-        self.prev_factor = -1.0
-        self.solver = PETSc.KSP().create(self.comm)
-        self.solver.setType(self.solver_ksp)
-        self.solver.getPC().setType(self.solver_pc)
+        pass
+
+    def define_solver_for_factor(self, factor):
+        solver = PETSc.KSP().create(self.comm)
+        solver.setType(self.solver_ksp)
+        solver.getPC().setType(self.solver_pc)
         if self.solver_ksp != "preonly" and hasattr(self, "lin_solv_rtol") and self.lin_solv_rtol is not None:
             assert type(self.lin_solv_rtol) is float, 'problem_params["lin_solv_rtol"] must be a float or "None"'
-            self.solver.setTolerances(rtol=self.lin_solv_rtol)
+            solver.setTolerances(rtol=self.lin_solv_rtol)
         if self.solver_ksp != "preonly" and hasattr(self, "lin_solv_max_iter") and self.lin_solv_max_iter is not None:
             assert type(self.lin_solv_max_iter) is int, 'problem_params["lin_solv_max_iter"] must be a int or "None"'
-            self.solver.setIterationNumber(its=self.lin_solv_max_iter)
+            solver.setIterationNumber(its=self.lin_solv_max_iter)
+        solver.setOperators(self.M + factor * self.K)
+        self.solvers.append(solver)
+        self.prev_factors.append(factor)
+
+    def get_solver_for_factor(self, factor):
+        if self.prev_factors == [] or not np.any(np.isclose(self.prev_factors, factor, rtol=1e-8, atol=0)):
+            self.define_solver_for_factor(factor)
+            return self.solvers[-1]
+        else:
+            close = np.isclose(self.prev_factors, factor, rtol=1e-8, atol=0)
+            index = np.argmax(close)
+            return self.solvers[index]
 
     def solve_system(self, rhs, factor, u0, t, u_sol):
-        if abs(factor - self.prev_factor) > 1e-8 * factor:
-            self.prev_factor = factor
-            self.solver.setOperators(self.M + factor * self.K)
+        solver = self.get_solver_for_factor(factor)
 
         # if self.mass_rhs != "none":
-        #     self.solver.solve(rhs.values.vector, u_sol.values.vector)
+        #     solver.solve(rhs.values.vector, u_sol.values.vector)
         # else:
         self.apply_mass_matrix(rhs, self.tmp1)
-        self.solver.solve(self.tmp1.values.vector, u_sol.values.vector)
+        solver.solve(self.tmp1.values.vector, u_sol.values.vector)
 
         return u_sol
 
     def add_disc_laplacian(self, uh, res):
-        self.K.mult(uh.values.vector, self.tmp1.values.vector)  # WARNING: DO NOT DO -u[0].values.vector HERE AND += self.interp_f BELOW SINCE IT CREATES MEMORY LEAK!!!
+        self.K.mult(uh.values.vector, self.tmp1.values.vector)  # WARNING: DO NOT DO -uh.values.vector HERE SINCE IT CREATES MEMORY LEAK!!!
         self.invert_mass_matrix(self.tmp1.values.vector, self.tmp2.values.vector)
         res -= self.tmp2
 

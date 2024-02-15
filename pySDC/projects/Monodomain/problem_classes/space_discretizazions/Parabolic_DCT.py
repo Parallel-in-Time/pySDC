@@ -12,7 +12,7 @@ class Parabolic_DCT(RegisterParams):
 
         self.define_domain()
         self.define_coefficients()
-        self.define_laplacian()
+        self.define_diffusion()
         self.define_stimulus()
         self.define_eval_points()
 
@@ -70,81 +70,68 @@ class Parabolic_DCT(RegisterParams):
 
     def define_domain(self):
         if "cube" in self.domain_name:
-            self.dom_size = ([0.0, 100.0], [0.0, 100.0], [0.0, 100.0])
+            self.dom_size = (100.0, 100.0, 100.0)
             self.dim = int(self.domain_name[5])
         else:  # cuboid
             if "smaller" in self.domain_name:
-                self.dom_size = ([0.0, 10.0], [0.0, 4.5], [0.0, 2.0])
+                self.dom_size = (10.0, 4.5, 2.0)
             elif "small" in self.domain_name:
-                self.dom_size = ([0.0, 5.0], [0.0, 3.0], [0.0, 1.0])
+                self.dom_size = (5.0, 3.0, 1.0)
             elif "very_large" in self.domain_name:
-                self.dom_size = ([0.0, 280.0], [0.0, 112.0], [0.0, 48.0])
+                self.dom_size = (280.0, 112.0, 48.0)
             elif "large" in self.domain_name:
-                self.dom_size = ([0.0, 60.0], [0.0, 21.0], [0.0, 9.0])
+                self.dom_size = (60.0, 21.0, 9.0)
             else:
-                self.dom_size = ([0.0, 20.0], [0.0, 7.0], [0.0, 3.0])
+                self.dom_size = (20.0, 7.0, 3.0)
             self.dim = int(self.domain_name[7])
 
-        # self.n_elems = 5.0 * np.max(self.dom_size) * 2**self.pre_refinements + 1
-        # self.n_elems = int(np.round(self.n_elems))
-
-        assert self.dim == 1, "only 1D implemented"
-
         self.dom_size = self.dom_size[: self.dim]
-        if self.dim == 2:
-            assert self.dom_size[0][1] == self.dom_size[1][1], "only cube implemented"
-        if self.dim == 3:
-            assert self.dom_size[0][1] == self.dom_size[1][1] and self.dom_size[0][1] == self.dom_size[2][1], "only cube implemented"
+        self.n_elems = [int(2 ** np.round(np.log2(5.0 * L * 2**self.pre_refinements))) for L in self.dom_size]
+        self.grids, self.dx = self.get_grids_dx(self.dom_size, self.n_elems)
 
-        self.L = self.dom_size[0][1]
-        # self.n_elems = int(2 ** np.round(np.log2(5.0 * self.L * 2**self.pre_refinements)))
-        # x = np.linspace(0, self.L, 2 * self.n_elems + 1)
-        # self.grids = (x[1::2],)
-        self.n_elems, self.grids = self.get_mesh(self.L, self.pre_refinements)
-        self.shape = (self.grids[0].size,)
+        self.shape = tuple(np.flip([x.size for x in self.grids]))
         self.n_dofs = int(np.prod(self.shape))
         self.init = self.n_dofs
 
-        self.dx = np.max([grid[1] - grid[0] for grid in self.grids])
+    def define_diffusion(self):
+        N = self.n_elems
+        dx = self.dx
+        dim = len(N)
+        diff_dct = self.diff[0] * (2.0 * np.cos(np.pi * np.arange(N[0]) / N[0]) - 2.0) / dx[0] ** 2
+        if dim >= 2:
+            diff_dct = diff_dct[None, :] + self.diff[1] * np.array((2.0 * np.cos(np.pi * np.arange(N[1]) / N[1]) - 2.0) / dx[1] ** 2)[:, None]
+        if dim >= 3:
+            diff_dct = diff_dct[None, :, :] + self.diff[2] * np.array((2.0 * np.cos(np.pi * np.arange(N[2]) / N[2]) - 2.0) / dx[2] ** 2)[:, None, None]
+        self.diff_dct = diff_dct
 
-        # self.fine_mesh_pre_refinements = 2
-        # self.fine_mesh_n_elems, self.fine_mesh_grids = self.get_mesh(self.L, self.fine_mesh_pre_refinements)
+    def grids_from_x(self, x):
+        dim = len(x)
+        if dim == 1:
+            return (x[0],)
+        elif dim == 2:
+            return (x[0][None, :], x[1][:, None])
+        elif dim == 3:
+            return (x[0][None, None, :], x[1][None, :, None], x[2][:, None, None])
 
-    def define_laplacian(self):
-        self.dct_lap = self.get_dct_laplacian(self.n_elems, self.grids)
-        # self.fine_mesh_dct_lap = self.get_dct_laplacian(self.fine_mesh_n_elems, self.fine_mesh_grids)
+    def get_grids_dx(self, dom_size, N):
+        x = [np.linspace(0, dom_size[i], 2 * N[i] + 1) for i in range(len(N))]
+        x = [xi[1::2] for xi in x]
+        dx = [xi[1] - xi[0] for xi in x]
+        return self.grids_from_x(x), dx
 
     def define_stimulus(self):
         self.zero_stim_vec = 0.0
         # all remaining stimulus parameters are set in MonodomainODE
 
-    def get_mesh(self, L, pre_refinements):
-        n_elems = int(2 ** np.round(np.log2(5.0 * L * 2**pre_refinements)))
-        x = np.linspace(0, L, 2 * n_elems + 1)
-        grids = (x[1::2],)
-        return n_elems, grids
-
-    def get_dct_laplacian(self, n_elems, grids):
-        x = grids[0]
-        dx = x[1] - x[0]
-        dct_lap = self.diff_l * (2.0 * np.cos(np.pi * np.arange(n_elems) / n_elems) - 2.0) / dx**2
-        return dct_lap
-
     def solve_system(self, rhs, factor, u0, t, u_sol):
-        rhs_hat = sp.fft.dct(rhs.values)
-        u_sol_hat = rhs_hat / (1.0 - factor * self.dct_lap)
-        u_sol.values[:] = sp.fft.idct(u_sol_hat)
-
-        # rhs_hat = sp.fft.dct(rhs.values)
-        # u_sol_hat = rhs_hat / (1.0 - factor * self.fine_mesh_dct_lap[: self.n_elems])
-        # u_sol.values[:] = sp.fft.idct(u_sol_hat)
+        rhs_hat = sp.fft.dctn(rhs.values.reshape(self.shape))
+        u_sol_hat = rhs_hat / (1.0 - factor * self.diff_dct)
+        u_sol.values[:] = sp.fft.idctn(u_sol_hat).ravel()
 
         return u_sol
 
     def add_disc_laplacian(self, uh, res):
-        res.values += sp.fft.idct(self.dct_lap * sp.fft.dct(uh.values))
-
-        # res.values += sp.fft.idct(self.fine_mesh_dct_lap[: self.n_elems] * sp.fft.dct(uh.values))
+        res.values += sp.fft.idctn(self.diff_dct * sp.fft.dctn(uh.values.reshape(self.shape))).ravel()
 
     def init_output(self, output_folder):
         self.output_folder = output_folder

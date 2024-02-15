@@ -10,6 +10,7 @@ namespace py = pybind11;
 #include "hodgkinhuxley.h"
 #include "courtemanche.h"
 #include "tentusscher.h"
+#include "tentusscher_smooth.h"
 #include "bistable.h"
 
 PYBIND11_MODULE(ionicmodels, m)
@@ -63,6 +64,18 @@ PYBIND11_MODULE(ionicmodels, m)
     TenTusscher2006_epiPy.def("f_stiff", &TenTusscher2006_epi::f_stiff);
     TenTusscher2006_epiPy.def("rho_f_expl", &TenTusscher2006_epi::rho_f_expl);
     TenTusscher2006_epiPy.def("rho_f_nonstiff", &TenTusscher2006_epi::rho_f_nonstiff);
+
+    py::class_<TenTusscher2006_epi_smooth, IonicModel> TenTusscher2006_epi_smoothPy(m, "TenTusscher2006_epi_smooth");
+    TenTusscher2006_epi_smoothPy.def(py::init<const double>());
+    TenTusscher2006_epi_smoothPy.def("initial_values", &TenTusscher2006_epi_smooth::initial_values, py::return_value_policy::copy);
+    TenTusscher2006_epi_smoothPy.def("f", &TenTusscher2006_epi_smooth::f);
+    TenTusscher2006_epi_smoothPy.def("f_expl", &TenTusscher2006_epi_smooth::f_expl);
+    TenTusscher2006_epi_smoothPy.def("lmbda_exp", &TenTusscher2006_epi_smooth::lmbda_exp);
+    TenTusscher2006_epi_smoothPy.def("lmbda_yinf_exp", &TenTusscher2006_epi_smooth::lmbda_yinf_exp);
+    TenTusscher2006_epi_smoothPy.def("f_nonstiff", &TenTusscher2006_epi_smooth::f_nonstiff);
+    TenTusscher2006_epi_smoothPy.def("f_stiff", &TenTusscher2006_epi_smooth::f_stiff);
+    TenTusscher2006_epi_smoothPy.def("rho_f_expl", &TenTusscher2006_epi_smooth::rho_f_expl);
+    TenTusscher2006_epi_smoothPy.def("rho_f_nonstiff", &TenTusscher2006_epi_smooth::rho_f_nonstiff);
 
     py::class_<BiStable, IonicModel> BiStablePy(m, "BiStable");
     BiStablePy.def(py::init<const double>());

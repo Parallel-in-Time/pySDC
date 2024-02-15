@@ -22,25 +22,15 @@ class DCT_to_DCT(space_transfer):
         # invoke super initialization
         super(DCT_to_DCT, self).__init__(fine_prob, coarse_prob, params)
 
-        fine_grid = self.fine_prob.parabolic.grids
-        coarse_grid = self.coarse_prob.parabolic.grids
-        ndim = len(fine_grid)
         self.norm = "forward"
 
-        assert ndim == 1, 'DCT transfer only implemented for 1D problems'
+        self.fine_shape = self.fine_prob.parabolic.shape
+        self.coarse_shape = self.coarse_prob.parabolic.shape
 
-        # we have a 1d problem
-        if ndim == 1:
-            fine_grid = fine_grid[0]
-            coarse_grid = coarse_grid[0]
-            # if number of variables is the same on both levels, Rspace and Pspace are identity
-            if fine_grid.size == coarse_grid.size:
-                self.same_grid = True
-            else:
-                self.same_grid = False
-        # we have an n-d problem
+        if self.fine_shape == self.coarse_shape:
+            self.same_grid = True
         else:
-            raise TransferError('DCT transfer only implemented for 1D problems')
+            self.same_grid = False
 
     def restrict(self, F):
         """
@@ -53,7 +43,7 @@ class DCT_to_DCT(space_transfer):
             G = F.copy()
         else:
             G = FD_Vector(self.coarse_prob.init)
-            G.values[:] = fft.idct(fft.dct(F.values, norm=self.norm), n=G.values.size, norm=self.norm)
+            G.values[:] = fft.idctn(fft.dctn(F.values.reshape(self.fine_shape), norm=self.norm), s=self.coarse_shape, norm=self.norm).ravel()
 
         return G
 
@@ -68,6 +58,6 @@ class DCT_to_DCT(space_transfer):
             F = G.copy()
         else:
             F = FD_Vector(self.fine_prob.init)
-            F.values[:] = fft.idct(fft.dct(G.values, norm=self.norm), n=F.values.size, norm=self.norm)
+            F.values[:] = fft.idctn(fft.dctn(G.values.reshape(self.coarse_shape), norm=self.norm), s=self.fine_shape, norm=self.norm).ravel()
 
         return F

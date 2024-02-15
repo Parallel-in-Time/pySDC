@@ -13,41 +13,42 @@ To be run:
 
 
 def main():
-    local = False
-    compute_reference_solution = True
+    local = True
+    compute_reference_solution = False
     max_dt = 1.0
     min_dt_pow = 1
-    max_dt_pow = 6
+    max_dt_pow = 5
     list_dts = max_dt * np.array([1.0 / 2**i for i in range(min_dt_pow, max_dt_pow + 1)])
 
     # define sweeper parameters
     options = dict()
     options["integrator"] = "IMEXEXP_EXPRK"
-    options["num_nodes"] = [6]
+    # options["integrator"] = "IMEXEXP"
+    options["num_nodes"] = [8]
     options["num_sweeps"] = [1]
 
     # set step parameters
-    options["max_iter"] = 6
+    options["max_iter"] = 2
 
     # set space discretization
-    options["space_disc"] = "FD"
+    options["space_disc"] = "FEM"
 
     # set level parameters
-    options["restol"] = 5e-15
+    options["restol"] = 5e-12
 
     # set time parallelism to True or emulated (False)
     options["truly_time_parallel"] = False
     options["n_time_ranks"] = 1
 
-    options["end_time"] = 10.0
+    options["end_time"] = 1.0
 
     # set problem parameters
-    options["domain_name"] = "cube_2D"
-    options["pre_refinements"] = [-1]
-    options["order"] = 4
+    options["domain_name"] = "03_fastl_LA"
+    options["pre_refinements"] = [0]
+    options["order"] = 1
     options["lin_solv_max_iter"] = int(1e9)
     options["lin_solv_rtol"] = 1e-12
-    options["ionic_model_name"] = "TTP"
+    options["ionic_model_name"] = "TTP_SMOOTH"
     options["read_init_val"] = True
     options["init_time"] = 2500.0
     options["enable_output"] = False
@@ -55,8 +56,9 @@ def main():
     options["output_root"] = "results_convergence"
     options["mass_lumping"] = True
     options["mass_rhs"] = "none"
+    options["skip_res"] = False
 
-    options["print_stats"] = True
+    options["print_stats"] = False
 
     slurm_options = dict()
     slurm_options["cluster"] = "eiger"
@@ -69,7 +71,7 @@ def main():
 
     dependencies = False
     job_number = 0
-    n_space_ranks = 1
+    n_space_ranks = 12
     n_time_ranks = options["n_time_ranks"]
     n_tasks = n_space_ranks * n_time_ranks
 
@@ -77,7 +79,7 @@ def main():
     local_docker_command = "docker exec -w /src/pySDC/pySDC/projects/Monodomain/run_scripts -it my_dolfinx_daint_container_monodomain_new "
 
     dt_ref_sol = list_dts[-1] / 4.0
-    nodes_ref_sol = options["num_nodes"][0] + 0
+    nodes_ref_sol = options["num_nodes"][0]
     pre_refinement_ref_sol = options["pre_refinements"][0]
     ref_sol_name = "ref_sol_pre_refinements_" + str(pre_refinement_ref_sol) + "_num_nodes_" + str(nodes_ref_sol) + "_dt_" + str(dt_ref_sol).replace(".", "p")
 

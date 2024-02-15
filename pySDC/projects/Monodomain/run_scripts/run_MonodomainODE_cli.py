@@ -16,19 +16,20 @@ def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     # define sweeper parameters
     parser.add_argument("--integrator", default="IMEXEXP_EXPRK", type=str, help="sweeper name")
-    parser.add_argument("--num_nodes", default="6", type=list_of_ints, help="list of ints (as '5,3', i.e. no brakets): number of collocation nodes per level")
+    parser.add_argument("--num_nodes", default="4", type=list_of_ints, help="list of ints (as '5,3', i.e. no brakets): number of collocation nodes per level")
     parser.add_argument("--num_sweeps", default="1", type=list_of_ints, help="list of ints: number of sweeps per level")
     parser.add_argument("--mass_rhs", default="none", type=str, help="if rhs is already multiplied by mass matrix: none, one (only potential), all (also ionic model states)")
+    parser.add_argument("--skip_res", default=False, action=argparse.BooleanOptionalAction, help="compute residual only when really needed")
     # set step parameters
     parser.add_argument("--max_iter", default=100, type=int, help="maximal number of iterations")
     # set level parameters
-    parser.add_argument("--dt", default=0.1, type=float, help="step size")
+    parser.add_argument("--dt", default=0.05, type=float, help="step size")
     parser.add_argument("--restol", default=5e-8, type=float, help="residual tolerance")
     # problem args
-    parser.add_argument("--space_disc", default="FD", type=str, help="space discretization method: FEM, FD")
-    parser.add_argument("--domain_name", default="cube_2D", type=str, help="cuboid_2D, cuboid_3D, truncated_ellipsoid,...")
-    parser.add_argument("--pre_refinements", default="-1", type=list_of_ints, help="list of ints: loads a mesh which has already been pre-refined pre_refinements times.")
-    parser.add_argument("--order", default="4", type=list_of_ints, help="list of ints: order of FEM or FD discretization")
+    parser.add_argument("--space_disc", default="FEM", type=str, help="space discretization method: FEM, FD")
+    parser.add_argument("--domain_name", default="cuboid_2D_small", type=str, help="cuboid_2D, cuboid_3D, truncated_ellipsoid,...")
+    parser.add_argument("--pre_refinements", default="0", type=list_of_ints, help="list of ints: loads a mesh which has already been pre-refined pre_refinements times.")
+    parser.add_argument("--order", default="1", type=list_of_ints, help="list of ints: order of FEM or FD discretization")
     parser.add_argument("--lin_solv_max_iter", default=1000, type=int, help="maximal number of iterations in iterative linear solver")
     parser.add_argument("--lin_solv_rtol", default=1e-8, type=float, help="residual tolerance in iterative linear solver")
     parser.add_argument("--ionic_model_name", default="TTP", type=str, help="ionic_model: HH, CRN, TTP")
@@ -51,6 +52,7 @@ def main():
     err, rel_err = setup_and_run(
         args.integrator,
         args.num_nodes,
+        args.skip_res,
         args.num_sweeps,
         args.max_iter,
         args.space_disc,

@@ -53,21 +53,6 @@ class imexexp_1st_order(sweeper):
             # compute lambda
             self.lmbda = P.lmbda_eval(L.u[0], L.time)
 
-            # improve stability? yes but doesnt converge
-            # for i in range(self.lmbda.size):
-            #     self.lmbda.val_list[i].values[:] = self.lmbda.val_list[i].values.min()
-            # ---
-
-            # another try
-            # for i in range(M):
-            #     lmbda_i=P.lmbda_eval(L.u[i + 1], L.time + c[i] * L.dt)
-            #     for j in range(self.lmbda.size):
-            #         self.lmbda.val_list[j].values[:]=np.minimum(self.lmbda.val_list[j].values, lmbda_i.val_list[j].values)
-            # ----
-            # another
-            # self.lmbda *= 1.5
-            # ----
-
             if not hasattr(self, "phi"):
                 self.phi = [[P.dtype_u(init=P.init, val=0.0) for i in range(M)] for k in range(M + 1)]
                 self.phi_one = [[P.dtype_u(init=P.init, val=0.0) for i in range(M)]]
@@ -177,7 +162,7 @@ class imexexp_1st_order(sweeper):
             self.tmp += L.u[m]
 
             # implicit solve with prefactor stemming from QI
-            L.u[m + 1] = P.solve_system(self.tmp, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
+            L.u[m + 1] = P.solve_system(self.tmp, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m], L.u[m + 1])
 
             if L.u[m + 1].is_nan_or_inf():
                 L.u[m + 1] = L.u[m].copy()
@@ -276,14 +261,22 @@ class imexexp_1st_order(sweeper):
         if not self.level.prob.constant_lambda_and_phi and outdated:
             self.lambda_and_phi_outdated = True
 
-    def compute_residual(self):
+    def compute_residual(self, stage=''):
         """
         Computation of the residual using the collocation matrix Q
+
+        Args:
+            stage (str): The current stage of the step the level belongs to
         """
 
         # get current level and problem description
         L = self.level
-        P = L.prob
+
+        # Check if we want to skip the residual computation to gain performance
+        # Keep in mind that skipping any residual computation is likely to give incorrect outputs of the residual!
+        if stage in self.params.skip_residual_computation:
+            L.status.residual = 0.0 if L.status.residual is None else L.status.residual
+            return None
 
         # check if there are new values (e.g. from a sweep)
         # assert L.status.updated
@@ -295,7 +288,8 @@ class imexexp_1st_order(sweeper):
         rel_res_norm = []
         res = self.integrate()
         for m in range(self.coll.num_nodes):
-            res[m] += L.u[0] - L.u[m + 1]
+            res[m] += L.u[0]
+            res[m] -= L.u[m + 1]
             # add tau if associated
             if L.tau[m] is not None:
                 res[m] += L.tau[m]

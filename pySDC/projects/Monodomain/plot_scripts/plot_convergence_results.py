@@ -33,7 +33,7 @@ def read_results(results_root, num_nodes_list, pre_refinements_list, max_iter_li
     return all_res
 
 
-def plot(experiment_name, domain_name, ionic_model_name, num_nodes_list, pre_refinements_list, max_iter_list, n_time_ranks_list, min_dt_pow, max_dt_pow, max_dt, **kwargs):
+def plot(experiment_name, domain_name, ionic_model_name, num_nodes_list, pre_refinements_list, max_iter_list, n_time_ranks_list, min_dt_pow, max_dt_pow, max_dt, slopes, **kwargs):
     save_plots_to_disk = True
     show_plots = True
 
@@ -62,13 +62,42 @@ def plot(experiment_name, domain_name, ionic_model_name, num_nodes_list, pre_ref
     # plot_options["yticks"]=[]
     plot_options["set_x_ticks_formatter"] = '{x:.1f}'
     # plot_options["set_y_ticks_formatter"] = '{x:.1f}'
-    if "slopes" in kwargs:
-        plot_options["slopes"] = kwargs["slopes"]
-    else:
-        plot_options["slopes"] = [4]
+    plot_options["slopes"] = slopes
     # plot_options["max_y"] = 50
     axes_data = [["level_params", 'dt'], ["perf_data", 'rel_err']]
     plot_results(all_res, axes_data, save_plots_to_disk, show_plots, output_file, plot_options)
+
+
+def fast_LA_one_level_diff_iter():
+    experiment_name = "convergence"
+    domain_name = "03_fastl_LA"
+    ionic_model_name = "TTP_SMOOTH"
+    max_dt = 1.0
+    min_dt_pow = 1
+    max_dt_pow = 5
+    n_time_ranks_list = [1, 1, 1, 1]
+
+    num_nodes_list = [[8], [8], [8]]
+    pre_refinements_list = [[0], [0], [0]]
+    max_iter_list = [4, 6, 8]
+    slopes = [4, 6, 8]
+    plot(experiment_name, domain_name, ionic_model_name, num_nodes_list, pre_refinements_list, max_iter_list, n_time_ranks_list, min_dt_pow, max_dt_pow, max_dt, slopes)
+
+
+def cube_1D_one_level_diff_iter():
+    experiment_name = "convergence"
+    domain_name = "cube_1D"
+    ionic_model_name = "TTP"
+    max_dt = 1.0
+    min_dt_pow = 1
+    max_dt_pow = 6
+    n_time_ranks_list = [1, 1, 1, 1]
+
+    num_nodes_list = [[8]]
+    pre_refinements_list = [[0]]
+    max_iter_list = [8]
+    slopes = [4, 8]
+    plot(experiment_name, domain_name, ionic_model_name, num_nodes_list, pre_refinements_list, max_iter_list, n_time_ranks_list, min_dt_pow, max_dt_pow, max_dt, slopes)
 
 
 def cuboid_1D_one_level_diff_iter():
@@ -125,11 +154,13 @@ def cube_2D_two_level_diff_iter():
     max_iter_list = [1, 2, 3]
     n_time_ranks_list = [1, 1, 1]
     slopes = [2, 4, 6]
-    plot(experiment_name, domain_name, ionic_model_name, num_nodes_list, pre_refinements_list, max_iter_list, n_time_ranks_list, min_dt_pow, max_dt_pow, max_dt, slopes=slopes)
+    plot(experiment_name, domain_name, ionic_model_name, num_nodes_list, pre_refinements_list, max_iter_list, n_time_ranks_list, min_dt_pow, max_dt_pow, max_dt, slopes)
 
 
 if __name__ == "__main__":
-    cuboid_1D_one_level_diff_iter()
+    # cuboid_1D_one_level_diff_iter()
     # cuboid_1D_two_level_diff_iter()
+    # cube_1D_one_level_diff_iter()
     # cube_2D_one_level_diff_iter()
     # cube_2D_two_level_diff_iter()
+    fast_LA_one_level_diff_iter()

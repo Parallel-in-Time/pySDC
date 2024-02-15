@@ -97,18 +97,13 @@ class fenicsx_heat_mass(ptype):
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nx, None, np.dtype('float64')))
-        self._makeAttributeAndRegister(
-            'nelems', 't0', 'family', 'order', 'refinements', 'nu', 'c', localVars=locals(), readOnly=True
-        )
+        self._makeAttributeAndRegister('nelems', 't0', 'family', 'order', 'refinements', 'nu', 'c', localVars=locals(), readOnly=True)
 
         # Create boundary condition
         fdim = domain.topology.dim - 1
-        boundary_facets = dfx.mesh.locate_entities_boundary(
-            domain, fdim, lambda x: np.full(x.shape[1], True, dtype=bool))
-        self.bc = dfx.fem.dirichletbc(PETSc.ScalarType(self.c),
-                                      dfx.fem.locate_dofs_topological(self.V, fdim, boundary_facets), self.V)
-        self.bc_hom = dfx.fem.dirichletbc(PETSc.ScalarType(0),
-                                      dfx.fem.locate_dofs_topological(self.V, fdim, boundary_facets), self.V)
+        boundary_facets = dfx.mesh.locate_entities_boundary(domain, fdim, lambda x: np.full(x.shape[1], True, dtype=bool))
+        self.bc = dfx.fem.dirichletbc(PETSc.ScalarType(self.c), dfx.fem.locate_dofs_topological(self.V, fdim, boundary_facets), self.V)
+        self.bc_hom = dfx.fem.dirichletbc(PETSc.ScalarType(0), dfx.fem.locate_dofs_topological(self.V, fdim, boundary_facets), self.V)
         self.fix_bc_for_residual = True
 
         # Stiffness term (Laplace) and mass term
@@ -127,8 +122,7 @@ class fenicsx_heat_mass(ptype):
         # set forcing term
         self.g = dfx.fem.Function(self.V)
         t = self.t0
-        self.g.interpolate(
-            lambda x: -np.sin(2 * np.pi * x[0]) * (np.sin(t) - 4 * self.nu * np.pi * np.pi * np.cos(t)))
+        self.g.interpolate(lambda x: -np.sin(2 * np.pi * x[0]) * (np.sin(t) - 4 * self.nu * np.pi * np.pi * np.cos(t)))
 
         self.tmp_u = dfx.fem.Function(self.V)
         self.tmp_f = dfx.fem.Function(self.V)
@@ -204,8 +198,7 @@ class fenicsx_heat_mass(ptype):
         self.K.mult(self.tmp_u.vector, self.tmp_f.vector)
         self.convert_from_fenicsx_vector(input=self.tmp_f, output=f.impl)
 
-        self.g.interpolate(
-            lambda x: -np.sin(2 * np.pi * x[0]) * (np.sin(t) - self.nu * np.pi * np.pi * 4 * np.cos(t)))
+        self.g.interpolate(lambda x: -np.sin(2 * np.pi * x[0]) * (np.sin(t) - self.nu * np.pi * np.pi * 4 * np.cos(t)))
         self.M.mult(self.g.vector, self.tmp_f.vector)
         self.convert_from_fenicsx_vector(input=self.tmp_f, output=f.expl)
 
@@ -231,7 +224,6 @@ class fenicsx_heat_mass(ptype):
         uM = self.dtype_u(self.init)
         self.convert_from_fenicsx_vector(input=self.tmp_f, output=uM)
         return uM
-
 
     def u_exact(self, t):
         r"""

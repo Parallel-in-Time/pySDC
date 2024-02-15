@@ -124,6 +124,8 @@ class MonodomainODE(ptype):
             self.ionic_model = ionicmodels.Courtemanche1998(self.scale_im)
         elif self.ionic_model_name in ["TenTusscher2006_epi", "TTP"]:
             self.ionic_model = ionicmodels.TenTusscher2006_epi(self.scale_im)
+        elif self.ionic_model_name in ["TTP_S", "TTP_SMOOTH"]:
+            self.ionic_model = ionicmodels.TenTusscher2006_epi_smooth(self.scale_im)
         elif self.ionic_model_name in ["BiStable", "BS"]:
             self.ionic_model = ionicmodels.BiStable(self.scale_im)
         else:
@@ -152,15 +154,15 @@ class MonodomainODE(ptype):
             # self.stim_protocol = [[0.0, 2.0], [700.0, 10.0]]
             # for FD
             # for pre_ref=-1 (remember to change the diffusion coefficeints if you are computing the initial value)
-            # self.stim_protocol = [[0.0, 2.0], [480.0, 10.0]]
+            # self.stim_protocol = [[0.0, 2.0], [420.0, 10.0]]
             # for pre_ref=0
-            # self.stim_protocol = [[0.0, 2.0], [520.0, 10.0]]
+            self.stim_protocol = [[0.0, 2.0], [400.0, 10.0]]
             # For CRN
             # for FD
             # for pre_ref=-1 (remember to change the diffusion coefficeints if you are computing the initial value)
             # self.stim_protocol = [[0.0, 2.0], [545.0, 10.0]]
             # for pre_ref=0
-            self.stim_protocol = [[0.0, 2.0], [570.0, 10.0]]
+            # self.stim_protocol = [[0.0, 2.0], [570.0, 10.0]]
             #
             self.stim_intensities = [50.0, 80.0]
             centers = [[0.0, 50.0, 50.0], [58.5, 0.0, 50.0]]
@@ -361,6 +363,8 @@ class MultiscaleMonodomainODE(MonodomainODE):
 
         if fh is None:
             fh = self.dtype_f(init=self.init, val=0.0)
+
+        u.ghostUpdate(addv="insert", mode="forward")
 
         # evaluate explicit (non stiff) part M^-1*f_nonstiff(u,t)
         if eval_expl:

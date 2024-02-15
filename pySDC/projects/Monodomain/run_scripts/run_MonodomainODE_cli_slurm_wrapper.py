@@ -116,6 +116,7 @@ def main():
     parser.add_argument("--num_nodes", default="5", type=list_of_ints, help="list of ints (as '5,3', i.e. no brakets): number of collocation nodes per level")
     parser.add_argument("--num_sweeps", default="1", type=list_of_ints, help="list of ints: number of sweeps per level")
     parser.add_argument("--mass_rhs", default="none", type=str, help="if rhs is already multiplied by mass matrix: none, one (only potential), all (also ionic model states)")
+    parser.add_argument("--skip_res", default=True, action=argparse.BooleanOptionalAction, help="compute residual only when really needed")
     # set step parameters
     parser.add_argument("--max_iter", default=100, type=int, help="maximal number of iterations")
     # set level parameters

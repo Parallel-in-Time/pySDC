@@ -46,6 +46,8 @@ class FEniCSx_Vector(object):
         else:
             raise DataError("something went wrong during %s initialization" % type(init))
 
+        self.str2petsc = {"addv": PETSc.InsertMode.ADD, "insert": PETSc.InsertMode.INSERT, "forward": PETSc.ScatterMode.FORWARD, "reverse": PETSc.ScatterMode.REVERSE}
+
     def copy(self, other=None):
         if other is None:  # return a copy of this vector
             return FEniCSx_Vector(self)
@@ -107,6 +109,10 @@ class FEniCSx_Vector(object):
         return self.values.vector.getSize()
 
     def ghostUpdate(self, addv, mode):
+        if type(addv) is str:
+            addv = self.str2petsc[addv]
+        if type(mode) is str:
+            mode = self.str2petsc[mode]
         self.values.vector.ghostUpdate(addv, mode)
 
     @property
