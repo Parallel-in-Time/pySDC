@@ -1,4 +1,5 @@
 import logging
+import warnings
 
 import numpy as np
 import scipy as sp
@@ -15,7 +16,7 @@ from pySDC.helpers.pysdc_helper import FrozenClass
 class _Pars(FrozenClass):
     def __init__(self, pars):
         self.do_coll_update = False
-        self.initial_guess = 'spread'
+        self.initial_guess = 'spread'  # default value (see also below)
         self.skip_residual_computation = ()  # gain performance at the cost of correct residual output
 
         for k, v in pars.items():
@@ -58,13 +59,13 @@ class sweeper(object):
             params['collocation_class'] = CollBase
 
         # prepare random generator for initial guess
-        if params.get('initial_guess', 'spread') == 'random':
+        if params.get('initial_guess', 'spread') == 'random':  # default value (see also above)
             params['random_seed'] = params.get('random_seed', 1984)
             self.rng = np.random.RandomState(params['random_seed'])
 
         self.params = _Pars(params)
 
-        self.coll = params['collocation_class'](**params)
+        self.coll: CollBase = params['collocation_class'](**params)
 
         if not self.coll.right_is_node and not self.params.do_coll_update:
             self.logger.warning(
@@ -116,6 +117,15 @@ class sweeper(object):
             x0 = 10 * np.ones(m)
             d = opt.minimize(rho, x0, method='Nelder-Mead')
             QDmat[1:, 1:] = np.linalg.inv(np.diag(d.x))
+            self.parallelizable = True
+        elif qd_type.startswith('MIN-SR-FLEX'):
+            m = QDmat.shape[0] - 1
+            try:
+                k = abs(int(qd_type[11:]))
+            except ValueError:
+                k = 1
+            d = min(k, m)
+            QDmat[1:, 1:] = np.diag(coll.nodes) / d
             self.parallelizable = True
         elif qd_type in ['MIN_GT', 'MIN-SR-NS']:
             m = QDmat.shape[0] - 1
@@ -271,39 +281,119 @@ class sweeper(object):
 
         elif qd_type == "MIN-SR-S":
             M = QDmat.shape[0] - 1
-            Q = coll.Qmat[1:, 1:]
-            nodes = coll.nodes
+            quadType = coll.quad_type
+            nodeType = coll.node_type
 
-            nCoeffs = M
-            if coll.quad_type in ['LOBATTO', 'RADAU-LEFT']:
-                nCoeffs -= 1
-                Q = Q[1:, 1:]
-                nodes = nodes[1:]
+            # Main function to compute coefficients
+            def computeCoeffs(M, a=None, b=None):
+                """
+                Compute diagonal coefficients for a given number of nodes M.
+                If `a` and `b` are given, then it uses as initial guess:
 
-            def func(coeffs):
-                coeffs = np.asarray(coeffs)
-                kMats = [(1 - z) * np.eye(nCoeffs) + z * np.diag(1 / coeffs) @ Q for z in nodes]
-                vals = [np.linalg.det(K) - 1 for K in kMats]
-                return np.array(vals)
+                >>> a * nodes**b / M
 
-            coeffs = sp.optimize.fsolve(func, nodes / M, xtol=1e-13)
+                If `a` is not given, then do not care about `b` and uses as initial guess:
 
-            if coll.quad_type in ['LOBATTO', 'RADAU-LEFT']:
-                coeffs = [0] + list(coeffs)
+                >>> nodes / M
+
+                Parameters
+                ----------
+                M : int
+                    Number of collocation nodes.
+                a : float, optional
+                    `a` coefficient for the initial guess.
+                b : float, optional
+                    `b` coefficient for the initial guess.
+
+                Returns
+                -------
+                coeffs : array
+                    The diagonal coefficients.
+                nodes : array
+                    The nodes associated to the current coefficients.
+                """
+                collM = CollBase(num_nodes=M, node_type=nodeType, quad_type=quadType)
+
+                QM = collM.Qmat[1:, 1:]
+                nodesM = collM.nodes
+
+                if quadType in ['LOBATTO', 'RADAU-LEFT']:
+                    QM = QM[1:, 1:]
+                    nodesM = nodesM[1:]
+                nCoeffs = len(nodesM)
+
+                if nCoeffs == 1:
+                    coeffs = np.diag(QM)
+
+                else:
+
+                    def nilpotency(coeffs):
+                        """Function verifying the nilpotency from given coefficients"""
+                        coeffs = np.asarray(coeffs)
+                        kMats = [(1 - z) * np.eye(nCoeffs) + z * np.diag(1 / coeffs) @ QM for z in nodesM]
+                        vals = [np.linalg.det(K) - 1 for K in kMats]
+                        return np.array(vals)
+
+                    if a is None:
+                        coeffs0 = nodesM / M
+                    else:
+                        coeffs0 = a * nodesM**b / M
+
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore")
+                        coeffs = sp.optimize.fsolve(nilpotency, coeffs0, xtol=1e-15)
+
+                # Handle first node equal to zero
+                if quadType in ['LOBATTO', 'RADAU-LEFT']:
+                    coeffs = np.asarray([0.0] + list(coeffs))
+                    nodesM = np.asarray([0.0] + list(nodesM))
+
+                return coeffs, nodesM
+
+            def fit(coeffs, nodes):
+                """Function fitting given coefficients to a power law"""
+
+                def lawDiff(ab):
+                    a, b = ab
+                    return np.linalg.norm(a * nodes**b - coeffs)
+
+                sol = sp.optimize.minimize(lawDiff, [1.0, 1.0], method="nelder-mead")
+                return sol.x
+
+            # Compute coefficients incrementaly
+            a, b = None, None
+            m0 = 2 if quadType in ['LOBATTO', 'RADAU-LEFT'] else 1
+            for m in range(m0, M + 1):
+                coeffs, nodes = computeCoeffs(m, a, b)
+                if m > 1:
+                    a, b = fit(coeffs * m, nodes)
 
             QDmat[1:, 1:] = np.diag(coeffs)
+            self.parallelizable = True
 
+        elif qd_type == "VDHS":
+            # coefficients from Van der Houwen & Sommeijer, 1991
+
+            m = QDmat.shape[0] - 1
+
+            if m == 4 and coll.node_type == 'LEGENDRE' and coll.quad_type == "RADAU-RIGHT":
+                coeffs = [3055 / 9532, 531 / 5956, 1471 / 8094, 1848 / 7919]
+            else:
+                raise NotImplementedError('no VDHS diagonal coefficients for this node configuration')
+
+            QDmat[1:, 1:] = np.diag(coeffs)
             self.parallelizable = True
 
         else:
             # see if an explicit preconditioner with this name is available
             try:
                 QDmat = self.get_Qdelta_explicit(coll, qd_type)
-                self.logger.warn(f'Using explicit preconditioner \"{qd_type}\" on the left hand side!')
+                self.logger.warning(f'Using explicit preconditioner \"{qd_type}\" on the left hand side!')
             except NotImplementedError:
                 raise NotImplementedError(f'qd_type implicit "{qd_type}" not implemented')
 
         # check if we got not more than a lower triangular matrix
+        # TODO : this should be a regression test, not run-time ...
         np.testing.assert_array_equal(
             np.triu(QDmat, k=1), np.zeros(QDmat.shape), err_msg='Lower triangular matrix expected!'
         )
@@ -349,6 +439,10 @@ class sweeper(object):
             if self.params.initial_guess == 'spread':
                 L.u[m] = P.dtype_u(L.u[0])
                 L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
+            # copy u[0] and RHS evaluation to all collocation nodes
+            elif self.params.initial_guess == 'copy':
+                L.u[m] = P.dtype_u(L.u[0])
+                L.f[m] = P.dtype_f(L.f[0])
             # start with zero everywhere
             elif self.params.initial_guess == 'zero':
                 L.u[m] = P.dtype_u(init=P.init, val=0.0)
