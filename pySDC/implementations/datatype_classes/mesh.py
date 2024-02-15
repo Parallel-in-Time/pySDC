@@ -80,7 +80,7 @@ class mesh(np.ndarray):
             else:
                 args.append(input_)
 
-        results = super(mesh, self).__array_ufunc__(ufunc, method, *args, **kwargs).view(mesh)
+        results = super(mesh, self).__array_ufunc__(ufunc, method, *args, **kwargs).view(type(self))
         if type(self) == type(results):
             results._comm = comm
         return results
@@ -159,18 +159,16 @@ class MultiComponentMesh(mesh):
         else:
             obj = super().__new__(cls, init, *args, **kwargs)
 
-        for comp, i in zip(cls.components, range(len(cls.components))):
-            obj.__dict__[comp] = obj[i]
         return obj
 
-    def __array_ufunc__(self, *args, **kwargs):
-        results = super().__array_ufunc__(*args, **kwargs).view(type(self))
-
-        if type(self) == type(results) and self.flags['OWNDATA']:
-            for comp, i in zip(self.components, range(len(self.components))):
-                results.__dict__[comp] = results[i]
-
-        return results
+    def __getattr__(self, name):
+        if name in self.components:
+            if self.shape[0] == len(self.components):
+                return self[self.components.index(name)]
+            else:
+                raise AttributeError(f'Cannot access {name!r} in {type(self)!r} because the shape is unexpected.')
+        else:
+            raise AttributeError(f"{type(self)!r} does not have attribute {name!r}!")
 
 
 class imex_mesh(MultiComponentMesh):
