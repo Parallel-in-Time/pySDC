@@ -1,7 +1,7 @@
 from mpi4py import MPI
 
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.core.Sweeper import sweeper
+from pySDC.core.Sweeper import sweeper, ParameterError
 import logging
 
 
@@ -127,12 +127,22 @@ class SweeperMPI(sweeper):
         # evaluate RHS at left point
         L.f[0] = P.eval_f(L.u[0], L.time)
 
+        m = self.rank
+
         if self.params.initial_guess == 'spread':
-            L.u[self.rank + 1] = P.dtype_u(L.u[0])
-            L.f[self.rank + 1] = P.eval_f(L.u[self.rank + 1], L.time + L.dt * self.coll.nodes[self.rank])
+            # copy u[0] to all collocation nodes, evaluate RHS
+            L.u[m + 1] = P.dtype_u(L.u[0])
+            L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
+        elif self.params.initial_guess == 'copy':
+            # copy u[0] and RHS evaluation to all collocation nodes
+            L.u[m + 1] = P.dtype_u(L.u[0])
+            L.f[m + 1] = P.dtype_f(L.f[0])
+        elif self.params.initial_guess == 'zero':
+            # zeros solution for u and RHS
+            L.u[m + 1] = P.dtype_u(init=P.init, val=0.0)
+            L.f[m + 1] = P.dtype_f(init=P.init, val=0.0)
         else:
-            L.u[self.rank + 1] = P.dtype_u(init=P.init, val=0.0)
-            L.f[self.rank + 1] = P.dtype_f(init=P.init, val=0.0)
+            raise ParameterError(f'initial_guess option {self.params.initial_guess} not implemented')
 
         # indicate that this level is now ready for sweeps
         L.status.unlocked = True

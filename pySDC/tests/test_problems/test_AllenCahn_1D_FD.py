@@ -172,7 +172,6 @@ def test_capture_errors_and_warnings(caplog, stop_at_nan):
     multi_periodic = allencahn_periodic_multiimplicit(**problem_params)
 
     t0 = 0.0
-    dt = 1e-3
 
     u0_front = full_front.u_exact(t0)
     u0_periodic = full_periodic.u_exact(t0)
