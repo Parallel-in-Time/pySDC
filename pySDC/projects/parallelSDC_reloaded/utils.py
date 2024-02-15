@@ -294,7 +294,10 @@ def solutionExact(tEnd, nSteps, probName, **kwargs):
     tVals = np.linspace(0, tEnd, nSteps + 1)
     uExact = [solver(0)]
     for i in range(nSteps):
-        uExact.append(solver(tVals[i + 1], uExact[-1], tVals[i]))
+        try:
+            uExact.append(solver(tVals[i + 1], uExact[-1], tVals[i]))
+        except TypeError:
+            uExact.append(solver(tVals[i + 1]))
     uExact = np.array(uExact)
     print(f"    done in {time()-tBeg:1.2f}s")
 

@@ -209,7 +209,7 @@ class ProtheroRobinsonAutonomous(ptype):
             f[1] = 1
 
             # form the function g with g(u) = 0
-            g = u - dt * self.eval_f(u, t) - rhs
+            g = u - dt * f - rhs
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)

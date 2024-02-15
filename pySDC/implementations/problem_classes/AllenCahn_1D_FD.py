@@ -230,18 +230,14 @@ class allencahn_front_fullyimplicit(ptype):
         self.work_counters['rhs']()
         return f
 
-    def u_exact(self, t, u_init=None, t_init=None):
+    def u_exact(self, t):
         r"""
-        Routine to return initial conditions or the exact solution
+        Routine to return initial condition or the exact solution
 
         Parameters
         ----------
         t : float
             Time at which the exact solution is computed.
-        u_init : pySDC.implementations.problem_classes.Lorenz.dtype_u
-            Initial conditions for getting the exact solution.
-        t_init : float
-            The starting time.
 
         Returns
         -------
@@ -672,18 +668,14 @@ class allencahn_periodic_fullyimplicit(ptype):
         self.work_counters['rhs']()
         return f
 
-    def u_exact(self, t, u_init=None, t_init=None):
+    def u_exact(self, t):
         r"""
-        Routine to return initial conditions or to approximate exact solution using ``SciPy``.
+        Routine to return initial condition or the exact solution.
 
         Parameters
         ----------
         t : float
             Time at which the approximated exact solution is computed.
-        u_init : pySDC.implementations.problem_classes.Lorenz.dtype_u
-            Initial conditions for getting the exact solution.
-        t_init : float
-            The starting time.
 
         Returns
         -------
