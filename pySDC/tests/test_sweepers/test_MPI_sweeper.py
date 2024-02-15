@@ -1,7 +1,7 @@
 import pytest
 
 
-def run(use_MPI, num_nodes, quad_type, residual_type, imex, useNCCL):
+def run(use_MPI, num_nodes, quad_type, residual_type, imex, initGuess, useNCCL):
     """
     Run a single sweep for a problem and compute the solution at the end point with a sweeper as specified.
 
@@ -11,11 +11,12 @@ def run(use_MPI, num_nodes, quad_type, residual_type, imex, useNCCL):
         quad_type (str): Type of nodes
         residual_type (str): Type of residual computation
         imex (bool): Use IMEX sweeper or not
+        initGuess (str): which initial guess should be used
+        useNCCL (bool): ...
 
     Returns:
         pySDC.Level.level: The level containing relevant data
     """
-    import numpy as np
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
     if not imex:
@@ -34,7 +35,13 @@ def run(use_MPI, num_nodes, quad_type, residual_type, imex, useNCCL):
         from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced as problem_class
 
     dt = 1e-1
-    sweeper_params = {'num_nodes': num_nodes, 'quad_type': quad_type, 'QI': 'IEpar', 'QE': 'PIC'}
+    sweeper_params = {
+        'num_nodes': num_nodes,
+        'quad_type': quad_type,
+        'QI': 'IEpar',
+        'QE': 'PIC',
+        "initial_guess": initGuess,
+    }
     problem_params = {}
 
     if useNCCL:
@@ -63,7 +70,7 @@ def run(use_MPI, num_nodes, quad_type, residual_type, imex, useNCCL):
     return controller.MS[0].levels[0]
 
 
-def individual_test(num_nodes, quad_type, residual_type, imex, useNCCL, launch=True):
+def individual_test(num_nodes, quad_type, residual_type, imex, initGuess, useNCCL, launch=True):
     """
     Make a test if the result matches between the MPI and non-MPI versions of a sweeper.
     Tests solution at the right end point and the residual.
@@ -73,6 +80,8 @@ def individual_test(num_nodes, quad_type, residual_type, imex, useNCCL, launch=T
         quad_type (str): Type of nodes
         residual_type (str): Type of residual computation
         imex (bool): Use IMEX sweeper or not
+        initGuess (str): which initial guess should be used
+        useNCCL (bool): ...
         launch (bool): If yes, it will launch `mpirun` with the required number of processes
     """
     if launch:
@@ -84,7 +93,7 @@ def individual_test(num_nodes, quad_type, residual_type, imex, useNCCL, launch=T
         my_env['PYTHONPATH'] = '../../..:.'
         my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
 
-        cmd = f"mpirun -np {num_nodes} python {__file__} --test_sweeper {num_nodes} {quad_type} {residual_type} {imex} {useNCCL}".split()
+        cmd = f"mpirun -np {num_nodes} python {__file__} --test_sweeper {num_nodes} {quad_type} {residual_type} {imex} {initGuess} {useNCCL}".split()
 
         p = subprocess.Popen(cmd, env=my_env, cwd=".")
 
@@ -105,6 +114,7 @@ def individual_test(num_nodes, quad_type, residual_type, imex, useNCCL, launch=T
             quad_type=quad_type,
             residual_type=residual_type,
             imex=imex,
+            initGuess=initGuess,
             useNCCL=useNCCL,
         )
         nonMPI = run(
@@ -113,6 +123,7 @@ def individual_test(num_nodes, quad_type, residual_type, imex, useNCCL, launch=T
             quad_type=quad_type,
             residual_type=residual_type,
             imex=imex,
+            initGuess=initGuess,
             useNCCL=False,
         )
 
@@ -125,7 +136,8 @@ def individual_test(num_nodes, quad_type, residual_type, imex, useNCCL, launch=T
 @pytest.mark.parametrize("quad_type", ['GAUSS', 'RADAU-RIGHT'])
 @pytest.mark.parametrize("residual_type", ['last_abs', 'full_rel'])
 @pytest.mark.parametrize("imex", [True, False])
-def test_sweeper(num_nodes, quad_type, residual_type, imex, launch=True):
+@pytest.mark.parametrize("initGuess", ['spread', 'copy', 'zero'])
+def test_sweeper(num_nodes, quad_type, residual_type, imex, initGuess, launch=True):
     """
     Make a test if the result matches between the MPI and non-MPI versions of a sweeper.
     Tests solution at the right end point and the residual.
@@ -137,7 +149,7 @@ def test_sweeper(num_nodes, quad_type, residual_type, imex, launch=True):
         imex (bool): Use IMEX sweeper or not
         launch (bool): If yes, it will launch `mpirun` with the required number of processes
     """
-    individual_test(num_nodes, quad_type, residual_type, imex, useNCCL=False, launch=launch)
+    individual_test(num_nodes, quad_type, residual_type, imex, initGuess, useNCCL=False, launch=launch)
 
 
 @pytest.mark.cupy
@@ -145,7 +157,8 @@ def test_sweeper(num_nodes, quad_type, residual_type, imex, launch=True):
 @pytest.mark.parametrize("quad_type", ['GAUSS', 'RADAU-RIGHT'])
 @pytest.mark.parametrize("residual_type", ['last_abs', 'full_rel'])
 @pytest.mark.parametrize("imex", [False])
-def test_sweeper_NCCL(num_nodes, quad_type, residual_type, imex, launch=True):
+@pytest.mark.parametrize("initGuess", ['spread', 'copy', 'zero'])
+def test_sweeper_NCCL(num_nodes, quad_type, residual_type, imex, initGuess, launch=True):
     """
     Make a test if the result matches between the MPI and non-MPI versions of a sweeper.
     Tests solution at the right end point and the residual.
@@ -157,13 +170,15 @@ def test_sweeper_NCCL(num_nodes, quad_type, residual_type, imex, launch=True):
         imex (bool): Use IMEX sweeper or not
         launch (bool): If yes, it will launch `mpirun` with the required number of processes
     """
-    individual_test(num_nodes, quad_type, residual_type, imex, useNCCL=True, launch=launch)
+    individual_test(num_nodes, quad_type, residual_type, imex, initGuess, useNCCL=True, launch=launch)
 
 
 if __name__ == '__main__':
     import sys
 
     if '--test_sweeper' in sys.argv:
-        imex = False if sys.argv[-2] == 'False' else True
+        imex = False if sys.argv[-3] == 'False' else True
         useNCCL = False if sys.argv[-1] == 'False' else True
-        individual_test(sys.argv[-5], sys.argv[-4], sys.argv[-3], imex=imex, useNCCL=useNCCL, launch=False)
+        individual_test(
+            sys.argv[-6], sys.argv[-5], sys.argv[-4], imex=imex, initGuess=sys.argv[-2], useNCCL=useNCCL, launch=False
+        )
