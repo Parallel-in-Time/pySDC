@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>helpers.testing module &#8212; pySDC 5.4.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=41d0e7f4"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="helpers.transfer_helper module" href="helpers.transfer_helper.html" />
+    <link rel="prev" title="helpers.stats_helper module" href="helpers.stats_helper.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="helpers.transfer_helper.html" title="helpers.transfer_helper module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="helpers.stats_helper.html" title="helpers.stats_helper module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.4.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="helpers.html" accesskey="U">helpers package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">helpers.testing module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-helpers.testing">
+<span id="helpers-testing-module"></span><h1>helpers.testing module<a class="headerlink" href="#module-helpers.testing" title="Link to this heading">¶</a></h1>
+<p>Created on Fri Feb  9 14:41:43 2024</p>
+<p>Helpers module for testing utilities</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="helpers.testing.DataChecker">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DataChecker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filePath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/testing.html#DataChecker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.testing.DataChecker" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Object allowing to quickly generate and check generated data from scripts.</p>
+<p>Here is an example of use for one given script:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pySDC.helpers.testing</span> <span class="kn">import</span> <span class="n">DataChecker</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">DataChecker</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># ... some computations ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">storeAndCheck</span><span class="p">(</span><span class="s1">&#39;solution&#39;</span><span class="p">,</span> <span class="n">solution</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># ... some other computations ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">storeAndCheck</span><span class="p">(</span><span class="s1">&#39;errors&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># ... ploting some figures</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">writeToJSON</span><span class="p">()</span> <span class="c1"># end of script</span>
+</pre></div>
+</div>
+<p>The <cite>storeAndCheck</cite> method use a unique key as first argument, and the
+data as second argument, into list format.
+Calling this method will store the data into a cache variable, and compare
+with reference data stored in <cite>_dataRef.json</cite> (if it exists, see below …).
+Finally, the <cite>writeToJSON</cite> method saves the cache variable into a json
+file <cite>_data.json</cite>.</p>
+<p>When there is no <cite>_dataRef.json</cite> in the script directory,
+executing the script output some warning telling that there is no
+reference data to compare with.
+To remove those warnings (and properly test data), just rename the
+<cite>_data.json</cite> into <cite>_dataRef.json</cite>.
+Then re-running the script will then compare the newly generated data with
+the reference data stored into <cite>_dataRef.json</cite>, and raise an error if there
+is some differences.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<ul class="simple">
+<li><p>using the <cite>__file__</cite> built-in variable is necessary to save data in the
+script directory, independently of the working directory.</p></li>
+<li><p>several script in the same directory can use the DataChecker, which
+implies that the key provided to <cite>storeAndCheck</cite> must be unique across
+all directory scripts. If not, the same key from previous directory will
+simply be overwritten in the cached variable and the <cite>_data.ref</cite> file.</p></li>
+</ul>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.testing.DataChecker.storeAndCheck">
+<span class="sig-name descname"><span class="pre">storeAndCheck</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/testing.html#DataChecker.storeAndCheck"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.testing.DataChecker.storeAndCheck" title="Link to this definition">¶</a></dt>
+<dd><p>Store data into cache, and check with eventual reference data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) – Unique key (project wide) for the data.</p></li>
+<li><p><strong>data</strong> (<em>list</em><em> or </em><em>array-like</em>) – The data that has to be stored.</p></li>
+<li><p><strong>rtol</strong> (<em>float</em>) – Relative tolerance</p></li>
+<li><p><strong>atol</strong> (<em>float</em>) – Absolute tolerance</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.testing.DataChecker.writeToJSON">
+<span class="sig-name descname"><span class="pre">writeToJSON</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/testing.html#DataChecker.writeToJSON"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.testing.DataChecker.writeToJSON" title="Link to this definition">¶</a></dt>
+<dd><p>Write cached data into a json file</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">helpers.testing module</a><ul>
+<li><a class="reference internal" href="#helpers.testing.DataChecker"><code class="docutils literal notranslate"><span class="pre">DataChecker</span></code></a><ul>
+<li><a class="reference internal" href="#helpers.testing.DataChecker.storeAndCheck"><code class="docutils literal notranslate"><span class="pre">storeAndCheck()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.testing.DataChecker.writeToJSON"><code class="docutils literal notranslate"><span class="pre">writeToJSON()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="helpers.stats_helper.html"
+                          title="previous chapter">helpers.stats_helper module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="helpers.transfer_helper.html"
+                          title="next chapter">helpers.transfer_helper module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/helpers.testing.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="helpers.transfer_helper.html" title="helpers.transfer_helper module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="helpers.stats_helper.html" title="helpers.stats_helper module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.4.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="helpers.html" >helpers package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">helpers.testing module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>

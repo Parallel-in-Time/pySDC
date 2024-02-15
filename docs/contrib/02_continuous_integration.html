@@ -117,7 +117,7 @@ This might cause the linting to fail in the GitHub action, which uses the most u
 <span id="docs-contrib-02-continuous-integration-code-testing"></span><h2>Code testing<a class="headerlink" href="#code-testing" title="Link to this heading">¶</a></h2>
 <p>This is done using <a class="reference external" href="https://docs.pytest.org/en/7.2.x/">pytest</a>, and runs all the tests written in the <code class="docutils literal notranslate"><span class="pre">pySDC/tests</span></code> folder. You can run those locally in the root folder of <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> using :</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install required packages (works also with conda/mamba)</span>
-pip<span class="w"> </span>install<span class="w"> </span>pytest&lt;<span class="m">7</span>.2.0<span class="w"> </span>pytest-benchmark<span class="w"> </span>coverage<span class="o">[</span>toml<span class="o">]</span>
+pip<span class="w"> </span>install<span class="w"> </span>pytest<span class="w"> </span>pytest-benchmark<span class="w"> </span>pytest-timeout<span class="w"> </span>coverage<span class="o">[</span>toml<span class="o">]</span>
 <span class="c1"># Run tests</span>
 pytest<span class="w"> </span>-v<span class="w"> </span>pySDC/tests
 </pre></div>
@@ -126,6 +126,11 @@ pytest<span class="w"> </span>-v<span class="w"> </span>pySDC/tests
 <div><p>🔔 Many components are tested (core, implementations, projects, tutorials, etc …) which make the testing quite long.
 When working on a single part of the code, you can run only the corresponding part of the test by specifying the test path, for instance :</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>-v<span class="w"> </span>pySDC/tests/test_nodes.py<span class="w">  </span><span class="c1"># only test nodes generation</span>
+</pre></div>
+</div>
+<p>You can also run one specific test only like this:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>-v<span class="w"> </span>pySDC/tests/test_nodes.py::test_nodesGeneration<span class="w">             </span><span class="c1"># only test_nodesGeneration function</span>
+pytest<span class="w"> </span>-v<span class="w"> </span>pySDC/tests/test_nodes.py::test_nodesGeneration<span class="o">[</span>LEGENDRE<span class="o">]</span><span class="w">   </span><span class="c1"># only test_nodesGeneration with LEGENDRE nodes</span>
 </pre></div>
 </div>
 </div></blockquote>

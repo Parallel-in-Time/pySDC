@@ -37,14 +37,13 @@
           <div class="body" role="main">
             
   <h1>Source code for implementations.problem_classes.TestEquation_0D</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pySDC.core.Problem</span> <span class="kn">import</span> <span class="n">ptype</span><span class="p">,</span> <span class="n">WorkCounter</span>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">nsp</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.core.Problem</span> <span class="kn">import</span> <span class="n">ptype</span><span class="p">,</span> <span class="n">WorkCounter</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">splu</span> <span class="k">as</span> <span class="n">_splu</span>
 
 
-<span class="c1"># noinspection PyUnusedLocal</span>
 <div class="viewcode-block" id="testequation0d">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d">[docs]</a>
 <span class="k">class</span> <span class="nc">testequation0d</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
@@ -70,10 +69,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">xp</span> <span class="o">=</span> <span class="n">np</span>
-    <span class="n">xsp</span> <span class="o">=</span> <span class="n">sp</span>
+    <span class="n">xsp</span> <span class="o">=</span> <span class="n">nsp</span>
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
-    <span class="n">splu</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">_splu</span><span class="p">)</span>
 
 <div class="viewcode-block" id="testequation0d.setup_GPU">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.setup_GPU">[docs]</a>
@@ -85,13 +83,11 @@
         <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span> <span class="kn">import</span> <span class="n">cupy_mesh</span>
         <span class="kn">import</span> <span class="nn">cupy</span> <span class="k">as</span> <span class="nn">cp</span>
         <span class="kn">import</span> <span class="nn">cupyx.scipy.sparse</span> <span class="k">as</span> <span class="nn">csp</span>
-        <span class="kn">from</span> <span class="nn">cupyx.scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">splu</span> <span class="k">as</span> <span class="n">_splu</span>
 
         <span class="bp">cls</span><span class="o">.</span><span class="n">xp</span> <span class="o">=</span> <span class="n">cp</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">xsp</span> <span class="o">=</span> <span class="n">csp</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">dtype_u</span> <span class="o">=</span> <span class="n">cupy_mesh</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">dtype_f</span> <span class="o">=</span> <span class="n">cupy_mesh</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">splu</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">_splu</span><span class="p">)</span></div>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">dtype_f</span> <span class="o">=</span> <span class="n">cupy_mesh</span></div>
 
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">u0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">useGPU</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -105,37 +101,18 @@
             <span class="n">lambdas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="nb">complex</span><span class="p">(</span><span class="n">re</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">im</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">re</span><span class="p">))]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">im</span><span class="p">))])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
                 <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">re</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">im</span><span class="p">))</span>
             <span class="p">)</span>
-
-        <span class="k">assert</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">lambdas</span><span class="p">),</span> <span class="s1">&#39;ERROR: expect flat list here, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">lambdas</span>
-        <span class="n">nvars</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lambdas</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">nvars</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ERROR: expect at least one lambda parameter here&#39;</span>
+        <span class="n">lambdas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">lambdas</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">lambdas</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;expect flat list here, got </span><span class="si">{</span><span class="n">lambdas</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">nvars</span> <span class="o">=</span> <span class="n">lambdas</span><span class="o">.</span><span class="n">size</span>
+        <span class="k">assert</span> <span class="n">nvars</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;expect at least one lambda parameter here&#39;</span>
 
         <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;complex128&#39;</span><span class="p">)))</span>
 
         <span class="n">lambdas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lambdas</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_A</span><span class="p">(</span><span class="n">lambdas</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xsp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xsp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">lambdas</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;nvars&#39;</span><span class="p">,</span> <span class="s1">&#39;lambdas&#39;</span><span class="p">,</span> <span class="s1">&#39;u0&#39;</span><span class="p">,</span> <span class="s1">&#39;useGPU&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__get_A</span><span class="p">(</span><span class="n">lambdas</span><span class="p">,</span> <span class="n">xsp</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Helper function to assemble FD matrix A in sparse format.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        lambdas : sequence of array_like</span>
-<span class="sd">            List of lambda parameters.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        scipy.sparse.csc_matrix</span>
-<span class="sd">            Diagonal matrix A in CSC format.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">A</span> <span class="o">=</span> <span class="n">xsp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">lambdas</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">A</span>
 
 <div class="viewcode-block" id="testequation0d.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.eval_f">[docs]</a>
@@ -157,7 +134,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-        <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">u</span>
+        <span class="n">f</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lambdas</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
@@ -184,10 +162,11 @@
 <span class="sd">        me : dtype_u</span>
 <span class="sd">            The solution as mesh.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-        <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xsp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
-        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">rhs</span><span class="p">)</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">lambdas</span>
+        <span class="n">L</span><span class="p">[</span><span class="n">L</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># to avoid potential divisions by zeros</span>
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">rhs</span>
+        <span class="n">me</span> <span class="o">/=</span> <span class="n">L</span>
         <span class="k">return</span> <span class="n">me</span></div>
 
 

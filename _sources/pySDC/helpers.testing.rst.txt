@@ -1,0 +1,7 @@
+helpers.testing module
+======================
+
+.. automodule:: helpers.testing
+   :members:
+   :undoc-members:
+   :show-inheritance:
