@@ -121,7 +121,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">input_</span><span class="p">)</span>
 
-        <span class="n">results</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__array_ufunc__</span><span class="p">(</span><span class="n">ufunc</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__array_ufunc__</span><span class="p">(</span><span class="n">ufunc</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
             <span class="n">results</span><span class="o">.</span><span class="n">_comm</span> <span class="o">=</span> <span class="n">comm</span>
         <span class="k">return</span> <span class="n">results</span>
@@ -200,82 +200,77 @@
 
 
 
-<div class="viewcode-block" id="imex_mesh">
-<a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.imex_mesh">[docs]</a>
-<span class="k">class</span> <span class="nc">imex_mesh</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    RHS data type for meshes with implicit and explicit components</span>
+<div class="viewcode-block" id="MultiComponentMesh">
+<a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.MultiComponentMesh">[docs]</a>
+<span class="k">class</span> <span class="nc">MultiComponentMesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generic mesh with multiple components.</span>
 
-<span class="sd">    This data type can be used to have RHS with 2 components (here implicit and explicit)</span>
+<span class="sd">    To make a specific multi-component mesh, derive from this class and list the components as strings in the class</span>
+<span class="sd">    attribute ``components``. An example:</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        impl (mesh.mesh): implicit part</span>
-<span class="sd">        expl (mesh.mesh): explicit part</span>
+<span class="sd">    ```</span>
+<span class="sd">    class imex_mesh(MultiComponentMesh):</span>
+<span class="sd">        components = [&#39;impl&#39;, &#39;expl&#39;]</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    Instantiating such a mesh will expand the mesh along an added first dimension for each component and allow access</span>
+<span class="sd">    to the components with ``.``. Continuing the above example:</span>
+
+<span class="sd">    ```</span>
+<span class="sd">    init = ((100,), None, numpy.dtype(&#39;d&#39;))</span>
+<span class="sd">    f = imex_mesh(init)</span>
+<span class="sd">    f.shape  # (2, 100)</span>
+<span class="sd">    f.expl.shape  # (100,)</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    Note that the components are not attributes of the mesh: ``&quot;expl&quot; in dir(f)`` will return False! Rather, the</span>
+<span class="sd">    components are handled in ``__getattr__``. This function is called if an attribute is not found and returns a view</span>
+<span class="sd">    on to the component if appropriate. Importantly, this means that you cannot name a component like something that</span>
+<span class="sd">    is already an attribute of ``mesh`` or ``numpy.ndarray`` because this will not result in calls to ``__getattr__``.</span>
+
+<span class="sd">    There are a couple more things to keep in mind:</span>
+<span class="sd">     - Because a ``MultiComponentMesh`` is just a ``numpy.ndarray`` with one more dimension, all components must have</span>
+<span class="sd">       the same shape.</span>
+<span class="sd">     - You can use the entire ``MultiComponentMesh`` like a ``numpy.ndarray`` in operations that accept arrays, but make</span>
+<span class="sd">       sure that you really want to apply the same operation on all components if you do.</span>
+<span class="sd">     - If you omit the assignment operator ``[:]`` during assignment, you will not change the mesh at all. Omitting this</span>
+<span class="sd">       leads to all kinds of trouble throughout the code. But here you really cannot get away without.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialization routine</span>
+    <span class="n">components</span> <span class="o">=</span> <span class="p">[]</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)</span>
-<span class="sd">                  or another imex_mesh object</span>
-<span class="sd">            val (float): an initial number (default: 0.0)</span>
-<span class="sd">        Raises:</span>
-<span class="sd">            DataError: if init is none of the types above</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">impl</span> <span class="o">=</span> <span class="n">mesh</span><span class="p">(</span><span class="n">init</span><span class="o">.</span><span class="n">impl</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="n">mesh</span><span class="p">(</span><span class="n">init</span><span class="o">.</span><span class="n">expl</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="p">(</span>
-            <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">MPI</span><span class="o">.</span><span class="n">Intracomm</span><span class="p">))</span>
-            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">impl</span> <span class="o">=</span> <span class="n">mesh</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="n">mesh</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
-        <span class="c1"># something is wrong, if none of the ones above hit</span>
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">],)</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">int</span> <span class="k">else</span> <span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">components</span><span class="p">),</span> <span class="o">*</span><span class="n">shape</span><span class="p">),</span> <span class="o">*</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">:]),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s1">&#39;something went wrong during </span><span class="si">%s</span><span class="s1"> initialization&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div>
+            <span class="n">obj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">name</span><span class="p">)]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cannot access </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s1"> in </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">!r}</span><span class="s1"> because the shape is unexpected.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">!r}</span><span class="s2"> does not have attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">!&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="imex_mesh">
+<a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.imex_mesh">[docs]</a>
+<span class="k">class</span> <span class="nc">imex_mesh</span><span class="p">(</span><span class="n">MultiComponentMesh</span><span class="p">):</span>
+    <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;impl&#39;</span><span class="p">,</span> <span class="s1">&#39;expl&#39;</span><span class="p">]</span></div>
 
 
 
 <div class="viewcode-block" id="comp2_mesh">
 <a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.comp2_mesh">[docs]</a>
-<span class="k">class</span> <span class="nc">comp2_mesh</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    RHS data type for meshes with 2 components</span>
-
-<span class="sd">    Attributes:</span>
-<span class="sd">        comp1 (mesh.mesh): first part</span>
-<span class="sd">        comp2 (mesh.mesh): second part</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialization routine</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)</span>
-<span class="sd">                  or another comp2_mesh object</span>
-<span class="sd">        Raises:</span>
-<span class="sd">            DataError: if init is none of the types above</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">comp1</span> <span class="o">=</span> <span class="n">mesh</span><span class="p">(</span><span class="n">init</span><span class="o">.</span><span class="n">comp1</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">comp2</span> <span class="o">=</span> <span class="n">mesh</span><span class="p">(</span><span class="n">init</span><span class="o">.</span><span class="n">comp2</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="p">(</span>
-            <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">MPI</span><span class="o">.</span><span class="n">Intracomm</span><span class="p">))</span>
-            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">comp1</span> <span class="o">=</span> <span class="n">mesh</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">comp2</span> <span class="o">=</span> <span class="n">mesh</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
-        <span class="c1"># something is wrong, if none of the ones above hit</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s1">&#39;something went wrong during </span><span class="si">%s</span><span class="s1"> initialization&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div>
+<span class="k">class</span> <span class="nc">comp2_mesh</span><span class="p">(</span><span class="n">MultiComponentMesh</span><span class="p">):</span>
+    <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;comp1&#39;</span><span class="p">,</span> <span class="s1">&#39;comp2&#39;</span><span class="p">]</span></div>
 
 </pre></div>
 

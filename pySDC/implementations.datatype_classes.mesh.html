@@ -49,61 +49,67 @@
   <section id="module-implementations.datatype_classes.mesh">
 <span id="implementations-datatype-classes-mesh-module"></span><h1>implementations.datatype_classes.mesh module<a class="headerlink" href="#module-implementations.datatype_classes.mesh" title="Link to this heading">¶</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.comp2_mesh">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">comp2_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#comp2_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.comp2_mesh" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>RHS data type for meshes with 2 components</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.comp2_mesh.comp1">
-<span class="sig-name descname"><span class="pre">comp1</span></span><a class="headerlink" href="#implementations.datatype_classes.mesh.comp2_mesh.comp1" title="Link to this definition">¶</a></dt>
-<dd><p>first part</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh" title="implementations.datatype_classes.mesh.mesh">mesh.mesh</a></p>
+<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.MultiComponentMesh">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultiComponentMesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#MultiComponentMesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.MultiComponentMesh" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.datatype_classes.mesh.mesh" title="implementations.datatype_classes.mesh.mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></a></p>
+<p>Generic mesh with multiple components.</p>
+<p>To make a specific multi-component mesh, derive from this class and list the components as strings in the class
+attribute <code class="docutils literal notranslate"><span class="pre">components</span></code>. An example:</p>
+<p><a href="#id1"><span class="problematic" id="id2">``</span></a>`
+class imex_mesh(MultiComponentMesh):</p>
+<blockquote>
+<div><p>components = [‘impl’, ‘expl’]</p>
+</div></blockquote>
+<p><a href="#id3"><span class="problematic" id="id4">``</span></a><a href="#id5"><span class="problematic" id="id6">`</span></a></p>
+<p>Instantiating such a mesh will expand the mesh along an added first dimension for each component and allow access
+to the components with <code class="docutils literal notranslate"><span class="pre">.</span></code>. Continuing the above example:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">init</span> <span class="pre">=</span> <span class="pre">((100,),</span> <span class="pre">None,</span> <span class="pre">numpy.dtype('d'))</span>
+<span class="pre">f</span> <span class="pre">=</span> <span class="pre">imex_mesh(init)</span>
+<span class="pre">f.shape</span>&#160; <span class="pre">#</span> <span class="pre">(2,</span> <span class="pre">100)</span>
+<span class="pre">f.expl.shape</span>&#160; <span class="pre">#</span> <span class="pre">(100,)</span>
+<span class="pre">`</span></code></p>
+<p>Note that the components are not attributes of the mesh: <code class="docutils literal notranslate"><span class="pre">&quot;expl&quot;</span> <span class="pre">in</span> <span class="pre">dir(f)</span></code> will return False! Rather, the
+components are handled in <code class="docutils literal notranslate"><span class="pre">__getattr__</span></code>. This function is called if an attribute is not found and returns a view
+on to the component if appropriate. Importantly, this means that you cannot name a component like something that
+is already an attribute of <code class="docutils literal notranslate"><span class="pre">mesh</span></code> or <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> because this will not result in calls to <code class="docutils literal notranslate"><span class="pre">__getattr__</span></code>.</p>
+<dl class="simple">
+<dt>There are a couple more things to keep in mind:</dt><dd><ul class="simple">
+<li><p>Because a <code class="docutils literal notranslate"><span class="pre">MultiComponentMesh</span></code> is just a <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> with one more dimension, all components must have
+the same shape.</p></li>
+<li><p>You can use the entire <code class="docutils literal notranslate"><span class="pre">MultiComponentMesh</span></code> like a <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> in operations that accept arrays, but make
+sure that you really want to apply the same operation on all components if you do.</p></li>
+<li><p>If you omit the assignment operator <code class="docutils literal notranslate"><span class="pre">[:]</span></code> during assignment, you will not change the mesh at all. Omitting this
+leads to all kinds of trouble throughout the code. But here you really cannot get away without.</p></li>
+</ul>
 </dd>
 </dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.MultiComponentMesh.components">
+<span class="sig-name descname"><span class="pre">components</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#implementations.datatype_classes.mesh.MultiComponentMesh.components" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.comp2_mesh">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">comp2_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#comp2_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.comp2_mesh" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.datatype_classes.mesh.MultiComponentMesh" title="implementations.datatype_classes.mesh.MultiComponentMesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiComponentMesh</span></code></a></p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.comp2_mesh.comp2">
-<span class="sig-name descname"><span class="pre">comp2</span></span><a class="headerlink" href="#implementations.datatype_classes.mesh.comp2_mesh.comp2" title="Link to this definition">¶</a></dt>
-<dd><p>second part</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh" title="implementations.datatype_classes.mesh.mesh">mesh.mesh</a></p>
-</dd>
-</dl>
-</dd></dl>
+<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.comp2_mesh.components">
+<span class="sig-name descname"><span class="pre">components</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['comp1',</span> <span class="pre">'comp2']</span></em><a class="headerlink" href="#implementations.datatype_classes.mesh.comp2_mesh.components" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.datatype_classes.mesh.imex_mesh">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">imex_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#imex_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.imex_mesh" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>RHS data type for meshes with implicit and explicit components</p>
-<p>This data type can be used to have RHS with 2 components (here implicit and explicit)</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">imex_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#imex_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.imex_mesh" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.datatype_classes.mesh.MultiComponentMesh" title="implementations.datatype_classes.mesh.MultiComponentMesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiComponentMesh</span></code></a></p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.imex_mesh.impl">
-<span class="sig-name descname"><span class="pre">impl</span></span><a class="headerlink" href="#implementations.datatype_classes.mesh.imex_mesh.impl" title="Link to this definition">¶</a></dt>
-<dd><p>implicit part</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh" title="implementations.datatype_classes.mesh.mesh">mesh.mesh</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.imex_mesh.expl">
-<span class="sig-name descname"><span class="pre">expl</span></span><a class="headerlink" href="#implementations.datatype_classes.mesh.imex_mesh.expl" title="Link to this definition">¶</a></dt>
-<dd><p>explicit part</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh" title="implementations.datatype_classes.mesh.mesh">mesh.mesh</a></p>
-</dd>
-</dl>
-</dd></dl>
+<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.imex_mesh.components">
+<span class="sig-name descname"><span class="pre">components</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['impl',</span> <span class="pre">'expl']</span></em><a class="headerlink" href="#implementations.datatype_classes.mesh.imex_mesh.components" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -193,14 +199,16 @@ Can include a communicator and expects a dtype to allow complex data.</p>
     <h3><a href="../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">implementations.datatype_classes.mesh module</a><ul>
+<li><a class="reference internal" href="#implementations.datatype_classes.mesh.MultiComponentMesh"><code class="docutils literal notranslate"><span class="pre">MultiComponentMesh</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.datatype_classes.mesh.MultiComponentMesh.components"><code class="docutils literal notranslate"><span class="pre">components</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#implementations.datatype_classes.mesh.comp2_mesh"><code class="docutils literal notranslate"><span class="pre">comp2_mesh</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.mesh.comp2_mesh.comp1"><code class="docutils literal notranslate"><span class="pre">comp1</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.mesh.comp2_mesh.comp2"><code class="docutils literal notranslate"><span class="pre">comp2</span></code></a></li>
+<li><a class="reference internal" href="#implementations.datatype_classes.mesh.comp2_mesh.components"><code class="docutils literal notranslate"><span class="pre">components</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.datatype_classes.mesh.imex_mesh"><code class="docutils literal notranslate"><span class="pre">imex_mesh</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.mesh.imex_mesh.impl"><code class="docutils literal notranslate"><span class="pre">impl</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.mesh.imex_mesh.expl"><code class="docutils literal notranslate"><span class="pre">expl</span></code></a></li>
+<li><a class="reference internal" href="#implementations.datatype_classes.mesh.imex_mesh.components"><code class="docutils literal notranslate"><span class="pre">components</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh"><code class="docutils literal notranslate"><span class="pre">mesh</span></code></a><ul>
