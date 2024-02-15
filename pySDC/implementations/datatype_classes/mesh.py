@@ -150,6 +150,41 @@ class mesh(np.ndarray):
 
 
 class MultiComponentMesh(mesh):
+    """
+    Generic mesh with multiple components.
+
+    To make a specific multi-component mesh, derive from this class and list the components as strings in the class
+    attribute `components`. An example:
+
+    ```
+    class imex_mesh(MultiComponentMesh):
+        components = ['impl', 'expl']
+    ```
+
+    Instantiating such a mesh will expand the mesh along an added first dimension for each component and allow access
+    to the components with `.`. Continuing the above example:
+
+    ```
+    init = ((100,), None, numpy.dtype('d'))
+    f = imex_mesh(init)
+    f.shape  # (2, 100)
+    f.expl.shape  # (100,)
+    ```
+
+    Note that the components are not attributes of the mesh: `"expl" in dir(f)` will return False! Rather, the
+    components are handled in `__getattr__`. This function is called if an attribute is not found and returns a view
+    on to the component if appropriate. Importantly, this means that you cannot name a component like something that
+    is already an attribute of `mesh` or `numpy.ndarray` because this will not result in calls to `__getattr__`.
+
+    There are a couple more things to keep in mind:
+     - Because a `MultiComponentMesh` is just a `numpy.ndarray` with one more dimension, all components must have the
+       same shape.
+     - You can use the entire `MultiComponentMesh` like a `numpy.ndarray` in operations that accept arrays, but make
+       sure that you really want to apply the same operation on all components if you do.
+     - If you omit the assignment operator `[:]` during assignment, you will not change the mesh at all. Omitting this
+       leads to all kinds of trouble throughout the code. But here you really cannot get away without.
+    """
+
     components = []
 
     def __new__(cls, init, *args, **kwargs):

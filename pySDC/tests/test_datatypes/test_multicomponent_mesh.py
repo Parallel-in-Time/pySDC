@@ -45,6 +45,7 @@ def test_MultiComponentMesh(shape):
     D = np.exp(A)
     assert type(D) == TestMesh
     assert np.allclose(D.a, np.exp(a))
+    assert np.allclose(D.b, zero + 1)
     assert not np.shares_memory(A, D)
 
     B *= A
