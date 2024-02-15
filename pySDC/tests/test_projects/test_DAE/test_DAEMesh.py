@@ -2,7 +2,7 @@ import pytest
 
 
 @pytest.mark.base
-@pytest.mark.parametrize('shape', [(6,), (4, 6)])
+@pytest.mark.parametrize('shape', [(6,), (4, 6), (4, 6, 8)])
 def testInitialization(shape):
     """
     Tests for a random init if initialization results in desired shape of mesh.
@@ -16,7 +16,7 @@ def testInitialization(shape):
 
     for comp in mesh.components:
         assert comp in dir(mesh), f'ERROR: DAEMesh does not have a {comp} attribute!'
-        print(mesh.__dict__[comp].size)
+
         assert np.shape(mesh.__dict__[comp]) == shape, f'ERROR: Component {comp} does not have the desired length!'
 
     assert len(mesh.components) == len(mesh), 'ERROR: Mesh does not contain two component arrays!'
@@ -45,7 +45,8 @@ def testInitializationGivenMesh():
 
 
 @pytest.mark.base
-def testArrayUFuncOperator():
+@pytest.mark.parametrize('shape', [(6,), (4, 6), (4, 6, 8)])
+def testArrayUFuncOperator(shape):
     """
     Test if overloaded __array_ufunc__ operator of datatype does what it is supposed to do.
     """
@@ -53,22 +54,25 @@ def testArrayUFuncOperator():
     import numpy as np
     from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
 
-    init = ((4, 6), None, np.dtype('float64'))
+    init = (shape, None, np.dtype('float64'))
     mesh = DAEMesh(init)
-
-    # addition with numpy array
-    mesh += np.arange(6)
-
-    for comp in mesh.components:
-        assert comp in dir(mesh), f'ERROR: After addition DAEMesh has lost {comp} attribute!'
-
-        assert np.allclose(mesh.__dict__[comp], np.arange(6)), 'ERROR: Addition did not provide desired result!'
-
-    # addition with mesh type
     mesh2 = DAEMesh(mesh)
-    mesh += mesh2
 
-    # for comp in mesh.components:
-        # assert comp in dir(mesh), f'ERROR: After addition DAEMesh has lost {comp} attribute!'
+    randomArr = np.random.random(shape)
+    mesh.diff[:] = randomArr
+    mesh2.diff[:] = 2 * randomArr
 
-        # assert np.allclose(mesh.__dict__[comp], 2 * np.arange(6)), 'ERROR: Addition did not provide desired result!'
+    subMesh = mesh - mesh2
+    assert type(subMesh) == DAEMesh
+    assert np.allclose(subMesh.diff, randomArr - 2 * randomArr)
+    assert np.allclose(subMesh.alg, 0)
+
+    addMesh = mesh + mesh2
+    assert type(addMesh) == DAEMesh
+    assert np.allclose(addMesh.diff, randomArr + 2 * randomArr)
+    assert np.allclose(addMesh.alg, 0)
+
+    sinMesh = np.sin(mesh)
+    assert type(sinMesh) == DAEMesh
+    assert np.allclose(sinMesh.diff, np.sin(randomArr))
+    assert np.allclose(sinMesh.alg, 0)
