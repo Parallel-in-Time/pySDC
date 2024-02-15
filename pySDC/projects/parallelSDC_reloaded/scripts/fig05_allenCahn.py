@@ -80,13 +80,11 @@ config = [
 
 i = 0
 for qDeltaList in config:
-
     figNameConv = f"{SCRIPT}_conv_{i}"
     figNameCost = f"{SCRIPT}_cost_{i}"
     i += 1
 
     for qDelta, sym in zip(qDeltaList, symList):
-
         try:
             params = getParamsRK(qDelta)
         except KeyError:
@@ -98,7 +96,6 @@ for qDeltaList in config:
         costs = []
 
         for nSteps in nStepsList:
-
             uRef = solutionExact(tEnd, nSteps, pName, **pParams)
 
             uSDC, counters, parallel = solutionSDC(tEnd, nSteps, params, pName, **pParams)

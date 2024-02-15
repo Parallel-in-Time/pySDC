@@ -27,7 +27,7 @@ nodeType = "LEGENDRE"
 
 
 def getError(uNum, uRef):
-    if uNum is None:
+    if uNum is None:  # pragma: no cover
         return np.inf
     return np.linalg.norm(uRef - uNum[:, 0], np.inf)
 
@@ -47,7 +47,6 @@ config = [
 # Script execution
 # -----------------------------------------------------------------------------
 for nNodes, quadType, sweepType in config:
-
     # Schemes parameters
     schemes = [
         # ("RK4", None), ("ESDIRK53", None),
@@ -68,13 +67,11 @@ for nNodes, quadType, sweepType in config:
     figName = f"{sweepType}_{quadType}"
     plt.figure(f"{sweepType}_{quadType}")
     for (qDelta, nSweeps), style in zip(schemes, styles):
-
         params = getParamsSDC(quadType, nNodes, qDelta, nSweeps, nodeType)
         label = f"$K={nSweeps}$"
         errors = []
 
         for nSteps in nStepsList:
-
             uNum, counters, parallel = solutionSDC(tEnd, nSteps, params, 'DAHLQUIST', lambdas=np.array([lam]))
 
             tVals = np.linspace(0, tEnd, nSteps + 1)

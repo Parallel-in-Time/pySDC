@@ -22,7 +22,7 @@ pName = "CHEMREC"
 
 
 def getError(uNum, uRef):
-    if uNum is None:
+    if uNum is None:  # pragma: no cover
         return np.inf
     return max(np.linalg.norm(uRef[:, 0] - uNum[:, 0], np.inf), np.linalg.norm(uRef[:, 1] - uNum[:, 1], np.inf))
 
@@ -48,10 +48,10 @@ qDeltaList = [
     'MIN-SR-FLEX',
     # "MIN3",
 ]
-nStepsList = np.array([2, 5, 10, 20, 50, 100])
+nStepsList = np.array([2, 5, 10, 20])
 nSweepList = [1, 2, 3, 4, 5, 6]
 
-qDeltaList = ['ESDIRK43', 'MIN-SR-S']
+qDeltaList = ['ESDIRK43', 'MIN-SR-S', 'MIN-SR-FLEX']
 nSweepList = [4]
 
 
@@ -63,7 +63,6 @@ dtVals = tEnd / nStepsList
 i = 0
 for qDelta in qDeltaList:
     for nSweeps in nSweepList:
-
         sym = symList[i]
         i += 1
 

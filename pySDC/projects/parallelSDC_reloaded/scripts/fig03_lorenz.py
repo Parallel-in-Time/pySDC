@@ -63,19 +63,17 @@ dtVals = tEnd / nStepsList
 
 
 def getError(uNum, uRef):
-    if uNum is None:
+    if uNum is None:  # pragma: no cover
         return np.inf
     return np.linalg.norm(np.linalg.norm(uRef - uNum, np.inf, axis=-1), np.inf)
 
 
 config = ["PIC", "MIN-SR-NS"]
 for qDelta, sym in zip(config, symList):
-
     figName = f"{SCRIPT}_conv_{qDelta}"
     plt.figure(figName)
 
     for nSweeps in [1, 2, 3, 4, 5]:
-
         params = getParamsSDC(quadType=quadType, numNodes=nNodes, nodeType=nodeType, qDeltaI=qDelta, nSweeps=nSweeps)
 
         errors = []
@@ -130,13 +128,11 @@ config = [
 
 i = 0
 for qDeltaList, nSweeps in config:
-
     figName = f"{SCRIPT}_cost_{i}"
     i += 1
     plt.figure(figName)
 
     for qDelta, sym in zip(qDeltaList, symList):
-
         try:
             params = getParamsRK(qDelta)
         except KeyError:
@@ -148,7 +144,6 @@ for qDeltaList, nSweeps in config:
         costs = []
 
         for nSteps in nStepsList:
-
             uRef = solutionExact(tEnd, nSteps, "LORENZ", u0=(5, -5, 20))
 
             uSDC, counters, parallel = solutionSDC(tEnd, nSteps, params, "LORENZ", u0=(5, -5, 20))

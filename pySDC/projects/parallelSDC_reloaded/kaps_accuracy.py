@@ -66,7 +66,6 @@ dtVals = tEnd / nStepsList
 i = 0
 for qDelta in qDeltaList:
     for nSweeps in nSweepList:
-
         sym = symList[i]
         i += 1
 

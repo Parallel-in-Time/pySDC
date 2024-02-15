@@ -68,7 +68,6 @@ dtVals = tEnd / nStepsList
 i = 0
 for qDelta in qDeltaList:
     for nSweeps in nSweepList:
-
         sym = symList[i]
         i += 1
 
@@ -76,7 +75,7 @@ for qDelta in qDeltaList:
         try:
             params = getParamsRK(qDelta)
             name = name.split('(')[0]
-            if nSweeps != nSweepList[0]:
+            if nSweeps != nSweepList[0]:  # pragma: no cover
                 continue
 
         except KeyError:

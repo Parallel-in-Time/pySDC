@@ -19,7 +19,7 @@ useRK = True
 if useRK:
     rkScheme = "ESDIRK53"
     params = getParamsRK(rkScheme)
-else:
+else:  # pragma: no cover
     nNodes = 4
     nSweeps = 5
     quadType = 'RADAU-RIGHT'

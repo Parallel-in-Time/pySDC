@@ -21,14 +21,9 @@ pName = "JACELL"
 
 
 def getError(uNum, uRef):
-    if uNum is None:
+    if uNum is None:  # pragma: no cover
         return np.inf
     return np.linalg.norm(uRef[-1] - uNum[-1], np.inf)
-    return max(
-        np.linalg.norm(uRef[:, 0] - uNum[:, 0], np.inf),
-        np.linalg.norm(uRef[:, 1] - uNum[:, 1], np.inf),
-        np.linalg.norm(uRef[:, 2] - uNum[:, 2], np.inf),
-    )
 
 
 def getCost(counters):
@@ -68,7 +63,6 @@ dtVals = tEnd / nStepsList
 i = 0
 for qDelta in qDeltaList:
     for nSweeps in nSweepList:
-
         sym = symList[i]
         i += 1
 
@@ -76,7 +70,7 @@ for qDelta in qDeltaList:
         try:
             params = getParamsRK(qDelta)
             name = name[:-3]
-            if nSweeps != nSweepList[0]:
+            if nSweeps != nSweepList[0]:  # pragma: no cover
                 continue
         except KeyError:
             params = getParamsSDC(

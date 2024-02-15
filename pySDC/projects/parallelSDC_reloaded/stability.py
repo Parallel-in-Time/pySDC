@@ -37,7 +37,7 @@ collUpdate = False
 # -----------------------------------------------------------------------------
 
 # Scheme instanciation
-if useRK:
+if useRK:  # pragma: no cover
     params = getParamsRK(rkScheme)
 else:
     params = getParamsSDC(quadType, nNodes, qDeltaType, nSweeps, nodeType, collUpdate)
@@ -54,7 +54,7 @@ stab = np.abs(uEnd)
 fig, axs = plt.subplots(1, 2)
 
 ax = plotStabContour(reVals, imVals, stab, ax=axs[0])
-if useRK:
+if useRK:  # pragma: no cover
     ax.set_title(rkScheme)
 else:
     ax.set_title(f"{qDeltaType}, K={nSweeps}")

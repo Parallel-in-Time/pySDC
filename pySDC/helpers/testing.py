@@ -83,7 +83,7 @@ class DataChecker:
                     self._dataRef = json.load(f)
             except FileNotFoundError:
                 warnings.warn(f"no reference data to check key:{key}")
-                return
+                return  # pragma: no cover
 
         assert key in self._dataRef, f"key:{key} not in reference data"
 

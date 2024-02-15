@@ -21,7 +21,6 @@ tVals = np.linspace(0, tEnd, nSteps + 1)
 tValsFine = np.linspace(0, tEnd, nSteps * 10 + 1)
 
 for pType in ["linear", "nonlinear"]:
-
     probName = "PROTHERO-ROBINSON"
     if pType == "nonlinear":
         probName += "-NL"
