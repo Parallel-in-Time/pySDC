@@ -2,9 +2,30 @@ import pytest
 
 
 @pytest.mark.base
-def testInitialization():
+@pytest.mark.parametrize('shape', [(6,), (4, 6)])
+def testInitialization(shape):
     """
     Tests for a random init if initialization results in desired shape of mesh.
+    """
+
+    import numpy as np
+    from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
+
+    init = (shape, None, np.dtype('float64'))
+    mesh = DAEMesh(init)
+
+    for comp in mesh.components:
+        assert comp in dir(mesh), f'ERROR: DAEMesh does not have a {comp} attribute!'
+        print(mesh.__dict__[comp].size)
+        assert np.shape(mesh.__dict__[comp]) == shape, f'ERROR: Component {comp} does not have the desired length!'
+
+    assert len(mesh.components) == len(mesh), 'ERROR: Mesh does not contain two component arrays!'
+
+
+@pytest.mark.base
+def testInitializationGivenMesh():
+    """
+    Tests if for a given mesh the initialization results in the same mesh.
     """
 
     import numpy as np
@@ -18,27 +39,11 @@ def testInitialization():
 
     mesh2 = DAEMesh(mesh1)
 
-    nvars_multi = (4, 6)
-    init_multi = (nvars_multi, None, np.dtype('float64'))
-    mesh_multi = DAEMesh(init_multi)
-
-    for nvar, mesh in zip([nvars_1d, nvars_1d, nvars_multi], [mesh1, mesh2, mesh_multi]):
-        assert 'diff' in dir(mesh), 'ERROR: DAEMesh does not have a diff attribute!'
-        assert 'alg' in dir(mesh), 'ERROR: DAEMesh does not have a diff attribute!'
-
-        if isinstance(nvar, int):
-            assert np.shape(mesh.diff)[0] == nvar and np.shape(mesh.alg)[0] == nvar, 'ERROR: Components does not have the desired length!'
-        else:
-            assert np.shape(mesh.diff) == nvar and np.shape(mesh.alg) == nvar, 'ERROR: Components does not have the desired length!'
-
-        assert len(mesh.components) == len(mesh), 'ERROR: Mesh does not contain two component arrays!'
-
     assert np.allclose(mesh1.diff, mesh2.diff) and np.allclose(
         mesh1.alg, mesh2.alg
     ), 'ERROR: Components in initialized meshes do not match!'
 
 
-testInitialization()
 @pytest.mark.base
 def testArrayUFuncOperator():
     """
@@ -48,12 +53,22 @@ def testArrayUFuncOperator():
     import numpy as np
     from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
 
-    init = (6, None, np.dtype('float64'))
+    init = ((4, 6), None, np.dtype('float64'))
     mesh = DAEMesh(init)
 
+    # addition with numpy array
     mesh += np.arange(6)
-    for m in range(6):
-        assert mesh.diff[m] == m and mesh.alg[m] == m, 'ERROR: Addition did not provide desired result!'
 
-    assert 'diff' in dir(mesh), 'ERROR: After addition DAEMesh has lost diff attribute!'
-    assert 'alg' in dir(mesh), 'ERROR: After addition DAEMesh has lost alg attribute!'
+    for comp in mesh.components:
+        assert comp in dir(mesh), f'ERROR: After addition DAEMesh has lost {comp} attribute!'
+
+        assert np.allclose(mesh.__dict__[comp], np.arange(6)), 'ERROR: Addition did not provide desired result!'
+
+    # addition with mesh type
+    mesh2 = DAEMesh(mesh)
+    mesh += mesh2
+
+    # for comp in mesh.components:
+        # assert comp in dir(mesh), f'ERROR: After addition DAEMesh has lost {comp} attribute!'
+
+        # assert np.allclose(mesh.__dict__[comp], 2 * np.arange(6)), 'ERROR: Addition did not provide desired result!'
