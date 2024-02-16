@@ -80,7 +80,7 @@ class mesh(np.ndarray):
             else:
                 args.append(input_)
 
-        results = super(mesh, self).__array_ufunc__(ufunc, method, *args, **kwargs).view(mesh)
+        results = super(mesh, self).__array_ufunc__(ufunc, method, *args, **kwargs).view(type(self))
         if type(self) == type(results):
             results._comm = comm
         return results
@@ -149,74 +149,66 @@ class mesh(np.ndarray):
         return self
 
 
-class imex_mesh(object):
+class MultiComponentMesh(mesh):
+    r"""
+    Generic mesh with multiple components.
+
+    To make a specific multi-component mesh, derive from this class and list the components as strings in the class
+    attribute ``components``. An example:
+
+    ```
+    class imex_mesh(MultiComponentMesh):
+        components = ['impl', 'expl']
+    ```
+
+    Instantiating such a mesh will expand the mesh along an added first dimension for each component and allow access
+    to the components with ``.``. Continuing the above example:
+
+    ```
+    init = ((100,), None, numpy.dtype('d'))
+    f = imex_mesh(init)
+    f.shape  # (2, 100)
+    f.expl.shape  # (100,)
+    ```
+
+    Note that the components are not attributes of the mesh: ``"expl" in dir(f)`` will return False! Rather, the
+    components are handled in ``__getattr__``. This function is called if an attribute is not found and returns a view
+    on to the component if appropriate. Importantly, this means that you cannot name a component like something that
+    is already an attribute of ``mesh`` or ``numpy.ndarray`` because this will not result in calls to ``__getattr__``.
+
+    There are a couple more things to keep in mind:
+     - Because a ``MultiComponentMesh`` is just a ``numpy.ndarray`` with one more dimension, all components must have
+       the same shape.
+     - You can use the entire ``MultiComponentMesh`` like a ``numpy.ndarray`` in operations that accept arrays, but make
+       sure that you really want to apply the same operation on all components if you do.
+     - If you omit the assignment operator ``[:]`` during assignment, you will not change the mesh at all. Omitting this
+       leads to all kinds of trouble throughout the code. But here you really cannot get away without.
     """
-    RHS data type for meshes with implicit and explicit components
 
-    This data type can be used to have RHS with 2 components (here implicit and explicit)
+    components = []
 
-    Attributes:
-        impl (mesh.mesh): implicit part
-        expl (mesh.mesh): explicit part
-    """
-
-    def __init__(self, init, val=0.0):
-        """
-        Initialization routine
-
-        Args:
-            init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)
-                  or another imex_mesh object
-            val (float): an initial number (default: 0.0)
-        Raises:
-            DataError: if init is none of the types above
-        """
-
-        if isinstance(init, type(self)):
-            self.impl = mesh(init.impl)
-            self.expl = mesh(init.expl)
-        elif (
-            isinstance(init, tuple)
-            and (init[1] is None or isinstance(init[1], MPI.Intracomm))
-            and isinstance(init[2], np.dtype)
-        ):
-            self.impl = mesh(init, val=val)
-            self.expl = mesh(init, val=val)
-        # something is wrong, if none of the ones above hit
+    def __new__(cls, init, *args, **kwargs):
+        if isinstance(init, tuple):
+            shape = (init[0],) if type(init[0]) is int else init[0]
+            obj = super().__new__(cls, ((len(cls.components), *shape), *init[1:]), *args, **kwargs)
         else:
-            raise DataError('something went wrong during %s initialization' % type(self))
+            obj = super().__new__(cls, init, *args, **kwargs)
 
+        return obj
 
-class comp2_mesh(object):
-    """
-    RHS data type for meshes with 2 components
-
-    Attributes:
-        comp1 (mesh.mesh): first part
-        comp2 (mesh.mesh): second part
-    """
-
-    def __init__(self, init, val=0.0):
-        """
-        Initialization routine
-
-        Args:
-            init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)
-                  or another comp2_mesh object
-        Raises:
-            DataError: if init is none of the types above
-        """
-
-        if isinstance(init, type(self)):
-            self.comp1 = mesh(init.comp1)
-            self.comp2 = mesh(init.comp2)
-        elif (
-            isinstance(init, tuple)
-            and (init[1] is None or isinstance(init[1], MPI.Intracomm))
-            and isinstance(init[2], np.dtype)
-        ):
-            self.comp1 = mesh(init, val=val)
-            self.comp2 = mesh(init, val=val)
-        # something is wrong, if none of the ones above hit
+    def __getattr__(self, name):
+        if name in self.components:
+            if self.shape[0] == len(self.components):
+                return self[self.components.index(name)]
+            else:
+                raise AttributeError(f'Cannot access {name!r} in {type(self)!r} because the shape is unexpected.')
         else:
-            raise DataError('something went wrong during %s initialization' % type(self))
+            raise AttributeError(f"{type(self)!r} does not have attribute {name!r}!")
+
+
+class imex_mesh(MultiComponentMesh):
+    components = ['impl', 'expl']
+
+
+class comp2_mesh(MultiComponentMesh):
+    components = ['comp1', 'comp2']
