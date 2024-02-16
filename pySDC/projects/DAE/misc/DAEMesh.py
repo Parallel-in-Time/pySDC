@@ -1,4 +1,4 @@
-from pySDC.implementations.datatype_classes.MultiComponentMesh import MultiComponentMesh
+from pySDC.implementations.datatype_classes.mesh import MultiComponentMesh
 
 
 class DAEMesh(MultiComponentMesh):

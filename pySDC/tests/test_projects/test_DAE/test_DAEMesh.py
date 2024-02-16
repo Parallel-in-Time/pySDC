@@ -14,10 +14,8 @@ def testInitialization(shape):
     init = (shape, None, np.dtype('float64'))
     mesh = DAEMesh(init)
 
-    for comp in mesh.components:
-        assert comp in dir(mesh), f'ERROR: DAEMesh does not have a {comp} attribute!'
-
-        assert np.shape(mesh.__dict__[comp]) == shape, f'ERROR: Component {comp} does not have the desired length!'
+    assert np.shape(mesh.diff) == shape, f'ERROR: Component diff does not have the desired length!'
+    assert np.shape(mesh.alg) == shape, f'ERROR: Component alg does not have the desired length!'
 
     assert len(mesh.components) == len(mesh), 'ERROR: Mesh does not contain two component arrays!'
 
