@@ -244,5 +244,5 @@ def plot_iterations():
 if __name__ == "__main__":
     comm = MPI.COMM_WORLD
     main(comm=comm)
-    if comm.Get_rank() == 0:
-        plot_iterations()
+    # if comm.Get_rank() == 0:
+    #     plot_iterations()
