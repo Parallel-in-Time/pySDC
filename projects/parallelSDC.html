@@ -570,15 +570,15 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
     <span class="n">main</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">plot_iterations</span><span class="p">()</span>
+    <span class="c1"># if comm.Get_rank() == 0:</span>
+    <span class="c1">#     plot_iterations()</span>
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_heat.png"><img alt="../_images/parallelSDC_preconditioner_MPI_heat.png" src="../_images/parallelSDC_preconditioner_MPI_heat.png" style="width: 269.0px; height: 185.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_advection.png"><img alt="../_images/parallelSDC_preconditioner_MPI_advection.png" src="../_images/parallelSDC_preconditioner_MPI_advection.png" style="width: 269.0px; height: 185.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" src="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" style="width: 269.0px; height: 187.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../_images/parallelSDC_preconditioner_MPI_fisher.png" src="../_images/parallelSDC_preconditioner_MPI_fisher.png" style="width: 269.0px; height: 188.0px;" /></a>
+<a class="reference internal image-reference" href="../../data/parallelSDC_preconditioner_MPI_heat.png"><img alt="../../data/parallelSDC_preconditioner_MPI_heat.png" src="../../data/parallelSDC_preconditioner_MPI_heat.png" /></a>
+<a class="reference internal image-reference" href="../../data/parallelSDC_preconditioner_MPI_advection.png"><img alt="../../data/parallelSDC_preconditioner_MPI_advection.png" src="../../data/parallelSDC_preconditioner_MPI_advection.png" /></a>
+<a class="reference internal image-reference" href="../../data/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="../../data/parallelSDC_preconditioner_MPI_vanderpol.png" src="../../data/parallelSDC_preconditioner_MPI_vanderpol.png" /></a>
+<a class="reference internal image-reference" href="../../data/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../../data/parallelSDC_preconditioner_MPI_fisher.png" src="../../data/parallelSDC_preconditioner_MPI_fisher.png" /></a>
 </section>
 <section id="simplified-newton-for-nonlinear-problems">
 <h2>Simplified Newton for nonlinear problems<a class="headerlink" href="#simplified-newton-for-nonlinear-problems" title="Link to this heading">¶</a></h2>
@@ -1227,15 +1227,15 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
     <span class="n">main</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">plot_iterations</span><span class="p">()</span>
+    <span class="c1"># if comm.Get_rank() == 0:</span>
+    <span class="c1">#     plot_iterations()</span>
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_heat.png"><img alt="../_images/parallelSDC_preconditioner_MPI_heat.png" src="../_images/parallelSDC_preconditioner_MPI_heat.png" style="width: 269.0px; height: 185.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_advection.png"><img alt="../_images/parallelSDC_preconditioner_MPI_advection.png" src="../_images/parallelSDC_preconditioner_MPI_advection.png" style="width: 269.0px; height: 185.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" src="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" style="width: 269.0px; height: 187.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../_images/parallelSDC_preconditioner_MPI_fisher.png" src="../_images/parallelSDC_preconditioner_MPI_fisher.png" style="width: 269.0px; height: 188.0px;" /></a>
+<a class="reference internal image-reference" href="../../data/parallelSDC_preconditioner_MPI_heat.png"><img alt="../../data/parallelSDC_preconditioner_MPI_heat.png" src="../../data/parallelSDC_preconditioner_MPI_heat.png" /></a>
+<a class="reference internal image-reference" href="../../data/parallelSDC_preconditioner_MPI_advection.png"><img alt="../../data/parallelSDC_preconditioner_MPI_advection.png" src="../../data/parallelSDC_preconditioner_MPI_advection.png" /></a>
+<a class="reference internal image-reference" href="../../data/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="../../data/parallelSDC_preconditioner_MPI_vanderpol.png" src="../../data/parallelSDC_preconditioner_MPI_vanderpol.png" /></a>
+<a class="reference internal image-reference" href="../../data/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../../data/parallelSDC_preconditioner_MPI_fisher.png" src="../../data/parallelSDC_preconditioner_MPI_fisher.png" /></a>
 </section>
 </section>
 
