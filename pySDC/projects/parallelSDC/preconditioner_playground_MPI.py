@@ -189,9 +189,10 @@ def plot_iterations():
     color_list = ['r', 'g', 'b', 'c', 'm']
 
     plt_helper.setup_mpl()
-
+    print('post setup')
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
     for setup in setup_list:
+        print('setup')
         plt_helper.newfig(textwidth=238.96, scale=0.89)
 
         for qd_type, marker, color in zip(qd_type_list, marker_list, color_list):
@@ -244,5 +245,5 @@ def plot_iterations():
 if __name__ == "__main__":
     comm = MPI.COMM_WORLD
     main(comm=comm)
-    # if comm.Get_rank() == 0:
-    #     plot_iterations()
+    if comm.Get_rank() == 0:
+        plot_iterations()
