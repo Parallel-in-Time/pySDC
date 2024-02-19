@@ -5,7 +5,7 @@ channels:
 dependencies:
   - numpy>=1.15.4
   - scipy>=0.17.1
-  - matplotlib>=3.0
+  - matplotlib>=3.0,<=3.5.3
   - dill>=0.2.6
   - mpich
   - mpi4py-fft>=2.0.2
