@@ -228,9 +228,10 @@
     <span class="n">color_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">]</span>
 
     <span class="n">plt_helper</span><span class="o">.</span><span class="n">setup_mpl</span><span class="p">()</span>
-
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;post setup&#39;</span><span class="p">)</span>
     <span class="c1"># loop over setups and Q-delta types: one figure per setup, all Qds in one plot</span>
     <span class="k">for</span> <span class="n">setup</span> <span class="ow">in</span> <span class="n">setup_list</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;setup&#39;</span><span class="p">)</span>
         <span class="n">plt_helper</span><span class="o">.</span><span class="n">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="o">=</span><span class="mf">238.96</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.89</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">qd_type</span><span class="p">,</span> <span class="n">marker</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">qd_type_list</span><span class="p">,</span> <span class="n">marker_list</span><span class="p">,</span> <span class="n">color_list</span><span class="p">):</span>
@@ -283,15 +284,15 @@
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
     <span class="n">main</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span>
-    <span class="c1"># if comm.Get_rank() == 0:</span>
-    <span class="c1">#     plot_iterations()</span>
+    <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">plot_iterations</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../../data/parallelSDC_preconditioner_MPI_heat.png"><img alt="../../data/parallelSDC_preconditioner_MPI_heat.png" src="../../data/parallelSDC_preconditioner_MPI_heat.png" /></a>
-<a class="reference internal image-reference" href="../../data/parallelSDC_preconditioner_MPI_advection.png"><img alt="../../data/parallelSDC_preconditioner_MPI_advection.png" src="../../data/parallelSDC_preconditioner_MPI_advection.png" /></a>
-<a class="reference internal image-reference" href="../../data/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="../../data/parallelSDC_preconditioner_MPI_vanderpol.png" src="../../data/parallelSDC_preconditioner_MPI_vanderpol.png" /></a>
-<a class="reference internal image-reference" href="../../data/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../../data/parallelSDC_preconditioner_MPI_fisher.png" src="../../data/parallelSDC_preconditioner_MPI_fisher.png" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_heat.png"><img alt="../_images/parallelSDC_preconditioner_MPI_heat.png" src="../_images/parallelSDC_preconditioner_MPI_heat.png" style="width: 269.0px; height: 185.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_advection.png"><img alt="../_images/parallelSDC_preconditioner_MPI_advection.png" src="../_images/parallelSDC_preconditioner_MPI_advection.png" style="width: 269.0px; height: 185.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" src="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" style="width: 269.0px; height: 187.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../_images/parallelSDC_preconditioner_MPI_fisher.png" src="../_images/parallelSDC_preconditioner_MPI_fisher.png" style="width: 269.0px; height: 188.0px;" /></a>
 
 
             <div class="clearer"></div>
