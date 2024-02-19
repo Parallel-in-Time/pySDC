@@ -1,6 +1,7 @@
 import pytest
 
 
+@pytest.mark.base
 def test_Brusselator():
     """
     Test the implementation of the 2D Brusselator by doing an IMEX Euler step forward and then an explicit Euler step
