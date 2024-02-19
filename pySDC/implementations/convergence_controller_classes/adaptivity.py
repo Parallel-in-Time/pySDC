@@ -179,7 +179,8 @@ class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
                 description=description,
                 params={},
             )
-        self.interpolator = controller.convergence_controllers[-1]
+        if self.params.interpolate_between_restarts:
+            self.interpolator = controller.convergence_controllers[-1]
         return None
 
     def get_convergence(self, controller, S, **kwargs):
