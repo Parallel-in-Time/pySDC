@@ -31,8 +31,7 @@ implemented.
 -   Continuous integration via [GitHub
     Actions](https://github.com/Parallel-in-Time/pySDC/actions) and
     [Gitlab CI](https://gitlab.hzdr.de/r.speck/pysdc/-/pipelines)
--   Fully compatible with Python 3.7 - 3.10, runs at least on Ubuntu and
-    MacOS
+-   Fully compatible with Python 3.8 - 3.10, runs at least on Ubuntu
 
 ## Getting started
 
