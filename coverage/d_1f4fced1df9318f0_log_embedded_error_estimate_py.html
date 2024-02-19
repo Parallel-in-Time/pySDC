@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_1f4fced1df9318f0_log_errors_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -92,7 +92,7 @@
     <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t">        <span class="nam">L</span> <span class="op">=</span> <span class="nam">step</span><span class="op">.</span><span class="nam">levels</span><span class="op">[</span><span class="nam">level_number</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t">        <span class="key">for</span> <span class="nam">flavour</span> <span class="key">in</span> <span class="op">[</span><span class="str">''</span><span class="op">,</span> <span class="str">'_collocation'</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">            <span class="key">if</span> <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">f'error_embedded_estimate{flavour}'</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">            <span class="key">if</span> <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="fst">f'</span><span class="fst">error_embedded_estimate</span><span class="op">{</span><span class="nam">flavour</span><span class="op">}</span><span class="fst">'</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t">                <span class="key">if</span> <span class="nam">flavour</span> <span class="op">==</span> <span class="str">'_collocation'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t">                    <span class="nam">iter</span><span class="op">,</span> <span class="nam">value</span> <span class="op">=</span> <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">error_embedded_estimate_collocation</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t">                <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -105,7 +105,7 @@
     <p class="pln"><span class="n"><a id="t23" href="#t23">23</a></span><span class="t">                    <span class="nam">level</span><span class="op">=</span><span class="nam">L</span><span class="op">.</span><span class="nam">level_index</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t">                    <span class="nam">iter</span><span class="op">=</span><span class="nam">iter</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t">                    <span class="nam">sweep</span><span class="op">=</span><span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">sweep</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t26" href="#t26">26</a></span><span class="t">                    <span class="nam">type</span><span class="op">=</span><span class="str">f'error_embedded_estimate{flavour}{appendix}'</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t26" href="#t26">26</a></span><span class="t">                    <span class="nam">type</span><span class="op">=</span><span class="fst">f'</span><span class="fst">error_embedded_estimate</span><span class="op">{</span><span class="nam">flavour</span><span class="op">}</span><span class="op">{</span><span class="nam">appendix</span><span class="op">}</span><span class="fst">'</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t">                    <span class="nam">value</span><span class="op">=</span><span class="nam">value</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t">                <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t29" href="#t29">29</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -157,7 +157,7 @@
             <a id="nextFileLink" class="nav" href="d_1f4fced1df9318f0_log_errors_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
     </div>
 </footer>

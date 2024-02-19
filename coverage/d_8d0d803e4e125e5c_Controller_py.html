@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_8d0d803e4e125e5c_ConvergenceController_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -256,7 +256,7 @@
     <p class="run"><span class="n"><a id="t174" href="#t174">174</a></span><span class="t">                    <span class="nam">out</span> <span class="op">+=</span> <span class="str">'--> %s = %s\n'</span> <span class="op">%</span> <span class="op">(</span><span class="nam">k</span><span class="op">,</span> <span class="nam">v</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t175" href="#t175">175</a></span><span class="t">                <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t176" href="#t176">176</a></span><span class="t">                    <span class="nam">out</span> <span class="op">+=</span> <span class="str">'    %s = %s\n'</span> <span class="op">%</span> <span class="op">(</span><span class="nam">k</span><span class="op">,</span> <span class="nam">v</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t177" href="#t177">177</a></span><span class="t">        <span class="nam">out</span> <span class="op">+=</span> <span class="str">f'    Number of steps: {step.status.time_size}\n'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t177" href="#t177">177</a></span><span class="t">        <span class="nam">out</span> <span class="op">+=</span> <span class="fst">f'</span><span class="fst">    Number of steps: </span><span class="op">{</span><span class="nam">step</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">time_size</span><span class="op">}</span><span class="fst">\n</span><span class="fst">'</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t178" href="#t178">178</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t179" href="#t179">179</a></span><span class="t">        <span class="nam">out</span> <span class="op">+=</span> <span class="str">'    Level: %s\n'</span> <span class="op">%</span> <span class="nam">step</span><span class="op">.</span><span class="nam">levels</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">__class__</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t180" href="#t180">180</a></span><span class="t">        <span class="key">for</span> <span class="nam">L</span> <span class="key">in</span> <span class="nam">step</span><span class="op">.</span><span class="nam">levels</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -407,7 +407,7 @@
     <p class="pln"><span class="n"><a id="t325" href="#t325">325</a></span><span class="t">            <span class="key">else</span><span class="op">:</span>  <span class="com"># added as dependency</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t326" href="#t326">326</a></span><span class="t">                <span class="nam">user_added</span> <span class="op">=</span> <span class="str">' -> '</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t327" href="#t327">327</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t328" href="#t328">328</a></span><span class="t">            <span class="nam">out</span> <span class="op">+=</span> <span class="str">f'\n{user_added}|{i:3} | {C.params.control_order:5} | {type(C).__name__}'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t328" href="#t328">328</a></span><span class="t">            <span class="nam">out</span> <span class="op">+=</span> <span class="fst">f'</span><span class="fst">\n</span><span class="op">{</span><span class="nam">user_added</span><span class="op">}</span><span class="fst">|</span><span class="op">{</span><span class="nam">i</span><span class="op">:</span><span class="fst">3</span><span class="op">}</span><span class="fst"> | </span><span class="op">{</span><span class="nam">C</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">control_order</span><span class="op">:</span><span class="fst">5</span><span class="op">}</span><span class="fst"> | </span><span class="op">{</span><span class="nam">type</span><span class="op">(</span><span class="nam">C</span><span class="op">)</span><span class="op">.</span><span class="nam">__name__</span><span class="op">}</span><span class="fst">'</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t329" href="#t329">329</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t330" href="#t330">330</a></span><span class="t">        <span class="key">return</span> <span class="nam">out</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t331" href="#t331">331</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -431,7 +431,7 @@
             <a id="nextFileLink" class="nav" href="d_8d0d803e4e125e5c_ConvergenceController_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
     </div>
 </footer>

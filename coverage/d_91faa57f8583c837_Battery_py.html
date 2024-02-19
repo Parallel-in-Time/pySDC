@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_91faa57f8583c837_Boussinesq_2D_FD_imex_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -153,7 +153,7 @@
     <p class="mis show_mis"><span class="n"><a id="t71" href="#t71">71</a></span><span class="t">            <span class="key">elif</span> <span class="nam">ncapacitors</span> <span class="op">==</span> <span class="num">2</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t72" href="#t72">72</a></span><span class="t">                <span class="nam">C</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">array</span><span class="op">(</span><span class="op">[</span><span class="num">1.0</span><span class="op">,</span> <span class="num">1.0</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t73" href="#t73">73</a></span><span class="t">            <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t74" href="#t74">74</a></span><span class="t">                <span class="key">raise</span> <span class="nam">ParameterError</span><span class="op">(</span><span class="str">f"No default value for C is set up for ncapacitors={ncapacitors}"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t74" href="#t74">74</a></span><span class="t">                <span class="key">raise</span> <span class="nam">ParameterError</span><span class="op">(</span><span class="fst">f"</span><span class="fst">No default value for C is set up for ncapacitors=</span><span class="op">{</span><span class="nam">ncapacitors</span><span class="op">}</span><span class="fst">"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t75" href="#t75">75</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t76" href="#t76">76</a></span><span class="t">            <span class="nam">msgC</span> <span class="op">=</span> <span class="str">"ERROR for capacitance C: C has to be an np.ndarray and/or length of array needs to be equal to number of capacitances"</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t77" href="#t77">77</a></span><span class="t">            <span class="key">assert</span> <span class="nam">all</span><span class="op">(</span><span class="op">[</span><span class="nam">type</span><span class="op">(</span><span class="nam">C</span><span class="op">)</span> <span class="op">==</span> <span class="nam">np</span><span class="op">.</span><span class="nam">ndarray</span><span class="op">,</span> <span class="nam">np</span><span class="op">.</span><span class="nam">shape</span><span class="op">(</span><span class="nam">C</span><span class="op">)</span><span class="op">[</span><span class="num">0</span><span class="op">]</span> <span class="op">==</span> <span class="nam">n</span><span class="op">]</span><span class="op">)</span><span class="op">,</span> <span class="nam">msgC</span>&nbsp;</span><span class="r"></span></p>
@@ -164,7 +164,7 @@
     <p class="mis show_mis"><span class="n"><a id="t82" href="#t82">82</a></span><span class="t">            <span class="key">elif</span> <span class="nam">ncapacitors</span> <span class="op">==</span> <span class="num">2</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t83" href="#t83">83</a></span><span class="t">                <span class="nam">V_ref</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">array</span><span class="op">(</span><span class="op">[</span><span class="num">1.0</span><span class="op">,</span> <span class="num">1.0</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t84" href="#t84">84</a></span><span class="t">            <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t85" href="#t85">85</a></span><span class="t">                <span class="key">raise</span> <span class="nam">ParameterError</span><span class="op">(</span><span class="str">f"No default value for V_ref is set up for ncapacitors={ncapacitors}"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t85" href="#t85">85</a></span><span class="t">                <span class="key">raise</span> <span class="nam">ParameterError</span><span class="op">(</span><span class="fst">f"</span><span class="fst">No default value for V_ref is set up for ncapacitors=</span><span class="op">{</span><span class="nam">ncapacitors</span><span class="op">}</span><span class="fst">"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t86" href="#t86">86</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t87" href="#t87">87</a></span><span class="t">            <span class="nam">assertions_V_ref_1</span> <span class="op">=</span> <span class="op">[</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t88" href="#t88">88</a></span><span class="t">                <span class="nam">type</span><span class="op">(</span><span class="nam">V_ref</span><span class="op">)</span> <span class="op">==</span> <span class="nam">np</span><span class="op">.</span><span class="nam">ndarray</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
@@ -671,7 +671,7 @@
             <a id="nextFileLink" class="nav" href="d_91faa57f8583c837_Boussinesq_2D_FD_imex_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
     </div>
 </footer>

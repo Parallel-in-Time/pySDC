@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_c28af68f8f845bbd_estimate_contraction_factor_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -178,7 +178,7 @@
     <p class="run"><span class="n"><a id="t96" href="#t96">96</a></span><span class="t">            <span class="key">if</span> <span class="nam">crash</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t97" href="#t97">97</a></span><span class="t">                <span class="key">break</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t98" href="#t98">98</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t99" href="#t99">99</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">communicate_crash</span><span class="op">(</span><span class="nam">crash</span><span class="op">,</span> <span class="nam">msg</span><span class="op">=</span><span class="str">f'Solution exceeds bounds! Crashing code at {S.time}!'</span><span class="op">,</span> <span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t99" href="#t99">99</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">communicate_crash</span><span class="op">(</span><span class="nam">crash</span><span class="op">,</span> <span class="nam">msg</span><span class="op">=</span><span class="fst">f'</span><span class="fst">Solution exceeds bounds! Crashing code at </span><span class="op">{</span><span class="nam">S</span><span class="op">.</span><span class="nam">time</span><span class="op">}</span><span class="fst">!</span><span class="fst">'</span><span class="op">,</span> <span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t100" href="#t100">100</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t101" href="#t101">101</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t102" href="#t102">102</a></span><span class="t"><span class="key">class</span> <span class="nam">StopAtMaxRuntime</span><span class="op">(</span><span class="nam">CrashBase</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -224,7 +224,7 @@
     <p class="pln"><span class="n"><a id="t142" href="#t142">142</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t143" href="#t143">143</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">communicate_crash</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t144" href="#t144">144</a></span><span class="t">            <span class="nam">crash</span><span class="op">=</span><span class="nam">abs</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">t0</span> <span class="op">-</span> <span class="nam">time</span><span class="op">.</span><span class="nam">perf_counter</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">></span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">max_runtime</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t145" href="#t145">145</a></span><span class="t">            <span class="nam">msg</span><span class="op">=</span><span class="str">f'Exceeding max. runtime of {self.params.max_runtime}s! Crashing code at {S.time}!'</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t145" href="#t145">145</a></span><span class="t">            <span class="nam">msg</span><span class="op">=</span><span class="fst">f'</span><span class="fst">Exceeding max. runtime of </span><span class="op">{</span><span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">max_runtime</span><span class="op">}</span><span class="fst">s! Crashing code at </span><span class="op">{</span><span class="nam">S</span><span class="op">.</span><span class="nam">time</span><span class="op">}</span><span class="fst">!</span><span class="fst">'</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t146" href="#t146">146</a></span><span class="t">            <span class="op">**</span><span class="nam">kwargs</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t147" href="#t147">147</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
 </main>
@@ -236,7 +236,7 @@
             <a id="nextFileLink" class="nav" href="d_c28af68f8f845bbd_estimate_contraction_factor_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
     </div>
 </footer>

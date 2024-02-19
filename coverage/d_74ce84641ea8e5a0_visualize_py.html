@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_66292b4c3b6b9cb6_battery_model_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -148,8 +148,8 @@
     <p class="pln"><span class="n"><a id="t66" href="#t66">66</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t67" href="#t67">67</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t68" href="#t68">68</a></span><span class="t">    <span class="com"># get data and json files</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t69" href="#t69">69</a></span><span class="t">    <span class="nam">json_files</span> <span class="op">=</span> <span class="nam">sorted</span><span class="op">(</span><span class="nam">glob</span><span class="op">.</span><span class="nam">glob</span><span class="op">(</span><span class="str">f'./data/{name}_*.json'</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t70" href="#t70">70</a></span><span class="t">    <span class="nam">data_files</span> <span class="op">=</span> <span class="nam">sorted</span><span class="op">(</span><span class="nam">glob</span><span class="op">.</span><span class="nam">glob</span><span class="op">(</span><span class="str">f'./data/{name}_*.dat'</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t69" href="#t69">69</a></span><span class="t">    <span class="nam">json_files</span> <span class="op">=</span> <span class="nam">sorted</span><span class="op">(</span><span class="nam">glob</span><span class="op">.</span><span class="nam">glob</span><span class="op">(</span><span class="fst">f'</span><span class="fst">./data/</span><span class="op">{</span><span class="nam">name</span><span class="op">}</span><span class="fst">_*.json</span><span class="fst">'</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t70" href="#t70">70</a></span><span class="t">    <span class="nam">data_files</span> <span class="op">=</span> <span class="nam">sorted</span><span class="op">(</span><span class="nam">glob</span><span class="op">.</span><span class="nam">glob</span><span class="op">(</span><span class="fst">f'</span><span class="fst">./data/</span><span class="op">{</span><span class="nam">name</span><span class="op">}</span><span class="fst">_*.dat</span><span class="fst">'</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t71" href="#t71">71</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t72" href="#t72">72</a></span><span class="t">    <span class="com"># setup plotting</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t73" href="#t73">73</a></span><span class="t">    <span class="nam">plt_helper</span><span class="op">.</span><span class="nam">setup_mpl</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -159,7 +159,7 @@
     <p class="mis show_mis"><span class="n"><a id="t77" href="#t77">77</a></span><span class="t">            <span class="nam">obj</span> <span class="op">=</span> <span class="nam">json</span><span class="op">.</span><span class="nam">load</span><span class="op">(</span><span class="nam">fp</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t78" href="#t78">78</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t79" href="#t79">79</a></span><span class="t">        <span class="nam">index</span> <span class="op">=</span> <span class="nam">json_file</span><span class="op">.</span><span class="nam">split</span><span class="op">(</span><span class="str">'_'</span><span class="op">)</span><span class="op">[</span><span class="num">1</span><span class="op">]</span><span class="op">.</span><span class="nam">split</span><span class="op">(</span><span class="str">'.'</span><span class="op">)</span><span class="op">[</span><span class="num">0</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t80" href="#t80">80</a></span><span class="t">        <span class="nam">print</span><span class="op">(</span><span class="str">f'Working on step {index}...'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t80" href="#t80">80</a></span><span class="t">        <span class="nam">print</span><span class="op">(</span><span class="fst">f'</span><span class="fst">Working on step </span><span class="op">{</span><span class="nam">index</span><span class="op">}</span><span class="fst">...</span><span class="fst">'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t81" href="#t81">81</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t82" href="#t82">82</a></span><span class="t">        <span class="com"># get data and format</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t83" href="#t83">83</a></span><span class="t">        <span class="nam">array</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">fromfile</span><span class="op">(</span><span class="nam">data_file</span><span class="op">,</span> <span class="nam">dtype</span><span class="op">=</span><span class="nam">obj</span><span class="op">[</span><span class="str">'datatype'</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -175,7 +175,7 @@
     <p class="pln"><span class="n"><a id="t93" href="#t93">93</a></span><span class="t">        <span class="com"># plt_helper.plt.title(f"Time: {obj['time']:6.4f}")</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t94" href="#t94">94</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t95" href="#t95">95</a></span><span class="t">        <span class="com"># save plot, beautify</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t96" href="#t96">96</a></span><span class="t">        <span class="nam">fname</span> <span class="op">=</span> <span class="str">f'data/{name}_{index}'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t96" href="#t96">96</a></span><span class="t">        <span class="nam">fname</span> <span class="op">=</span> <span class="fst">f'</span><span class="fst">data/</span><span class="op">{</span><span class="nam">name</span><span class="op">}</span><span class="fst">_</span><span class="op">{</span><span class="nam">index</span><span class="op">}</span><span class="fst">'</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t97" href="#t97">97</a></span><span class="t">        <span class="nam">plt_helper</span><span class="op">.</span><span class="nam">savefig</span><span class="op">(</span><span class="nam">fname</span><span class="op">,</span> <span class="nam">save_pgf</span><span class="op">=</span><span class="key">False</span><span class="op">,</span> <span class="nam">save_png</span><span class="op">=</span><span class="key">False</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t98" href="#t98">98</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t99" href="#t99">99</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -196,7 +196,7 @@
             <a id="nextFileLink" class="nav" href="d_66292b4c3b6b9cb6_battery_model_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
     </div>
 </footer>

@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_b9c274c7ffe3e178_Runge_Kutta_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -128,7 +128,7 @@
     <p class="pln"><span class="n"><a id="t46" href="#t46">46</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t47" href="#t47">47</a></span><span class="t">        <span class="nam">string</span> <span class="op">=</span> <span class="str">''</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t48" href="#t48">48</a></span><span class="t">        <span class="key">for</span> <span class="nam">i</span> <span class="key">in</span> <span class="nam">range</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">num_steps</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t49" href="#t49">49</a></span><span class="t">            <span class="nam">string</span> <span class="op">=</span> <span class="str">f'{string} t={self.t[i]}: u={self.u[i]}, f={self.f[i]}'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t49" href="#t49">49</a></span><span class="t">            <span class="nam">string</span> <span class="op">=</span> <span class="fst">f'</span><span class="op">{</span><span class="nam">string</span><span class="op">}</span><span class="fst"> t=</span><span class="op">{</span><span class="nam">self</span><span class="op">.</span><span class="nam">t</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">}</span><span class="fst">: u=</span><span class="op">{</span><span class="nam">self</span><span class="op">.</span><span class="nam">u</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">}</span><span class="fst">, f=</span><span class="op">{</span><span class="nam">self</span><span class="op">.</span><span class="nam">f</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">}</span><span class="fst">'</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t50" href="#t50">50</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t">        <span class="key">return</span> <span class="nam">string</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -165,7 +165,7 @@
     <p class="pln"><span class="n"><a id="t83" href="#t83">83</a></span><span class="t">        <span class="com"># check if some parameters are set which only apply to actual sweepers</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t84" href="#t84">84</a></span><span class="t">        <span class="key">for</span> <span class="nam">key</span> <span class="key">in</span> <span class="op">[</span><span class="str">'initial_guess'</span><span class="op">,</span> <span class="str">'collocation_class'</span><span class="op">,</span> <span class="str">'num_nodes'</span><span class="op">,</span> <span class="str">'quad_type'</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t85" href="#t85">85</a></span><span class="t">            <span class="key">if</span> <span class="nam">key</span> <span class="key">in</span> <span class="nam">params</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t86" href="#t86">86</a></span><span class="t">                <span class="nam">self</span><span class="op">.</span><span class="nam">logger</span><span class="op">.</span><span class="nam">warning</span><span class="op">(</span><span class="str">f'"{key}" will be ignored by multistep sweeper'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t86" href="#t86">86</a></span><span class="t">                <span class="nam">self</span><span class="op">.</span><span class="nam">logger</span><span class="op">.</span><span class="nam">warning</span><span class="op">(</span><span class="fst">f'</span><span class="fst">"</span><span class="op">{</span><span class="nam">key</span><span class="op">}</span><span class="fst">" will be ignored by multistep sweeper</span><span class="fst">'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t87" href="#t87">87</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t88" href="#t88">88</a></span><span class="t">        <span class="com"># we need a dummy collocation object to instantiate the levels.</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t89" href="#t89">89</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">coll</span> <span class="op">=</span> <span class="nam">CollBase</span><span class="op">(</span><span class="nam">num_nodes</span><span class="op">=</span><span class="num">1</span><span class="op">,</span> <span class="nam">quad_type</span><span class="op">=</span><span class="str">'RADAU-RIGHT'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -309,7 +309,7 @@
             <a id="nextFileLink" class="nav" href="d_b9c274c7ffe3e178_Runge_Kutta_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
     </div>
 </footer>

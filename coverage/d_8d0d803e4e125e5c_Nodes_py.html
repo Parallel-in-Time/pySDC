@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_8d0d803e4e125e5c_Problem_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -141,7 +141,7 @@
     <p class="run"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t">        <span class="key">for</span> <span class="nam">arg</span><span class="op">,</span> <span class="nam">vals</span> <span class="key">in</span> <span class="nam">zip</span><span class="op">(</span><span class="op">[</span><span class="str">'node_type'</span><span class="op">,</span> <span class="str">'quad_type'</span><span class="op">]</span><span class="op">,</span> <span class="op">[</span><span class="nam">NODE_TYPES</span><span class="op">,</span> <span class="nam">QUAD_TYPES</span><span class="op">]</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">            <span class="nam">val</span> <span class="op">=</span> <span class="nam">eval</span><span class="op">(</span><span class="nam">arg</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t61" href="#t61">61</a></span><span class="t">            <span class="key">if</span> <span class="nam">val</span> <span class="key">not</span> <span class="key">in</span> <span class="nam">vals</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t">                <span class="key">raise</span> <span class="nam">NodesError</span><span class="op">(</span><span class="str">f"{arg}='{val}' not implemented, must be in {vals}"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t">                <span class="key">raise</span> <span class="nam">NodesError</span><span class="op">(</span><span class="fst">f"</span><span class="op">{</span><span class="nam">arg</span><span class="op">}</span><span class="fst">='</span><span class="op">{</span><span class="nam">val</span><span class="op">}</span><span class="fst">' not implemented, must be in </span><span class="op">{</span><span class="nam">vals</span><span class="op">}</span><span class="fst">"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t64" href="#t64">64</a></span><span class="t">        <span class="com"># Store attributes</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t65" href="#t65">65</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">node_type</span> <span class="op">=</span> <span class="nam">node_type</span>&nbsp;</span><span class="r"></span></p>
@@ -163,7 +163,7 @@
     <p class="pln"><span class="n"><a id="t81" href="#t81">81</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t82" href="#t82">82</a></span><span class="t">        <span class="com"># Check number of nodes</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t83" href="#t83">83</a></span><span class="t">        <span class="key">if</span> <span class="nam">self</span><span class="op">.</span><span class="nam">quad_type</span> <span class="key">in</span> <span class="op">[</span><span class="str">'LOBATTO'</span><span class="op">,</span> <span class="str">'RADAU-LEFT'</span><span class="op">]</span> <span class="key">and</span> <span class="nam">num_nodes</span> <span class="op">&lt;</span> <span class="num">2</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t84" href="#t84">84</a></span><span class="t">            <span class="key">raise</span> <span class="nam">NodesError</span><span class="op">(</span><span class="str">f"num_nodes must be larger than 2 for {self.quad_type}, but got {num_nodes}"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t84" href="#t84">84</a></span><span class="t">            <span class="key">raise</span> <span class="nam">NodesError</span><span class="op">(</span><span class="fst">f"</span><span class="fst">num_nodes must be larger than 2 for </span><span class="op">{</span><span class="nam">self</span><span class="op">.</span><span class="nam">quad_type</span><span class="op">}</span><span class="fst">, but got </span><span class="op">{</span><span class="nam">num_nodes</span><span class="op">}</span><span class="fst">"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t85" href="#t85">85</a></span><span class="t">        <span class="key">elif</span> <span class="nam">num_nodes</span> <span class="op">&lt;</span> <span class="num">1</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t86" href="#t86">86</a></span><span class="t">            <span class="key">raise</span> <span class="nam">NodesError</span><span class="op">(</span><span class="str">"you surely want at least one node ;)"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t87" href="#t87">87</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -300,7 +300,7 @@
             <a id="nextFileLink" class="nav" href="d_8d0d803e4e125e5c_Problem_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
     </div>
 </footer>

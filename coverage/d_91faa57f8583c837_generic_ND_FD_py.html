@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_91faa57f8583c837_nonlinear_ODE_1_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -189,13 +189,13 @@
     <p class="pln"><span class="n"><a id="t107" href="#t107">107</a></span><span class="t">        <span class="com"># automatically determine ndim from nvars</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t108" href="#t108">108</a></span><span class="t">        <span class="nam">ndim</span> <span class="op">=</span> <span class="nam">len</span><span class="op">(</span><span class="nam">nvars</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t109" href="#t109">109</a></span><span class="t">        <span class="key">if</span> <span class="nam">ndim</span> <span class="op">></span> <span class="num">3</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t110" href="#t110">110</a></span><span class="t">            <span class="key">raise</span> <span class="nam">ProblemError</span><span class="op">(</span><span class="str">f'can work with up to three dimensions, got {ndim}'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t110" href="#t110">110</a></span><span class="t">            <span class="key">raise</span> <span class="nam">ProblemError</span><span class="op">(</span><span class="fst">f'</span><span class="fst">can work with up to three dimensions, got </span><span class="op">{</span><span class="nam">ndim</span><span class="op">}</span><span class="fst">'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t111" href="#t111">111</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t112" href="#t112">112</a></span><span class="t">        <span class="com"># eventually extend freq to other dimension</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t113" href="#t113">113</a></span><span class="t">        <span class="key">if</span> <span class="nam">type</span><span class="op">(</span><span class="nam">freq</span><span class="op">)</span> <span class="key">is</span> <span class="nam">int</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t114" href="#t114">114</a></span><span class="t">            <span class="nam">freq</span> <span class="op">=</span> <span class="op">(</span><span class="nam">freq</span><span class="op">,</span><span class="op">)</span> <span class="op">*</span> <span class="nam">ndim</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t115" href="#t115">115</a></span><span class="t">        <span class="key">if</span> <span class="nam">len</span><span class="op">(</span><span class="nam">freq</span><span class="op">)</span> <span class="op">!=</span> <span class="nam">ndim</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t116" href="#t116">116</a></span><span class="t">            <span class="key">raise</span> <span class="nam">ProblemError</span><span class="op">(</span><span class="str">f'len(freq)={len(freq)}, different to ndim={ndim}'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t116" href="#t116">116</a></span><span class="t">            <span class="key">raise</span> <span class="nam">ProblemError</span><span class="op">(</span><span class="fst">f'</span><span class="fst">len(freq)=</span><span class="op">{</span><span class="nam">len</span><span class="op">(</span><span class="nam">freq</span><span class="op">)</span><span class="op">}</span><span class="fst">, different to ndim=</span><span class="op">{</span><span class="nam">ndim</span><span class="op">}</span><span class="fst">'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t117" href="#t117">117</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t118" href="#t118">118</a></span><span class="t">        <span class="com"># check values for freq and nvars</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t119" href="#t119">119</a></span><span class="t">        <span class="key">for</span> <span class="nam">f</span> <span class="key">in</span> <span class="nam">freq</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -340,7 +340,7 @@
     <p class="pln"><span class="n"><a id="t258" href="#t258">258</a></span><span class="t">                <span class="nam">callback</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">work_counters</span><span class="op">[</span><span class="nam">solver_type</span><span class="op">]</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t259" href="#t259">259</a></span><span class="t">            <span class="op">)</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">reshape</span><span class="op">(</span><span class="nam">nvars</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t260" href="#t260">260</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t261" href="#t261">261</a></span><span class="t">            <span class="key">raise</span> <span class="nam">ValueError</span><span class="op">(</span><span class="str">f'solver type "{solver_type}" not known in generic advection-diffusion implementation!'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t261" href="#t261">261</a></span><span class="t">            <span class="key">raise</span> <span class="nam">ValueError</span><span class="op">(</span><span class="fst">f'</span><span class="fst">solver type "</span><span class="op">{</span><span class="nam">solver_type</span><span class="op">}</span><span class="fst">" not known in generic advection-diffusion implementation!</span><span class="fst">'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t262" href="#t262">262</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t263" href="#t263">263</a></span><span class="t">        <span class="key">return</span> <span class="nam">sol</span>&nbsp;</span><span class="r"></span></p>
 </main>
@@ -352,7 +352,7 @@
             <a id="nextFileLink" class="nav" href="d_91faa57f8583c837_nonlinear_ODE_1_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
     </div>
 </footer>

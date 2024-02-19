@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_8d0d803e4e125e5c_Level_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -128,7 +128,7 @@
     <p class="pln"><span class="n"><a id="t46" href="#t46">46</a></span><span class="t">    <span class="com"># -- Compute inverse Fourier transform</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t47" href="#t47">47</a></span><span class="t">    <span class="nam">w</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">fft</span><span class="op">.</span><span class="nam">ifft</span><span class="op">(</span><span class="nam">v1</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t48" href="#t48">48</a></span><span class="t">    <span class="key">if</span> <span class="nam">max</span><span class="op">(</span><span class="nam">w</span><span class="op">.</span><span class="nam">imag</span><span class="op">)</span> <span class="op">></span> <span class="num">1.0e-15</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t49" href="#t49">49</a></span><span class="t">        <span class="key">raise</span> <span class="nam">ValueError</span><span class="op">(</span><span class="str">f'Max imaginary value to important for ifft: {max(w.imag)}'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t49" href="#t49">49</a></span><span class="t">        <span class="key">raise</span> <span class="nam">ValueError</span><span class="op">(</span><span class="fst">f'</span><span class="fst">Max imaginary value to important for ifft: </span><span class="op">{</span><span class="nam">max</span><span class="op">(</span><span class="nam">w</span><span class="op">.</span><span class="nam">imag</span><span class="op">)</span><span class="op">}</span><span class="fst">'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t50" href="#t50">50</a></span><span class="t">    <span class="com"># -- Store weights</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t">    <span class="nam">weights</span><span class="op">[</span><span class="op">:</span><span class="op">]</span> <span class="op">=</span> <span class="nam">w</span><span class="op">.</span><span class="nam">real</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -296,7 +296,7 @@
     <p class="pln"><span class="n"><a id="t214" href="#t214">214</a></span><span class="t">            <span class="com"># Fejer-I rule, integrate exactly polynomial of deg. n-1</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t215" href="#t215">215</a></span><span class="t">            <span class="nam">iNodes</span><span class="op">,</span> <span class="nam">iWeights</span> <span class="op">=</span> <span class="nam">computeFejerRule</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">n</span> <span class="op">-</span> <span class="op">(</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">n</span> <span class="op">+</span> <span class="num">1</span><span class="op">)</span> <span class="op">%</span> <span class="num">2</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t216" href="#t216">216</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t217" href="#t217">217</a></span><span class="t">            <span class="key">raise</span> <span class="nam">NotImplementedError</span><span class="op">(</span><span class="str">f'numQuad={numQuad}'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t217" href="#t217">217</a></span><span class="t">            <span class="key">raise</span> <span class="nam">NotImplementedError</span><span class="op">(</span><span class="fst">f'</span><span class="fst">numQuad=</span><span class="op">{</span><span class="nam">numQuad</span><span class="op">}</span><span class="fst">'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t218" href="#t218">218</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t219" href="#t219">219</a></span><span class="t">        <span class="com"># Compute quadrature nodes for each interval</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t220" href="#t220">220</a></span><span class="t">        <span class="nam">intervals</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">array</span><span class="op">(</span><span class="nam">intervals</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -322,7 +322,7 @@
             <a id="nextFileLink" class="nav" href="d_8d0d803e4e125e5c_Level_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
     </div>
 </footer>

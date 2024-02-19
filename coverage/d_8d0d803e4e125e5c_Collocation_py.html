@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_8d0d803e4e125e5c_Common_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -220,7 +220,7 @@
     <p class="pln"><span class="n"><a id="t138" href="#t138">138</a></span><span class="t"><span class="str">            numpy.ndarray: weights of the collocation formula given by the nodes</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t139" href="#t139">139</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t140" href="#t140">140</a></span><span class="t">        <span class="key">if</span> <span class="nam">self</span><span class="op">.</span><span class="nam">nodes</span> <span class="key">is</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t141" href="#t141">141</a></span><span class="t">            <span class="key">raise</span> <span class="nam">CollocationError</span><span class="op">(</span><span class="str">f"Need nodes before computing weights, got {self.nodes}"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t141" href="#t141">141</a></span><span class="t">            <span class="key">raise</span> <span class="nam">CollocationError</span><span class="op">(</span><span class="fst">f"</span><span class="fst">Need nodes before computing weights, got </span><span class="op">{</span><span class="nam">self</span><span class="op">.</span><span class="nam">nodes</span><span class="op">}</span><span class="fst">"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t142" href="#t142">142</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t143" href="#t143">143</a></span><span class="t">        <span class="com"># Instantiate the Lagrange interpolator object</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t144" href="#t144">144</a></span><span class="t">        <span class="nam">approx</span> <span class="op">=</span> <span class="nam">LagrangeApproximation</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">nodes</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -267,7 +267,7 @@
     <p class="pln"><span class="n"><a id="t185" href="#t185">185</a></span><span class="t"><span class="str">            numpy.ndarray: matrix containing the weights for tleft to node</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t186" href="#t186">186</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t187" href="#t187">187</a></span><span class="t">        <span class="key">if</span> <span class="nam">self</span><span class="op">.</span><span class="nam">nodes</span> <span class="key">is</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t188" href="#t188">188</a></span><span class="t">            <span class="key">raise</span> <span class="nam">CollocationError</span><span class="op">(</span><span class="str">f"Need nodes before computing weights, got {self.nodes}"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t188" href="#t188">188</a></span><span class="t">            <span class="key">raise</span> <span class="nam">CollocationError</span><span class="op">(</span><span class="fst">f"</span><span class="fst">Need nodes before computing weights, got </span><span class="op">{</span><span class="nam">self</span><span class="op">.</span><span class="nam">nodes</span><span class="op">}</span><span class="fst">"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t189" href="#t189">189</a></span><span class="t">        <span class="nam">M</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">num_nodes</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t190" href="#t190">190</a></span><span class="t">        <span class="nam">Q</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">zeros</span><span class="op">(</span><span class="op">[</span><span class="nam">M</span> <span class="op">+</span> <span class="num">1</span><span class="op">,</span> <span class="nam">M</span> <span class="op">+</span> <span class="num">1</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t191" href="#t191">191</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -326,7 +326,7 @@
             <a id="nextFileLink" class="nav" href="d_8d0d803e4e125e5c_Common_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
     </div>
 </footer>

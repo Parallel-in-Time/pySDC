@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_91faa57f8583c837_OuterSolarSystem_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -143,10 +143,10 @@
     <p class="mis show_mis"><span class="n"><a id="t61" href="#t61">61</a></span><span class="t">            <span class="nam">nvars</span> <span class="op">=</span> <span class="op">(</span><span class="num">128</span><span class="op">,</span> <span class="num">128</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t">        <span class="key">if</span> <span class="key">not</span> <span class="nam">L</span> <span class="op">==</span> <span class="num">2.0</span> <span class="op">*</span> <span class="nam">np</span><span class="op">.</span><span class="nam">pi</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t64" href="#t64">64</a></span><span class="t">            <span class="key">raise</span> <span class="nam">ProblemError</span><span class="op">(</span><span class="str">f'Setup not implemented, L has to be 2pi, got {L}'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t64" href="#t64">64</a></span><span class="t">            <span class="key">raise</span> <span class="nam">ProblemError</span><span class="op">(</span><span class="fst">f'</span><span class="fst">Setup not implemented, L has to be 2pi, got </span><span class="op">{</span><span class="nam">L</span><span class="op">}</span><span class="fst">'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t65" href="#t65">65</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t66" href="#t66">66</a></span><span class="t">        <span class="key">if</span> <span class="key">not</span> <span class="op">(</span><span class="nam">c</span> <span class="op">==</span> <span class="num">0.0</span> <span class="key">or</span> <span class="nam">c</span> <span class="op">==</span> <span class="num">1.0</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t67" href="#t67">67</a></span><span class="t">            <span class="key">raise</span> <span class="nam">ProblemError</span><span class="op">(</span><span class="str">f'Setup not implemented, c has to be 0 or 1, got {c}'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t67" href="#t67">67</a></span><span class="t">            <span class="key">raise</span> <span class="nam">ProblemError</span><span class="op">(</span><span class="fst">f'</span><span class="fst">Setup not implemented, c has to be 0 or 1, got </span><span class="op">{</span><span class="nam">c</span><span class="op">}</span><span class="fst">'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t68" href="#t68">68</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t69" href="#t69">69</a></span><span class="t">        <span class="key">if</span> <span class="key">not</span> <span class="op">(</span><span class="nam">isinstance</span><span class="op">(</span><span class="nam">nvars</span><span class="op">,</span> <span class="nam">tuple</span><span class="op">)</span> <span class="key">and</span> <span class="nam">len</span><span class="op">(</span><span class="nam">nvars</span><span class="op">)</span> <span class="op">></span> <span class="num">1</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t70" href="#t70">70</a></span><span class="t">            <span class="key">raise</span> <span class="nam">ProblemError</span><span class="op">(</span><span class="str">'Need at least two dimensions'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -274,7 +274,7 @@
     <p class="pln"><span class="n"><a id="t192" href="#t192">192</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t193" href="#t193">193</a></span><span class="t">        <span class="key">if</span> <span class="str">'u_init'</span> <span class="key">in</span> <span class="nam">kwargs</span><span class="op">.</span><span class="nam">keys</span><span class="op">(</span><span class="op">)</span> <span class="key">or</span> <span class="str">'t_init'</span> <span class="key">in</span> <span class="nam">kwargs</span><span class="op">.</span><span class="nam">keys</span><span class="op">(</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t194" href="#t194">194</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">logger</span><span class="op">.</span><span class="nam">warning</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t195" href="#t195">195</a></span><span class="t">                <span class="str">f'{type(self).__name__} uses an analytic exact solution from t=0. If you try to compute the local error, you will get the global error instead!'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t195" href="#t195">195</a></span><span class="t">                <span class="fst">f'</span><span class="op">{</span><span class="nam">type</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">.</span><span class="nam">__name__</span><span class="op">}</span><span class="fst"> uses an analytic exact solution from t=0. If you try to compute the local error, you will get the global error instead!</span><span class="fst">'</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t196" href="#t196">196</a></span><span class="t">            <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t197" href="#t197">197</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t198" href="#t198">198</a></span><span class="t">        <span class="key">def</span> <span class="nam">nls_exact_1D</span><span class="op">(</span><span class="nam">t</span><span class="op">,</span> <span class="nam">x</span><span class="op">,</span> <span class="nam">c</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -412,7 +412,7 @@
             <a id="nextFileLink" class="nav" href="d_91faa57f8583c837_OuterSolarSystem_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 23:44 +0000
+            created at 2024-02-19 07:52 +0000
         </p>
     </div>
 </footer>
