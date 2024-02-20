@@ -3,7 +3,7 @@ from mpi4py import MPI
 from mpi4py_fft import PFFT
 
 from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 from mpi4py_fft import newDistArray
@@ -88,6 +88,8 @@ class Brusselator(ptype):
         self.dx = self.L / nvars[0]
         self.dy = self.L / nvars[1]
 
+        self.work_counters['rhs'] = WorkCounter()
+
     def eval_f(self, u, t):
         """
         Routine to evaluate the right-hand side of the problem.
@@ -115,14 +117,16 @@ class Brusselator(ptype):
             lap_u_hat = -self.alpha * self.K2 * u_hat
             f.impl[i, ...] = self.fft.backward(lap_u_hat, f.impl[i, ...])
 
-        # evaluate autonomous part
+        # evaluate time independent part
         f.expl[iU, ...] = 1.0 + u[iU] ** 2 * u[iV] - 4.4 * u[iU]
         f.expl[iV, ...] = 3.4 * u[iU] - u[iU] ** 2 * u[iV]
 
-        # add non-autonomous part
+        # add time-dependent part
         if t >= 1.1:
             mask = (x - 0.3) ** 2 + (y - 0.6) ** 2 <= 0.1**2
             f.expl[iU][mask] += 5.0
+
+        self.work_counters['rhs']()
 
         return f
 
@@ -192,7 +196,7 @@ class Brusselator(ptype):
 
         return me
 
-    def get_fig(self):
+    def get_fig(self):  # pragma: no cover
         """
         Get a figure suitable to plot the solution of this problem
 
@@ -209,7 +213,7 @@ class Brusselator(ptype):
         self.cax = divider.append_axes('right', size='3%', pad=0.03)
         return self.fig
 
-    def plot(self, u, t=None, fig=None):
+    def plot(self, u, t=None, fig=None):  # pragma: no cover
         r"""
         Plot the solution. Please supply a figure with the same structure as returned by ``self.get_fig``.
 

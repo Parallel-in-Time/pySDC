@@ -33,6 +33,7 @@ def test_Brusselator():
     order = np.log(errors[1:] / errors[:-1]) / np.log(dts[1:] / dts[:-1])
 
     assert np.isclose(np.median(order), 2, atol=6e-2)
+    assert prob.work_counters['rhs'].niter == len(errors) * 2
 
 
 if __name__ == '__main__':
