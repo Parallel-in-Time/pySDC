@@ -3,622 +3,622 @@ import warnings
 import numpy as np
 
 
-# @pytest.mark.base
-# def test_pendulum_u_exact_main():
-#     from pySDC.projects.DAE.problems.simple_DAE import pendulum_2d
-
-#     # initialize problem parameters
-#     problem_params = dict()
-#     problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
+@pytest.mark.base
+def test_pendulum_u_exact_main():
+    from pySDC.projects.DAE.problems.simple_DAE import pendulum_2d
+
+    # initialize problem parameters
+    problem_params = dict()
+    problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
 
-#     # instantiate problem
-#     prob = pendulum_2d(**problem_params)
-
-#     u_test = prob.u_exact(5.0)
-#     assert np.isclose(abs(u_test), 0.0)
-
-
-# @pytest.mark.base
-# def test_one_transistor_amplifier_u_exact_main():
-#     from pySDC.projects.DAE.problems.transistor_amplifier import one_transistor_amplifier
-
-#     # initialize problem parameters
-#     problem_params = dict()
-#     problem_params['newton_tol'] = 1e-12  # tollerance for implicit solver
-
-#     # instantiate problem
-#     prob = one_transistor_amplifier(**problem_params)
-
-#     u_test = prob.u_exact(5.0)
-#     assert np.array_equal(abs(u_test), 0.0)
-
-
-# @pytest.mark.base
-# def test_two_transistor_amplifier_u_exact_main():
-#     from pySDC.projects.DAE.problems.transistor_amplifier import two_transistor_amplifier
-
-#     # initialize problem parameters
-#     problem_params = dict()
-#     problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
-
-#     # instantiate problem
-#     prob = two_transistor_amplifier(**problem_params)
-
-#     u_test = prob.u_exact(5.0)
-#     assert np.isclose(abs(u_test), 0.0)
-
-
-# #
-# #   Explicit test for the pendulum example
-# #
-# @pytest.mark.base
-# def test_pendulum_main():
-#     from pySDC.projects.DAE.problems.simple_DAE import pendulum_2d
-#     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-#     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-
-#     # initialize level parameters
-#     level_params = dict()
-#     level_params['restol'] = 1e-6
-#     level_params['dt'] = 5e-2
-
-#     # initialize sweeper parameters
-#     sweeper_params = dict()
-#     sweeper_params['quad_type'] = 'RADAU-RIGHT'
-#     sweeper_params['num_nodes'] = 3
-
-#     # initialize problem parameters
-#     problem_params = dict()
-#     problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
-
-#     # initialize step parameters
-#     step_params = dict()
-#     step_params['maxiter'] = 200
-
-#     # initialize controller parameters
-#     controller_params = dict()
-#     controller_params['logger_level'] = 30
-
-#     # Fill description dictionary for easy hierarchy creation
-#     description = dict()
-#     description['problem_class'] = pendulum_2d
-#     description['problem_params'] = problem_params
-#     description['sweeper_class'] = fully_implicit_DAE
-#     description['sweeper_params'] = sweeper_params
-#     description['level_params'] = level_params
-#     description['step_params'] = step_params
-
-#     # instantiate the controller
-#     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
-
-#     # set time parameters
-#     t0 = 0.0
-#     Tend = 1.0
-
-#     # get initial values on finest level
-#     P = controller.MS[0].levels[0].prob
-#     uinit = P.u_exact(t0)
-
-#     # call main function to get things done...
-#     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-#     uend_ref = P.dtype_u(P.init)
-#     uend_ref.diff[:4] = (0.98613917, -0.16592027, 0.29956023, 1.77825875)
-#     uend_ref.alg[0] = 4.82500525
-#     # check error
-#     err = abs(uend.diff - uend_ref.diff)
-#     assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
-
-
-# @pytest.mark.base
-# def test_one_transistor_amplifier_main():
-#     from pySDC.projects.DAE.problems.transistor_amplifier import one_transistor_amplifier
-#     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-#     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-
-#     # initialize level parameters
-#     level_params = dict()
-#     level_params['restol'] = 1e-6
-#     level_params['dt'] = 1e-4
-
-#     # initialize sweeper parameters
-#     sweeper_params = dict()
-#     sweeper_params['quad_type'] = 'RADAU-RIGHT'
-#     sweeper_params['num_nodes'] = 3
-
-#     # initialize problem parameters
-#     problem_params = dict()
-#     problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
-
-#     # initialize step parameters
-#     step_params = dict()
-#     step_params['maxiter'] = 50
-
-#     # initialize controller parameters
-#     controller_params = dict()
-#     controller_params['logger_level'] = 30
-
-#     # Fill description dictionary for easy hierarchy creation
-#     description = dict()
-#     description['problem_class'] = one_transistor_amplifier
-#     description['problem_params'] = problem_params
-#     description['sweeper_class'] = fully_implicit_DAE
-#     description['sweeper_params'] = sweeper_params
-#     description['level_params'] = level_params
-#     description['step_params'] = step_params
-
-#     # instantiate the controller
-#     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
-
-#     # set time parameters
-#     t0 = 0.0
-#     Tend = 2e-2
-
-#     # get initial values on finest level
-#     P = controller.MS[0].levels[0].prob
-#     uinit = P.u_exact(t0)
-
-#     # call main function to get things done...
-#     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-#     uend_ref = P.dtype_u(P.init)
-#     uend_ref[:] = (-0.02182035, 3.06674603, 2.89634691, 2.45212382, -2.69727238)
-
-#     # check error
-#     err = abs(uend - uend_ref)
-#     assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
-
-
-# @pytest.mark.base
-# def test_two_transistor_amplifier_main():
-#     from pySDC.projects.DAE.problems.transistor_amplifier import two_transistor_amplifier
-#     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-#     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-
-#     # initialize level parameters
-#     level_params = dict()
-#     level_params['restol'] = 1e-6
-#     level_params['dt'] = 1e-4
-
-#     # initialize sweeper parameters
-#     sweeper_params = dict()
-#     sweeper_params['quad_type'] = 'RADAU-RIGHT'
-#     sweeper_params['num_nodes'] = 3
-
-#     # initialize problem parameters
-#     problem_params = dict()
-#     problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
-
-#     # initialize step parameters
-#     step_params = dict()
-#     step_params['maxiter'] = 50
-
-#     # initialize controller parameters
-#     controller_params = dict()
-#     controller_params['logger_level'] = 30
-
-#     # Fill description dictionary for easy hierarchy creation
-#     description = dict()
-#     description['problem_class'] = two_transistor_amplifier
-#     description['problem_params'] = problem_params
-#     description['sweeper_class'] = fully_implicit_DAE
-#     description['sweeper_params'] = sweeper_params
-#     description['level_params'] = level_params
-#     description['step_params'] = step_params
-
-#     # instantiate the controller
-#     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
-
-#     # set time parameters
-#     t0 = 0.0
-#     Tend = 2e-2
-
-#     # get initial values on finest level
-#     P = controller.MS[0].levels[0].prob
-#     uinit = P.u_exact(t0)
-
-#     # call main function to get things done...
-#     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-#     uend_ref = P.dtype_u(P.init)
-#     uend_ref[:] = (
-#         -5.52721527e-03,
-#         3.00630407e00,
-#         2.84974338e00,
-#         4.07588343e00,
-#         2.12960582e00,
-#         2.19430889e00,
-#         5.89240699e00,
-#         9.99531182e-02,
-#     )
-
-#     # check error
-#     err = abs(uend - uend_ref)
-#     assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
-
-
-# @pytest.mark.base
-# def test_synchgen_infinite_bus_main():
-#     from pySDC.projects.DAE.problems.synchronous_machine import synchronous_machine_infinite_bus
-#     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-#     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-
-#     # initialize level parameters
-#     level_params = dict()
-#     level_params['restol'] = 1e-6
-#     level_params['dt'] = 1e-1
-
-#     # initialize sweeper parameters
-#     sweeper_params = dict()
-#     sweeper_params['quad_type'] = 'RADAU-RIGHT'
-#     sweeper_params['num_nodes'] = 3
-
-#     # initialize problem parameters
-#     problem_params = dict()
-#     problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
-
-#     # initialize step parameters
-#     step_params = dict()
-#     step_params['maxiter'] = 50
-
-#     # initialize controller parameters
-#     controller_params = dict()
-#     controller_params['logger_level'] = 30
-
-#     # Fill description dictionary for easy hierarchy creation
-#     description = dict()
-#     description['problem_class'] = synchronous_machine_infinite_bus
-#     description['problem_params'] = problem_params
-#     description['sweeper_class'] = fully_implicit_DAE
-#     description['sweeper_params'] = sweeper_params
-#     description['level_params'] = level_params
-#     description['step_params'] = step_params
-
-#     # instantiate the controller
-#     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
-
-#     # set time parameters
-#     t0 = 0.0
-#     Tend = 1
-
-#     # get initial values on finest level
-#     P = controller.MS[0].levels[0].prob
-#     uinit = P.u_exact(t0)
-
-#     # call main function to get things done...
-#     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-#     uend_ref = P.dtype_u(P.init)
-#     uend_ref.diff[:8] = (
-#         8.30823565e-01,
-#         -4.02584174e-01,
-#         1.16966755e00,
-#         9.47592808e-01,
-#         -3.68076863e-01,
-#         -3.87492326e-01,
-#         3.10281509e-01,
-#         9.94039645e-01,
-#     )
-
-#     uend_ref.alg[:6] = (
-#         -7.77837831e-01,
-#         -1.67347611e-01,
-#         1.34810867e00,
-#         5.46223705e-04,
-#         1.29690691e-02,
-#         -8.00823474e-02,
-#     )
-
-#     # check error
-#     err = abs(uend.diff - uend_ref.diff)
-#     assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
-
-
-# @pytest.mark.base
-# def test_DiscontinuousTestDAE_singularity():
-#     """
-#     Test if the event occurs at the correct time and proves if the right-hand side has with the correct values at the event.
-#     """
-#     import numpy as np
-#     from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
-
-#     t_event = np.arccosh(50.0)
-#     disc_test_DAE = DiscontinuousTestDAE()
-
-#     # test for t < t^* by setting t^* = t^* - eps
-#     eps = 1e-3
-#     t_before_event = t_event - eps
-#     u_before_event = disc_test_DAE.u_exact(t_before_event)
-#     du_before_event = disc_test_DAE.dtype_f(disc_test_DAE.init)
-#     du_before_event.diff[0] = np.sinh(t_before_event)
-#     du_before_event.alg[0] = np.cosh(t_before_event)
-#     f_before_event = disc_test_DAE.eval_f(u_before_event, du_before_event, t_before_event)
-
-#     assert np.isclose(
-#         abs(f_before_event), 0.0
-#     ), f"ERROR: Right-hand side after event does not match! Expected {(0.0, 0.0)}, got {f_before_event}"
-
-#     # test for t <= t^*
-#     u_event = disc_test_DAE.u_exact(t_event)
-#     du_event = disc_test_DAE.dtype_f(disc_test_DAE.init)
-#     du_event.diff[0] = np.sinh(t_event)
-#     du_event.alg[0] = np.cosh(t_event)
-#     f_event = disc_test_DAE.eval_f(u_event, du_event, t_event)
-
-#     assert np.isclose(f_event.diff[0], 7 * np.sqrt(51.0)) and np.isclose(
-#         f_event.alg[0], 0.0
-#     ), f"ERROR: Right-hand side at event does not match! Expected {(7 * np.sqrt(51), 0.0)}, got {(f_event.diff[0], f_event.alg[0])}"
-
-#     # test for t > t^* by setting t^* = t^* + eps
-#     t_after_event = t_event + eps
-#     u_after_event = disc_test_DAE.u_exact(t_after_event)
-#     du_after_event = disc_test_DAE.dtype_f(disc_test_DAE.init)
-#     du_after_event.diff[0] = np.sinh(t_event)
-#     du_after_event.alg[0] = np.cosh(t_event)
-#     f_after_event = disc_test_DAE.eval_f(u_after_event, du_after_event, t_after_event)
-
-#     assert np.isclose(f_after_event.diff[0], 7 * np.sqrt(51.0)) and np.isclose(
-#         f_after_event.alg[0], 0.0
-#     ), f"ERROR: Right-hand side after event does not match! Expected {(7 * np.sqrt(51), 0.0)}, got {(f_after_event.diff[0], f_after_event.alg[0])}"
-
-
-# @pytest.mark.base
-# @pytest.mark.parametrize('M', [2, 3, 4, 5])
-# def test_DiscontinuousTestDAE_SDC(M):
-#     """
-#     Simulates one SDC run for different number of coll.nodes and compares if the error satisfies an approppriate value.
-#     """
-
-#     from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
-#     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-#     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-
-#     # large errors are expected since the simulation domain contains the event
-#     err_tol = {
-#         2: 0.2025,
-#         3: 0.2308,
-#         4: 0.2407,
-#         5: 0.245,
-#     }
-
-#     level_params = {
-#         'restol': 1e-13,
-#         'dt': 1e-1,
-#     }
-
-#     problem_params = {
-#         'newton_tol': 1e-6,
-#     }
-
-#     sweeper_params = {
-#         'quad_type': 'RADAU-RIGHT',
-#         'num_nodes': M,
-#         'QI': 'IE',
-#     }
-
-#     step_params = {
-#         'maxiter': 45,
-#     }
-
-#     controller_params = {
-#         'logger_level': 30,
-#     }
-
-#     description = {
-#         'problem_class': DiscontinuousTestDAE,
-#         'problem_params': problem_params,
-#         'sweeper_class': fully_implicit_DAE,
-#         'sweeper_params': sweeper_params,
-#         'level_params': level_params,
-#         'step_params': step_params,
-#     }
-
-#     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
-
-#     t0 = 4.6
-#     Tend = 4.7
-
-#     P = controller.MS[0].levels[0].prob
-#     uinit = P.u_exact(t0)
-#     uex = P.u_exact(Tend)
-
-#     uend, _ = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-#     err = abs(uex.diff[0] - uend.diff[0])
-#     assert err < err_tol[M], f"ERROR: Error is too large! Expected {err_tol[M]}, got {err}"
-
-
-# @pytest.mark.base
-# @pytest.mark.parametrize('M', [2, 3, 4, 5])
-# def test_DiscontinuousTestDAE_SDC_detection(M):
-#     """
-#     Test for one SDC run with event detection if the found event is close to the exact value and if the global error
-#     can be reduced.
-#     """
-
-#     from pySDC.helpers.stats_helper import get_sorted
-#     from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
-#     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-#     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-#     from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
-#     from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
-
-#     err_tol = {
-#         2: 5.3952e-9,
-#         3: 2.6741e-9,
-#         4: 1.9163e-8,
-#         5: 2.4791e-8,
-#     }
-
-#     event_err_tol = {
-#         2: 0.0011,
-#         3: 0.01,
-#         4: 0.02,
-#         5: 0.0101,
-#     }
-
-#     level_params = {
-#         'restol': 1e-13,
-#         'dt': 1e-2,
-#     }
-
-#     problem_params = {
-#         'newton_tol': 1e-6,
-#     }
-
-#     sweeper_params = {
-#         'quad_type': 'RADAU-RIGHT',
-#         'num_nodes': M,
-#         'QI': 'IE',
-#     }
-
-#     step_params = {
-#         'maxiter': 45,
-#     }
-
-#     controller_params = {
-#         'logger_level': 30,
-#     }
-
-#     switch_estimator_params = {
-#         'tol': 1e-10,
-#         'alpha': 0.95,
-#     }
-
-#     restarting_params = {
-#         'max_restarts': 200,
-#         'crash_after_max_restarts': False,
-#     }
-
-#     convergence_controllers = {
-#         SwitchEstimator: switch_estimator_params,
-#         BasicRestartingNonMPI: restarting_params,
-#     }
-
-#     description = {
-#         'problem_class': DiscontinuousTestDAE,
-#         'problem_params': problem_params,
-#         'sweeper_class': fully_implicit_DAE,
-#         'sweeper_params': sweeper_params,
-#         'level_params': level_params,
-#         'step_params': step_params,
-#         'convergence_controllers': convergence_controllers,
-#     }
-
-#     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
-
-#     t0 = 4.6
-#     Tend = 4.7
-
-#     P = controller.MS[0].levels[0].prob
-#     uinit = P.u_exact(t0)
-#     uex = P.u_exact(Tend)
-
-#     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-#     err = abs(uex.diff[0] - uend.diff[0])
-#     assert err < err_tol[M], f"ERROR for M={M}: Error is too large! Expected {err_tol[M]}, got {err}"
-
-#     switches = get_sorted(stats, type='switch', sortby='time', recomputed=False)
-#     assert len(switches) >= 1, 'ERROR for M={M}: No events found!'
-#     t_switches = [item[1] for item in switches]
-#     t_switch = t_switches[-1]
-
-#     t_switch_exact = P.t_switch_exact
-#     event_err = abs(t_switch_exact - t_switch)
-#     assert (
-#         event_err < event_err_tol[M]
-#     ), f"ERROR for M={M}: Event error is too large! Expected {event_err_tol[M]}, got {event_err}"
-
-
-# @pytest.mark.base
-# def test_WSCC9_evaluation():
-#     r"""
-#     Test for WSCC9 bus test case. The class is written for components :math:`m = 3`, :math:`n = 9`.
-#     """
-#     from pySDC.core.Errors import ParameterError
-#     from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem
-
-#     problem_params = {
-#         'newton_tol': 1e-10,
-#     }
-
-#     WSCC9 = WSCC9BusSystem(**problem_params)
-#     m, n = WSCC9.m, WSCC9.n
-#     nvars = 13 * m + 2 * n
-
-#     # test if right-hand side of does have the correct length
-#     t0 = 0.0
-#     u0 = WSCC9.u_exact(t0)
-#     du0 = WSCC9.dtype_f(WSCC9.init, val=0.0)
-
-#     f = WSCC9.eval_f(u0, du0, t0)
-
-#     assert len(f.diff) == nvars and len(f.alg) == nvars, 'Shape of f does not match with shape it is supposed to be!'
-
-
-# @pytest.mark.base
-# def test_WSCC9_update_YBus():
-#     """
-#     Test if YBus is updated at time 0.05. For this SDC performs one time step.
-#     """
-
-#     from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem, get_initial_Ybus, get_event_Ybus
-#     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-#     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-
-#     dt = 0.05
-#     level_params = {
-#         'restol': 5e-13,
-#         'dt': dt,
-#     }
-
-#     problem_params = {
-#         'newton_tol': 1e-10,
-#     }
-
-#     sweeper_params = {
-#         'quad_type': 'RADAU-RIGHT',
-#         'num_nodes': 2,
-#         'QI': 'LU',
-#     }
-
-#     step_params = {
-#         'maxiter': 1,
-#     }
-
-#     controller_params = {
-#         'logger_level': 30,
-#     }
-
-#     description = {
-#         'problem_class': WSCC9BusSystem,
-#         'problem_params': problem_params,
-#         'sweeper_class': fully_implicit_DAE,
-#         'sweeper_params': sweeper_params,
-#         'level_params': level_params,
-#         'step_params': step_params,
-#     }
-
-#     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
-
-#     t0 = 0.0
-#     Tend = dt
-
-#     P = controller.MS[0].levels[0].prob
-#     uinit = P.u_exact(t0)
-
-#     YBus_initial = P.YBus
-#     YBus_initial_ref = get_initial_Ybus()
-
-#     assert np.allclose(YBus_initial, YBus_initial_ref), 'YBus does not match with the YBus at initialization!'
-
-#     _, _ = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-#     YBus_line_outage = P.YBus
-#     YBus_line6_8_outage = get_event_Ybus()
-#     assert np.allclose(
-#         YBus_line_outage, YBus_line6_8_outage
-#     ), 'YBus after line outage does not match with the one it should supposed to!'
+    # instantiate problem
+    prob = pendulum_2d(**problem_params)
+
+    u_test = prob.u_exact(5.0)
+    assert np.isclose(abs(u_test), 0.0)
+
+
+@pytest.mark.base
+def test_one_transistor_amplifier_u_exact_main():
+    from pySDC.projects.DAE.problems.transistor_amplifier import one_transistor_amplifier
+
+    # initialize problem parameters
+    problem_params = dict()
+    problem_params['newton_tol'] = 1e-12  # tollerance for implicit solver
+
+    # instantiate problem
+    prob = one_transistor_amplifier(**problem_params)
+
+    u_test = prob.u_exact(5.0)
+    assert np.array_equal(abs(u_test), 0.0)
+
+
+@pytest.mark.base
+def test_two_transistor_amplifier_u_exact_main():
+    from pySDC.projects.DAE.problems.transistor_amplifier import two_transistor_amplifier
+
+    # initialize problem parameters
+    problem_params = dict()
+    problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
+
+    # instantiate problem
+    prob = two_transistor_amplifier(**problem_params)
+
+    u_test = prob.u_exact(5.0)
+    assert np.isclose(abs(u_test), 0.0)
+
+
+#
+#   Explicit test for the pendulum example
+#
+@pytest.mark.base
+def test_pendulum_main():
+    from pySDC.projects.DAE.problems.simple_DAE import pendulum_2d
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+
+    # initialize level parameters
+    level_params = dict()
+    level_params['restol'] = 1e-6
+    level_params['dt'] = 5e-2
+
+    # initialize sweeper parameters
+    sweeper_params = dict()
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
+    sweeper_params['num_nodes'] = 3
+
+    # initialize problem parameters
+    problem_params = dict()
+    problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
+
+    # initialize step parameters
+    step_params = dict()
+    step_params['maxiter'] = 200
+
+    # initialize controller parameters
+    controller_params = dict()
+    controller_params['logger_level'] = 30
+
+    # Fill description dictionary for easy hierarchy creation
+    description = dict()
+    description['problem_class'] = pendulum_2d
+    description['problem_params'] = problem_params
+    description['sweeper_class'] = fully_implicit_DAE
+    description['sweeper_params'] = sweeper_params
+    description['level_params'] = level_params
+    description['step_params'] = step_params
+
+    # instantiate the controller
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+
+    # set time parameters
+    t0 = 0.0
+    Tend = 1.0
+
+    # get initial values on finest level
+    P = controller.MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
+
+    # call main function to get things done...
+    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+    uend_ref = P.dtype_u(P.init)
+    uend_ref.diff[:4] = (0.98613917, -0.16592027, 0.29956023, 1.77825875)
+    uend_ref.alg[0] = 4.82500525
+    # check error
+    err = abs(uend.diff - uend_ref.diff)
+    assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
+
+
+@pytest.mark.base
+def test_one_transistor_amplifier_main():
+    from pySDC.projects.DAE.problems.transistor_amplifier import one_transistor_amplifier
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+
+    # initialize level parameters
+    level_params = dict()
+    level_params['restol'] = 1e-6
+    level_params['dt'] = 1e-4
+
+    # initialize sweeper parameters
+    sweeper_params = dict()
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
+    sweeper_params['num_nodes'] = 3
+
+    # initialize problem parameters
+    problem_params = dict()
+    problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
+
+    # initialize step parameters
+    step_params = dict()
+    step_params['maxiter'] = 50
+
+    # initialize controller parameters
+    controller_params = dict()
+    controller_params['logger_level'] = 30
+
+    # Fill description dictionary for easy hierarchy creation
+    description = dict()
+    description['problem_class'] = one_transistor_amplifier
+    description['problem_params'] = problem_params
+    description['sweeper_class'] = fully_implicit_DAE
+    description['sweeper_params'] = sweeper_params
+    description['level_params'] = level_params
+    description['step_params'] = step_params
+
+    # instantiate the controller
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+
+    # set time parameters
+    t0 = 0.0
+    Tend = 2e-2
+
+    # get initial values on finest level
+    P = controller.MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
+
+    # call main function to get things done...
+    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    uend_ref = P.dtype_u(P.init)
+    uend_ref[:] = (-0.02182035, 3.06674603, 2.89634691, 2.45212382, -2.69727238)
+
+    # check error
+    err = abs(uend - uend_ref)
+    assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
+
+
+@pytest.mark.base
+def test_two_transistor_amplifier_main():
+    from pySDC.projects.DAE.problems.transistor_amplifier import two_transistor_amplifier
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+
+    # initialize level parameters
+    level_params = dict()
+    level_params['restol'] = 1e-6
+    level_params['dt'] = 1e-4
+
+    # initialize sweeper parameters
+    sweeper_params = dict()
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
+    sweeper_params['num_nodes'] = 3
+
+    # initialize problem parameters
+    problem_params = dict()
+    problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
+
+    # initialize step parameters
+    step_params = dict()
+    step_params['maxiter'] = 50
+
+    # initialize controller parameters
+    controller_params = dict()
+    controller_params['logger_level'] = 30
+
+    # Fill description dictionary for easy hierarchy creation
+    description = dict()
+    description['problem_class'] = two_transistor_amplifier
+    description['problem_params'] = problem_params
+    description['sweeper_class'] = fully_implicit_DAE
+    description['sweeper_params'] = sweeper_params
+    description['level_params'] = level_params
+    description['step_params'] = step_params
+
+    # instantiate the controller
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+
+    # set time parameters
+    t0 = 0.0
+    Tend = 2e-2
+
+    # get initial values on finest level
+    P = controller.MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
+
+    # call main function to get things done...
+    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    uend_ref = P.dtype_u(P.init)
+    uend_ref[:] = (
+        -5.52721527e-03,
+        3.00630407e00,
+        2.84974338e00,
+        4.07588343e00,
+        2.12960582e00,
+        2.19430889e00,
+        5.89240699e00,
+        9.99531182e-02,
+    )
+
+    # check error
+    err = abs(uend - uend_ref)
+    assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
+
+
+@pytest.mark.base
+def test_synchgen_infinite_bus_main():
+    from pySDC.projects.DAE.problems.synchronous_machine import synchronous_machine_infinite_bus
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+
+    # initialize level parameters
+    level_params = dict()
+    level_params['restol'] = 1e-6
+    level_params['dt'] = 1e-1
+
+    # initialize sweeper parameters
+    sweeper_params = dict()
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
+    sweeper_params['num_nodes'] = 3
+
+    # initialize problem parameters
+    problem_params = dict()
+    problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
+
+    # initialize step parameters
+    step_params = dict()
+    step_params['maxiter'] = 50
+
+    # initialize controller parameters
+    controller_params = dict()
+    controller_params['logger_level'] = 30
+
+    # Fill description dictionary for easy hierarchy creation
+    description = dict()
+    description['problem_class'] = synchronous_machine_infinite_bus
+    description['problem_params'] = problem_params
+    description['sweeper_class'] = fully_implicit_DAE
+    description['sweeper_params'] = sweeper_params
+    description['level_params'] = level_params
+    description['step_params'] = step_params
+
+    # instantiate the controller
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+
+    # set time parameters
+    t0 = 0.0
+    Tend = 1
+
+    # get initial values on finest level
+    P = controller.MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
+
+    # call main function to get things done...
+    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    uend_ref = P.dtype_u(P.init)
+    uend_ref.diff[:8] = (
+        8.30823565e-01,
+        -4.02584174e-01,
+        1.16966755e00,
+        9.47592808e-01,
+        -3.68076863e-01,
+        -3.87492326e-01,
+        3.10281509e-01,
+        9.94039645e-01,
+    )
+
+    uend_ref.alg[:6] = (
+        -7.77837831e-01,
+        -1.67347611e-01,
+        1.34810867e00,
+        5.46223705e-04,
+        1.29690691e-02,
+        -8.00823474e-02,
+    )
+
+    # check error
+    err = abs(uend.diff - uend_ref.diff)
+    assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
+
+
+@pytest.mark.base
+def test_DiscontinuousTestDAE_singularity():
+    """
+    Test if the event occurs at the correct time and proves if the right-hand side has with the correct values at the event.
+    """
+    import numpy as np
+    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
+
+    t_event = np.arccosh(50.0)
+    disc_test_DAE = DiscontinuousTestDAE()
+
+    # test for t < t^* by setting t^* = t^* - eps
+    eps = 1e-3
+    t_before_event = t_event - eps
+    u_before_event = disc_test_DAE.u_exact(t_before_event)
+    du_before_event = disc_test_DAE.dtype_f(disc_test_DAE.init)
+    du_before_event.diff[0] = np.sinh(t_before_event)
+    du_before_event.alg[0] = np.cosh(t_before_event)
+    f_before_event = disc_test_DAE.eval_f(u_before_event, du_before_event, t_before_event)
+
+    assert np.isclose(
+        abs(f_before_event), 0.0
+    ), f"ERROR: Right-hand side after event does not match! Expected {(0.0, 0.0)}, got {f_before_event}"
+
+    # test for t <= t^*
+    u_event = disc_test_DAE.u_exact(t_event)
+    du_event = disc_test_DAE.dtype_f(disc_test_DAE.init)
+    du_event.diff[0] = np.sinh(t_event)
+    du_event.alg[0] = np.cosh(t_event)
+    f_event = disc_test_DAE.eval_f(u_event, du_event, t_event)
+
+    assert np.isclose(f_event.diff[0], 7 * np.sqrt(51.0)) and np.isclose(
+        f_event.alg[0], 0.0
+    ), f"ERROR: Right-hand side at event does not match! Expected {(7 * np.sqrt(51), 0.0)}, got {(f_event.diff[0], f_event.alg[0])}"
+
+    # test for t > t^* by setting t^* = t^* + eps
+    t_after_event = t_event + eps
+    u_after_event = disc_test_DAE.u_exact(t_after_event)
+    du_after_event = disc_test_DAE.dtype_f(disc_test_DAE.init)
+    du_after_event.diff[0] = np.sinh(t_event)
+    du_after_event.alg[0] = np.cosh(t_event)
+    f_after_event = disc_test_DAE.eval_f(u_after_event, du_after_event, t_after_event)
+
+    assert np.isclose(f_after_event.diff[0], 7 * np.sqrt(51.0)) and np.isclose(
+        f_after_event.alg[0], 0.0
+    ), f"ERROR: Right-hand side after event does not match! Expected {(7 * np.sqrt(51), 0.0)}, got {(f_after_event.diff[0], f_after_event.alg[0])}"
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('M', [2, 3, 4, 5])
+def test_DiscontinuousTestDAE_SDC(M):
+    """
+    Simulates one SDC run for different number of coll.nodes and compares if the error satisfies an approppriate value.
+    """
+
+    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+
+    # large errors are expected since the simulation domain contains the event
+    err_tol = {
+        2: 0.2025,
+        3: 0.2308,
+        4: 0.2407,
+        5: 0.245,
+    }
+
+    level_params = {
+        'restol': 1e-13,
+        'dt': 1e-1,
+    }
+
+    problem_params = {
+        'newton_tol': 1e-6,
+    }
+
+    sweeper_params = {
+        'quad_type': 'RADAU-RIGHT',
+        'num_nodes': M,
+        'QI': 'IE',
+    }
+
+    step_params = {
+        'maxiter': 45,
+    }
+
+    controller_params = {
+        'logger_level': 30,
+    }
+
+    description = {
+        'problem_class': DiscontinuousTestDAE,
+        'problem_params': problem_params,
+        'sweeper_class': fully_implicit_DAE,
+        'sweeper_params': sweeper_params,
+        'level_params': level_params,
+        'step_params': step_params,
+    }
+
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+
+    t0 = 4.6
+    Tend = 4.7
+
+    P = controller.MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
+    uex = P.u_exact(Tend)
+
+    uend, _ = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    err = abs(uex.diff[0] - uend.diff[0])
+    assert err < err_tol[M], f"ERROR: Error is too large! Expected {err_tol[M]}, got {err}"
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('M', [2, 3, 4, 5])
+def test_DiscontinuousTestDAE_SDC_detection(M):
+    """
+    Test for one SDC run with event detection if the found event is close to the exact value and if the global error
+    can be reduced.
+    """
+
+    from pySDC.helpers.stats_helper import get_sorted
+    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
+    from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
+
+    err_tol = {
+        2: 5.3952e-9,
+        3: 2.6741e-9,
+        4: 1.9163e-8,
+        5: 2.4791e-8,
+    }
+
+    event_err_tol = {
+        2: 0.0011,
+        3: 0.01,
+        4: 0.02,
+        5: 0.0101,
+    }
+
+    level_params = {
+        'restol': 1e-13,
+        'dt': 1e-2,
+    }
+
+    problem_params = {
+        'newton_tol': 1e-6,
+    }
+
+    sweeper_params = {
+        'quad_type': 'RADAU-RIGHT',
+        'num_nodes': M,
+        'QI': 'IE',
+    }
+
+    step_params = {
+        'maxiter': 45,
+    }
+
+    controller_params = {
+        'logger_level': 30,
+    }
+
+    switch_estimator_params = {
+        'tol': 1e-10,
+        'alpha': 0.95,
+    }
+
+    restarting_params = {
+        'max_restarts': 200,
+        'crash_after_max_restarts': False,
+    }
+
+    convergence_controllers = {
+        SwitchEstimator: switch_estimator_params,
+        BasicRestartingNonMPI: restarting_params,
+    }
+
+    description = {
+        'problem_class': DiscontinuousTestDAE,
+        'problem_params': problem_params,
+        'sweeper_class': fully_implicit_DAE,
+        'sweeper_params': sweeper_params,
+        'level_params': level_params,
+        'step_params': step_params,
+        'convergence_controllers': convergence_controllers,
+    }
+
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+
+    t0 = 4.6
+    Tend = 4.7
+
+    P = controller.MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
+    uex = P.u_exact(Tend)
+
+    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    err = abs(uex.diff[0] - uend.diff[0])
+    assert err < err_tol[M], f"ERROR for M={M}: Error is too large! Expected {err_tol[M]}, got {err}"
+
+    switches = get_sorted(stats, type='switch', sortby='time', recomputed=False)
+    assert len(switches) >= 1, 'ERROR for M={M}: No events found!'
+    t_switches = [item[1] for item in switches]
+    t_switch = t_switches[-1]
+
+    t_switch_exact = P.t_switch_exact
+    event_err = abs(t_switch_exact - t_switch)
+    assert (
+        event_err < event_err_tol[M]
+    ), f"ERROR for M={M}: Event error is too large! Expected {event_err_tol[M]}, got {event_err}"
+
+
+@pytest.mark.base
+def test_WSCC9_evaluation():
+    r"""
+    Test for WSCC9 bus test case. The class is written for components :math:`m = 3`, :math:`n = 9`.
+    """
+    from pySDC.core.Errors import ParameterError
+    from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem
+
+    problem_params = {
+        'newton_tol': 1e-10,
+    }
+
+    WSCC9 = WSCC9BusSystem(**problem_params)
+    m, n = WSCC9.m, WSCC9.n
+    nvars = 13 * m + 2 * n
+
+    # test if right-hand side of does have the correct length
+    t0 = 0.0
+    u0 = WSCC9.u_exact(t0)
+    du0 = WSCC9.dtype_f(WSCC9.init, val=0.0)
+
+    f = WSCC9.eval_f(u0, du0, t0)
+
+    assert len(f.diff) == nvars and len(f.alg) == nvars, 'Shape of f does not match with shape it is supposed to be!'
+
+
+@pytest.mark.base
+def test_WSCC9_update_YBus():
+    """
+    Test if YBus is updated at time 0.05. For this SDC performs one time step.
+    """
+
+    from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem, get_initial_Ybus, get_event_Ybus
+    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+
+    dt = 0.05
+    level_params = {
+        'restol': 5e-13,
+        'dt': dt,
+    }
+
+    problem_params = {
+        'newton_tol': 1e-10,
+    }
+
+    sweeper_params = {
+        'quad_type': 'RADAU-RIGHT',
+        'num_nodes': 2,
+        'QI': 'LU',
+    }
+
+    step_params = {
+        'maxiter': 1,
+    }
+
+    controller_params = {
+        'logger_level': 30,
+    }
+
+    description = {
+        'problem_class': WSCC9BusSystem,
+        'problem_params': problem_params,
+        'sweeper_class': fully_implicit_DAE,
+        'sweeper_params': sweeper_params,
+        'level_params': level_params,
+        'step_params': step_params,
+    }
+
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+
+    t0 = 0.0
+    Tend = dt
+
+    P = controller.MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
+
+    YBus_initial = P.YBus
+    YBus_initial_ref = get_initial_Ybus()
+
+    assert np.allclose(YBus_initial, YBus_initial_ref), 'YBus does not match with the YBus at initialization!'
+
+    _, _ = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    YBus_line_outage = P.YBus
+    YBus_line6_8_outage = get_event_Ybus()
+    assert np.allclose(
+        YBus_line_outage, YBus_line6_8_outage
+    ), 'YBus after line outage does not match with the one it should supposed to!'
 
 
 @pytest.mark.base
