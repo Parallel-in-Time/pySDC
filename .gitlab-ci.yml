@@ -44,7 +44,6 @@ test_JUWELS:
   artifacts:
     when: always
     paths:
-      - *.json
       - coverage_*.dat
       - sbatch.err
       - sbatch.out
