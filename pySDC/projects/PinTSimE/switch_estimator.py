@@ -124,24 +124,16 @@ class SwitchEstimator(ConvergenceController):
                 if self.params.state_function[0] * self.params.state_function[-1] < 0 and self.status.is_zero is None:
                     self.status.t_switch = self.get_switch(self.params.t_interp, self.params.state_function, m_guess)
 
-                    controller.hooks[0].add_to_stats(
-                        process=S.status.slot,
-                        time=L.time,
-                        level=L.level_index,
-                        iter=0,
-                        sweep=L.status.sweep,
-                        type='switch_all',
-                        value=self.status.t_switch,
+                    self.logging_during_estimation(
+                        controller.hooks[0],
+                        S.status.slot,
+                        L.time,
+                        L.level_index,
+                        L.status.sweep,
+                        self.status.t_switch,
+                        self.params.state_function
                     )
-                    controller.hooks[0].add_to_stats(
-                        process=S.status.slot,
-                        time=L.time,
-                        level=L.level_index,
-                        iter=0,
-                        sweep=L.status.sweep,
-                        type='h_all',
-                        value=max([abs(item) for item in self.params.state_function]),
-                    )
+
                     if L.time < self.status.t_switch < L.time + L.dt:
                         dt_switch = (self.status.t_switch - L.time) * self.params.alpha
 
@@ -184,7 +176,6 @@ class SwitchEstimator(ConvergenceController):
                             L.status.sweep,
                             self.status.t_switch,
                         )
-                        print('Occurs at boundary')
                         L.prob.count_switches()
                         self.status.switch_detected = False
 
@@ -262,6 +253,27 @@ class SwitchEstimator(ConvergenceController):
         )
 
     @staticmethod
+    def logging_during_estimation(controller_hooks, process, time, level, sweep, t_switch, state_function):
+        controller_hooks.add_to_stats(
+            process=process,
+            time=time,
+            level=level,
+            iter=0,
+            sweep=sweep,
+            type='switch_all',
+            value=t_switch,
+        )
+        controller_hooks.add_to_stats(
+            process=process,
+            time=time,
+            level=level,
+            iter=0,
+            sweep=sweep,
+            type='h_all',
+            value=max([abs(item) for item in state_function]),
+        )
+
+    @staticmethod
     def get_switch(t_interp, state_function, m_guess):
         """
         Routine to do the interpolation and root finding stuff.
@@ -280,28 +292,12 @@ class SwitchEstimator(ConvergenceController):
         t_switch : float
            Time point of found event.
         """
-
         LinearInterpolator = LinearInterpolation(t_interp, state_function)
-
-        def p(t):
-            """
-            Simplifies the call of the interpolant.
-
-            Parameters
-            ----------
-            t : float
-                Time t at which the interpolant is called.
-
-            Returns
-            -------
-            p(t) : float
-                The value of the interpolated function at time t.
-            """
-            return LinearInterpolator.eval(t)
+        p = lambda t: LinearInterpolator.eval(t)
 
         def fprime(t):
             """
-            Computes the derivative of the scalar interpolant using finite differences.
+            Computes the derivative of the scalar interpolant using centered finite difference.
 
             Parameters
             ----------
@@ -313,11 +309,11 @@ class SwitchEstimator(ConvergenceController):
             dp : float
                 Derivative of interpolation p at time t.
             """
-            dt_FD = 1e-10
-            dp = (p(t + dt_FD) - p(t)) / dt_FD  # forward difference
+            dt_FD = 1e-11
+            dp = (p(t + dt_FD) - p(t - dt_FD)) / dt_FD
             return dp
 
-        newton_tol, newton_maxiter = 1e-15, 100
+        newton_tol, newton_maxiter = 1e-12, 100
         t_switch = newton(t_interp[m_guess], p, fprime, newton_tol, newton_maxiter)
         return t_switch
 
@@ -382,15 +378,21 @@ def newton(x0, p, fprime, newton_tol, newton_maxiter):
 
     n = 0
     while n < newton_maxiter:
-        if abs(p(x0)) < newton_tol or np.isnan(p(x0)) and np.isnan(fprime(x0)):
+        res = abs(p(x0))
+        if res < newton_tol or np.isnan(p(x0)) and np.isnan(fprime(x0)) or np.isclose(fprime(x0), 0.0):
             break
 
         x0 -= 1.0 / fprime(x0) * p(x0)
 
         n += 1
 
-    root = x0
+    if n == newton_maxiter:
+        msg = 'Newton did not converge after %i iterations, error is %s' % (n, res)
+    else:
+        msg = f'Newton did converge after {n} iterations, error is {res}'
+    print(msg)
 
+    root = x0
     return root
 
 
@@ -404,6 +406,7 @@ class LinearInterpolation(object):
     def eval(self, t):
         r"""
         Evaluates the linear interpolant at time :math:`t`.
+        Binary search is used to find the index in which piece :math:`t` lies.
 
         Parameters
         ----------
@@ -416,12 +419,13 @@ class LinearInterpolation(object):
             Value of the interpolant at time :math:`t`.
         """
 
-        for i in range(1, self.n):
-            if t >= self.ti[i - 1] or t <= self.ti[i]:
-                p = self.yi[i - 1] + (self.yi[i] - self.yi[i - 1]) / (self.ti[i] - self.ti[i - 1]) * (
-                    t - self.ti[i - 1]
-                )
-            else:
-                p = 0
-                raise ParameterError('Interpolant is only evaluated for time occuring between time nodes')
+        ind = np.searchsorted(self.ti, t)
+        if ind == 0:
+            p = self.yi[0]
+        elif ind == len(self.ti):
+            p = self.yi[-1]
+        else:
+            p = self.yi[ind - 1] + (self.yi[ind] - self.yi[ind - 1]) / (self.ti[ind] - self.ti[ind - 1]) * (
+                t - self.ti[ind - 1]
+            )
         return p
