@@ -2,8 +2,6 @@ import numpy as np
 import pytest
 
 from pySDC.implementations.problem_classes.DiscontinuousTestODE import DiscontinuousTestODE
-from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 class ExactDiscontinuousTestODE(DiscontinuousTestODE):
@@ -131,7 +129,7 @@ def get_controller(switch_estimator, problem, sweeper, quad_type, num_nodes, dt,
     convergence_controllers = dict()
     switch_estimator_params = {
         'tol': tol,
-        'alpha': 1.0,
+        'alpha': 0.95,
     }
     convergence_controllers.update({switch_estimator: switch_estimator_params})
 
@@ -199,6 +197,49 @@ def discontinuousTestProblem_run(switch_estimator, problem, sweeper, quad_type, 
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     return stats, t_switch_exact
+
+
+def getTestDict():
+    testDict = {
+        0 : {
+            't': [0, 2],
+            'p': [1, 5],
+            'tMid': [1],
+            'pMid': [3],
+        },
+        1 : {
+            't': [1, 2, 4, 5],
+            'p': [6, 4, 3, 7],
+            'tMid': [1.5, 3],
+            'pMid': [5, 3.5],
+        },
+    }
+    return testDict
+
+
+@pytest.mark.base
+@pytest.mark.parametrize("key", [0, 1])
+def testInterpolationValues(key):
+    """
+    Test for linear interpolation class in switch estimator. Linear interpolation is tested against
+    values in testDict that contains values for interpolation computed by hand.
+    Further, NumPy's routine interp is used as reference to have a second test on hand.
+    """
+    from pySDC.projects.PinTSimE.switch_estimator import LinearInterpolation
+
+    testDict = getTestDict()
+    testSet = testDict[key]
+    t, p = testSet['t'], testSet['p']
+    tMid, pMid = testSet['tMid'], testSet['pMid']
+    LinearInterpolator = LinearInterpolation(t, p)
+
+    for m in range(len(t)):
+        assert LinearInterpolator.eval(t[m]) == p[m]
+        assert np.interp(t[m], t, p) == LinearInterpolator.eval(t[m])
+
+    for m in range(len(tMid)):
+        assert LinearInterpolator.eval(tMid[m]) == pMid[m]
+        assert np.interp(tMid[m], t, p) == LinearInterpolator.eval(tMid[m])
 
 
 @pytest.mark.base
@@ -372,4 +413,4 @@ def test_all_tolerances_ODE(tol, num_nodes, quad_type):
 
     t_switch = switches[-1]
     event_err = abs(t_switch - t_switch_exact)
-    assert event_err < 1e-14, f'Event time error for is not small enough!'
+    assert np.isclose(event_err, 0, atol=3e-12), f'Event time error is not small enough!'
