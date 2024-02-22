@@ -38,10 +38,14 @@ test_JUWELS:
     - juwels
     - login
     - shell
+  parallel:
+    matrix:
+      - SHELL_SCRIPT: [ 'benchmark', 'cupy' ]
   artifacts:
     when: always
     paths:
-      - benchmarks
+      - *.json
+      - coverage_*.dat
       - sbatch.err
       - sbatch.out
   before_script:
@@ -62,13 +66,15 @@ test_JUWELS:
   script:
     # - touch benchmarks/output.json
     - echo $SYSTEMNAME
-    - sbatch --wait etc/juwels_benchmark.sh
+    - sbatch --wait etc/juwels_${{ SHELL_SCRIPT }}.sh
     - echo "Following Errors occured:"
     - cat sbatch.err
     - echo "Following was written to stdout:"
     - cat sbatch.out
+    - coverage combine
+    - mv .coverage coverage_${{ SHELL_SCRIPT }}.dat
   after_script:
-    - ls -lh benchmarks
+    - ls -lh .
 
 
 #test_kit:
