@@ -65,13 +65,13 @@ test_JUWELS:
   script:
     # - touch benchmarks/output.json
     - echo $SYSTEMNAME
-    - sbatch --wait etc/juwels_${{ SHELL_SCRIPT }}.sh
+    - sbatch --wait etc/juwels_${SHELL_SCRIPT}.sh
     - echo "Following Errors occured:"
     - cat sbatch.err
     - echo "Following was written to stdout:"
     - cat sbatch.out
     - coverage combine
-    - mv .coverage coverage_${{ SHELL_SCRIPT }}.dat
+    - mv .coverage coverage_${SHELL_SCRIPT}.dat
   after_script:
     - ls -lh .
 
