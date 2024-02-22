@@ -309,8 +309,8 @@ class SwitchEstimator(ConvergenceController):
             dp : float
                 Derivative of interpolation p at time t.
             """
-            dt_FD = 1e-11
-            dp = (p(t + dt_FD) - p(t - dt_FD)) / dt_FD
+            dt_FD = 1e-12
+            dp = (p(t + dt_FD) - p(t - dt_FD)) / (2 * dt_FD)
             return dp
 
         newton_tol, newton_maxiter = 1e-12, 100
@@ -364,7 +364,7 @@ def newton(x0, p, fprime, newton_tol, newton_maxiter):
     p : callable
         Interpolated function where Newton's method is applied at.
     fprime : callable
-        Approximated erivative of p using finite differences.
+        Approximated derivative of p using finite differences.
     newton_tol : float
         Tolerance for termination.
     newton_maxiter : int
