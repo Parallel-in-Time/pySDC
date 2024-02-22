@@ -122,10 +122,7 @@ class penningtrap(ptype):
 
             for j in range(N):
                 dist2 = (
-                    (pos[0, i] - pos[0, j]) ** 2
-                    + (pos[1, i] - pos[1, j]) ** 2
-                    + (pos[2, i] - pos[2, j]) ** 2
-                    + sig**2
+                    (pos[0, i] - pos[0, j]) ** 2 + (pos[1, i] - pos[1, j]) ** 2 + (pos[2, i] - pos[2, j]) ** 2 + sig**2
                 )
                 contrib += q[j] * (pos[:, i] - pos[:, j]) / dist2**1.5
 

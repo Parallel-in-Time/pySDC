@@ -125,6 +125,9 @@ class imex_1st_order_mass(imex_1st_order):
             # add tau if associated
             if L.tau[m] is not None:
                 res[m] += L.tau[m]
+            # Due to different boundary conditions we might have to fix the residual
+            if L.prob.fix_bc_for_residual:
+                L.prob.fix_residual(res[m])
             # use abs function from data type here
             res_norm.append(abs(res[m]))
 

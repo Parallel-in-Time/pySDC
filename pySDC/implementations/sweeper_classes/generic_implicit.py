@@ -65,6 +65,15 @@ class generic_implicit(sweeper):
         # get number of collocation nodes for easier access
         M = self.coll.num_nodes
 
+        # update the MIN-SR-FLEX preconditioner
+        if self.params.QI.startswith('MIN-SR-FLEX'):
+            k = L.status.sweep
+            if k > M:
+                self.params.QI = "MIN-SR-S"
+            else:
+                self.params.QI = 'MIN-SR-FLEX' + str(k)
+            self.QI = self.get_Qdelta_implicit(self.coll, qd_type=self.params.QI)
+
         # gather all terms which are known already (e.g. from the previous iteration)
         # this corresponds to u0 + QF(u^k) - QdF(u^k) + tau
 
@@ -89,9 +98,11 @@ class generic_implicit(sweeper):
                 rhs += L.dt * self.QI[m + 1, j] * L.f[j]
 
             # implicit solve with prefactor stemming from the diagonal of Qd
-            L.u[m + 1] = P.solve_system(
-                rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m]
-            )
+            alpha = L.dt * self.QI[m + 1, m + 1]
+            if alpha == 0:
+                L.u[m + 1] = rhs
+            else:
+                L.u[m + 1] = P.solve_system(rhs, alpha, L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
             # update function values
             L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 

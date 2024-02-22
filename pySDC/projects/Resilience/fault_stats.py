@@ -20,6 +20,7 @@ from pySDC.projects.Resilience.piline import run_piline
 from pySDC.projects.Resilience.Lorenz import run_Lorenz
 from pySDC.projects.Resilience.Schroedinger import run_Schroedinger
 from pySDC.projects.Resilience.quench import run_quench
+from pySDC.projects.Resilience.AC import run_AC
 
 from pySDC.projects.Resilience.strategies import BaseStrategy, AdaptivityStrategy, IterateStrategy, HotRodStrategy
 import logging
@@ -629,6 +630,8 @@ class FaultStats:
             prob_name = 'Schroedinger'
         elif self.prob == run_quench:
             prob_name = 'Quench'
+        elif self.prob.__name__ == 'run_AC':
+            prob_name = 'Allen-Cahn'
         else:
             raise NotImplementedError(f'Name not implemented for problem {self.prob}')
 
@@ -1651,11 +1654,11 @@ def compare_adaptivity_modes():
 
 def main():
     kwargs = {
-        'prob': run_quench,
+        'prob': run_AC,
         'num_procs': 1,
         'mode': 'default',
         'runs': 2000,
-        'reload': False,
+        'reload': True,
         **parse_args(),
     }
 

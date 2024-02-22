@@ -70,6 +70,7 @@ class allencahn_front_fullyimplicit(ptype):
         newton_tol=1e-12,
         interval=(-0.5, 0.5),
         stop_at_nan=True,
+        stop_at_maxiter=False,
     ):
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if (nvars + 1) % 2:
@@ -85,6 +86,7 @@ class allencahn_front_fullyimplicit(ptype):
             'newton_tol',
             'interval',
             'stop_at_nan',
+            'stop_at_maxiter',
             localVars=locals(),
             readOnly=True,
         )
@@ -185,7 +187,11 @@ class allencahn_front_fullyimplicit(ptype):
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
         if n == self.newton_maxiter:
-            self.logger.warning('Newton did not converge after %i iterations, error is %s' % (n, res))
+            msg = 'Newton did not converge after %i iterations, error is %s' % (n, res)
+            if self.stop_at_maxiter:
+                raise ProblemError(msg)
+            else:
+                self.logger.warning(msg)
 
         me = self.dtype_u(self.init)
         me[:] = u[:]
@@ -226,19 +232,18 @@ class allencahn_front_fullyimplicit(ptype):
 
     def u_exact(self, t):
         r"""
-        Routine to compute the exact solution at time :math:`t`.
+        Routine to return initial condition or the exact solution
 
         Parameters
         ----------
         t : float
-            Time of the exact solution.
+            Time at which the exact solution is computed.
 
         Returns
         -------
         me : dtype_u
-            The exact solution.
+            The exact solution (in space and time).
         """
-
         v = 3.0 * np.sqrt(2) * self.eps * self.dw
         me = self.dtype_u(self.init, val=0.0)
         me[:] = 0.5 * (1 + np.tanh((self.xvalues - v * t) / (np.sqrt(2) * self.eps)))
@@ -665,19 +670,18 @@ class allencahn_periodic_fullyimplicit(ptype):
 
     def u_exact(self, t):
         r"""
-        Routine to compute the exact solution at time :math:`t`.
+        Routine to return initial condition or the exact solution.
 
         Parameters
         ----------
         t : float
-            Time of the exact solution.
+            Time at which the approximated exact solution is computed.
 
         Returns
         -------
         me : dtype_u
-            The exact solution.
+            The approximated exact solution.
         """
-
         v = 3.0 * np.sqrt(2) * self.eps * self.dw
         me = self.dtype_u(self.init, val=0.0)
         me[:] = 0.5 * (1 + np.tanh((self.radius - abs(self.xvalues) - v * t) / (np.sqrt(2) * self.eps)))
@@ -762,9 +766,7 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
         f = self.dtype_f(self.init)
         f.impl[:] = self.A.dot(u)
         f.expl[:] = (
-            -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u)
-            - 6.0 * self.dw * u * (1.0 - u)
-            + 0.0 / self.eps**2 * u
+            -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u) - 6.0 * self.dw * u * (1.0 - u) + 0.0 / self.eps**2 * u
         )
         self.work_counters['rhs']()
         return f
@@ -849,9 +851,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
         f = self.dtype_f(self.init)
         f.comp1[:] = self.A.dot(u)
         f.comp2[:] = (
-            -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u)
-            - 6.0 * self.dw * u * (1.0 - u)
-            + 0.0 / self.eps**2 * u
+            -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u) - 6.0 * self.dw * u * (1.0 - u) + 0.0 / self.eps**2 * u
         )
         self.work_counters['rhs']()
         return f

@@ -50,14 +50,14 @@ done
 
 # apply black and stage the changes that black made
 if [[ $files != "" ]]
-then  
+then
         black $files
         git add $files
 fi
 ```
 
 You may need to run `chmod +x` on the file to allow it to be executed.
-Be aware that the hook will alter files you may have opened in an editor whenever you make a commit, which may confuse you(r editor). 
+Be aware that the hook will alter files you may have opened in an editor whenever you make a commit, which may confuse you(r editor).
 
 To automate flakeheaven, we want to write a hook that alters the commit message in case any errors are detected. This gives us the choice of aborting the commit and fixing the issues, or we can go ahead and commit them and worry about flakeheaven only when the time comes to do a pull request.
 To obtain this functionality, add the following to `<pySDC-root-directory>/.git/hooks/prepare-commit-msg`:
@@ -91,7 +91,7 @@ This is done using [pytest](https://docs.pytest.org/en/7.2.x/), and runs all the
 
 ```bash
 # Install required packages (works also with conda/mamba)
-pip install pytest<7.2.0 pytest-benchmark coverage[toml]
+pip install pytest pytest-benchmark pytest-timeout coverage[toml]
 # Run tests
 pytest -v pySDC/tests
 ```
@@ -101,6 +101,13 @@ pytest -v pySDC/tests
 >
 > ```bash
 > pytest -v pySDC/tests/test_nodes.py  # only test nodes generation
+> ```
+>
+> You can also run one specific test only like this:
+>
+> ```bash
+> pytest -v pySDC/tests/test_nodes.py::test_nodesGeneration             # only test_nodesGeneration function
+> pytest -v pySDC/tests/test_nodes.py::test_nodesGeneration[LEGENDRE]   # only test_nodesGeneration with LEGENDRE nodes
 > ```
 
 ## Code coverage

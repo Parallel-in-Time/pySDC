@@ -40,10 +40,10 @@ class base_transfer_mass(base_transfer):
         # restrict fine values in space
         tmp_u = []
         for m in range(1, SF.coll.num_nodes + 1):
-            tmp_u.append(self.space_transfer.restrict(F.u[m]))
+            tmp_u.append(self.space_transfer.project(F.u[m]))
 
         # restrict collocation values
-        G.u[0] = self.space_transfer.restrict(F.u[0])
+        G.u[0] = self.space_transfer.project(F.u[0])
         for n in range(1, SG.coll.num_nodes + 1):
             G.u[n] = self.Rcoll[n - 1, 0] * tmp_u[0]
             for m in range(1, SF.coll.num_nodes):

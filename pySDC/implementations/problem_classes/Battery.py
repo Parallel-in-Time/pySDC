@@ -329,6 +329,7 @@ class battery(battery_n_capacitors):
     ----
     This class has the same attributes as the class it inherits from.
     """
+
     dtype_f = imex_mesh
 
     def __init__(self, ncapacitors=1, Vs=5.0, Rs=0.5, C=None, R=1.0, L=1.0, alpha=1.2, V_ref=None):
@@ -455,6 +456,7 @@ class battery_implicit(battery):
     work_counters : WorkCounter
         Counts different things, here: Number of Newton iterations is counted.
     """
+
     dtype_f = mesh
 
     def __init__(

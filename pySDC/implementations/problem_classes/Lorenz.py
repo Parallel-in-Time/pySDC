@@ -32,9 +32,10 @@ class LorenzAttractor(ptype):
     .. math::
         \frac{d y_3(t)}{dt} = y_1 (t) y_2 (t) - \beta y_3 (t)
 
-    with initial condition :math:`(y_1(0), y_2(0), y_3(0))^T = (1, 1, 1)^T` for :math:`t \in [0, 1]`. The problem parameters
-    for this problem are :math:`\sigma = 10`, :math:`\rho = 28` and :math:`\beta = 8/3`. Lorenz chose these parameters such
-    that the Reynolds number :math:`\rho` is slightly supercritical as to provoke instability of steady convection.
+    with initial condition :math:`(y_1(0), y_2(0), y_3(0))^T = (1, 1, 1)^T` (default) for :math:`t \in [0, 1]`.
+    The problem parameters for this problem are :math:`\sigma = 10`, :math:`\rho = 28` and :math:`\beta = 8/3`.
+    Lorenz chose these parameters such that the Reynolds number :math:`\rho` is slightly supercritical
+    as to provoke instability of steady convection.
 
     Parameters
     ----------
@@ -44,6 +45,8 @@ class LorenzAttractor(ptype):
         Parameter :math:`\rho` of the problem.
     beta : float, optional
         Parameter :math:`\beta` of the problem.
+    u0 : tuple, optional
+        Initial solution :math:`u_0` of the problem.
     newton_tol : float, optional
         Tolerance for Newton for termination.
     newton_maxiter : int, optional
@@ -58,7 +61,9 @@ class LorenzAttractor(ptype):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, sigma=10.0, rho=28.0, beta=8.0 / 3.0, newton_tol=1e-9, newton_maxiter=99, stop_at_nan=True):
+    def __init__(
+        self, sigma=10.0, rho=28.0, beta=8.0 / 3.0, u0=(1, 1, 1), newton_tol=1e-9, newton_maxiter=99, stop_at_nan=True
+    ):
         """Initialization routine"""
 
         nvars = 3
@@ -66,7 +71,7 @@ class LorenzAttractor(ptype):
         super().__init__(init=(nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister('nvars', 'stop_at_nan', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister(
-            'sigma', 'rho', 'beta', 'newton_tol', 'newton_maxiter', localVars=locals(), readOnly=False
+            'sigma', 'rho', 'beta', 'u0', 'newton_tol', 'newton_maxiter', localVars=locals(), readOnly=False
         )
         self.work_counters['newton'] = WorkCounter()
         self.work_counters['rhs'] = WorkCounter()
@@ -225,5 +230,5 @@ class LorenzAttractor(ptype):
 
             me[:] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init)
         else:
-            me[:] = 1.0
+            me[:] = self.u0
         return me

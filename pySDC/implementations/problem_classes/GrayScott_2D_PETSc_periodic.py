@@ -132,9 +132,7 @@ class GS_full(object):
                 row.field = 1
                 col.field = 1
                 val = 1.0 - self.factor * (
-                    self.prob.Dv * (-2.0 / self.dx**2 - 2.0 / self.dy**2)
-                    + 2.0 * x[i, j, 0] * x[i, j, 1]
-                    - self.prob.B
+                    self.prob.Dv * (-2.0 / self.dx**2 - 2.0 / self.dy**2) + 2.0 * x[i, j, 0] * x[i, j, 1] - self.prob.B
                 )
                 P.setValueStencil(row, col, val)
                 row.field = 1
