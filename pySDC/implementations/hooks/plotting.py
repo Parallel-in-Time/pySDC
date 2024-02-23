@@ -29,7 +29,7 @@ class PlottingHook(hooks):  # pragma: no cover
         if self.save_plot is not None:
             path = f'{self.save_plot}_{self.plot_counter:04d}.png'
             self.fig.savefig(path, dpi=100)
-            self.logger.log(30, f'Saved figure {path!r}.')
+            self.logger.log(25, f'Saved figure {path!r}.')
 
         if self.live_plot is not None:
             plt.pause(self.live_plot)
