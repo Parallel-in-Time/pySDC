@@ -2,11 +2,12 @@ import numpy as np
 import pytest
 
 from pySDC.implementations.problem_classes.DiscontinuousTestODE import DiscontinuousTestODE
+from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
 
 
 class ExactDiscontinuousTestODE(DiscontinuousTestODE):
     r"""
-    Dummy problem for testing. The problem contains the exact dynamics of the problem class ``DiscontinuousTestODE``.
+    Dummy ODE problem for testing. The problem contains the exact dynamics of the problem class ``DiscontinuousTestODE``.
     """
 
     def __init__(self, newton_maxiter=100, newton_tol=1e-8):
@@ -25,7 +26,7 @@ class ExactDiscontinuousTestODE(DiscontinuousTestODE):
         ----------
         u : dtype_u
             Exact value of u.
-        t : _type_
+        t : float
             Time :math:`t`.
 
         Returns
@@ -66,6 +67,86 @@ class ExactDiscontinuousTestODE(DiscontinuousTestODE):
         """
 
         return self.u_exact(t)
+
+
+class ExactDiscontinuousTestDAE(DiscontinuousTestDAE):
+    r"""
+    Dummy DAE problem for testing. The problem contains the exact dynamics of the problem class ``DiscontinuousTestDAE``.
+    """
+
+    def __init__(self, newton_tol=1e-8):
+        """Initialization routine"""
+        super().__init__(newton_tol)
+
+        self.t_switch_exact = np.arccosh(50)
+        self.t_switch = None
+        self.nswitches = 0
+
+    def eval_f(self, u, du, t):
+        r"""
+        Returns the exact right-hand side of the problem. The first components in both
+        cases of ``f`` are set to 1 do avoid getting a zero residual (enforced the sweeper to stop
+        since "convergence is reached").
+
+        Parameters
+        ----------
+        u : dtype_u
+            Exact value of u.
+        du : dtype_u
+            Current values of the derivative of the numerical solution at time t.
+        t : float
+            Time :math:`t`.
+
+        Returns
+        -------
+        f : dtype_f
+            Right-hand side.
+        """
+
+        f = self.dtype_f(self.init)
+
+        t_switch = np.inf if self.t_switch is None else self.t_switch
+
+        h = 2 * u[0] - 100
+        f = self.dtype_f(self.init)
+
+        if h >= 0 or t >= t_switch:
+            f[:] = (
+                1,
+                0,
+            )
+        else:
+            f[:] = (
+                1,
+                0,
+            )
+        return f
+
+    def solve_system(self, impl_sys, u0, t):
+        r"""
+        Just returns the derivative of the exact solution.
+
+        Parameters
+        ----------
+        impl_sys : callable
+            Implicit system to be solved.
+        u0 : dtype_u
+            Initial guess for solver.
+        t : float
+            Current time :math:`t`.
+
+        Returns
+        -------
+        me : dtype_u
+            Numerical solution.
+        """
+
+        me = self.dtype_u(self.init)
+        if t <= self.t_switch_exact:
+            me[:] = (np.sinh(t), np.cosh(t))
+        else:
+            me[:] = (np.sinh(self.t_switch_exact), np.cosh(self.t_switch_exact))
+        return me
 
 
 def get_controller(switch_estimator, problem, sweeper, quad_type, num_nodes, dt, tol):
@@ -116,7 +197,7 @@ def get_controller(switch_estimator, problem, sweeper, quad_type, num_nodes, dt,
 
     # initialize step parameters
     step_params = {
-        'maxiter': 10,
+        'maxiter': 1,
     }
 
     # initialize controller parameters
@@ -201,13 +282,13 @@ def discontinuousTestProblem_run(switch_estimator, problem, sweeper, quad_type, 
 
 def getTestDict():
     testDict = {
-        0 : {
+        0: {
             't': [0, 2],
             'p': [1, 5],
             'tMid': [1],
             'pMid': [3],
         },
-        1 : {
+        1: {
             't': [1, 2, 4, 5],
             'p': [6, 4, 3, 7],
             'tMid': [1.5, 3],
@@ -414,3 +495,55 @@ def test_all_tolerances_ODE(tol, num_nodes, quad_type):
     t_switch = switches[-1]
     event_err = abs(t_switch - t_switch_exact)
     assert np.isclose(event_err, 0, atol=3e-12), f'Event time error is not small enough!'
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('tol', [10 ** (-m) for m in range(8, 13)])
+@pytest.mark.parametrize('num_nodes', [3, 4, 5])
+def test_all_tolerances_DAE(tol, num_nodes):
+    r"""
+    In this test, the switch estimator is applied to a DAE dummy problem of ``DiscontinuousTestDAE``,
+    where the dynamics of the differential equation is replaced by its exact dynamics to see if
+    the switch estimator predicts the event correctly. The problem is tested for a combination
+    of different tolerances ``tol`` and different number of collocation nodes ``num_nodes``.
+
+    Since the problem only uses the exact dynamics, the event should be predicted very accurately
+    by the switch estimator.
+
+    Parameters
+    ----------
+    tol : float
+        Tolerance for switch estimator.
+    num_nodes : int
+        Number of collocation nodes.
+    quad_type : str
+        Type of quadrature.
+    """
+
+    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
+    from pySDC.helpers.stats_helper import get_sorted
+
+    t0 = 4.6
+    Tend = 4.62
+    problem = ExactDiscontinuousTestDAE
+
+    stats, t_switch_exact = discontinuousTestProblem_run(
+        switch_estimator=SwitchEstimator,
+        problem=problem,
+        sweeper=fully_implicit_DAE,
+        quad_type='RADAU-RIGHT',
+        num_nodes=num_nodes,
+        t0=t0,
+        Tend=Tend,
+        dt=2e-2,
+        tol=tol,
+    )
+
+    # in this specific example only one event has to be found
+    switches = [me[1] for me in get_sorted(stats, type='switch', sortby='time', recomputed=False)]
+    assert len(switches) >= 1, f'{problem.__name__}: No events found for tol={tol}!'
+
+    t_switch = switches[-1]
+    event_err = abs(t_switch - t_switch_exact)
+    assert np.isclose(event_err, 0, atol=1e-14), f'Event time error {event_err} is not small enough!'

@@ -131,7 +131,7 @@ class SwitchEstimator(ConvergenceController):
                         L.level_index,
                         L.status.sweep,
                         self.status.t_switch,
-                        self.params.state_function
+                        self.params.state_function,
                     )
 
                     if L.time < self.status.t_switch < L.time + L.dt:
