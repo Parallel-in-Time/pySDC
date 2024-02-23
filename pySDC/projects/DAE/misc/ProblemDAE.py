@@ -57,13 +57,12 @@ class ptype_dae(ptype):
         me = self.dtype_u(self.init)
 
         def implSysFlatten(unknowns, **kwargs):
-            me[:] = unknowns.reshape(me.shape)
-            sys = impl_sys(me, **kwargs)
+            sys = impl_sys(unknowns.reshape(me.shape).view(type(u0)), **kwargs)
             return sys.flatten()
 
         opt = root(
             implSysFlatten,
-            u0.flatten(),
+            u0,
             method='hybr',
             tol=self.newton_tol,
         )
