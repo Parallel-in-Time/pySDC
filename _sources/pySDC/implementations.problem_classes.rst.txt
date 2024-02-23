@@ -29,6 +29,7 @@ Submodules
    implementations.problem_classes.Auzinger_implicit
    implementations.problem_classes.Battery
    implementations.problem_classes.Boussinesq_2D_FD_imex
+   implementations.problem_classes.Brusselator
    implementations.problem_classes.BuckConverter
    implementations.problem_classes.DiscontinuousTestODE
    implementations.problem_classes.FastWaveSlowWave_0D

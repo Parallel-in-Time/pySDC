@@ -171,10 +171,42 @@ as <cite>jac=jac</cite>.</p>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_default_sweeper_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Problem.html#ptype.get_default_sweeper_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Problem.ptype.get_default_sweeper_class" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="core.Problem.ptype.get_fig">
+<span class="sig-name descname"><span class="pre">get_fig</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Problem.html#ptype.get_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Problem.ptype.get_fig" title="Link to this definition">¶</a></dt>
+<dd><p>Get a figure suitable to plot the solution of this problem</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self.fig</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>matplotlib.pyplot.figure.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id0">
 <span class="sig-name descname"><span class="pre">logger</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;Logger</span> <span class="pre">problem</span> <span class="pre">(WARNING)&gt;</span></em><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.Problem.ptype.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Problem.html#ptype.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Problem.ptype.plot" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the solution. Please supply a figure with the same structure as returned by <code class="docutils literal notranslate"><span class="pre">self.get_fig</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Solution to be plotted</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Time to display at the top of the figure</p></li>
+<li><p><strong>fig</strong> (<em>matplotlib.pyplot.figure.Figure</em>) – Figure with the correct structure</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="core.Problem.ptype.u_init">
@@ -211,7 +243,9 @@ as <cite>jac=jac</cite>.</p>
 <li><a class="reference internal" href="#core.Problem.ptype.f_init"><code class="docutils literal notranslate"><span class="pre">f_init</span></code></a></li>
 <li><a class="reference internal" href="#core.Problem.ptype.generate_scipy_reference_solution"><code class="docutils literal notranslate"><span class="pre">generate_scipy_reference_solution()</span></code></a></li>
 <li><a class="reference internal" href="#core.Problem.ptype.get_default_sweeper_class"><code class="docutils literal notranslate"><span class="pre">get_default_sweeper_class()</span></code></a></li>
+<li><a class="reference internal" href="#core.Problem.ptype.get_fig"><code class="docutils literal notranslate"><span class="pre">get_fig()</span></code></a></li>
 <li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
+<li><a class="reference internal" href="#core.Problem.ptype.plot"><code class="docutils literal notranslate"><span class="pre">plot()</span></code></a></li>
 <li><a class="reference internal" href="#core.Problem.ptype.u_init"><code class="docutils literal notranslate"><span class="pre">u_init</span></code></a></li>
 </ul>
 </li>
