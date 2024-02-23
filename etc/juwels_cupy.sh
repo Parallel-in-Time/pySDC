@@ -2,8 +2,8 @@
 #SBATCH --account=cstma
 #SBATCH --nodes=1
 #SBATCH --time=00:10:00
-#SBATCH --partition=develgpu
+#SBATCH --partition=develgpus
 #SBATCH --output=sbatch.out
 #SBATCH --error=sbatch.err
 
-srun coverage run -m pytest --continue-on-collection-errors -v pySDC/tests -m "cupy"
+srun python -m coverage run -m pytest --continue-on-collection-errors -v pySDC/tests -m "cupy"
