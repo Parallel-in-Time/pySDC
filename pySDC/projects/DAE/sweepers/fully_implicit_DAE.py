@@ -107,11 +107,8 @@ class fully_implicit_DAE(generic_implicit):
                     System to be solved as implicit function.
                 """
 
-                if type(params) == DAEMesh:
-                    params_mesh = P.dtype_f(params)
-                else:
-                    params_mesh = P.dtype_f(P.init)
-                    params_mesh[:] = params
+                params_mesh = P.dtype_f(P.init)
+                params_mesh[:] = params.reshape(params_mesh.shape)
 
                 # build parameters to pass to implicit function
                 local_u_approx = P.dtype_f(u_approx)

@@ -56,28 +56,17 @@ class ptype_dae(ptype):
         """
         me = self.dtype_u(self.init)
 
-        def implSysAsNumpy(unknowns, **kwargs):
-            me.diff[:] = unknowns[: np.size(me.diff)].reshape(me.diff.shape)
-            me.alg[:] = unknowns[np.size(me.diff) :].reshape(me.alg.shape)
+        def implSysFlatten(unknowns, **kwargs):
+            me[:] = unknowns.reshape(me.shape)
             sys = impl_sys(me, **kwargs)
-            return np.append(sys.diff.flatten(), sys.alg.flatten())  # TODO: more efficient way?
+            return sys.flatten()
 
-        if type(me) == DAEMesh:
-            opt = root(
-                implSysAsNumpy,
-                np.append(u0.diff.flatten(), u0.alg.flatten()),
-                method='hybr',
-                tol=self.newton_tol,
-            )
-            me.diff[:] = opt.x[: np.size(me.diff)].reshape(me.diff.shape)
-            me.alg[:] = opt.x[np.size(me.diff) :].reshape(me.alg.shape)
-        else:
-            opt = root(
-                impl_sys,
-                u0,
-                method='hybr',
-                tol=self.newton_tol,
-            )
-            me[:] = opt.x
+        opt = root(
+            implSysFlatten,
+            u0.flatten(),
+            method='hybr',
+            tol=self.newton_tol,
+        )
+        me[:] = opt.x.reshape(me.shape)
         self.work_counters['newton'].niter += opt.nfev
         return me
