@@ -61,7 +61,7 @@ test_JUWELS:
     - pwd
     - ls -lah
     - pip install -e .
-    - pip install pytest-benchmark
+    - pip install pytest-benchmark coverage
   script:
     # - touch benchmarks/output.json
     - echo $SYSTEMNAME
