@@ -14,10 +14,6 @@ class ExactDiscontinuousTestODE(DiscontinuousTestODE):
         """Initialization routine"""
         super().__init__(newton_maxiter, newton_tol)
 
-        self.t_switch_exact = np.log(5)
-        self.t_switch = None
-        self.nswitches = 0
-
     def eval_f(self, u, t):
         """
         Derivative.
@@ -77,10 +73,6 @@ class ExactDiscontinuousTestDAE(DiscontinuousTestDAE):
     def __init__(self, newton_tol=1e-8):
         """Initialization routine"""
         super().__init__(newton_tol)
-
-        self.t_switch_exact = np.arccosh(50)
-        self.t_switch = None
-        self.nswitches = 0
 
     def eval_f(self, u, du, t):
         r"""
