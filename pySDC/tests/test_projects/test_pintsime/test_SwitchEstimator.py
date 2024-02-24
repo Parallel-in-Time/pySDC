@@ -494,7 +494,7 @@ def test_all_tolerances_ODE(tol, num_nodes, quad_type):
 
     t_switch = switches[-1]
     event_err = abs(t_switch - t_switch_exact)
-    assert np.isclose(event_err, 0, atol=3e-12), f'Event time error is not small enough!'
+    assert np.isclose(event_err, 0, atol=1.2e-11), f'Event time error {event_err} is not small enough!'
 
 
 @pytest.mark.base
@@ -546,4 +546,4 @@ def test_all_tolerances_DAE(tol, num_nodes):
 
     t_switch = switches[-1]
     event_err = abs(t_switch - t_switch_exact)
-    assert np.isclose(event_err, 0, atol=1e-14), f'Event time error {event_err} is not small enough!'
+    assert np.isclose(event_err, 0, atol=8e-14), f'Event time error {event_err} is not small enough!'

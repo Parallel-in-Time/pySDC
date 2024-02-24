@@ -294,6 +294,10 @@ class SwitchEstimator(ConvergenceController):
         """
         LinearInterpolator = LinearInterpolation(t_interp, state_function)
         p = lambda t: LinearInterpolator.eval(t)
+        if state_function[0] < 0 and state_function[-1] >= 0:
+            chooseFD = 'centered'
+        else:
+            chooseFD = 'backward'
 
         def fprime(t):
             """
@@ -309,8 +313,15 @@ class SwitchEstimator(ConvergenceController):
             dp : float
                 Derivative of interpolation p at time t.
             """
-            dt_FD = 1e-12
-            dp = (p(t + dt_FD) - p(t - dt_FD)) / (2 * dt_FD)
+
+            if chooseFD == 'centered':
+                dt_FD = 1e-12
+                dp = (p(t + dt_FD) - p(t - dt_FD)) / (2 * dt_FD)
+            elif chooseFD == 'backward':
+                dt_FD = 1e-10
+                dp = (p(t) - p(t - dt_FD)) / (dt_FD)
+            else:
+                raise NotImplementedError
             return dp
 
         newton_tol, newton_maxiter = 1e-12, 100
@@ -387,9 +398,9 @@ def newton(x0, p, fprime, newton_tol, newton_maxiter):
         n += 1
 
     if n == newton_maxiter:
-        msg = 'Newton did not converge after %i iterations, error is %s' % (n, res)
+        msg = f'Newton did not converge after {n} iterations, error is {res}'
     else:
-        msg = f'Newton did converge after {n} iterations, error is {res}'
+        msg = f'Newton did converge after {n} iterations, error for root {x0} is {res}'
     print(msg)
 
     root = x0
