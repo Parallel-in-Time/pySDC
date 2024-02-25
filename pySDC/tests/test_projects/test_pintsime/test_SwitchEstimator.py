@@ -77,7 +77,7 @@ class ExactDiscontinuousTestDAE(DiscontinuousTestDAE):
     def eval_f(self, u, du, t):
         r"""
         Returns the exact right-hand side of the problem. The first components in both
-        cases of ``f`` are set to 1 do avoid getting a zero residual (enforced the sweeper to stop
+        cases of ``f`` are set to 1 to avoid getting a zero residual (enforced the sweeper to stop
         since "convergence is reached").
 
         Parameters

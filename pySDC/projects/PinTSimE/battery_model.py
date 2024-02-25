@@ -106,7 +106,7 @@ def generateDescription(
     controller_params : dict
         Parameters needed for a controller run.
     """
-    print(use_adaptivity)
+
     # initialize level parameters
     level_params = {
         'restol': -1 if use_adaptivity else restol,
@@ -235,7 +235,7 @@ def main():
         'max_restarts': 50,
         'recomputed': False,
         'tol_event': 1e-10,
-        'alpha': 1.0,
+        'alpha': 0.95,
         'exact_event_time_avail': None,
     }
 
@@ -246,8 +246,8 @@ def main():
 
     hook_class = [LogSolution, LogEventBattery, LogEmbeddedErrorEstimate, LogStepSize]
 
-    use_detection = [True]
-    use_adaptivity = [True]
+    use_detection = [True, False]
+    use_adaptivity = [True, False]
 
     for problem, sweeper in zip([battery, battery_implicit], [imex_1st_order, generic_implicit]):
         for defaults in [False, True]:
