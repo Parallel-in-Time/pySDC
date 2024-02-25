@@ -170,7 +170,8 @@ def getParamsRun():
     useA = False
     useSE = True
     exact_event_time_avail = True
-    return restol, alpha, maxiter, max_restarts, useA, useSE, exact_event_time_avail
+    typeFD = 'centered'
+    return restol, alpha, maxiter, max_restarts, useA, useSE, exact_event_time_avail, typeFD
 
 
 @pytest.mark.base
@@ -296,7 +297,7 @@ def testAdaptInterpolationInfo(quad_type):
 
     tol = 1e-10
 
-    restol, alpha, maxiter, max_restarts, useA, useSE, _ = getParamsRun()
+    restol, alpha, maxiter, max_restarts, useA, useSE, _, typeFD = getParamsRun()
 
     hook_class = []
 
@@ -316,6 +317,7 @@ def testAdaptInterpolationInfo(quad_type):
         max_restarts=max_restarts,
         tol_event=tol,
         alpha=alpha,
+        typeFD=typeFD,
     )
 
     S = controller.MS[0]
@@ -392,7 +394,7 @@ def testDetectionBoundary(num_nodes):
 
     tol = 1e-10
 
-    restol, alpha, maxiter, max_restarts, useA, useSE, exact_event_time_avail = getParamsRun()
+    restol, alpha, maxiter, max_restarts, useA, useSE, exact_event_time_avail, typeFD = getParamsRun()
 
     hook_class = [LogSolution, LogRestarts]
 
@@ -412,6 +414,7 @@ def testDetectionBoundary(num_nodes):
         max_restarts=max_restarts,
         tol_event=tol,
         alpha=alpha,
+        typeFD=typeFD,
     )
 
     stats, _ = controllerRun(
@@ -466,7 +469,7 @@ def testDetectionODE(tol, num_nodes, quad_type):
     sweeper = generic_implicit
     QI = 'IE'
 
-    restol, alpha, maxiter, max_restarts, useA, useSE, exact_event_time_avail = getParamsRun()
+    restol, alpha, maxiter, max_restarts, useA, useSE, exact_event_time_avail, typeFD = getParamsRun()
 
     hook_class = [LogSolution, LogRestarts]
 
@@ -486,6 +489,7 @@ def testDetectionODE(tol, num_nodes, quad_type):
         max_restarts=max_restarts,
         tol_event=tol,
         alpha=alpha,
+        typeFD=typeFD,
     )
 
     stats, t_switch_exact = controllerRun(
@@ -545,7 +549,7 @@ def testDetectionDAE(tol, num_nodes):
     QI = 'IE'
     quad_type = 'RADAU-RIGHT'
 
-    restol, alpha, maxiter, max_restarts, useA, useSE, exact_event_time_avail = getParamsRun()
+    restol, alpha, maxiter, max_restarts, useA, useSE, exact_event_time_avail, typeFD = getParamsRun()
 
     hook_class = [LogSolution, LogRestarts]
 
@@ -565,6 +569,7 @@ def testDetectionDAE(tol, num_nodes):
         max_restarts=max_restarts,
         tol_event=tol,
         alpha=alpha,
+        typeFD=typeFD,
     )
 
     stats, t_switch_exact = controllerRun(

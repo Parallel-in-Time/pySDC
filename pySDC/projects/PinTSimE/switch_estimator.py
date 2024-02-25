@@ -122,7 +122,9 @@ class SwitchEstimator(ConvergenceController):
 
                 # intermediate value theorem states that a root is contained in current step
                 if self.params.state_function[0] * self.params.state_function[-1] < 0 and self.status.is_zero is None:
-                    self.status.t_switch = self.get_switch(self.params.t_interp, self.params.state_function, m_guess)
+                    self.status.t_switch = self.get_switch(
+                        self.params.t_interp, self.params.state_function, m_guess, self.params.typeFD
+                    )
 
                     self.logging_during_estimation(
                         controller.hooks[0],
@@ -274,8 +276,8 @@ class SwitchEstimator(ConvergenceController):
         )
 
     @staticmethod
-    def get_switch(t_interp, state_function, m_guess):
-        """
+    def get_switch(t_interp, state_function, m_guess, choiceFD='backward'):
+        r"""
         Routine to do the interpolation and root finding stuff.
 
         Parameters
@@ -286,6 +288,10 @@ class SwitchEstimator(ConvergenceController):
             Contains values of state function at these collocation nodes.
         m_guess : float
             Index at which the difference drops below zero.
+        choiceFD : str
+            Finite difference to be used to approximate derivative of
+            state function. Can be ``'forward'``, ``'centered'``, or
+            ``'backward'``. Default is ``'backward'``
 
         Returns
         -------
@@ -294,10 +300,6 @@ class SwitchEstimator(ConvergenceController):
         """
         LinearInterpolator = LinearInterpolation(t_interp, state_function)
         p = lambda t: LinearInterpolator.eval(t)
-        if state_function[0] < 0 and state_function[-1] >= 0:
-            chooseFD = 'centered'
-        else:
-            chooseFD = 'backward'
 
         def fprime(t):
             """
@@ -314,10 +316,13 @@ class SwitchEstimator(ConvergenceController):
                 Derivative of interpolation p at time t.
             """
 
-            if chooseFD == 'centered':
+            if choiceFD == 'forward':
+                dt_FD = 1e-10
+                dp = (p(t + dt_FD) - p(t)) / (dt_FD)
+            elif choiceFD == 'centered':
                 dt_FD = 1e-12
                 dp = (p(t + dt_FD) - p(t - dt_FD)) / (2 * dt_FD)
-            elif chooseFD == 'backward':
+            elif choiceFD == 'backward':
                 dt_FD = 1e-10
                 dp = (p(t) - p(t - dt_FD)) / (dt_FD)
             else:

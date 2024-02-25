@@ -375,21 +375,21 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
             msg = f"Error when using switch estimator for {prob_cls_name} for dt={dt:.1e}:"
             if dt == 1e-2:
                 expected = {
-                    'u': 5.9941358952954955,
-                    't_switches': [1.6094379124671208],
-                    'sum_restarts': 25.0,
-                    'sum_niters': 710.0,
-                    'e_global': 8.195133460731086e-11,
-                    'e_event': [3.302047524300633e-11],
+                    'u': 5.994135895337547,
+                    'e_global': 7.765876830490015e-11,
+                    't_switches': [1.6094379124455047],
+                    'e_event': [1.1404432953554533e-11],
+                    'sum_restarts': 22.0,
+                    'sum_niters': 686.0,
                 }
             elif dt == 1e-3:
                 expected = {
-                    'u': 5.971767837651004,
-                    't_switches': [1.6094379124247695],
-                    'sum_restarts': 23.0,
-                    'sum_niters': 2388.0,
-                    'e_global': 2.3067769916451653e-11,
-                    'e_event': [9.330758388159666e-12],
+                    'u': 5.972186947618947,
+                    'e_global': 0.00041911003080929987,
+                    't_switches': [1.6094379124055875],
+                    'e_event': [2.851274771842327e-11],
+                    'sum_restarts': 17.0,
+                    'sum_niters': 2338.0,
                 }
             got.update(
                 {
@@ -406,14 +406,14 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
             if dt == 1e-2:
                 expected = {
                     'u': 5.9805345175338225,
-                    'sum_niters': 527.0,
                     'e_global': 0.009855041056925806,
+                    'sum_niters': 527.0,
                 }
             elif dt == 1e-3:
                 expected = {
                     'u': 5.9737411566014105,
-                    'sum_niters': 2226.0,
                     'e_global': 0.0005763403865515215,
+                    'sum_niters': 2226.0,
                 }
         got.update(
             {

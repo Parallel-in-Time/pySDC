@@ -61,6 +61,7 @@ def generateDescription(
     max_restarts=None,
     tol_event=1e-10,
     alpha=1.0,
+    typeFD='backward',
 ):
     r"""
     Generate a description for the battery models for a controller run.
@@ -98,6 +99,9 @@ def generateDescription(
         Tolerance for event detection to terminate.
     alpha : float, optional
         Factor that indicates how the new step size in the Switch Estimator is reduced.
+    typeFD : str, optional
+        Type of finite difference in switch estimator. For detailed documentation, see
+        switch_estimator.py.
 
     Returns
     -------
@@ -139,9 +143,11 @@ def generateDescription(
     # convergence controllers
     convergence_controllers = {}
     if use_switch_estimator:
+        typeFD = typeFD if typeFD is not None else 'backward'
         switch_estimator_params = {
             'tol': tol_event,
             'alpha': alpha,
+            'typeFD': typeFD,
         }
         convergence_controllers.update({SwitchEstimator: switch_estimator_params})
     if use_adaptivity:
@@ -237,6 +243,7 @@ def main():
         'tol_event': 1e-10,
         'alpha': 0.95,
         'exact_event_time_avail': None,
+        'typeFD': 'backward',
     }
 
     all_params = {
@@ -378,6 +385,7 @@ def runSimulation(problem, sweeper, all_params, use_adaptivity, use_detection, h
                         max_restarts=handling_params['max_restarts'],
                         tol_event=handling_params['tol_event'],
                         alpha=handling_params['alpha'],
+                        typeFD=handling_params['typeFD'],
                     )
 
                     stats, t_switch_exact = controllerRun(

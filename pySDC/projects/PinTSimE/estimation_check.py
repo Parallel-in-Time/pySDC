@@ -45,8 +45,9 @@ def run_estimation_check():
         'max_restarts': 50,
         'recomputed': False,
         'tol_event': 1e-10,
-        'alpha': 1.0,
+        'alpha': 0.95,
         'exact_event_time_avail': None,
+        'typeFD': 'backward',
     }
 
     problem_classes = [battery, battery_implicit, battery_n_capacitors]
@@ -114,7 +115,7 @@ def run_estimation_check():
 
         plotAccuracyCheck(u_num, prob_cls_name, M_fix)
 
-        plotStateFunctionAroundEvent(u_num, prob_cls_name, M_fix)
+        # plotStateFunctionAroundEvent(u_num, prob_cls_name, M_fix)
 
         plotStateFunctionOverTime(u_num, prob_cls_name, M_fix)
 
@@ -187,6 +188,9 @@ def plotStateFunctionAroundEvent(u_num, prob_cls_name, M_fix):  # pragma: no cov
     Routine that plots the state function at time before the event, exactly at the event, and after the event. Note
     that this routine does make sense only for a state function that remains constant after the event.
 
+    TODO: Function still does not work as expected. Every time when the switch estimator is adapted, the tolerances
+    does not suit anymore!
+
     Parameters
     ----------
     u_num : dict
@@ -239,15 +243,19 @@ def plotStateFunctionAroundEvent(u_num, prob_cls_name, M_fix):  # pragma: no cov
 
                     if use_SE:
                         t_switches = [u_num[dt][M_fix][use_SE][use_A]['t_switches'] for dt in dt_list]
-                        t_switch = [t_event[i] for t_event in t_switches]
+                        for t_switch_item in t_switches:
+                            for m in range(1, len(t_switch_item)):
+                                if np.isclose(t_switch_item[m - 1], t_switch_item[m], atol=1e-10):
+                                    t_switch_item.pop(m - 1)
 
+                        t_switch = [t_event[i] for t_event in t_switches]
                         ax[0, ind].plot(
                             dt_list,
                             [
                                 h_item[m]
                                 for (t_item, h_item, t_switch_item) in zip(t, h, t_switch)
                                 for m in range(len(t_item))
-                                if abs(t_item[m] - t_switch_item) <= 1e-14
+                                if abs(t_item[m] - t_switch_item) <= 2.7961188919789493e-11
                             ],
                             color='limegreen',
                             marker='s',
