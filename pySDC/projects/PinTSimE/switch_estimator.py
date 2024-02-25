@@ -17,9 +17,11 @@ class SwitchEstimator(ConvergenceController):
         r"""
         Function sets default variables to handle with the event at the beginning. The default params are:
 
-        - control_order : controls the order of the SE's call of convergence controllers
-        - coll.nodes : defines the collocation nodes for interpolation
-        - tol_zero : inner tolerance for SE; state function has to satisfy it to terminate
+        - control_order : controls the order of the SE's call of convergence controllers.
+        - coll.nodes : defines the collocation nodes for interpolation.
+        - tol_zero : inner tolerance for SE; state function has to satisfy it to terminate.
+        - t_interp : interpolation axis with time points.
+        - state_function : List of values from state function.
 
         Parameters
         ----------
@@ -302,8 +304,25 @@ class SwitchEstimator(ConvergenceController):
         p = lambda t: LinearInterpolator.eval(t)
 
         def fprime(t):
-            """
-            Computes the derivative of the scalar interpolant using centered finite difference.
+            r"""
+            Computes the derivative of the scalar interpolant using finite difference.
+            Here, different finite differences can be used. The type of FD can be set by
+            setting ``typeFD`` in switch estimator parameters. There are three choices possible:
+
+            - ``typeFD='backward'`` for :math:`h=10^{-10}`:
+
+                .. math::
+                \frac{dp}{dt} \approx \frac{p(t) - p(t - h)}{h}
+
+            - ``typeFD='centered'`` for :math:`h=10^{-12}`:
+
+                .. math::
+                \frac{dp}{dt} \approx \frac{p(t + h) - p(t - h)}{2h}
+
+            - ``typeFD='forward'`` for :math:`h=10^{-10}`:
+
+                .. math::
+                \frac{dp}{dt} \approx \frac{p(t + h) - p(t)}{h}
 
             Parameters
             ----------
