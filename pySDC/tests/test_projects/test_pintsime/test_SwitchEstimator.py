@@ -114,7 +114,7 @@ class ExactDiscontinuousTestDAE(DiscontinuousTestDAE):
             )
         return f
 
-    def solve_system(self, impl_sys, u0, t):
+    def solve_system(self, impl_sys, u0, t, **kwargs):
         r"""
         Just returns the derivative of the exact solution.
 
@@ -141,137 +141,6 @@ class ExactDiscontinuousTestDAE(DiscontinuousTestDAE):
         return me
 
 
-def get_controller(switch_estimator, problem, sweeper, quad_type, num_nodes, dt, tol):
-    r"""
-    This function prepares the controller for one simulation run. Based on function in
-    ``pySDC.tests.test_convergence_controllers.test_adaptivity.py``
-
-    Parameters
-    ----------
-    switch_estimator : pySDC.core.ConvergenceController
-        Switch estimator.
-    problem : pySDC.core.Problem
-        Problem class to be simulated.
-    sweeper: pySDC.core.Sweeper
-        Sweeper used for the simulation.
-    quad_type : str
-        Type of quadrature used.
-    num_nodes : int
-        Number of collocation nodes.
-    t0 : float
-        Starting time.
-    Tend : float
-        End time.
-    dt : float
-        Time step size.
-    tol : float
-        Tolerance for the switch estimator.
-    """
-    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
-
-    from pySDC.implementations.hooks.log_solution import LogSolution
-    from pySDC.implementations.hooks.log_restarts import LogRestarts
-
-    # initialize level parameters
-    level_params = {
-        'restol': 1e-13,
-        'dt': dt,
-    }
-
-    # initialize sweeper parameters
-    sweeper_params = {
-        'quad_type': quad_type,
-        'num_nodes': num_nodes,
-        'QI': 'IE',
-        'initial_guess': 'spread',
-    }
-
-    # initialize step parameters
-    step_params = {
-        'maxiter': 1,
-    }
-
-    # initialize controller parameters
-    controller_params = {
-        'logger_level': 30,
-        'hook_class': [LogSolution, LogRestarts],
-    }
-
-    # convergence controllers
-    convergence_controllers = dict()
-    switch_estimator_params = {
-        'tol': tol,
-        'alpha': 0.95,
-    }
-    convergence_controllers.update({switch_estimator: switch_estimator_params})
-
-    convergence_controllers[BasicRestartingNonMPI] = {
-        'max_restarts': 3,
-        'crash_after_max_restarts': False,
-    }
-
-    # fill description dictionary for easy step instantiation
-    description = {
-        'problem_class': problem,  # pass problem class
-        'problem_params': dict(),  # problem_params,  # pass problem parameters
-        'sweeper_class': sweeper,  # pass sweeper
-        'sweeper_params': sweeper_params,  # pass sweeper parameters
-        'level_params': level_params,  # pass level parameters
-        'step_params': step_params,
-        'convergence_controllers': convergence_controllers,
-    }
-
-    # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
-
-    return controller
-
-
-def discontinuousTestProblem_run(switch_estimator, problem, sweeper, quad_type, num_nodes, t0, Tend, dt, tol):
-    """
-    Simulates one run of a discontinuous test problem class for one specific tolerance specified in
-    the parameters. For testing, only one time step should be considered.
-
-    Parameters
-    ----------
-    switch_estimator : pySDC.core.ConvergenceController
-        Switch Estimator.
-    problem : pySDC.core.Problem
-        Problem class to be simulated.
-    sweeper: pySDC.core.Sweeper
-        Sweeper used for the simulation.
-    quad_type : str
-        Type of quadrature used.
-    num_nodes : int
-        Number of collocation nodes.
-    t0 : float
-        Starting time.
-    Tend : float
-        End time.
-    dt : float
-        Time step size.
-    tol : float
-        Tolerance for the switch estimator.
-    """
-
-    controller = get_controller(switch_estimator, problem, sweeper, quad_type, num_nodes, dt, tol)
-
-    # set time parameters
-    t0 = t0
-    Tend = Tend
-
-    # get initial values on finest level
-    P = controller.MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
-    t_switch_exact = P.t_switch_exact
-
-    # call main function to get things done...
-    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-    return stats, t_switch_exact
-
-
 def getTestDict():
     testDict = {
         0: {
@@ -288,6 +157,68 @@ def getTestDict():
         },
     }
     return testDict
+
+
+@pytest.mark.base
+def testExactDummyProblems():
+    r"""
+    Test for dummy problems. The test verifies that the dummy problems exactly returns the dynamics of
+    the parent class. ``eval_f`` of ``ExactDiscontinuousTestDAE`` is not tested here, since it only returns
+    a random right-hand side to enforce the sweeper to do not stop to compute.
+    """
+
+    from pySDC.implementations.datatype_classes.mesh import mesh
+
+    childODE = ExactDiscontinuousTestODE(**{})
+    parentODE = DiscontinuousTestODE(**{})
+    assert childODE.t_switch_exact == parentODE.t_switch_exact, f"Exact event times between classes does not match!"
+
+    t0 = 1.0
+    dt = 0.1
+    u0 = parentODE.u_exact(t0)
+    rhs = u0.copy()
+
+    uSolve = childODE.solve_system(rhs, dt, u0, t0)
+    uExact = parentODE.u_exact(t0)
+    assert np.allclose(uSolve, uExact)
+
+    # same test for event time
+    tExactEventODE = parentODE.t_switch_exact
+    dt = 0.1
+    u0Event = parentODE.u_exact(tExactEventODE)
+    rhsEvent = u0.copy()
+
+    uSolveEvent = childODE.solve_system(rhsEvent, dt, u0Event, tExactEventODE)
+    uExactEvent = parentODE.u_exact(tExactEventODE)
+    assert np.allclose(uSolveEvent, uExactEvent)
+
+    fExactOde = childODE.eval_f(u0, t0)
+    fOde = parentODE.eval_f(u0, t0)
+    assert np.allclose(fExactOde, fOde), f"Right-hand sides do not match!"
+
+    fExactOdeEvent = childODE.eval_f(u0Event, tExactEventODE)
+    fOdeEvent = parentODE.eval_f(u0Event, tExactEventODE)
+    assert np.allclose(fExactOdeEvent, fOdeEvent), f"Right-hand sides at event do not match!"
+
+    childDAE = ExactDiscontinuousTestDAE(**{})
+    parentDAE = DiscontinuousTestDAE(**{})
+    assert childDAE.t_switch_exact == parentDAE.t_switch_exact, f"Exact event times between classes does not match!"
+
+    t0 = 0.0
+    u0 = mesh(childDAE.init)
+    duExactDAE = childDAE.solve_system(impl_sys=None, u0=u0, t=t0)
+    duDAE = mesh(parentDAE.init)
+    duDAE[:] = (np.sinh(t0), np.cosh(t0))
+    assert np.allclose(duExactDAE, duDAE), f"Method solve_system of dummy problem do not return exact derivative!"
+
+    tExactEventDAE = parentDAE.t_switch_exact
+    u0Event = mesh(childDAE.init)
+    duExactDAEEvent = childDAE.solve_system(impl_sys=None, u0=u0Event, t=tExactEventDAE)
+    duDAEEvent = mesh(parentDAE.init)
+    duDAEEvent[:] = (np.sinh(tExactEventDAE), np.cosh(tExactEventDAE))
+    assert np.allclose(
+        duExactDAEEvent, duDAEEvent
+    ), f"Method solve_system of dummy problem do not return exact derivative at event!"
 
 
 @pytest.mark.base
@@ -317,7 +248,7 @@ def testInterpolationValues(key):
 
 @pytest.mark.base
 @pytest.mark.parametrize('quad_type', ['LOBATTO', 'RADAU-RIGHT'])
-def test_adapt_interpolation_info(quad_type):
+def testAdaptInterpolationInfo(quad_type):
     r"""
     Tests if the method ``adapt_interpolation_info`` does what it is supposed to do.
 
@@ -334,25 +265,47 @@ def test_adapt_interpolation_info(quad_type):
         Type of quadrature used.
     """
 
+    from pySDC.projects.PinTSimE.battery_model import generateDescription
     from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
+    problem = ExactDiscontinuousTestODE
+    problem_params = dict()
     t0 = 1.6
-    Tend = ExactDiscontinuousTestODE().t_switch_exact
+    Tend = problem(**problem_params).t_switch_exact
     eps = 1e-13  # choose this eps to enforce a sign chance in state function
     dt = (Tend - t0) + eps
 
-    tol = 1e-10
+    sweeper = generic_implicit
     num_nodes = 3
+    QI = 'IE'
 
-    controller = get_controller(
-        switch_estimator=SwitchEstimator,
-        problem=ExactDiscontinuousTestODE,
-        sweeper=generic_implicit,
-        quad_type=quad_type,
-        num_nodes=num_nodes,
+    restol = 1e-13
+    tol = 1e-10
+    alpha = 0.95
+    maxiter = 1
+    max_restarts = 3
+    useA = False
+    useSE = True
+
+    hook_class = []
+
+    _, _, controller = generateDescription(
         dt=dt,
-        tol=tol,
+        problem=problem,
+        sweeper=sweeper,
+        num_nodes=num_nodes,
+        quad_type=quad_type,
+        QI=QI,
+        hook_class=hook_class,
+        use_adaptivity=useA,
+        use_switch_estimator=useSE,
+        problem_params=problem_params,
+        restol=restol,
+        maxiter=maxiter,
+        max_restarts=max_restarts,
+        tol_event=tol,
+        alpha=alpha,
     )
 
     S = controller.MS[0]
@@ -399,7 +352,7 @@ def test_adapt_interpolation_info(quad_type):
 
 @pytest.mark.base
 @pytest.mark.parametrize('num_nodes', [3, 4, 5])
-def test_detection_at_boundary(num_nodes):
+def testDetectionBoundary(num_nodes):
     """
     This test checks whether a restart is executed or not when the event exactly occurs at the boundary. In this case,
     no restart should be done because occuring the event at the boundary means that the event is already resolved well,
@@ -411,25 +364,58 @@ def test_detection_at_boundary(num_nodes):
         Number of collocation nodes.
     """
 
+    from pySDC.projects.PinTSimE.battery_model import generateDescription, controllerRun
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-    from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
+    from pySDC.implementations.hooks.log_solution import LogSolution
+    from pySDC.implementations.hooks.log_restarts import LogRestarts
     from pySDC.helpers.stats_helper import get_sorted
 
     problem = ExactDiscontinuousTestODE
+    problem_params = dict()
     t0 = 1.6
-    Tend = ExactDiscontinuousTestODE().t_switch_exact
+    Tend = problem(**problem_params).t_switch_exact
     dt = Tend - t0
 
-    stats, _ = discontinuousTestProblem_run(
-        switch_estimator=SwitchEstimator,
+    sweeper = generic_implicit
+    QI = 'IE'
+    quad_type = 'LOBATTO'
+
+    restol = 1e-13
+    tol = 1e-10
+    alpha = 0.95
+    maxiter = 1
+    max_restarts = 3
+    useA = False
+    useSE = True
+    exact_event_time_avail = True
+
+    hook_class = [LogSolution, LogRestarts]
+
+    description, controller_params, controller = generateDescription(
+        dt=dt,
         problem=problem,
-        sweeper=generic_implicit,
-        quad_type='LOBATTO',
+        sweeper=sweeper,
         num_nodes=num_nodes,
+        quad_type=quad_type,
+        QI=QI,
+        hook_class=hook_class,
+        use_adaptivity=useA,
+        use_switch_estimator=useSE,
+        problem_params=problem_params,
+        restol=restol,
+        maxiter=maxiter,
+        max_restarts=max_restarts,
+        tol_event=tol,
+        alpha=alpha,
+    )
+
+    stats, _ = controllerRun(
+        description=description,
+        controller_params=controller_params,
+        controller=controller,
         t0=t0,
         Tend=Tend,
-        dt=dt,
-        tol=1e-10,
+        exact_event_time_avail=exact_event_time_avail,
     )
 
     sum_restarts = np.sum(np.array(get_sorted(stats, type='restart', sortby='time', recomputed=None))[:, 1])
@@ -440,7 +426,7 @@ def test_detection_at_boundary(num_nodes):
 @pytest.mark.parametrize('tol', [10 ** (-m) for m in range(8, 13)])
 @pytest.mark.parametrize('num_nodes', [3, 4, 5])
 @pytest.mark.parametrize('quad_type', ['LOBATTO', 'RADAU-RIGHT'])
-def test_all_tolerances_ODE(tol, num_nodes, quad_type):
+def testDetectionODE(tol, num_nodes, quad_type):
     r"""
     Here, the switch estimator is applied to a dummy problem of ``DiscontinuousTestODE``,
     where the dynamics of the differential equation is replaced by its exact dynamics to see if
@@ -461,23 +447,55 @@ def test_all_tolerances_ODE(tol, num_nodes, quad_type):
     """
 
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-    from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
     from pySDC.helpers.stats_helper import get_sorted
+    from pySDC.projects.PinTSimE.battery_model import generateDescription, controllerRun
+    from pySDC.implementations.hooks.log_solution import LogSolution
+    from pySDC.implementations.hooks.log_restarts import LogRestarts
 
+    problem = ExactDiscontinuousTestODE
+    problem_params = dict()
     t0 = 1.6
     Tend = 1.62
-    problem = ExactDiscontinuousTestODE
+    dt = Tend - t0
 
-    stats, t_switch_exact = discontinuousTestProblem_run(
-        switch_estimator=SwitchEstimator,
+    sweeper = generic_implicit
+    QI = 'IE'
+
+    restol = 1e-13
+    alpha = 0.95
+    maxiter = 1
+    max_restarts = 3
+    useA = False
+    useSE = True
+    exact_event_time_avail = True
+
+    hook_class = [LogSolution, LogRestarts]
+
+    description, controller_params, controller = generateDescription(
+        dt=dt,
         problem=problem,
-        sweeper=generic_implicit,
-        quad_type=quad_type,
+        sweeper=sweeper,
         num_nodes=num_nodes,
+        quad_type=quad_type,
+        QI=QI,
+        hook_class=hook_class,
+        use_adaptivity=useA,
+        use_switch_estimator=useSE,
+        problem_params=problem_params,
+        restol=restol,
+        maxiter=maxiter,
+        max_restarts=max_restarts,
+        tol_event=tol,
+        alpha=alpha,
+    )
+
+    stats, t_switch_exact = controllerRun(
+        description=description,
+        controller_params=controller_params,
+        controller=controller,
         t0=t0,
         Tend=Tend,
-        dt=2e-2,
-        tol=tol,
+        exact_event_time_avail=exact_event_time_avail,
     )
 
     # in this specific example only one event has to be found
@@ -492,7 +510,7 @@ def test_all_tolerances_ODE(tol, num_nodes, quad_type):
 @pytest.mark.base
 @pytest.mark.parametrize('tol', [10 ** (-m) for m in range(8, 13)])
 @pytest.mark.parametrize('num_nodes', [3, 4, 5])
-def test_all_tolerances_DAE(tol, num_nodes):
+def testDetectionDAE(tol, num_nodes):
     r"""
     In this test, the switch estimator is applied to a DAE dummy problem of ``DiscontinuousTestDAE``,
     where the dynamics of the differential equation is replaced by its exact dynamics to see if
@@ -513,23 +531,56 @@ def test_all_tolerances_DAE(tol, num_nodes):
     """
 
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-    from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
     from pySDC.helpers.stats_helper import get_sorted
+    from pySDC.projects.PinTSimE.battery_model import generateDescription, controllerRun
+    from pySDC.implementations.hooks.log_solution import LogSolution
+    from pySDC.implementations.hooks.log_restarts import LogRestarts
 
+    problem = ExactDiscontinuousTestDAE
+    problem_params = dict()
     t0 = 4.6
     Tend = 4.62
-    problem = ExactDiscontinuousTestDAE
+    dt = Tend - t0
 
-    stats, t_switch_exact = discontinuousTestProblem_run(
-        switch_estimator=SwitchEstimator,
+    sweeper = fully_implicit_DAE
+    QI = 'IE'
+    quad_type = 'RADAU-RIGHT'
+
+    restol = 1e-13
+    alpha = 0.95
+    maxiter = 1
+    max_restarts = 3
+    useA = False
+    useSE = True
+    exact_event_time_avail = True
+
+    hook_class = [LogSolution, LogRestarts]
+
+    description, controller_params, controller = generateDescription(
+        dt=dt,
         problem=problem,
-        sweeper=fully_implicit_DAE,
-        quad_type='RADAU-RIGHT',
+        sweeper=sweeper,
         num_nodes=num_nodes,
+        quad_type=quad_type,
+        QI=QI,
+        hook_class=hook_class,
+        use_adaptivity=useA,
+        use_switch_estimator=useSE,
+        problem_params=problem_params,
+        restol=restol,
+        maxiter=maxiter,
+        max_restarts=max_restarts,
+        tol_event=tol,
+        alpha=alpha,
+    )
+
+    stats, t_switch_exact = controllerRun(
+        description=description,
+        controller_params=controller_params,
+        controller=controller,
         t0=t0,
         Tend=Tend,
-        dt=2e-2,
-        tol=tol,
+        exact_event_time_avail=exact_event_time_avail,
     )
 
     # in this specific example only one event has to be found
