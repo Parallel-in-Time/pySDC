@@ -159,6 +159,20 @@ def getTestDict():
     return testDict
 
 
+def getParamsRun():
+    r"""
+    Returns parameters for conroller run that are used in each test.
+    """
+    restol = 1e-13
+    alpha = 0.95
+    maxiter = 1
+    max_restarts = 3
+    useA = False
+    useSE = True
+    exact_event_time_avail = True
+    return restol, alpha, maxiter, max_restarts, useA, useSE, exact_event_time_avail
+
+
 @pytest.mark.base
 def testExactDummyProblems():
     r"""
@@ -280,13 +294,9 @@ def testAdaptInterpolationInfo(quad_type):
     num_nodes = 3
     QI = 'IE'
 
-    restol = 1e-13
     tol = 1e-10
-    alpha = 0.95
-    maxiter = 1
-    max_restarts = 3
-    useA = False
-    useSE = True
+
+    restol, alpha, maxiter, max_restarts, useA, useSE, _ = getParamsRun()
 
     hook_class = []
 
@@ -380,14 +390,9 @@ def testDetectionBoundary(num_nodes):
     QI = 'IE'
     quad_type = 'LOBATTO'
 
-    restol = 1e-13
     tol = 1e-10
-    alpha = 0.95
-    maxiter = 1
-    max_restarts = 3
-    useA = False
-    useSE = True
-    exact_event_time_avail = True
+
+    restol, alpha, maxiter, max_restarts, useA, useSE, exact_event_time_avail = getParamsRun()
 
     hook_class = [LogSolution, LogRestarts]
 
@@ -461,13 +466,7 @@ def testDetectionODE(tol, num_nodes, quad_type):
     sweeper = generic_implicit
     QI = 'IE'
 
-    restol = 1e-13
-    alpha = 0.95
-    maxiter = 1
-    max_restarts = 3
-    useA = False
-    useSE = True
-    exact_event_time_avail = True
+    restol, alpha, maxiter, max_restarts, useA, useSE, exact_event_time_avail = getParamsRun()
 
     hook_class = [LogSolution, LogRestarts]
 
@@ -546,13 +545,7 @@ def testDetectionDAE(tol, num_nodes):
     QI = 'IE'
     quad_type = 'RADAU-RIGHT'
 
-    restol = 1e-13
-    alpha = 0.95
-    maxiter = 1
-    max_restarts = 3
-    useA = False
-    useSE = True
-    exact_event_time_avail = True
+    restol, alpha, maxiter, max_restarts, useA, useSE, exact_event_time_avail = getParamsRun()
 
     hook_class = [LogSolution, LogRestarts]
 
