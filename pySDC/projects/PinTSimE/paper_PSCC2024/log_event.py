@@ -8,7 +8,7 @@ class LogEventDiscontinuousTestDAE(hooks):
     """
 
     def post_step(self, step, level_number):
-        super(LogEventDiscontinuousTestDAE, self).post_step(step, level_number)
+        super().post_step(step, level_number)
 
         L = step.levels[level_number]
 
@@ -32,7 +32,7 @@ class LogEventWSCC9(hooks):
     """
 
     def post_step(self, step, level_number):
-        super(LogEventWSCC9, self).post_step(step, level_number)
+        super().post_step(step, level_number)
 
         L = step.levels[level_number]
         P = L.prob

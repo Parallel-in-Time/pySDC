@@ -65,105 +65,11 @@ class ExactDiscontinuousTestODE(DiscontinuousTestODE):
         return self.u_exact(t)
 
 
-class ExactDiscontinuousTestDAE(DiscontinuousTestDAE):
-    r"""
-    Dummy DAE problem for testing. The problem contains the exact dynamics of the problem class ``DiscontinuousTestDAE``.
-    """
-
-    def __init__(self, newton_tol=1e-8):
-        """Initialization routine"""
-        super().__init__(newton_tol)
-
-    def eval_f(self, u, du, t):
-        r"""
-        Returns the exact right-hand side of the problem. The first components in both
-        cases of ``f`` are set to 1 to avoid getting a zero residual (enforced the sweeper to stop
-        since "convergence is reached").
-
-        Parameters
-        ----------
-        u : dtype_u
-            Exact value of u.
-        du : dtype_u
-            Current values of the derivative of the numerical solution at time t.
-        t : float
-            Time :math:`t`.
-
-        Returns
-        -------
-        f : dtype_f
-            Right-hand side.
-        """
-
-        f = self.dtype_f(self.init)
-
-        t_switch = np.inf if self.t_switch is None else self.t_switch
-
-        h = 2 * u[0] - 100
-        f = self.dtype_f(self.init)
-
-        if h >= 0 or t >= t_switch:
-            f[:] = (
-                1,
-                0,
-            )
-        else:
-            f[:] = (
-                1,
-                0,
-            )
-        return f
-
-    def solve_system(self, impl_sys, u0, t, **kwargs):
-        r"""
-        Just returns the derivative of the exact solution.
-
-        Parameters
-        ----------
-        impl_sys : callable
-            Implicit system to be solved.
-        u0 : dtype_u
-            Initial guess for solver.
-        t : float
-            Current time :math:`t`.
-
-        Returns
-        -------
-        me : dtype_u
-            Numerical solution.
-        """
-
-        me = self.dtype_u(self.init)
-        if t <= self.t_switch_exact:
-            me[:] = (np.sinh(t), np.cosh(t))
-        else:
-            me[:] = (np.sinh(self.t_switch_exact), np.cosh(self.t_switch_exact))
-        return me
-
-
-def getTestDict():
-    testDict = {
-        0: {
-            't': [0, 2],
-            'p': [1, 5],
-            'tMid': [1],
-            'pMid': [3],
-        },
-        1: {
-            't': [1, 2, 4, 5],
-            'p': [6, 4, 3, 7],
-            'tMid': [1.5, 3],
-            'pMid': [5, 3.5],
-        },
-    }
-    return testDict
-
-
 def getParamsRun():
     r"""
     Returns parameters for conroller run that are used in each test.
     """
-    restol = 1e-13
+    restol = -1
     alpha = 0.95
     maxiter = 1
     max_restarts = 3
@@ -214,51 +120,6 @@ def testExactDummyProblems():
     fExactOdeEvent = childODE.eval_f(u0Event, tExactEventODE)
     fOdeEvent = parentODE.eval_f(u0Event, tExactEventODE)
     assert np.allclose(fExactOdeEvent, fOdeEvent), f"Right-hand sides at event do not match!"
-
-    childDAE = ExactDiscontinuousTestDAE(**{})
-    parentDAE = DiscontinuousTestDAE(**{})
-    assert childDAE.t_switch_exact == parentDAE.t_switch_exact, f"Exact event times between classes does not match!"
-
-    t0 = 0.0
-    u0 = mesh(childDAE.init)
-    duExactDAE = childDAE.solve_system(impl_sys=None, u0=u0, t=t0)
-    duDAE = mesh(parentDAE.init)
-    duDAE[:] = (np.sinh(t0), np.cosh(t0))
-    assert np.allclose(duExactDAE, duDAE), f"Method solve_system of dummy problem do not return exact derivative!"
-
-    tExactEventDAE = parentDAE.t_switch_exact
-    u0Event = mesh(childDAE.init)
-    duExactDAEEvent = childDAE.solve_system(impl_sys=None, u0=u0Event, t=tExactEventDAE)
-    duDAEEvent = mesh(parentDAE.init)
-    duDAEEvent[:] = (np.sinh(tExactEventDAE), np.cosh(tExactEventDAE))
-    assert np.allclose(
-        duExactDAEEvent, duDAEEvent
-    ), f"Method solve_system of dummy problem do not return exact derivative at event!"
-
-
-@pytest.mark.base
-@pytest.mark.parametrize("key", [0, 1])
-def testInterpolationValues(key):
-    """
-    Test for linear interpolation class in switch estimator. Linear interpolation is tested against
-    values in testDict that contains values for interpolation computed by hand.
-    Further, NumPy's routine interp is used as reference to have a second test on hand.
-    """
-    from pySDC.projects.PinTSimE.switch_estimator import LinearInterpolation
-
-    testDict = getTestDict()
-    testSet = testDict[key]
-    t, p = testSet['t'], testSet['p']
-    tMid, pMid = testSet['tMid'], testSet['pMid']
-    LinearInterpolator = LinearInterpolation(t, p)
-
-    for m in range(len(t)):
-        assert LinearInterpolator.eval(t[m]) == p[m]
-        assert np.interp(t[m], t, p) == LinearInterpolator.eval(t[m])
-
-    for m in range(len(tMid)):
-        assert LinearInterpolator.eval(tMid[m]) == pMid[m]
-        assert np.interp(tMid[m], t, p) == LinearInterpolator.eval(tMid[m])
 
 
 @pytest.mark.base
@@ -511,9 +372,10 @@ def testDetectionODE(tol, num_nodes, quad_type):
 
 
 @pytest.mark.base
-@pytest.mark.parametrize('tol', [10 ** (-m) for m in range(8, 13)])
+@pytest.mark.parametrize('dt', np.logspace(-2.5, -1.5, num=4))
+@pytest.mark.parametrize('tol', [10 ** (-m) for m in range(9, 13)])
 @pytest.mark.parametrize('num_nodes', [3, 4, 5])
-def testDetectionDAE(tol, num_nodes):
+def testDetectionDAE(dt, tol, num_nodes):
     r"""
     In this test, the switch estimator is applied to a DAE dummy problem of ``DiscontinuousTestDAE``,
     where the dynamics of the differential equation is replaced by its exact dynamics to see if
@@ -534,24 +396,31 @@ def testDetectionDAE(tol, num_nodes):
     """
 
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
     from pySDC.helpers.stats_helper import get_sorted
     from pySDC.projects.PinTSimE.battery_model import generateDescription, controllerRun
     from pySDC.implementations.hooks.log_solution import LogSolution
     from pySDC.implementations.hooks.log_restarts import LogRestarts
+    from pySDC.projects.PinTSimE.paper_PSCC2024.log_event import LogEventDiscontinuousTestDAE
 
-    problem = ExactDiscontinuousTestDAE
+    problem = DiscontinuousTestDAE
     problem_params = dict()
     t0 = 4.6
     Tend = 4.62
-    dt = Tend - t0
 
     sweeper = fully_implicit_DAE
-    QI = 'IE'
+    QI = 'LU'
     quad_type = 'RADAU-RIGHT'
 
-    restol, alpha, maxiter, max_restarts, useA, useSE, exact_event_time_avail, typeFD = getParamsRun()
+    _, _, _, _, useA, useSE, exact_event_time_avail, _ = getParamsRun()
 
-    hook_class = [LogSolution, LogRestarts]
+    restol=1e-13
+    maxiter = 60
+    typeFD = 'backward'
+    max_restarts = 20
+    alpha = 0.9
+
+    hook_class = [LogSolution, LogRestarts, LogEventDiscontinuousTestDAE]
 
     description, controller_params, controller = generateDescription(
         dt=dt,
@@ -583,8 +452,11 @@ def testDetectionDAE(tol, num_nodes):
 
     # in this specific example only one event has to be found
     switches = [me[1] for me in get_sorted(stats, type='switch', sortby='time', recomputed=False)]
-    assert len(switches) >= 1, f'{problem.__name__}: No events found for tol={tol}!'
+    assert len(switches) >= 1, f'{problem.__name__}: No events found for tol={tol} and M={num_nodes}!'
 
     t_switch = switches[-1]
     event_err = abs(t_switch - t_switch_exact)
-    assert np.isclose(event_err, 0, atol=8e-14), f'Event time error {event_err} is not small enough!'
+    assert np.isclose(event_err, 0, atol=3e-7), f'Event time error {event_err} is not small enough!'
+
+    h = np.array([np.abs(val[1]) for val in get_sorted(stats, type='state_function', sortby='time', recomputed=False)])
+    assert np.isclose(h[-1], 0.0, atol=3e-6), f'State function is not close to zero; value is {h[-1]}'

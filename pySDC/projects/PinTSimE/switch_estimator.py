@@ -300,7 +300,7 @@ class SwitchEstimator(ConvergenceController):
         t_switch : float
            Time point of found event.
         """
-        LinearInterpolator = LinearInterpolation(t_interp, state_function)
+        LinearInterpolator = LagrangeInterpolation(t_interp, state_function)
         p = lambda t: LinearInterpolator.eval(t)
 
         def fprime(t):
@@ -342,13 +342,15 @@ class SwitchEstimator(ConvergenceController):
                 dt_FD = 1e-12
                 dp = (p(t + dt_FD) - p(t - dt_FD)) / (2 * dt_FD)
             elif choiceFD == 'backward':
-                dt_FD = 1e-10
-                dp = (p(t) - p(t - dt_FD)) / (dt_FD)
+                dt_FD = 1e-12
+                # dp = (p(t) - p(t - dt_FD)) / (dt_FD)
+                # dp = (11 * p(t) - 18 * p(t - dt_FD) + 9 * p(t - 2 * dt_FD) - 2 * p(t - 3 * dt_FD)) / (6 * dt_FD)
+                dp = (25 * p(t) - 48 * p(t - dt_FD) + 36 * p(t - 2 * dt_FD) - 16 * p(t - 3 * dt_FD) + 3 * p(t - 4 * dt_FD)) / (12 * dt_FD)
             else:
                 raise NotImplementedError
             return dp
 
-        newton_tol, newton_maxiter = 1e-12, 100
+        newton_tol, newton_maxiter = 1e-15, 100
         t_switch = newton(t_interp[m_guess], p, fprime, newton_tol, newton_maxiter)
         return t_switch
 
@@ -431,36 +433,45 @@ def newton(x0, p, fprime, newton_tol, newton_maxiter):
     return root
 
 
-class LinearInterpolation(object):
+class LagrangeInterpolation(object):
     def __init__(self, ti, yi):
         """Initialization routine"""
         self.ti = np.asarray(ti)
         self.yi = np.asarray(yi)
         self.n = len(ti)
 
-    def eval(self, t):
-        r"""
-        Evaluates the linear interpolant at time :math:`t`.
-        Binary search is used to find the index in which piece :math:`t` lies.
+    def get_Lagrange_polynomial(self, t, i):
+        """
+        Computes the basis of the i-th Lagrange polynomial.
 
         Parameters
         ----------
         t : float
-            Time where the interpolant is evaluated.
+            Time where the polynomial is computed at.
+        i : int
+            Index of the Lagrange polynomial
+
+        Returns
+        -------
+        product : float
+            The product of the bases.
+        """
+        product = np.prod([(t - self.ti[k]) / (self.ti[i] - self.ti[k]) for k in range(self.n) if k != i])
+        return product
+
+    def eval(self, t):
+        """
+        Evaluates the Lagrange interpolation at time t.
+
+        Parameters
+        ----------
+        t : float
+            Time where interpolation is computed.
 
         Returns
         -------
         p : float
-            Value of the interpolant at time :math:`t`.
+            Value of interpolant at time t.
         """
-
-        ind = np.searchsorted(self.ti, t)
-        if ind == 0:
-            p = self.yi[0]
-        elif ind == len(self.ti):
-            p = self.yi[-1]
-        else:
-            p = self.yi[ind - 1] + (self.yi[ind] - self.yi[ind - 1]) / (self.ti[ind] - self.ti[ind - 1]) * (
-                t - self.ti[ind - 1]
-            )
+        p = np.sum([self.yi[i] * self.get_Lagrange_polynomial(t, i) for i in range(self.n)])
         return p
