@@ -302,6 +302,7 @@ class heatNd_unforced(heatNd_forced):
 
     The implementation is this class uses the ``CuPy`` package in order to make ``pySDC`` available for GPUs.
     """
+
     dtype_f = cupy_mesh
 
     def eval_f(self, u, t):

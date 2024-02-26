@@ -37,7 +37,7 @@ jobs:
               echo 'Permissions granted'
               exit 0
             else
-              echo 'Not enough permissions'
+              echo 'Not enough permissions. Please ask a member of Parallel-in-Time to rerun the job.'
               exit 1
           fi
       - name: Pass if workflow from push or schedule

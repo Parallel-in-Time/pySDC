@@ -34,6 +34,7 @@ class logistics_equation(ptype):
     stop_at_nan : bool, optional
         Indicates if the Newton solver stops when nan values arise.
     """
+
     dtype_u = mesh
     dtype_f = mesh
 

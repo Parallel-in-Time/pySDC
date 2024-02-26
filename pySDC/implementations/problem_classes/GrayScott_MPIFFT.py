@@ -590,6 +590,7 @@ class grayscott_mi_linear(grayscott_imex_linear):
     The problem in this class will be treated in a *multi-implicit* way for time-stepping, i.e., for the system containing
     the diffusion part will be solved by FFT, and for the linear part a Newton solver is used.
     """
+
     dtype_f = comp2_mesh
 
     def __init__(
