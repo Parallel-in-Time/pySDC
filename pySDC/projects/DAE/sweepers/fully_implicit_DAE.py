@@ -3,6 +3,7 @@ from scipy import optimize
 
 from pySDC.core.Errors import ParameterError
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
 
 
 class fully_implicit_DAE(generic_implicit):
@@ -46,18 +47,13 @@ class fully_implicit_DAE(generic_implicit):
     """
 
     def __init__(self, params):
-        """
-        Initialization routine for the custom sweeper
-
-        Args:
-            params: parameters for the sweeper
-        """
+        """Initialization routine"""
 
         if 'QI' not in params:
             params['QI'] = 'IE'
 
         # call parent's initialization routine
-        super(fully_implicit_DAE, self).__init__(params)
+        super().__init__(params)
 
         msg = f"Quadrature type {self.params.quad_type} is not implemented yet. Use 'RADAU-RIGHT' instead!"
         if self.coll.left_is_node:
@@ -71,34 +67,27 @@ class fully_implicit_DAE(generic_implicit):
         preconditioned Richardson iteration in **"ordinary"** SDC.
         """
 
-        # get current level and problem description
         L = self.level
-        # in the fully implicit case L.prob.eval_f() evaluates the function F(u, u', t)
         P = L.prob
 
         # only if the level has been touched before
         assert L.status.unlocked
 
-        # get number of collocation nodes for easier access
         M = self.coll.num_nodes
         u_0 = L.u[0]
 
         # get QU^k where U = u'
-        # note that for multidimensional functions the required Kronecker product is achieved since
-        # e.g. L.f[j] is a mesh object and multiplication with a number distributes over the mesh
         integral = self.integrate()
         # build the rest of the known solution u_0 + del_t(Q - Q_del)U_k
         for m in range(1, M + 1):
             for j in range(1, M + 1):
                 integral[m - 1] -= L.dt * self.QI[m, j] * L.f[j]
-            # add initial value
             integral[m - 1] += u_0
 
         # do the sweep
         for m in range(1, M + 1):
-            # build implicit function, consisting of the known values from above and new values from previous nodes (at k+1)
-            u_approx = P.dtype_u(integral[m - 1])
             # add the known components from current sweep del_t*Q_del*U_k+1
+            u_approx = P.dtype_u(integral[m - 1])
             for j in range(1, m):
                 u_approx += L.dt * self.QI[m, j] * L.f[j]
 
@@ -118,11 +107,10 @@ class fully_implicit_DAE(generic_implicit):
                     System to be solved as implicit function.
                 """
 
-                params_mesh = P.dtype_f(P.init)
-                params_mesh[:] = params
+                params_mesh = P.dtype_f(params)
 
                 # build parameters to pass to implicit function
-                local_u_approx = u_approx
+                local_u_approx = P.dtype_f(u_approx)
 
                 # note that derivatives of algebraic variables are taken into account here too
                 # these do not directly affect the output of eval_f but rather indirectly via QI
@@ -131,22 +119,14 @@ class fully_implicit_DAE(generic_implicit):
                 sys = P.eval_f(local_u_approx, params_mesh, L.time + L.dt * self.coll.nodes[m - 1])
                 return sys
 
-            # get U_k+1
-            # note: not using solve_system here because this solve step is the same for any problem
-            # See link for how different methods use the default tol parameter
-            # https://github.com/scipy/scipy/blob/8a6f1a0621542f059a532953661cd43b8167fce0/scipy/optimize/_root.py#L220
-            # options['xtol'] = P.params.newton_tol
-            # options['eps'] = 1e-16
-
-            u_new = P.solve_system(implSystem, L.f[m], L.time + L.dt * self.coll.nodes[m - 1])
-
             # update gradient (recall L.f is being used to store the gradient)
-            L.f[m][:] = u_new
+            L.f[m] = P.solve_system(implSystem, L.f[m], L.time + L.dt * self.coll.nodes[m - 1])
 
         # Update solution approximation
         integral = self.integrate()
         for m in range(M):
             L.u[m + 1] = u_0 + integral[m]
+
         # indicate presence of new values at this level
         L.status.updated = True
 
@@ -213,11 +193,7 @@ class fully_implicit_DAE(generic_implicit):
             L.status.residual = 0.0 if L.status.residual is None else L.status.residual
             return None
 
-        # check if there are new values (e.g. from a sweep)
-        # assert L.status.updated
-
         # compute the residual for each node
-
         res_norm = []
         for m in range(self.coll.num_nodes):
             # use abs function from data type here
@@ -242,3 +218,18 @@ class fully_implicit_DAE(generic_implicit):
         L.status.updated = False
 
         return None
+
+    def compute_end_point(self):
+        """
+        Compute u at the right point of the interval
+
+        The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False
+
+        Returns:
+            None
+        """
+
+        if not self.coll.right_is_node or self.params.do_coll_update:
+            raise NotImplementedError()
+
+        super().compute_end_point()

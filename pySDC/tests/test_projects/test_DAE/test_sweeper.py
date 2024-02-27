@@ -21,7 +21,6 @@ def test_predict_main():
     # initialize problem parameters
     problem_params = dict()
     problem_params['newton_tol'] = 1e-12  # tollerance for implicit solver
-    problem_params['nvars'] = 3
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -41,10 +40,10 @@ def test_predict_main():
     # call prediction function to initialise nodes
     L.sweep.predict()
     # check correct initialisation
-    assert np.array_equal(L.f[0], np.zeros(3))
+    assert np.allclose(abs(L.f[0]), 0.0)
     for i in range(sweeper_params['num_nodes']):
-        assert np.array_equal(L.u[i + 1], np.zeros(3))
-        assert np.array_equal(L.f[i + 1], np.zeros(3))
+        assert np.allclose(abs(L.u[i + 1]), 0.0)
+        assert np.allclose(abs(L.f[i + 1]), 0.0)
 
     # rerun check for random initialisation
     # expecting that random initialisation does not initialise to zero
@@ -58,10 +57,10 @@ def test_predict_main():
     # compute initial value (using the exact function here)
     L.u[0] = P.u_exact(L.time)
     L.sweep.predict()
-    assert np.array_equal(L.f[0], np.zeros(3))
+    assert abs(L.f[0]) == 0.0
     for i in range(sweeper_params['num_nodes']):
-        assert np.not_equal(L.u[i + 1], np.zeros(3)).any()
-        assert np.not_equal(L.f[i + 1], np.zeros(3)).any()
+        assert abs(L.u[i + 1]) > 0.0
+        assert abs(L.f[i + 1]) > 0.0
 
 
 @pytest.mark.base
@@ -83,7 +82,6 @@ def test_residual_main():
     # initialize problem parameters
     problem_params = dict()
     problem_params['newton_tol'] = 1e-12  # tollerance for implicit solver
-    problem_params['nvars'] = 3
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -101,8 +99,10 @@ def test_residual_main():
     # set reference values
     u = P.dtype_u(P.init)
     du = P.dtype_u(P.init)
-    u[:] = (5, 5, 5)
-    du[:] = (0, 0, 0)
+    u.diff[:2] = (5, 5)
+    u.alg[0] = 5
+    du.diff[:2] = (0, 0)
+    du.alg[0] = 0
     # set initial time in the status of the level
     L.status.time = 0.0
     L.u[0] = u
@@ -168,7 +168,6 @@ def test_compute_end_point_main():
     # initialize problem parameters
     problem_params = dict()
     problem_params['newton_tol'] = 1e-12  # tollerance for implicit solver
-    problem_params['nvars'] = 3
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -192,4 +191,4 @@ def test_compute_end_point_main():
     L.sweep.compute_end_point()
 
     for m in range(1, L.sweep.coll.num_nodes):
-        assert np.array_equal(L.u[m], L.uend), "ERROR: end point not computed correctly"
+        assert np.allclose(abs(L.u[m] - L.uend), 0.0), "ERROR: end point not computed correctly"

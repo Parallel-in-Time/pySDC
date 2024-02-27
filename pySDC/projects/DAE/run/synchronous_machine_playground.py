@@ -6,10 +6,10 @@ import statistics
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.DAE.problems.synchronous_machine import synchronous_machine_infinite_bus
 from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-from pySDC.projects.DAE.misc.HookClass_DAE import approx_solution_hook
-from pySDC.projects.DAE.misc.HookClass_DAE import error_hook
+from pySDC.projects.DAE.misc.HookClass_DAE import LogGlobalErrorPostStepDifferentialVariable
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.helpers.stats_helper import filter_stats
+from pySDC.implementations.hooks.log_solution import LogSolution
 
 
 def main():
@@ -29,8 +29,7 @@ def main():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
-    problem_params['nvars'] = 14
+    problem_params['newton_tol'] = 1e-3
 
     # initialize step parameters
     step_params = dict()
@@ -39,7 +38,7 @@ def main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = [error_hook, approx_solution_hook]
+    controller_params['hook_class'] = [LogGlobalErrorPostStepDifferentialVariable, LogSolution]
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -67,33 +66,41 @@ def main():
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # check error (only available if reference solution was provided)
-    # err = get_sorted(stats, type='error_post_step', sortby='time')
+    # err = get_sorted(stats, type='e_global_differential_post_step', sortby='time')
     # err = np.linalg.norm([err[i][1] for i in range(len(err))], np.inf)
     # print(f"Error is {err}")
 
-    uend_ref = [
+    uend_ref = P.dtype_u(P.init)
+    uend_ref.diff[:8] = (
         8.30823565e-01,
         -4.02584174e-01,
         1.16966755e00,
         9.47592808e-01,
         -3.68076863e-01,
         -3.87492326e-01,
+        3.10281509e-01,
+        9.94039645e-01,
+    )
+    uend_ref.alg[:6] = (
         -7.77837831e-01,
         -1.67347611e-01,
         1.34810867e00,
         5.46223705e-04,
         1.29690691e-02,
         -8.00823474e-02,
-        3.10281509e-01,
-        9.94039645e-01,
-    ]
-    err = np.linalg.norm(uend - uend_ref, np.inf)
+    )
+    err = abs(uend.diff - uend_ref.diff)
     assert np.isclose(err, 0, atol=1e-4), "Error too large."
 
     # store results
-    sol = get_sorted(stats, type='approx_solution', sortby='time')
+    sol = get_sorted(stats, type='u', sortby='time')
     sol_dt = np.array([sol[i][0] for i in range(len(sol))])
-    sol_data = np.array([[sol[j][1][i] for j in range(len(sol))] for i in range(problem_params['nvars'])])
+    sol_data = np.array(
+        [
+            [(sol[j][1].diff[id], sol[j][1].alg[ia]) for j in range(len(sol))]
+            for id, ia in zip(range(len(uend.diff)), range(len(uend.alg)))
+        ]
+    )
     niter = filter_stats(stats, type='niter')
     niter = np.fromiter(niter.values(), int)
 

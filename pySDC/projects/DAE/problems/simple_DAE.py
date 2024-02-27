@@ -3,6 +3,7 @@ import numpy as np
 from scipy.interpolate import interp1d
 
 from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
+from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 class pendulum_2d(ptype_dae):
@@ -11,15 +12,22 @@ class pendulum_2d(ptype_dae):
     The DAE system is given by the equations
 
     .. math::
-        x' = u,
+        \frac{dp}{dt} = u,
 
     .. math::
-        \frac{d}{dt} \frac{\partial}{\partial u} L = \frac{\partial L}{\partial x} + f + G^{T} \lambda,
+        \frac{dq}{dt} = v,
 
     .. math::
-        0 = \phi.
+        m\frac{du}{dt} = -p \lambda,
 
-    The pendulum is used in most introductory literature on DAEs, for example on page 8 of [1]_.
+    .. math::
+        m\frac{dv}{dt} = -q \lambda - g,
+
+    .. math::
+        0 = p^2 + q^2 - l^2
+
+    for :math:`l=1` and :math:`m=1`. The pendulum is used in most introductory literature on DAEs, for example on page 8
+    of [1]_.
 
     Parameters
     ----------
@@ -39,9 +47,9 @@ class pendulum_2d(ptype_dae):
         Lect. Notes Math. (1989).
     """
 
-    def __init__(self, nvars, newton_tol):
+    def __init__(self, newton_tol):
         """Initialization routine"""
-        super().__init__(nvars, newton_tol)
+        super().__init__(nvars=5, newton_tol=newton_tol)
         # load reference solution
         # data file must be generated and stored under misc/data and self.t_end = t[-1]
         # data = np.load(r'pySDC/projects/DAE/misc/data/pendulum.npy')
@@ -72,7 +80,13 @@ class pendulum_2d(ptype_dae):
         # The last element of u is a Lagrange multiplier. Not sure if this needs to be time dependent, but must model the
         # weight somehow
         f = self.dtype_f(self.init)
-        f[:] = (du[0] - u[2], du[1] - u[3], du[2] + u[4] * u[0], du[3] + u[4] * u[1] + g, u[0] ** 2 + u[1] ** 2 - 1)
+        f.diff[:4] = (
+            du.diff[0] - u.diff[2],
+            du.diff[1] - u.diff[3],
+            du.diff[2] + u.alg[0] * u.diff[0],
+            du.diff[3] + u.alg[0] * u.diff[1] + g,
+        )
+        f.alg[0] = u.diff[0] ** 2 + u.diff[1] ** 2 - 1
         self.work_counters['rhs']()
         return f
 
@@ -92,12 +106,16 @@ class pendulum_2d(ptype_dae):
         """
         me = self.dtype_u(self.init)
         if t == 0:
-            me[:] = (-1, 0, 0, 0, 0)
+            me.diff[:4] = (-1, 0, 0, 0)
+            me.alg[0] = 0
         elif t < self.t_end:
-            me[:] = self.u_ref(t)
+            u_ref = self.u_ref(t)
+            me.diff[:4] = u_ref[:4]
+            me.alg[0] = u_ref[5]
         else:
             self.logger.warning("Requested time exceeds domain of the reference solution. Returning zero.")
-            me[:] = (0, 0, 0, 0, 0)
+            me.diff[:4] = (0, 0, 0, 0)
+            me.alg[0] = 0
         return me
 
 
@@ -139,6 +157,10 @@ class simple_dae_1(ptype_dae):
         equations. Society for Industrial and Applied Mathematics (1998).
     """
 
+    def __init__(self, newton_tol=1e-10):
+        """Initialization routine"""
+        super().__init__(nvars=3, newton_tol=newton_tol)
+
     def eval_f(self, u, du, t):
         r"""
         Routine to evaluate the implicit representation of the problem, i.e., :math:`F(u, u', t)`.
@@ -160,11 +182,12 @@ class simple_dae_1(ptype_dae):
         # Smooth index-2 DAE pg. 267 Ascher and Petzold (also the first example in KDC Minion paper)
         a = 10.0
         f = self.dtype_f(self.init)
-        f[:] = (
-            -du[0] + (a - 1 / (2 - t)) * u[0] + (2 - t) * a * u[2] + np.exp(t) * (3 - t) / (2 - t),
-            -du[1] + (1 - a) / (t - 2) * u[0] - u[1] + (a - 1) * u[2] + 2 * np.exp(t),
-            (t + 2) * u[0] + (t**2 - 4) * u[1] - (t**2 + t - 2) * np.exp(t),
+
+        f.diff[:2] = (
+            -du.diff[0] + (a - 1 / (2 - t)) * u.diff[0] + (2 - t) * a * u.alg[0] + (3 - t) / (2 - t) * np.exp(t),
+            -du.diff[1] + (1 - a) / (t - 2) * u.diff[0] - u.diff[1] + (a - 1) * u.alg[0] + 2 * np.exp(t),
         )
+        f.alg[0] = (t + 2) * u.diff[0] + (t**2 - 4) * u.diff[1] - (t**2 + t - 2) * np.exp(t)
         self.work_counters['rhs']()
         return f
 
@@ -183,7 +206,8 @@ class simple_dae_1(ptype_dae):
             The reference solution as mesh object containing three components.
         """
         me = self.dtype_u(self.init)
-        me[:] = (np.exp(t), np.exp(t), -np.exp(t) / (2 - t))
+        me.diff[:2] = (np.exp(t), np.exp(t))
+        me.alg[0] = -np.exp(t) / (2 - t)
         return me
 
 
@@ -193,10 +217,10 @@ class problematic_f(ptype_dae):
     numerically solvable for certain choices of the parameter :math:`\eta`. The DAE system is given by
 
     .. math::
-        y (t) + \eta t z (t) = f(t),
+        \frac{d y(t)}{dt} + \eta t \frac{d z(t)}{dt} + (1 + \eta) z (t) = g (t).
 
     .. math::
-        \frac{d y(t)}{dt} + \eta t \frac{d z(t)}{dt} + (1 + \eta) z (t) = g (t).
+        y (t) + \eta t z (t) = f(t),
 
     See, for example, page 264 of [1]_.
 
@@ -218,9 +242,12 @@ class problematic_f(ptype_dae):
         equations. Society for Industrial and Applied Mathematics (1998).
     """
 
-    def __init__(self, nvars, newton_tol, eta=1):
+    dtype_u = mesh
+    dtype_f = mesh
+
+    def __init__(self, newton_tol, eta=1):
         """Initialization routine"""
-        super().__init__(nvars, newton_tol)
+        super().__init__(nvars=2, newton_tol=newton_tol)
         self._makeAttributeAndRegister('eta', localVars=locals())
 
     def eval_f(self, u, du, t):

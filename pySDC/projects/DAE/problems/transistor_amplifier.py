@@ -3,6 +3,7 @@ import numpy as np
 from scipy.interpolate import interp1d
 
 from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
+from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 # Helper function
@@ -12,7 +13,7 @@ def _transistor(u_in):
 
 class one_transistor_amplifier(ptype_dae):
     r"""
-    The one transistor amplifier example from pg. 404 in [1]_. The problem is an index-1 differential-algebraic equation
+    The one transistor amplifier example from pg. 377 in [1]_. The problem is an index-1 differential-algebraic equation
     (DAE) having the equations
 
     .. math::
@@ -61,8 +62,11 @@ class one_transistor_amplifier(ptype_dae):
         Springer (2009).
     """
 
-    def __init__(self, nvars, newton_tol):
-        super().__init__(nvars, newton_tol)
+    dtype_u = mesh
+    dtype_f = mesh
+
+    def __init__(self, newton_tol):
+        super().__init__(nvars=5, newton_tol=newton_tol)
         # load reference solution
         # data file must be generated and stored under misc/data and self.t_end = t[-1]
         # data = np.load(r'pySDC/projects/DAE/misc/data/one_trans_amp.npy')
@@ -195,8 +199,11 @@ class two_transistor_amplifier(ptype_dae):
         Lect. Notes Math. (1989).
     """
 
-    def __init__(self, nvars, newton_tol):
-        super().__init__(nvars, newton_tol)
+    dtype_u = mesh
+    dtype_f = mesh
+
+    def __init__(self, newton_tol):
+        super().__init__(nvars=8, newton_tol=newton_tol)
         # load reference solution
         # data file must be generated and stored under misc/data and self.t_end = t[-1]
         # data = np.load(r'pySDC/projects/DAE/misc/data/two_trans_amp.npy')
