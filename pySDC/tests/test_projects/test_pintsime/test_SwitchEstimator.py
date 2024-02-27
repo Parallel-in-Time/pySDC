@@ -401,6 +401,7 @@ def testDetectionDAE(dt, tol, num_nodes):
     from pySDC.projects.PinTSimE.battery_model import generateDescription, controllerRun
     from pySDC.implementations.hooks.log_solution import LogSolution
     from pySDC.implementations.hooks.log_restarts import LogRestarts
+    from pySDC.projects.DAE.misc.HookClass_DAE import error_hook
     from pySDC.projects.PinTSimE.paper_PSCC2024.log_event import LogEventDiscontinuousTestDAE
 
     problem = DiscontinuousTestDAE
@@ -418,9 +419,9 @@ def testDetectionDAE(dt, tol, num_nodes):
     maxiter = 60
     typeFD = 'backward'
     max_restarts = 20
-    alpha = 0.9
+    alpha = 0.94
 
-    hook_class = [LogSolution, LogRestarts, LogEventDiscontinuousTestDAE]
+    hook_class = [LogSolution, LogRestarts, LogEventDiscontinuousTestDAE, error_hook]
 
     description, controller_params, controller = generateDescription(
         dt=dt,
@@ -456,7 +457,12 @@ def testDetectionDAE(dt, tol, num_nodes):
 
     t_switch = switches[-1]
     event_err = abs(t_switch - t_switch_exact)
-    assert np.isclose(event_err, 0, atol=3e-7), f'Event time error {event_err} is not small enough!'
+    assert np.isclose(event_err, 0, atol=1e-10), f'Event time error {event_err} is not small enough!'
 
-    h = np.array([np.abs(val[1]) for val in get_sorted(stats, type='state_function', sortby='time', recomputed=False)])
-    assert np.isclose(h[-1], 0.0, atol=3e-6), f'State function is not close to zero; value is {h[-1]}'
+    h = np.array([val[1] for val in get_sorted(stats, type='state_function', sortby='time', recomputed=False)])
+    if h[-1] < 0:
+        assert h[-1] > -1e-10, f"State function has large negative value -> SE does switch too early!"
+    assert np.isclose(abs(h[-1]), 0.0, atol=1e-11), f'State function is not close to zero; value is {h[-1]}'
+
+    e_global = np.array(get_sorted(stats, type='error_post_step', sortby='time', recomputed=False))
+    assert np.isclose(e_global[-1, 1], 0.0, atol=1e-11), f"Error at end time is too large! Expected {1e-11}, got {e_global[-1, 1]}"
