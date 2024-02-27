@@ -470,7 +470,7 @@ class BackwardEuler(RungeKutta):
     A-stable first order method.
     """
 
-    nodes = np.array([0.0])
+    nodes = np.array([1.0])
     weights = np.array([1.0])
     matrix = np.array(
         [
