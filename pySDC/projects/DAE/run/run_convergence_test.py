@@ -5,7 +5,7 @@ import pickle
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
 from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-from pySDC.projects.DAE.misc.HookClass_DAE import error_hook
+from pySDC.projects.DAE.misc.HookClass_DAE import LogGlobalErrorPostStepDifferentialVariable
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.helpers.stats_helper import filter_stats
 
@@ -25,7 +25,6 @@ def setup():
     # This comes as read-in for the problem class
     problem_params = dict()
     problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
-    problem_params['nvars'] = 3
 
     # This comes as read-in for the step class
     step_params = dict()
@@ -34,7 +33,7 @@ def setup():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = error_hook
+    controller_params['hook_class'] = LogGlobalErrorPostStepDifferentialVariable
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -90,7 +89,7 @@ def run(description, controller_params, run_params):
                 uend, stats = controller.run(u0=uinit, t0=run_params['t0'], Tend=run_params['tend'])
 
                 # compute exact solution and compare
-                err = get_sorted(stats, type='error_post_step', sortby='time')
+                err = get_sorted(stats, type='e_global_differential_post_step', sortby='time')
                 niter = filter_stats(stats, type='niter')
 
                 conv_data[qd_type][num_nodes]['error'][j] = np.linalg.norm([err[j][1] for j in range(len(err))], np.inf)

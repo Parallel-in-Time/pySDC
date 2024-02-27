@@ -1,6 +1,5 @@
 import numpy as np
 from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
-from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.core.Errors import ParameterError
 
 
@@ -763,16 +762,12 @@ class WSCC9BusSystem(ptype_dae):
        for Power Systems Research and Education. IEEE Transactions on Power Systems. Vol. 26, No. 1, pp. 12–19 (2011).
     """
 
-    dtype_u = mesh
-    dtype_f = mesh
-
-    def __init__(self, nvars=None, newton_tol=1e-10, m=3, n=9):
+    def __init__(self, newton_tol=1e-10):
         """Initialization routine"""
-
+        m, n = 3, 9
         nvars = 11 * m + 2 * m + 2 * n
         # invoke super init, passing number of dofs
-        super().__init__(nvars, newton_tol)
-        self._makeAttributeAndRegister('nvars', 'newton_tol', localVars=locals(), readOnly=True)
+        super().__init__(nvars=nvars, newton_tol=newton_tol)
         self._makeAttributeAndRegister('m', 'n', localVars=locals())
         self.mpc = WSCC9Bus()
 
@@ -993,19 +988,31 @@ class WSCC9BusSystem(ptype_dae):
             The right-hand side of f (contains two components).
         """
 
-        dEqp, dSi1d, dEdp = du[0 : self.m], du[self.m : 2 * self.m], du[2 * self.m : 3 * self.m]
-        dSi2q, dDelta = du[3 * self.m : 4 * self.m], du[4 * self.m : 5 * self.m]
-        dw, dEfd, dRF = du[5 * self.m : 6 * self.m], du[6 * self.m : 7 * self.m], du[7 * self.m : 8 * self.m]
-        dVR, dTM, dPSV = du[8 * self.m : 9 * self.m], du[9 * self.m : 10 * self.m], du[10 * self.m : 11 * self.m]
+        dEqp, dSi1d, dEdp = du.diff[0 : self.m], du.diff[self.m : 2 * self.m], du.diff[2 * self.m : 3 * self.m]
+        dSi2q, dDelta = du.diff[3 * self.m : 4 * self.m], du.diff[4 * self.m : 5 * self.m]
+        dw, dEfd, dRF = (
+            du.diff[5 * self.m : 6 * self.m],
+            du.diff[6 * self.m : 7 * self.m],
+            du.diff[7 * self.m : 8 * self.m],
+        )
+        dVR, dTM, dPSV = (
+            du.diff[8 * self.m : 9 * self.m],
+            du.diff[9 * self.m : 10 * self.m],
+            du.diff[10 * self.m : 11 * self.m],
+        )
 
-        Eqp, Si1d, Edp = u[0 : self.m], u[self.m : 2 * self.m], u[2 * self.m : 3 * self.m]
-        Si2q, Delta = u[3 * self.m : 4 * self.m], u[4 * self.m : 5 * self.m]
-        w, Efd, RF = u[5 * self.m : 6 * self.m], u[6 * self.m : 7 * self.m], u[7 * self.m : 8 * self.m]
-        VR, TM, PSV = u[8 * self.m : 9 * self.m], u[9 * self.m : 10 * self.m], u[10 * self.m : 11 * self.m]
+        Eqp, Si1d, Edp = u.diff[0 : self.m], u.diff[self.m : 2 * self.m], u.diff[2 * self.m : 3 * self.m]
+        Si2q, Delta = u.diff[3 * self.m : 4 * self.m], u.diff[4 * self.m : 5 * self.m]
+        w, Efd, RF = u.diff[5 * self.m : 6 * self.m], u.diff[6 * self.m : 7 * self.m], u.diff[7 * self.m : 8 * self.m]
+        VR, TM, PSV = (
+            u.diff[8 * self.m : 9 * self.m],
+            u.diff[9 * self.m : 10 * self.m],
+            u.diff[10 * self.m : 11 * self.m],
+        )
 
-        Id, Iq = u[11 * self.m : 11 * self.m + self.m], u[11 * self.m + self.m : 11 * self.m + 2 * self.m]
-        V = u[11 * self.m + 2 * self.m : 11 * self.m + 2 * self.m + self.n]
-        TH = u[11 * self.m + 2 * self.m + self.n : 11 * self.m + 2 * self.m + 2 * self.n]
+        Id, Iq = u.alg[0 : self.m], u.alg[self.m : 2 * self.m]
+        V = u.alg[2 * self.m : 2 * self.m + self.n]
+        TH = u.alg[2 * self.m + self.n : 2 * self.m + 2 * self.n]
 
         # line outage disturbance:
         if t >= 0.05:
@@ -1137,7 +1144,8 @@ class WSCC9BusSystem(ptype_dae):
         eqs.append(-QL2[self.m : self.n] - sum4)  # (17)
         eqs_flatten = [item for sublist in eqs for item in sublist]
 
-        f[:] = eqs_flatten
+        f.diff[: 11 * self.m] = eqs_flatten[0 : 11 * self.m]
+        f.alg[: 2 * self.n + 2 * self.m] = eqs_flatten[11 * self.m :]
         return f
 
     def u_exact(self, t):
@@ -1157,24 +1165,24 @@ class WSCC9BusSystem(ptype_dae):
         assert t == 0, 'ERROR: u_exact only valid for t=0'
 
         me = self.dtype_u(self.init)
-        me[0 : self.m] = self.Eqp0
-        me[self.m : 2 * self.m] = self.Si1d0
-        me[2 * self.m : 3 * self.m] = self.Edp0
-        me[3 * self.m : 4 * self.m] = self.Si2q0
-        me[4 * self.m : 5 * self.m] = self.D0
-        me[5 * self.m : 6 * self.m] = self.ws_vector
-        me[6 * self.m : 7 * self.m] = self.Efd0
-        me[7 * self.m : 8 * self.m] = self.RF0
-        me[8 * self.m : 9 * self.m] = self.VR0
-        me[9 * self.m : 10 * self.m] = self.TM0
-        me[10 * self.m : 11 * self.m] = self.PSV0
-        me[11 * self.m : 11 * self.m + self.m] = self.Id0
-        me[11 * self.m + self.m : 11 * self.m + 2 * self.m] = self.Iq0
-        me[11 * self.m + 2 * self.m : 11 * self.m + 2 * self.m + self.n] = self.V0
-        me[11 * self.m + 2 * self.m + self.n : 11 * self.m + 2 * self.m + 2 * self.n] = self.TH0
+        me.diff[0 : self.m] = self.Eqp0
+        me.diff[self.m : 2 * self.m] = self.Si1d0
+        me.diff[2 * self.m : 3 * self.m] = self.Edp0
+        me.diff[3 * self.m : 4 * self.m] = self.Si2q0
+        me.diff[4 * self.m : 5 * self.m] = self.D0
+        me.diff[5 * self.m : 6 * self.m] = self.ws_vector
+        me.diff[6 * self.m : 7 * self.m] = self.Efd0
+        me.diff[7 * self.m : 8 * self.m] = self.RF0
+        me.diff[8 * self.m : 9 * self.m] = self.VR0
+        me.diff[9 * self.m : 10 * self.m] = self.TM0
+        me.diff[10 * self.m : 11 * self.m] = self.PSV0
+        me.alg[0 : self.m] = self.Id0
+        me.alg[self.m : 2 * self.m] = self.Iq0
+        me.alg[2 * self.m : 2 * self.m + self.n] = self.V0
+        me.alg[2 * self.m + self.n : 2 * self.m + 2 * self.n] = self.TH0
         return me
 
-    def get_switching_info(self, u, t, du=None):
+    def get_switching_info(self, u, t):
         r"""
         Provides information about the state function of the problem. When the state function changes its sign,
         typically an event occurs. So the check for an event should be done in the way that the state function
@@ -1208,14 +1216,14 @@ class WSCC9BusSystem(ptype_dae):
         switch_detected = False
         m_guess = -100
         for m in range(1, len(u)):
-            h_prev_node = u[m - 1][10 * self.m] - self.psv_max
-            h_curr_node = u[m][10 * self.m] - self.psv_max
+            h_prev_node = u[m - 1].diff[10 * self.m] - self.psv_max
+            h_curr_node = u[m].diff[10 * self.m] - self.psv_max
             if h_prev_node < 0 and h_curr_node >= 0:
                 switch_detected = True
                 m_guess = m - 1
                 break
 
-        state_function = [u[m][10 * self.m] - self.psv_max for m in range(len(u))]
+        state_function = [u[m].diff[10 * self.m] - self.psv_max for m in range(len(u))]
         return switch_detected, m_guess, state_function
 
     def count_switches(self):

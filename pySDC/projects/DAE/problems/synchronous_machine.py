@@ -149,8 +149,8 @@ class synchronous_machine_infinite_bus(ptype_dae):
     .. [1] P. Kundur, N. J. Balu, M. G. Lauby. Power system stability and control. The EPRI power system series (1994).
     """
 
-    def __init__(self, nvars, newton_tol):
-        super(synchronous_machine_infinite_bus, self).__init__(nvars, newton_tol)
+    def __init__(self, newton_tol):
+        super().__init__(nvars=14, newton_tol=newton_tol)
         # load reference solution
         # data file must be generated and stored under misc/data and self.t_end = t[-1]
         # data = np.load(r'pySDC/projects/DAE/misc/data/synch_gen.npy')
@@ -217,16 +217,22 @@ class synchronous_machine_infinite_bus(ptype_dae):
 
         # extract variables for readability
         # algebraic components
-        psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2 = u[0], u[1], u[2], u[3], u[4], u[5]
-        i_d, i_q, i_F, i_D, i_Q1, i_Q2 = u[6], u[7], u[8], u[9], u[10], u[11]
-        delta_r = u[12]
-        omega_m = u[13]
+        psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2 = u.diff[0], u.diff[1], u.diff[2], u.diff[3], u.diff[4], u.diff[5]
+        delta_r, omega_m = u.diff[6], u.diff[7]
+        i_d, i_q, i_F, i_D, i_Q1, i_Q2 = u.alg[0], u.alg[1], u.alg[2], u.alg[3], u.alg[4], u.alg[5]
 
         # differential components
         # these result directly from the voltage equations, introduced e.g. pg. 145 Krause
-        dpsi_d, dpsi_q, dpsi_F, dpsi_D, dpsi_Q1, dpsi_Q2 = du[0], du[1], du[2], du[3], du[4], du[5]
-        ddelta_r = du[12]
-        domega_m = du[13]
+        dpsi_d, dpsi_q, dpsi_F, dpsi_D, dpsi_Q1, dpsi_Q2 = (
+            du.diff[0],
+            du.diff[1],
+            du.diff[2],
+            du.diff[3],
+            du.diff[4],
+            du.diff[5],
+        )
+        ddelta_r, domega_m = du.diff[6], du.diff[7]
+
         # Network current
         I_Re = i_d * np.sin(delta_r) + i_q * np.cos(delta_r)
         I_Im = -i_d * np.cos(delta_r) + i_q * np.sin(delta_r)
@@ -237,9 +243,7 @@ class synchronous_machine_infinite_bus(ptype_dae):
         v_d = np.real(V_comp) * np.sin(delta_r) - np.imag(V_comp) * np.cos(delta_r)
         v_q = np.real(V_comp) * np.cos(delta_r) + np.imag(V_comp) * np.sin(delta_r)
 
-        # algebraic variables are i_d, i_q, i_F, i_D, i_Q1, i_Q2, il_d, il_q
-        f[:] = (
-            # differential generator
+        f.diff[:8] = (
             -dpsi_d + self.omega_b * (v_d - self.R_s * i_d + omega_m * psi_q),
             -dpsi_q + self.omega_b * (v_q - self.R_s * i_q - omega_m * psi_d),
             -dpsi_F + self.omega_b * (self.v_F - self.R_F * i_F),
@@ -249,7 +253,8 @@ class synchronous_machine_infinite_bus(ptype_dae):
             -ddelta_r + self.omega_b * (omega_m - 1),
             -domega_m
             + 1 / (2 * self.H_) * (self.T_m - (psi_q * i_d - psi_d * i_q) - self.K_D * self.omega_b * (omega_m - 1)),
-            # algebraic generator
+        )
+        f.alg[:6] = (
             -psi_d + self.L_d * i_d + self.L_md * i_F + self.L_md * i_D,
             -psi_q + self.L_q * i_q + self.L_mq * i_Q1 + self.L_mq * i_Q2,
             -psi_F + self.L_md * i_d + self.L_F * i_F + self.L_md * i_D,
@@ -296,12 +301,16 @@ class synchronous_machine_infinite_bus(ptype_dae):
             omega_b = 2 * np.pi * 60
             omega_m = omega_0 / omega_b  # = omega_r since pf = 2 i.e. two pole machine
 
-            me[:] = (psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2, i_d, i_q, i_F, i_D, i_Q1, i_Q2, delta_r, omega_m)
+            me.diff[:8] = (psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2, delta_r, omega_m)
+            me.alg[:6] = (i_d, i_q, i_F, i_D, i_Q1, i_Q2)
         elif t < self.t_end:
-            me[:] = self.u_ref(t)
+            u_ref = self.u_ref(t)
+            me.diff[:8] = u_ref[:8]
+            me.alg[:6] = u_ref[8:]
         else:
             self.logger.warning("Requested time exceeds domain of the reference solution. Returning zero.")
-            me[:] = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+            me.diff[:8] = (0, 0, 0, 0, 0, 0, 0, 0)
+            me.alg[:6] = (0, 0, 0, 0, 0, 0)
 
         return me
 
