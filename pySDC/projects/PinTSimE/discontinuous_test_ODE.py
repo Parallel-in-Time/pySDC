@@ -68,7 +68,7 @@ def main():
         'max_restarts': 50,
         'recomputed': False,
         'tol_event': 1e-12,
-        'alpha': 0.95,
+        'alpha': 0.96,
         'exact_event_time_avail': True,
         'typeFD': 'backward',
     }

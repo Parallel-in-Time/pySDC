@@ -45,7 +45,7 @@ def run_estimation_check():
         'max_restarts': 50,
         'recomputed': False,
         'tol_event': 1e-10,
-        'alpha': 0.95,
+        'alpha': 0.96,
         'exact_event_time_avail': None,
         'typeFD': 'backward',
     }

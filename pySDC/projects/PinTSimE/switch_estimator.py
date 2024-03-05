@@ -48,7 +48,7 @@ class SwitchEstimator(ConvergenceController):
         defaults = {
             'control_order': 0,
             'nodes': coll.nodes,
-            'tol_zero': 1e-13,
+            'tol_zero': 2.5e-12,
             't_interp': [],
             'state_function': [],
         }
@@ -125,7 +125,7 @@ class SwitchEstimator(ConvergenceController):
                 # intermediate value theorem states that a root is contained in current step
                 if self.params.state_function[0] * self.params.state_function[-1] < 0 and self.status.is_zero is None:
                     self.status.t_switch = self.get_switch(
-                        self.params.t_interp, self.params.state_function, m_guess, self.params.typeFD
+                        self.params.t_interp, self.params.state_function, m_guess
                     )
 
                     self.logging_during_estimation(
@@ -278,7 +278,7 @@ class SwitchEstimator(ConvergenceController):
         )
 
     @staticmethod
-    def get_switch(t_interp, state_function, m_guess, choiceFD='backward'):
+    def get_switch(t_interp, state_function, m_guess):
         r"""
         Routine to do the interpolation and root finding stuff.
 
@@ -290,10 +290,6 @@ class SwitchEstimator(ConvergenceController):
             Contains values of state function at these collocation nodes.
         m_guess : float
             Index at which the difference drops below zero.
-        choiceFD : str
-            Finite difference to be used to approximate derivative of
-            state function. Can be ``'forward'``, ``'centered'``, or
-            ``'backward'``. Default is ``'backward'``
 
         Returns
         -------
@@ -305,24 +301,12 @@ class SwitchEstimator(ConvergenceController):
 
         def fprime(t):
             r"""
-            Computes the derivative of the scalar interpolant using finite difference.
-            Here, different finite differences can be used. The type of FD can be set by
-            setting ``typeFD`` in switch estimator parameters. There are three choices possible:
-
-            - ``typeFD='backward'`` for :math:`h=10^{-10}`:
+            Computes the derivative of the scalar interpolant using finite difference. Here,
+            the derivative is approximated by the backward difference:
 
                 .. math::
-                \frac{dp}{dt} \approx \frac{p(t) - p(t - h)}{h}
+                \frac{dp}{dt} \approx \frac{25 p(t) - 48 p(t - h) + 36 p(t - 2 h) - 16 p(t - 3h) + 3 p(t - 4 h)}{12 h}
 
-            - ``typeFD='centered'`` for :math:`h=10^{-12}`:
-
-                .. math::
-                \frac{dp}{dt} \approx \frac{p(t + h) - p(t - h)}{2h}
-
-            - ``typeFD='forward'`` for :math:`h=10^{-10}`:
-
-                .. math::
-                \frac{dp}{dt} \approx \frac{p(t + h) - p(t)}{h}
 
             Parameters
             ----------
@@ -335,22 +319,13 @@ class SwitchEstimator(ConvergenceController):
                 Derivative of interpolation p at time t.
             """
 
-            if choiceFD == 'forward':
-                dt_FD = 1e-10
-                dp = (p(t + dt_FD) - p(t)) / (dt_FD)
-            elif choiceFD == 'centered':
-                dt_FD = 1e-12
-                dp = (p(t + dt_FD) - p(t - dt_FD)) / (2 * dt_FD)
-            elif choiceFD == 'backward':
-                dt_FD = 1e-12
-                # dp = (p(t) - p(t - dt_FD)) / (dt_FD)
-                # dp = (11 * p(t) - 18 * p(t - dt_FD) + 9 * p(t - 2 * dt_FD) - 2 * p(t - 3 * dt_FD)) / (6 * dt_FD)
-                dp = (25 * p(t) - 48 * p(t - dt_FD) + 36 * p(t - 2 * dt_FD) - 16 * p(t - 3 * dt_FD) + 3 * p(t - 4 * dt_FD)) / (12 * dt_FD)
-            else:
-                raise NotImplementedError
+            dt_FD = 1e-10
+            # dp = (p(t) - p(t - dt_FD)) / dt_FD
+            # dp = (11 * p(t) - 18 * p(t - dt_FD) + 9 * p(t - 2 * dt_FD) - 2 * p(t - 3 * dt_FD)) / (6 * dt_FD)
+            dp = (25 * p(t) - 48 * p(t - dt_FD) + 36 * p(t - 2 * dt_FD) - 16 * p(t - 3 * dt_FD) + 3 * p(t - 4 * dt_FD)) / (12 * dt_FD)
             return dp
 
-        newton_tol, newton_maxiter = 1e-15, 100
+        newton_tol, newton_maxiter = 1e-14, 100
         t_switch = newton(t_interp[m_guess], p, fprime, newton_tol, newton_maxiter)
         return t_switch
 
