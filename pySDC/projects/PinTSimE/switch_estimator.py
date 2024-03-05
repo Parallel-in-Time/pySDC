@@ -124,9 +124,7 @@ class SwitchEstimator(ConvergenceController):
 
                 # intermediate value theorem states that a root is contained in current step
                 if self.params.state_function[0] * self.params.state_function[-1] < 0 and self.status.is_zero is None:
-                    self.status.t_switch = self.get_switch(
-                        self.params.t_interp, self.params.state_function, m_guess
-                    )
+                    self.status.t_switch = self.get_switch(self.params.t_interp, self.params.state_function, m_guess)
 
                     self.logging_during_estimation(
                         controller.hooks[0],
@@ -296,8 +294,8 @@ class SwitchEstimator(ConvergenceController):
         t_switch : float
            Time point of found event.
         """
-        LinearInterpolator = LagrangeInterpolation(t_interp, state_function)
-        p = lambda t: LinearInterpolator.eval(t)
+        LagrangeInterpolator = LagrangeInterpolation(t_interp, state_function)
+        p = lambda t: LagrangeInterpolator.eval(t)
 
         def fprime(t):
             r"""
@@ -320,9 +318,9 @@ class SwitchEstimator(ConvergenceController):
             """
 
             dt_FD = 1e-10
-            # dp = (p(t) - p(t - dt_FD)) / dt_FD
-            # dp = (11 * p(t) - 18 * p(t - dt_FD) + 9 * p(t - 2 * dt_FD) - 2 * p(t - 3 * dt_FD)) / (6 * dt_FD)
-            dp = (25 * p(t) - 48 * p(t - dt_FD) + 36 * p(t - 2 * dt_FD) - 16 * p(t - 3 * dt_FD) + 3 * p(t - 4 * dt_FD)) / (12 * dt_FD)
+            dp = (
+                25 * p(t) - 48 * p(t - dt_FD) + 36 * p(t - 2 * dt_FD) - 16 * p(t - 3 * dt_FD) + 3 * p(t - 4 * dt_FD)
+            ) / (12 * dt_FD)
             return dp
 
         newton_tol, newton_maxiter = 1e-14, 100

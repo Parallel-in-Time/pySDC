@@ -34,7 +34,6 @@ def main():
         'tol_event': None,
         'alpha': None,
         'exact_event_time_avail': None,
-        'typeFD': None,
     }
 
     # ---- all parameters are stored in this dictionary - note: defaults are used for the problem ----

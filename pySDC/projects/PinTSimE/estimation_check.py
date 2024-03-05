@@ -47,7 +47,6 @@ def run_estimation_check():
         'tol_event': 1e-10,
         'alpha': 0.96,
         'exact_event_time_avail': None,
-        'typeFD': 'backward',
     }
 
     problem_classes = [battery, battery_implicit, battery_n_capacitors]

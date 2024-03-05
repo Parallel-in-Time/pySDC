@@ -80,7 +80,7 @@ def getParamsRun():
 
 
 @pytest.mark.base
-def testExactDummyProblems():
+def testExactDummyProblem():
     r"""
     Test for dummy problems. The test verifies that the dummy problems exactly returns the dynamics of
     the parent class. ``eval_f`` of ``ExactDiscontinuousTestDAE`` is not tested here, since it only returns
@@ -368,8 +368,6 @@ def testDetectionODE(tol, num_nodes, quad_type):
 
 
 @pytest.mark.base
-# @pytest.mark.parametrize('dt', np.logspace(-2.5, -1.5, num=4))
-# @pytest.mark.parametrize('tol', [10 ** (-m) for m in range(9, 13)])
 @pytest.mark.parametrize('num_nodes', [3, 4, 5])
 def testDetectionDAE(num_nodes):
     r"""
@@ -413,7 +411,7 @@ def testDetectionDAE(num_nodes):
 
     _, _, _, _, useA, useSE, exact_event_time_avail = getParamsRun()
 
-    restol=1e-13
+    restol = 1e-13
     maxiter = 60
     max_restarts = 20
     alpha = 0.97
@@ -461,4 +459,6 @@ def testDetectionDAE(num_nodes):
     assert np.isclose(abs(h[-1]), 0.0, atol=5e-10), f'State function is not close to zero; value is {h[-1]}'
 
     e_global = np.array(get_sorted(stats, type='e_global_differential_post_step', sortby='time', recomputed=False))
-    assert np.isclose(e_global[-1, 1], 0.0, atol=2.4e-10), f"Error at end time is too large! Expected {1e-11}, got {e_global[-1, 1]}"
+    assert np.isclose(
+        e_global[-1, 1], 0.0, atol=2.4e-10
+    ), f"Error at end time is too large! Expected {1e-11}, got {e_global[-1, 1]}"
