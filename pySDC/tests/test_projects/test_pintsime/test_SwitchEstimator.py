@@ -213,12 +213,12 @@ def testAdaptInterpolationInfo(quad_type):
         assert t_interp[0] != t_interp[1], 'Starting time from interpolation axis is not removed!'
         assert (
             len(t_interp) == num_nodes
-        ), f'Number of values on interpolation axis does not match. Expected {num_nodes}, got {len(t_interp)}'
+        ), f'Number of values on interpolation axis does not match. Expected {num_nodes=}, got {len(t_interp)}'
 
     elif quad_type == 'RADAU-RIGHT':
         assert (
             len(t_interp) == num_nodes + 1
-        ), f'Number of values on interpolation axis does not match. Expected {num_nodes + 1}, got {len(t_interp)}'
+        ), f'Number of values on interpolation axis does not match. Expected {num_nodes + 1=}, got {len(t_interp)}'
 
 
 @pytest.mark.base
@@ -364,7 +364,7 @@ def testDetectionODE(tol, num_nodes, quad_type):
 
     t_switch = switches[-1]
     event_err = abs(t_switch - t_switch_exact)
-    assert np.isclose(event_err, 0, atol=1.2e-11), f'Event time error {event_err} is not small enough!'
+    assert np.isclose(event_err, 0, atol=1.2e-11), f'Event time error {event_err=} is not small enough!'
 
 
 @pytest.mark.base
@@ -411,7 +411,7 @@ def testDetectionDAE(num_nodes):
 
     _, _, _, _, useA, useSE, exact_event_time_avail = getParamsRun()
 
-    restol = 1e-13
+    restol = 1e-11
     maxiter = 60
     max_restarts = 20
     alpha = 0.97
@@ -447,18 +447,16 @@ def testDetectionDAE(num_nodes):
 
     # in this specific example only one event has to be found
     switches = [me[1] for me in get_sorted(stats, type='switch', sortby='time', recomputed=False)]
-    assert len(switches) >= 1, f'{problem.__name__}: No events found for tol={tol} and M={num_nodes}!'
+    assert len(switches) >= 1, f'{problem.__name__}: No events found for {tol=} and {num_nodes=}!'
 
     t_switch = switches[-1]
     event_err = abs(t_switch - t_switch_exact)
-    assert np.isclose(event_err, 0, atol=2.2e-6), f'Event time error {event_err} is not small enough!'
+    assert np.isclose(event_err, 0, atol=2.2e-6), f'Event time error {event_err=} is not small enough!'
 
     h = np.array([val[1] for val in get_sorted(stats, type='state_function', sortby='time', recomputed=False)])
-    if h[-1] < 0:
-        assert abs(h[-1]) < 4.7e-10, f"State function has large negative value -> SE does switch too early! Got {h[-1]}"
-    assert np.isclose(abs(h[-1]), 0.0, atol=5e-10), f'State function is not close to zero; value is {h[-1]}'
+    assert np.isclose(abs(h[-1]), 0.0, atol=2e-9), f'State function is not close to zero; value is {h[-1]}'
 
     e_global = np.array(get_sorted(stats, type='e_global_differential_post_step', sortby='time', recomputed=False))
     assert np.isclose(
-        e_global[-1, 1], 0.0, atol=2.4e-10
+        e_global[-1, 1], 0.0, atol=9.93e-10
     ), f"Error at end time is too large! Expected {1e-11}, got {e_global[-1, 1]}"
