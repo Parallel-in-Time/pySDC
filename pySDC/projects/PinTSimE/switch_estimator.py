@@ -400,7 +400,7 @@ def newton(x0, p, fprime, newton_tol, newton_maxiter):
         msg = f'Newton did not converge after {n} iterations, error is {res}'
     else:
         msg = f'Newton did converge after {n} iterations, error for root {x0} is {res}'
-    # print(msg)
+    print(msg)
 
     root = x0
     return root
