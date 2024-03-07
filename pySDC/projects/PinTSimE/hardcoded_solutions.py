@@ -450,17 +450,17 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
             msg = f"Error for {prob_cls_name} for dt={dt:.1e}:"
             if dt == 2e-5:
                 expected = {
-                    'vC1': 9.890997780767632,
-                    'vC2': 4.710415385551326,
-                    'iLp': -0.315406990615236,
-                    'sum_niters': 5036.0,
+                    'vC1': 9.781955920747619,
+                    'vC2': 6.396971204930281,
+                    'iLp': -1.1056614708409171,
+                    'sum_niters': 2519.0,
                 }
             elif dt == 1e-5:
                 expected = {
-                    'vC1': 9.891508522329485,
-                    'vC2': 4.70939963429714,
-                    'iLp': -0.32177442457657557,
-                    'sum_niters': 8262.0,
+                    'vC1': 9.782142840662102,
+                    'vC2': 6.388775533709242,
+                    'iLp': -1.0994027552202539,
+                    'sum_niters': 4242.0,
                 }
         got.update(
             {

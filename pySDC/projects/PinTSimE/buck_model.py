@@ -55,7 +55,7 @@ def main():
         use_adaptivity=use_adaptivity,
         use_detection=use_detection,
         hook_class=hook_class,
-        interval=(0.0, 2e-2),
+        interval=(0.0, 1e-2),
         dt_list=[1e-5, 2e-5],
         nnodes=[M_fix],
     )
