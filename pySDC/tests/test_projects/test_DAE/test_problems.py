@@ -687,7 +687,9 @@ def test_WSCC9_SDC_detection():
     switches = get_sorted(stats, type='switch', sortby='time', recomputed=False)
     assert len(switches) >= 1, 'ERROR: No events found!'
     t_switch = [me[1] for me in switches][0]
-    assert np.isclose(t_switch, 0.528458886745887, atol=1e-3), f'Found event does not match a threshold! Got {t_switch=}'
+    assert np.isclose(
+        t_switch, 0.528458886745887, atol=1e-3
+    ), f'Found event does not match a threshold! Got {t_switch=}'
 
 
 # @pytest.mark.base
