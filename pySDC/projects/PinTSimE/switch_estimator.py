@@ -166,11 +166,6 @@ class SwitchEstimator(ConvergenceController):
                             L.status.dt_new = dt_switch
                         else:
                             L.status.dt_new = min([dt_planned, dt_switch])
-                        self.log(
-                            f"Switch detected: {self.status.switch_detected} -- Adapting step size from {L.dt:.2e} to {L.status.dt_new:.2e}",
-                            S,
-                        )
-                        # breakpoint()
 
                     else:
                         # event occurs on L.time or L.time + L.dt; no restart necessary
