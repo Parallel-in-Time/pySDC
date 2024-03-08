@@ -88,7 +88,7 @@ class LagrangeApproximation(object):
         The associated barycentric weights
     """
 
-    def __init__(self, points):
+    def __init__(self, points, fValues=None):
         points = np.asarray(points).ravel()
 
         diffs = points[:, None] - points[None, :]
@@ -109,6 +109,20 @@ class LagrangeApproximation(object):
         # Store attributes
         self.points = points
         self.weights = weights
+
+        # Store function values if provided
+        if fValues is not None:
+            fValues = np.asarray(fValues)
+            if fValues.shape != points.shape:
+                raise ValueError(f'fValues {fValues.shape} has not the correct shape: {points.shape}')
+        self.fValues = fValues
+
+    def __call__(self, t):
+        assert self.fValues is not None, "cannot evaluate polynomial without fValues"
+        t = np.asarray(t)
+        values = self.getInterpolationMatrix(t.ravel()).dot(self.fValues)
+        values.shape = t.shape
+        return values
 
     @property
     def n(self):
