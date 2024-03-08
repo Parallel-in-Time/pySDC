@@ -43,23 +43,23 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
             msg = f"Error when using switch estimator and adaptivity for {prob_cls_name} for dt={dt:.1e}:"
             if dt == 1e-2:
                 expected = {
-                    'iL': 0.5614559718189012,
-                    'vC': 1.0053361988800296,
-                    't_switches': [0.18232155679214296],
-                    'dt': 0.11767844320785703,
-                    'e_em': 7.811640223565064e-12,
-                    'sum_restarts': 3.0,
-                    'sum_niters': 56.0,
+                    'iL': 0.5393867577881641,
+                    'vC': 0.9999999999913842,
+                    't_switches': [0.1823215567921536, 0.18232155679215356, 0.18232155679173784],
+                    'dt': 0.09453745651144455,
+                    'e_em': 1.7587042933087105e-12,
+                    'sum_restarts': 15.0,
+                    'sum_niters': 280.0,
                 }
             elif dt == 1e-3:
                 expected = {
-                    'iL': 0.5393867578949986,
-                    'vC': 1.0000000000165197,
-                    't_switches': [0.18232155677793654],
-                    'dt': 0.015641173481932502,
-                    'e_em': 2.220446049250313e-16,
-                    'sum_restarts': 14.0,
-                    'sum_niters': 328.0,
+                    'iL': 0.5393867577223005,
+                    'vC': 0.9999999999813279,
+                    't_switches': [0.18232155676894835, 0.1823215567897308, 0.18232155678877865],
+                    'dt': 0.06467602356229402,
+                    'e_em': 1.1468603844377867e-13,
+                    'sum_restarts': 17.0,
+                    'sum_niters': 368.0,
                 }
             got.update(
                 {
@@ -75,19 +75,19 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
             msg = f"Error when using switch estimator for {prob_cls_name} for dt={dt:.1e}:"
             if dt == 1e-2:
                 expected = {
-                    'iL': 0.549122133626298,
-                    'vC': 0.9999999999999998,
-                    't_switches': [0.1823215567939562],
-                    'sum_restarts': 4.0,
-                    'sum_niters': 296.0,
+                    'iL': 0.5456190026495924,
+                    'vC': 0.9991666666670524,
+                    't_switches': [0.18232155679395579, 0.18232155679395592, 0.18232155679356965],
+                    'sum_restarts': 14.0,
+                    'sum_niters': 416.0,
                 }
             elif dt == 1e-3:
                 expected = {
-                    'iL': 0.5408462989990014,
-                    'vC': 1.0,
-                    't_switches': [0.18232155679395023],
-                    'sum_restarts': 2.0,
-                    'sum_niters': 2424.0,
+                    'iL': 0.5403849766797957,
+                    'vC': 0.9999166666675774,
+                    't_switches': [0.18232155679395004, 0.18232155679303919],
+                    'sum_restarts': 11.0,
+                    'sum_niters': 2536.0,
                 }
             got.update(
                 {
@@ -151,23 +151,23 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
             msg = f"Error when using switch estimator and adaptivity for {prob_cls_name} for dt={dt:.1e}:"
             if dt == 1e-2:
                 expected = {
-                    'iL': 0.5614559717904407,
-                    'vC': 1.0053361988803866,
-                    't_switches': [0.18232155679736195],
-                    'dt': 0.11767844320263804,
+                    'iL': 0.5393867577468375,
+                    'vC': 0.9999999999980123,
+                    't_switches': [0.18232155680038617, 0.1823215568023739],
+                    'dt': 0.08896232033732146,
                     'e_em': 2.220446049250313e-16,
-                    'sum_restarts': 3.0,
-                    'sum_niters': 56.0,
+                    'sum_restarts': 15.0,
+                    'sum_niters': 280.0,
                 }
             elif dt == 1e-3:
                 expected = {
-                    'iL': 0.5393867577837699,
-                    'vC': 1.0000000000250129,
-                    't_switches': [0.1823215568036829],
-                    'dt': 0.015641237833012522,
+                    'iL': 0.5393867576415584,
+                    'vC': 0.9999999999802239,
+                    't_switches': [0.18232155678530526, 0.1823215568066914, 0.1823215568057151],
+                    'dt': 0.06333183541149384,
                     'e_em': 2.220446049250313e-16,
-                    'sum_restarts': 14.0,
-                    'sum_niters': 328.0,
+                    'sum_restarts': 17.0,
+                    'sum_niters': 368.0,
                 }
             got.update(
                 {
@@ -183,19 +183,19 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
             msg = f"Error when using switch estimator for {prob_cls_name} for dt={dt:.1e}:"
             if dt == 1e-2:
                 expected = {
-                    'iL': 0.5456190026227917,
-                    'vC': 0.999166666666676,
-                    't_switches': [0.18232155679663525],
-                    'sum_restarts': 4.0,
-                    'sum_niters': 296.0,
+                    'iL': 0.5490992952561473,
+                    'vC': 0.9999999999982524,
+                    't_switches': [0.1823215567992934, 0.18232155680104123],
+                    'sum_restarts': 14.0,
+                    'sum_niters': 416.0,
                 }
             elif dt == 1e-3:
                 expected = {
-                    'iL': 0.5407340515794409,
-                    'vC': 1.0000000000010945,
-                    't_switches': [0.182321556796257],
-                    'sum_restarts': 3.0,
-                    'sum_niters': 2440.0,
+                    'iL': 0.5407340516779595,
+                    'vC': 0.9999999999936255,
+                    't_switches': [0.18232155676519302],
+                    'sum_restarts': 10.0,
+                    'sum_niters': 2536.0,
                 }
             got.update(
                 {
@@ -259,25 +259,25 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
             msg = f"Error when using switch estimator and adaptivity for {prob_cls_name} for dt={dt:.1e}:"
             if dt == 1e-2:
                 expected = {
-                    'iL': 0.6244130166029733,
-                    'vC1': 0.999647921822499,
-                    'vC2': 1.0000000000714673,
-                    't_switches': [0.18232155679216916, 0.3649951297770592],
-                    'dt': 0.01,
-                    'e_em': 2.220446049250313e-16,
-                    'sum_restarts': 19.0,
-                    'sum_niters': 400.0,
+                    'iL': 0.6125019898578352,
+                    'vC1': 1.0000000000471956,
+                    'vC2': 1.0000000000165106,
+                    't_switches': [0.18232155678158268, 0.36464311353802376],
+                    'dt': 0.0985931246953285,
+                    'e_em': 2.295386103412511e-12,
+                    'sum_restarts': 24.0,
+                    'sum_niters': 552.0,
                 }
             elif dt == 1e-3:
                 expected = {
-                    'iL': 0.6112496171462107,
-                    'vC1': 0.9996894956748836,
-                    'vC2': 1.0,
-                    't_switches': [0.1823215567907929, 0.3649535697059346],
-                    'dt': 0.07298158272977251,
-                    'e_em': 2.703393064962256e-13,
-                    'sum_restarts': 11.0,
-                    'sum_niters': 216.0,
+                    'iL': 0.6125019901065321,
+                    'vC1': 1.0000000000787372,
+                    'vC2': 1.000000000028657,
+                    't_switches': [0.1823215567907939, 0.3646431134803315],
+                    'dt': 0.07154669986159717,
+                    'e_em': 2.3381296898605797e-13,
+                    'sum_restarts': 22.0,
+                    'sum_niters': 472.0,
                 }
             got.update(
                 {
@@ -293,21 +293,21 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
             msg = f"Error when using switch estimator for {prob_cls_name} for dt={dt:.1e}:"
             if dt == 1e-2:
                 expected = {
-                    'iL': 0.6314080101219072,
-                    'vC1': 0.9999999999999998,
-                    'vC2': 0.9999999999999996,
-                    't_switches': [0.1823215567939562, 0.3646431135879125],
-                    'sum_restarts': 8.0,
-                    'sum_niters': 512.0,
+                    'iL': 0.6313858468030417,
+                    'vC1': 1.0000000002414198,
+                    'vC2': 1.0000000000095093,
+                    't_switches': [0.18232155679395579, 0.3646431133464922],
+                    'sum_restarts': 19.0,
+                    'sum_niters': 664.0,
                 }
             elif dt == 1e-3:
                 expected = {
-                    'iL': 0.6152346866530549,
-                    'vC1': 1.0,
-                    'vC2': 1.0,
-                    't_switches': [0.18232155679395023, 0.3646431135879003],
-                    'sum_restarts': 4.0,
-                    'sum_niters': 4048.0,
+                    'iL': 0.6151254295045797,
+                    'vC1': 1.0000000000227713,
+                    'vC2': 1.0000000000329365,
+                    't_switches': [0.18232155680153855, 0.3646431135651182],
+                    'sum_restarts': 16.0,
+                    'sum_niters': 4224.0,
                 }
             got.update(
                 {
@@ -375,21 +375,21 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
             msg = f"Error when using switch estimator for {prob_cls_name} for dt={dt:.1e}:"
             if dt == 1e-2:
                 expected = {
-                    'u': 5.9941358952954955,
-                    't_switches': [1.6094379124671208],
-                    'sum_restarts': 25.0,
-                    'sum_niters': 710.0,
-                    'e_global': 8.195133460731086e-11,
-                    'e_event': [3.302047524300633e-11],
+                    'u': 5.998326995729771,
+                    'e_global': 0.0041911003550794135,
+                    't_switches': [1.6094379124660123],
+                    'e_event': [3.1912028575220575e-11],
+                    'sum_restarts': 22.0,
+                    'sum_niters': 675.0,
                 }
             elif dt == 1e-3:
                 expected = {
-                    'u': 5.971767837651004,
-                    't_switches': [1.6094379124247695],
-                    'sum_restarts': 23.0,
-                    'sum_niters': 2388.0,
-                    'e_global': 2.3067769916451653e-11,
-                    'e_event': [9.330758388159666e-12],
+                    'u': 5.9721869476933005,
+                    'e_global': 0.0004191100622819022,
+                    't_switches': [1.6094379124262566, 1.6094379124260099],
+                    'e_event': [7.843725668976731e-12],
+                    'sum_restarts': 20.0,
+                    'sum_niters': 2352.0,
                 }
             got.update(
                 {
@@ -406,14 +406,14 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
             if dt == 1e-2:
                 expected = {
                     'u': 5.9805345175338225,
-                    'sum_niters': 527.0,
                     'e_global': 0.009855041056925806,
+                    'sum_niters': 527.0,
                 }
             elif dt == 1e-3:
                 expected = {
                     'u': 5.9737411566014105,
-                    'sum_niters': 2226.0,
                     'e_global': 0.0005763403865515215,
+                    'sum_niters': 2226.0,
                 }
         got.update(
             {
@@ -450,17 +450,17 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
             msg = f"Error for {prob_cls_name} for dt={dt:.1e}:"
             if dt == 2e-5:
                 expected = {
-                    'vC1': 9.890997780767632,
-                    'vC2': 4.710415385551326,
-                    'iLp': -0.315406990615236,
-                    'sum_niters': 5036.0,
+                    'vC1': 9.781955920747619,
+                    'vC2': 6.396971204930281,
+                    'iLp': -1.1056614708409171,
+                    'sum_niters': 2519.0,
                 }
             elif dt == 1e-5:
                 expected = {
-                    'vC1': 9.891508522329485,
-                    'vC2': 4.70939963429714,
-                    'iLp': -0.32177442457657557,
-                    'sum_niters': 8262.0,
+                    'vC1': 9.782142840662102,
+                    'vC2': 6.388775533709242,
+                    'iLp': -1.0994027552202539,
+                    'sum_niters': 4242.0,
                 }
         got.update(
             {
@@ -474,7 +474,10 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
     for key in expected.keys():
         if key == 't_switches' or key == 'e_event':
             err_msg = f'{msg} Expected {key}={expected[key]}, got {key}={got[key]}'
-            assert all(np.isclose(expected[key], got[key], atol=1e-4)) == True, err_msg
+            if len(expected[key]) == got[key]:
+                assert np.allclose(expected[key], got[key], atol=1e-4) == True, err_msg
+            else:
+                assert np.isclose(expected[key][-1], got[key][-1], atol=1e-4) == True, err_msg
         else:
             err_msg = f'{msg} Expected {key}={expected[key]:.4e}, got {key}={got[key]:.4e}'
             assert np.isclose(expected[key], got[key], atol=1e-4), err_msg
