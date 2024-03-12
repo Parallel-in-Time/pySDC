@@ -126,11 +126,11 @@ class MultiscaleTestODE(TestODE):
         self.num_coll_nodes = 10
         self.coll = CollBase(num_nodes=self.num_coll_nodes, tleft=0, tright=1, node_type='LEGENDRE', quad_type='GAUSS')
 
-    def rho_nonstiff(self, y, t, fy=None):
-        return abs(self.lmbda_others)
+    # def rho_nonstiff(self, y, t, fy=None):
+    #     return abs(self.lmbda_others)
 
-    def rho_stiff(self, y, t, fy=None):
-        return abs(self.lmbda_laplacian)
+    # def rho_stiff(self, y, t, fy=None):
+    #     return abs(self.lmbda_laplacian)
 
     def solve_system(self, rhs, factor, u0, t, u_sol=None):
         if u_sol is None:
@@ -172,25 +172,6 @@ class MultiscaleTestODE(TestODE):
         phi_f_exp.values = (np.exp(factor * self.lmbda_gating) - 1.0) / (factor) * u.values
 
         return phi_f_exp
-
-    def phi_eval(self, u, factor, t, k, phi=None):
-        if phi is None:
-            phi = self.dtype_u(init=self.init, val=0.0)
-
-        dt_lmbda = factor * self.lmbda_gating
-
-        if k == 0:
-            phi.values = np.exp(dt_lmbda)
-        else:
-            c = self.coll.nodes
-            b = self.coll.weights
-
-            phi.values = (b[0] * c[0] ** (k - 1)) * np.exp((1.0 - c[0]) * dt_lmbda)
-            for j in range(1, self.num_coll_nodes):
-                phi.values += (b[j] * c[j] ** (k - 1)) * np.exp((1.0 - c[j]) * dt_lmbda)
-            phi.values /= scipy.special.factorial(k - 1)
-
-        return phi
 
     def phi_eval_lists(self, u, factors, t, indeces, phi=None, lmbda=None, update_non_exp_indeces=True):
         # compute phi[k][i] = phi_{k}(factor_i*lmbda), factor_i in factors, k in indeces
