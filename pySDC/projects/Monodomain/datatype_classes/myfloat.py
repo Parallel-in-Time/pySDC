@@ -60,6 +60,12 @@ class myfloat:
     def numpy_array(self):
         return Exception("numpy_array not implemented")
 
+    def is_nan_or_inf(self):
+        return np.isnan(self.values) or np.isinf(self.values)
+
+    def rel_norm(self, other):
+        return abs(self.values) / abs(other.values)
+
     def isend(self, dest=None, tag=None, comm=None):
         return comm.issend(self.values, dest=dest, tag=tag)
 

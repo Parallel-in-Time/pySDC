@@ -1,13 +1,10 @@
-from pathlib import Path
 import logging
 import numpy as np
 from pySDC.core.Problem import ptype
 from pySDC.core.Common import RegisterParams
-from pySDC.projects.Monodomain.datatype_classes.DCT_Vector import DCT_Vector
-from pySDC.projects.Monodomain.datatype_classes.VectorOfVectors import VectorOfVectors, IMEXEXP_VectorOfVectors
+from pySDC.projects.Monodomain.datatype_classes.myfloat import myfloat, IMEXEXP_myfloat
 from pySDC.core.Collocation import CollBase
 import scipy
-import os
 
 
 class dummy_communicator:
@@ -17,34 +14,11 @@ class dummy_communicator:
 class Parabolic(RegisterParams):
     def __init__(self, **problem_params):
         self._makeAttributeAndRegister(*problem_params.keys(), localVars=problem_params, readOnly=True)
-        self.vector_type = DCT_Vector
 
         self.comm = dummy_communicator()
 
         x = np.array([0.0])
         self.grids = (x,)
-
-    def __del__(self):
-        if self.enable_output:
-            self.output_file.close()
-            with open(self.output_file_path.parent / Path(self.output_file_name + '_t').with_suffix(".npy"), 'wb') as f:
-                np.save(f, np.array(self.t_out))
-
-    def init_output(self, output_folder):
-        self.output_folder = output_folder
-        self.output_file_path = self.output_folder / Path(self.output_file_name).with_suffix(".npy")
-        if self.enable_output:
-            if self.output_file_path.is_file():
-                os.remove(self.output_file_path)
-            if not self.output_folder.is_dir():
-                os.makedirs(self.output_folder)
-            self.output_file = open(self.output_file_path, 'wb')
-            self.t_out = []
-
-    def write_solution(self, V, t):
-        if self.enable_output:
-            np.save(self.output_file, V.values)
-            self.t_out.append(t)
 
     def get_dofs_stats(self):
         data = (1, 1, 0, 0)
@@ -58,10 +32,10 @@ class TestODE(ptype):
 
         # the class for the spatial discretization of the parabolic part of monodomain
         self.parabolic = Parabolic(**problem_params)
-        self.init = 1  # one dof
-        self.size = 1  # one state variable
 
         # invoke super init
+        self.init = 1
+        self.size = 1
         super(TestODE, self).__init__(self.init)
         # store all problem params dictionary values as attributes
         self._makeAttributeAndRegister(*problem_params.keys(), localVars=problem_params, readOnly=True)
@@ -79,31 +53,14 @@ class TestODE(ptype):
 
         # assert self.lmbda_laplacian <= 0.0 and self.lmbda_gating <= 0.0 and self.lmbda_others <= 0.0, "lmbda_laplacian, lmbda_gating and lmbda_others must be negative"
 
-        # dtype_u and dtype_f are super vectors of vector_type
-        self.vector_type = self.parabolic.vector_type
+        def dtype_u(init, val=0.0):
+            return myfloat(init, val)
 
-        def dtype_u(init=None, val=0.0):
-            return VectorOfVectors(init, val, self.vector_type, self.size)
-
-        def dtype_f(init=None, val=0.0):
-            return VectorOfVectors(init, val, self.vector_type, self.size)
+        def dtype_f(init, val=0.0):
+            return myfloat(init, val)
 
         self.dtype_u = dtype_u
         self.dtype_f = dtype_f
-
-        # init output stuff
-        self.output_folder = Path(self.output_root)
-        self.parabolic.init_output(self.output_folder)
-
-    def write_solution(self, uh, t):
-        # write solution to file, only the potential V=uh[0], not the ionic model variables
-        self.parabolic.write_solution(uh[0], t)
-
-    def write_reference_solution(self, uh, all=False):
-        raise Exception("write_reference_solution not implemented")
-
-    def read_reference_solution(self, uh, ref_file_name, all=False):
-        raise Exception("read_reference_solution not implemented")
 
     def initial_value(self):
         u0 = self.dtype_u(self.init, val=1.0)
@@ -121,14 +78,13 @@ class TestODE(ptype):
             error (float): L2 error
             rel_error (float): relative L2 error
         """
-        exact_sol = self.vector_type(init=self.init, val=0.0)
-        exact_sol.values[0] = np.exp((self.lmbda_laplacian + self.lmbda_gating + self.lmbda_others) * self.Tend)
-        error_L2 = np.linalg.norm(uh[0].values - exact_sol.values)
-        rel_error_L2 = error_L2 / np.linalg.norm(exact_sol.values)
+        exact_sol = self.dtype_u(init=self.init, val=0.0)
+        exact_sol.values = np.exp((self.lmbda_laplacian + self.lmbda_gating + self.lmbda_others) * self.Tend)
+        error_L2 = abs(uh - exact_sol)
+        rel_error_L2 = error_L2 / abs(exact_sol)
 
-        if self.comm.rank == 0:
-            print(f"L2-errors: {error_L2}")
-            print(f"Relative L2-errors: {rel_error_L2}")
+        print(f"L2-errors: {error_L2}")
+        print(f"Relative L2-errors: {rel_error_L2}")
 
         return True, error_L2, rel_error_L2
 
@@ -136,15 +92,12 @@ class TestODE(ptype):
         # return number of dofs in the mesh
         return 1
 
-    def eval_on_points(self, u):
-        return [u[0].values[0]]
-
     def eval_f(self, u, t, fh=None):
         if fh is None:
             fh = self.dtype_f(init=self.init, val=0.0)
 
         # apply stimulus
-        fh.val_list[0].values[0] = (self.lmbda_laplacian + self.lmbda_gating + self.lmbda_others) * u[0].values[0]
+        fh.values = (self.lmbda_laplacian + self.lmbda_gating + self.lmbda_others) * u.values
 
         return fh
 
@@ -157,14 +110,21 @@ class MultiscaleTestODE(TestODE):
         super(MultiscaleTestODE, self).__init__(**problem_params)
 
         def dtype_f(init=None, val=0.0):
-            return IMEXEXP_VectorOfVectors(init, val, self.vector_type, self.size)
+            return IMEXEXP_myfloat(init, val)
 
         self.dtype_f = dtype_f
 
+        self.rhs_stiff_indeces = [0]
         self.rhs_stiff_args = [0]
+        self.rhs_nonstiff_indeces = [0]
+        self.rhs_nonstiff_args = [0]
+        self.rhs_exp_args = [0]
         self.rhs_exp_indeces = [0]
 
         self.constant_lambda_and_phi = True
+
+        self.num_coll_nodes = 10
+        self.coll = CollBase(num_nodes=self.num_coll_nodes, tleft=0, tright=1, node_type='LEGENDRE', quad_type='GAUSS')
 
     def rho_nonstiff(self, y, t, fy=None):
         return abs(self.lmbda_others)
@@ -172,14 +132,11 @@ class MultiscaleTestODE(TestODE):
     def rho_stiff(self, y, t, fy=None):
         return abs(self.lmbda_laplacian)
 
-    def eval_lmbda_exp(self, u, lmbda):
-        self.im_lmbda_exp(u.np_list, lmbda.np_list)
-
     def solve_system(self, rhs, factor, u0, t, u_sol=None):
         if u_sol is None:
             u_sol = self.dtype_u(init=self.init, val=0.0)
 
-        u_sol[0].values[0] = rhs[0].values[0] / (1 - factor * self.lmbda_laplacian)
+        u_sol.values = rhs.values / (1 - factor * self.lmbda_laplacian)
 
         return u_sol
 
@@ -196,15 +153,15 @@ class MultiscaleTestODE(TestODE):
 
         # evaluate explicit (non stiff) part M^-1*f_nonstiff(u,t)
         if eval_expl:
-            fh.expl.val_list[0].values[0] = self.lmbda_others * u[0].values[0]
+            fh.expl.values = self.lmbda_others * u.values
 
         # evaluate implicit (stiff) part M^1*A*u+M^-1*f_stiff(u,t)
         if eval_impl:
-            fh.impl.val_list[0].values[0] = self.lmbda_laplacian * u[0].values[0]
+            fh.impl.values = self.lmbda_laplacian * u.values
 
         # evaluate exponential part
         if eval_exp:
-            fh.exp.val_list[0].values[0] = self.lmbda_gating * u[0].values[0]
+            fh.exp.values = self.lmbda_gating * u.values
 
         return fh
 
@@ -212,7 +169,7 @@ class MultiscaleTestODE(TestODE):
         if phi_f_exp is None:
             phi_f_exp = self.dtype_u(init=self.init, val=0.0)
 
-        phi_f_exp.val_list[0].values[0] = (np.exp(factor * self.lmbda_gating) - 1.0) / (factor) * u.val_list[0].values[0]
+        phi_f_exp.values = (np.exp(factor * self.lmbda_gating) - 1.0) / (factor) * u.values
 
         return phi_f_exp
 
@@ -223,17 +180,45 @@ class MultiscaleTestODE(TestODE):
         dt_lmbda = factor * self.lmbda_gating
 
         if k == 0:
-            phi.val_list[0].values[0] = np.exp(dt_lmbda)
+            phi.values = np.exp(dt_lmbda)
         else:
-            num_nodes = 10
-            self.coll = CollBase(num_nodes=num_nodes, tleft=0, tright=1, node_type='LEGENDRE', quad_type='GAUSS')
             c = self.coll.nodes
             b = self.coll.weights
 
-            phi.val_list[0].values[0] = (b[0] * c[0] ** (k - 1)) * np.exp((1.0 - c[0]) * dt_lmbda)
-            for j in range(1, num_nodes):
-                phi.val_list[0].values[0] += (b[j] * c[j] ** (k - 1)) * np.exp((1.0 - c[j]) * dt_lmbda)
-            phi.val_list[0].values[0] /= scipy.special.factorial(k - 1)
+            phi.values = (b[0] * c[0] ** (k - 1)) * np.exp((1.0 - c[0]) * dt_lmbda)
+            for j in range(1, self.num_coll_nodes):
+                phi.values += (b[j] * c[j] ** (k - 1)) * np.exp((1.0 - c[j]) * dt_lmbda)
+            phi.values /= scipy.special.factorial(k - 1)
+
+        return phi
+
+    def phi_eval_lists(self, u, factors, t, indeces, phi=None, lmbda=None, update_non_exp_indeces=True):
+        # compute phi[k][i] = phi_{k}(factor_i*lmbda), factor_i in factors, k in indeces
+
+        N_fac = len(factors)
+        N_ind = len(indeces)
+
+        if phi is None:
+            phi = [[self.dtype_u(init=self.init, val=0.0) for i in range(N_fac)] for j in range(N_ind)]
+        else:
+            for n in range(N_fac):
+                for m in range(N_ind):
+                    phi[m][n].zero()
+
+        factorials = scipy.special.factorial(np.array(indeces) - 1)
+        c = self.coll.nodes
+        b = self.coll.weights
+        for n in range(N_fac):
+            factor = factors[n]
+            exp_terms = [np.exp(((1.0 - c[j]) * factor) * self.lmbda_gating) for j in range(self.num_coll_nodes)]
+            for m in range(N_ind):
+                k = indeces[m]
+                km1_fac = factorials[m]
+                if k == 0:
+                    phi[m][n].values = np.exp(factor * self.lmbda_gating)
+                else:
+                    for j in range(self.num_coll_nodes):
+                        phi[m][n].values += ((b[j] * c[j] ** (k - 1)) / km1_fac) * exp_terms[j]
 
         return phi
 
@@ -241,6 +226,6 @@ class MultiscaleTestODE(TestODE):
         if lmbda is None:
             lmbda = self.dtype_u(init=self.init, val=0.0)
 
-        lmbda.val_list[0].values[0] = self.lmbda_gating
+        lmbda.values = self.lmbda_gating
 
         return lmbda

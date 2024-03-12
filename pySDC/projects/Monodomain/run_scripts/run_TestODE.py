@@ -8,10 +8,8 @@ from tqdm import tqdm
 
 from pySDC.core.Errors import ParameterError
 
-# from pySDC.projects.Monodomain.problem_classes.TestODE import TestODE, MultiscaleTestODE
-# from pySDC.projects.Monodomain.transfer_classes.TransferVectorOfFDVectors import TransferVectorOfFDVectors
 
-from pySDC.projects.Monodomain.problem_classes.TestODE_myfloat import TestODE, MultiscaleTestODE
+from pySDC.projects.Monodomain.problem_classes.TestODE import MultiscaleTestODE
 from pySDC.projects.Monodomain.transfer_classes.Transfer_myfloat import Transfer_myfloat
 
 from pySDC.projects.Monodomain.hooks.HookClass_post_iter_info import post_iter_info_hook
@@ -22,12 +20,6 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 
 from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1st_order import imexexp_1st_order as imexexp_1st_order_ExpRK
 from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.imexexp_1st_order import imexexp_1st_order
-
-from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.explicit_stabilized import explicit_stabilized
-from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.exponential_multirate_explicit_stabilized import exponential_multirate_explicit_stabilized
-from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.exponential_multirate_explicit_stabilized import (
-    exponential_multirate_explicit_stabilized as exponential_multirate_explicit_stabilized_ExpRK,
-)
 
 
 def set_logger(controller_params):
@@ -56,12 +48,6 @@ def print_statistics(stats, controller, problem_params, space_rank, time_comm, n
         timing = np.mean(np.array(timing))
         controller.logger.info(f"Time to solution: {timing:6.4f} sec.")
 
-    from pySDC.projects.Monodomain.utils.visualization_tools import show_residual_across_simulation
-
-    fname = problem_params["output_root"] + f"/residuals_{n_time_ranks}_time_ranks.png"
-    if space_rank == 0:
-        show_residual_across_simulation(stats=stats, fname=fname, comm=time_comm, tend=tend)
-
 
 def get_P_data(controller):
     P = controller.MS[0].levels[0].prob
@@ -72,52 +58,32 @@ def get_P_data(controller):
     return t0, Tend, uinit, P
 
 
-def get_comms():
-    space_comm = None
-    space_rank = 0
-    time_comm = None
-    time_rank = 0
-    return space_comm, time_comm, space_rank, time_rank
-
-
 def get_base_transfer_params():
     base_transfer_params = dict()
     base_transfer_params["finter"] = False
     return base_transfer_params
 
 
-def get_controller_params(output_root, space_rank, logger_level):
+def get_controller_params(output_root, logger_level):
     controller_params = dict()
     controller_params["predict_type"] = "pfasst_burnin"
     controller_params["log_to_file"] = False
     controller_params["fname"] = output_root + "controller"
-    controller_params["logger_level"] = logger_level if space_rank == 0 else 99  # set level depending on rank
+    controller_params["logger_level"] = logger_level
     controller_params["dump_setup"] = False
     controller_params["hook_class"] = [post_iter_info_hook]
     return controller_params
 
 
-def get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class, space_transfer_params):
+def get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class):
     description = dict()
 
-    if integrator == 'mES':
-        raise Exception("Test equation for mES not implemented")
-
-    if integrator != "ES":
-        problem = MultiscaleTestODE
-    else:
-        problem = TestODE
+    problem = MultiscaleTestODE
 
     if integrator == "IMEXEXP":
         description["sweeper_class"] = imexexp_1st_order
     elif integrator == "IMEXEXP_EXPRK":
         description["sweeper_class"] = imexexp_1st_order_ExpRK
-    elif integrator == "ES":
-        description["sweeper_class"] = explicit_stabilized
-    elif integrator == "exp_mES":
-        description["sweeper_class"] = exponential_multirate_explicit_stabilized
-    elif integrator == "exp_mES_EXPRK":
-        description["sweeper_class"] = exponential_multirate_explicit_stabilized_ExpRK
     else:
         raise ParameterError("Unknown integrator.")
 
@@ -128,7 +94,6 @@ def get_description(integrator, problem_params, sweeper_params, level_params, st
     description["step_params"] = step_params
     description["base_transfer_params"] = base_transfer_params
     description["space_transfer_class"] = space_transfer_class
-    description["space_transfer_params"] = space_transfer_params
     return description
 
 
@@ -155,27 +120,8 @@ def get_sweeper_params(num_nodes):
     sweeper_params["quad_type"] = "RADAU-RIGHT"
     sweeper_params["num_nodes"] = num_nodes
     sweeper_params["QI"] = "IE"
-    # specific for explicit stabilized methods
-    sweeper_params["es_class"] = "RKW1"
-    sweeper_params["es_class_outer"] = "RKW1"
-    sweeper_params["es_class_inner"] = "RKW1"
-    sweeper_params['es_s_outer'] = 0  # if given, or not zero, then the algorithm fixes s of the outer stabilized scheme to this value.
-    sweeper_params['es_s_inner'] = 0
-    # # sweeper_params['res_comp'] = 'f_eta'
-    sweeper_params["damping"] = 0.05
-    sweeper_params["safe_add"] = 0
-    # sweeper_params["rho_freq"] = 100
+
     return sweeper_params
-
-
-def get_space_tranfer_params():
-    space_transfer_class = Transfer_myfloat
-    # space_transfer_class = TransferVectorOfFDVectors
-    space_transfer_params = dict()
-    space_transfer_params["iorder"] = 0
-    space_transfer_params["rorder"] = 0
-
-    return space_transfer_class, space_transfer_params
 
 
 def get_output_root():
@@ -188,7 +134,6 @@ def get_problem_params(lmbda_laplacian, lmbda_gating, lmbda_others, end_time):
     # initialize problem parameters
     problem_params = dict()
     problem_params["output_file_name"] = "monodomain"
-    problem_params["enable_output"] = False
     problem_params["output_root"] = get_output_root()
     problem_params["end_time"] = end_time
     problem_params["lmbda_laplacian"] = lmbda_laplacian
@@ -201,10 +146,7 @@ def get_problem_params(lmbda_laplacian, lmbda_gating, lmbda_others, end_time):
 def plot_stability_domain(lmbda_laplacian_list, lmbda_gating_list, R):
     import matplotlib.pyplot as plt
 
-    # matplotlib.rc("text", usetex=True)
-    # matplotlib.rc("font", **{"family": "TeX Gyre DejaVu Math"})
     plt.rc("text", usetex=True)
-    # plt.rc("text.latex", preamble=r"\usepackage{amsmath}")
 
     fs_label = 16
     fs_ticks = 16
@@ -228,27 +170,16 @@ def plot_stability_domain(lmbda_laplacian_list, lmbda_gating_list, R):
 
 
 def main():
-    # define integration method
-    # integrators = ['ES']
-    # integrators = ['mES']
-    # integrators = ["exp_mES"]
-    # integrators = ["exp_mES_EXPRK"]
 
     # integrator = "IMEXEXP"
     integrator = "IMEXEXP_EXPRK"
 
-    # integrator = "ES"
-    # integrator = "exp_mES"
-    # integrator = "exp_mES_EXPRK"
-
-    # number of time ranks. If truly_parallel, space ranks chosen accoding to world_size/n_time_ranks, else space_ranks = world_size
-    n_time_ranks = 4
+    # number of time ranks.
+    n_time_ranks = 1
     openmp = True
 
     end_time = float(n_time_ranks)
 
-    # get space-time communicators
-    space_comm, time_comm, space_rank, time_rank = get_comms()
     # get time integration parameters
     # set maximum number of iterations in SDC/ESDC/MLSDC/etc
     step_params = get_step_params(maxiter=5)
@@ -261,9 +192,9 @@ def main():
         restol=5e-8,
     )
     # set space transfer parameters
-    space_transfer_class, space_transfer_params = get_space_tranfer_params()
+    space_transfer_class = Transfer_myfloat
     base_transfer_params = get_base_transfer_params()
-    controller_params = get_controller_params(get_output_root(), space_rank, logger_level=40)
+    controller_params = get_controller_params(get_output_root(), logger_level=40)
 
     # set stability test parameters
     dl = 10.0
@@ -274,8 +205,6 @@ def main():
     lmbda_gating_max = 100.0
     n_lmbda_laplacian = np.round((lmbda_laplacian_max - lmbda_laplacian_min) / dl).astype(int) + 1
     n_lmbda_gating = np.round((lmbda_gating_max - lmbda_gating_min) / dl).astype(int) + 1
-    # n_lmbda_laplacian = 2
-    # n_lmbda_gating = 2
     lmbda_laplacian_list = np.linspace(lmbda_laplacian_min, lmbda_laplacian_max, n_lmbda_laplacian)
     lmbda_gating_list = np.linspace(lmbda_gating_min, lmbda_gating_max, n_lmbda_gating)
 
@@ -287,7 +216,7 @@ def main():
                 lmbda_laplacian = lmbda_laplacian_list[j]
 
                 problem_params = get_problem_params(lmbda_laplacian=lmbda_laplacian, lmbda_gating=lmbda_gating, lmbda_others=lmbda_others, end_time=end_time)
-                description = get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class, space_transfer_params)
+                description = get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class)
                 set_logger(controller_params)
                 controller = get_controller(controller_params, description, n_time_ranks)
 
@@ -311,7 +240,7 @@ def main():
                     lmbda_laplacian = lmbda_laplacian_list[j]
 
                     problem_params = get_problem_params(lmbda_laplacian=lmbda_laplacian, lmbda_gating=lmbda_gating, lmbda_others=lmbda_others, end_time=end_time)
-                    description = get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class, space_transfer_params)
+                    description = get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class)
                     set_logger(controller_params)
                     controller = get_controller(controller_params, description, n_time_ranks)
 
