@@ -19,11 +19,8 @@ public:
     void f_expl(py::list y, py::list fy);
     void lmbda_exp(py::list y_list, py::list lmbda_list);
     void lmbda_yinf_exp(py::list y_list, py::list lmbda_list, py::list yinf_list);
-    void f_nonstiff(py::list y, py::list fy);
-    void f_stiff(py::list y, py::list fy);
     py::list initial_values();
     double rho_f_expl();
-    double rho_f_nonstiff();
 
 private:
     double AC_g_L, AC_Cm, AC_E_R, AC_E_K, AC_g_K, AC_E_Na, AC_g_Na, AC_E_L;
@@ -44,12 +41,8 @@ HodgkinHuxley::HodgkinHuxley(const double scale_)
     AC_g_Na = 120.0;
     AC_E_L = AC_E_R + 10.613;
 
-    assign(f_nonstiff_args, {0, 1, 2, 3});
-    assign(f_stiff_args, {0, 1});
     assign(f_expl_args, {0, 1, 2, 3});
     assign(f_exp_args, {0, 1, 2, 3});
-    assign(f_nonstiff_indeces, {0, 2, 3});
-    assign(f_stiff_indeces, {1});
     assign(f_expl_indeces, {0});
     assign(f_exp_indeces, {1, 2, 3});
 }
@@ -176,66 +169,9 @@ void HodgkinHuxley::lmbda_yinf_exp(py::list y_list, py::list lmbda_list, py::lis
     }
 }
 
-void HodgkinHuxley::f_nonstiff(py::list y_list, py::list fy_list)
-{
-    double *y_ptrs[size];
-    double *fy_ptrs[size];
-    size_t N;
-    size_t n_dofs;
-    get_raw_data(y_list, y_ptrs, N, n_dofs);
-    get_raw_data(fy_list, fy_ptrs, N, n_dofs);
-
-    double AV_alpha_n, AV_beta_n, AV_alpha_h, AV_beta_h, AV_i_K, AV_i_Na, AV_i_L;
-    // Remember to scale the first variable!!!
-    for (unsigned j = 0; j < n_dofs; j++)
-    {
-        const double y[4] = {y_ptrs[0][j], y_ptrs[1][j], y_ptrs[2][j], y_ptrs[3][j]};
-
-        AV_alpha_n = (-0.01) * (y[0] + 65.0) / (exp((-(y[0] + 65.0)) / 10.0) - 1.0);
-        AV_beta_n = 0.125 * exp((y[0] + 75.0) / 80.0);
-        fy_ptrs[3][j] = AV_alpha_n * (1.0 - y[3]) - AV_beta_n * y[3];
-
-        AV_alpha_h = 0.07 * exp((-(y[0] + 75.0)) / 20.0);
-        AV_beta_h = 1.0 / (exp((-(y[0] + 45.0)) / 10.0) + 1.0);
-        fy_ptrs[2][j] = AV_alpha_h * (1.0 - y[2]) - AV_beta_h * y[2];
-
-        AV_i_K = AC_g_K * pow(y[3], 4) * (y[0] - AC_E_K);
-        AV_i_Na = AC_g_Na * pow(y[1], 3) * y[2] * (y[0] - AC_E_Na);
-        AV_i_L = AC_g_L * (y[0] - AC_E_L);
-        fy_ptrs[0][j] = -scale * (AV_i_Na + AV_i_K + AV_i_L);
-    }
-}
-
-void HodgkinHuxley::f_stiff(py::list y_list, py::list fy_list)
-{
-    double *y_ptrs[size];
-    double *fy_ptrs[size];
-    size_t N;
-    size_t n_dofs;
-    get_raw_data(y_list, y_ptrs, N, n_dofs);
-    get_raw_data(fy_list, fy_ptrs, N, n_dofs);
-
-    double AV_alpha_m, AV_beta_m;
-    // Remember to scale the first variable!!!
-    for (unsigned j = 0; j < n_dofs; j++)
-    {
-        double y[4] = {y_ptrs[0][j], y_ptrs[1][j], y_ptrs[2][j], y_ptrs[3][j]};
-
-        AV_alpha_m = (-0.1) * (y[0] + 50.0) / (exp((-(y[0] + 50.0)) / 10.0) - 1.0);
-        AV_beta_m = 4.0 * exp((-(y[0] + 75.0)) / 18.0);
-        fy_ptrs[1][j] = AV_alpha_m * (1.0 - y[1]) - AV_beta_m * y[1];
-    }
-}
-
 double HodgkinHuxley::rho_f_expl()
 {
     return 40.;
 }
-
-double HodgkinHuxley::rho_f_nonstiff()
-{
-    return 40.;
-}
-
 
 #endif

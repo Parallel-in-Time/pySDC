@@ -19,11 +19,8 @@ public:
     void f_expl(py::list y, py::list fy);
     void lmbda_exp(py::list y_list, py::list lmbda_list);
     void lmbda_yinf_exp(py::list y_list, py::list lmbda_list, py::list yinf_list);
-    void f_nonstiff(py::list y, py::list fy);
-    void f_stiff(py::list y, py::list fy);
     py::list initial_values();
     double rho_f_expl();
-    double rho_f_nonstiff();
 
 private:
     double V_th, V_depol, V_rest, a;
@@ -40,10 +37,6 @@ BiStable::BiStable(const double scale_)
     V_rest = -85.;
     a = 1.4e-3;
 
-    assign(f_nonstiff_args, {0});
-    assign(f_stiff_args, {});
-    assign(f_nonstiff_indeces, {0});
-    assign(f_stiff_indeces, {});
     assign(f_expl_args, {0});
     assign(f_exp_args, {});
     assign(f_expl_indeces, {0});
@@ -87,22 +80,7 @@ void BiStable::lmbda_yinf_exp(py::list y_list, py::list lmbda_list, py::list yin
     return;
 }
 
-void BiStable::f_nonstiff(py::list y_list, py::list fy_list)
-{
-    this->f(y_list, fy_list);
-}
-
-void BiStable::f_stiff(py::list y_list, py::list fy_list)
-{
-    return;
-}
-
 double BiStable::rho_f_expl()
-{
-    return 20.;
-}
-
-double BiStable::rho_f_nonstiff()
 {
     return 20.;
 }
