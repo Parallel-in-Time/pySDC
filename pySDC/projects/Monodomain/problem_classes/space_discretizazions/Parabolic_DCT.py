@@ -31,7 +31,7 @@ class Parabolic_DCT(RegisterParams):
 
     @property
     def mesh_name(self):
-        return "ref_" + str(self.pre_refinements)
+        return "ref_" + str(self.refinements)
 
     def define_solver(self):
         pass
@@ -45,10 +45,10 @@ class Parabolic_DCT(RegisterParams):
         self.se_t = 0.24  # mS/mm
 
         if "cube" in self.domain_name:
-            # if self.pre_refinements == -1: # only for generating initial value
+            # if self.refinements == -1: # only for generating initial value
             # self.si_l *= 0.5
             # self.se_l *= 0.5
-            # elif self.pre_refinements == 0:
+            # elif self.refinements == 0:
             # self.si_l *= 0.25
             # self.se_l *= 0.25
             self.si_t = self.si_l
@@ -84,7 +84,7 @@ class Parabolic_DCT(RegisterParams):
             self.dim = int(self.domain_name[7])
 
         self.dom_size = self.dom_size[: self.dim]
-        self.n_elems = [int(2 ** np.round(np.log2(5.0 * L * 2**self.pre_refinements))) for L in self.dom_size]
+        self.n_elems = [int(2 ** np.round(np.log2(5.0 * L * 2**self.refinements))) for L in self.dom_size]
         self.grids, self.dx = self.get_grids_dx(self.dom_size, self.n_elems)
 
         self.shape = tuple(np.flip([x.size for x in self.grids]))

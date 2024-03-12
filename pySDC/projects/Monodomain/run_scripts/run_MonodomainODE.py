@@ -149,7 +149,7 @@ def get_space_tranfer_params():
 
 def get_problem_params(
     domain_name,
-    pre_refinements,
+    refinements,
     ionic_model_name,
     read_init_val,
     init_time,
@@ -163,7 +163,7 @@ def get_problem_params(
     # initialize problem parameters
     problem_params = dict()
     problem_params["order"] = order
-    problem_params["pre_refinements"] = pre_refinements
+    problem_params["refinements"] = refinements
     executed_file_dir = os.path.dirname(os.path.realpath(__file__))
     problem_params["domain_name"] = domain_name
     problem_params["ionic_model_name"] = ionic_model_name
@@ -189,7 +189,7 @@ def setup_and_run(
     dt,
     restol,
     domain_name,
-    pre_refinements,
+    refinements,
     order,
     ionic_model_name,
     read_init_val,
@@ -220,7 +220,7 @@ def setup_and_run(
     # get problem parameters
     problem_params = get_problem_params(
         domain_name=domain_name,
-        pre_refinements=pre_refinements,
+        refinements=refinements,
         ionic_model_name=ionic_model_name,
         read_init_val=read_init_val,
         init_time=init_time,
@@ -286,17 +286,14 @@ def main():
     # set step parameters
     max_iter = 100
 
-    # set space discretization
-    space_disc = "DCT"
-
     # set level parameters
     dt = 0.01
     restol = 5e-8
 
     # set problem parameters
     domain_name = "cube_1D"
-    pre_refinements = [0]
-    order = 1 if space_disc == "FEM" else 4
+    refinements = [0]
+    order = 4
     ionic_model_name = "TTP"
     read_init_val = False
     init_time = 0.0
@@ -323,7 +320,7 @@ def main():
         dt,
         restol,
         domain_name,
-        pre_refinements,
+        refinements,
         order,
         ionic_model_name,
         read_init_val,
