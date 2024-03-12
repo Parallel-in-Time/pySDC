@@ -1,5 +1,3 @@
-import mpi4py
-
 from pathlib import Path
 import numpy as np
 from mpi4py import MPI
