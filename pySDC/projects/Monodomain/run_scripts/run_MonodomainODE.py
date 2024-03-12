@@ -177,7 +177,7 @@ def get_sweeper_params(num_nodes, skip_residual_computation):
     return sweeper_params
 
 
-def get_space_tranfer_params(problem_params, iorder, rorder, fine_to_coarse):
+def get_space_tranfer_params(problem_params):
     if problem_params["space_disc"] == 'FEM':
         from pySDC.projects.Monodomain.transfer_classes.TransferVectorOfFEniCSxVectors import TransferVectorOfFEniCSxVectors
 
@@ -188,16 +188,6 @@ def get_space_tranfer_params(problem_params, iorder, rorder, fine_to_coarse):
 
         space_transfer_class = TransferVectorOfDCTVectors
         space_transfer_params = dict()
-    elif problem_params["space_disc"] == 'FD':
-        from pySDC.projects.Monodomain.transfer_classes.TransferVectorOfFDVectors import TransferVectorOfFDVectors
-
-        space_transfer_class = TransferVectorOfFDVectors
-        space_transfer_params = dict()
-        space_transfer_params["iorder"] = iorder
-        space_transfer_params["rorder"] = rorder
-        space_transfer_params["periodic"] = problem_params['bc'] == 'P'
-        # space_transfer_params["equidist_nested"] = False
-        space_transfer_params["fine_to_coarse"] = fine_to_coarse  # how to transfer from fine to coarse space voltage and ionic model variables
 
     return space_transfer_class, space_transfer_params
 
@@ -314,19 +304,7 @@ def setup_and_run(
         ref_sol=ref_sol,
     )
 
-    space_transfer_class, space_transfer_params = get_space_tranfer_params(
-        problem_params,
-        iorder=16,
-        rorder=8,
-        fine_to_coarse=['restriction', 'restriction'],  # restriction or injection, for voltage and ionic model variables
-    )
-
-    space_transfer_class, space_transfer_params = get_space_tranfer_params(
-        problem_params,
-        iorder=16,
-        rorder=8,
-        fine_to_coarse=['restriction', 'restriction'],  # restriction or injection, for voltage and ionic model variables
-    )
+    space_transfer_class, space_transfer_params = get_space_tranfer_params(problem_params)
 
     # Usually do not modify below this line ------------------
     # get remaining prams
