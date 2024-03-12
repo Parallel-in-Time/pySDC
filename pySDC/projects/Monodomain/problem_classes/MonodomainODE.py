@@ -270,46 +270,24 @@ class MultiscaleMonodomainODE(MonodomainODE):
     def define_splittings(self):
         # Here we define different splittings of the rhs into stiff, nonstiff and exponential terms
 
-        if self.splitting == "stiff_nonstiff":
-            # SPLITTING stiff_nonstiff
-            # this is a splitting to be used in multirate explicit stabilized methods. W euse it for the mES schemes.
-            # define nonstiff
-            self.im_f_nonstiff = self.ionic_model.f_nonstiff
-            self.im_nonstiff_args = self.ionic_model.f_nonstiff_args
-            self.im_nonstiff_indeces = self.ionic_model.f_nonstiff_indeces
-            # define stiff
-            self.im_f_stiff = self.ionic_model.f_stiff
-            self.im_stiff_args = self.ionic_model.f_stiff_args
-            self.im_stiff_indeces = self.ionic_model.f_stiff_indeces
-            # define exp
-            self.im_lmbda_exp = None
-            self.im_lmbda_yinf_exp = None
-            self.im_exp_args = []
-            self.im_exp_indeces = []
 
-            self.rho_nonstiff_cte = self.ionic_model.rho_f_nonstiff()
+        # SPLITTING exp_nonstiff
+        # this is the standard splitting used in Rush-Larsen methods. We use it for the IMEXEXP (IMEX+RL) and exp_mES schemes.
+        # define nonstiff.
+        self.im_f_nonstiff = self.ionic_model.f_expl
+        self.im_nonstiff_args = self.ionic_model.f_expl_args
+        self.im_nonstiff_indeces = self.ionic_model.f_expl_indeces
+        # define stiff
+        self.im_f_stiff = None  # no stiff part coming from ionic model (everything stiff is in the exponential part)
+        self.im_stiff_args = []
+        self.im_stiff_indeces = []
+        # define exp
+        self.im_lmbda_exp = self.ionic_model.lmbda_exp
+        self.im_lmbda_yinf_exp = self.ionic_model.lmbda_yinf_exp
+        self.im_exp_args = self.ionic_model.f_exp_args
+        self.im_exp_indeces = self.ionic_model.f_exp_indeces
 
-        elif self.splitting == "exp_nonstiff":
-            # SPLITTING exp_nonstiff
-            # this is the standard splitting used in Rush-Larsen methods. We use it for the IMEXEXP (IMEX+RL) and exp_mES schemes.
-            # define nonstiff.
-            self.im_f_nonstiff = self.ionic_model.f_expl
-            self.im_nonstiff_args = self.ionic_model.f_expl_args
-            self.im_nonstiff_indeces = self.ionic_model.f_expl_indeces
-            # define stiff
-            self.im_f_stiff = None  # no stiff part coming from ionic model (everything stiff is in the exponential part)
-            self.im_stiff_args = []
-            self.im_stiff_indeces = []
-            # define exp
-            self.im_lmbda_exp = self.ionic_model.lmbda_exp
-            self.im_lmbda_yinf_exp = self.ionic_model.lmbda_yinf_exp
-            self.im_exp_args = self.ionic_model.f_exp_args
-            self.im_exp_indeces = self.ionic_model.f_exp_indeces
-
-            self.rho_nonstiff_cte = self.ionic_model.rho_f_expl()
-
-        else:
-            raise Exception("Unknown splitting.")
+        self.rho_nonstiff_cte = self.ionic_model.rho_f_expl()
 
         self.rhs_stiff_args = self.im_stiff_args
         self.rhs_stiff_indeces = self.im_stiff_indeces

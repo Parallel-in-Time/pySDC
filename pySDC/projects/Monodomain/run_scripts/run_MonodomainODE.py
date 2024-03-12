@@ -9,7 +9,7 @@ import os
 
 from pySDC.core.Errors import ParameterError
 
-from pySDC.projects.Monodomain.problem_classes.MonodomainODE import MonodomainODE, MultiscaleMonodomainODE
+from pySDC.projects.Monodomain.problem_classes.MonodomainODE import MultiscaleMonodomainODE
 from pySDC.projects.Monodomain.hooks.HookClass_post_iter_info import post_iter_info_hook
 
 from pySDC.helpers.stats_helper import get_sorted
@@ -17,8 +17,6 @@ from pySDC.helpers.stats_helper import get_sorted
 from pySDC.projects.Monodomain.transfer_classes.my_BaseTransfer_mass import my_base_transfer_mass
 from pySDC.projects.Monodomain.transfer_classes.my_BaseTransfer import my_base_transfer
 
-# from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-# from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 
 from pySDC.projects.Monodomain.controller_classes.my_controller_MPI import my_controller_MPI as controller_MPI
 from pySDC.projects.Monodomain.controller_classes.my_controller_nonMPI import my_controller_nonMPI as controller_nonMPI
@@ -26,14 +24,6 @@ from pySDC.projects.Monodomain.controller_classes.my_controller_nonMPI import my
 from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1st_order import imexexp_1st_order as imexexp_1st_order_ExpRK
 from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1st_order_mass import imexexp_1st_order_mass as imexexp_1st_order_mass_ExpRK
 from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.imexexp_1st_order import imexexp_1st_order
-
-from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.exponential_multirate_explicit_stabilized import (
-    exponential_multirate_explicit_stabilized as exponential_multirate_explicit_stabilized_ExpRK,
-)
-
-from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.multirate_explicit_stabilized import multirate_explicit_stabilized
-from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.exponential_multirate_explicit_stabilized import exponential_multirate_explicit_stabilized
-from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.explicit_stabilized import explicit_stabilized
 
 from pySDC.projects.Monodomain.utils.data_management import database
 
@@ -145,15 +135,7 @@ def get_controller_params(problem_params, space_rank, n_time_ranks):
 def get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class, space_transfer_params):
     description = dict()
 
-    if integrator != "ES":
-        problem = MultiscaleMonodomainODE
-    else:
-        problem = MonodomainODE
-
-    if integrator != 'mES':
-        problem_params["splitting"] = "exp_nonstiff"
-    else:
-        problem_params["splitting"] = "stiff_nonstiff"
+    problem = MultiscaleMonodomainODE
 
     if integrator == "IMEXEXP":
         description["sweeper_class"] = imexexp_1st_order
@@ -162,14 +144,6 @@ def get_description(integrator, problem_params, sweeper_params, level_params, st
             description["sweeper_class"] = imexexp_1st_order_mass_ExpRK
         else:
             description["sweeper_class"] = imexexp_1st_order_ExpRK
-    elif integrator == "ES":
-        description["sweeper_class"] = explicit_stabilized
-    elif integrator == "mES":
-        description["sweeper_class"] = multirate_explicit_stabilized
-    elif integrator == "exp_mES":
-        description["sweeper_class"] = exponential_multirate_explicit_stabilized
-    elif integrator == "exp_mES_EXPRK":
-        description["sweeper_class"] = exponential_multirate_explicit_stabilized_ExpRK
     else:
         raise ParameterError("Unknown integrator.")
 
@@ -214,16 +188,7 @@ def get_sweeper_params(num_nodes, skip_residual_computation):
     sweeper_params["QI"] = "IE"
     if skip_residual_computation:
         sweeper_params["skip_residual_computation"] = ("IT_FINE", "IT_COARSE", "IT_DOWN", "IT_UP")
-    # specific for explicit stabilized methods
-    # sweeper_params["es_class"] = "RKW1"
-    # sweeper_params["es_class_outer"] = "RKW1"
-    # sweeper_params["es_class_inner"] = "RKW1"
-    # sweeper_params['es_s_outer'] = 0  # if given, or not zero, then the algorithm fixes s of the outer stabilized scheme to this value.
-    # sweeper_params['es_s_inner'] = 0
-    # # # sweeper_params['res_comp'] = 'f_eta'
-    # sweeper_params["damping"] = 0.05
-    # sweeper_params["safe_add"] = 0
-    # sweeper_params["rho_freq"] = 100
+
     return sweeper_params
 
 
@@ -488,7 +453,7 @@ def main():
     # define sweeper parameters
     # integrator = "IMEXEXP"
     integrator = "IMEXEXP_EXPRK"
-    num_nodes = [6]
+    num_nodes = [6, 3]
     num_sweeps = [1]
 
     # set step parameters
@@ -512,7 +477,7 @@ def main():
     init_time = 0.0
     enable_output = False
     write_as_reference_solution = False
-    end_time = 0.04
+    end_time = 0.02
     output_root = "results_tmp"
     output_file_name = "ref_sol" if write_as_reference_solution else "monodomain"
     ref_sol = "ref_sol"
