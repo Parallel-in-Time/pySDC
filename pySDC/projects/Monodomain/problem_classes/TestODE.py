@@ -7,28 +7,14 @@ from pySDC.core.Collocation import CollBase
 import scipy
 
 
-class dummy_communicator:
-    rank = 0
-
-
 class Parabolic(RegisterParams):
     def __init__(self, **problem_params):
         self._makeAttributeAndRegister(*problem_params.keys(), localVars=problem_params, readOnly=True)
-
-        self.comm = dummy_communicator()
-
-        x = np.array([0.0])
-        self.grids = (x,)
-
-    def get_dofs_stats(self):
-        data = (1, 1, 0, 0)
-        return (data,), data
 
 
 class TestODE(ptype):
     def __init__(self, **problem_params):
         self.logger = logging.getLogger("step")
-        self.comm = dummy_communicator()
 
         # the class for the spatial discretization of the parabolic part of monodomain
         self.parabolic = Parabolic(**problem_params)
@@ -51,8 +37,6 @@ class TestODE(ptype):
         if not hasattr(self, 'lmbda_others'):
             self.lmbda_others = -1.0
 
-        # assert self.lmbda_laplacian <= 0.0 and self.lmbda_gating <= 0.0 and self.lmbda_others <= 0.0, "lmbda_laplacian, lmbda_gating and lmbda_others must be negative"
-
         def dtype_u(init, val=0.0):
             return myfloat(init, val)
 
@@ -67,31 +51,6 @@ class TestODE(ptype):
 
         return u0
 
-    # def compute_errors(self, uh):
-    #     """
-    #     Compute L2 error of uh[0] (potential V)
-    #     Args:
-    #         uh (VectorOfVectors): solution as vector of vectors
-
-    #     Returns:
-    #         computed (bool): if error computation was successful
-    #         error (float): L2 error
-    #         rel_error (float): relative L2 error
-    #     """
-    #     exact_sol = self.dtype_u(init=self.init, val=0.0)
-    #     exact_sol.values = np.exp((self.lmbda_laplacian + self.lmbda_gating + self.lmbda_others) * self.Tend)
-    #     error_L2 = abs(uh - exact_sol)
-    #     rel_error_L2 = error_L2 / abs(exact_sol)
-
-    #     print(f"L2-errors: {error_L2}")
-    #     print(f"Relative L2-errors: {rel_error_L2}")
-
-    #     return True, error_L2, rel_error_L2
-
-    # def getSize(self):
-    #     # return number of dofs in the mesh
-    # return 1
-
     def eval_f(self, u, t, fh=None):
         if fh is None:
             fh = self.dtype_f(init=self.init, val=0.0)
@@ -100,9 +59,6 @@ class TestODE(ptype):
         fh.values = (self.lmbda_laplacian + self.lmbda_gating + self.lmbda_others) * u.values
 
         return fh
-
-    # def rho(self, y, t, fy):
-    #     return abs(self.lmbda_laplacian + self.lmbda_gating + self.lmbda_others)
 
 
 class MultiscaleTestODE(TestODE):
@@ -145,15 +101,15 @@ class MultiscaleTestODE(TestODE):
         if fh is None:
             fh = self.dtype_f(init=self.init, val=0.0)
 
-        # evaluate explicit (non stiff) part M^-1*f_nonstiff(u,t)
+        # evaluate explicit (non stiff) part lambda_others*u
         if eval_expl:
             fh.expl.values = self.lmbda_others * u.values
 
-        # evaluate implicit (stiff) part M^1*A*u+M^-1*f_stiff(u,t)
+        # evaluate implicit (stiff) part lambda_laplacian*u
         if eval_impl:
             fh.impl.values = self.lmbda_laplacian * u.values
 
-        # evaluate exponential part
+        # evaluate exponential part lambda_gating*u
         if eval_exp:
             fh.exp.values = self.lmbda_gating * u.values
 
