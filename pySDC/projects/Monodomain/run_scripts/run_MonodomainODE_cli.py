@@ -38,11 +38,10 @@ def main():
     # controller args
     parser.add_argument("--truly_time_parallel", default=True, action=argparse.BooleanOptionalAction, help="truly time parallel or emulated")
     parser.add_argument("--n_time_ranks", default=1, type=int, help="number of time ranks")
-    parser.add_argument("--print_stats", default=True, action=argparse.BooleanOptionalAction, help="print stats or not")
 
     args = parser.parse_args()
 
-    err, rel_err = setup_and_run(
+    err, rel_err, avg_niters = setup_and_run(
         args.integrator,
         args.num_nodes,
         args.skip_res,
@@ -65,7 +64,6 @@ def main():
         args.truly_time_parallel,
         args.n_time_ranks,
         args.finter,
-        args.print_stats,
     )
 
 

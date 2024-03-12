@@ -35,36 +35,10 @@ def get_controller(controller_params, description, time_comm, n_time_ranks, trul
     return controller
 
 
-def print_statistics(stats, controller, problem_params, space_rank, time_comm, output_file_name, Tend):
-    iter_counts = get_sorted(stats, type="niter", sortby="time")
-    niters = [item[1] for item in iter_counts]
-    timing = get_sorted(stats, type="timing_run", sortby="time")
-    timing = timing[0][1]
-    if time_comm is not None:
-        niters = time_comm.gather(niters, root=0)
-        timing = time_comm.gather(timing, root=0)
-    if time_comm is None or time_comm.rank == 0:
-        niters = np.array(niters).flatten()
-        controller.logger.info("Mean number of iterations: %4.2f" % np.mean(niters))
-        controller.logger.info("Std and var for number of iterations: %4.2f -- %4.2f" % (float(np.std(niters)), float(np.var(niters))))
-        timing = np.mean(np.array(timing))
-        controller.logger.info(f"Time to solution: {timing:6.4f} sec.")
-
-    from pySDC.projects.Monodomain.utils.visualization_tools import show_residual_across_simulation
-
-    pre_ref = problem_params["pre_refinements"][0] if type(problem_params["pre_refinements"]) is list else problem_params["pre_refinements"]
-    out_folder = problem_params["output_root"] + "/" + problem_params["domain_name"] + "/ref_" + str(pre_ref) + "/" + problem_params["ionic_model_name"] + "/"
-    os.makedirs(out_folder, exist_ok=True)
-    fname = out_folder + f"{output_file_name}_residuals.png"
-    if space_rank == 0:
-        show_residual_across_simulation(stats=stats, fname=fname, comm=time_comm, tend=Tend)
-
-
-def print_dofs_stats(space_rank, time_rank, controller, P, uinit):
-    data, avg_data = P.parabolic.get_dofs_stats()
+def print_dofs_stats(time_rank, controller, P, uinit):
     tot_dofs = uinit.getSize()
     mesh_dofs = uinit[0].getSize()
-    if space_rank == 0 and time_rank == 0:
+    if time_rank == 0:
         controller.logger.info(f"Total dofs: {tot_dofs}, mesh dofs = {mesh_dofs}")
 
 
@@ -82,26 +56,13 @@ def get_P_data(controller, truly_time_parallel):
 
 def get_comms(n_time_ranks, truly_time_parallel):
     if truly_time_parallel:
-        # set MPI communicator
-        comm = MPI.COMM_WORLD
-        world_rank = comm.Get_rank()
-        world_size = comm.Get_size()
-        assert world_size % n_time_ranks == 0, "Total number of ranks must be a multiple of n_time_ranks"
-        n_space_ranks = int(world_size / n_time_ranks)
-        # split world communicator to create space-communicators
-        color = int(world_rank / n_space_ranks)
-        space_comm = comm.Split(color=color)
-        space_rank = space_comm.Get_rank()
-        # split world communicator to create time-communicators
-        color = int(world_rank % n_space_ranks)
-        time_comm = comm.Split(color=color)
+        time_comm = MPI.COMM_WORLD
         time_rank = time_comm.Get_rank()
+        assert time_comm.Get_size() == n_time_ranks, "Number of time ranks does not match the number of MPI ranks"
     else:
-        space_comm = MPI.COMM_WORLD
-        space_rank = space_comm.Get_rank()
         time_comm = None
         time_rank = 0
-    return space_comm, time_comm, space_rank, time_rank
+    return time_comm, time_rank
 
 
 def get_base_transfer_params(finter):
@@ -110,14 +71,17 @@ def get_base_transfer_params(finter):
     return base_transfer_params
 
 
-def get_controller_params(problem_params, space_rank, n_time_ranks):
+def get_controller_params(problem_params, n_time_ranks):
     controller_params = dict()
     controller_params["predict_type"] = "pfasst_burnin" if n_time_ranks > 1 else None
     controller_params["log_to_file"] = False
     controller_params["fname"] = problem_params["output_root"] + "controller"
-    controller_params["logger_level"] = 20 if space_rank == 0 else 99  # set level depending on rank
+    controller_params["logger_level"] = 20
     controller_params["dump_setup"] = False
-    controller_params["hook_class"] = [post_iter_info_hook, pde_hook]
+    if n_time_ranks == 1:
+        controller_params["hook_class"] = [post_iter_info_hook, pde_hook]
+    else:
+        controller_params["hook_class"] = [post_iter_info_hook]
     return controller_params
 
 
@@ -239,10 +203,9 @@ def setup_and_run(
     truly_time_parallel,
     n_time_ranks,
     finter,
-    print_stats,
 ):
     # get space-time communicators
-    space_comm, time_comm, space_rank, time_rank = get_comms(n_time_ranks, truly_time_parallel)
+    time_comm, time_rank = get_comms(n_time_ranks, truly_time_parallel)
     # get time integration parameters
     # set maximum number of iterations in SDC/ESDC/MLSDC/etc
     step_params = get_step_params(maxiter=max_iter)
@@ -274,7 +237,7 @@ def setup_and_run(
     # Usually do not modify below this line ------------------
     # get remaining prams
     base_transfer_params = get_base_transfer_params(finter)
-    controller_params = get_controller_params(problem_params, space_rank, n_time_ranks)
+    controller_params = get_controller_params(problem_params, n_time_ranks)
     description = get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class, space_transfer_params)
     set_logger(controller_params)
     controller = get_controller(controller_params, description, time_comm, n_time_ranks, truly_time_parallel)
@@ -283,7 +246,7 @@ def setup_and_run(
     t0, Tend, uinit, P = get_P_data(controller, truly_time_parallel)
 
     # print dofs stats (dofs per processor, etc.)
-    print_dofs_stats(space_rank, time_rank, controller, P, uinit)
+    print_dofs_stats(time_rank, controller, P, uinit)
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
@@ -293,83 +256,24 @@ def setup_and_run(
 
     # compute errors, if a reference solution is available
     error_availabe, error_L2, rel_error_L2 = P.compute_errors(uend)
-    # error_L2, rel_error_L2 = 0, 0
 
-    # print statistics (number of iterations, time to solution, etc.)
-    if print_stats:
-        print_statistics(stats, controller, problem_params, space_rank, time_comm, output_file_name, Tend)
-
-    from pySDC.projects.Monodomain.utils.visualization_tools import get_times_procs_and_res
-
-    if space_comm is not None or space_rank == 0:
-        times_a, procs, last_residual, residuals = get_times_procs_and_res(stats, comm=time_comm, tend=Tend)
-
+    # get some stats
     iter_counts = get_sorted(stats, type="niter", sortby="time")
     niters = [item[1] for item in iter_counts]
-    times = [item[0] for item in iter_counts]
-    cpu_time = get_sorted(stats, type="timing_run", sortby="time")
-    cpu_time = cpu_time[0][1]
     if time_comm is not None:
         niters = time_comm.gather(niters, root=0)
-        times = time_comm.gather(times, root=0)
-        cpu_time = time_comm.gather(cpu_time, root=0)
+        if time_comm.rank == 0:
+            niters = np.array(niters).flatten()
+            avg_niters = np.mean(niters)
+        else:
+            avg_niters = 0
+        avg_niters = time_comm.bcast(avg_niters, root=0)
+
     if time_comm is None or time_comm.rank == 0:
-        niters = np.array(niters).flatten()
-        times = np.array(times).flatten()
-        times.sort()
-        mean_niters = np.mean(niters)
-        std_niters = float(np.std(niters))
-        cpu_time = np.mean(np.array(cpu_time))
+        controller.logger.info("Mean number of iterations: %4.2f" % avg_niters)
+        controller.logger.info("Std and var for number of iterations: %4.2f -- %4.2f" % (float(np.std(niters)), float(np.var(niters))))
 
-    if space_comm is not None or space_rank == 0:
-        if time_comm is None or time_comm.rank == 0:
-            assert np.allclose(times, times_a), "Times are not the same"
-
-    if time_comm is None or time_rank == 0:
-        if space_comm is None or space_rank == 0:
-            perf_data = dict()
-            perf_data["niters"] = list(niters.astype(float))
-            perf_data["mean_niters"] = mean_niters
-            perf_data["std_niters"] = std_niters
-            perf_data["times"] = list(times.astype(float))
-            perf_data["error_available"] = error_availabe
-            perf_data["err"] = error_L2
-            perf_data["rel_err"] = rel_error_L2
-            perf_data["truly_parallel"] = truly_time_parallel
-            perf_data["n_time_ranks"] = n_time_ranks
-            perf_data["cpu_time"] = cpu_time
-            perf_data["procs"] = procs
-            perf_data["last_residual"] = last_residual
-            perf_data["residuals"] = residuals
-            ref_sol_data_path = P.output_folder / Path(P.ref_sol)
-            if ref_sol_data_path.with_suffix('.db').is_file():
-                ref_sol_data = database(ref_sol_data_path)
-                perf_data_ref_sol = ref_sol_data.read_dictionary("perf_data")
-                perf_data["speedup"] = perf_data_ref_sol["cpu_time"] / cpu_time
-                perf_data["parallel_efficiency"] = perf_data["speedup"] / n_time_ranks
-
-            file_name = P.output_folder / Path(P.output_file_name)
-            if file_name.with_suffix('.db').is_file():
-                os.remove(file_name.with_suffix('.db'))
-            data_man = database(file_name)
-            problem_params_no_comm = problem_params
-            controller_params_no_hook = controller_params
-            del controller_params_no_hook["hook_class"]
-            data_man.write_dictionary("problem_params", problem_params_no_comm)
-            data_man.write_dictionary("step_params", step_params)
-            data_man.write_dictionary("sweeper_params", sweeper_params)
-            data_man.write_dictionary("level_params", level_params)
-            data_man.write_dictionary("space_transfer_params", space_transfer_params)
-            data_man.write_dictionary("base_transfer_params", base_transfer_params)
-            data_man.write_dictionary("controller_params", controller_params_no_hook)
-            data_man.write_dictionary("perf_data", perf_data)
-
-    # free communicators
-    if truly_time_parallel:
-        space_comm.Free()
-        time_comm.Free()
-
-    return error_L2, rel_error_L2
+    return error_L2, rel_error_L2, avg_niters
 
 
 def main():
@@ -409,9 +313,8 @@ def main():
     # set time parallelism to True or emulated (False)
     truly_time_parallel = False
     n_time_ranks = 1
-    print_stats = True
 
-    err, rel_err = setup_and_run(
+    err, rel_err, avg_niters = setup_and_run(
         integrator,
         num_nodes,
         skip_residual_computation,
@@ -434,7 +337,6 @@ def main():
         truly_time_parallel,
         n_time_ranks,
         finter,
-        print_stats,
     )
 
 
