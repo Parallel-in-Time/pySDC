@@ -198,8 +198,8 @@ class rho_estimator:
 
     def rho_f_nondiagonal(self, f, fx, y, fy, eigval, eigvec, n_f_eval):
         """
-        Estimates spectral radius of df/dy, for f with one component.
-        eigval,eigvec are guesses for the dominant eigenvalue,eigenvector. n_f_eval counts the number of f evaluations
+        Estimates spectral radius of df/dy.
+        eigval, eigvec are guesses for the dominant eigenvalue,eigenvector. n_f_eval counts the number of f evaluations
         fy can be None or an already available evaluation of f(y)
 
         It is a nonlinear power method based on finite differentiation: df/dy(y)*v = f(y+v)-f(y) + O(|v|^2)

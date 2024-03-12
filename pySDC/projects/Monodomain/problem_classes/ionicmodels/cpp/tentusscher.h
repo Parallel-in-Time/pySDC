@@ -140,7 +140,7 @@ void TenTusscher2006_epi::f(py::list y_list, py::list fy_list)
     double AV_f_JCa_i_free, AV_f_JCa_sr_free, AV_f_JCa_ss_free, AV_i_leak, AV_i_up, AV_i_xfer, AV_kcasr, AV_k1, AV_k2, AV_O, AV_i_rel, AV_ddt_Ca_sr_total;
     double AV_E_Ca, AV_E_K, AV_i_NaK, AV_i_to, AV_i_p_Ca, AV_i_CaL, AV_i_b_Ca, AV_alpha_K1, AV_beta_K1, AV_i_p_K, AV_i_Kr, AV_E_Ks, AV_E_Na, AV_i_NaCa;
     double AV_ddt_Ca_i_total, AV_ddt_Ca_ss_total, AV_i_Na, AV_i_K1, AV_xK1_inf, AV_i_Ks, AV_i_b_Na;
-    // Remember to scale the first variable!!!
+
     for (unsigned j = 0; j < n_dofs; j++)
     {
         for (unsigned i = 0; i < size; i++)
@@ -289,19 +289,16 @@ void TenTusscher2006_epi::f_expl(py::list y_list, py::list fy_list)
     get_raw_data(fy_list, fy_ptrs, N, n_dofs);
 
     double y[size];
-    // # needed for nonlinear in gating variables
     double AV_f_JCa_i_free, AV_f_JCa_sr_free, AV_f_JCa_ss_free, AV_i_leak, AV_i_up, AV_i_xfer, AV_kcasr, AV_k1, AV_k2, AV_O, AV_i_rel, AV_ddt_Ca_sr_total;
     double AV_E_Ca, AV_E_K, AV_i_NaK, AV_i_to, AV_i_p_Ca, AV_i_CaL, AV_i_b_Ca, AV_alpha_K1, AV_beta_K1, AV_i_p_K, AV_i_Kr, AV_E_Ks, AV_E_Na, AV_i_NaCa;
     double AV_ddt_Ca_i_total, AV_ddt_Ca_ss_total, AV_i_Na, AV_i_K1, AV_xK1_inf, AV_i_Ks, AV_i_b_Na;
-    // Remember to scale the first variable!!!
+
     for (unsigned j = 0; j < n_dofs; j++)
     {
+
         for (unsigned i = 0; i < size; i++)
             y[i] = y_ptrs[i][j];
 
-        // # Non linear in gating variables
-
-        // # /* calcium_dynamics */
         AV_f_JCa_i_free = 1.0 / (1.0 + AC_Buf_c * AC_K_buf_c / pow(NV_Ith_S(y, 13) + AC_K_buf_c, 2.0));
         AV_f_JCa_sr_free = 1.0 / (1.0 + AC_Buf_sr * AC_K_buf_sr / pow(NV_Ith_S(y, 14) + AC_K_buf_sr, 2.0));
         AV_f_JCa_ss_free = 1.0 / (1.0 + AC_Buf_ss * AC_K_buf_ss / pow(NV_Ith_S(y, 15) + AC_K_buf_ss, 2.0));
@@ -371,13 +368,13 @@ void TenTusscher2006_epi::lmbda_yinf_exp(py::list y_list, py::list lmbda_list, p
     double AV_alpha_h, AV_beta_h, AV_tau_h, AV_alpha_j, AV_beta_j, AV_tau_j, AV_alpha_m, AV_beta_m, AV_tau_m;
     double AV_alpha_xr1, AV_beta_xr1, AV_tau_xr1, AV_alpha_xr2, AV_beta_xr2, AV_tau_xr2, AV_alpha_xs, AV_beta_xs, AV_tau_xs;
     double AV_tau_r, AV_tau_s;
+
     // Remember to scale the first variable!!!
     for (unsigned j = 0; j < n_dofs; j++)
     {
+
         for (unsigned i = 0; i < size; i++)
             y[i] = y_ptrs[i][j];
-
-        // # Linear in gating variables
 
         // # /* L_type_Ca_current_d_gate */
         AV_alpha_d = 1.4 / (1.0 + exp(((-35.0) - NV_Ith_S(y, 0)) / 13.0)) + 0.25;
@@ -470,13 +467,14 @@ void TenTusscher2006_epi::lmbda_exp(py::list y_list, py::list lmbda_list)
     double AV_alpha_h, AV_beta_h, AV_tau_h, AV_alpha_j, AV_beta_j, AV_tau_j, AV_alpha_m, AV_beta_m, AV_tau_m;
     double AV_alpha_xr1, AV_beta_xr1, AV_tau_xr1, AV_alpha_xr2, AV_beta_xr2, AV_tau_xr2, AV_alpha_xs, AV_beta_xs, AV_tau_xs;
     double AV_tau_r, AV_tau_s;
+
     // Remember to scale the first variable!!!
+
     for (unsigned j = 0; j < n_dofs; j++)
     {
+
         for (unsigned i = 0; i < size; i++)
             y[i] = y_ptrs[i][j];
-
-        // # Linear in gating variables
 
         // # /* L_type_Ca_current_d_gate */
         AV_alpha_d = 1.4 / (1.0 + exp(((-35.0) - NV_Ith_S(y, 0)) / 13.0)) + 0.25;
@@ -563,6 +561,7 @@ void TenTusscher2006_epi::f_nonstiff(py::list y_list, py::list fy_list)
     double AV_E_Ca, AV_E_K, AV_i_NaK, AV_i_to, AV_i_p_Ca, AV_i_CaL, AV_i_b_Ca, AV_alpha_K1, AV_beta_K1, AV_i_p_K, AV_i_Kr, AV_E_Ks, AV_E_Na, AV_i_NaCa;
     double AV_ddt_Ca_i_total, AV_ddt_Ca_ss_total, AV_i_Na, AV_i_K1, AV_xK1_inf, AV_i_Ks, AV_i_b_Na;
     // Remember to scale the first variable!!!
+
     for (unsigned j = 0; j < n_dofs; j++)
     {
         for (unsigned i = 0; i < size; i++)
@@ -713,6 +712,7 @@ void TenTusscher2006_epi::f_stiff(py::list y_list, py::list fy_list)
     double y0, y4;
     double AV_alpha_m, AV_beta_m, AV_m_inf, AV_tau_m;
     // Remember to scale the first variable!!!
+
     for (unsigned j = 0; j < n_dofs; j++)
     {
         y0 = y_ptrs[0][j];

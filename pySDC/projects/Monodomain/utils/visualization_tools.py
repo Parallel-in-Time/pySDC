@@ -127,3 +127,67 @@ def show_residual_across_simulation(stats, fname="residuals.png", comm=None, ten
     ax.set_ylabel("Time")
 
     plt.savefig(fname, transparent=True, bbox_inches="tight")
+
+
+def get_times_procs_and_res(stats, comm=None, tend=None):
+    """
+    Helper routine returning time steps and for each of them the procesor number and the residuals
+
+    Args:
+        stats (dict): statistics object from a PFASST run
+    """
+
+    # get residuals of the run
+    extract_stats = filter_stats(stats, type="residual_post_iteration")
+
+    sortby_list = ["time", "iter", "process"]
+    sorted_stats = sort_stats(extract_stats, sortby_list, comm)
+    dt = sorted_stats[0][0][0]
+    gathered_stats = tuple_to_stats(sorted_stats, sortby_list)
+    del extract_stats, sortby_list, sorted_stats
+
+    # find boundaries for x-,y- and c-axis as well as arrays
+    maxprocs = 0
+    maxiter = 0
+    minres = 0
+    maxres = -99
+    for k, v in gathered_stats.items():
+        maxprocs = max(maxprocs, k.process)
+        maxiter = max(maxiter, k.iter)
+        minres = min(minres, np.log10(v))
+        maxres = max(maxres, np.log10(v))
+
+    times = np.array([])
+    for k, v in gathered_stats.items():
+        if not np.any(np.isclose(times - k.time, np.zeros_like(times))):
+            times = np.append(times, k.time)
+    if times.size > 1:
+        dt = times[1]
+    else:
+        dt = tend
+    n_steps = times.shape[0]
+
+    # grep residuals and put into array
+    residual = np.zeros((maxiter, n_steps))
+    iterations = np.zeros(n_steps, dtype=int)
+    procs = np.zeros(n_steps, dtype=int)
+    residual[:] = 0.0
+    for k, v in gathered_stats.items():
+        step = np.round(k.time / dt).astype(int)
+        iter = k.iter
+        if iter != -1:
+            residual[iter - 1, step] = v
+            procs[step] = int(k.process)
+            if iter > iterations[step]:
+                iterations[step] = int(iter)
+
+    last_residual = np.zeros(n_steps)
+    residuals = []
+    for i in range(residual.shape[1]):
+        last_residual[i] = residual[iterations[i] - 1, i]
+        residuals.append(list(residual[: iterations[i], i]))
+
+    procs = procs.tolist()
+    last_residual = last_residual.tolist()
+
+    return times, procs, last_residual, residuals

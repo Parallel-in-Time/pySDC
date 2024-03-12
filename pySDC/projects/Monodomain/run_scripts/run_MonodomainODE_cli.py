@@ -42,6 +42,7 @@ def main():
     parser.add_argument("--ref_sol", default="ref_sol", type=str, help="reference solution file name")
     parser.add_argument("--output_root", default="results_tmp/", type=str, help="output root folder")
     parser.add_argument("--mass_lumping", default=True, action=argparse.BooleanOptionalAction, help="with or without mass lumping")
+    parser.add_argument("--finter", default=False, action=argparse.BooleanOptionalAction, help="in prolong, re-evaluate f (false) or interpolate (true)")
     # controller args
     parser.add_argument("--truly_time_parallel", default=True, action=argparse.BooleanOptionalAction, help="truly time parallel or emulated")
     parser.add_argument("--n_time_ranks", default=1, type=int, help="number of time ranks")
@@ -76,6 +77,7 @@ def main():
         args.end_time,
         args.truly_time_parallel,
         args.n_time_ranks,
+        args.finter,
         args.print_stats,
     )
 

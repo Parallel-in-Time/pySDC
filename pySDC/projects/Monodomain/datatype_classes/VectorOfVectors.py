@@ -225,6 +225,53 @@ class IMEXEXP_VectorOfVectors(object):
             self.exp = VectorOfVectors(init, val, type_sub_vector, size)
             self.size = size
 
+    def __iadd__(self, other):
+        self.impl += other.impl
+        self.expl += other.expl
+        self.exp += other.exp
+
+        return self
+
+    def __sub__(self, other):
+        me = IMEXEXP_VectorOfVectors(self)
+        me -= other
+        return me
+
+    def __isub__(self, other):
+        self.expl -= other.expl
+        self.impl -= other.impl
+        self.exp -= other.exp
+        return self
+
+    def __mul__(self, other):
+        if isinstance(other, IMEXEXP_VectorOfVectors) or isinstance(other, float):
+            me = IMEXEXP_VectorOfVectors(self)
+            me *= other
+            return me
+        else:
+            raise DataError("Type error: cannot mul %s to %s" % (type(other), type(self)))
+
+    def __rmul__(self, other):
+        if isinstance(other, float):
+            me = IMEXEXP_VectorOfVectors(self)
+            me *= other
+            return me
+        else:
+            raise DataError("Type error: cannot rmul %s to %s" % (type(other), type(self)))
+
+    def __imul__(self, other):
+        if isinstance(other, float):
+            self.impl *= other
+            self.expl *= other
+            self.exp *= other
+        elif isinstance(other, IMEXEXP_VectorOfVectors):
+            self.impl *= other.impl
+            self.expl *= other.expl
+            self.exp *= other.exp
+        else:
+            raise DataError("Type error: cannot imul %s to %s" % (type(other), type(self)))
+        return self
+
     def ghostUpdate(self, addv, mode, all=True):
         self.impl.ghostUpdate(addv, mode, all)
         self.expl.ghostUpdate(addv, mode, all)

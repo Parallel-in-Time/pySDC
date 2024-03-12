@@ -124,15 +124,15 @@ def get_comms(n_time_ranks, truly_time_parallel):
     return space_comm, time_comm, space_rank, time_rank
 
 
-def get_base_transfer_params():
+def get_base_transfer_params(finter):
     base_transfer_params = dict()
-    base_transfer_params["finter"] = False
+    base_transfer_params["finter"] = finter
     return base_transfer_params
 
 
-def get_controller_params(problem_params, space_rank):
+def get_controller_params(problem_params, space_rank, n_time_ranks):
     controller_params = dict()
-    controller_params["predict_type"] = "pfasst_burnin"
+    controller_params["predict_type"] = "pfasst_burnin" if n_time_ranks > 1 else None
     # controller_params["predict_type"] = "fine_only"
     controller_params["log_to_file"] = False
     controller_params["fname"] = problem_params["output_root"] + "controller"
@@ -330,6 +330,7 @@ def setup_and_run(
     end_time,
     truly_time_parallel,
     n_time_ranks,
+    finter,
     print_stats,
 ):
     # get space-time communicators
@@ -383,8 +384,8 @@ def setup_and_run(
 
     # Usually do not modify below this line ------------------
     # get remaining prams
-    base_transfer_params = get_base_transfer_params()
-    controller_params = get_controller_params(problem_params, space_rank)
+    base_transfer_params = get_base_transfer_params(finter)
+    controller_params = get_controller_params(problem_params, space_rank, n_time_ranks)
     description = get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class, space_transfer_params)
     set_logger(controller_params)
     controller = get_controller(controller_params, description, time_comm, n_time_ranks, truly_time_parallel)
@@ -409,6 +410,11 @@ def setup_and_run(
     if print_stats:
         print_statistics(stats, controller, problem_params, space_rank, time_comm, output_file_name, Tend)
 
+    from pySDC.projects.Monodomain.utils.visualization_tools import get_times_procs_and_res
+
+    if space_comm is not None or space_rank == 0:
+        times_a, procs, last_residual, residuals = get_times_procs_and_res(stats, comm=time_comm, tend=Tend)
+
     iter_counts = get_sorted(stats, type="niter", sortby="time")
     niters = [item[1] for item in iter_counts]
     times = [item[0] for item in iter_counts]
@@ -421,9 +427,14 @@ def setup_and_run(
     if time_comm is None or time_comm.rank == 0:
         niters = np.array(niters).flatten()
         times = np.array(times).flatten()
+        times.sort()
         mean_niters = np.mean(niters)
         std_niters = float(np.std(niters))
         cpu_time = np.mean(np.array(cpu_time))
+
+    if space_comm is not None or space_rank == 0:
+        if time_comm is None or time_comm.rank == 0:
+            assert np.allclose(times, times_a), "Times are not the same"
 
     if time_comm is None or time_rank == 0:
         if space_comm is None or space_rank == 0:
@@ -438,6 +449,9 @@ def setup_and_run(
             perf_data["truly_parallel"] = truly_time_parallel
             perf_data["n_time_ranks"] = n_time_ranks
             perf_data["cpu_time"] = cpu_time
+            perf_data["procs"] = procs
+            perf_data["last_residual"] = last_residual
+            perf_data["residuals"] = residuals
             ref_sol_data_path = P.output_folder / Path(P.ref_sol)
             if ref_sol_data_path.with_suffix('.db').is_file():
                 ref_sol_data = database(ref_sol_data_path)
@@ -474,23 +488,23 @@ def main():
     # define sweeper parameters
     # integrator = "IMEXEXP"
     integrator = "IMEXEXP_EXPRK"
-    num_nodes = [6, 4, 2]
+    num_nodes = [6]
     num_sweeps = [1]
 
     # set step parameters
     max_iter = 100
 
     # set space discretization
-    space_disc = "FD"
+    space_disc = "DCT"
 
     # set level parameters
-    dt = 0.05
+    dt = 0.01
     restol = 5e-8
 
     # set problem parameters
     domain_name = "cube_1D"
     pre_refinements = [0]
-    order = 4 if space_disc == "FD" else 1
+    order = 1 if space_disc == "FEM" else 4
     lin_solv_max_iter = None
     lin_solv_rtol = 1e-8
     ionic_model_name = "TTP"
@@ -498,13 +512,15 @@ def main():
     init_time = 0.0
     enable_output = False
     write_as_reference_solution = False
-    end_time = 0.1
+    end_time = 0.04
     output_root = "results_tmp"
     output_file_name = "ref_sol" if write_as_reference_solution else "monodomain"
     ref_sol = "ref_sol"
     mass_lumping = True
     mass_rhs = "none"
     skip_residual_computation = False
+
+    finter = False
 
     # set time parallelism to True or emulated (False)
     truly_time_parallel = False
@@ -538,6 +554,7 @@ def main():
         end_time,
         truly_time_parallel,
         n_time_ranks,
+        finter,
         print_stats,
     )
 

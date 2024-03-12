@@ -41,29 +41,41 @@ def get_plot_settings():
     lw = 2
     slopes_style = dict()
     slopes_style["linewidth"] = 2
-    slopes_style["linestyle"] = ["--", "-.", "-"]
-    slopes_style["color"] = ["k", "k", "k"]
+    slopes_style["linestyle"] = [
+        "--",
+        "-.",
+        "-",
+        ":",
+    ]
+    slopes_style["color"] = ["k", "k", "k", "k"]
     return markers, markerfacecolors, markersizes, markeredgewidths, colors, figsize, lw, slopes_style
 
 
 def plot_results(all_results, axes_data, save_plots_to_disk, show_plots, output_file, plot_options):
     location = plot_options["location"]
+    legend_outside = plot_options["legend_outside"] if "legend_outside" in plot_options else False
     figure_title = plot_options["figure_title"]
-    with_legend = plot_options["with_legend"]
+    show_legend = plot_options["show_legend"]
     logx = plot_options["logx"]
     logy = plot_options["logy"]
     log_base = plot_options["log_base"] if "log_base" in plot_options else 10
     max_y = plot_options["max_y"] if "max_y" in plot_options else None
     min_y = plot_options["min_y"] if "min_y" in plot_options else None
     slopes = plot_options["slopes"] if "slopes" in plot_options else None
+    set_x_label = plot_options["set_x_label"] if "set_x_label" in plot_options else False
+    set_y_label = plot_options["set_y_label"] if "set_y_label" in plot_options else False
     set_x_ticks_formatter = plot_options["set_x_ticks_formatter"] if "set_x_ticks_formatter" in plot_options else None
     set_y_ticks_formatter = plot_options["set_y_ticks_formatter"] if "set_y_ticks_formatter" in plot_options else None
     set_x_ticks_labels = plot_options["set_x_ticks_labels"] if "set_x_ticks_labels" in plot_options else False
     set_y_ticks_labels = plot_options["set_y_ticks_labels"] if "set_y_ticks_labels" in plot_options else False
     xticks = plot_options["xticks"] if "xticks" in plot_options else None
     yticks = plot_options["yticks"] if "yticks" in plot_options else None
-
+    export_legend = plot_options["export_legend"] if "export_legend" in plot_options else False
     markers, markerfacecolors, markersizes, markeredgewidths, colors, figsize, lw, slopes_style = get_plot_settings()
+
+    if "figsize" in plot_options:
+        figsize = plot_options["figsize"]
+
     fig, ax = plt.subplots(figsize=figsize)
     if logx:
         ax.set_xscale("log", base=log_base)
@@ -81,25 +93,28 @@ def plot_results(all_results, axes_data, save_plots_to_disk, show_plots, output_
     ax1_data = axes_data[0]
     ax2_data = axes_data[1]
 
-    min_max_ax2 = np.inf
-
+    ax1 = []
+    ax2 = []
+    ax3 = []
+    min_ax2 = []
     for i, results in enumerate(all_results):
-        ax1 = []
-        ax2 = []
+        ax1.append([])
+        ax2.append([])
         if with_std:
-            ax3 = []
+            ax3.append([])
         label = results["plot_label"]
         del results["plot_label"]
         for key, result in results.items():
-            ax1.append(result[ax1_data[0]][ax1_data[1]])
-            ax2.append(result[ax2_data[0]][ax2_data[1]])
+            ax1[-1].append(result[ax1_data[0]][ax1_data[1]])
+            ax2[-1].append(result[ax2_data[0]][ax2_data[1]])
             if with_std:
-                ax3.append(result[axes_data[2][0]][axes_data[2][1]])
-        if ax2 != []:
-            min_max_ax2 = min(min_max_ax2, max(ax2))
+                ax3[-1].append(result[axes_data[2][0]][axes_data[2][1]])
+        ax1[-1] = list(np.array(ax1[-1]).flatten())
+        if ax2[-1] != []:
+            min_ax2.append(min(ax2[-1]))
         ax.plot(
-            ax1,
-            ax2,
+            ax1[-1],
+            ax2[-1],
             label=label,
             linewidth=lw,
             marker=markers[i],
@@ -109,16 +124,17 @@ def plot_results(all_results, axes_data, save_plots_to_disk, show_plots, output_
             markersize=markersizes[i],
         )
         if with_std:
-            y1 = np.array(ax2) - np.array(ax3)
-            y2 = np.array(ax2) + np.array(ax3)
-            ax.fill_between(ax1, y1, y2, color=colors[i], alpha=0.1)
+            y1 = np.array(ax2[-1]) - np.array(ax3[-1])
+            y2 = np.array(ax2[-1]) + np.array(ax3[-1])
+            ax.fill_between(ax1[-1], y1, y2, color=colors[i], alpha=0.1)
 
     if slopes is not None:
-        ax1_np = np.array(ax1)
-        for i, slope in enumerate(slopes):
+        for i, (slope, j, fac, n) in enumerate(zip(*slopes)):
+            ax1_np = np.array(ax1[j])
+            ax1_np = ax1_np[n[0] : n[1]]
             ax.plot(
                 ax1_np,
-                min_max_ax2 * (ax1_np / ax1_np[0]) ** slope,
+                fac * min_ax2[j] * (ax1_np / ax1_np[-1]) ** slope,
                 linewidth=slopes_style["linewidth"],
                 linestyle=slopes_style["linestyle"][i],
                 color=slopes_style["color"][i],
@@ -135,30 +151,60 @@ def plot_results(all_results, axes_data, save_plots_to_disk, show_plots, output_
 
     fs_label = 12
     fs_tick = 12
-    ax.set_xlabel(label_from_key(ax1_data[1]), fontsize=fs_label, labelpad=-0.5)
-    ax.set_ylabel(label_from_key(ax2_data[1]), fontsize=fs_label, labelpad=-0.5)
+    if set_x_label:
+        ax.set_xlabel(label_from_key(ax1_data[1]), fontsize=fs_label, labelpad=-0.5)
+    if set_y_label:
+        ax.set_ylabel(label_from_key(ax2_data[1]), fontsize=fs_label, labelpad=-0.5)
     ax.tick_params(axis="x", labelsize=fs_tick, pad=1)
     ax.tick_params(axis="y", labelsize=fs_tick, pad=0)
     ax.set_ylim([min_y, max_y])
 
+    def merge_ax(ax):
+        merged_ax = ax[0]
+        for i in range(1, len(ax)):
+            for j in range(len(ax[i])):
+                if not np.any(np.isclose(merged_ax, ax[i][j])):
+                    merged_ax.append(ax[i][j])
+        merged_ax.sort()
+        return merged_ax
+
+    merged_ax1 = merge_ax(ax1)
+    merged_ax2 = merge_ax(ax2)
+
     if set_x_ticks_labels:
-        ax1_np = np.array(ax1)
         if xticks is not None:
             ax.set_xticks(xticks)
         else:
-            ax.set_xticks(ax1_np[range(0, len(ax1), 2)])
+            ax.set_xticks(merged_ax1[: len(merged_ax1) : 2])
     if set_y_ticks_labels:
-        ax2_np = np.array(ax2)
         if yticks is not None:
             ax.set_yticks(yticks)
         else:
-            ax.set_yticks(ax2_np)
+            ax.set_yticks(merged_ax2)
 
     if figure_title != "":
         ax.set_title(figure_title)
 
-    if with_legend:
-        ax.legend(loc=location)
+    if not legend_outside:
+        ax.legend(loc=location, facecolor='white', framealpha=0.95)
+    else:
+        n = len(all_results)
+        if slopes is not None:
+            assert len(slopes) == n, "Number of slopes must be equal to the number of curves"
+            order = [[i, i + n] for i in range(n)]
+            order = [item for sublist in order for item in sublist]
+        else:
+            order = list(range(n))
+        handles, labels = plt.gca().get_legend_handles_labels()
+        ax.legend([handles[idx] for idx in order], [labels[idx] for idx in order], bbox_to_anchor=(0.4, 1.0), loc='lower center', ncols=n)
+        # ax.legend(bbox_to_anchor=(0.5, 1.0), loc='lower center', ncols=n)
+
+    if save_plots_to_disk and export_legend:
+        legend_file_name = output_file.with_name(output_file.stem + "_legend.pdf")
+        export_legend_image(ax.get_legend(), legend_file_name)
+
+    if not show_legend:
+        ax.get_legend().remove()
 
     if show_plots:
         plt.show()
@@ -167,12 +213,11 @@ def plot_results(all_results, axes_data, save_plots_to_disk, show_plots, output_
         if not output_file.parent.is_dir():
             os.makedirs(output_file.parent, exist_ok=True)
         fig.savefig(output_file, bbox_inches="tight", format="pdf")
-        # export_legend(ax.get_legend())
 
     plt.close(fig)
 
 
-def export_legend(legend, filename="legend.png"):
+def export_legend_image(legend, filename="legend.png"):
     fig = legend.figure
     fig.canvas.draw()
     bbox = legend.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
@@ -190,6 +235,12 @@ def label_from_key(key):
         return "\#ranks"
     elif key == "mean_niters":
         return "avg \#iterations"
+    elif key == "num_nodes":
+        return "$m$"
+    elif key == "last_residual":
+        return "res"
+    elif key == "times":
+        return "$t$"
     else:
         return key
 
@@ -215,7 +266,7 @@ def pre_refinements_str(pre_refinements):
     return "-".join([str(pre_refinement) for pre_refinement in pre_refinements])
 
 
-def label_from_data(num_nodes=None, pre_refinements=None, max_iter=None, dt=None):
+def label_from_data(num_nodes=None, pre_refinements=None, max_iter=None, dt=None, n_time_ranks=None):
     label = []
     if num_nodes is not None:
         label.append("$m = " + num_nodes_str_for_label(num_nodes) + "$")
@@ -225,7 +276,9 @@ def label_from_data(num_nodes=None, pre_refinements=None, max_iter=None, dt=None
         label.append("$k = " + str(max_iter) + "$")
     if dt is not None:
         label.append("$\Delta t = " + str(dt) + "$")
-    return ",".join(label)
+    if n_time_ranks is not None:
+        label.append("$P = " + str(n_time_ranks) + "$")
+    return ", ".join(label)
 
 
 def get_folders(experiment_name, domain_name, pre_refinements_list, ionic_model_name):

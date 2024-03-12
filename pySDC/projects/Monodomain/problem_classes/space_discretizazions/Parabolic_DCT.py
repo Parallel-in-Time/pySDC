@@ -97,11 +97,26 @@ class Parabolic_DCT(RegisterParams):
         N = self.n_elems
         dx = self.dx
         dim = len(N)
-        diff_dct = self.diff[0] * (2.0 * np.cos(np.pi * np.arange(N[0]) / N[0]) - 2.0) / dx[0] ** 2
-        if dim >= 2:
-            diff_dct = diff_dct[None, :] + self.diff[1] * np.array((2.0 * np.cos(np.pi * np.arange(N[1]) / N[1]) - 2.0) / dx[1] ** 2)[:, None]
-        if dim >= 3:
-            diff_dct = diff_dct[None, :, :] + self.diff[2] * np.array((2.0 * np.cos(np.pi * np.arange(N[2]) / N[2]) - 2.0) / dx[2] ** 2)[:, None, None]
+        if self.order == 2:
+            diff_dct = self.diff[0] * (2.0 * np.cos(np.pi * np.arange(N[0]) / N[0]) - 2.0) / dx[0] ** 2
+            if dim >= 2:
+                diff_dct = diff_dct[None, :] + self.diff[1] * np.array((2.0 * np.cos(np.pi * np.arange(N[1]) / N[1]) - 2.0) / dx[1] ** 2)[:, None]
+            if dim >= 3:
+                diff_dct = diff_dct[None, :, :] + self.diff[2] * np.array((2.0 * np.cos(np.pi * np.arange(N[2]) / N[2]) - 2.0) / dx[2] ** 2)[:, None, None]
+        elif self.order == 4:
+            diff_dct = self.diff[0] * ((-1.0 / 6.0) * np.cos(2.0 * np.pi * np.arange(N[0]) / N[0]) + (8.0 / 3.0) * np.cos(np.pi * np.arange(N[0]) / N[0]) - 2.5) / dx[0] ** 2
+            if dim >= 2:
+                diff_dct = (
+                    diff_dct[None, :]
+                    + self.diff[1] * np.array(((-1.0 / 6.0) * np.cos(2.0 * np.pi * np.arange(N[1]) / N[1]) + (8.0 / 3.0) * np.cos(np.pi * np.arange(N[1]) / N[1]) - 2.5) / dx[1] ** 2)[:, None]
+                )
+            if dim >= 3:
+                diff_dct = (
+                    diff_dct[None, :, :]
+                    + self.diff[2] * np.array(((-1.0 / 6.0) * np.cos(2.0 * np.pi * np.arange(N[2]) / N[2]) + (8.0 / 3.0) * np.cos(np.pi * np.arange(N[2]) / N[2]) - 2.5) / dx[2] ** 2)[:, None, None]
+                )
+        else:
+            raise NotImplementedError("Only order 2 and 4 are implemented for Parabolic_DCT.")
         self.diff_dct = diff_dct
 
     def grids_from_x(self, x):

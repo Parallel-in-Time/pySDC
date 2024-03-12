@@ -156,14 +156,16 @@ class MonodomainODE(ptype):
             # for pre_ref=-1 (remember to change the diffusion coefficeints if you are computing the initial value)
             # self.stim_protocol = [[0.0, 2.0], [420.0, 10.0]]
             # for pre_ref=0
-            self.stim_protocol = [[0.0, 2.0], [400.0, 10.0]]
+            # self.stim_protocol = [[0.0, 2.0], [400.0, 10.0]]
             # For CRN
             # for FD
             # for pre_ref=-1 (remember to change the diffusion coefficeints if you are computing the initial value)
             # self.stim_protocol = [[0.0, 2.0], [545.0, 10.0]]
             # for pre_ref=0
             # self.stim_protocol = [[0.0, 2.0], [570.0, 10.0]]
-            #
+            # For HH
+            self.stim_protocol = [[0.0, 2.0], [1000.0, 10.0]]
+
             self.stim_intensities = [50.0, 80.0]
             centers = [[0.0, 50.0, 50.0], [58.5, 0.0, 50.0]]
             self.stim_centers = [centers[i] for i in range(len(self.stim_protocol))]
@@ -259,7 +261,7 @@ class MultiscaleMonodomainODE(MonodomainODE):
 
         self.constant_lambda_and_phi = False
 
-        self.num_nodes = 40
+        self.num_nodes = 5
         self.coll = CollBase(num_nodes=self.num_nodes, tleft=0, tright=1, node_type='LEGENDRE', quad_type='GAUSS')
 
     def rho_nonstiff(self, y, t, fy=None):
