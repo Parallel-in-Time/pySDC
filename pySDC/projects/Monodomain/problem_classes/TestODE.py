@@ -67,30 +67,30 @@ class TestODE(ptype):
 
         return u0
 
-    def compute_errors(self, uh):
-        """
-        Compute L2 error of uh[0] (potential V)
-        Args:
-            uh (VectorOfVectors): solution as vector of vectors
+    # def compute_errors(self, uh):
+    #     """
+    #     Compute L2 error of uh[0] (potential V)
+    #     Args:
+    #         uh (VectorOfVectors): solution as vector of vectors
 
-        Returns:
-            computed (bool): if error computation was successful
-            error (float): L2 error
-            rel_error (float): relative L2 error
-        """
-        exact_sol = self.dtype_u(init=self.init, val=0.0)
-        exact_sol.values = np.exp((self.lmbda_laplacian + self.lmbda_gating + self.lmbda_others) * self.Tend)
-        error_L2 = abs(uh - exact_sol)
-        rel_error_L2 = error_L2 / abs(exact_sol)
+    #     Returns:
+    #         computed (bool): if error computation was successful
+    #         error (float): L2 error
+    #         rel_error (float): relative L2 error
+    #     """
+    #     exact_sol = self.dtype_u(init=self.init, val=0.0)
+    #     exact_sol.values = np.exp((self.lmbda_laplacian + self.lmbda_gating + self.lmbda_others) * self.Tend)
+    #     error_L2 = abs(uh - exact_sol)
+    #     rel_error_L2 = error_L2 / abs(exact_sol)
 
-        print(f"L2-errors: {error_L2}")
-        print(f"Relative L2-errors: {rel_error_L2}")
+    #     print(f"L2-errors: {error_L2}")
+    #     print(f"Relative L2-errors: {rel_error_L2}")
 
-        return True, error_L2, rel_error_L2
+    #     return True, error_L2, rel_error_L2
 
-    def getSize(self):
-        # return number of dofs in the mesh
-        return 1
+    # def getSize(self):
+    #     # return number of dofs in the mesh
+    # return 1
 
     def eval_f(self, u, t, fh=None):
         if fh is None:
@@ -101,8 +101,8 @@ class TestODE(ptype):
 
         return fh
 
-    def rho(self, y, t, fy):
-        return abs(self.lmbda_laplacian + self.lmbda_gating + self.lmbda_others)
+    # def rho(self, y, t, fy):
+    #     return abs(self.lmbda_laplacian + self.lmbda_gating + self.lmbda_others)
 
 
 class MultiscaleTestODE(TestODE):
@@ -125,12 +125,6 @@ class MultiscaleTestODE(TestODE):
 
         self.num_coll_nodes = 10
         self.coll = CollBase(num_nodes=self.num_coll_nodes, tleft=0, tright=1, node_type='LEGENDRE', quad_type='GAUSS')
-
-    # def rho_nonstiff(self, y, t, fy=None):
-    #     return abs(self.lmbda_others)
-
-    # def rho_stiff(self, y, t, fy=None):
-    #     return abs(self.lmbda_laplacian)
 
     def solve_system(self, rhs, factor, u0, t, u_sol=None):
         if u_sol is None:
