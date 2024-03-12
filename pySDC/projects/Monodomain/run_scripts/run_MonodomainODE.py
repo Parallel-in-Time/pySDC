@@ -14,7 +14,6 @@ from pySDC.projects.Monodomain.hooks.HookClass_post_iter_info import post_iter_i
 
 from pySDC.helpers.stats_helper import get_sorted
 
-from pySDC.projects.Monodomain.transfer_classes.my_BaseTransfer_mass import my_base_transfer_mass
 from pySDC.projects.Monodomain.transfer_classes.my_BaseTransfer import my_base_transfer
 
 
@@ -22,7 +21,6 @@ from pySDC.projects.Monodomain.controller_classes.my_controller_MPI import my_co
 from pySDC.projects.Monodomain.controller_classes.my_controller_nonMPI import my_controller_nonMPI as controller_nonMPI
 
 from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1st_order import imexexp_1st_order as imexexp_1st_order_ExpRK
-from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1st_order_mass import imexexp_1st_order_mass as imexexp_1st_order_mass_ExpRK
 from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.imexexp_1st_order import imexexp_1st_order
 
 from pySDC.projects.Monodomain.utils.data_management import database
@@ -140,10 +138,7 @@ def get_description(integrator, problem_params, sweeper_params, level_params, st
     if integrator == "IMEXEXP":
         description["sweeper_class"] = imexexp_1st_order
     elif integrator == "IMEXEXP_EXPRK":
-        if problem_params["mass_rhs"] != "none":
-            description["sweeper_class"] = imexexp_1st_order_mass_ExpRK
-        else:
-            description["sweeper_class"] = imexexp_1st_order_ExpRK
+        description["sweeper_class"] = imexexp_1st_order_ExpRK
     else:
         raise ParameterError("Unknown integrator.")
 
@@ -153,11 +148,7 @@ def get_description(integrator, problem_params, sweeper_params, level_params, st
     description["level_params"] = level_params
     description["step_params"] = step_params
     description["base_transfer_params"] = base_transfer_params
-    if problem_params["mass_rhs"] != "none":
-        assert problem_params["space_disc"] == "FEM", "Mass rhs only implemented for FEM"
-        description["base_transfer_class"] = my_base_transfer_mass
-    else:
-        description["base_transfer_class"] = my_base_transfer
+    description["base_transfer_class"] = my_base_transfer
     description["space_transfer_class"] = space_transfer_class
     description["space_transfer_params"] = space_transfer_params
     return description
@@ -232,7 +223,6 @@ def get_problem_params(
     lin_solv_max_iter,
     lin_solv_rtol,
     mass_lumping,
-    mass_rhs,
     output_root,
     output_file_name,
     ref_sol,
@@ -244,7 +234,6 @@ def get_problem_params(
     problem_params["order"] = order
     problem_params["bc"] = bc
     problem_params["mass_lumping"] = mass_lumping
-    problem_params["mass_rhs"] = mass_rhs
     problem_params["pre_refinements"] = pre_refinements
     problem_params["post_refinements"] = [0]
     problem_params["fibrosis"] = False
@@ -281,7 +270,6 @@ def setup_and_run(
     pre_refinements,
     order,
     mass_lumping,
-    mass_rhs,
     lin_solv_max_iter,
     lin_solv_rtol,
     ionic_model_name,
@@ -327,7 +315,6 @@ def setup_and_run(
         lin_solv_max_iter=lin_solv_max_iter,
         lin_solv_rtol=lin_solv_rtol,
         mass_lumping=mass_lumping,
-        mass_rhs=mass_rhs,
         output_root=output_root,
         output_file_name=output_file_name,
         ref_sol=ref_sol,
@@ -482,7 +469,6 @@ def main():
     output_file_name = "ref_sol" if write_as_reference_solution else "monodomain"
     ref_sol = "ref_sol"
     mass_lumping = True
-    mass_rhs = "none"
     skip_residual_computation = False
 
     finter = False
@@ -505,7 +491,6 @@ def main():
         pre_refinements,
         order,
         mass_lumping,
-        mass_rhs,
         lin_solv_max_iter,
         lin_solv_rtol,
         ionic_model_name,
