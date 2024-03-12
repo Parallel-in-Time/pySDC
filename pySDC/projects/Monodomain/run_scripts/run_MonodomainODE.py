@@ -18,8 +18,6 @@ from pySDC.projects.Monodomain.controller_classes.my_controller_nonMPI import my
 from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1st_order import imexexp_1st_order as imexexp_1st_order_ExpRK
 from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.imexexp_1st_order import imexexp_1st_order
 
-from pySDC.projects.Monodomain.utils.data_management import database
-
 
 def set_logger(controller_params):
     logging.basicConfig(level=controller_params["logger_level"])
