@@ -3,18 +3,14 @@ import numpy as np
 import logging
 import os
 
-# from mpi4py import MPI
 from tqdm import tqdm
 
 from pySDC.core.Errors import ParameterError
-
 
 from pySDC.projects.Monodomain.problem_classes.TestODE import MultiscaleTestODE
 from pySDC.projects.Monodomain.transfer_classes.Transfer_myfloat import Transfer_myfloat
 
 from pySDC.projects.Monodomain.hooks.HookClass_post_iter_info import post_iter_info_hook
-
-from pySDC.helpers.stats_helper import get_sorted
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
@@ -31,22 +27,6 @@ def set_logger(controller_params):
 def get_controller(controller_params, description, n_time_ranks):
     controller = controller_nonMPI(num_procs=n_time_ranks, controller_params=controller_params, description=description)
     return controller
-
-
-def print_statistics(stats, controller, problem_params, space_rank, time_comm, n_time_ranks, tend):
-    iter_counts = get_sorted(stats, type="niter", sortby="time")
-    niters = [item[1] for item in iter_counts]
-    timing = get_sorted(stats, type="timing_run", sortby="time")
-    timing = timing[0][1]
-    if time_comm is not None:
-        niters = time_comm.gather(niters, root=0)
-        timing = time_comm.gather(timing, root=0)
-    if time_comm is None or time_comm.rank == 0:
-        niters = np.array(niters).flatten()
-        controller.logger.info("Mean number of iterations: %4.2f" % np.mean(niters))
-        controller.logger.info("Std and var for number of iterations: %4.2f -- %4.2f" % (float(np.std(niters)), float(np.var(niters))))
-        timing = np.mean(np.array(timing))
-        controller.logger.info(f"Time to solution: {timing:6.4f} sec.")
 
 
 def get_P_data(controller):
@@ -143,30 +123,30 @@ def get_problem_params(lmbda_laplacian, lmbda_gating, lmbda_others, end_time):
     return problem_params
 
 
-def plot_stability_domain(lmbda_laplacian_list, lmbda_gating_list, R):
-    import matplotlib.pyplot as plt
+# def plot_stability_domain(lmbda_laplacian_list, lmbda_gating_list, R):
+#     import matplotlib.pyplot as plt
 
-    plt.rc("text", usetex=True)
+#     plt.rc("text", usetex=True)
 
-    fs_label = 16
-    fs_ticks = 16
-    fig, ax = plt.subplots(layout='constrained')
-    X, Y = np.meshgrid(lmbda_gating_list, lmbda_laplacian_list)
-    R = np.abs(R)
-    CS = ax.contourf(X, Y, R, cmap=plt.cm.bone, levels=np.array([0.0, 1.0]))
-    ax.plot(lmbda_gating_list, 0 * lmbda_gating_list, 'k--', linewidth=1.0)
-    ax.plot(0 * lmbda_laplacian_list, lmbda_laplacian_list, 'k--', linewidth=1.0)
-    ax.contour(CS, levels=CS.levels, colors='black')
-    ax.set_xlabel(r'$z_{g}$', fontsize=fs_label)
-    ax.set_ylabel(r'$z_{\Delta}$', fontsize=fs_label)
-    ax.tick_params(axis='x', labelsize=fs_ticks)
-    ax.tick_params(axis='y', labelsize=fs_ticks)
-    # ax.set_title(r'$R(z_g,z_{\Delta})$')
-    ax.yaxis.tick_right()
-    ax.yaxis.set_label_position("right")
-    # cbar = fig.colorbar(CS)
-    # cbar.ax.set_ylabel(r'$R(z_{\Delta},z_g)$')
-    plt.show()
+#     fs_label = 16
+#     fs_ticks = 16
+#     fig, ax = plt.subplots(layout='constrained')
+#     X, Y = np.meshgrid(lmbda_gating_list, lmbda_laplacian_list)
+#     R = np.abs(R)
+#     CS = ax.contourf(X, Y, R, cmap=plt.cm.bone, levels=np.array([0.0, 1.0]))
+#     ax.plot(lmbda_gating_list, 0 * lmbda_gating_list, 'k--', linewidth=1.0)
+#     ax.plot(0 * lmbda_laplacian_list, lmbda_laplacian_list, 'k--', linewidth=1.0)
+#     ax.contour(CS, levels=CS.levels, colors='black')
+#     ax.set_xlabel(r'$z_{g}$', fontsize=fs_label)
+#     ax.set_ylabel(r'$z_{\Delta}$', fontsize=fs_label)
+#     ax.tick_params(axis='x', labelsize=fs_ticks)
+#     ax.tick_params(axis='y', labelsize=fs_ticks)
+#     # ax.set_title(r'$R(z_g,z_{\Delta})$')
+#     ax.yaxis.tick_right()
+#     ax.yaxis.set_label_position("right")
+#     # cbar = fig.colorbar(CS)
+#     # cbar.ax.set_ylabel(r'$R(z_{\Delta},z_g)$')
+#     plt.show()
 
 
 def main():
@@ -176,7 +156,7 @@ def main():
 
     # number of time ranks.
     n_time_ranks = 1
-    openmp = True
+    openmp = False
 
     end_time = float(n_time_ranks)
 
@@ -186,23 +166,19 @@ def main():
     # set number of collocation nodes in each level
     sweeper_params = get_sweeper_params(num_nodes=[5, 3])
     # set step size, number of sweeps per iteration, and residual tolerance for the stopping criterion
-    level_params = get_level_params(
-        dt=1.0,
-        nsweeps=[1],
-        restol=5e-8,
-    )
+    level_params = get_level_params(dt=1.0, nsweeps=[1], restol=5e-8)
     # set space transfer parameters
     space_transfer_class = Transfer_myfloat
     base_transfer_params = get_base_transfer_params()
     controller_params = get_controller_params(get_output_root(), logger_level=40)
 
     # set stability test parameters
-    dl = 10.0
+    dl = 100.0  # use 10 or less for plotting the stability domain, use 100 for test
     lmbda_others = -1.0
     lmbda_laplacian_min = -1000.0
-    lmbda_laplacian_max = 100.0
+    lmbda_laplacian_max = 0.0
     lmbda_gating_min = -1000.0
-    lmbda_gating_max = 100.0
+    lmbda_gating_max = 0.0
     n_lmbda_laplacian = np.round((lmbda_laplacian_max - lmbda_laplacian_min) / dl).astype(int) + 1
     n_lmbda_gating = np.round((lmbda_gating_max - lmbda_gating_min) / dl).astype(int) + 1
     lmbda_laplacian_list = np.linspace(lmbda_laplacian_min, lmbda_laplacian_max, n_lmbda_laplacian)
@@ -220,10 +196,6 @@ def main():
                 set_logger(controller_params)
                 controller = get_controller(controller_params, description, n_time_ranks)
 
-                if controller_params["logger_level"] <= 20:
-                    print(f'Running with lmbda_laplacian = {lmbda_laplacian}, lmbda_gating = {lmbda_gating}')
-
-                # run controller
                 t0, Tend, uinit, P = get_P_data(controller)
                 uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
@@ -234,7 +206,6 @@ def main():
         R = pymp.shared.array((n_lmbda_laplacian, n_lmbda_gating), dtype=float)
         with pymp.Parallel(12) as p:
             for i in tqdm(p.range(0, n_lmbda_gating)):
-                # p.print(f'Running with lmbda_gating = {lmbda_gating_list[i]}, percent = {i/n_lmbda_gating*100}')
                 for j in range(n_lmbda_laplacian):
                     lmbda_gating = lmbda_gating_list[i]
                     lmbda_laplacian = lmbda_laplacian_list[j]
@@ -244,16 +215,14 @@ def main():
                     set_logger(controller_params)
                     controller = get_controller(controller_params, description, n_time_ranks)
 
-                    if controller_params["logger_level"] <= 20:
-                        print(f'Running with lmbda_laplacian = {lmbda_laplacian}, lmbda_gating = {lmbda_gating}')
-
-                    # run controller
                     t0, Tend, uinit, P = get_P_data(controller)
                     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
                     R[j, i] = abs(uend)
 
-    plot_stability_domain(lmbda_laplacian_list, lmbda_gating_list, R)
+    # plot_stability_domain(lmbda_laplacian_list, lmbda_gating_list, R)
+
+    assert np.max(np.abs(R.ravel())) <= 1.0, "The maximum absolute value of the stability function is greater than 1.0."
 
 
 if __name__ == "__main__":
