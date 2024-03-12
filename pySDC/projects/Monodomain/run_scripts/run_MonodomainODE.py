@@ -7,6 +7,7 @@ import os
 from pySDC.core.Errors import ParameterError
 
 from pySDC.projects.Monodomain.problem_classes.MonodomainODE import MultiscaleMonodomainODE
+from pySDC.projects.Monodomain.hooks.HookClass_pde import pde_hook
 from pySDC.projects.Monodomain.hooks.HookClass_post_iter_info import post_iter_info_hook
 
 from pySDC.helpers.stats_helper import get_sorted
@@ -116,7 +117,7 @@ def get_controller_params(problem_params, space_rank, n_time_ranks):
     controller_params["fname"] = problem_params["output_root"] + "controller"
     controller_params["logger_level"] = 20 if space_rank == 0 else 99  # set level depending on rank
     controller_params["dump_setup"] = False
-    controller_params["hook_class"] = [post_iter_info_hook]
+    controller_params["hook_class"] = [post_iter_info_hook, pde_hook]
     return controller_params
 
 
