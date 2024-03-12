@@ -1,6 +1,5 @@
 import mpi4py
 
-mpi4py.rc.recv_mprobe = False
 from pathlib import Path
 import numpy as np
 from mpi4py import MPI
@@ -13,8 +12,6 @@ from pySDC.projects.Monodomain.problem_classes.MonodomainODE import MultiscaleMo
 from pySDC.projects.Monodomain.hooks.HookClass_post_iter_info import post_iter_info_hook
 
 from pySDC.helpers.stats_helper import get_sorted
-
-from pySDC.projects.Monodomain.transfer_classes.my_BaseTransfer import my_base_transfer
 
 
 from pySDC.projects.Monodomain.controller_classes.my_controller_MPI import my_controller_MPI as controller_MPI
@@ -148,7 +145,6 @@ def get_description(integrator, problem_params, sweeper_params, level_params, st
     description["level_params"] = level_params
     description["step_params"] = step_params
     description["base_transfer_params"] = base_transfer_params
-    description["base_transfer_class"] = my_base_transfer
     description["space_transfer_class"] = space_transfer_class
     description["space_transfer_params"] = space_transfer_params
     return description

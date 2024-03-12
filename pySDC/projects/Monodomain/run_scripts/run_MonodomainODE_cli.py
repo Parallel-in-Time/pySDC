@@ -1,6 +1,3 @@
-import mpi4py
-
-mpi4py.rc.recv_mprobe = False
 import argparse
 from pySDC.projects.Monodomain.run_scripts.run_MonodomainODE import setup_and_run
 
