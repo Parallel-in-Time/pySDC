@@ -18,7 +18,6 @@ def main():
     parser.add_argument("--integrator", default="IMEXEXP_EXPRK", type=str, help="sweeper name")
     parser.add_argument("--num_nodes", default="4", type=list_of_ints, help="list of ints (as '5,3', i.e. no brakets): number of collocation nodes per level")
     parser.add_argument("--num_sweeps", default="1", type=list_of_ints, help="list of ints: number of sweeps per level")
-    parser.add_argument("--mass_rhs", default="none", type=str, help="if rhs is already multiplied by mass matrix: none, one (only potential), all (also ionic model states)")
     parser.add_argument("--skip_res", default=False, action=argparse.BooleanOptionalAction, help="compute residual only when really needed")
     # set step parameters
     parser.add_argument("--max_iter", default=100, type=int, help="maximal number of iterations")
@@ -63,7 +62,6 @@ def main():
         args.pre_refinements,
         args.order,
         args.mass_lumping,
-        args.mass_rhs,
         args.lin_solv_max_iter,
         args.lin_solv_rtol,
         args.ionic_model_name,
