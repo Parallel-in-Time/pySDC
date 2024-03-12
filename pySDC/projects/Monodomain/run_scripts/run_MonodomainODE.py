@@ -11,7 +11,6 @@ from pySDC.projects.Monodomain.hooks.HookClass_post_iter_info import post_iter_i
 
 from pySDC.helpers.stats_helper import get_sorted
 
-
 from pySDC.projects.Monodomain.controller_classes.my_controller_MPI import my_controller_MPI as controller_MPI
 from pySDC.projects.Monodomain.controller_classes.my_controller_nonMPI import my_controller_nonMPI as controller_nonMPI
 
@@ -66,9 +65,6 @@ def print_dofs_stats(space_rank, time_rank, controller, P, uinit):
     mesh_dofs = uinit[0].getSize()
     if space_rank == 0 and time_rank == 0:
         controller.logger.info(f"Total dofs: {tot_dofs}, mesh dofs = {mesh_dofs}")
-        for i, d in enumerate(data):
-            controller.logger.info(f"Processor {i}: tot_mesh_dofs = {d[0]:.2e}, n_loc_mesh_dofs = {d[1]:.2e}, n_mesh_ghost_dofs = {d[2]:.2e}, %ghost = {100*d[3]:.2f}")
-        controller.logger.info(f"Average    : tot_mesh_dofs = {avg_data[0]:.2e}, n_loc_mesh_dofs = {avg_data[1]:.2e}, n_mesh_ghost_dofs = {avg_data[2]:.2e}, %ghost = {100*avg_data[3]:.2f}")
 
 
 def get_P_data(controller, truly_time_parallel):
@@ -116,7 +112,6 @@ def get_base_transfer_params(finter):
 def get_controller_params(problem_params, space_rank, n_time_ranks):
     controller_params = dict()
     controller_params["predict_type"] = "pfasst_burnin" if n_time_ranks > 1 else None
-    # controller_params["predict_type"] = "fine_only"
     controller_params["log_to_file"] = False
     controller_params["fname"] = problem_params["output_root"] + "controller"
     controller_params["logger_level"] = 20 if space_rank == 0 else 99  # set level depending on rank
@@ -177,60 +172,39 @@ def get_sweeper_params(num_nodes, skip_residual_computation):
     return sweeper_params
 
 
-def get_space_tranfer_params(problem_params):
-    if problem_params["space_disc"] == 'FEM':
-        from pySDC.projects.Monodomain.transfer_classes.TransferVectorOfFEniCSxVectors import TransferVectorOfFEniCSxVectors
+def get_space_tranfer_params():
 
-        space_transfer_class = TransferVectorOfFEniCSxVectors
-        space_transfer_params = dict()
-    elif problem_params["space_disc"] == 'DCT':
-        from pySDC.projects.Monodomain.transfer_classes.TransferVectorOfDCTVectors import TransferVectorOfDCTVectors
+    from pySDC.projects.Monodomain.transfer_classes.TransferVectorOfDCTVectors import TransferVectorOfDCTVectors
 
-        space_transfer_class = TransferVectorOfDCTVectors
-        space_transfer_params = dict()
+    space_transfer_class = TransferVectorOfDCTVectors
+    space_transfer_params = dict()
 
     return space_transfer_class, space_transfer_params
 
 
 def get_problem_params(
-    space_comm,
     domain_name,
-    space_disc,
     pre_refinements,
     ionic_model_name,
     read_init_val,
     init_time,
     enable_output,
     end_time,
-    bc,
     order,
-    lin_solv_max_iter,
-    lin_solv_rtol,
-    mass_lumping,
     output_root,
     output_file_name,
     ref_sol,
 ):
     # initialize problem parameters
     problem_params = dict()
-    problem_params["comm"] = space_comm
-    problem_params["family"] = "CG"
     problem_params["order"] = order
-    problem_params["bc"] = bc
-    problem_params["mass_lumping"] = mass_lumping
     problem_params["pre_refinements"] = pre_refinements
-    problem_params["post_refinements"] = [0]
-    problem_params["fibrosis"] = False
     executed_file_dir = os.path.dirname(os.path.realpath(__file__))
-    problem_params["meshes_fibers_root_folder"] = executed_file_dir + "/../../../../../meshes_fibers_fibrosis/results"
     problem_params["domain_name"] = domain_name
-    problem_params["lin_solv_max_iter"] = lin_solv_max_iter
-    problem_params["lin_solv_rtol"] = lin_solv_rtol
-    problem_params["space_disc"] = space_disc
     problem_params["ionic_model_name"] = ionic_model_name
     problem_params["read_init_val"] = read_init_val
     problem_params["init_time"] = init_time
-    problem_params["init_val_name"] = "init_val_" + problem_params["space_disc"]
+    problem_params["init_val_name"] = "init_val_DCT"
     problem_params["enable_output"] = enable_output
     problem_params["output_V_only"] = True
     problem_params["output_root"] = executed_file_dir + "/../../../../data/Monodomain/" + output_root
@@ -247,15 +221,11 @@ def setup_and_run(
     skip_residual_computation,
     num_sweeps,
     max_iter,
-    space_disc,
     dt,
     restol,
     domain_name,
     pre_refinements,
     order,
-    mass_lumping,
-    lin_solv_max_iter,
-    lin_solv_rtol,
     ionic_model_name,
     read_init_val,
     init_time,
@@ -285,26 +255,20 @@ def setup_and_run(
     )
     # get problem parameters
     problem_params = get_problem_params(
-        space_comm=space_comm,
         domain_name=domain_name,
-        space_disc=space_disc,
         pre_refinements=pre_refinements,
         ionic_model_name=ionic_model_name,
         read_init_val=read_init_val,
         init_time=init_time,
         enable_output=enable_output,
         end_time=end_time,
-        bc='N',
         order=order,
-        lin_solv_max_iter=lin_solv_max_iter,
-        lin_solv_rtol=lin_solv_rtol,
-        mass_lumping=mass_lumping,
         output_root=output_root,
         output_file_name=output_file_name,
         ref_sol=ref_sol,
     )
 
-    space_transfer_class, space_transfer_params = get_space_tranfer_params(problem_params)
+    space_transfer_class, space_transfer_params = get_space_tranfer_params()
 
     # Usually do not modify below this line ------------------
     # get remaining prams
@@ -388,7 +352,6 @@ def setup_and_run(
                 os.remove(file_name.with_suffix('.db'))
             data_man = database(file_name)
             problem_params_no_comm = problem_params
-            del problem_params_no_comm["comm"]
             controller_params_no_hook = controller_params
             del controller_params_no_hook["hook_class"]
             data_man.write_dictionary("problem_params", problem_params_no_comm)
@@ -429,8 +392,6 @@ def main():
     domain_name = "cube_1D"
     pre_refinements = [0]
     order = 1 if space_disc == "FEM" else 4
-    lin_solv_max_iter = None
-    lin_solv_rtol = 1e-8
     ionic_model_name = "TTP"
     read_init_val = False
     init_time = 0.0
@@ -440,7 +401,6 @@ def main():
     output_root = "results_tmp"
     output_file_name = "ref_sol" if write_as_reference_solution else "monodomain"
     ref_sol = "ref_sol"
-    mass_lumping = True
     skip_residual_computation = False
 
     finter = False
@@ -456,15 +416,11 @@ def main():
         skip_residual_computation,
         num_sweeps,
         max_iter,
-        space_disc,
         dt,
         restol,
         domain_name,
         pre_refinements,
         order,
-        mass_lumping,
-        lin_solv_max_iter,
-        lin_solv_rtol,
         ionic_model_name,
         read_init_val,
         init_time,

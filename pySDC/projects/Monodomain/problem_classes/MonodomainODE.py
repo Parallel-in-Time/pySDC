@@ -3,6 +3,7 @@ import logging
 import numpy as np
 from pySDC.core.Problem import ptype
 from pySDC.projects.Monodomain.datatype_classes.VectorOfVectors import VectorOfVectors, IMEXEXP_VectorOfVectors
+from pySDC.projects.Monodomain.problem_classes.space_discretizazions.Parabolic_DCT import Parabolic_DCT
 import pySDC.projects.Monodomain.problem_classes.ionicmodels.cpp as ionicmodels
 from pySDC.core.Collocation import CollBase
 import scipy
@@ -12,21 +13,8 @@ class MonodomainODE(ptype):
     def __init__(self, **problem_params):
         self.logger = logging.getLogger("step")
 
-        # the class for the spatial discretization of the parabolic part of monodomain
-        if problem_params['space_disc'] == "FEM":
-            from pySDC.projects.Monodomain.problem_classes.space_discretizazions.Parabolic_FEniCSx import Parabolic_FEniCSx
+        self.parabolic = Parabolic_DCT(**problem_params)
 
-            self.parabolic = Parabolic_FEniCSx(**problem_params)
-        elif problem_params['space_disc'] == "FD":
-            from pySDC.projects.Monodomain.problem_classes.space_discretizazions.Parabolic_FD import Parabolic_FD
-
-            self.parabolic = Parabolic_FD(**problem_params)
-        elif problem_params['space_disc'] == "DCT":
-            from pySDC.projects.Monodomain.problem_classes.space_discretizazions.Parabolic_DCT import Parabolic_DCT
-
-            self.parabolic = Parabolic_DCT(**problem_params)
-
-        # self.init = self.parabolic.init
         self.init = self.parabolic.init
 
         # invoke super init
@@ -269,7 +257,6 @@ class MultiscaleMonodomainODE(MonodomainODE):
 
     def define_splittings(self):
         # Here we define different splittings of the rhs into stiff, nonstiff and exponential terms
-
 
         # SPLITTING exp_nonstiff
         # this is the standard splitting used in Rush-Larsen methods. We use it for the IMEXEXP (IMEX+RL) and exp_mES schemes.

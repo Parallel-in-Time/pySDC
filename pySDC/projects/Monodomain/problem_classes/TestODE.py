@@ -3,7 +3,7 @@ import logging
 import numpy as np
 from pySDC.core.Problem import ptype
 from pySDC.core.Common import RegisterParams
-from pySDC.projects.Monodomain.datatype_classes.FD_Vector import FD_Vector
+from pySDC.projects.Monodomain.datatype_classes.DCT_Vector import DCT_Vector
 from pySDC.projects.Monodomain.datatype_classes.VectorOfVectors import VectorOfVectors, IMEXEXP_VectorOfVectors
 from pySDC.core.Collocation import CollBase
 import scipy
@@ -17,7 +17,7 @@ class dummy_communicator:
 class Parabolic(RegisterParams):
     def __init__(self, **problem_params):
         self._makeAttributeAndRegister(*problem_params.keys(), localVars=problem_params, readOnly=True)
-        self.vector_type = FD_Vector
+        self.vector_type = DCT_Vector
 
         self.comm = dummy_communicator()
 

@@ -22,12 +22,9 @@ def main():
     parser.add_argument("--dt", default=0.05, type=float, help="step size")
     parser.add_argument("--restol", default=5e-8, type=float, help="residual tolerance")
     # problem args
-    parser.add_argument("--space_disc", default="FEM", type=str, help="space discretization method: FEM, FD")
     parser.add_argument("--domain_name", default="cuboid_2D_small", type=str, help="cuboid_2D, cuboid_3D, truncated_ellipsoid,...")
     parser.add_argument("--pre_refinements", default="0", type=list_of_ints, help="list of ints: loads a mesh which has already been pre-refined pre_refinements times.")
     parser.add_argument("--order", default="1", type=list_of_ints, help="list of ints: order of FEM or FD discretization")
-    parser.add_argument("--lin_solv_max_iter", default=1000, type=int, help="maximal number of iterations in iterative linear solver")
-    parser.add_argument("--lin_solv_rtol", default=1e-8, type=float, help="residual tolerance in iterative linear solver")
     parser.add_argument("--ionic_model_name", default="TTP", type=str, help="ionic_model: HH, CRN, TTP")
     parser.add_argument("--read_init_val", default=False, action=argparse.BooleanOptionalAction, help="read the initial value from file")
     parser.add_argument("--init_time", default=0.0, type=float, help="duration of stimulus. -1 means default")
@@ -37,7 +34,6 @@ def main():
     parser.add_argument("--output_file_name", default="monodomain", type=str, help="output file name")
     parser.add_argument("--ref_sol", default="ref_sol", type=str, help="reference solution file name")
     parser.add_argument("--output_root", default="results_tmp/", type=str, help="output root folder")
-    parser.add_argument("--mass_lumping", default=True, action=argparse.BooleanOptionalAction, help="with or without mass lumping")
     parser.add_argument("--finter", default=False, action=argparse.BooleanOptionalAction, help="in prolong, re-evaluate f (false) or interpolate (true)")
     # controller args
     parser.add_argument("--truly_time_parallel", default=True, action=argparse.BooleanOptionalAction, help="truly time parallel or emulated")
@@ -52,15 +48,11 @@ def main():
         args.skip_res,
         args.num_sweeps,
         args.max_iter,
-        args.space_disc,
         args.dt,
         args.restol,
         args.domain_name,
         args.pre_refinements,
         args.order,
-        args.mass_lumping,
-        args.lin_solv_max_iter,
-        args.lin_solv_rtol,
         args.ionic_model_name,
         args.read_init_val,
         args.init_time,

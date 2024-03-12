@@ -1,7 +1,7 @@
 import numpy as np
 import scipy as sp
 from pySDC.core.Common import RegisterParams
-from pySDC.projects.Monodomain.datatype_classes.FD_Vector import FD_Vector
+from pySDC.projects.Monodomain.datatype_classes.DCT_Vector import DCT_Vector
 from pathlib import Path
 import os
 
@@ -16,8 +16,6 @@ class Parabolic_DCT(RegisterParams):
         self.define_stimulus()
         self.define_eval_points()
 
-        assert self.bc == 'N', "bc must be 'N'"
-
     def __del__(self):
         if self.enable_output:
             self.output_file.close()
@@ -29,7 +27,7 @@ class Parabolic_DCT(RegisterParams):
 
     @property
     def vector_type(self):
-        return FD_Vector
+        return DCT_Vector
 
     @property
     def mesh_name(self):

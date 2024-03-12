@@ -3,7 +3,7 @@ import numpy as np
 from pySDC.core.Errors import DataError
 
 
-class FD_Vector:
+class DCT_Vector:
     """
     FD Function data type with arbitrary dimensions
 
@@ -12,7 +12,7 @@ class FD_Vector:
     """
 
     def __init__(self, init, val=0.0):
-        if isinstance(init, FD_Vector):
+        if isinstance(init, DCT_Vector):
             self.values = init.values.copy()
         elif isinstance(init, np.ndarray):
             self.values = init.copy()
@@ -25,13 +25,13 @@ class FD_Vector:
             elif val is None:
                 pass  # leave values uninitialized
             else:
-                raise DataError(f"Type error: cannot create FD_Vector from val = {val}")
+                raise DataError(f"Type error: cannot create DCT_Vector from val = {val}")
         else:
-            raise DataError(f"Type error: cannot create FD_Vector from init = {init}")
+            raise DataError(f"Type error: cannot create DCT_Vector from init = {init}")
 
     def copy(self, other=None):
         if other is None:  # return a copy of this vector
-            return FD_Vector(self)
+            return DCT_Vector(self)
         elif isinstance(other, type(self)):  # copy the values of other into this vector
             self.values[:] = other.values[:]
         else:
@@ -79,7 +79,7 @@ class FD_Vector:
 
     def __add__(self, other):
         if isinstance(other, type(self)):
-            me = FD_Vector(self)
+            me = DCT_Vector(self)
             me += other
             return me
         else:
@@ -97,7 +97,7 @@ class FD_Vector:
 
     def __sub__(self, other):
         if isinstance(other, type(self)):
-            me = FD_Vector(self)
+            me = DCT_Vector(self)
             me -= other
             return me
         else:
@@ -111,8 +111,8 @@ class FD_Vector:
             raise DataError("Type error: cannot isub %s to %s" % (type(other), type(self)))
 
     def __mul__(self, other):
-        if isinstance(other, FD_Vector) or isinstance(other, float):
-            me = FD_Vector(self)
+        if isinstance(other, DCT_Vector) or isinstance(other, float):
+            me = DCT_Vector(self)
             me *= other
             return me
         else:
@@ -120,7 +120,7 @@ class FD_Vector:
 
     def __rmul__(self, other):
         if isinstance(other, float):
-            me = FD_Vector(self)
+            me = DCT_Vector(self)
             me *= other
             return me
         else:
@@ -130,7 +130,7 @@ class FD_Vector:
         if isinstance(other, float):
             self.values *= other
             return self
-        elif isinstance(other, FD_Vector):
+        elif isinstance(other, DCT_Vector):
             self.values *= other.values
             return self
         else:

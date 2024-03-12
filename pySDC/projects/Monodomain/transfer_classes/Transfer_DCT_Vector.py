@@ -3,7 +3,7 @@ import scipy.fft as fft
 
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.projects.Monodomain.datatype_classes.FD_Vector import FD_Vector
+from pySDC.projects.Monodomain.datatype_classes.DCT_Vector import DCT_Vector
 
 
 class DCT_to_DCT(space_transfer):
@@ -42,7 +42,7 @@ class DCT_to_DCT(space_transfer):
         if self.same_grid:
             G = F.copy()
         else:
-            G = FD_Vector(self.coarse_prob.init)
+            G = DCT_Vector(self.coarse_prob.init)
             G.values[:] = fft.idctn(fft.dctn(F.values.reshape(self.fine_shape), norm=self.norm), s=self.coarse_shape, norm=self.norm).ravel()
 
         return G
@@ -57,7 +57,7 @@ class DCT_to_DCT(space_transfer):
         if self.same_grid:
             F = G.copy()
         else:
-            F = FD_Vector(self.fine_prob.init)
+            F = DCT_Vector(self.fine_prob.init)
             F.values[:] = fft.idctn(fft.dctn(G.values.reshape(self.coarse_shape), norm=self.norm), s=self.fine_shape, norm=self.norm).ravel()
 
         return F
