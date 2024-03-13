@@ -74,7 +74,9 @@ class controller_nonMPI(controller):
             raise ControllerError('this controller cannot do multiple sweeps on coarsest level')
 
         if self.nlevels == 1 and self.params.predict_type is not None:
-            self.logger.warning('you have specified a predictor type but only a single level.. predictor will be ignored')
+            self.logger.warning(
+                'you have specified a predictor type but only a single level.. predictor will be ignored'
+            )
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.reset_buffers_nonMPI(self)
@@ -242,7 +244,9 @@ class controller_nonMPI(controller):
         for hook in self.hooks:
             hook.pre_comm(step=S, level_number=level)
         if not S.status.last:
-            self.logger.debug('Process %2i provides data on level %2i with tag %s' % (S.status.slot, level, S.status.iter))
+            self.logger.debug(
+                'Process %2i provides data on level %2i with tag %s' % (S.status.slot, level, S.status.iter)
+            )
             send(S.levels[level], tag=(level, S.status.iter, S.status.slot))
 
         for hook in self.hooks:
@@ -278,7 +282,10 @@ class controller_nonMPI(controller):
         for hook in self.hooks:
             hook.pre_comm(step=S, level_number=level)
         if not S.status.prev_done and not S.status.first:
-            self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' % (S.status.slot, S.prev.status.slot, level, S.status.iter))
+            self.logger.debug(
+                'Process %2i receives from %2i on level %2i with tag %s'
+                % (S.status.slot, S.prev.status.slot, level, S.status.iter)
+            )
             recv(S.levels[level], S.prev.levels[level], tag=(level, S.status.iter, S.prev.status.slot))
         for hook in self.hooks:
             hook.post_comm(step=S, level_number=level, add_to_stats=add_to_stats)

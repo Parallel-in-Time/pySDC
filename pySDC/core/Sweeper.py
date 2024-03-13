@@ -68,7 +68,9 @@ class sweeper(object):
         self.coll: CollBase = params['collocation_class'](**params)
 
         if not self.coll.right_is_node and not self.params.do_coll_update:
-            self.logger.warning('we need to do a collocation update here, since the right end point is not a node. Changing this!')
+            self.logger.warning(
+                'we need to do a collocation update here, since the right end point is not a node. Changing this!'
+            )
             self.params.do_coll_update = True
 
         # This will be set as soon as the sweeper is instantiated at the level
@@ -173,7 +175,9 @@ class sweeper(object):
                     # rho = 0
                     x = [0.0, 0.5]
                 else:
-                    NotImplementedError('This combination of preconditioner, node type and node number is not ' 'implemented')
+                    NotImplementedError(
+                        'This combination of preconditioner, node type and node number is not ' 'implemented'
+                    )
             elif coll.node_type == 'LEGENDRE' and coll.quad_type == 'RADAU-RIGHT':
                 if m == 9:
                     # rho = 0.151784861385
@@ -218,7 +222,9 @@ class sweeper(object):
                     # rho = 0.0208560702294 (iteration 6690)
                     x = [0.2584092406077449, 0.6449261740461826]
                 else:
-                    raise NotImplementedError('This combination of preconditioner, node type and node number is not implemented')
+                    raise NotImplementedError(
+                        'This combination of preconditioner, node type and node number is not implemented'
+                    )
             elif coll.node_type == 'EQUID' and coll.quad_type == 'RADAU-RIGHT':
                 if m == 9:
                     # rho = 0.251820022583 (iteration 32402)
@@ -263,9 +269,13 @@ class sweeper(object):
                     # rho = 0.0214806480623 (iteration 6109)
                     x = [0.3749891032632652, 0.6666472946796036]
                 else:
-                    NotImplementedError('This combination of preconditioner, node type and node number is not ' 'implemented')
+                    NotImplementedError(
+                        'This combination of preconditioner, node type and node number is not ' 'implemented'
+                    )
             else:
-                NotImplementedError('This combination of preconditioner, node type and node number is not ' 'implemented')
+                NotImplementedError(
+                    'This combination of preconditioner, node type and node number is not ' 'implemented'
+                )
             QDmat[1:, 1:] = np.diag(x)
             self.parallelizable = True
 
@@ -384,7 +394,9 @@ class sweeper(object):
 
         # check if we got not more than a lower triangular matrix
         # TODO : this should be a regression test, not run-time ...
-        np.testing.assert_array_equal(np.triu(QDmat, k=1), np.zeros(QDmat.shape), err_msg='Lower triangular matrix expected!')
+        np.testing.assert_array_equal(
+            np.triu(QDmat, k=1), np.zeros(QDmat.shape), err_msg='Lower triangular matrix expected!'
+        )
 
         return QDmat
 
@@ -401,7 +413,9 @@ class sweeper(object):
             raise NotImplementedError('qd_type explicit not implemented')
 
         # check if we got not more than a lower triangular matrix
-        np.testing.assert_array_equal(np.triu(QDmat, k=0), np.zeros(QDmat.shape), err_msg='Strictly lower triangular matrix expected!')
+        np.testing.assert_array_equal(
+            np.triu(QDmat, k=0), np.zeros(QDmat.shape), err_msg='Strictly lower triangular matrix expected!'
+        )
 
         return QDmat
 
@@ -487,7 +501,10 @@ class sweeper(object):
         elif L.params.residual_type == 'last_rel':
             L.status.residual = res_norm[-1] / abs(L.u[0])
         else:
-            raise ParameterError(f'residual_type = {L.params.residual_type} not implemented, choose ' f'full_abs, last_abs, full_rel or last_rel instead')
+            raise ParameterError(
+                f'residual_type = {L.params.residual_type} not implemented, choose '
+                f'full_abs, last_abs, full_rel or last_rel instead'
+            )
 
         # indicate that the residual has seen the new values
         L.status.updated = False
