@@ -7,9 +7,7 @@ from tqdm import tqdm
 
 from pySDC.core.Errors import ParameterError
 
-# from pySDC.projects.Monodomain.problem_classes.TestODE import MultiscaleTestODE
-# from pySDC.projects.Monodomain.transfer_classes.Transfer_myfloat import Transfer_myfloat
-from pySDC.projects.Monodomain.problem_classes.TestODEnew import MultiscaleTestODE
+from pySDC.projects.Monodomain.problem_classes.TestODE import MultiscaleTestODE
 from pySDC.projects.Monodomain.transfer_classes.TransferVectorOfDCTVectors import TransferVectorOfDCTVectors
 
 from pySDC.projects.Monodomain.hooks.HookClass_post_iter_info import post_iter_info_hook
