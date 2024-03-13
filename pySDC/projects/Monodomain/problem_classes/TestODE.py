@@ -1,5 +1,4 @@
 import logging
-import numpy as np
 from pySDC.core.Problem import ptype
 from pySDC.core.Common import RegisterParams
 from pySDC.projects.Monodomain.datatype_classes.DCT_Vector import DCT_Vector

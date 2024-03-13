@@ -61,6 +61,12 @@ def main():
         action=argparse.BooleanOptionalAction,
         help="write as reference solution: True or False",
     )
+    parser.add_argument(
+        "--write_all_variables",
+        default=False,
+        action=argparse.BooleanOptionalAction,
+        help="when write_as_reference_solution=True, write write all variables (True) or only potential V (False)",
+    )
     parser.add_argument("--end_time", default=1.0, type=float, help="end time. If negative, a default one is used")
     parser.add_argument("--output_file_name", default="monodomain", type=str, help="output file name")
     parser.add_argument("--ref_sol", default="ref_sol", type=str, help="reference solution file name")
@@ -98,6 +104,7 @@ def main():
         args.init_time,
         args.enable_output,
         args.write_as_reference_solution,
+        args.write_all_variables,
         args.output_root,
         args.output_file_name,
         args.ref_sol,

@@ -214,6 +214,7 @@ def setup_and_run(
     init_time,
     enable_output,
     write_as_reference_solution,
+    write_all_variables,
     output_root,
     output_file_name,
     ref_sol,
@@ -284,7 +285,7 @@ def setup_and_run(
 
     # write reference solution, to be used later for error computation
     if write_as_reference_solution:
-        P.write_reference_solution(uend, Tend)
+        P.write_reference_solution(uend, write_all_variables)
 
     # compute errors, if a reference solution is found
     error_availabe, error_L2, rel_error_L2 = P.compute_errors(uend)
@@ -330,6 +331,7 @@ def main():
     init_time = 0.0
     enable_output = False
     write_as_reference_solution = False
+    write_all_variables = False
     end_time = 0.02
     output_root = "results_tmp"
     output_file_name = "ref_sol" if write_as_reference_solution else "monodomain"
@@ -358,6 +360,7 @@ def main():
         init_time,
         enable_output,
         write_as_reference_solution,
+        write_all_variables,
         output_root,
         output_file_name,
         ref_sol,

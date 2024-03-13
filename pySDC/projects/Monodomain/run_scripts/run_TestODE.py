@@ -153,21 +153,16 @@ def plot_stability_domain(lmbda_laplacian_list, lmbda_gating_list, R):
     plt.show()
 
 
-def main(dl, openmp):
+def main(dl, openmp, n_time_ranks, end_time, num_nodes):
 
     # integrator = "IMEXEXP"
     integrator = "IMEXEXP_EXPRK"
-
-    # number of time ranks.
-    n_time_ranks = 1
-
-    end_time = float(n_time_ranks)
 
     # get time integration parameters
     # set maximum number of iterations in SDC/ESDC/MLSDC/etc
     step_params = get_step_params(maxiter=5)
     # set number of collocation nodes in each level
-    sweeper_params = get_sweeper_params(num_nodes=[5, 3])
+    sweeper_params = get_sweeper_params(num_nodes=num_nodes)
     # set step size, number of sweeps per iteration, and residual tolerance for the stopping criterion
     level_params = get_level_params(dt=1.0, nsweeps=[1], restol=5e-8)
     # set space transfer parameters
@@ -255,4 +250,4 @@ def main(dl, openmp):
 
 
 if __name__ == "__main__":
-    main(100, False)
+    main(dl=100, openmp=True, n_time_ranks=4, end_time=4.0, num_nodes=[5, 3])

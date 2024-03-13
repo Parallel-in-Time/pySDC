@@ -6,7 +6,6 @@ from pySDC.projects.Monodomain.datatype_classes.VectorOfVectors import VectorOfV
 from pySDC.projects.Monodomain.problem_classes.space_discretizazions.Parabolic_DCT import Parabolic_DCT
 import pySDC.projects.Monodomain.problem_classes.ionicmodels.cpp as ionicmodels
 from pySDC.core.Collocation import CollBase
-import scipy
 
 
 class MonodomainODE(ptype):
@@ -90,9 +89,8 @@ class MonodomainODE(ptype):
         if read_ok:
             error_L2, rel_error_L2 = self.parabolic.compute_errors(uh[0], ref_sol_V)
 
-            if self.comm.rank == 0:
-                print(f"L2-errors: {error_L2}")
-                print(f"Relative L2-errors: {rel_error_L2}")
+            print(f"L2-errors: {error_L2}")
+            print(f"Relative L2-errors: {rel_error_L2}")
 
             return True, error_L2, rel_error_L2
         else:
@@ -139,48 +137,13 @@ class MonodomainODE(ptype):
             r = 1.5
             self.stim_radii = [[r, r, r]] * len(self.stim_protocol)
         elif "cube" in self.parabolic.domain_name:
-            # For TTP
-            # for FEM
-            # for pre_ref=-1
-            # self.stim_protocol = [[0.0, 2.0], [700.0, 10.0]]
-            # for pre ref 0
-            # self.stim_protocol = [[0.0, 2.0], [700.0, 10.0]]
-            # for FD
-            # for pre_ref=-1 (remember to change the diffusion coefficeints if you are computing the initial value)
-            # self.stim_protocol = [[0.0, 2.0], [420.0, 10.0]]
-            # for pre_ref=0
-            # self.stim_protocol = [[0.0, 2.0], [400.0, 10.0]]
-            # For CRN
-            # for FD
-            # for pre_ref=-1 (remember to change the diffusion coefficeints if you are computing the initial value)
-            # self.stim_protocol = [[0.0, 2.0], [545.0, 10.0]]
-            # for pre_ref=0
-            # self.stim_protocol = [[0.0, 2.0], [570.0, 10.0]]
-            # For HH
             self.stim_protocol = [[0.0, 2.0], [1000.0, 10.0]]
-
             self.stim_intensities = [50.0, 80.0]
             centers = [[0.0, 50.0, 50.0], [58.5, 0.0, 50.0]]
             self.stim_centers = [centers[i] for i in range(len(self.stim_protocol))]
             self.stim_radii = [[1.0, 50.0, 50.0], [1.5, 60.0, 50.0]]
-        elif "03_fastl_LA" == self.parabolic.domain_name:
-            stim_dur = 4.0
-            stim_interval = [0, 280, 170, 160, 155, 150, 145, 140, 135, 130, 126, 124, 124, 124, 124]
-            stim_times = np.cumsum(stim_interval)
-            self.stim_protocol = [[stim_time, stim_dur] for stim_time in stim_times]
-            self.stim_intensities = [80.0] * len(self.stim_protocol)
-            # self.stim_centers = [[43.3696, 31.5672, 13.2908], [30.2473, 15.1548, 51.9687]]
-            centers = [[29.7377, 17.648, 45.8272], [60.5251, 27.9437, 41.0176]]
-            self.stim_centers = [centers[i % 2] for i in range(len(self.stim_protocol))]
-            r = 5.0
-            self.stim_radii = [[r, r, r]] * len(self.stim_protocol)
-
-            # new
-            # stim_dur = 4
-            # self.stim_protocol = [[0.0, stim_dur], [500.0, stim_dur]]
-            # self.stim_intensities = [800.0] * len(self.stim_protocol)
-            # self.stim_centers = [[43.3696, 31.5672, 13.2908], [30.2473, 15.1548, 51.9687]]
-            # self.stim_radii = [[8.0, 8.0, 8.0]] * len(self.stim_protocol)
+        else:
+            raise Exception("Unknown domain name.")
 
         self.stim_protocol = np.array(self.stim_protocol)
         self.stim_protocol[:, 0] -= self.init_time
@@ -254,26 +217,38 @@ class MultiscaleMonodomainODE(MonodomainODE):
 
         self.constant_lambda_and_phi = False
 
-        self.num_nodes = 5
-        self.coll = CollBase(num_nodes=self.num_nodes, tleft=0, tright=1, node_type='LEGENDRE', quad_type='GAUSS')
-
     def rho_nonstiff(self, y, t, fy=None):
         return self.rho_nonstiff_cte
 
     def define_splittings(self):
-        # Here we define different splittings of the rhs into stiff, nonstiff and exponential terms
+        """
+        This function defines the splittings used in the problem.
+        The self.im_* variables are meant for internal use, the self.rhs_* for external use (i.e. in the sweeper).
+        The *_args and *_indeces are list of integers.
+        The args are list of variables that are needed to evaluate a function plus the variables that are modified by the function
+        The indeces are the list of variables that are modified by the function (subset of args).
+        Example: for f(x_0,x_1,x_2,x_3,x_4)=f(x_0,x_2,x_4)=(y_0,y_1,0,0,y_4) we have
+        f_args=[0,1,2,4]=([0,2,4] union [0,1,4]) since f needs x_0,x_2,x_4 and y_0,y_1,y_4 are effective outputs of the function (others are zero).
+        f_indeces=[0,1,4] since only y_0,y_1,y_4 are outputs of the function, y_2,y_3 are zero
 
-        # SPLITTING exp_nonstiff
-        # this is the standard splitting used in Rush-Larsen methods. We use it for the IMEXEXP (IMEX+RL) and exp_mES schemes.
-        # define nonstiff.
+        The ionic model has many variables (say M) and each variable has the same number of dofs as the mesh (say N).
+        Therefore the problem has size N*M and quickly becomes very large. Thanks to args and indeces we can:
+        - avoid to copy the whole vector M*N of variables when we only need a subset, for instance 2*N
+        - avoid unnecessary operations on the whole vector, for instance update only the variables that are effective outputs of a function (indeces),
+        and so on.
+
+        Yeah, it's a bit a mess, but helpful.
+        """
+        # this is the standard splitting used in Rush-Larsen methods.
+        # define nonstiff term (explicit part)
         self.im_f_nonstiff = self.ionic_model.f_expl
         self.im_nonstiff_args = self.ionic_model.f_expl_args
         self.im_nonstiff_indeces = self.ionic_model.f_expl_indeces
-        # define stiff
+        # define stiff term (implicit part)
         self.im_f_stiff = None  # no stiff part coming from ionic model (everything stiff is in the exponential part)
         self.im_stiff_args = []
         self.im_stiff_indeces = []
-        # define exp
+        # define exp term (eponential part)
         self.im_lmbda_exp = self.ionic_model.lmbda_exp
         self.im_lmbda_yinf_exp = self.ionic_model.lmbda_yinf_exp
         self.im_exp_args = self.ionic_model.f_exp_args

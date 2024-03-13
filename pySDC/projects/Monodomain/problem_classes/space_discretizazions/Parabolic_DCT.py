@@ -47,12 +47,6 @@ class Parabolic_DCT(RegisterParams):
         self.se_t = 0.24  # mS/mm
 
         if "cube" in self.domain_name:
-            # if self.refinements == -1: # only for generating initial value
-            # self.si_l *= 0.5
-            # self.se_l *= 0.5
-            # elif self.refinements == 0:
-            # self.si_l *= 0.25
-            # self.se_l *= 0.25
             self.si_t = self.si_l
             self.se_t = self.se_l
 
@@ -208,6 +202,8 @@ class Parabolic_DCT(RegisterParams):
             [np.save(file, uh[i].values.reshape(self.shape)) for i in indeces]
 
     def read_reference_solution(self, uh, indeces, ref_file_name):
+        if ref_file_name == "":
+            return False
         ref_sol_path = Path(self.output_folder) / Path(ref_file_name).with_suffix(".npy")
         if ref_sol_path.is_file():
             with open(ref_sol_path, 'rb') as f:

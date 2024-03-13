@@ -45,7 +45,7 @@ class imexexp_1st_order(sweeper):
         c = self.coll.nodes
         self.w = fornberg.fd_weights_all(c, 0.0, M - 1)
 
-        phi_num_nodes = 5
+        phi_num_nodes = 20
         self.phi_coll = CollBase(num_nodes=phi_num_nodes, tleft=0, tright=1, node_type='LEGENDRE', quad_type='GAUSS')
 
     def phi_eval_lists(self, P, factors, indeces, phi, lmbda, update_non_exp_indeces=True):
