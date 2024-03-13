@@ -186,9 +186,7 @@ class PlotManager(object):  # pragma: no cover
 
             ax1.loglog(
                 func_eval_RKN[0],
-                error_RKN['pos'][value,][
-                    0
-                ][:],
+                error_RKN['pos'][value,][0][:],
                 ls='dashdot',
                 color='purple',
                 marker='p',
@@ -196,9 +194,7 @@ class PlotManager(object):  # pragma: no cover
             )
             ax2.loglog(
                 func_eval_RKN[0],
-                error_RKN['vel'][value,][
-                    0
-                ][:],
+                error_RKN['vel'][value,][0][:],
                 ls='dashdot',
                 color='purple',
                 marker='p',
@@ -212,9 +208,7 @@ class PlotManager(object):  # pragma: no cover
 
             ax1.loglog(
                 func_eval_VV[0],
-                error_VV['pos'][value,][
-                    0
-                ][:],
+                error_VV['pos'][value,][0][:],
                 ls='dashdot',
                 color='blue',
                 marker='H',
@@ -222,9 +216,7 @@ class PlotManager(object):  # pragma: no cover
             )
             ax2.loglog(
                 func_eval_VV[0],
-                error_VV['vel'][value,][
-                    0
-                ][:],
+                error_VV['vel'][value,][0][:],
                 ls='dashdot',
                 color='blue',
                 marker='H',
