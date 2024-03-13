@@ -14,8 +14,8 @@ def test_monodomain_convergence_one_level():
     max_iter = 6
 
     # set level parameters
-    dt_max = 0.1
-    n_dt = 4
+    dt_max = 0.05
+    n_dt = 3
     dt_list = [dt_max / 2**i for i in range(n_dt)]
 
     # skip residual computation at coarser levels (if any)
@@ -163,8 +163,8 @@ def test_monodomain_convergence_one_level():
     for i in range(n_dt - 1):
         rates[i] = np.log(rel_err[i] / rel_err[i + 1]) / np.log(dt_list[i] / dt_list[i + 1])
 
-    # print(f"Relative errors: {rel_err}")
-    # print(f"Rates: {rates}")
+    print(f"Relative errors: {rel_err}")
+    print(f"Rates: {rates}")
 
     assert np.all(rates > 5.5), "ERROR: convergence rate is too low!"
     assert np.all(rates < 6.5), "ERROR: convergence rate is too high!"
@@ -339,6 +339,6 @@ def test_monodomain_convergence_two_levels():
     assert np.all(rates < 4.5), "ERROR: convergence rate is too high!"
 
 
-# if __name__ == "__main__":
-# test_monodomain_convergence_one_level()
-# test_monodomain_convergence_two_levels()
+if __name__ == "__main__":
+    test_monodomain_convergence_one_level()
+    test_monodomain_convergence_two_levels()
