@@ -167,25 +167,25 @@ def get_problem_params(
     problem_params = dict()
     problem_params["order"] = order  # order of the spatial discretization
     problem_params["refinements"] = refinements  # number of refinements with respect to a baseline
-    problem_params[
-        "domain_name"
-    ] = domain_name  # name of the domain: cube_1D, cube_2D, cube_3D, cuboid_1D, cuboid_2D, cuboid_3D, cuboid_1D_small, cuboid_2D_small, cuboid_3D_small
-    problem_params[
-        "ionic_model_name"
-    ] = ionic_model_name  # name of the ionic model: HH, CRN, TTP, TTP_SMOOTH for Hodgkin-Huxley, Courtemanche-Ramirez-Nattel, Ten Tusscher-Panfilov and a smoothed version of Ten Tusscher-Panfilov
-    problem_params[
-        "read_init_val"
-    ] = read_init_val  # read the initial value from file (True) or initiate an action potential with a stimulus (False)
-    problem_params[
-        "init_time"
-    ] = init_time  # stimulus happpens at t=0 and t=1000 and lasts 2ms. If init_time>2 nothing happens up to t=1000. If init_time>1002 nothing happens, never.
+    problem_params["domain_name"] = (
+        domain_name  # name of the domain: cube_1D, cube_2D, cube_3D, cuboid_1D, cuboid_2D, cuboid_3D, cuboid_1D_small, cuboid_2D_small, cuboid_3D_small
+    )
+    problem_params["ionic_model_name"] = (
+        ionic_model_name  # name of the ionic model: HH, CRN, TTP, TTP_SMOOTH for Hodgkin-Huxley, Courtemanche-Ramirez-Nattel, Ten Tusscher-Panfilov and a smoothed version of Ten Tusscher-Panfilov
+    )
+    problem_params["read_init_val"] = (
+        read_init_val  # read the initial value from file (True) or initiate an action potential with a stimulus (False)
+    )
+    problem_params["init_time"] = (
+        init_time  # stimulus happpens at t=0 and t=1000 and lasts 2ms. If init_time>2 nothing happens up to t=1000. If init_time>1002 nothing happens, never.
+    )
     problem_params["init_val_name"] = "init_val_DCT"  # name of the file containing the initial value
-    problem_params[
-        "enable_output"
-    ] = enable_output  # activate or deactivate output (that can be visualized with visualization/show_monodomain_sol.py)
-    problem_params[
-        "output_V_only"
-    ] = True  # output only the transmembrane potential (V) and not the ionic model variables
+    problem_params["enable_output"] = (
+        enable_output  # activate or deactivate output (that can be visualized with visualization/show_monodomain_sol.py)
+    )
+    problem_params["output_V_only"] = (
+        True  # output only the transmembrane potential (V) and not the ionic model variables
+    )
     executed_file_dir = os.path.dirname(os.path.realpath(__file__))
     problem_params["output_root"] = (
         executed_file_dir + "/../output_data/" + output_root
