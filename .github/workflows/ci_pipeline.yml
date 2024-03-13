@@ -168,9 +168,8 @@ jobs:
           IONIC_MODELS_PATH: "pySDC/projects/Monodomain/problem_classes/ionicmodels/cpp"
         run: |
           echo "Compiling ionic models..."
-          echo $(env)
-          echo $(pwd)
           c++ -O3 -Wall -shared -std=c++11 -fPIC -fvisibility=hidden $(python3 -m pybind11 --includes) ${IONIC_MODELS_PATH}/bindings_definitions.cpp -o ${IONIC_MODELS_PATH}/ionicmodels$(python3-config --extension-suffix)
+          ls ${IONIC_MODELS_PATH}
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py

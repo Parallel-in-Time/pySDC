@@ -153,14 +153,13 @@ def get_problem_params(lmbda_laplacian, lmbda_gating, lmbda_others, end_time):
 #     plt.show()
 
 
-def main():
+def main(dl, openmp):
 
     # integrator = "IMEXEXP"
     integrator = "IMEXEXP_EXPRK"
 
     # number of time ranks.
     n_time_ranks = 1
-    openmp = False
 
     end_time = float(n_time_ranks)
 
@@ -177,7 +176,6 @@ def main():
     controller_params = get_controller_params(get_output_root(), logger_level=40)
 
     # set stability test parameters
-    dl = 100.0  # use 10 or less for plotting the stability domain, use 100 for test
     lmbda_others = -1.0
     lmbda_laplacian_min = -1000.0
     lmbda_laplacian_max = 0.0
@@ -256,4 +254,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(10, True)
