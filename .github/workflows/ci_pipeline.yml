@@ -3,39 +3,39 @@ name: CI pipeline for pySDC
 on:
   push:
   pull_request:
-  # schedule:
-  #   - cron: '1 5 * * 1'
+  schedule:
+    - cron: '1 5 * * 1'
 
 jobs:
 
-  # lint:
-  #   runs-on: ubuntu-latest
+  lint:
+    runs-on: ubuntu-latest
 
-  #   env:
-  #     YML: 'etc/environment-lint.yml'
+    env:
+      YML: 'etc/environment-lint.yml'
 
-  #   defaults:
-  #     run:
-  #       shell: bash -l {0}
+    defaults:
+      run:
+        shell: bash -l {0}
 
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
 
-  #     - name: Install Conda environment with Micromamba
-  #       uses: mamba-org/setup-micromamba@v1
-  #       with:
-  #         environment-file: ${{ env.YML }}
-  #         create-args: >-
-  #             python=3.10
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-file: ${{ env.YML }}
+          create-args: >-
+              python=3.10
 
-  #     - name: Code reformatting with black
-  #       run: |
-  #         black pySDC  --check --diff --color
+      - name: Code reformatting with black
+        run: |
+          black pySDC  --check --diff --color
 
-  #     - name: Linting with flakeheaven
-  #       run: |
-  #         flakeheaven lint --benchmark pySDC
+      - name: Linting with flakeheaven
+        run: |
+          flakeheaven lint --benchmark pySDC
 
 #   mirror_to_gitlab:
 
@@ -55,95 +55,95 @@ jobs:
 #           GITLAB_PROJECT_ID: "3525"
 #           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # user_cpu_tests_linux:
-  #   runs-on: ubuntu-latest
+  user_cpu_tests_linux:
+    runs-on: ubuntu-latest
 
-  #   strategy:
-  #     matrix:
-  #       python: ['3.8', '3.9', '3.10']
-  #       env: ['base', 'fenics', 'mpi4py', 'petsc']
+    strategy:
+      matrix:
+        python: ['3.8', '3.9', '3.10']
+        env: ['base', 'fenics', 'mpi4py', 'petsc']
 
-  #   defaults:
-  #     run:
-  #       shell: bash -l {0}
+    defaults:
+      run:
+        shell: bash -l {0}
 
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-  #     - name: Install Conda environment with Micromamba
-  #       uses: mamba-org/setup-micromamba@v1
-  #       with:
-  #         environment-file: "etc/environment-${{ matrix.env }}.yml"
-  #         create-args: >-
-  #             python=${{ matrix.python }}
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-file: "etc/environment-${{ matrix.env }}.yml"
+          create-args: >-
+              python=${{ matrix.python }}
 
-  #     - name: Run pytest for CPU stuff
-  #       run: |
-  #         echo "print('Loading sitecustomize.py...')
-  #         import coverage
-  #         coverage.process_startup() " > sitecustomize.py
-  #         coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
+      - name: Run pytest for CPU stuff
+        run: |
+          echo "print('Loading sitecustomize.py...')
+          import coverage
+          coverage.process_startup() " > sitecustomize.py
+          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
 
-  #     - name: Make coverage report
-  #       run: |
-  #         mv data data_${{ matrix.python }}
-  #         coverage combine
-  #         mv .coverage coverage_${{ matrix.env }}_${{ matrix.python }}.dat
+      - name: Make coverage report
+        run: |
+          mv data data_${{ matrix.python }}
+          coverage combine
+          mv .coverage coverage_${{ matrix.env }}_${{ matrix.python }}.dat
 
-  #     - name: Uploading artifacts
-  #       uses: actions/upload-artifact@v3
-  #       if: matrix.python == '3.10'
-  #       with:
-  #         name: cpu-test-artifacts
-  #         path: |
-  #           data_3.10
-  #           coverage_${{ matrix.env }}_3.10.dat
+      - name: Uploading artifacts
+        uses: actions/upload-artifact@v3
+        if: matrix.python == '3.10'
+        with:
+          name: cpu-test-artifacts
+          path: |
+            data_3.10
+            coverage_${{ matrix.env }}_3.10.dat
 
-  # user_libpressio_tests:
-  #   runs-on: ubuntu-latest
+  user_libpressio_tests:
+    runs-on: ubuntu-latest
 
-  #   container:
-  #     image: brownbaerchen/libpressio:amd64_2
-  #     volumes:
-  #       - ${{ github.workspace }}:/pySDC
+    container:
+      image: brownbaerchen/libpressio:amd64_2
+      volumes:
+        - ${{ github.workspace }}:/pySDC
 
-  #   defaults:
-  #     run:
-  #       shell: bash -l {0}
+    defaults:
+      run:
+        shell: bash -l {0}
 
-  #   steps:
+    steps:
            
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
            
-  #     - name: Install pySDC and pytest
-  #       run: |
-  #         source /pySDC/pySDC/projects/compression/Docker/install_pySDC.sh
+      - name: Install pySDC and pytest
+        run: |
+          source /pySDC/pySDC/projects/compression/Docker/install_pySDC.sh
 
-  #     - name: Run pytest
-  #       run: |
-  #         source /opt/spack/share/spack/setup-env.sh
-  #         spack load libpressio
+      - name: Run pytest
+        run: |
+          source /opt/spack/share/spack/setup-env.sh
+          spack load libpressio
            
-  #         coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m libpressio
+          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m libpressio
 
-  #     - name: Make coverage report
-  #       run: |
-  #         source /opt/spack/share/spack/setup-env.sh
-  #         spack load libpressio
+      - name: Make coverage report
+        run: |
+          source /opt/spack/share/spack/setup-env.sh
+          spack load libpressio
 
-  #         mv data data_libpressio
-  #         coverage combine
-  #         mv .coverage coverage_libpressio_3.10.dat
+          mv data data_libpressio
+          coverage combine
+          mv .coverage coverage_libpressio_3.10.dat
 
-  #     - name: Upload artifacts
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: cpu-test-artifacts
-  #         path: |
-  #           data_libpressio
-  #           coverage_libpressio_3.10.dat
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: cpu-test-artifacts
+          path: |
+            data_libpressio
+            coverage_libpressio_3.10.dat
          
   user_monodomain_tests_linux:
     runs-on: ubuntu-latest
@@ -249,9 +249,9 @@ jobs:
     if: ${{ github.repository_owner == 'Parallel-in-Time'}}
 
     needs:
-      # - lint
-      # - user_cpu_tests_linux
-      # - user_libpressio_tests
+      - lint
+      - user_cpu_tests_linux
+      - user_libpressio_tests
       - user_monodomain_tests_linux
 #       - wait_for_gitlab
 
