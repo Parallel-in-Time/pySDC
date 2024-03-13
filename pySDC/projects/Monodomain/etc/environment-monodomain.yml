@@ -20,3 +20,4 @@ dependencies:
   - pybind11
   - mpi4py
   - mpich
+  - tqdm
