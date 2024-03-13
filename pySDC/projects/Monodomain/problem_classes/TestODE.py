@@ -4,8 +4,6 @@ from pySDC.core.Problem import ptype
 from pySDC.core.Common import RegisterParams
 from pySDC.projects.Monodomain.datatype_classes.DCT_Vector import DCT_Vector
 from pySDC.projects.Monodomain.datatype_classes.VectorOfVectors import VectorOfVectors, IMEXEXP_VectorOfVectors
-from pySDC.core.Collocation import CollBase
-import scipy
 
 
 class Parabolic(RegisterParams):
@@ -61,13 +59,9 @@ class TestODE(ptype):
         if fh is None:
             fh = self.dtype_f(init=self.init, val=0.0)
 
-        # apply stimulus
         fh.val_list[0].values[0] = (self.lmbda_laplacian + self.lmbda_gating + self.lmbda_others) * u[0].values[0]
 
         return fh
-
-    def rho(self, y, t, fy):
-        return abs(self.lmbda_laplacian + self.lmbda_gating + self.lmbda_others)
 
 
 class MultiscaleTestODE(TestODE):
@@ -124,36 +118,15 @@ class MultiscaleTestODE(TestODE):
 
         return fh
 
-    def eval_phi_f_exp(self, u, factor, t, phi_f_exp=None, zero_untouched_indeces=True):
-        if phi_f_exp is None:
-            phi_f_exp = self.dtype_u(init=self.init, val=0.0)
+    # def eval_phi_f_exp(self, u, factor, t, phi_f_exp=None, zero_untouched_indeces=True):
+    #     if phi_f_exp is None:
+    #         phi_f_exp = self.dtype_u(init=self.init, val=0.0)
 
-        phi_f_exp.val_list[0].values[0] = (
-            (np.exp(factor * self.lmbda_gating) - 1.0) / (factor) * u.val_list[0].values[0]
-        )
+    #     phi_f_exp.val_list[0].values[0] = (
+    #         (np.exp(factor * self.lmbda_gating) - 1.0) / (factor) * u.val_list[0].values[0]
+    #     )
 
-        return phi_f_exp
-
-    # def phi_eval(self, u, factor, t, k, phi=None):
-    #     if phi is None:
-    #         phi = self.dtype_u(init=self.init, val=0.0)
-
-    #     dt_lmbda = factor * self.lmbda_gating
-
-    #     if k == 0:
-    #         phi.val_list[0].values[0] = np.exp(dt_lmbda)
-    #     else:
-    #         num_nodes = 10
-    #         self.coll = CollBase(num_nodes=num_nodes, tleft=0, tright=1, node_type='LEGENDRE', quad_type='GAUSS')
-    #         c = self.coll.nodes
-    #         b = self.coll.weights
-
-    #         phi.val_list[0].values[0] = (b[0] * c[0] ** (k - 1)) * np.exp((1.0 - c[0]) * dt_lmbda)
-    #         for j in range(1, num_nodes):
-    #             phi.val_list[0].values[0] += (b[j] * c[j] ** (k - 1)) * np.exp((1.0 - c[j]) * dt_lmbda)
-    #         phi.val_list[0].values[0] /= scipy.special.factorial(k - 1)
-
-    #     return phi
+    #     return phi_f_exp
 
     def lmbda_eval(self, u, t, lmbda=None):
         if lmbda is None:

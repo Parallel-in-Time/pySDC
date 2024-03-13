@@ -74,11 +74,10 @@ class imexexp_1st_order(sweeper):
                     k = indeces[m]
                     km1_fac = factorials[m]
                     if k == 0:
-                        phi[m][n][i].copy(np.exp(factor * lmbda.np_array(i)))
+                        phi[m][n].np_array(i)[:] = np.exp(factor * lmbda.np_array(i))
                     else:
                         for j in range(self.phi_coll.num_nodes):
-                            # phi[m][n].np_array(i)[:] += ((b[j] * c[j] ** (k - 1)) / km1_fac) * exp_terms[j]
-                            phi[m][n].val_list[i] += ((b[j] * c[j] ** (k - 1)) / km1_fac) * exp_terms[j]
+                            phi[m][n].np_array(i)[:] += ((b[j] * c[j] ** (k - 1)) / km1_fac) * exp_terms[j]
 
         if update_non_exp_indeces:
             for n in range(N_fac):

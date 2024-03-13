@@ -305,26 +305,15 @@ class MultiscaleMonodomainODE(MonodomainODE):
         self.lmbda = self.dtype_u(init=self.init, val=0.0)
         self.yinf = self.dtype_u(init=self.init, val=0.0)
 
-    def eval_lmbda_yinf_exp(self, u, lmbda, yinf):
-        self.im_lmbda_yinf_exp(u.np_list, lmbda.np_list, yinf.np_list)
-
-    def eval_lmbda_exp(self, u, lmbda):
-        self.im_lmbda_exp(u.np_list, lmbda.np_list)
-
     def solve_system(self, rhs, factor, u0, t, u_sol=None):
         if u_sol is None:
             u_sol = self.dtype_u(init=self.init, val=0.0)
 
         self.parabolic.solve_system(rhs[0], factor, u0[0], t, u_sol[0])
 
-        # if self.mass_rhs != "all":
         if rhs is not u_sol:
             for i in range(1, self.size):
                 u_sol[i].copy(rhs[i])
-
-        # if self.mass_rhs == "all":
-        #     for i in range(1, self.size):
-        #         self.parabolic.solve_system(rhs[i], 0.0, u0[i], t, u_sol[i])
 
         return u_sol
 
@@ -389,101 +378,6 @@ class MultiscaleMonodomainODE(MonodomainODE):
 
         return fh_exp
 
-    def eval_phi_f_exp(self, u, factor, t, phi_f_exp=None, zero_untouched_indeces=True):
-        if phi_f_exp is None:
-            phi_f_exp = self.dtype_u(init=self.init, val=0.0)
-
-        self.eval_lmbda_yinf_exp(u, self.lmbda, self.yinf)
-        for i in self.im_exp_indeces:
-            phi_f_exp.np_array(i)[:] = (
-                (np.exp(factor * self.lmbda.np_array(i)) - 1.0) / (factor) * (u.np_array(i) - self.yinf.np_array(i))
-            )
-
-        if zero_untouched_indeces:
-            phi_f_exp.zero_sub(self.im_non_exp_indeces)
-
-        return phi_f_exp
-
-    # def phi_eval(self, u, factor, t, k, phi=None, lmbda=None):
-    #     if phi is None:
-    #         phi = self.dtype_u(init=self.init, val=0.0)
-
-    #     if lmbda is None:
-    #         self.eval_lmbda_exp(u, self.lmbda)
-    #         lmbda_loc = self.lmbda
-    #     else:
-    #         lmbda_loc = lmbda
-
-    #     if k == 0:
-    #         for i in self.im_exp_indeces:  # phi_0
-    #             phi.np_array(i)[:] = np.exp(factor * lmbda_loc.np_array(i))
-    #     else:
-    #         c = self.coll.nodes
-    #         b = self.coll.weights
-
-    #         km1_fac = scipy.special.factorial(k - 1)
-    #         for i in self.im_exp_indeces:
-    #             phi.np_array(i)[:] = (b[0] * c[0] ** (k - 1)) * np.exp(((1.0 - c[0]) * factor) * lmbda_loc.np_array(i))
-    #             for j in range(1, self.num_nodes):
-    #                 phi.np_array(i)[:] += (b[j] * c[j] ** (k - 1)) * np.exp(
-    #                     ((1.0 - c[j]) * factor) * lmbda_loc.np_array(i)
-    #                 )
-    #             phi.np_array(i)[:] /= km1_fac
-
-    #     phi.copy_sub(self.one, self.im_non_exp_indeces)
-    #     if k > 1:
-    #         k_fac = km1_fac * k
-    #         phi.imul_sub(1.0 / k_fac, self.im_non_exp_indeces)
-
-    #     return phi
-
-    # def phi_eval_lists(self, u, factors, t, indeces, phi=None, lmbda=None, update_non_exp_indeces=True):
-    #     # compute phi[k][i] = phi_{k}(factor_i*lmbda), factor_i in factors, k in indeces
-
-    #     N_fac = len(factors)
-    #     N_ind = len(indeces)
-
-    #     if phi is None:
-    #         phi = [[self.dtype_u(init=self.init, val=0.0) for i in range(N_fac)] for j in range(N_ind)]
-    #     else:
-    #         for n in range(N_fac):
-    #             for m in range(N_ind):
-    #                 phi[m][n].zero_sub(self.im_exp_indeces)
-
-    #     if lmbda is None:
-    #         self.eval_lmbda_exp(u, self.lmbda)
-    #         lmbda_loc = self.lmbda
-    #     else:
-    #         lmbda_loc = lmbda
-
-    #     factorials = scipy.special.factorial(np.array(indeces) - 1)
-    #     c = self.coll.nodes
-    #     b = self.coll.weights
-    #     for i in self.im_exp_indeces:
-    #         for n in range(N_fac):
-    #             factor = factors[n]
-    #             exp_terms = [np.exp(((1.0 - c[j]) * factor) * lmbda_loc.np_array(i)) for j in range(self.num_nodes)]
-    #             for m in range(N_ind):
-    #                 k = indeces[m]
-    #                 km1_fac = factorials[m]
-    #                 if k == 0:
-    #                     phi[m][n].np_array(i)[:] = np.exp(factor * lmbda_loc.np_array(i))
-    #                 else:
-    #                     for j in range(self.num_nodes):
-    #                         phi[m][n].np_array(i)[:] += ((b[j] * c[j] ** (k - 1)) / km1_fac) * exp_terms[j]
-
-    #     if update_non_exp_indeces:
-    #         for n in range(N_fac):
-    #             for m in range(N_ind):
-    #                 k = indeces[m]
-    #                 phi[m][n].copy_sub(self.one, self.im_non_exp_indeces)
-    #                 if k > 1:
-    #                     km1_fac = factorials[m]
-    #                     k_fac = km1_fac * k
-    #                     phi[m][n].imul_sub(1.0 / k_fac, self.im_non_exp_indeces)
-
-    #     return phi
-
     def lmbda_eval(self, u, t, lmbda=None):
         if lmbda is None:
             lmbda = self.dtype_u(init=self.init, val=0.0)
@@ -493,3 +387,9 @@ class MultiscaleMonodomainODE(MonodomainODE):
         lmbda.zero_sub(self.im_non_exp_indeces)
 
         return lmbda
+
+    def eval_lmbda_yinf_exp(self, u, lmbda, yinf):
+        self.im_lmbda_yinf_exp(u.np_list, lmbda.np_list, yinf.np_list)
+
+    def eval_lmbda_exp(self, u, lmbda):
+        self.im_lmbda_exp(u.np_list, lmbda.np_list)

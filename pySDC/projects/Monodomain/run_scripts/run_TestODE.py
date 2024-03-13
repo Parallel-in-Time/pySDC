@@ -249,10 +249,10 @@ def main(dl, openmp):
 
                     R[j, i] = abs(uend)
 
-    plot_stability_domain(lmbda_laplacian_list, lmbda_gating_list, R)
+    # plot_stability_domain(lmbda_laplacian_list, lmbda_gating_list, R)
 
     assert np.max(np.abs(R.ravel())) <= 1.0, "The maximum absolute value of the stability function is greater than 1.0."
 
 
 if __name__ == "__main__":
-    main(10, True)
+    main(100, False)
