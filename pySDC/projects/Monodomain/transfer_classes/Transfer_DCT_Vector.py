@@ -43,7 +43,9 @@ class DCT_to_DCT(space_transfer):
             G = F.copy()
         else:
             G = DCT_Vector(self.coarse_prob.init)
-            G.values[:] = fft.idctn(fft.dctn(F.values.reshape(self.fine_shape), norm=self.norm), s=self.coarse_shape, norm=self.norm).ravel()
+            G.values[:] = fft.idctn(
+                fft.dctn(F.values.reshape(self.fine_shape), norm=self.norm), s=self.coarse_shape, norm=self.norm
+            ).ravel()
 
         return G
 
@@ -58,6 +60,8 @@ class DCT_to_DCT(space_transfer):
             F = G.copy()
         else:
             F = DCT_Vector(self.fine_prob.init)
-            F.values[:] = fft.idctn(fft.dctn(G.values.reshape(self.coarse_shape), norm=self.norm), s=self.fine_shape, norm=self.norm).ravel()
+            F.values[:] = fft.idctn(
+                fft.dctn(G.values.reshape(self.coarse_shape), norm=self.norm), s=self.fine_shape, norm=self.norm
+            ).ravel()
 
         return F

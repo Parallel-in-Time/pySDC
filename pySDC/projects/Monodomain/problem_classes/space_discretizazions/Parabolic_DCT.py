@@ -19,7 +19,9 @@ class Parabolic_DCT(RegisterParams):
     def __del__(self):
         if self.enable_output:
             self.output_file.close()
-            with open(self.output_file_path.parent / Path(self.output_file_name + '_txyz').with_suffix(".npy"), 'wb') as f:
+            with open(
+                self.output_file_path.parent / Path(self.output_file_name + '_txyz').with_suffix(".npy"), 'wb'
+            ) as f:
                 np.save(f, np.array(self.t_out))
                 xyz = self.grids
                 for i in range(self.dim):
@@ -98,20 +100,52 @@ class Parabolic_DCT(RegisterParams):
         if self.order == 2:
             diff_dct = self.diff[0] * (2.0 * np.cos(np.pi * np.arange(N[0]) / N[0]) - 2.0) / dx[0] ** 2
             if dim >= 2:
-                diff_dct = diff_dct[None, :] + self.diff[1] * np.array((2.0 * np.cos(np.pi * np.arange(N[1]) / N[1]) - 2.0) / dx[1] ** 2)[:, None]
-            if dim >= 3:
-                diff_dct = diff_dct[None, :, :] + self.diff[2] * np.array((2.0 * np.cos(np.pi * np.arange(N[2]) / N[2]) - 2.0) / dx[2] ** 2)[:, None, None]
-        elif self.order == 4:
-            diff_dct = self.diff[0] * ((-1.0 / 6.0) * np.cos(2.0 * np.pi * np.arange(N[0]) / N[0]) + (8.0 / 3.0) * np.cos(np.pi * np.arange(N[0]) / N[0]) - 2.5) / dx[0] ** 2
-            if dim >= 2:
                 diff_dct = (
                     diff_dct[None, :]
-                    + self.diff[1] * np.array(((-1.0 / 6.0) * np.cos(2.0 * np.pi * np.arange(N[1]) / N[1]) + (8.0 / 3.0) * np.cos(np.pi * np.arange(N[1]) / N[1]) - 2.5) / dx[1] ** 2)[:, None]
+                    + self.diff[1]
+                    * np.array((2.0 * np.cos(np.pi * np.arange(N[1]) / N[1]) - 2.0) / dx[1] ** 2)[:, None]
                 )
             if dim >= 3:
                 diff_dct = (
                     diff_dct[None, :, :]
-                    + self.diff[2] * np.array(((-1.0 / 6.0) * np.cos(2.0 * np.pi * np.arange(N[2]) / N[2]) + (8.0 / 3.0) * np.cos(np.pi * np.arange(N[2]) / N[2]) - 2.5) / dx[2] ** 2)[:, None, None]
+                    + self.diff[2]
+                    * np.array((2.0 * np.cos(np.pi * np.arange(N[2]) / N[2]) - 2.0) / dx[2] ** 2)[:, None, None]
+                )
+        elif self.order == 4:
+            diff_dct = (
+                self.diff[0]
+                * (
+                    (-1.0 / 6.0) * np.cos(2.0 * np.pi * np.arange(N[0]) / N[0])
+                    + (8.0 / 3.0) * np.cos(np.pi * np.arange(N[0]) / N[0])
+                    - 2.5
+                )
+                / dx[0] ** 2
+            )
+            if dim >= 2:
+                diff_dct = (
+                    diff_dct[None, :]
+                    + self.diff[1]
+                    * np.array(
+                        (
+                            (-1.0 / 6.0) * np.cos(2.0 * np.pi * np.arange(N[1]) / N[1])
+                            + (8.0 / 3.0) * np.cos(np.pi * np.arange(N[1]) / N[1])
+                            - 2.5
+                        )
+                        / dx[1] ** 2
+                    )[:, None]
+                )
+            if dim >= 3:
+                diff_dct = (
+                    diff_dct[None, :, :]
+                    + self.diff[2]
+                    * np.array(
+                        (
+                            (-1.0 / 6.0) * np.cos(2.0 * np.pi * np.arange(N[2]) / N[2])
+                            + (8.0 / 3.0) * np.cos(np.pi * np.arange(N[2]) / N[2])
+                            - 2.5
+                        )
+                        / dx[2] ** 2
+                    )[:, None, None]
                 )
         else:
             raise NotImplementedError("Only order 2 and 4 are implemented for Parabolic_DCT.")

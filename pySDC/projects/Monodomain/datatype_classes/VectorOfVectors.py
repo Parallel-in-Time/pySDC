@@ -99,7 +99,9 @@ class VectorOfVectors(object):
                 self.val_list[i] *= other
         elif isinstance(other, VectorOfVectors):
             for i in range(self.size):
-                self.val_list[i] *= other.val_list[i]  # dont know why but this does not work, makes self.val_list[i] be None
+                self.val_list[i] *= other.val_list[
+                    i
+                ]  # dont know why but this does not work, makes self.val_list[i] be None
                 # self.val_list[i].values.x.array[:] *= other.val_list[i].values.x.array[:]
         else:
             raise DataError("Type error: cannot imul %s to %s" % (type(other), type(self)))

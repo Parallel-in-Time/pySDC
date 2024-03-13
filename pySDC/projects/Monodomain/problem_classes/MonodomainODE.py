@@ -42,7 +42,12 @@ class MonodomainODE(ptype):
         self.dtype_f = dtype_f
 
         # init output stuff
-        self.output_folder = Path(self.output_root) / Path(self.parabolic.domain_name) / Path(self.parabolic.mesh_name) / Path(self.ionic_model_name)
+        self.output_folder = (
+            Path(self.output_root)
+            / Path(self.parabolic.domain_name)
+            / Path(self.parabolic.mesh_name)
+            / Path(self.ionic_model_name)
+        )
         self.parabolic.init_output(self.output_folder)
 
     def write_solution(self, uh, t):
@@ -387,7 +392,9 @@ class MultiscaleMonodomainODE(MonodomainODE):
 
         self.eval_lmbda_yinf_exp(u, self.lmbda, self.yinf)
         for i in self.im_exp_indeces:
-            phi_f_exp.np_array(i)[:] = (np.exp(factor * self.lmbda.np_array(i)) - 1.0) / (factor) * (u.np_array(i) - self.yinf.np_array(i))
+            phi_f_exp.np_array(i)[:] = (
+                (np.exp(factor * self.lmbda.np_array(i)) - 1.0) / (factor) * (u.np_array(i) - self.yinf.np_array(i))
+            )
 
         if zero_untouched_indeces:
             phi_f_exp.zero_sub(self.im_non_exp_indeces)
@@ -415,7 +422,9 @@ class MultiscaleMonodomainODE(MonodomainODE):
             for i in self.im_exp_indeces:
                 phi.np_array(i)[:] = (b[0] * c[0] ** (k - 1)) * np.exp(((1.0 - c[0]) * factor) * lmbda_loc.np_array(i))
                 for j in range(1, self.num_nodes):
-                    phi.np_array(i)[:] += (b[j] * c[j] ** (k - 1)) * np.exp(((1.0 - c[j]) * factor) * lmbda_loc.np_array(i))
+                    phi.np_array(i)[:] += (b[j] * c[j] ** (k - 1)) * np.exp(
+                        ((1.0 - c[j]) * factor) * lmbda_loc.np_array(i)
+                    )
                 phi.np_array(i)[:] /= km1_fac
 
         phi.copy_sub(self.one, self.im_non_exp_indeces)

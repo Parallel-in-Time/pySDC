@@ -14,7 +14,9 @@ from pySDC.projects.Monodomain.hooks.HookClass_post_iter_info import post_iter_i
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
-from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1st_order import imexexp_1st_order as imexexp_1st_order_ExpRK
+from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1st_order import (
+    imexexp_1st_order as imexexp_1st_order_ExpRK,
+)
 from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.imexexp_1st_order import imexexp_1st_order
 
 
@@ -55,7 +57,9 @@ def get_controller_params(output_root, logger_level):
     return controller_params
 
 
-def get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class):
+def get_description(
+    integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class
+):
     description = dict()
 
     problem = MultiscaleTestODE
@@ -191,8 +195,21 @@ def main():
                 lmbda_gating = lmbda_gating_list[i]
                 lmbda_laplacian = lmbda_laplacian_list[j]
 
-                problem_params = get_problem_params(lmbda_laplacian=lmbda_laplacian, lmbda_gating=lmbda_gating, lmbda_others=lmbda_others, end_time=end_time)
-                description = get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class)
+                problem_params = get_problem_params(
+                    lmbda_laplacian=lmbda_laplacian,
+                    lmbda_gating=lmbda_gating,
+                    lmbda_others=lmbda_others,
+                    end_time=end_time,
+                )
+                description = get_description(
+                    integrator,
+                    problem_params,
+                    sweeper_params,
+                    level_params,
+                    step_params,
+                    base_transfer_params,
+                    space_transfer_class,
+                )
                 set_logger(controller_params)
                 controller = get_controller(controller_params, description, n_time_ranks)
 
@@ -210,8 +227,21 @@ def main():
                     lmbda_gating = lmbda_gating_list[i]
                     lmbda_laplacian = lmbda_laplacian_list[j]
 
-                    problem_params = get_problem_params(lmbda_laplacian=lmbda_laplacian, lmbda_gating=lmbda_gating, lmbda_others=lmbda_others, end_time=end_time)
-                    description = get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class)
+                    problem_params = get_problem_params(
+                        lmbda_laplacian=lmbda_laplacian,
+                        lmbda_gating=lmbda_gating,
+                        lmbda_others=lmbda_others,
+                        end_time=end_time,
+                    )
+                    description = get_description(
+                        integrator,
+                        problem_params,
+                        sweeper_params,
+                        level_params,
+                        step_params,
+                        base_transfer_params,
+                        space_transfer_class,
+                    )
                     set_logger(controller_params)
                     controller = get_controller(controller_params, description, n_time_ranks)
 

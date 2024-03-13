@@ -119,7 +119,10 @@ class my_controller_nonMPI(controller_nonMPI):
         for hook in self.hooks:
             hook.pre_comm(step=S, level_number=level)
         if not S.status.prev_done and not S.status.first:
-            self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' % (S.status.slot, S.prev.status.slot, level, S.status.iter))
+            self.logger.debug(
+                'Process %2i receives from %2i on level %2i with tag %s'
+                % (S.status.slot, S.prev.status.slot, level, S.status.iter)
+            )
             recv(S.levels[level], S.prev.levels[level], tag=(level, S.status.iter, S.prev.status.slot))
         for hook in self.hooks:
             hook.post_comm(step=S, level_number=level, add_to_stats=add_to_stats)

@@ -56,8 +56,18 @@ class imexexp_1st_order(sweeper):
             if not hasattr(self, "phi"):
                 self.phi = [[P.dtype_u(init=P.init, val=0.0) for i in range(M)] for k in range(M + 1)]
                 self.phi_one = [[P.dtype_u(init=P.init, val=0.0) for i in range(M)]]
-            self.phi = P.phi_eval_lists(L.u[0], L.dt * c, L.time, list(range(M + 1)), phi=self.phi, lmbda=self.lmbda, update_non_exp_indeces=False)
-            self.phi_one = P.phi_eval_lists(L.u[0], L.dt * self.delta, L.time, [1], phi=self.phi_one, lmbda=self.lmbda, update_non_exp_indeces=True)
+            self.phi = P.phi_eval_lists(
+                L.u[0],
+                L.dt * c,
+                L.time,
+                list(range(M + 1)),
+                phi=self.phi,
+                lmbda=self.lmbda,
+                update_non_exp_indeces=False,
+            )
+            self.phi_one = P.phi_eval_lists(
+                L.u[0], L.dt * self.delta, L.time, [1], phi=self.phi_one, lmbda=self.lmbda, update_non_exp_indeces=True
+            )
 
             # compute weight for the integration of \int_0^ci exp(dt*(ci-r)lmbda)*PiQ(r)dr = \sum_{j=0}^{M-1} Qmat_exp[i,j]*Q[j]
             if not hasattr(self, "Qmat_exp"):
@@ -66,7 +76,9 @@ class imexexp_1st_order(sweeper):
                 for j in range(M):
                     self.Qmat_exp[i][j].zero_sub(P.rhs_exp_indeces)
                     for k in range(M):
-                        self.Qmat_exp[i][j].axpy_sub(self.w[k, j] * c[i] ** (k + 1), self.phi[k + 1][i], P.rhs_exp_indeces)
+                        self.Qmat_exp[i][j].axpy_sub(
+                            self.w[k, j] * c[i] ** (k + 1), self.phi[k + 1][i], P.rhs_exp_indeces
+                        )
                         # self.Qmat_exp[i][j] += self.w[k, j] * c[i] ** (k + 1) * self.phi[k + 1][i]
 
             self.lambda_and_phi_outdated = False
@@ -162,7 +174,9 @@ class imexexp_1st_order(sweeper):
             self.tmp += L.u[m]
 
             # implicit solve with prefactor stemming from QI
-            L.u[m + 1] = P.solve_system(self.tmp, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m], L.u[m + 1])
+            L.u[m + 1] = P.solve_system(
+                self.tmp, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m], L.u[m + 1]
+            )
 
             if L.u[m + 1].is_nan_or_inf():
                 L.u[m + 1] = L.u[m].copy()
@@ -307,7 +321,10 @@ class imexexp_1st_order(sweeper):
         elif L.params.residual_type == 'last_rel':
             L.status.residual = rel_res_norm[-1]
         else:
-            raise ParameterError(f'residual_type = {L.params.residual_type} not implemented, choose ' f'full_abs, last_abs, full_rel or last_rel instead')
+            raise ParameterError(
+                f'residual_type = {L.params.residual_type} not implemented, choose '
+                f'full_abs, last_abs, full_rel or last_rel instead'
+            )
 
         # indicate that the residual has seen the new values
         L.status.updated = False

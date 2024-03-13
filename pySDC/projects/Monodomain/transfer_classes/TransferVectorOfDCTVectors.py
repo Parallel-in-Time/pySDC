@@ -30,7 +30,12 @@ class TransferVectorOfDCTVectors(space_transfer):
         Args:
             F: the fine level data
         """
-        u_coarse = VectorOfVectors(init=self.coarse_prob.init, val=0.0, type_sub_vector=self.coarse_prob.vector_type, size=self.coarse_prob.size)
+        u_coarse = VectorOfVectors(
+            init=self.coarse_prob.init,
+            val=0.0,
+            type_sub_vector=self.coarse_prob.vector_type,
+            size=self.coarse_prob.size,
+        )
 
         for i in range(u_coarse.size):
             u_coarse.val_list[i].values[:] = self.DCT_to_DCT.restrict(F[i]).values
@@ -45,11 +50,15 @@ class TransferVectorOfDCTVectors(space_transfer):
             G: the coarse level data
         """
         if isinstance(G, VectorOfVectors):
-            u_fine = VectorOfVectors(init=self.fine_prob.init, val=0.0, type_sub_vector=self.fine_prob.vector_type, size=self.fine_prob.size)
+            u_fine = VectorOfVectors(
+                init=self.fine_prob.init, val=0.0, type_sub_vector=self.fine_prob.vector_type, size=self.fine_prob.size
+            )
             for i in range(u_fine.size):
                 u_fine.val_list[i].values[:] = self.DCT_to_DCT.prolong(G[i]).values
         elif isinstance(G, IMEXEXP_VectorOfVectors):
-            u_fine = IMEXEXP_VectorOfVectors(init=self.fine_prob.init, val=0.0, type_sub_vector=self.fine_prob.vector_type, size=self.fine_prob.size)
+            u_fine = IMEXEXP_VectorOfVectors(
+                init=self.fine_prob.init, val=0.0, type_sub_vector=self.fine_prob.vector_type, size=self.fine_prob.size
+            )
             for i in range(u_fine.size):
                 u_fine.impl.val_list[i].values[:] = self.DCT_to_DCT.prolong(G.impl[i]).values
                 u_fine.expl.val_list[i].values[:] = self.DCT_to_DCT.prolong(G.expl[i]).values

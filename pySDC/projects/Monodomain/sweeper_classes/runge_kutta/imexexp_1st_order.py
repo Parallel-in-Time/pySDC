@@ -83,9 +83,17 @@ class imexexp_1st_order(sweeper):
 
         # do the sweep: expl and exp at same u
         for m in range(M):
-            integral[m] -= L.dt * self.delta[m] * (L.f[m].expl + L.f[m + 1].impl + P.eval_phi_f_exp(L.u[m], L.dt * self.delta[m], L.time))
+            integral[m] -= (
+                L.dt
+                * self.delta[m]
+                * (L.f[m].expl + L.f[m + 1].impl + P.eval_phi_f_exp(L.u[m], L.dt * self.delta[m], L.time))
+            )
         for m in range(M):
-            rhs = L.u[m] + integral[m] + L.dt * self.delta[m] * (L.f[m].expl + P.eval_phi_f_exp(L.u[m], L.dt * self.delta[m], L.time))
+            rhs = (
+                L.u[m]
+                + integral[m]
+                + L.dt * self.delta[m] * (L.f[m].expl + P.eval_phi_f_exp(L.u[m], L.dt * self.delta[m], L.time))
+            )
 
             # implicit solve with prefactor stemming from QI
             L.u[m + 1] = P.solve_system(rhs, L.dt * self.delta[m], L.u[m + 1], L.time + L.dt * self.coll.nodes[m])

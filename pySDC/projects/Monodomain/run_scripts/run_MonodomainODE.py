@@ -15,7 +15,9 @@ from pySDC.helpers.stats_helper import get_sorted
 from pySDC.projects.Monodomain.controller_classes.my_controller_MPI import my_controller_MPI as controller_MPI
 from pySDC.projects.Monodomain.controller_classes.my_controller_nonMPI import my_controller_nonMPI as controller_nonMPI
 
-from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1st_order import imexexp_1st_order as imexexp_1st_order_ExpRK
+from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1st_order import (
+    imexexp_1st_order as imexexp_1st_order_ExpRK,
+)
 from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.imexexp_1st_order import imexexp_1st_order
 
 from pySDC.projects.Monodomain.transfer_classes.TransferVectorOfDCTVectors import TransferVectorOfDCTVectors
@@ -31,7 +33,9 @@ def get_controller(controller_params, description, time_comm, n_time_ranks, trul
     if truly_time_parallel:
         controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
     else:
-        controller = controller_nonMPI(num_procs=n_time_ranks, controller_params=controller_params, description=description)
+        controller = controller_nonMPI(
+            num_procs=n_time_ranks, controller_params=controller_params, description=description
+        )
     return controller
 
 
@@ -85,7 +89,9 @@ def get_controller_params(problem_params, n_time_ranks):
     return controller_params
 
 
-def get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class):
+def get_description(
+    integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class
+):
     description = dict()
 
     problem = MultiscaleMonodomainODE
@@ -144,20 +150,42 @@ def get_space_tranfer_params():
     return space_transfer_class
 
 
-def get_problem_params(domain_name, refinements, ionic_model_name, read_init_val, init_time, enable_output, end_time, order, output_root, output_file_name, ref_sol):
+def get_problem_params(
+    domain_name,
+    refinements,
+    ionic_model_name,
+    read_init_val,
+    init_time,
+    enable_output,
+    end_time,
+    order,
+    output_root,
+    output_file_name,
+    ref_sol,
+):
     # initialize problem parameters
     problem_params = dict()
     problem_params["order"] = order  # order of the spatial discretization
     problem_params["refinements"] = refinements  # number of refinements with respect to a baseline
-    problem_params["domain_name"] = domain_name  # name of the domain: cube_1D, cube_2D, cube_3D, cuboid_1D, cuboid_2D, cuboid_3D, cuboid_1D_small, cuboid_2D_small, cuboid_3D_small
-    problem_params["ionic_model_name"] = (
-        ionic_model_name  # name of the ionic model: HH, CRN, TTP, TTP_SMOOTH for Hodgkin-Huxley, Courtemanche-Ramirez-Nattel, Ten Tusscher-Panfilov and a smoothed version of Ten Tusscher-Panfilov
-    )
-    problem_params["read_init_val"] = read_init_val  # read the initial value from file (True) or initiate an action potential with a stimulus (False)
-    problem_params["init_time"] = init_time  # stimulus happpens at t=0 and t=1000 and lasts 2ms. If init_time>2 nothing happens up to t=1000. If init_time>1002 nothing happens, never.
+    problem_params[
+        "domain_name"
+    ] = domain_name  # name of the domain: cube_1D, cube_2D, cube_3D, cuboid_1D, cuboid_2D, cuboid_3D, cuboid_1D_small, cuboid_2D_small, cuboid_3D_small
+    problem_params[
+        "ionic_model_name"
+    ] = ionic_model_name  # name of the ionic model: HH, CRN, TTP, TTP_SMOOTH for Hodgkin-Huxley, Courtemanche-Ramirez-Nattel, Ten Tusscher-Panfilov and a smoothed version of Ten Tusscher-Panfilov
+    problem_params[
+        "read_init_val"
+    ] = read_init_val  # read the initial value from file (True) or initiate an action potential with a stimulus (False)
+    problem_params[
+        "init_time"
+    ] = init_time  # stimulus happpens at t=0 and t=1000 and lasts 2ms. If init_time>2 nothing happens up to t=1000. If init_time>1002 nothing happens, never.
     problem_params["init_val_name"] = "init_val_DCT"  # name of the file containing the initial value
-    problem_params["enable_output"] = enable_output  # activate or deactivate output (that can be visualized with visualization/show_monodomain_sol.py)
-    problem_params["output_V_only"] = True  # output only the transmembrane potential (V) and not the ionic model variables
+    problem_params[
+        "enable_output"
+    ] = enable_output  # activate or deactivate output (that can be visualized with visualization/show_monodomain_sol.py)
+    problem_params[
+        "output_V_only"
+    ] = True  # output only the transmembrane potential (V) and not the ionic model variables
     executed_file_dir = os.path.dirname(os.path.realpath(__file__))
     problem_params["output_root"] = (
         executed_file_dir + "/../output_data/" + output_root
@@ -233,7 +261,15 @@ def setup_and_run(
     # get remaining prams
     base_transfer_params = get_base_transfer_params(finter)
     controller_params = get_controller_params(problem_params, n_time_ranks)
-    description = get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class)
+    description = get_description(
+        integrator,
+        problem_params,
+        sweeper_params,
+        level_params,
+        step_params,
+        base_transfer_params,
+        space_transfer_class,
+    )
     set_logger(controller_params)
     controller = get_controller(controller_params, description, time_comm, n_time_ranks, truly_time_parallel)
 
@@ -264,7 +300,9 @@ def setup_and_run(
     avg_niters = np.mean(niters)
     if time_rank == 0:
         controller.logger.info("Mean number of iterations: %4.2f" % avg_niters)
-        controller.logger.info("Std and var for number of iterations: %4.2f -- %4.2f" % (float(np.std(niters)), float(np.var(niters))))
+        controller.logger.info(
+            "Std and var for number of iterations: %4.2f -- %4.2f" % (float(np.std(niters)), float(np.var(niters)))
+        )
 
     return error_L2, rel_error_L2, avg_niters
 
