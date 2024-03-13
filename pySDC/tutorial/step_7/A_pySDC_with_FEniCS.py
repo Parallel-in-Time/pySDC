@@ -11,7 +11,6 @@ from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced 
 )
 from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass, imex_1st_order
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
-from pySDC.implementations.transfer_classes.BaseTransfer_mass import base_transfer_mass
 
 
 def setup(t0=None, ml=None):
@@ -40,24 +39,24 @@ def setup(t0=None, ml=None):
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     if ml:
         # Note that coarsening in the nodes actually HELPS MLSDC to converge (M=1 is exact on the coarse level)
-        sweeper_params['num_nodes'] = [3]
+        sweeper_params['num_nodes'] = [3, 1]
     else:
         sweeper_params['num_nodes'] = [3]
 
     problem_params = dict()
     problem_params['nu'] = 0.1
     problem_params['t0'] = t0  # ugly, but necessary to set up this ProblemClass
-    problem_params['c_nvars'] = [256]
+    problem_params['c_nvars'] = [128]
     problem_params['family'] = 'CG'
     problem_params['c'] = 1.0
     if ml:
         # We can do rather aggressive coarsening here. As long as we have 1 node on the coarse level, all is "well" (ie.
         # MLSDC does not take more iterations than SDC, but also not less). If we just coarsen in the refinement (and
         # not in the nodes and order, the mass inverse approach is way better, ie. halves the number of iterations!
-        problem_params['order'] = [2, 1]
-        problem_params['refinements'] = [1, 1]
+        problem_params['order'] = [4, 1]
+        problem_params['refinements'] = [1, 0]
     else:
-        problem_params['order'] = [1]
+        problem_params['order'] = [4]
         problem_params['refinements'] = [1]
 
     # initialize controller parameters
@@ -100,7 +99,6 @@ def run_variants(variant=None, ml=None, num_procs=None):
         description['level_params']['restol'] /= 500
         description['problem_class'] = fenics_heat_mass
         description['sweeper_class'] = imex_1st_order_mass
-        description['base_transfer_class'] = base_transfer_mass
     elif variant == 'mass_inv':
         description['problem_class'] = fenics_heat
         description['sweeper_class'] = imex_1st_order
