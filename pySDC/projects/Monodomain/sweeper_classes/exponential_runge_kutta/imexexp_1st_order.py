@@ -2,7 +2,9 @@ import numpy as np
 
 from pySDC.core.Sweeper import sweeper
 from pySDC.core.Errors import CollocationError, ParameterError
+from pySDC.core.Collocation import CollBase
 import numdifftools.fornberg as fornberg
+import scipy
 
 
 class imexexp_1st_order(sweeper):
@@ -43,6 +45,53 @@ class imexexp_1st_order(sweeper):
         c = self.coll.nodes
         self.w = fornberg.fd_weights_all(c, 0.0, M - 1)
 
+        phi_num_nodes = 5
+        self.phi_coll = CollBase(num_nodes=phi_num_nodes, tleft=0, tright=1, node_type='LEGENDRE', quad_type='GAUSS')
+
+    def phi_eval_lists(self, P, factors, indeces, phi, lmbda, update_non_exp_indeces=True):
+        # compute phi[k][i] = phi_{k}(factor_i*lmbda), factor_i in factors, k in indeces
+
+        N_fac = len(factors)
+        N_ind = len(indeces)
+
+        if phi is None:
+            phi = [[P.dtype_u(init=P.init, val=0.0) for i in range(N_fac)] for j in range(N_ind)]
+        else:
+            for n in range(N_fac):
+                for m in range(N_ind):
+                    phi[m][n].zero_sub(P.rhs_exp_indeces)
+
+        factorials = scipy.special.factorial(np.array(indeces) - 1)
+        c = self.phi_coll.nodes
+        b = self.phi_coll.weights
+        for i in P.rhs_exp_indeces:
+            for n in range(N_fac):
+                factor = factors[n]
+                exp_terms = [
+                    np.exp(((1.0 - c[j]) * factor) * lmbda.np_array(i)) for j in range(self.phi_coll.num_nodes)
+                ]
+                for m in range(N_ind):
+                    k = indeces[m]
+                    km1_fac = factorials[m]
+                    if k == 0:
+                        phi[m][n][i].copy(np.exp(factor * lmbda.np_array(i)))
+                    else:
+                        for j in range(self.phi_coll.num_nodes):
+                            # phi[m][n].np_array(i)[:] += ((b[j] * c[j] ** (k - 1)) / km1_fac) * exp_terms[j]
+                            phi[m][n].val_list[i] += ((b[j] * c[j] ** (k - 1)) / km1_fac) * exp_terms[j]
+
+        if update_non_exp_indeces:
+            for n in range(N_fac):
+                for m in range(N_ind):
+                    k = indeces[m]
+                    phi[m][n].copy_sub(P.one, P.rhs_non_exp_indeces)
+                    if k > 1:
+                        km1_fac = factorials[m]
+                        k_fac = km1_fac * k
+                        phi[m][n].imul_sub(1.0 / k_fac, P.rhs_non_exp_indeces)
+
+        return phi
+
     def compute_lambda_and_phi(self):
         if self.lambda_and_phi_outdated:
             L = self.level
@@ -56,18 +105,8 @@ class imexexp_1st_order(sweeper):
             if not hasattr(self, "phi"):
                 self.phi = [[P.dtype_u(init=P.init, val=0.0) for i in range(M)] for k in range(M + 1)]
                 self.phi_one = [[P.dtype_u(init=P.init, val=0.0) for i in range(M)]]
-            self.phi = P.phi_eval_lists(
-                L.u[0],
-                L.dt * c,
-                L.time,
-                list(range(M + 1)),
-                phi=self.phi,
-                lmbda=self.lmbda,
-                update_non_exp_indeces=False,
-            )
-            self.phi_one = P.phi_eval_lists(
-                L.u[0], L.dt * self.delta, L.time, [1], phi=self.phi_one, lmbda=self.lmbda, update_non_exp_indeces=True
-            )
+            self.phi = self.phi_eval_lists(P, L.dt * c, list(range(M + 1)), self.phi, self.lmbda, False)
+            self.phi_one = self.phi_eval_lists(P, L.dt * self.delta, [1], self.phi_one, self.lmbda, True)
 
             # compute weight for the integration of \int_0^ci exp(dt*(ci-r)lmbda)*PiQ(r)dr = \sum_{j=0}^{M-1} Qmat_exp[i,j]*Q[j]
             if not hasattr(self, "Qmat_exp"):

@@ -293,9 +293,12 @@ class MultiscaleMonodomainODE(MonodomainODE):
         if 0 not in self.rhs_nonstiff_indeces:
             self.rhs_nonstiff_indeces = [0] + self.rhs_nonstiff_indeces
 
+        self.im_non_exp_indeces = [i for i in range(self.size) if i not in self.im_exp_indeces]
+
         self.rhs_exp_args = self.im_exp_args
         self.rhs_exp_indeces = self.im_exp_indeces
-        self.im_non_exp_indeces = [i for i in range(self.size) if i not in self.im_exp_indeces]
+
+        self.rhs_non_exp_indeces = self.im_non_exp_indeces
 
         self.one = self.dtype_u(init=self.init, val=1.0)
 
@@ -401,85 +404,85 @@ class MultiscaleMonodomainODE(MonodomainODE):
 
         return phi_f_exp
 
-    def phi_eval(self, u, factor, t, k, phi=None, lmbda=None):
-        if phi is None:
-            phi = self.dtype_u(init=self.init, val=0.0)
+    # def phi_eval(self, u, factor, t, k, phi=None, lmbda=None):
+    #     if phi is None:
+    #         phi = self.dtype_u(init=self.init, val=0.0)
 
-        if lmbda is None:
-            self.eval_lmbda_exp(u, self.lmbda)
-            lmbda_loc = self.lmbda
-        else:
-            lmbda_loc = lmbda
+    #     if lmbda is None:
+    #         self.eval_lmbda_exp(u, self.lmbda)
+    #         lmbda_loc = self.lmbda
+    #     else:
+    #         lmbda_loc = lmbda
 
-        if k == 0:
-            for i in self.im_exp_indeces:  # phi_0
-                phi.np_array(i)[:] = np.exp(factor * lmbda_loc.np_array(i))
-        else:
-            c = self.coll.nodes
-            b = self.coll.weights
+    #     if k == 0:
+    #         for i in self.im_exp_indeces:  # phi_0
+    #             phi.np_array(i)[:] = np.exp(factor * lmbda_loc.np_array(i))
+    #     else:
+    #         c = self.coll.nodes
+    #         b = self.coll.weights
 
-            km1_fac = scipy.special.factorial(k - 1)
-            for i in self.im_exp_indeces:
-                phi.np_array(i)[:] = (b[0] * c[0] ** (k - 1)) * np.exp(((1.0 - c[0]) * factor) * lmbda_loc.np_array(i))
-                for j in range(1, self.num_nodes):
-                    phi.np_array(i)[:] += (b[j] * c[j] ** (k - 1)) * np.exp(
-                        ((1.0 - c[j]) * factor) * lmbda_loc.np_array(i)
-                    )
-                phi.np_array(i)[:] /= km1_fac
+    #         km1_fac = scipy.special.factorial(k - 1)
+    #         for i in self.im_exp_indeces:
+    #             phi.np_array(i)[:] = (b[0] * c[0] ** (k - 1)) * np.exp(((1.0 - c[0]) * factor) * lmbda_loc.np_array(i))
+    #             for j in range(1, self.num_nodes):
+    #                 phi.np_array(i)[:] += (b[j] * c[j] ** (k - 1)) * np.exp(
+    #                     ((1.0 - c[j]) * factor) * lmbda_loc.np_array(i)
+    #                 )
+    #             phi.np_array(i)[:] /= km1_fac
 
-        phi.copy_sub(self.one, self.im_non_exp_indeces)
-        if k > 1:
-            k_fac = km1_fac * k
-            phi.imul_sub(1.0 / k_fac, self.im_non_exp_indeces)
+    #     phi.copy_sub(self.one, self.im_non_exp_indeces)
+    #     if k > 1:
+    #         k_fac = km1_fac * k
+    #         phi.imul_sub(1.0 / k_fac, self.im_non_exp_indeces)
 
-        return phi
+    #     return phi
 
-    def phi_eval_lists(self, u, factors, t, indeces, phi=None, lmbda=None, update_non_exp_indeces=True):
-        # compute phi[k][i] = phi_{k}(factor_i*lmbda), factor_i in factors, k in indeces
+    # def phi_eval_lists(self, u, factors, t, indeces, phi=None, lmbda=None, update_non_exp_indeces=True):
+    #     # compute phi[k][i] = phi_{k}(factor_i*lmbda), factor_i in factors, k in indeces
 
-        N_fac = len(factors)
-        N_ind = len(indeces)
+    #     N_fac = len(factors)
+    #     N_ind = len(indeces)
 
-        if phi is None:
-            phi = [[self.dtype_u(init=self.init, val=0.0) for i in range(N_fac)] for j in range(N_ind)]
-        else:
-            for n in range(N_fac):
-                for m in range(N_ind):
-                    phi[m][n].zero_sub(self.im_exp_indeces)
+    #     if phi is None:
+    #         phi = [[self.dtype_u(init=self.init, val=0.0) for i in range(N_fac)] for j in range(N_ind)]
+    #     else:
+    #         for n in range(N_fac):
+    #             for m in range(N_ind):
+    #                 phi[m][n].zero_sub(self.im_exp_indeces)
 
-        if lmbda is None:
-            self.eval_lmbda_exp(u, self.lmbda)
-            lmbda_loc = self.lmbda
-        else:
-            lmbda_loc = lmbda
+    #     if lmbda is None:
+    #         self.eval_lmbda_exp(u, self.lmbda)
+    #         lmbda_loc = self.lmbda
+    #     else:
+    #         lmbda_loc = lmbda
 
-        factorials = scipy.special.factorial(np.array(indeces) - 1)
-        c = self.coll.nodes
-        b = self.coll.weights
-        for i in self.im_exp_indeces:
-            for n in range(N_fac):
-                factor = factors[n]
-                exp_terms = [np.exp(((1.0 - c[j]) * factor) * lmbda_loc.np_array(i)) for j in range(self.num_nodes)]
-                for m in range(N_ind):
-                    k = indeces[m]
-                    km1_fac = factorials[m]
-                    if k == 0:
-                        phi[m][n].np_array(i)[:] = np.exp(factor * lmbda_loc.np_array(i))
-                    else:
-                        for j in range(self.num_nodes):
-                            phi[m][n].np_array(i)[:] += ((b[j] * c[j] ** (k - 1)) / km1_fac) * exp_terms[j]
+    #     factorials = scipy.special.factorial(np.array(indeces) - 1)
+    #     c = self.coll.nodes
+    #     b = self.coll.weights
+    #     for i in self.im_exp_indeces:
+    #         for n in range(N_fac):
+    #             factor = factors[n]
+    #             exp_terms = [np.exp(((1.0 - c[j]) * factor) * lmbda_loc.np_array(i)) for j in range(self.num_nodes)]
+    #             for m in range(N_ind):
+    #                 k = indeces[m]
+    #                 km1_fac = factorials[m]
+    #                 if k == 0:
+    #                     phi[m][n].np_array(i)[:] = np.exp(factor * lmbda_loc.np_array(i))
+    #                 else:
+    #                     for j in range(self.num_nodes):
+    #                         phi[m][n].np_array(i)[:] += ((b[j] * c[j] ** (k - 1)) / km1_fac) * exp_terms[j]
 
-        if update_non_exp_indeces:
-            for n in range(N_fac):
-                for m in range(N_ind):
-                    k = indeces[m]
-                    phi[m][n].copy_sub(self.one, self.im_non_exp_indeces)
-                    if k > 1:
-                        km1_fac = factorials[m]
-                        k_fac = km1_fac * k
-                        phi[m][n].imul_sub(1.0 / k_fac, self.im_non_exp_indeces)
+    #     if update_non_exp_indeces:
+    #         for n in range(N_fac):
+    #             for m in range(N_ind):
+    #                 k = indeces[m]
+    #                 phi[m][n].copy_sub(self.one, self.im_non_exp_indeces)
+    #                 if k > 1:
+    #                     km1_fac = factorials[m]
+    #                     k_fac = km1_fac * k
+    #                     phi[m][n].imul_sub(1.0 / k_fac, self.im_non_exp_indeces)
 
-        return phi
+    #     return phi
 
     def lmbda_eval(self, u, t, lmbda=None):
         if lmbda is None:

@@ -34,6 +34,8 @@ class DCT_Vector:
             return DCT_Vector(self)
         elif isinstance(other, type(self)):  # copy the values of other into this vector
             self.values[:] = other.values[:]
+        elif isinstance(other, np.ndarray):  # copy the values of other into this vector
+            self.values[:] = other[:]
         else:
             raise DataError("Type error: cannot copy %s to %s" % (type(other), type(self)))
 
@@ -88,6 +90,9 @@ class DCT_Vector:
     def __iadd__(self, other):
         if isinstance(other, type(self)):
             self.values += other.values
+            return self
+        elif isinstance(other, np.ndarray):
+            self.values += other
             return self
         elif isinstance(other, float):
             self.values += other

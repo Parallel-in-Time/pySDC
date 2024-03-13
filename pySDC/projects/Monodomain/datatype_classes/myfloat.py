@@ -33,6 +33,8 @@ class myfloat:
             return myfloat(self)
         elif isinstance(other, type(self)):  # copy the values of other into this vector
             self.values = other.values
+        elif isinstance(other, float):  # copy the values of other into this vector
+            self.values = other
         else:
             raise DataError("Type error: cannot copy %s to %s" % (type(other), type(self)))
 
@@ -41,6 +43,12 @@ class myfloat:
 
     def __abs__(self):
         return abs(self.values)
+
+    def __getitem__(self, key):
+        return self
+
+    def __setitem__(self, key):
+        return self
 
     @property
     def n_loc_dofs(self):
@@ -56,9 +64,8 @@ class myfloat:
     def ghostUpdate(self, addv, mode):
         pass
 
-    @property
-    def numpy_array(self):
-        return Exception("numpy_array not implemented")
+    def np_array(self, i):
+        return self.values
 
     def is_nan_or_inf(self):
         return np.isnan(self.values) or np.isinf(self.values)

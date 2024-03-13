@@ -7,8 +7,10 @@ from tqdm import tqdm
 
 from pySDC.core.Errors import ParameterError
 
-from pySDC.projects.Monodomain.problem_classes.TestODE import MultiscaleTestODE
-from pySDC.projects.Monodomain.transfer_classes.Transfer_myfloat import Transfer_myfloat
+# from pySDC.projects.Monodomain.problem_classes.TestODE import MultiscaleTestODE
+# from pySDC.projects.Monodomain.transfer_classes.Transfer_myfloat import Transfer_myfloat
+from pySDC.projects.Monodomain.problem_classes.TestODEnew import MultiscaleTestODE
+from pySDC.projects.Monodomain.transfer_classes.TransferVectorOfDCTVectors import TransferVectorOfDCTVectors
 
 from pySDC.projects.Monodomain.hooks.HookClass_post_iter_info import post_iter_info_hook
 
@@ -127,30 +129,30 @@ def get_problem_params(lmbda_laplacian, lmbda_gating, lmbda_others, end_time):
     return problem_params
 
 
-# def plot_stability_domain(lmbda_laplacian_list, lmbda_gating_list, R):
-#     import matplotlib.pyplot as plt
+def plot_stability_domain(lmbda_laplacian_list, lmbda_gating_list, R):
+    import matplotlib.pyplot as plt
 
-#     plt.rc("text", usetex=True)
+    plt.rc("text", usetex=True)
 
-#     fs_label = 16
-#     fs_ticks = 16
-#     fig, ax = plt.subplots(layout='constrained')
-#     X, Y = np.meshgrid(lmbda_gating_list, lmbda_laplacian_list)
-#     R = np.abs(R)
-#     CS = ax.contourf(X, Y, R, cmap=plt.cm.bone, levels=np.array([0.0, 1.0]))
-#     ax.plot(lmbda_gating_list, 0 * lmbda_gating_list, 'k--', linewidth=1.0)
-#     ax.plot(0 * lmbda_laplacian_list, lmbda_laplacian_list, 'k--', linewidth=1.0)
-#     ax.contour(CS, levels=CS.levels, colors='black')
-#     ax.set_xlabel(r'$z_{g}$', fontsize=fs_label)
-#     ax.set_ylabel(r'$z_{\Delta}$', fontsize=fs_label)
-#     ax.tick_params(axis='x', labelsize=fs_ticks)
-#     ax.tick_params(axis='y', labelsize=fs_ticks)
-#     # ax.set_title(r'$R(z_g,z_{\Delta})$')
-#     ax.yaxis.tick_right()
-#     ax.yaxis.set_label_position("right")
-#     # cbar = fig.colorbar(CS)
-#     # cbar.ax.set_ylabel(r'$R(z_{\Delta},z_g)$')
-#     plt.show()
+    fs_label = 16
+    fs_ticks = 16
+    fig, ax = plt.subplots(layout='constrained')
+    X, Y = np.meshgrid(lmbda_gating_list, lmbda_laplacian_list)
+    R = np.abs(R)
+    CS = ax.contourf(X, Y, R, cmap=plt.cm.bone, levels=np.array([0.0, 1.0]))
+    ax.plot(lmbda_gating_list, 0 * lmbda_gating_list, 'k--', linewidth=1.0)
+    ax.plot(0 * lmbda_laplacian_list, lmbda_laplacian_list, 'k--', linewidth=1.0)
+    ax.contour(CS, levels=CS.levels, colors='black')
+    ax.set_xlabel(r'$z_{g}$', fontsize=fs_label)
+    ax.set_ylabel(r'$z_{\Delta}$', fontsize=fs_label)
+    ax.tick_params(axis='x', labelsize=fs_ticks)
+    ax.tick_params(axis='y', labelsize=fs_ticks)
+    # ax.set_title(r'$R(z_g,z_{\Delta})$')
+    ax.yaxis.tick_right()
+    ax.yaxis.set_label_position("right")
+    # cbar = fig.colorbar(CS)
+    # cbar.ax.set_ylabel(r'$R(z_{\Delta},z_g)$')
+    plt.show()
 
 
 def main(dl, openmp):
@@ -171,7 +173,8 @@ def main(dl, openmp):
     # set step size, number of sweeps per iteration, and residual tolerance for the stopping criterion
     level_params = get_level_params(dt=1.0, nsweeps=[1], restol=5e-8)
     # set space transfer parameters
-    space_transfer_class = Transfer_myfloat
+    # space_transfer_class = Transfer_myfloat
+    space_transfer_class = TransferVectorOfDCTVectors
     base_transfer_params = get_base_transfer_params()
     controller_params = get_controller_params(get_output_root(), logger_level=40)
 
@@ -248,7 +251,7 @@ def main(dl, openmp):
 
                     R[j, i] = abs(uend)
 
-    # plot_stability_domain(lmbda_laplacian_list, lmbda_gating_list, R)
+    plot_stability_domain(lmbda_laplacian_list, lmbda_gating_list, R)
 
     assert np.max(np.abs(R.ravel())) <= 1.0, "The maximum absolute value of the stability function is greater than 1.0."
 
