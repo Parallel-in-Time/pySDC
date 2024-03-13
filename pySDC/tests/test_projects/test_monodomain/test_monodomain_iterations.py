@@ -76,51 +76,51 @@ def check_iterations(num_nodes, ionic_model_name, expected_avg_niters):
 
 
 @pytest.mark.monodomain
-def test_iterations_BS_one_level():
+def test_monodomain_iterations_BS_one_level():
     check_iterations(num_nodes=[6], ionic_model_name="BS", expected_avg_niters=3.175)
 
 
 @pytest.mark.monodomain
-def test_iterations_BS_two_levels():
+def test_monodomain_iterations_BS_two_levels():
     check_iterations(num_nodes=[6, 3], ionic_model_name="BS", expected_avg_niters=2.03125)
 
 
 @pytest.mark.monodomain
-def test_iterations_HH_one_level():
+def test_monodomain_iterations_HH_one_level():
     check_iterations(num_nodes=[6], ionic_model_name="HH", expected_avg_niters=3.90625)
 
 
 @pytest.mark.monodomain
-def test_iterations_HH_two_levels():
+def test_monodomain_iterations_HH_two_levels():
     check_iterations(num_nodes=[6, 3], ionic_model_name="HH", expected_avg_niters=2.80625)
 
 
 @pytest.mark.monodomain
-def test_iterations_CRN_one_level():
+def test_monodomain_iterations_CRN_one_level():
     check_iterations(num_nodes=[6], ionic_model_name="CRN", expected_avg_niters=3.18125)
 
 
 @pytest.mark.monodomain
-def test_iterations_CRN_two_levels():
+def test_monodomain_iterations_CRN_two_levels():
     check_iterations(num_nodes=[6, 3], ionic_model_name="CRN", expected_avg_niters=2.3625)
 
 
 @pytest.mark.monodomain
-def test_iterations_TTP_one_level():
+def test_monodomain_iterations_TTP_one_level():
     check_iterations(num_nodes=[6], ionic_model_name="TTP", expected_avg_niters=3.60625)
 
 
 @pytest.mark.monodomain
-def test_iterations_TTP_two_levels():
+def test_monodomain_iterations_TTP_two_levels():
     check_iterations(num_nodes=[6, 3], ionic_model_name="TTP", expected_avg_niters=2.90625)
 
 
 # if __name__ == "__main__":
-# test_iterations_BS_one_level()
-# test_iterations_BS_two_levels()
-# test_iterations_HH_one_level()
-# test_iterations_HH_two_levels()
-# test_iterations_CRN_one_level()
-# test_iterations_CRN_two_levels()
-# test_iterations_TTP_one_level()
-# test_iterations_TTP_two_levels()
+# test_monodomain_iterations_BS_one_level()
+# test_monodomain_iterations_BS_two_levels()
+# test_monodomain_iterations_HH_one_level()
+# test_monodomain_iterations_HH_two_levels()
+# test_monodomain_iterations_CRN_one_level()
+# test_monodomain_iterations_CRN_two_levels()
+# test_monodomain_iterations_TTP_one_level()
+# test_monodomain_iterations_TTP_two_levels()

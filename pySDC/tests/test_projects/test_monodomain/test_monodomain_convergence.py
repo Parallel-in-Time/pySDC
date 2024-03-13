@@ -2,7 +2,7 @@ import pytest
 
 
 @pytest.mark.monodomain
-def test_convergence_one_level():
+def test_monodomain_convergence_one_level():
     from pySDC.projects.Monodomain.run_scripts.run_MonodomainODE import setup_and_run
 
     # define sweeper parameters
@@ -171,7 +171,7 @@ def test_convergence_one_level():
 
 
 @pytest.mark.monodomain
-def test_convergence_two_levels():
+def test_monodomain_convergence_two_levels():
     from pySDC.projects.Monodomain.run_scripts.run_MonodomainODE import setup_and_run
 
     # define sweeper parameters
@@ -340,5 +340,5 @@ def test_convergence_two_levels():
 
 
 # if __name__ == "__main__":
-# test_convergence_one_level()
-# test_convergence_two_levels()
+# test_monodomain_convergence_one_level()
+# test_monodomain_convergence_two_levels()
