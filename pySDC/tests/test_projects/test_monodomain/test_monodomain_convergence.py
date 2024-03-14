@@ -208,69 +208,69 @@ def test_monodomain_convergence_ESDC_TTP():
         compute_ref_sol=False,
     )
 
-    import os
-    import numpy as np
-    import matplotlib.pyplot as plt
+    # import os
+    # import numpy as np
+    # import matplotlib.pyplot as plt
 
-    plt.rc("text", usetex=True)
-    font = {'family': 'serif', 'serif': ['computer modern roman']}
-    plt.rc('font', **font)
+    # plt.rc("text", usetex=True)
+    # font = {'family': 'serif', 'serif': ['computer modern roman']}
+    # plt.rc('font', **font)
 
-    max_iter_3_dt = np.array(max_iter_3_dt)
-    max_iter_3_rel_err = np.array(max_iter_3_rel_err)
-    max_iter_6_dt = np.array(max_iter_6_dt)
-    max_iter_6_rel_err = np.array(max_iter_6_rel_err)
+    # max_iter_3_dt = np.array(max_iter_3_dt)
+    # max_iter_3_rel_err = np.array(max_iter_3_rel_err)
+    # max_iter_6_dt = np.array(max_iter_6_dt)
+    # max_iter_6_rel_err = np.array(max_iter_6_rel_err)
 
-    fig, ax = plt.subplots(figsize=(3, 2))
-    ax.set_xscale("log", base=10)
-    ax.set_yscale("log", base=10)
-    ax.plot(
-        max_iter_3_dt,
-        max_iter_3_rel_err,
-        label="$k=3$",
-        linewidth=2,
-        marker="o",
-        color="C0",
-        markerfacecolor="none",
-        markeredgewidth=1.2,
-        markersize=7.5,
-    )
-    ax.plot(
-        max_iter_6_dt,
-        max_iter_6_rel_err,
-        label="$k=6$",
-        linewidth=2,
-        marker="x",
-        color="C1",
-        markerfacecolor="none",
-        markeredgewidth=1.2,
-        markersize=7.5,
-    )
-    ax.plot(
-        max_iter_3_dt,
-        0.1 * np.min(max_iter_3_rel_err) * (max_iter_3_dt / max_iter_3_dt[-1]) ** 3,
-        linewidth=2,
-        linestyle="--",
-        color="k",
-        label="$\mathcal{{O}}(\Delta t^3)$",
-    )
-    ax.plot(
-        max_iter_6_dt,
-        0.1 * np.min(max_iter_6_rel_err) * (max_iter_6_dt / max_iter_6_dt[-1]) ** 6,
-        linewidth=2,
-        linestyle="-",
-        color="k",
-        label="$\mathcal{{O}}(\Delta t^6)$",
-    )
-    ax.set_xlabel("$\Delta t$", fontsize=12)
-    ax.set_ylabel("rel. err.", fontsize=12)
-    ax.set_title("Convergence for fixed iterations")
-    ax.legend(loc="lower right", facecolor='white', framealpha=0.95)
-    # plt.show()
-    executed_file_dir = os.path.dirname(os.path.realpath(__file__))
-    fig.savefig(
-        executed_file_dir + "/../../../../data/convergence_ESDC_fixed_iter.png", bbox_inches="tight", format="png"
-    )
+    # fig, ax = plt.subplots(figsize=(3, 2))
+    # ax.set_xscale("log", base=10)
+    # ax.set_yscale("log", base=10)
+    # ax.plot(
+    #     max_iter_3_dt,
+    #     max_iter_3_rel_err,
+    #     label="$k=3$",
+    #     linewidth=2,
+    #     marker="o",
+    #     color="C0",
+    #     markerfacecolor="none",
+    #     markeredgewidth=1.2,
+    #     markersize=7.5,
+    # )
+    # ax.plot(
+    #     max_iter_6_dt,
+    #     max_iter_6_rel_err,
+    #     label="$k=6$",
+    #     linewidth=2,
+    #     marker="x",
+    #     color="C1",
+    #     markerfacecolor="none",
+    #     markeredgewidth=1.2,
+    #     markersize=7.5,
+    # )
+    # ax.plot(
+    #     max_iter_3_dt,
+    #     0.1 * np.min(max_iter_3_rel_err) * (max_iter_3_dt / max_iter_3_dt[-1]) ** 3,
+    #     linewidth=2,
+    #     linestyle="--",
+    #     color="k",
+    #     label="$\mathcal{{O}}(\Delta t^3)$",
+    # )
+    # ax.plot(
+    #     max_iter_6_dt,
+    #     0.1 * np.min(max_iter_6_rel_err) * (max_iter_6_dt / max_iter_6_dt[-1]) ** 6,
+    #     linewidth=2,
+    #     linestyle="-",
+    #     color="k",
+    #     label="$\mathcal{{O}}(\Delta t^6)$",
+    # )
+    # ax.set_xlabel("$\Delta t$", fontsize=12)
+    # ax.set_ylabel("rel. err.", fontsize=12)
+    # ax.set_title("Convergence for fixed iterations")
+    # ax.legend(loc="lower right", facecolor='white', framealpha=0.95)
+    # # plt.show()
+    # executed_file_dir = os.path.dirname(os.path.realpath(__file__))
+    # fig.savefig(
+    #     executed_file_dir + "/../../../../data/convergence_ESDC_fixed_iter.png", bbox_inches="tight", format="png"
+    # )
 
 
 if __name__ == "__main__":

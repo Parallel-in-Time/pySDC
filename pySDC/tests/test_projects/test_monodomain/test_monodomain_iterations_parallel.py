@@ -267,34 +267,34 @@ def test_monodomain_iterations_parallel():
         expected_avg_niters=2.708,
     )
 
-    iters_info_list = [ESDC_iters_info, MLESDC_iters_info, PFASST_iters_info]
-    labels_list = ["ESDC", "MLESDC", "PFASST"]
-    plot_iter_info(
-        iters_info_list,
-        labels_list,
-        key1='times',
-        key2='niters',
-        logy=False,
-        xlabel="$t$",
-        ylabel="\# iter",
-        ymin=None,
-        ymax=None,
-        title="Number of iterations",
-        output_file_name="niter_VS_time",
-    )
-    plot_iter_info(
-        iters_info_list,
-        labels_list,
-        key1='times',
-        key2='residuals',
-        logy=True,
-        xlabel="$t$",
-        ylabel="residual",
-        ymin=None,
-        ymax=None,
-        title="Residual over time",
-        output_file_name="res_VS_time",
-    )
+    # iters_info_list = [ESDC_iters_info, MLESDC_iters_info, PFASST_iters_info]
+    # labels_list = ["ESDC", "MLESDC", "PFASST"]
+    # plot_iter_info(
+    #     iters_info_list,
+    #     labels_list,
+    #     key1='times',
+    #     key2='niters',
+    #     logy=False,
+    #     xlabel="$t$",
+    #     ylabel="\# iter",
+    #     ymin=None,
+    #     ymax=None,
+    #     title="Number of iterations",
+    #     output_file_name="niter_VS_time",
+    # )
+    # plot_iter_info(
+    #     iters_info_list,
+    #     labels_list,
+    #     key1='times',
+    #     key2='residuals',
+    #     logy=True,
+    #     xlabel="$t$",
+    #     ylabel="residual",
+    #     ymin=None,
+    #     ymax=None,
+    #     title="Residual over time",
+    #     output_file_name="res_VS_time",
+    # )
 
 
 if __name__ == "__main__":
