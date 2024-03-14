@@ -34,6 +34,19 @@ class imexexp_1st_order(sweeper):
         self.QI = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.QI)
         self.delta = np.diagonal(self.QI)[1:]
 
+    def eval_phi_f_exp(self, u, factor):
+        L = self.level
+        P = L.prob
+        self.lmbda = P.dtype_u(init=P.init, val=0.0)
+        self.yinf = P.dtype_u(init=P.init, val=0.0)
+        P.eval_lmbda_yinf_exp(u, self.lmbda, self.yinf)
+        phi_f_exp = P.dtype_u(init=P.init, val=0.0)
+        for i in P.rhs_exp_indeces:
+            phi_f_exp.np_array(i)[:] = u.np_array(i)[:] - self.yinf.np_array(i)[:]
+            phi_f_exp.np_array(i)[:] *= (np.exp(factor * self.lmbda.np_array(i)) - 1.0) / factor
+
+        return phi_f_exp
+
     def integrate(self):
         """
         Integrates the right-hand side (here impl + expl + exp)
@@ -86,13 +99,13 @@ class imexexp_1st_order(sweeper):
             integral[m] -= (
                 L.dt
                 * self.delta[m]
-                * (L.f[m].expl + L.f[m + 1].impl + P.eval_phi_f_exp(L.u[m], L.dt * self.delta[m], L.time))
+                * (L.f[m].expl + L.f[m + 1].impl + self.eval_phi_f_exp(L.u[m], L.dt * self.delta[m]))
             )
         for m in range(M):
             rhs = (
                 L.u[m]
                 + integral[m]
-                + L.dt * self.delta[m] * (L.f[m].expl + P.eval_phi_f_exp(L.u[m], L.dt * self.delta[m], L.time))
+                + L.dt * self.delta[m] * (L.f[m].expl + self.eval_phi_f_exp(L.u[m], L.dt * self.delta[m]))
             )
 
             # implicit solve with prefactor stemming from QI

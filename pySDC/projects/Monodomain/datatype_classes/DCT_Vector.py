@@ -116,7 +116,7 @@ class DCT_Vector:
             raise DataError("Type error: cannot isub %s to %s" % (type(other), type(self)))
 
     def __mul__(self, other):
-        if isinstance(other, DCT_Vector) or isinstance(other, float):
+        if isinstance(other, DCT_Vector) or isinstance(other, float) or isinstance(other, np.ndarray):
             me = DCT_Vector(self)
             me *= other
             return me
@@ -124,7 +124,7 @@ class DCT_Vector:
             raise DataError("Type error: cannot rmul %s to %s" % (type(other), type(self)))
 
     def __rmul__(self, other):
-        if isinstance(other, float):
+        if isinstance(other, float) or isinstance(other, np.ndarray):
             me = DCT_Vector(self)
             me *= other
             return me
@@ -132,7 +132,7 @@ class DCT_Vector:
             raise DataError("Type error: cannot rmul %s to %s" % (type(other), type(self)))
 
     def __imul__(self, other):
-        if isinstance(other, float):
+        if isinstance(other, float) or isinstance(other, np.ndarray):
             self.values *= other
             return self
         elif isinstance(other, DCT_Vector):
