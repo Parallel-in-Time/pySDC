@@ -8,7 +8,7 @@ class RequestsList:
         self.size = len(req_list)
 
     def Test(self):
-        return all([req.Test() for req in self.req_list])
+        return all(req.Test() for req in self.req_list)
 
     def Wait(self):
         for req in self.req_list:
