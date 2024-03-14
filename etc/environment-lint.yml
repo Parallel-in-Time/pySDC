@@ -4,7 +4,6 @@ channels:
   - defaults
 dependencies:
   - black
-  - importlib-metadata=4.8.3
   - flake8
   - flakeheaven
   - flake8-comprehensions

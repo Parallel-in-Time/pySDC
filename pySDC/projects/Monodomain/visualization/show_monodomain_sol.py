@@ -24,7 +24,7 @@ print(f"t_end = {t[-1]}, n_dt = {n_dt}")
 
 V = []
 with open(file_path.with_suffix(".npy"), "rb") as file:
-    for i in range(n_dt):
+    for _ in range(n_dt):
         V.append(np.load(file, allow_pickle=True))
 
 Vmin = np.min(V[0].flatten())
@@ -42,7 +42,7 @@ dim = len(V[0].shape)
 with open(str(file_path) + "_txyz.npy", "rb") as file:
     t = np.load(file, allow_pickle=True)
     xyz = []
-    for i in range(dim):
+    for _ in range(dim):
         xyz.append(np.load(file, allow_pickle=True))
 
 if dim == 1:
