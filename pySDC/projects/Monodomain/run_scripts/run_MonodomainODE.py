@@ -188,7 +188,7 @@ def get_problem_params(
     )
     executed_file_dir = os.path.dirname(os.path.realpath(__file__))
     problem_params["output_root"] = (
-        executed_file_dir + "/../output_data/" + output_root
+        executed_file_dir + "/../../../../data/" + output_root
     )  # output root folder. A hierarchy of folders is created in this folder, as root/domain_name/ref_+str(refinements)/ionic_model_name. Initial values are put here
     problem_params["output_file_name"] = output_file_name
     problem_params["ref_sol"] = ref_sol  # reference solution file name
@@ -293,11 +293,15 @@ def setup_and_run(
     # get some stats
     iter_counts = get_sorted(stats, type="niter", sortby="time")
     niters = [item[1] for item in iter_counts]
+    times = [item[0] for item in iter_counts]
     # gather stats
     if time_comm is not None:
         niters = time_comm.gather(niters, root=0)
+        times = time_comm.gather(times, root=0)
         niters = np.array(niters).flatten()  # only rank 0 is doing something meaningful
+        times = np.array(times).flatten()
         niters = time_comm.bcast(niters, root=0)
+        times = time_comm.bcast(times, root=0)
     avg_niters = np.mean(niters)
     if time_rank == 0:
         controller.logger.info("Mean number of iterations: %4.2f" % avg_niters)
@@ -305,7 +309,8 @@ def setup_and_run(
             "Std and var for number of iterations: %4.2f -- %4.2f" % (float(np.std(niters)), float(np.var(niters)))
         )
 
-    return error_L2, rel_error_L2, avg_niters
+    iter_counts = [times, niters]
+    return error_L2, rel_error_L2, avg_niters, iter_counts
 
 
 def main():
@@ -344,7 +349,7 @@ def main():
     truly_time_parallel = False
     n_time_ranks = 1
 
-    err, rel_err, avg_niters = setup_and_run(
+    err, rel_err, avg_niters, iter_counts = setup_and_run(
         integrator,
         num_nodes,
         skip_residual_computation,

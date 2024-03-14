@@ -88,7 +88,7 @@ def main():
 
     args = parser.parse_args()
 
-    err, rel_err, avg_niters = setup_and_run(
+    err, rel_err, avg_niters, iter_counts = setup_and_run(
         args.integrator,
         args.num_nodes,
         args.skip_res,
