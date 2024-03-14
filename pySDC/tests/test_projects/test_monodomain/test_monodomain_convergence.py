@@ -212,9 +212,9 @@ def test_monodomain_convergence_ESDC_TTP():
     import numpy as np
     import matplotlib.pyplot as plt
 
-    plt.rc("text", usetex=True)
-    font = {'family': 'serif', 'serif': ['computer modern roman']}
-    plt.rc('font', **font)
+    # plt.rc("text", usetex=True)
+    # font = {'family': 'serif', 'serif': ['computer modern roman']}
+    # plt.rc('font', **font)
 
     max_iter_3_dt = np.array(max_iter_3_dt)
     max_iter_3_rel_err = np.array(max_iter_3_rel_err)
@@ -227,7 +227,7 @@ def test_monodomain_convergence_ESDC_TTP():
     ax.plot(
         max_iter_3_dt,
         max_iter_3_rel_err,
-        label="$k=3$",
+        label="k=3",
         linewidth=2,
         marker="o",
         color="C0",
@@ -238,7 +238,7 @@ def test_monodomain_convergence_ESDC_TTP():
     ax.plot(
         max_iter_6_dt,
         max_iter_6_rel_err,
-        label="$k=6$",
+        label="k=6",
         linewidth=2,
         marker="x",
         color="C1",
@@ -252,7 +252,8 @@ def test_monodomain_convergence_ESDC_TTP():
         linewidth=2,
         linestyle="--",
         color="k",
-        label="$\mathcal{{O}}(\Delta t^3)$",
+        label="O 3",
+        # label="$\mathcal{{O}}(\Delta t^3)$",
     )
     ax.plot(
         max_iter_6_dt,
@@ -260,12 +261,13 @@ def test_monodomain_convergence_ESDC_TTP():
         linewidth=2,
         linestyle="-",
         color="k",
-        label="$\mathcal{{O}}(\Delta t^6)$",
+        label="O 6",
+        # label="$\mathcal{{O}}(\Delta t^6)$",
     )
-    ax.set_xlabel("$\Delta t$", fontsize=12)
-    ax.set_ylabel("rel. err.", fontsize=12)
-    ax.set_title("Convergence for fixed iterations")
-    ax.legend(loc="lower right", facecolor='white', framealpha=0.95)
+    # ax.set_xlabel("$\Delta t$", fontsize=12)
+    # ax.set_ylabel("rel. err.", fontsize=12)
+    # ax.set_title("Convergence for fixed iterations")
+    # ax.legend(loc="lower right", facecolor='white', framealpha=0.95)
     # # plt.show()
     # executed_file_dir = os.path.dirname(os.path.realpath(__file__))
     # fig.savefig(
