@@ -185,7 +185,7 @@ def test_monodomain_convergence_ESDC_TTP():
         num_nodes=[6],
         max_iter=6,
         dt_max=0.2,
-        n_dt=5,
+        n_dt=2,  # 5
         n_time_ranks=1,
         end_time_conv=0.2,
         expected_convergence_rate=6.0,
@@ -199,7 +199,7 @@ def test_monodomain_convergence_ESDC_TTP():
         num_nodes=[6],
         max_iter=3,
         dt_max=0.2,
-        n_dt=5,
+        n_dt=2,
         n_time_ranks=1,
         end_time_conv=0.2,
         expected_convergence_rate=3.0,
@@ -208,45 +208,49 @@ def test_monodomain_convergence_ESDC_TTP():
         compute_ref_sol=False,
     )
 
-    import os
+    # import os
     import numpy as np
-    import matplotlib.pyplot as plt
 
-    # plt.rc("text", usetex=True)
-    # font = {'family': 'serif', 'serif': ['computer modern roman']}
-    # plt.rc('font', **font)
+    # import matplotlib.pyplot as plt
+    import pySDC.helpers.plot_helper as plt_helper
 
     max_iter_3_dt = np.array(max_iter_3_dt)
     max_iter_3_rel_err = np.array(max_iter_3_rel_err)
     max_iter_6_dt = np.array(max_iter_6_dt)
     max_iter_6_rel_err = np.array(max_iter_6_rel_err)
 
-    fig, ax = plt.subplots(figsize=(3, 2))
-    ax.set_xscale("log", base=10)
-    ax.set_yscale("log", base=10)
-    ax.plot(
+    plt_helper.setup_mpl()
+    plt_helper.newfig(textwidth=238.96, scale=0.89)
+
+    lw = 1.5
+    colors = ["C0", "C1", "C2", "C3", "C4"]
+    markers = ["o", "x", "s", "D", "^"]
+
+    plt_helper.plt.loglog(
         max_iter_3_dt,
         max_iter_3_rel_err,
         label="k=3",
-        linewidth=2,
-        marker="o",
-        color="C0",
+        lw=lw,
+        linestyle="-",
+        color=colors[0],
+        marker=markers[0],
         markerfacecolor="none",
         markeredgewidth=1.2,
         markersize=7.5,
     )
-    ax.plot(
+    plt_helper.plt.loglog(
         max_iter_6_dt,
         max_iter_6_rel_err,
         label="k=6",
-        linewidth=2,
-        marker="x",
-        color="C1",
+        lw=lw,
+        linestyle="-",
+        color=colors[1],
+        marker=markers[1],
         markerfacecolor="none",
         markeredgewidth=1.2,
         markersize=7.5,
     )
-    ax.plot(
+    plt_helper.plt.loglog(
         max_iter_3_dt,
         0.1 * np.min(max_iter_3_rel_err) * (max_iter_3_dt / max_iter_3_dt[-1]) ** 3,
         linewidth=2,
@@ -255,7 +259,7 @@ def test_monodomain_convergence_ESDC_TTP():
         label="O 3",
         # label="$\mathcal{{O}}(\Delta t^3)$",
     )
-    ax.plot(
+    plt_helper.plt.loglog(
         max_iter_6_dt,
         0.1 * np.min(max_iter_6_rel_err) * (max_iter_6_dt / max_iter_6_dt[-1]) ** 6,
         linewidth=2,
@@ -264,6 +268,56 @@ def test_monodomain_convergence_ESDC_TTP():
         label="O 6",
         # label="$\mathcal{{O}}(\Delta t^6)$",
     )
+    # plt_helper.plt.ylim([0, 60])
+    plt_helper.plt.legend(loc=2, ncol=1)
+    plt_helper.plt.ylabel('rel. err.')
+    plt_helper.plt.xlabel(r"$\Delta t$")
+    plt_helper.plt.grid()
+    plt_helper.savefig("data/convergence_ESDC_fixed_iter")
+
+    # fig, ax = plt.subplots(figsize=(3, 2))
+    # ax.set_xscale("log", base=10)
+    # ax.set_yscale("log", base=10)
+    # ax.plot(
+    #     max_iter_3_dt,
+    #     max_iter_3_rel_err,
+    #     label="k=3",
+    #     linewidth=2,
+    #     marker="o",
+    #     color="C0",
+    #     markerfacecolor="none",
+    #     markeredgewidth=1.2,
+    #     markersize=7.5,
+    # )
+    # ax.plot(
+    #     max_iter_6_dt,
+    #     max_iter_6_rel_err,
+    #     label="k=6",
+    #     linewidth=2,
+    #     marker="x",
+    #     color="C1",
+    #     markerfacecolor="none",
+    #     markeredgewidth=1.2,
+    #     markersize=7.5,
+    # )
+    # ax.plot(
+    #     max_iter_3_dt,
+    #     0.1 * np.min(max_iter_3_rel_err) * (max_iter_3_dt / max_iter_3_dt[-1]) ** 3,
+    #     linewidth=2,
+    #     linestyle="--",
+    #     color="k",
+    #     label="O 3",
+    #     # label="$\mathcal{{O}}(\Delta t^3)$",
+    # )
+    # ax.plot(
+    #     max_iter_6_dt,
+    #     0.1 * np.min(max_iter_6_rel_err) * (max_iter_6_dt / max_iter_6_dt[-1]) ** 6,
+    #     linewidth=2,
+    #     linestyle="-",
+    #     color="k",
+    #     label="O 6",
+    #     # label="$\mathcal{{O}}(\Delta t^6)$",
+    # )
     # ax.set_xlabel("$\Delta t$", fontsize=12)
     # ax.set_ylabel("rel. err.", fontsize=12)
     # ax.set_title("Convergence for fixed iterations")
@@ -273,7 +327,7 @@ def test_monodomain_convergence_ESDC_TTP():
     # fig.savefig(
     #     executed_file_dir + "/../../../../data/convergence_ESDC_fixed_iter.png", bbox_inches="tight", format="png"
     # )
-    fig.savefig("data/convergence_ESDC_fixed_iter.png", bbox_inches="tight", format="png")
+    # fig.savefig("data/convergence_ESDC_fixed_iter.png", bbox_inches="tight", format="png")
 
 
 if __name__ == "__main__":
