@@ -64,7 +64,9 @@ class controller_MPI(controller):
                     raise ControllerError("For PFASST to work, we assume uend^k = u_M^k")
 
         if num_levels == 1 and self.params.predict_type is not None:
-            self.logger.warning('you have specified a predictor type but only a single level.. predictor will be ignored')
+            self.logger.warning(
+                'you have specified a predictor type but only a single level.. predictor will be ignored'
+            )
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.setup_status_variables(self, comm=comm)
@@ -262,7 +264,9 @@ class controller_MPI(controller):
                     self.S.status.iter,
                 )
             )
-            self.req_send[level] = self.S.levels[level].uend.isend(dest=self.S.next, tag=level * 100 + self.S.status.iter, comm=comm)
+            self.req_send[level] = self.S.levels[level].uend.isend(
+                dest=self.S.next, tag=level * 100 + self.S.status.iter, comm=comm
+            )
             if blocking:
                 self.wait_with_interrupt(request=self.req_send[level])
                 if self.S.status.force_done:
@@ -346,11 +350,17 @@ class controller_MPI(controller):
             self.wait_with_interrupt(request=req)
             if self.S.status.force_done:
                 return None
-            self.logger.debug('recv diff: status %s, process %s, time %s, source %s, tag %s, iter %s' % (prev_diff, self.S.status.slot, self.S.time, self.S.prev, 999, self.S.status.iter))
+            self.logger.debug(
+                'recv diff: status %s, process %s, time %s, source %s, tag %s, iter %s'
+                % (prev_diff, self.S.status.slot, self.S.time, self.S.prev, 999, self.S.status.iter)
+            )
             diff_new = max(prev_diff[0], diff_new)
 
         if not self.S.status.last:
-            self.logger.debug('isend diff: status %s, process %s, time %s, target %s, tag %s, iter %s' % (diff_new, self.S.status.slot, self.S.time, self.S.next, 999, self.S.status.iter))
+            self.logger.debug(
+                'isend diff: status %s, process %s, time %s, target %s, tag %s, iter %s'
+                % (diff_new, self.S.status.slot, self.S.time, self.S.next, 999, self.S.status.iter)
+            )
             tmp = np.array(diff_new, dtype=float)
             self.req_diff = comm.Issend((tmp, MPI.DOUBLE), dest=self.S.next, tag=999)
 
@@ -367,7 +377,11 @@ class controller_MPI(controller):
             self.S.status.diff_old_loc = diff_new
             alpha = 1 / (1 - Ltilde_loc) * self.S.status.diff_first_loc
             Kest_loc = np.log(self.S.params.errtol / alpha) / np.log(Ltilde_loc) * 1.05  # Safety factor!
-            self.logger.debug(f'LOCAL: {L.time:8.4f}, {self.S.status.iter}: {int(np.ceil(Kest_loc))}, ' f'{Ltilde_loc:8.6e}, {Kest_loc:8.6e}, ' f'{Ltilde_loc ** self.S.status.iter * alpha:8.6e}')
+            self.logger.debug(
+                f'LOCAL: {L.time:8.4f}, {self.S.status.iter}: {int(np.ceil(Kest_loc))}, '
+                f'{Ltilde_loc:8.6e}, {Kest_loc:8.6e}, '
+                f'{Ltilde_loc ** self.S.status.iter * alpha:8.6e}'
+            )
             Kest_glob = Kest_loc
             # If condition is met, send interrupt
             if np.ceil(Kest_glob) <= self.S.status.iter:
@@ -536,7 +550,9 @@ class controller_MPI(controller):
                 self.S.levels[-1].sweep.update_nodes()
                 self.S.levels[-1].sweep.compute_end_point()
 
-                self.send_full(comm=comm, blocking=True, level=len(self.S.levels) - 1, add_to_stats=(p == self.S.status.slot))
+                self.send_full(
+                    comm=comm, blocking=True, level=len(self.S.levels) - 1, add_to_stats=(p == self.S.status.slot)
+                )
                 if self.S.status.force_done:
                     return None
 
@@ -726,7 +742,10 @@ class controller_MPI(controller):
         # do the sweep
         for hook in self.hooks:
             hook.pre_sweep(step=self.S, level_number=len(self.S.levels) - 1)
-        assert self.S.levels[-1].params.nsweeps == 1, 'ERROR: this controller can only work with one sweep on the coarse level, got %s' % self.S.levels[-1].params.nsweeps
+        assert self.S.levels[-1].params.nsweeps == 1, (
+            'ERROR: this controller can only work with one sweep on the coarse level, got %s'
+            % self.S.levels[-1].params.nsweeps
+        )
         self.S.levels[-1].sweep.update_nodes()
         self.S.levels[-1].sweep.compute_residual(stage='IT_COARSE')
         for hook in self.hooks:
