@@ -271,6 +271,7 @@ def test_monodomain_convergence_ESDC_TTP():
     # fig.savefig(
     #     executed_file_dir + "/../../../../data/convergence_ESDC_fixed_iter.png", bbox_inches="tight", format="png"
     # )
+    fig.savefig("data/convergence_ESDC_fixed_iter.png", bbox_inches="tight", format="png")
 
 
 if __name__ == "__main__":
