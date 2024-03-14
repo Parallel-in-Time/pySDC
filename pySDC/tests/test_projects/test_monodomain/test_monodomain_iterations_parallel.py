@@ -4,41 +4,70 @@ import subprocess
 
 
 def plot_iter_info(iters_info_list, labels_list, key1, key2, logy, xlabel, ylabel, ymin, ymax, title, output_file_name):
-    import os
-    import matplotlib.pyplot as plt
-
-    plt.rc("text", usetex=True)
-    font = {'family': 'serif', 'serif': ['computer modern roman']}
-    plt.rc('font', **font)
 
     markers = ["o", "x", "s", "D", "v", "^", "<", ">", "p", "h", "H", "*", "+", "X", "d", "|", "_"]
     colors = ["C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"]
 
-    fig, ax = plt.subplots(figsize=(5, 2))
+    import pySDC.helpers.plot_helper as plt_helper
+
+    plt_helper.setup_mpl()
+    plt_helper.newfig(textwidth=238.96, scale=0.89)
+
+    lw = 1.5
+    colors = ["C0", "C1", "C2", "C3", "C4"]
+    markers = ["o", "x", "s", "D", "^"]
+
     if logy:
-        ax.set_yscale("log", base=10)
+        plt_helper.plt.yscale("log", base=10)
+
     for i, (iters_info, label) in enumerate(zip(iters_info_list, labels_list)):
-        ax.plot(
+        plt_helper.plt.plot(
             iters_info[key1],
             iters_info[key2],
             label=label,
-            linewidth=2,
-            marker=markers[i],
+            lw=lw,
             color=colors[i],
+            marker=markers[i],
             markerfacecolor="none",
             markeredgewidth=1.2,
             markersize=7.5,
         )
 
     if ymin is not None and ymax is not None:
-        ax.set_ylim([ymin, ymax])
-    ax.set_xlabel(xlabel, fontsize=12)
-    ax.set_ylabel(ylabel, fontsize=12)
-    ax.set_title(title)
-    ax.legend(loc="lower right", facecolor='white', framealpha=0.95)
-    # plt.show()
-    executed_file_dir = os.path.dirname(os.path.realpath(__file__))
-    fig.savefig(executed_file_dir + "/../../../../data/" + output_file_name + ".png", bbox_inches="tight", format="png")
+        plt_helper.plt.set_ylim([ymin, ymax])
+
+    plt_helper.plt.legend(loc="lower right", ncol=1)
+    plt_helper.plt.ylabel(ylabel)
+    plt_helper.plt.xlabel(xlabel)
+    plt_helper.plt.title(title)
+    plt_helper.plt.grid()
+    plt_helper.savefig("data/" + output_file_name)
+
+    # fig, ax = plt.subplots(figsize=(5, 2))
+    # if logy:
+    #     ax.set_yscale("log", base=10)
+    # for i, (iters_info, label) in enumerate(zip(iters_info_list, labels_list)):
+    #     ax.plot(
+    #         iters_info[key1],
+    #         iters_info[key2],
+    #         label=label,
+    #         linewidth=2,
+    #         marker=markers[i],
+    #         color=colors[i],
+    #         markerfacecolor="none",
+    #         markeredgewidth=1.2,
+    #         markersize=7.5,
+    #     )
+
+    # if ymin is not None and ymax is not None:
+    #     ax.set_ylim([ymin, ymax])
+    # ax.set_xlabel(xlabel, fontsize=12)
+    # ax.set_ylabel(ylabel, fontsize=12)
+    # ax.set_title(title)
+    # ax.legend(loc="lower right", facecolor='white', framealpha=0.95)
+    # # plt.show()
+    # executed_file_dir = os.path.dirname(os.path.realpath(__file__))
+    # fig.savefig(executed_file_dir + "/../../../../data/" + output_file_name + ".png", bbox_inches="tight", format="png")
 
 
 def options_command(options):
@@ -235,66 +264,66 @@ def check_iterations_parallel(
     return iters_info
 
 
-# @pytest.mark.monodomain
-# def test_monodomain_iterations_parallel():
+@pytest.mark.monodomain
+def test_monodomain_iterations_parallel():
 
-#     generate_initial_value(ionic_model_name="TTP")
+    generate_initial_value(ionic_model_name="TTP")
 
-#     ESDC_iters_info = check_iterations_parallel(
-#         integrator="IMEXEXP_EXPRK",
-#         num_nodes=[8],
-#         ionic_model_name="TTP",
-#         truly_time_parallel=True,
-#         n_time_ranks=1,
-#         expected_avg_niters=3.375,
-#     )
+    ESDC_iters_info = check_iterations_parallel(
+        integrator="IMEXEXP_EXPRK",
+        num_nodes=[8],
+        ionic_model_name="TTP",
+        truly_time_parallel=True,
+        n_time_ranks=1,
+        expected_avg_niters=3.375,
+    )
 
-#     MLESDC_iters_info = check_iterations_parallel(
-#         integrator="IMEXEXP_EXPRK",
-#         num_nodes=[8, 4],
-#         ionic_model_name="TTP",
-#         truly_time_parallel=True,
-#         n_time_ranks=1,
-#         expected_avg_niters=2.125,
-#     )
+    MLESDC_iters_info = check_iterations_parallel(
+        integrator="IMEXEXP_EXPRK",
+        num_nodes=[8, 4],
+        ionic_model_name="TTP",
+        truly_time_parallel=True,
+        n_time_ranks=1,
+        expected_avg_niters=2.125,
+    )
 
-#     PFASST_iters_info = check_iterations_parallel(
-#         integrator="IMEXEXP_EXPRK",
-#         num_nodes=[8, 4],
-#         ionic_model_name="TTP",
-#         truly_time_parallel=True,
-#         n_time_ranks=24,
-#         expected_avg_niters=2.708,
-#     )
+    PFASST_iters_info = check_iterations_parallel(
+        integrator="IMEXEXP_EXPRK",
+        num_nodes=[8, 4],
+        ionic_model_name="TTP",
+        truly_time_parallel=True,
+        n_time_ranks=24,
+        expected_avg_niters=2.708,
+    )
 
-# iters_info_list = [ESDC_iters_info, MLESDC_iters_info, PFASST_iters_info]
-# labels_list = ["ESDC", "MLESDC", "PFASST"]
-# plot_iter_info(
-#     iters_info_list,
-#     labels_list,
-#     key1='times',
-#     key2='niters',
-#     logy=False,
-#     xlabel="$t$",
-#     ylabel="\# iter",
-#     ymin=None,
-#     ymax=None,
-#     title="Number of iterations",
-#     output_file_name="niter_VS_time",
-# )
-# plot_iter_info(
-#     iters_info_list,
-#     labels_list,
-#     key1='times',
-#     key2='residuals',
-#     logy=True,
-#     xlabel="$t$",
-#     ylabel="residual",
-#     ymin=None,
-#     ymax=None,
-#     title="Residual over time",
-#     output_file_name="res_VS_time",
-# )
+    iters_info_list = [ESDC_iters_info, MLESDC_iters_info, PFASST_iters_info]
+    labels_list = ["ESDC", "MLESDC", "PFASST"]
+    plot_iter_info(
+        iters_info_list,
+        labels_list,
+        key1='times',
+        key2='niters',
+        logy=False,
+        xlabel="$t$",
+        ylabel="\# iter",
+        ymin=None,
+        ymax=None,
+        title="Number of iterations",
+        output_file_name="niter_VS_time",
+    )
+    plot_iter_info(
+        iters_info_list,
+        labels_list,
+        key1='times',
+        key2='residuals',
+        logy=True,
+        xlabel="$t$",
+        ylabel="residual",
+        ymin=None,
+        ymax=None,
+        title="Residual over time",
+        output_file_name="res_VS_time",
+    )
 
 
 if __name__ == "__main__":
