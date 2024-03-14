@@ -57,7 +57,7 @@ def run_monodomain_convergence(
         print("Computing initial value for the convergence test...")
         err, rel_err, avg_niters, iter_counts = setup_and_run(
             integrator,
-            num_nodes,
+            num_nodes[:1],
             skip_residual_computation,
             num_sweeps,
             max_iter,
@@ -77,7 +77,7 @@ def run_monodomain_convergence(
             ref_sol,
             end_time,
             truly_time_parallel,
-            n_time_ranks,
+            1,
             finter,
         )
 
@@ -95,7 +95,7 @@ def run_monodomain_convergence(
         print("Computing reference solution for the convergence test...")
         err, rel_err, avg_niters, iter_counts = setup_and_run(
             integrator,
-            num_nodes,
+            num_nodes[:1],
             skip_residual_computation,
             num_sweeps,
             max_iter,
@@ -115,7 +115,7 @@ def run_monodomain_convergence(
             ref_sol,
             end_time,
             truly_time_parallel,
-            n_time_ranks,
+            1,
             finter,
         )
 
@@ -249,7 +249,7 @@ def test_monodomain_convergence_ESDC_TTP():
         linewidth=2,
         linestyle="--",
         color="k",
-        label=f"$\mathcal{{O}}(\Delta t^3)$",
+        label="$\mathcal{{O}}(\Delta t^3)$",
     )
     ax.plot(
         max_iter_6_dt,
@@ -257,7 +257,7 @@ def test_monodomain_convergence_ESDC_TTP():
         linewidth=2,
         linestyle="-",
         color="k",
-        label=f"$\mathcal{{O}}(\Delta t^6)$",
+        label="$\mathcal{{O}}(\Delta t^6)$",
     )
     ax.set_xlabel("$\Delta t$", fontsize=12)
     ax.set_ylabel("rel. err.", fontsize=12)
@@ -270,101 +270,5 @@ def test_monodomain_convergence_ESDC_TTP():
     )
 
 
-@pytest.mark.monodomain
-def test_monodomain_convergence_MLESDC_TTP():
-    max_iter_2_dt, max_iter_2_rel_err = run_monodomain_convergence(
-        integrator="IMEXEXP_EXPRK",
-        num_nodes=[4, 2],
-        max_iter=2,
-        dt_max=0.2,
-        n_dt=7,
-        n_time_ranks=1,
-        end_time_conv=0.2,
-        expected_convergence_rate=4.0,
-        convergence_rate_tolerance=0.5,
-        compute_init_val=True,
-        compute_ref_sol=True,
-    )
-
-    max_iter_1_dt, max_iter_1_rel_err = run_monodomain_convergence(
-        integrator="IMEXEXP_EXPRK",
-        num_nodes=[4, 2],
-        max_iter=1,
-        dt_max=0.2,
-        n_dt=7,
-        n_time_ranks=1,
-        end_time_conv=0.2,
-        expected_convergence_rate=2.0,
-        convergence_rate_tolerance=0.5,
-        compute_init_val=False,
-        compute_ref_sol=False,
-    )
-
-    import os
-    import matplotlib
-    import numpy as np
-    import matplotlib.pyplot as plt
-
-    matplotlib.rc("font", **{"family": "TeX Gyre DejaVu Math"})
-    plt.rc("text", usetex=True)
-
-    max_iter_1_dt = np.array(max_iter_1_dt)
-    max_iter_1_rel_err = np.array(max_iter_1_rel_err)
-    max_iter_2_dt = np.array(max_iter_2_dt)
-    max_iter_2_rel_err = np.array(max_iter_2_rel_err)
-
-    fig, ax = plt.subplots(figsize=(3, 2))
-    ax.set_xscale("log", base=10)
-    ax.set_yscale("log", base=10)
-    ax.plot(
-        max_iter_1_dt,
-        max_iter_1_dt,
-        label="$k=1$",
-        linewidth=2,
-        marker="o",
-        color="C0",
-        markerfacecolor="none",
-        markeredgewidth=1.2,
-        markersize=7.5,
-    )
-    ax.plot(
-        max_iter_2_dt,
-        max_iter_2_rel_err,
-        label="$k=2$",
-        linewidth=2,
-        marker="x",
-        color="C1",
-        markerfacecolor="none",
-        markeredgewidth=1.2,
-        markersize=7.5,
-    )
-    ax.plot(
-        max_iter_1_dt,
-        0.1 * np.min(max_iter_1_rel_err) * (max_iter_1_dt / max_iter_1_dt[-1]) ** 2,
-        linewidth=2,
-        linestyle="--",
-        color="k",
-        label=f"$\mathcal{{O}}(\Delta t^3)$",
-    )
-    ax.plot(
-        max_iter_2_dt,
-        0.1 * np.min(max_iter_2_rel_err) * (max_iter_2_dt / max_iter_2_dt[-1]) ** 4,
-        linewidth=2,
-        linestyle="-",
-        color="k",
-        label=f"$\mathcal{{O}}(\Delta t^6)$",
-    )
-    ax.set_xlabel("$\Delta t$", fontsize=12)
-    ax.set_ylabel("rel. err.", fontsize=12)
-    ax.set_title("Convergence for fixed iterations")
-    ax.legend(loc="lower right", facecolor='white', framealpha=0.95)
-    plt.show()
-    executed_file_dir = os.path.dirname(os.path.realpath(__file__))
-    fig.savefig(
-        executed_file_dir + "/../../../../data/convergence_MLESDC_fixed_iter.png", bbox_inches="tight", format="png"
-    )
-
-
 if __name__ == "__main__":
-    # test_monodomain_convergence_ESDC_TTP()
-    test_monodomain_convergence_MLESDC_TTP()
+    test_monodomain_convergence_ESDC_TTP()

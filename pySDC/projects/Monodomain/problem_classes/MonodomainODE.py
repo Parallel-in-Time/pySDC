@@ -5,7 +5,6 @@ from pySDC.core.Problem import ptype
 from pySDC.projects.Monodomain.datatype_classes.VectorOfVectors import VectorOfVectors, IMEXEXP_VectorOfVectors
 from pySDC.projects.Monodomain.problem_classes.space_discretizazions.Parabolic_DCT import Parabolic_DCT
 import pySDC.projects.Monodomain.problem_classes.ionicmodels.cpp as ionicmodels
-from pySDC.core.Collocation import CollBase
 
 
 class MonodomainODE(ptype):
