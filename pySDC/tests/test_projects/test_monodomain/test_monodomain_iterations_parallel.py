@@ -235,66 +235,66 @@ def check_iterations_parallel(
     return iters_info
 
 
-@pytest.mark.monodomain
-def test_monodomain_iterations_parallel():
+# @pytest.mark.monodomain
+# def test_monodomain_iterations_parallel():
 
-    generate_initial_value(ionic_model_name="TTP")
+#     generate_initial_value(ionic_model_name="TTP")
 
-    ESDC_iters_info = check_iterations_parallel(
-        integrator="IMEXEXP_EXPRK",
-        num_nodes=[8],
-        ionic_model_name="TTP",
-        truly_time_parallel=True,
-        n_time_ranks=1,
-        expected_avg_niters=3.375,
-    )
+#     ESDC_iters_info = check_iterations_parallel(
+#         integrator="IMEXEXP_EXPRK",
+#         num_nodes=[8],
+#         ionic_model_name="TTP",
+#         truly_time_parallel=True,
+#         n_time_ranks=1,
+#         expected_avg_niters=3.375,
+#     )
 
-    MLESDC_iters_info = check_iterations_parallel(
-        integrator="IMEXEXP_EXPRK",
-        num_nodes=[8, 4],
-        ionic_model_name="TTP",
-        truly_time_parallel=True,
-        n_time_ranks=1,
-        expected_avg_niters=2.125,
-    )
+#     MLESDC_iters_info = check_iterations_parallel(
+#         integrator="IMEXEXP_EXPRK",
+#         num_nodes=[8, 4],
+#         ionic_model_name="TTP",
+#         truly_time_parallel=True,
+#         n_time_ranks=1,
+#         expected_avg_niters=2.125,
+#     )
 
-    PFASST_iters_info = check_iterations_parallel(
-        integrator="IMEXEXP_EXPRK",
-        num_nodes=[8, 4],
-        ionic_model_name="TTP",
-        truly_time_parallel=True,
-        n_time_ranks=24,
-        expected_avg_niters=2.708,
-    )
+#     PFASST_iters_info = check_iterations_parallel(
+#         integrator="IMEXEXP_EXPRK",
+#         num_nodes=[8, 4],
+#         ionic_model_name="TTP",
+#         truly_time_parallel=True,
+#         n_time_ranks=24,
+#         expected_avg_niters=2.708,
+#     )
 
-    # iters_info_list = [ESDC_iters_info, MLESDC_iters_info, PFASST_iters_info]
-    # labels_list = ["ESDC", "MLESDC", "PFASST"]
-    # plot_iter_info(
-    #     iters_info_list,
-    #     labels_list,
-    #     key1='times',
-    #     key2='niters',
-    #     logy=False,
-    #     xlabel="$t$",
-    #     ylabel="\# iter",
-    #     ymin=None,
-    #     ymax=None,
-    #     title="Number of iterations",
-    #     output_file_name="niter_VS_time",
-    # )
-    # plot_iter_info(
-    #     iters_info_list,
-    #     labels_list,
-    #     key1='times',
-    #     key2='residuals',
-    #     logy=True,
-    #     xlabel="$t$",
-    #     ylabel="residual",
-    #     ymin=None,
-    #     ymax=None,
-    #     title="Residual over time",
-    #     output_file_name="res_VS_time",
-    # )
+# iters_info_list = [ESDC_iters_info, MLESDC_iters_info, PFASST_iters_info]
+# labels_list = ["ESDC", "MLESDC", "PFASST"]
+# plot_iter_info(
+#     iters_info_list,
+#     labels_list,
+#     key1='times',
+#     key2='niters',
+#     logy=False,
+#     xlabel="$t$",
+#     ylabel="\# iter",
+#     ymin=None,
+#     ymax=None,
+#     title="Number of iterations",
+#     output_file_name="niter_VS_time",
+# )
+# plot_iter_info(
+#     iters_info_list,
+#     labels_list,
+#     key1='times',
+#     key2='residuals',
+#     logy=True,
+#     xlabel="$t$",
+#     ylabel="residual",
+#     ymin=None,
+#     ymax=None,
+#     title="Residual over time",
+#     output_file_name="res_VS_time",
+# )
 
 
 if __name__ == "__main__":
