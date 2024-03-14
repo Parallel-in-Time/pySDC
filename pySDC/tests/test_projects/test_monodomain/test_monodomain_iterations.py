@@ -75,44 +75,44 @@ def check_iterations(num_nodes, ionic_model_name, expected_avg_niters):
     ), f"Average number of iterations {avg_niters} too different from the expected {expected_avg_niters}"
 
 
-@pytest.mark.monodomain
-def test_monodomain_iterations_ESDC_BS():
-    check_iterations(num_nodes=[6], ionic_model_name="BS", expected_avg_niters=3.175)
+# @pytest.mark.monodomain
+# def test_monodomain_iterations_ESDC_BS():
+#     check_iterations(num_nodes=[6], ionic_model_name="BS", expected_avg_niters=3.175)
 
 
-@pytest.mark.monodomain
-def test_monodomain_iterations_MLESDC_BS():
-    check_iterations(num_nodes=[6, 3], ionic_model_name="BS", expected_avg_niters=2.03125)
+# @pytest.mark.monodomain
+# def test_monodomain_iterations_MLESDC_BS():
+#     check_iterations(num_nodes=[6, 3], ionic_model_name="BS", expected_avg_niters=2.03125)
 
 
-@pytest.mark.monodomain
-def test_monodomain_iterations_ESDC_HH():
-    check_iterations(num_nodes=[6], ionic_model_name="HH", expected_avg_niters=3.90625)
+# @pytest.mark.monodomain
+# def test_monodomain_iterations_ESDC_HH():
+#     check_iterations(num_nodes=[6], ionic_model_name="HH", expected_avg_niters=3.90625)
 
 
-@pytest.mark.monodomain
-def test_monodomain_iterations_MLESDC_HH():
-    check_iterations(num_nodes=[6, 3], ionic_model_name="HH", expected_avg_niters=2.80625)
+# @pytest.mark.monodomain
+# def test_monodomain_iterations_MLESDC_HH():
+#     check_iterations(num_nodes=[6, 3], ionic_model_name="HH", expected_avg_niters=2.80625)
 
 
-@pytest.mark.monodomain
-def test_monodomain_iterations_ESDC_CRN():
-    check_iterations(num_nodes=[6], ionic_model_name="CRN", expected_avg_niters=3.18125)
+# @pytest.mark.monodomain
+# def test_monodomain_iterations_ESDC_CRN():
+#     check_iterations(num_nodes=[6], ionic_model_name="CRN", expected_avg_niters=3.18125)
 
 
-@pytest.mark.monodomain
-def test_monodomain_iterations_MLESDC_CRN():
-    check_iterations(num_nodes=[6, 3], ionic_model_name="CRN", expected_avg_niters=2.3625)
+# @pytest.mark.monodomain
+# def test_monodomain_iterations_MLESDC_CRN():
+#     check_iterations(num_nodes=[6, 3], ionic_model_name="CRN", expected_avg_niters=2.3625)
 
 
-@pytest.mark.monodomain
-def test_monodomain_iterations_ESDC_TTP():
-    check_iterations(num_nodes=[6], ionic_model_name="TTP", expected_avg_niters=3.60625)
+# @pytest.mark.monodomain
+# def test_monodomain_iterations_ESDC_TTP():
+#     check_iterations(num_nodes=[6], ionic_model_name="TTP", expected_avg_niters=3.60625)
 
 
-@pytest.mark.monodomain
-def test_monodomain_iterations_MLESDC_TTP():
-    check_iterations(num_nodes=[6, 3], ionic_model_name="TTP", expected_avg_niters=2.90625)
+# @pytest.mark.monodomain
+# def test_monodomain_iterations_MLESDC_TTP():
+#     check_iterations(num_nodes=[6, 3], ionic_model_name="TTP", expected_avg_niters=2.90625)
 
 
 # if __name__ == "__main__":

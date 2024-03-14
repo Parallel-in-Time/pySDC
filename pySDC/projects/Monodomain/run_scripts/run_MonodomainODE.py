@@ -22,6 +22,8 @@ from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.imexexp_1st_order imp
 
 from pySDC.projects.Monodomain.transfer_classes.TransferVectorOfDCTVectors import TransferVectorOfDCTVectors
 
+from pySDC.projects.Monodomain.utils.data_management import database
+
 
 def set_logger(controller_params):
     logging.basicConfig(level=controller_params["logger_level"])
@@ -222,6 +224,7 @@ def setup_and_run(
     truly_time_parallel,
     n_time_ranks,
     finter,
+    write_database,
 ):
 
     # get time communicator
@@ -292,16 +295,29 @@ def setup_and_run(
 
     # get some stats
     iter_counts = get_sorted(stats, type="niter", sortby="time")
-    niters = [item[1] for item in iter_counts]
-    times = [item[0] for item in iter_counts]
-    # gather stats
+    residuals = get_sorted(stats, type="residual_post_iteration", sortby="time")
     if time_comm is not None:
-        niters = time_comm.gather(niters, root=0)
-        times = time_comm.gather(times, root=0)
-        niters = np.array(niters).flatten()  # only rank 0 is doing something meaningful
-        times = np.array(times).flatten()
-        niters = time_comm.bcast(niters, root=0)
-        times = time_comm.bcast(times, root=0)
+        iter_counts = time_comm.gather(iter_counts, root=0)
+        residuals = time_comm.gather(residuals, root=0)
+        if time_rank == 0:
+            iter_counts = [item for sublist in iter_counts for item in sublist]
+            residuals = [item for sublist in residuals for item in sublist]
+        iter_counts = time_comm.bcast(iter_counts, root=0)
+        residuals = time_comm.bcast(residuals, root=0)
+
+    iter_counts.sort()
+    times = [item[0] for item in iter_counts]
+    niters = [item[1] for item in iter_counts]
+
+    residuals.sort()
+    residuals_new = [residuals[0][1]]
+    t = residuals[0][0]
+    for i in range(1, len(residuals)):
+        if residuals[i][0] > t + dt / 2.0:
+            residuals_new.append(residuals[i][1])
+            t = residuals[i][0]
+    residuals = residuals_new
+
     avg_niters = np.mean(niters)
     if time_rank == 0:
         controller.logger.info("Mean number of iterations: %4.2f" % avg_niters)
@@ -309,22 +325,37 @@ def setup_and_run(
             "Std and var for number of iterations: %4.2f -- %4.2f" % (float(np.std(niters)), float(np.var(niters)))
         )
 
-    iter_counts = [times, niters]
-    return error_L2, rel_error_L2, avg_niters, iter_counts
+    if write_database and time_rank == 0:
+        errors = dict()
+        errors["error_L2"] = error_L2
+        errors["rel_error_L2"] = rel_error_L2
+        iters_info = dict()
+        iters_info["avg_niters"] = avg_niters
+        iters_info["times"] = times
+        iters_info["niters"] = niters
+        iters_info["residuals"] = residuals
+        file_name = P.output_folder / Path(P.output_file_name)
+        if file_name.with_suffix('.db').is_file():
+            os.remove(file_name.with_suffix('.db'))
+        data_man = database(file_name)
+        data_man.write_dictionary("errors", errors)
+        data_man.write_dictionary("iters_info", iters_info)
+
+    return error_L2, rel_error_L2, avg_niters, times, niters, residuals
 
 
 def main():
     # define sweeper parameters
     # integrator = "IMEXEXP"
     integrator = "IMEXEXP_EXPRK"
-    num_nodes = [6, 3]
+    num_nodes = [4]
     num_sweeps = [1]
 
     # set step parameters
     max_iter = 100
 
     # set level parameters
-    dt = 0.01
+    dt = 0.05
     restol = 5e-8
 
     # set problem parameters
@@ -337,7 +368,8 @@ def main():
     enable_output = False
     write_as_reference_solution = False
     write_all_variables = False
-    end_time = 0.02
+    write_database = False
+    end_time = 0.1
     output_root = "results_tmp"
     output_file_name = "ref_sol" if write_as_reference_solution else "monodomain"
     ref_sol = "ref_sol"
@@ -349,7 +381,7 @@ def main():
     truly_time_parallel = False
     n_time_ranks = 1
 
-    err, rel_err, avg_niters, iter_counts = setup_and_run(
+    error_L2, rel_error_L2, avg_niters, times, niters, residuals = setup_and_run(
         integrator,
         num_nodes,
         skip_residual_computation,
@@ -373,6 +405,7 @@ def main():
         truly_time_parallel,
         n_time_ranks,
         finter,
+        write_database,
     )
 
 

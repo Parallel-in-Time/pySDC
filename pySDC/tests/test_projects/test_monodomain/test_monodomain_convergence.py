@@ -35,6 +35,7 @@ def run_monodomain_convergence(
     order = 2  # 2 or 4
     ionic_model_name = "TTP_SMOOTH"  # a smoothed ionic model, the original TTP model has (very small) discontinuities due if-else statements in its implementation
     enable_output = False
+    write_database = False
 
     output_root = "results_convergence"
 
@@ -55,7 +56,7 @@ def run_monodomain_convergence(
         output_file_name = "init_val_DCT"
         ref_sol = ""
         print("Computing initial value for the convergence test...")
-        err, rel_err, avg_niters, iter_counts = setup_and_run(
+        err, rel_err, avg_niters, times, niters, residuals = setup_and_run(
             integrator,
             num_nodes[:1],
             skip_residual_computation,
@@ -79,6 +80,7 @@ def run_monodomain_convergence(
             truly_time_parallel,
             1,
             finter,
+            write_database,
         )
 
     if compute_ref_sol:
@@ -93,7 +95,7 @@ def run_monodomain_convergence(
         output_file_name = "ref_sol"
         ref_sol = ""
         print("Computing reference solution for the convergence test...")
-        err, rel_err, avg_niters, iter_counts = setup_and_run(
+        err, rel_err, avg_niters, times, niters, residuals = setup_and_run(
             integrator,
             num_nodes[:1],
             skip_residual_computation,
@@ -117,6 +119,7 @@ def run_monodomain_convergence(
             truly_time_parallel,
             1,
             finter,
+            write_database,
         )
 
     # Third, run the convergence test
@@ -133,7 +136,7 @@ def run_monodomain_convergence(
     for i, dt in enumerate(dt_list):
         print(f"Iteration {i} of {n_dt}...")
         output_file_name = "monodomain_dt_" + str(dt).replace(".", "p")
-        err, rel_err[i], avg_niters, iter_counts = setup_and_run(
+        err, rel_err[i], avg_niters, times, niters, residuals = setup_and_run(
             integrator,
             num_nodes,
             skip_residual_computation,
@@ -157,6 +160,7 @@ def run_monodomain_convergence(
             truly_time_parallel,
             n_time_ranks,
             finter,
+            write_database,
         )
 
     import numpy as np
@@ -169,8 +173,7 @@ def run_monodomain_convergence(
     print(f"Relative errors: {rel_err}")
     print(f"Rates: {rates}")
 
-    # assert np.all(rates > expected_convergence_rate - convergence_rate_tolerance), "ERROR: convergence rate is too low!"
-    # assert np.all(rates < expected_convergence_rate + convergence_rate_tolerance), "ERROR: convergence rate is too high!"
+    assert np.all(rates > expected_convergence_rate - convergence_rate_tolerance), "ERROR: convergence rate is too low!"
 
     return dt_list, rel_err
 
@@ -206,12 +209,12 @@ def test_monodomain_convergence_ESDC_TTP():
     )
 
     import os
-    import matplotlib
     import numpy as np
     import matplotlib.pyplot as plt
 
-    matplotlib.rc("font", **{"family": "TeX Gyre DejaVu Math"})
     plt.rc("text", usetex=True)
+    font = {'family': 'serif', 'serif': ['computer modern roman']}
+    plt.rc('font', **font)
 
     max_iter_3_dt = np.array(max_iter_3_dt)
     max_iter_3_rel_err = np.array(max_iter_3_rel_err)
@@ -263,7 +266,7 @@ def test_monodomain_convergence_ESDC_TTP():
     ax.set_ylabel("rel. err.", fontsize=12)
     ax.set_title("Convergence for fixed iterations")
     ax.legend(loc="lower right", facecolor='white', framealpha=0.95)
-    plt.show()
+    # plt.show()
     executed_file_dir = os.path.dirname(os.path.realpath(__file__))
     fig.savefig(
         executed_file_dir + "/../../../../data/convergence_ESDC_fixed_iter.png", bbox_inches="tight", format="png"

@@ -86,9 +86,16 @@ def main():
     )
     parser.add_argument("--n_time_ranks", default=1, type=int, help="number of time ranks")
 
+    parser.add_argument(
+        "--write_database",
+        default=True,
+        action=argparse.BooleanOptionalAction,
+        help="save some simulation results in a database",
+    )
+
     args = parser.parse_args()
 
-    err, rel_err, avg_niters, iter_counts = setup_and_run(
+    error_L2, rel_error_L2, avg_niters, times, niters, residuals = setup_and_run(
         args.integrator,
         args.num_nodes,
         args.skip_res,
@@ -112,6 +119,7 @@ def main():
         args.truly_time_parallel,
         args.n_time_ranks,
         args.finter,
+        args.write_database,
     )
 
 
