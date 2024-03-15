@@ -41,33 +41,7 @@ def plot_iter_info(iters_info_list, labels_list, key1, key2, logy, xlabel, ylabe
     plt_helper.plt.xlabel(xlabel)
     plt_helper.plt.title(title)
     plt_helper.plt.grid()
-    plt_helper.savefig("data/" + output_file_name)
-
-    # fig, ax = plt.subplots(figsize=(5, 2))
-    # if logy:
-    #     ax.set_yscale("log", base=10)
-    # for i, (iters_info, label) in enumerate(zip(iters_info_list, labels_list)):
-    #     ax.plot(
-    #         iters_info[key1],
-    #         iters_info[key2],
-    #         label=label,
-    #         linewidth=2,
-    #         marker=markers[i],
-    #         color=colors[i],
-    #         markerfacecolor="none",
-    #         markeredgewidth=1.2,
-    #         markersize=7.5,
-    #     )
-
-    # if ymin is not None and ymax is not None:
-    #     ax.set_ylim([ymin, ymax])
-    # ax.set_xlabel(xlabel, fontsize=12)
-    # ax.set_ylabel(ylabel, fontsize=12)
-    # ax.set_title(title)
-    # ax.legend(loc="lower right", facecolor='white', framealpha=0.95)
-    # # plt.show()
-    # executed_file_dir = os.path.dirname(os.path.realpath(__file__))
-    # fig.savefig(executed_file_dir + "/../../../../data/" + output_file_name + ".png", bbox_inches="tight", format="png")
+    plt_helper.savefig("data/" + output_file_name, save_pdf=False, save_pgf=False, save_png=True)
 
 
 def options_command(options):
@@ -265,7 +239,7 @@ def check_iterations_parallel(
 
 
 @pytest.mark.monodomain
-def test_monodomain_iterations_parallel():
+def test_monodomain_iterations_ESDC_MLESDC_PFASST():
 
     generate_initial_value(ionic_model_name="TTP")
 
@@ -305,7 +279,7 @@ def test_monodomain_iterations_parallel():
         key2='niters',
         logy=False,
         xlabel="$t$",
-        ylabel="\# iter",
+        ylabel=r"\# iter",
         ymin=None,
         ymax=None,
         title="Number of iterations",
@@ -327,4 +301,4 @@ def test_monodomain_iterations_parallel():
 
 
 if __name__ == "__main__":
-    test_monodomain_iterations_parallel()
+    test_monodomain_iterations_ESDC_MLESDC_PFASST()

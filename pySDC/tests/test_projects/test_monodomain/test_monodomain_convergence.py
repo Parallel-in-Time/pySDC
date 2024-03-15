@@ -268,7 +268,7 @@ def test_monodomain_convergence_ESDC_TTP():
     plt_helper.plt.ylabel('rel. err.')
     plt_helper.plt.xlabel(r"$\Delta t$")
     plt_helper.plt.grid()
-    plt_helper.savefig("data/convergence_ESDC_fixed_iter")
+    plt_helper.savefig("data/convergence_ESDC_fixed_iter", save_pdf=False, save_pgf=False, save_png=True)
 
 
 if __name__ == "__main__":

@@ -127,6 +127,10 @@ class MultiscaleTestODE(TestODE):
 
     #     return phi_f_exp
 
+    def eval_lmbda_yinf_exp(self, u, lmbda, yinf):
+        lmbda.val_list[0].values[0] = self.lmbda_gating
+        yinf.val_list[0].values[0] = 0.0
+
     def lmbda_eval(self, u, t, lmbda=None):
         if lmbda is None:
             lmbda = self.dtype_u(init=self.init, val=0.0)

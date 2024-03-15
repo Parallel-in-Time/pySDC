@@ -127,36 +127,56 @@ def get_problem_params(lmbda_laplacian, lmbda_gating, lmbda_others, end_time):
     return problem_params
 
 
-def plot_stability_domain(lmbda_laplacian_list, lmbda_gating_list, R):
+def plot_stability_domain(lmbda_laplacian_list, lmbda_gating_list, R, integrator, num_nodes, n_time_ranks):
     import matplotlib.pyplot as plt
+    from matplotlib.colors import LogNorm
+    import pySDC.helpers.plot_helper as plt_helper
 
-    plt.rc("text", usetex=True)
+    plt_helper.setup_mpl()
 
-    fs_label = 16
-    fs_ticks = 16
-    fig, ax = plt.subplots(layout='constrained')
+    # fig, ax = plt_helper.newfig(textwidth=400, scale=0.89, ratio=0.5)
+    # fig, ax = plt_helper.newfig(textwidth=238.96, scale=0.89)
+    fig, ax = plt_helper.plt.subplots(
+        figsize=plt_helper.figsize(textwidth=400, scale=1.0, ratio=0.78), layout='constrained'
+    )
+
+    fs_label = 14
+    fs_ticks = 12
+    fs_title = 16
     X, Y = np.meshgrid(lmbda_gating_list, lmbda_laplacian_list)
     R = np.abs(R)
-    CS = ax.contourf(X, Y, R, cmap=plt.cm.bone, levels=np.array([0.0, 1.0]))
+    CS = ax.contourf(X, Y, R, cmap=plt.cm.viridis, levels=np.logspace(-6, 0, 13), norm=LogNorm())
     ax.plot(lmbda_gating_list, 0 * lmbda_gating_list, 'k--', linewidth=1.0)
     ax.plot(0 * lmbda_laplacian_list, lmbda_laplacian_list, 'k--', linewidth=1.0)
     ax.contour(CS, levels=CS.levels, colors='black')
-    ax.set_xlabel(r'$z_{g}$', fontsize=fs_label)
-    ax.set_ylabel(r'$z_{\Delta}$', fontsize=fs_label)
+    ax.set_xlabel(r'$z_{e}$', fontsize=fs_label, labelpad=-5)
+    ax.set_ylabel(r'$z_{I}$', fontsize=fs_label, labelpad=-10)
     ax.tick_params(axis='x', labelsize=fs_ticks)
     ax.tick_params(axis='y', labelsize=fs_ticks)
-    # ax.set_title(r'$R(z_g,z_{\Delta})$')
+    if len(num_nodes) == 1 and n_time_ranks == 1:
+        prefix = ""
+    elif len(num_nodes) > 1 and n_time_ranks == 1:
+        prefix = "ML"
+    elif len(num_nodes) > 1 and n_time_ranks > 1:
+        prefix = "PFASST "
+    if integrator == "IMEXEXP":
+        ax.set_title(prefix + "SDC stability domain", fontsize=fs_title)
+    elif integrator == "IMEXEXP_EXPRK":
+        ax.set_title(prefix + "ESDC stability domain", fontsize=fs_title)
     ax.yaxis.tick_right()
     ax.yaxis.set_label_position("right")
-    # cbar = fig.colorbar(CS)
-    # cbar.ax.set_ylabel(r'$R(z_{\Delta},z_g)$')
-    plt.show()
+    cbar = fig.colorbar(CS)
+    cbar.ax.set_ylabel(r'$|R(z_e,z_{I})|$', fontsize=fs_label, labelpad=-20)
+    cbar.set_ticks([cbar.vmin, cbar.vmax])  # keep only the ticks at the ends
+    cbar.ax.tick_params(labelsize=fs_ticks)
+    # plt_helper.plt.show()
+    plt_helper.savefig("data/stability_domain_" + integrator, save_pdf=False, save_pgf=False, save_png=True)
 
 
-def main(dl, openmp, n_time_ranks, end_time, num_nodes):
+def main(integrator, dl, l_min, openmp, n_time_ranks, end_time, num_nodes, check_stability):
 
     # integrator = "IMEXEXP"
-    integrator = "IMEXEXP_EXPRK"
+    # integrator = "IMEXEXP_EXPRK"
 
     # get time integration parameters
     # set maximum number of iterations in SDC/ESDC/MLSDC/etc
@@ -173,9 +193,9 @@ def main(dl, openmp, n_time_ranks, end_time, num_nodes):
 
     # set stability test parameters
     lmbda_others = -1.0
-    lmbda_laplacian_min = -1000.0
+    lmbda_laplacian_min = l_min
     lmbda_laplacian_max = 0.0
-    lmbda_gating_min = -1000.0
+    lmbda_gating_min = l_min
     lmbda_gating_max = 0.0
     n_lmbda_laplacian = np.round((lmbda_laplacian_max - lmbda_laplacian_min) / dl).astype(int) + 1
     n_lmbda_gating = np.round((lmbda_gating_max - lmbda_gating_min) / dl).astype(int) + 1
@@ -244,10 +264,32 @@ def main(dl, openmp, n_time_ranks, end_time, num_nodes):
 
                     R[j, i] = abs(uend)
 
-    # plot_stability_domain(lmbda_laplacian_list, lmbda_gating_list, R)
+    plot_stability_domain(lmbda_laplacian_list, lmbda_gating_list, R, integrator, num_nodes, n_time_ranks)
 
-    assert np.max(np.abs(R.ravel())) <= 1.0, "The maximum absolute value of the stability function is greater than 1.0."
+    if check_stability:
+        assert (
+            np.max(np.abs(R.ravel())) <= 1.0
+        ), "The maximum absolute value of the stability function is greater than 1.0."
 
 
 if __name__ == "__main__":
-    main(dl=100, openmp=True, n_time_ranks=4, end_time=4.0, num_nodes=[5, 3])
+    main(
+        integrator="IMEXEXP_EXPRK",
+        dl=2,
+        l_min=-100,
+        openmp=True,
+        n_time_ranks=1,
+        end_time=1.0,
+        num_nodes=[5, 3],
+        check_stability=True,
+    )
+    main(
+        integrator="IMEXEXP",
+        dl=2,
+        l_min=-100,
+        openmp=True,
+        n_time_ranks=1,
+        end_time=1.0,
+        num_nodes=[5, 3],
+        check_stability=False,
+    )
