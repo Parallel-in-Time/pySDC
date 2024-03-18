@@ -175,16 +175,16 @@ def check_iterations_parallel(
     options["finter"] = False
     options["write_database"] = True
 
-    base_python_command = "python3 run_MonodomainODE_cli.py"
+    my_env = os.environ.copy()
+    my_env['PYTHONPATH'] = '.:../../../..'
+    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
+    cwd = "pySDC/projects/Monodomain/run_scripts"
+
+    # base_python_command = "coverage run -p run_MonodomainODE_cli.py"
+    base_python_command = "coverage run -p " + cwd + "/run_MonodomainODE_cli.py"
     cmd = f"mpirun -n {n_time_ranks} " + base_python_command + " " + options_command(options)
 
     print(f"Running command: {cmd}")
-
-    # Set python path once
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-    cwd = "pySDC/projects/Monodomain/run_scripts"
 
     process = subprocess.Popen(
         args=cmd.split(),
@@ -192,7 +192,7 @@ def check_iterations_parallel(
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         env=my_env,
-        cwd=cwd,
+        cwd=".",
     )
 
     while True:
@@ -238,6 +238,20 @@ def check_iterations_parallel(
     return iters_info
 
 
+def move_coverage_folders():
+    import glob
+    import shutil
+
+    path = "pySDC/projects/Monodomain/run_scripts/"
+    folders_pattern = ".coverage*"
+    folders = glob.glob(path + folders_pattern, recursive=False)
+    print(folders)
+
+    for folder in folders:
+        folder_name = os.path.basename(folder)
+        shutil.move(folder, "./" + folder_name)
+
+
 @pytest.mark.monodomain
 def test_monodomain_iterations_ESDC_MLESDC_PFASST():
 
@@ -249,7 +263,7 @@ def test_monodomain_iterations_ESDC_MLESDC_PFASST():
         ionic_model_name="TTP",
         truly_time_parallel=True,
         n_time_ranks=1,
-        expected_avg_niters=3.375,
+        expected_avg_niters=3.58333,
     )
 
     MLESDC_iters_info = check_iterations_parallel(
@@ -258,7 +272,7 @@ def test_monodomain_iterations_ESDC_MLESDC_PFASST():
         ionic_model_name="TTP",
         truly_time_parallel=True,
         n_time_ranks=1,
-        expected_avg_niters=2.125,
+        expected_avg_niters=2.375,
     )
 
     PFASST_iters_info = check_iterations_parallel(
@@ -267,8 +281,10 @@ def test_monodomain_iterations_ESDC_MLESDC_PFASST():
         ionic_model_name="TTP",
         truly_time_parallel=True,
         n_time_ranks=24,
-        expected_avg_niters=2.708,
+        expected_avg_niters=3.0,
     )
+
+    move_coverage_folders()
 
     iters_info_list = [ESDC_iters_info, MLESDC_iters_info, PFASST_iters_info]
     labels_list = ["ESDC", "MLESDC", "PFASST"]

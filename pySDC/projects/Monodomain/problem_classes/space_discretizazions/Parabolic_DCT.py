@@ -14,7 +14,6 @@ class Parabolic_DCT(RegisterParams):
         self.define_coefficients()
         self.define_diffusion()
         self.define_stimulus()
-        self.define_eval_points()
 
     def __del__(self):
         if self.enable_output:
@@ -213,12 +212,6 @@ class Parabolic_DCT(RegisterParams):
         else:
             return False
 
-    def define_eval_points(self):
-        pass
-
-    def eval_on_points(self, u):
-        return None
-
     def stim_region(self, stim_center, stim_radius):
         grids = self.grids
         coord_inside_stim_box = []
@@ -238,13 +231,3 @@ class Parabolic_DCT(RegisterParams):
         rel_error_L2 = error_L2 / sol_norm_L2
 
         return error_L2, rel_error_L2
-
-    def get_dofs_stats(self):
-        tmp = self.vector_type(self.init)
-        data = (
-            tmp.n_loc_dofs + tmp.n_ghost_dofs,
-            tmp.n_loc_dofs,
-            tmp.n_ghost_dofs,
-            tmp.n_ghost_dofs / (tmp.n_loc_dofs + tmp.n_loc_dofs),
-        )
-        return (data,), data

@@ -1,7 +1,7 @@
 import pytest
 
 
-def check_iterations(num_nodes, ionic_model_name, expected_avg_niters):
+def check_iterations(domain_name, num_nodes, refinements, ionic_model_name, n_time_ranks, expected_avg_niters):
     from pySDC.projects.Monodomain.run_scripts.run_MonodomainODE import setup_and_run
 
     # define sweeper parameters
@@ -20,15 +20,12 @@ def check_iterations(num_nodes, ionic_model_name, expected_avg_niters):
     skip_residual_computation = True
 
     # interpolate or recompute rhs on fine level
-    finter = False
+    finter = True
 
     # set time parallelism to True or emulated (False)
     truly_time_parallel = False
-    n_time_ranks = 1
 
     # set monodomain parameters
-    domain_name = "cuboid_2D_small"
-    refinements = [-1]
     order = 4  # 2 or 4
     enable_output = False
     write_database = False
@@ -37,7 +34,7 @@ def check_iterations(num_nodes, ionic_model_name, expected_avg_niters):
 
     read_init_val = False
     init_time = 0.0
-    end_time = 4.0
+    end_time = 2.0
     write_as_reference_solution = False
     write_all_variables = False
     output_file_name = "monodomain"
@@ -78,11 +75,19 @@ def check_iterations(num_nodes, ionic_model_name, expected_avg_niters):
 
 
 # Many of the following are commented since they test features already tested in other tests
+# If you reactivate them the number of expected iterations should be updated
 
 
 @pytest.mark.monodomain
 def test_monodomain_iterations_ESDC_BS():
-    check_iterations(num_nodes=[6], ionic_model_name="BS", expected_avg_niters=3.175)
+    check_iterations(
+        domain_name="cuboid_2D_small",
+        num_nodes=[6, 3],
+        refinements=[0, -1],
+        ionic_model_name="BS",
+        n_time_ranks=4,
+        expected_avg_niters=3.3209876543209877,
+    )
 
 
 # @pytest.mark.monodomain
@@ -92,7 +97,14 @@ def test_monodomain_iterations_ESDC_BS():
 
 @pytest.mark.monodomain
 def test_monodomain_iterations_ESDC_HH():
-    check_iterations(num_nodes=[6], ionic_model_name="HH", expected_avg_niters=3.90625)
+    check_iterations(
+        domain_name="cuboid_2D_small",
+        num_nodes=[6, 3],
+        refinements=[0, -1],
+        ionic_model_name="HH",
+        n_time_ranks=2,
+        expected_avg_niters=3.074074074074074,
+    )
 
 
 # @pytest.mark.monodomain
@@ -102,7 +114,14 @@ def test_monodomain_iterations_ESDC_HH():
 
 @pytest.mark.monodomain
 def test_monodomain_iterations_ESDC_CRN():
-    check_iterations(num_nodes=[6], ionic_model_name="CRN", expected_avg_niters=3.18125)
+    check_iterations(
+        domain_name="cube_1D",
+        num_nodes=[6],
+        refinements=[0],
+        ionic_model_name="CRN",
+        n_time_ranks=1,
+        expected_avg_niters=3.382716,
+    )
 
 
 # @pytest.mark.monodomain
@@ -118,3 +137,9 @@ def test_monodomain_iterations_ESDC_CRN():
 # @pytest.mark.monodomain
 # def test_monodomain_iterations_MLESDC_TTP():
 #     check_iterations(num_nodes=[6, 3], ionic_model_name="TTP", expected_avg_niters=2.90625)
+
+
+# if __name__ == "__main__":
+# test_monodomain_iterations_ESDC_BS()
+# test_monodomain_iterations_ESDC_HH()
+# test_monodomain_iterations_ESDC_CRN()

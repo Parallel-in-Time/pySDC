@@ -95,14 +95,6 @@ class MonodomainODE(ptype):
         else:
             return False, 0.0, 0.0
 
-    def getSize(self):
-        # return number of dofs in the mesh
-        return self.parabolic.getSize()
-
-    def eval_on_points(self, u):
-        # evaluate the solution on a set of points (points are already defined in self.parabolic)
-        return self.parabolic.eval_on_points(u)
-
     def define_ionic_model(self):
         self.scale_Iion = 0.01  # used to convert currents in uA/cm^2 to uA/mm^2
         # scale_im is applied to the rhs of the ionic model, so that the rhs is in units of mV/ms
@@ -186,21 +178,6 @@ class MonodomainODE(ptype):
             for i in non_indeces:
                 fh[i].zero()
 
-    def apply_mass_matrix(self, x, y=None):
-        # computes y = M x on parabolic part and not on ionic model part
-        if y is None:
-            y = x.copy()
-        else:
-            y.copy(x)
-
-        if self.mass_rhs == "one":
-            self.parabolic.apply_mass_matrix(x.val_list[0], y.val_list[0])
-        elif self.mass_rhs == "all":
-            for i in range(self.size):
-                self.parabolic.apply_mass_matrix(x.val_list[i], y.val_list[i])
-
-        return y
-
 
 class MultiscaleMonodomainODE(MonodomainODE):
     def __init__(self, **problem_params):
@@ -215,9 +192,6 @@ class MultiscaleMonodomainODE(MonodomainODE):
         self.parabolic.define_solver()
 
         self.constant_lambda_and_phi = False
-
-    def rho_nonstiff(self, y, t, fy=None):
-        return self.rho_nonstiff_cte
 
     def define_splittings(self):
         """

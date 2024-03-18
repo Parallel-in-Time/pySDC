@@ -34,8 +34,6 @@ class DCT_Vector:
             return DCT_Vector(self)
         elif isinstance(other, type(self)):  # copy the values of other into this vector
             self.values[:] = other.values[:]
-        elif isinstance(other, np.ndarray):  # copy the values of other into this vector
-            self.values[:] = other[:]
         else:
             raise DataError("Type error: cannot copy %s to %s" % (type(other), type(self)))
 
@@ -44,14 +42,6 @@ class DCT_Vector:
 
     def __abs__(self):
         return np.linalg.norm(self.values) / np.sqrt(self.values.size)
-
-    @property
-    def n_loc_dofs(self):
-        return self.values.size
-
-    @property
-    def n_ghost_dofs(self):
-        return 0
 
     def getSize(self):
         return self.values.size
@@ -62,9 +52,6 @@ class DCT_Vector:
     @property
     def numpy_array(self):
         return self.values
-
-    def isnan(self):
-        return np.isnan(self.values).any()
 
     def is_nan_or_inf(self):
         return np.isnan(self.values).any() or np.isinf(self.values).any()
@@ -79,20 +66,9 @@ class DCT_Vector:
         comm.Bcast(self.values[:], root=root)
         return self
 
-    def __add__(self, other):
-        if isinstance(other, type(self)):
-            me = DCT_Vector(self)
-            me += other
-            return me
-        else:
-            raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
-
     def __iadd__(self, other):
         if isinstance(other, type(self)):
             self.values += other.values
-            return self
-        elif isinstance(other, np.ndarray):
-            self.values += other
             return self
         elif isinstance(other, float):
             self.values += other
@@ -100,36 +76,12 @@ class DCT_Vector:
         else:
             raise DataError("Type error: cannot iadd %s to %s" % (type(other), type(self)))
 
-    def __sub__(self, other):
-        if isinstance(other, type(self)):
-            me = DCT_Vector(self)
-            me -= other
-            return me
-        else:
-            raise DataError("Type error: cannot sub %s from %s" % (type(other), type(self)))
-
     def __isub__(self, other):
         if isinstance(other, type(self)):
             self.values -= other.values
             return self
         else:
             raise DataError("Type error: cannot isub %s to %s" % (type(other), type(self)))
-
-    def __mul__(self, other):
-        if isinstance(other, DCT_Vector) or isinstance(other, float) or isinstance(other, np.ndarray):
-            me = DCT_Vector(self)
-            me *= other
-            return me
-        else:
-            raise DataError("Type error: cannot rmul %s to %s" % (type(other), type(self)))
-
-    def __rmul__(self, other):
-        if isinstance(other, float) or isinstance(other, np.ndarray):
-            me = DCT_Vector(self)
-            me *= other
-            return me
-        else:
-            raise DataError("Type error: cannot rmul %s to %s" % (type(other), type(self)))
 
     def __imul__(self, other):
         if isinstance(other, float) or isinstance(other, np.ndarray):
@@ -159,16 +111,5 @@ class DCT_Vector:
         if isinstance(x, type(self)):
             self.values *= a
             self.values += x.values
-        else:
-            raise DataError("Type error: cannot add %s to %s" % (type(x), type(self)))
-
-    def axpby(self, a, b, x):
-        """
-        Performs self.values = a*x.values+b*self.values
-        """
-
-        if isinstance(x, type(self)):
-            self.values *= b
-            self.values += a * x.values
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(x), type(self)))
