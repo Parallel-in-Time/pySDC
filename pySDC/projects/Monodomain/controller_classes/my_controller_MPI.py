@@ -8,8 +8,8 @@ class my_controller_MPI(controller_MPI):
     def recv(self, target, source, tag=None, comm=None):
         """
         Wrapper around recv which updates the lmbda and yinf status
-        Indeed, whenever u[0] is updated, lmbda and yinf become outdated
-        since they are evaluated on u[0]
+        Indeed, lmbda and yinf are evaluated at u[0], so if we
+        receive a new u[0] we need to update lmbda and yinf too.
         """
         super().recv(target, source, tag=tag, comm=comm)
         target.sweep.update_lmbda_yinf_status(outdated=True)
