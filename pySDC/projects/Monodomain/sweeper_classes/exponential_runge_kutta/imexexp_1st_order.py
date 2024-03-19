@@ -223,33 +223,33 @@ class imexexp_1st_order(sweeper):
                 self.tmp, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m], L.u[m + 1]
             )
 
-            if L.u[m + 1].is_nan_or_inf():
-                L.u[m + 1] = L.u[m].copy()
+            # if L.u[m + 1].is_nan_or_inf():
+            #     L.u[m + 1] = L.u[m].copy()
 
             # update function values
             P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m], fh=L.f[m + 1])
 
-            # for robustness we check that we are not exploding
-            if (
-                (L.f[m + 1].impl.is_nan_or_inf() or abs(L.f[m + 1].impl) > 1e6 * (abs(L.f[m].impl) + 1))
-                or (L.f[m + 1].expl.is_nan_or_inf() or abs(L.f[m + 1].expl) > 1e6 * (abs(L.f[m].expl) + 1))
-                or (L.f[m + 1].exp.is_nan_or_inf() or abs(L.f[m + 1].exp) > 1e6 * (abs(L.f[m].exp) + 1))
-            ):
-                L.u[m + 1] = L.u[m].copy()
-                L.f[m + 1].expl = L.f[m].expl.copy()
-                L.f[m + 1].impl = L.f[m].impl.copy()
-                L.f[m + 1].exp = L.f[m].exp.copy()
+            # # for robustness we check that we are not exploding
+            # if (
+            #     (L.f[m + 1].impl.is_nan_or_inf() or abs(L.f[m + 1].impl) > 1e6 * (abs(L.f[m].impl) + 1))
+            #     or (L.f[m + 1].expl.is_nan_or_inf() or abs(L.f[m + 1].expl) > 1e6 * (abs(L.f[m].expl) + 1))
+            #     or (L.f[m + 1].exp.is_nan_or_inf() or abs(L.f[m + 1].exp) > 1e6 * (abs(L.f[m].exp) + 1))
+            # ):
+            #     L.u[m + 1] = L.u[m].copy()
+            #     L.f[m + 1].expl = L.f[m].expl.copy()
+            #     L.f[m + 1].impl = L.f[m].impl.copy()
+            #     L.f[m + 1].exp = L.f[m].exp.copy()
 
-            # for robustness we check that we are not exploding
-            if (
-                (L.f[m + 1].impl.is_nan_or_inf() or abs(L.f[m + 1].impl) > 1e6 * (abs(L.f[m].impl) + 1))
-                or (L.f[m + 1].expl.is_nan_or_inf() or abs(L.f[m + 1].expl) > 1e6 * (abs(L.f[m].expl) + 1))
-                or (L.f[m + 1].exp.is_nan_or_inf() or abs(L.f[m + 1].exp) > 1e6 * (abs(L.f[m].exp) + 1))
-            ):
-                L.u[m + 1] = L.u[m].copy()
-                L.f[m + 1].expl = L.f[m].expl.copy()
-                L.f[m + 1].impl = L.f[m].impl.copy()
-                L.f[m + 1].exp = L.f[m].exp.copy()
+            # # for robustness we check that we are not exploding
+            # if (
+            #     (L.f[m + 1].impl.is_nan_or_inf() or abs(L.f[m + 1].impl) > 1e6 * (abs(L.f[m].impl) + 1))
+            #     or (L.f[m + 1].expl.is_nan_or_inf() or abs(L.f[m + 1].expl) > 1e6 * (abs(L.f[m].expl) + 1))
+            #     or (L.f[m + 1].exp.is_nan_or_inf() or abs(L.f[m + 1].exp) > 1e6 * (abs(L.f[m].exp) + 1))
+            # ):
+            #     L.u[m + 1] = L.u[m].copy()
+            #     L.f[m + 1].expl = L.f[m].expl.copy()
+            #     L.f[m + 1].impl = L.f[m].impl.copy()
+            #     L.f[m + 1].exp = L.f[m].exp.copy()
 
         # indicate presence of new values at this level
         L.status.updated = True

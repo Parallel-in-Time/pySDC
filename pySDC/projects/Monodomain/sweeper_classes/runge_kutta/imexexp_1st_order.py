@@ -114,23 +114,6 @@ class imexexp_1st_order(sweeper):
             # update function values
             L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
-        # do the sweep: eval exp and then expl on update u
-        # for m in range(M):
-        #     rhs = L.u[m] + L.dt * self.delta[m] * P.eval_phi_f_exp(L.u[m], L.dt * self.delta[m], L.time)
-        #     P.eval_f(rhs, L.time + L.dt * self.coll.nodes[m], eval_impl=False, eval_expl=True, eval_exp=False, fh=L.f[m + 1])
-        #     integral[m] -= L.dt * self.delta[m] * (L.f[m + 1].expl + L.f[m + 1].impl) + (rhs - L.u[m])
-        # for m in range(M):
-        #     rhs = L.u[m] + L.dt * self.delta[m] * P.eval_phi_f_exp(L.u[m], L.dt * self.delta[m], L.time)
-
-        #     P.eval_f(rhs, L.time + L.dt * self.coll.nodes[m], eval_impl=False, eval_expl=True, eval_exp=False, fh=L.f[m + 1])
-        #     rhs += L.dt * self.delta[m] * L.f[m + 1].expl + integral[m]
-
-        #     # implicit solve with prefactor stemming from QI
-        #     L.u[m + 1] = P.solve_system(rhs, L.dt * self.delta[m], L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
-
-        #     # update function values
-        #     L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
-
         # indicate presence of new values at this level
         L.status.updated = True
 
