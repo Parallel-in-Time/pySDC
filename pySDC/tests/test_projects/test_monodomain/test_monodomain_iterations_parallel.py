@@ -272,7 +272,7 @@ def test_monodomain_iterations_ESDC_MLESDC_PFASST():
         ionic_model_name="TTP",
         truly_time_parallel=True,
         n_time_ranks=1,
-        expected_avg_niters=2.375,
+        expected_avg_niters=2.0,
     )
 
     PFASST_iters_info = check_iterations_parallel(

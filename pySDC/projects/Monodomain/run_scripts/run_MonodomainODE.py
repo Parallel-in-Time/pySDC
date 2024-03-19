@@ -12,8 +12,8 @@ from pySDC.projects.Monodomain.hooks.HookClass_post_iter_info import post_iter_i
 
 from pySDC.helpers.stats_helper import get_sorted
 
-from pySDC.projects.Monodomain.controller_classes.my_controller_MPI import my_controller_MPI as controller_MPI
-from pySDC.projects.Monodomain.controller_classes.my_controller_nonMPI import my_controller_nonMPI as controller_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 
 from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1st_order import (
     imexexp_1st_order as imexexp_1st_order_ExpRK,
@@ -122,13 +122,15 @@ def get_step_params(maxiter):
     return step_params
 
 
-def get_level_params(dt, nsweeps, restol):
+def get_level_params(dt, nsweeps, restol, n_time_ranks):
     # initialize level parameters
     level_params = dict()
     level_params["restol"] = restol
     level_params["dt"] = dt
     level_params["nsweeps"] = nsweeps
     level_params["residual_type"] = "full_rel"
+    level_params["parallel"] = n_time_ranks > 1
+
     return level_params
 
 
@@ -240,6 +242,7 @@ def setup_and_run(
         dt=dt,
         nsweeps=num_sweeps,
         restol=restol,
+        n_time_ranks=n_time_ranks,
     )
 
     # fix enable output to that only finest level has output

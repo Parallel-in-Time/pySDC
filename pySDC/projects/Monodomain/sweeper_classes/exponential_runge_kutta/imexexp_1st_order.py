@@ -45,7 +45,7 @@ class imexexp_1st_order(sweeper):
         c = self.coll.nodes
         self.w = fornberg.fd_weights_all(c, 0.0, M - 1)
 
-        phi_num_nodes = 20
+        phi_num_nodes = 5
         self.phi_coll = CollBase(num_nodes=phi_num_nodes, tleft=0, tright=1, node_type='LEGENDRE', quad_type='GAUSS')
 
     def phi_eval_lists(self, P, factors, indeces, phi, lmbda, update_non_exp_indeces=True):
@@ -92,7 +92,14 @@ class imexexp_1st_order(sweeper):
         return phi
 
     def compute_lambda_and_phi(self):
-        if True:  # self.lambda_and_phi_outdated:
+
+        if not hasattr(self, "old_V"):
+            self.old_V = self.level.prob.dtype_u(init=self.level.prob.init, val=0.0)
+
+        if abs(self.old_V[0] - self.level.u[0][0]) > 1e-10 * abs(self.level.u[0][0]):
+
+            self.old_V[0].numpy_array[:] = self.level.u[0][0].numpy_array[:]
+
             L = self.level
             P = L.prob
             M = self.coll.num_nodes

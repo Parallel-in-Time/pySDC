@@ -66,6 +66,14 @@ class DCT_Vector:
         comm.Bcast(self.values[:], root=root)
         return self
 
+    def __sub__(self, other):
+        if isinstance(other, type(self)):
+            me = DCT_Vector(self)
+            me -= other
+            return me
+        else:
+            raise DataError("Type error: cannot sub %s from %s" % (type(other), type(self)))
+
     def __iadd__(self, other):
         if isinstance(other, type(self)):
             self.values += other.values
