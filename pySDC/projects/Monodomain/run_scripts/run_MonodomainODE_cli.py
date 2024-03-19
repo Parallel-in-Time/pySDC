@@ -42,7 +42,7 @@ def main():
         help="list of ints: loads a mesh which has already been pre-refined pre_refinements times.",
     )
     parser.add_argument(
-        "--order", default="1", type=list_of_ints, help="list of ints: order of FEM or FD discretization"
+        "--order", default="4", type=list_of_ints, help="list of ints: order of FEM or FD discretization"
     )
     parser.add_argument("--ionic_model_name", default="TTP", type=str, help="ionic_model: HH, CRN, TTP")
     parser.add_argument(

@@ -35,6 +35,21 @@ However, this approach is unstable due to the severe stiffness of :math:`f_e`.
 Therefore we propose an hybrid method, where we employ SDC for the :math:`f_I,f_E` terms and ESDC for the :math:`f_e` term. For the correcttion scheme we still use the IMEXEXP method. 
 The resulting method can be seen as a particular case of ESDC and will be denoted by ESDC in the next figures, for simplicity.
 
+Running the code
+----------------
+Due to their complexity, ionic models are coded in C++ and wrapped to Python. Therefore, befofore running any example you need to compile the ionic models by running the following command in the root folder:
+
+.. code-block::
+
+   export IONIC_MODELS_PATH=pySDC/projects/Monodomain/problem_classes/ionicmodels/cpp
+   c++ -O3 -Wall -shared -std=c++11 -fPIC -fvisibility=hidden $(python3 -m pybind11 --includes) ${IONIC_MODELS_PATH}/bindings_definitions.cpp -o ${IONIC_MODELS_PATH}/ionicmodels$(python3-config --extension-suffix)
+
+Then an example can be run:
+
+.. code-block::
+
+   cd pySDC/projects/Monodomain/run_scripts
+   mpirun -n 4 python run_MonodomainODE_cli.py --dt 0.05 --end_time 0.2 --num_nodes 6,3 --domain_name cube_1D --refinements 0 --ionic_model_name TTP --truly_time_parallel --n_time_ranks 4
 
 Stability
 ---------
