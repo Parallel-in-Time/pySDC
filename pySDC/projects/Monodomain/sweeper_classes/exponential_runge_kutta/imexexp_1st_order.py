@@ -92,7 +92,7 @@ class imexexp_1st_order(sweeper):
         return phi
 
     def compute_lambda_and_phi(self):
-        if self.lambda_and_phi_outdated:
+        if True:  # self.lambda_and_phi_outdated:
             L = self.level
             P = L.prob
             M = self.coll.num_nodes
