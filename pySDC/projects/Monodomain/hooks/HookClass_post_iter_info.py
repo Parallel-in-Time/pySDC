@@ -1,20 +1,23 @@
-import numpy as np
-import os
 import time
 from pySDC.core.Hooks import hooks
 
 
 class post_iter_info_hook(hooks):
+    """
+    Hook class to write additional iteration information to the command line.
+    It is used to print the final residual, after u[0] has been updated with the new value from the previous step.
+    This residual is the one used to check the convergence of the iteration and when running in parallel is different from
+    the one printed at IT_FINE.
+    """
+
     def __init__(self):
         super(post_iter_info_hook, self).__init__()
 
     def post_iteration(self, step, level_number):
         """
-        Default routine called after each iteration
-
-        Args:
-            step (pySDC.Step.step): the current step
-            level_number (int): the current level number
+        Overwrite default routine called after each iteration.
+        It calls the default routine and then writes the residual to the command line.
+        We call this the residual at IT_END.
         """
         super().post_iteration(step, level_number)
         self.__t1_iteration = time.perf_counter()

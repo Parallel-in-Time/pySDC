@@ -7,12 +7,14 @@ class DCT_Vector:
     """
     DCT Function data type
 
-    Args:
+    Arguments::
+    ----------
         init: the size of the DCT_Vector, or another DCT_Vector to copy from or a numpy array to copy from
         val (optional): A value to initialize the DCT_Vector. Can be a float or the string 'random' to initialize it as a random vector. Defaults to 0.0.
 
 
     Attributes:
+    ----------
         values: contains the DCT Function as a numpy array
 
     """
@@ -57,7 +59,7 @@ class DCT_Vector:
         """
         Returns the l2 norm of the DCT_Vector divided by the square root of the size of the DCT_Vector.
         This normalization is used to make the norm of a DCT_Vector of all ones equal to 1.
-        It is useful when solving PDES, since it makes the norm of the solution much less dependent on the mesh size.
+        It is useful when solving PDES, since it makes the norm of the solution independent from the mesh size.
         """
         return np.linalg.norm(self.values) / np.sqrt(self.values.size)
 
@@ -70,9 +72,6 @@ class DCT_Vector:
     @property
     def numpy_array(self):
         return self.values
-
-    # def is_nan_or_inf(self):
-    #     return np.isnan(self.values).any() or np.isinf(self.values).any()
 
     def isend(self, dest=None, tag=None, comm=None):
         return comm.Issend(self.values[:], dest=dest, tag=tag)

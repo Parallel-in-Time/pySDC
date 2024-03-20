@@ -4,7 +4,7 @@ from pySDC.core.Errors import DataError
 
 class RequestsList:
     """
-    This class is a wrapper for a list of MPI requests. It is used to wait for all requests to complete.
+    A wrapper for a list of MPI requests. It is used to wait for all requests to complete.
     In this context it is used to check communication of all subvectors in a VectorOfVectors.
     """
 
@@ -20,14 +20,17 @@ class RequestsList:
 
 class VectorOfVectors(object):
     """
-    This class is a wrapper for a list of subvectors. It is used to represent a vector of vectors, for example in the context of a PDE with many unknowns.
-    Args:
+    A wrapper for a list of subvectors. It is used to represent a vector of vectors, for example in the context of a PDE with many unknowns.
+
+    Parameters:
+    ----------
         init: A VectorOfVectors to copy from or the size of the subvectors.
         val (optional): Used when init is not a VectorOfVectors. It is a value to initialize the subvectors. Can be a float, a list of subvectors, a list of numpy arrays. Defaults to 0.0.
         type_sub_vector (optional): Used when init is not a VectorOfVectors. The type of the subvectors.
-        size (optional): Used when init is not a VectorOfVectors and val is a float. The number of subvectors. All subvectors will have size=init are initialized to val.
+        size (optional): Used when init is not a VectorOfVectors and val is a float. The number of subvectors. All subvectors will have size=init and are initialized to val.
 
     Attributes:
+    ----------
         val_list: A list of subvectors.
         type_sub_vector: The type of the subvectors.
         size: The number of subvectors.
