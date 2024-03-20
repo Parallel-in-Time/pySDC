@@ -8,6 +8,29 @@ import pySDC.projects.Monodomain.problem_classes.ionicmodels.cpp as ionicmodels
 
 
 class MonodomainODE(ptype):
+    """
+    A class for the discretization of the Monodomain equation. The Monodomain equation is a parabolic PDE composed of
+    a reaction-diffusion equation coupled with an ODE system. The unknowns are the potential V and the ionic model variables (g_1,...,g_N).
+    The reaction-diffusion equation is discretized in another class, where any spatial discretization can be used.
+    The ODE system is the ionic model, which doesn't need spatial discretization, being a system of ODEs.
+
+
+
+    Attributes:
+    -----------
+    parabolic: The parabolic problem class used to discretize the reaction-diffusion equation
+    ionic_model: The ionic model used to discretize the ODE system. This is a wrapper around the actual ionic model, which is written in C++.
+    size: The number of variables in the ionic model
+    vector_type: The type of vector used to store a single unknown (e.g. V). This data type depends on spatial discretization, hence on the parabolic class.
+    dtype_u: The type of vector used to store all the unknowns (V,g_1,...,g_N). This is a vector of vector_type.
+    dtype_f: The type of vector used to store the right-hand side of the ODE system stemming from the monodomain equation. This is a vector of vector_type.
+    output_folder: The folder where the solution is written to file
+    t0: The initial simulation time. This is 0.0 by default but can be changed by the user in order to skip the initial stimulus.
+    Tend: The duration of the simulation.
+    output_V_only: If True, only the potential V is written to file. If False, all the ionic model variables are written to file.
+    read_init_val: If True, the initial value is read from file. If False, the initial value is at equilibrium.
+    """
+
     def __init__(self, **problem_params):
         self.logger = logging.getLogger("step")
 
@@ -65,7 +88,7 @@ class MonodomainODE(ptype):
         # create initial value (as vector of vectors). Every variable is constant in space
         u0 = self.dtype_u(self.init, val=self.ionic_model.initial_values())
 
-        # overwwrite the initial value with solution form file if desired
+        # overwwrite the initial value with solution from file if desired
         if self.read_init_val:
             read_ok = self.read_reference_solution(u0, self.init_val_name, True)
             assert read_ok, "ERROR: Could not read initial value from file."
@@ -116,17 +139,16 @@ class MonodomainODE(ptype):
         self.size = self.ionic_model.size
 
     def define_stimulus(self):
-        self.scale_Iion = 0.01  # used to convert currents in uA/cm^2 to uA/mm^2
-        # scale_im is applied to the rhs of the ionic model, so that the rhs is in units of mV/ms
-        self.scale_im = self.scale_Iion / self.parabolic.Cm
 
         stim_dur = 2.0
         if "cuboid" in self.parabolic.domain_name:
-            self.stim_protocol = [[0.0, stim_dur]]  # list of stim_time, sitm_dur values
-            self.stim_intensities = [50.0]
-            self.stim_centers = [[0.0, 0.0, 0.0]]
+            self.stim_protocol = [[0.0, stim_dur]]  # list of stimuli times and stimuli durations
+            self.stim_intensities = [50.0]  # list of stimuli intensities
+            self.stim_centers = [[0.0, 0.0, 0.0]]  # list of stimuli centers
             r = 1.5
-            self.stim_radii = [[r, r, r]] * len(self.stim_protocol)
+            self.stim_radii = [[r, r, r]] * len(
+                self.stim_protocol
+            )  # list of stimuli radii in the three directions (x,y,z)
         elif "cube" in self.parabolic.domain_name:
             self.stim_protocol = [[0.0, 2.0], [1000.0, 10.0]]
             self.stim_intensities = [50.0, 80.0]
@@ -137,22 +159,21 @@ class MonodomainODE(ptype):
             raise Exception("Unknown domain name.")
 
         self.stim_protocol = np.array(self.stim_protocol)
-        self.stim_protocol[:, 0] -= self.init_time
+        self.stim_protocol[:, 0] -= self.init_time  # shift stimulus times by the initial time
 
+        # index of the last stimulus applied. The value -1 means no stimulus has been applied yet.
         self.last_stim_index = -1
 
     def eval_f(self, u, t, fh=None):
         if fh is None:
             fh = self.dtype_f(init=self.init, val=0.0)
 
-        # self.update_u_and_uh(u, False)
-
-        # eval ionic model rhs on u and put result in fh. All indices of the super vector fh mush be computed (list(range(self.size))
+        # eval ionic model rhs on u and put result in fh. All indices of the vector of vector fh mush be computed (list(range(self.size))
         self.eval_expr(self.ionic_model.f, u, fh, list(range(self.size)), False)
         # apply stimulus
         fh.val_list[0] += self.Istim(t)
 
-        # eval diffusion
+        # apply diffusion
         self.parabolic.add_disc_laplacian(u[0], fh[0])
 
         return fh
@@ -160,19 +181,29 @@ class MonodomainODE(ptype):
     def Istim(self, t):
         tol = 1e-8
         for i, (stim_time, stim_dur) in enumerate(self.stim_protocol):
+            # Look for which stimulus to apply at the current time t by checking the stimulus protocol:
+            # Check if t is in the interval [stim_time, stim_time+stim_dur] with a tolerance tol
+            # and apply the corresponding stimulus
             if (t + stim_dur * tol >= stim_time) and (t + stim_dur * tol < stim_time + stim_dur):
+                # if the stimulus is not the same as the last one applied, update the last_stim_index and the space_stim vector
                 if i != self.last_stim_index:
                     self.last_stim_index = i
+                    # get the vector of zeros and ones defining the stimulus region
                     self.space_stim = self.parabolic.stim_region(self.stim_centers[i], self.stim_radii[i])
+                    # scale by the stimulus intensity and apply the change of units
                     self.space_stim *= self.scale_im * self.stim_intensities[i]
                 return self.space_stim
 
         return self.parabolic.zero_stim_vec
 
     def eval_expr(self, expr, u, fh, indeces, zero_untouched_indeces=True):
+        # evaluate the expression expr on u and put the result in fh
+        # Here expr is a wrapper on a C++ function that evaluates the rhs of the ionic model (or part of it)
         if expr is not None:
             expr(u.np_list, fh.np_list)
 
+        # indeces is a list of integers indicating which variables are modified by the expression expr.
+        # This information is known a priori. Here we use it to zero the variables that are not modified by expr (if zero_untouched_indeces is True)
         if zero_untouched_indeces:
             non_indeces = [i for i in range(self.size) if i not in indeces]
             for i in non_indeces:
@@ -180,12 +211,21 @@ class MonodomainODE(ptype):
 
 
 class MultiscaleMonodomainODE(MonodomainODE):
+    """
+    The multiscale version of the MonodomainODE problem. This class is used to solve the monodomain equation with a multirate solver.
+    The main difference with respect to the MonodomainODE class is that the right-hand side of the ODE system is split into three parts:
+    - impl: The discrete Laplacian. This is a stiff term threated implicitly by time integrators.
+    - expl: The non stiff term of the ionic models, threated explicitly by time integrators.
+    - exp:  The very stiff but diagonal terms of the ionic models, threated exponentially by time integrators.
+    """
+
     def __init__(self, **problem_params):
         super(MultiscaleMonodomainODE, self).__init__(**problem_params)
 
         def dtype_f(init, val=None):
             return IMEXEXP_VectorOfVectors(init, val, self.vector_type, self.size)
 
+        # Differently from the super class MonodomainODE, dtype_f is a vector of IMEXEXP_VectorOfVectors
         self.dtype_f = dtype_f
 
         self.define_splittings()
@@ -196,10 +236,10 @@ class MultiscaleMonodomainODE(MonodomainODE):
     def define_splittings(self):
         """
         This function defines the splittings used in the problem.
-        The self.im_* variables are meant for internal use, the self.rhs_* for external use (i.e. in the sweeper).
+        The im_* variables are meant for internal use, the rhs_* for external use (i.e. in the sweeper).
         The *_args and *_indeces are list of integers.
-        The args are list of variables that are needed to evaluate a function plus the variables that are modified by the function
-        The indeces are the list of variables that are modified by the function (subset of args).
+        The *_args are list of variables that are needed to evaluate a function plus the variables that are modified by the function.
+        The *_indeces are the list of variables that are modified by the function (subset of args).
         Example: for f(x_0,x_1,x_2,x_3,x_4)=f(x_0,x_2,x_4)=(y_0,y_1,0,0,y_4) we have
         f_args=[0,1,2,4]=([0,2,4] union [0,1,4]) since f needs x_0,x_2,x_4 and y_0,y_1,y_4 are effective outputs of the function (others are zero).
         f_indeces=[0,1,4] since only y_0,y_1,y_4 are outputs of the function, y_2,y_3 are zero
@@ -212,25 +252,36 @@ class MultiscaleMonodomainODE(MonodomainODE):
 
         Yeah, it's a bit a mess, but helpful.
         """
-        # this is the standard splitting used in Rush-Larsen methods.
         # define nonstiff term (explicit part)
+        # the wrapper to c++ expression that evaluates the nonstiff part of the ionic model
         self.im_f_nonstiff = self.ionic_model.f_expl
+        # the args of f_expl
         self.im_nonstiff_args = self.ionic_model.f_expl_args
+        # the indeces of f_expl
         self.im_nonstiff_indeces = self.ionic_model.f_expl_indeces
+
         # define stiff term (implicit part)
-        self.im_f_stiff = None  # no stiff part coming from ionic model (everything stiff is in the exponential part)
+        self.im_f_stiff = None  # no stiff part coming from ionic model to be threated implicitly. Indeed, all the stiff terms are diagonal and are threated exponentially.
         self.im_stiff_args = []
         self.im_stiff_indeces = []
+
         # define exp term (eponential part)
+        # the exponential term is defined by f_exp(u)= lmbda(u)*(u-yinf(u)), hence we only need to define lmbda and yinf
+        # the wrapper to c++ expression that evaluates lmbda(u)
         self.im_lmbda_exp = self.ionic_model.lmbda_exp
+        # the wrapper to c++ expression that evaluates lmbda(u) and yinf(u)
         self.im_lmbda_yinf_exp = self.ionic_model.lmbda_yinf_exp
+        # the args of lmbda and yinf (they are the same)
         self.im_exp_args = self.ionic_model.f_exp_args
+        # the indeces of lmbda and yinf
         self.im_exp_indeces = self.ionic_model.f_exp_indeces
 
+        # the spectral radius of the jacobian of non stiff term. We use a bound
         self.rho_nonstiff_cte = self.ionic_model.rho_f_expl()
 
         self.rhs_stiff_args = self.im_stiff_args
         self.rhs_stiff_indeces = self.im_stiff_indeces
+        # Add the potential V index 0 to the rhs_stiff_args and rhs_stiff_indeces. Indeed V is used to compute the Laplacian and is affected by the Laplacian, which is the implicit part of the problem.
         if 0 not in self.rhs_stiff_args:
             self.rhs_stiff_args = [0] + self.rhs_stiff_args
         if 0 not in self.rhs_stiff_indeces:
@@ -238,6 +289,7 @@ class MultiscaleMonodomainODE(MonodomainODE):
 
         self.rhs_nonstiff_args = self.im_nonstiff_args
         self.rhs_nonstiff_indeces = self.im_nonstiff_indeces
+        # Add the potential V index 0 to the rhs_nonstiff_indeces. Indeed V is affected by the stimulus, which is a non stiff term.
         if 0 not in self.rhs_nonstiff_indeces:
             self.rhs_nonstiff_indeces = [0] + self.rhs_nonstiff_indeces
 
@@ -248,12 +300,25 @@ class MultiscaleMonodomainODE(MonodomainODE):
 
         self.rhs_non_exp_indeces = self.im_non_exp_indeces
 
+        # a vector of ones, useful
         self.one = self.dtype_u(init=self.init, val=1.0)
 
+        # some space to store lmbda and yinf
         self.lmbda = self.dtype_u(init=self.init, val=0.0)
         self.yinf = self.dtype_u(init=self.init, val=0.0)
 
     def solve_system(self, rhs, factor, u0, t, u_sol=None):
+        """
+        Solve the system u_sol[0] = (M-factor*A)^{-1} * M * rhs[0]
+        and sets u_sol[i] = rhs[i] for i>0 (as if A=0 for i>0)
+
+        Arguments:
+            rhs (dtype_u): right-hand side
+            factor (float): factor multiplying the Laplacian
+            u0 (dtype_u): initial guess
+            t (float): current time
+            u_sol (dtype_u, optional): some space to store the solution. If None, a new space is allocated. Can be the same as rhs.
+        """
         if u_sol is None:
             u_sol = self.dtype_u(init=self.init, val=0.0)
 
@@ -267,10 +332,16 @@ class MultiscaleMonodomainODE(MonodomainODE):
 
     def eval_f(self, u, t, eval_impl=True, eval_expl=True, eval_exp=True, fh=None, zero_untouched_indeces=True):
         """
-        Evaluates F(u,t) = M^-1*( A*u + f(u,t) )
+        Evaluates the right-hand side terms.
 
-        Returns:
-            dtype_u: solution as mesh
+        Arguments:
+            u (dtype_u): the current solution
+            t (float): the current time
+            eval_impl (bool, optional): if True, evaluates the implicit part of the right-hand side. Default is True.
+            eval_expl (bool, optional): if True, evaluates the explicit part of the right-hand side. Default is True.
+            eval_exp (bool, optional): if True, evaluates the exponential part of the right-hand side. Default is True.
+            fh (dtype_f, optional): space to store the right-hand side. If None, a new space is allocated. Default is None.
+            zero_untouched_indeces (bool, optional): if True, the variables that are not modified by the right-hand side are zeroed. Default is True.
         """
 
         if fh is None:
@@ -278,15 +349,12 @@ class MultiscaleMonodomainODE(MonodomainODE):
 
         u.ghostUpdate(addv="insert", mode="forward")
 
-        # evaluate explicit (non stiff) part M^-1*f_nonstiff(u,t)
         if eval_expl:
             fh.expl = self.eval_f_nonstiff(u, t, fh.expl, zero_untouched_indeces)
 
-        # evaluate implicit (stiff) part M^1*A*u+M^-1*f_stiff(u,t)
         if eval_impl:
             fh.impl = self.eval_f_stiff(u, t, fh.impl, zero_untouched_indeces)
 
-        # evaluate exponential part
         if eval_exp:
             fh.exp = self.eval_f_exp(u, t, fh.exp, zero_untouched_indeces)
 
@@ -311,12 +379,13 @@ class MultiscaleMonodomainODE(MonodomainODE):
         if not zero_untouched_indeces and 0 not in self.im_stiff_indeces:
             fh_stiff[0].zero()
 
-        # eval diffusion
+        # apply diffusion
         self.parabolic.add_disc_laplacian(u[0], fh_stiff[0])
 
         return fh_stiff
 
     def eval_f_exp(self, u, t, fh_exp, zero_untouched_indeces=True):
+        # eval ionic model exp terms f_exp(u)= lmbda(u)*(u-yinf(u)
         self.eval_lmbda_yinf_exp(u, self.lmbda, self.yinf)
         for i in self.im_exp_indeces:
             fh_exp.np_array(i)[:] = self.lmbda.np_array(i) * (u.np_array(i) - self.yinf.np_array(i))

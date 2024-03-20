@@ -7,6 +7,80 @@ import os
 
 
 class Parabolic_DCT(RegisterParams):
+    """
+    A class for the spatial discreitzation of the parabolic part of the monodomain equation.
+    Here we discretize the spatial domain with a uniform mesh and use the discrete cosine transform (DCT)
+    to discretize the Laplacian operator. The DCT is a real-to-real type of Fourier transform that is well suited for
+    Neumann boundary conditions.
+
+    Parameters:
+    -----------
+    problem_params: dict containing the problem parameters
+
+    Attributes:
+    -----------
+    chi: float
+        Surface-to-volume ratio of the cell membrane
+    Cm: float
+        Membrane capacitance
+    si_l: float
+        Longitudinal intracellular conductivity
+    se_l: float
+        Longitudinal extracellular conductivity
+    si_t: float
+        Transversal intracellular conductivity
+    se_t: float
+        Transversal extracellular conductivity
+    sigma_l: float
+        Longitudinal conductivity
+    sigma_t: float
+        Transversal conductivity
+    diff_l: float
+        Longitudinal diffusion coefficient
+    diff_t: float
+        Transversal diffusion coefficient
+    diff: tuple of floats
+        Tuple containing the diffusion coefficients
+    dom_size: tuple of floats
+        Tuple containing the domain size
+    n_elems: tuple of ints
+        Tuple containing the number of elements in each direction
+    refinements: int
+        Number of refinements with respect to a baseline mesh. Can be both positive (to get finer meshes) and negative (to get coarser meshes).
+    grids: tuple of 1D arrays
+        Tuple containing the grid points in each direction
+    dx: tuple of floats
+        Tuple containing the grid spacings in each direction
+    shape: tuple of ints
+        Tuple containing the number of grid points in each direction. Same as n_elems with with reversed order.
+    n_dofs: int
+        Total number of degrees of freedom
+    dim: int
+        Dimension of the spatial domain. Can be 1, 2 or 3.
+    init: int
+        Number of degrees of freedom. Used to initialize the DCT_Vector
+    vector_type: DCT_Vector
+        The vector type used in this problem
+    mesh_name: str
+        Name of the mesh. Can be cube_ND, cubdoid_ND, cubdoid_ND_smaller, cubdoid_ND_small, cubdoid_ND_large, cubdoid_ND_very_large. Where N=1,2,3.
+    diff_dct: array
+        Array containing the discrete Laplacian operator
+    output_folder: Path
+        Path to the output folder
+    output_file_path: Path
+        Path to the output file
+    output_file: str
+        Name of the output file
+    enable_output: bool
+        If True, the solution is written to file. Else not.
+    t_out: list
+        List containing the output times
+    order: int
+        Order of the spatial discretization. Can be 2 or 4
+    zero_stim_vec: float
+        Used to apply zero stimili.
+    """
+
     def __init__(self, **problem_params):
         self._makeAttributeAndRegister(*problem_params.keys(), localVars=problem_params, readOnly=True)
 
@@ -17,7 +91,9 @@ class Parabolic_DCT(RegisterParams):
 
     def __del__(self):
         if self.enable_output:
+            # Close the output file
             self.output_file.close()
+            # Save the output times and the grid points
             with open(
                 self.output_file_path.parent / Path(self.output_file_name + '_txyz').with_suffix(".npy"), 'wb'
             ) as f:
@@ -46,6 +122,7 @@ class Parabolic_DCT(RegisterParams):
         self.se_t = 0.24  # mS/mm
 
         if "cube" in self.domain_name:
+            # For this domain we use isotropic conductivities
             self.si_t = self.si_l
             self.se_t = self.se_l
 
@@ -154,6 +231,8 @@ class Parabolic_DCT(RegisterParams):
             return (x[0][None, None, :], x[1][None, :, None], x[2][:, None, None])
 
     def get_grids_dx(self, dom_size, N):
+        # The grid points are the midpoints of the elements, hence x_{n+1/2}=(n+1/2)*dx
+        # This is needed for the DCT.
         x = [np.linspace(0, dom_size[i], 2 * N[i] + 1) for i in range(len(N))]
         x = [xi[1::2] for xi in x]
         dx = [xi[1] - xi[0] for xi in x]
@@ -164,6 +243,22 @@ class Parabolic_DCT(RegisterParams):
         # all remaining stimulus parameters are set in MonodomainODE
 
     def solve_system(self, rhs, factor, u0, t, u_sol):
+        """
+        Solve the linear system: u_sol = (I - factor * A)^{-1} rhs
+
+        Arguments:
+        ----------
+        rhs: DCT_Vector
+            The right-hand side of the linear system
+        factor: float
+            The factor in the linear system multiplying the Laplacian
+        u0: DCT_Vector
+            The initial guess for the solution. Not used here since we use a direct solver.
+        t: float
+            The current time. Not used here since the Laplacian is time-independent.
+        u_sol: DCT_Vector
+            The vector to store the solution in.
+        """
         rhs_hat = sp.fft.dctn(rhs.values.reshape(self.shape))
         u_sol_hat = rhs_hat / (1.0 - factor * self.diff_dct)
         u_sol.values[:] = sp.fft.idctn(u_sol_hat).ravel()
@@ -171,9 +266,13 @@ class Parabolic_DCT(RegisterParams):
         return u_sol
 
     def add_disc_laplacian(self, uh, res):
+        """
+        Add the discrete Laplacian operator to res: res += A * uh
+        """
         res.values += sp.fft.idctn(self.diff_dct * sp.fft.dctn(uh.values.reshape(self.shape))).ravel()
 
     def init_output(self, output_folder):
+        # Initialize the output parameters and file
         self.output_folder = output_folder
         self.output_file_path = self.output_folder / Path(self.output_file_name).with_suffix(".npy")
         if self.enable_output:
@@ -185,6 +284,8 @@ class Parabolic_DCT(RegisterParams):
             self.t_out = []
 
     def write_solution(self, u, t, all):
+        # Write the solution to file. Meant for visualization, hence we print the time stamp too.
+        # Usually we only write the first component of the solution, hence the electric potential.
         if self.enable_output:
             if not all:
                 np.save(self.output_file, u[0].values.reshape(self.shape))
@@ -193,6 +294,11 @@ class Parabolic_DCT(RegisterParams):
                 raise NotImplementedError("all=True not implemented for Parabolic_FD.write_solution")
 
     def write_reference_solution(self, uh, indeces):
+        """
+        Write the solution to file. This is meant to print solutions that will be used as reference solutions
+        and compute errors or as well solutions that will be used as initial values for other simulations.
+        Here we print the model variables listed in indeces.
+        """
         if self.output_file_path.is_file():
             os.remove(self.output_file_path)
         if not self.output_file_path.parent.is_dir():
@@ -201,6 +307,11 @@ class Parabolic_DCT(RegisterParams):
             [np.save(file, uh[i].values.reshape(self.shape)) for i in indeces]
 
     def read_reference_solution(self, uh, indeces, ref_file_name):
+        """
+        Read a reference solution from file. It can be used to set the initial values of a simulation
+        or to compute errors.
+        We read the model variables listed in indeces.
+        """
         if ref_file_name == "":
             return False
         ref_sol_path = Path(self.output_folder) / Path(ref_file_name).with_suffix(".npy")
@@ -213,6 +324,10 @@ class Parabolic_DCT(RegisterParams):
             return False
 
     def stim_region(self, stim_center, stim_radius):
+        """
+        Define the region where the stimulus is applied, given the center and the radius of the stimulus.
+        Returns a vector of the same size as the grid, with 1s inside the stimulus region and 0s outside.
+        """
         grids = self.grids
         coord_inside_stim_box = []
         for i in range(len(grids)):
@@ -225,7 +340,7 @@ class Parabolic_DCT(RegisterParams):
         return self.vector_type(inside_stim_box.ravel().astype(float))
 
     def compute_errors(self, uh, ref_sol):
-        # Compute L2 error
+        # Compute L2 errors with respect to the reference solution
         error_L2 = np.linalg.norm(uh.values - ref_sol.values)
         sol_norm_L2 = np.linalg.norm(ref_sol.values)
         rel_error_L2 = error_L2 / sol_norm_L2

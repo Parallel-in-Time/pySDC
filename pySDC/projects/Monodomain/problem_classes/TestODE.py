@@ -5,6 +5,12 @@ from pySDC.projects.Monodomain.datatype_classes.DCT_Vector import DCT_Vector
 from pySDC.projects.Monodomain.datatype_classes.VectorOfVectors import VectorOfVectors, IMEXEXP_VectorOfVectors
 
 
+""" 
+Here we define the problems classes for the multirate Dahlquist test equation y'=lambda_I*y + lambda_E*y + lambda_e*y
+Things are done so that it is compatible witht the sweepers. 
+"""
+
+
 class Parabolic(RegisterParams):
     def __init__(self, **problem_params):
         self._makeAttributeAndRegister(*problem_params.keys(), localVars=problem_params, readOnly=True)
@@ -16,7 +22,6 @@ class TestODE(ptype):
     def __init__(self, **problem_params):
         self.logger = logging.getLogger("step")
 
-        # the class for the spatial discretization of the parabolic part of monodomain
         self.parabolic = Parabolic(**problem_params)
         self.init = 1  # one dof
         self.size = 1  # one state variable
@@ -30,6 +35,7 @@ class TestODE(ptype):
         self.t0 = 0.0
         self.Tend = 1.0 if self.end_time < 0.0 else self.end_time
 
+        # set lambdas, if not provided by user
         if not hasattr(self, 'lmbda_laplacian'):
             self.lmbda_laplacian = -5.0
         if not hasattr(self, 'lmbda_gating'):
@@ -37,7 +43,6 @@ class TestODE(ptype):
         if not hasattr(self, 'lmbda_others'):
             self.lmbda_others = -1.0
 
-        # dtype_u and dtype_f are super vectors of vector_type
         self.vector_type = self.parabolic.vector_type
 
         def dtype_u(init=None, val=0.0):
@@ -93,39 +98,20 @@ class MultiscaleTestODE(TestODE):
         return u_sol
 
     def eval_f(self, u, t, eval_impl=True, eval_expl=True, eval_exp=True, fh=None, zero_untouched_indeces=True):
-        """
-        Evaluates F(u,t) = M^-1*( A*u + f(u,t) )
-
-        Returns:
-            dtype_u: solution as mesh
-        """
 
         if fh is None:
             fh = self.dtype_f(init=self.init, val=0.0)
 
-        # evaluate explicit (non stiff) part lambda_others*u
         if eval_expl:
             fh.expl.val_list[0].values[0] = self.lmbda_others * u[0].values[0]
 
-        # evaluate implicit (stiff) part lambda_laplacian*u
         if eval_impl:
             fh.impl.val_list[0].values[0] = self.lmbda_laplacian * u[0].values[0]
 
-        # evaluate exponential part lambda_gating*u
         if eval_exp:
             fh.exp.val_list[0].values[0] = self.lmbda_gating * u[0].values[0]
 
         return fh
-
-    # def eval_phi_f_exp(self, u, factor, t, phi_f_exp=None, zero_untouched_indeces=True):
-    #     if phi_f_exp is None:
-    #         phi_f_exp = self.dtype_u(init=self.init, val=0.0)
-
-    #     phi_f_exp.val_list[0].values[0] = (
-    #         (np.exp(factor * self.lmbda_gating) - 1.0) / (factor) * u.val_list[0].values[0]
-    #     )
-
-    #     return phi_f_exp
 
     def eval_lmbda_yinf_exp(self, u, lmbda, yinf):
         lmbda.val_list[0].values[0] = self.lmbda_gating
