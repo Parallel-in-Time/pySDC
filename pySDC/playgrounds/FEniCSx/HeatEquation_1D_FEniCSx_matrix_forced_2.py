@@ -97,13 +97,21 @@ class fenicsx_heat_mass(ptype):
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nx, None, np.dtype('float64')))
-        self._makeAttributeAndRegister('nelems', 't0', 'family', 'order', 'refinements', 'nu', 'c', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister(
+            'nelems', 't0', 'family', 'order', 'refinements', 'nu', 'c', localVars=locals(), readOnly=True
+        )
 
         # Create boundary condition
         fdim = domain.topology.dim - 1
-        boundary_facets = dfx.mesh.locate_entities_boundary(domain, fdim, lambda x: np.full(x.shape[1], True, dtype=bool))
-        self.bc = dfx.fem.dirichletbc(PETSc.ScalarType(self.c), dfx.fem.locate_dofs_topological(self.V, fdim, boundary_facets), self.V)
-        self.bc_hom = dfx.fem.dirichletbc(PETSc.ScalarType(0), dfx.fem.locate_dofs_topological(self.V, fdim, boundary_facets), self.V)
+        boundary_facets = dfx.mesh.locate_entities_boundary(
+            domain, fdim, lambda x: np.full(x.shape[1], True, dtype=bool)
+        )
+        self.bc = dfx.fem.dirichletbc(
+            PETSc.ScalarType(self.c), dfx.fem.locate_dofs_topological(self.V, fdim, boundary_facets), self.V
+        )
+        self.bc_hom = dfx.fem.dirichletbc(
+            PETSc.ScalarType(0), dfx.fem.locate_dofs_topological(self.V, fdim, boundary_facets), self.V
+        )
         self.fix_bc_for_residual = True
 
         # Stiffness term (Laplace) and mass term
