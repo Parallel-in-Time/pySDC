@@ -9,27 +9,13 @@ class TransferVectorOfDCTVectors(space_transfer):
     """
 
     def __init__(self, fine_prob, coarse_prob, params):
-        """
-        Initialization routine
-
-        Args:
-            fine_prob: fine problem
-            coarse_prob: coarse problem
-            params: parameters for the transfer operators
-        """
-
         # invoke super initialization
         super(TransferVectorOfDCTVectors, self).__init__(fine_prob, coarse_prob, params)
 
         self.DCT_to_DCT = DCT_to_DCT(fine_prob, coarse_prob, params)
 
     def restrict(self, F):
-        """
-        Restriction implementation
 
-        Args:
-            F: the fine level data
-        """
         u_coarse = VectorOfVectors(
             init=self.coarse_prob.init,
             val=0.0,
@@ -43,12 +29,7 @@ class TransferVectorOfDCTVectors(space_transfer):
         return u_coarse
 
     def prolong(self, G):
-        """
-        Prolongation implementation
 
-        Args:
-            G: the coarse level data
-        """
         if isinstance(G, VectorOfVectors):
             u_fine = VectorOfVectors(
                 init=self.fine_prob.init, val=0.0, type_sub_vector=self.fine_prob.vector_type, size=self.fine_prob.size

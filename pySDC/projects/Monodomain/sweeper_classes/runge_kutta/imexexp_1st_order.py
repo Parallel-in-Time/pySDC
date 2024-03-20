@@ -11,9 +11,7 @@ class imexexp_1st_order(sweeper):
     First-order IMEXEXP sweeper using implicit/explicit/exponential Euler as base integrator
     In the cardiac electrphysiology community this is known as Rush-Larsen scheme.
 
-    Attributes:
-        QI: implicit Euler integration matrix
-        QE: explicit Euler integration matrix
+    The underlying intergrator is collocation method, leading to standard SDC.
     """
 
     def __init__(self, params):
@@ -35,6 +33,10 @@ class imexexp_1st_order(sweeper):
         self.delta = np.diagonal(self.QI)[1:]
 
     def eval_phi_f_exp(self, u, factor):
+        """
+        Evaluates the exponential part of the right-hand side f_exp(u)=lambda(u)*(u-y_inf(u)) multiplied by the exponential factor phi_1(factor*lambda)
+        Since phi_1(z)=(e^z-1)/z then phi_1(factor*lambda) * f_exp(u) = ((e^(factor*lambda)-1)/factor) *(u-y_inf(u))
+        """
         L = self.level
         P = L.prob
         self.lmbda = P.dtype_u(init=P.init, val=0.0)
@@ -94,7 +96,7 @@ class imexexp_1st_order(sweeper):
         for i in range(1, M):
             integral[M - i] -= integral[M - i - 1]
 
-        # do the sweep: expl and exp at same u
+        # do the sweep
         for m in range(M):
             integral[m] -= (
                 L.dt

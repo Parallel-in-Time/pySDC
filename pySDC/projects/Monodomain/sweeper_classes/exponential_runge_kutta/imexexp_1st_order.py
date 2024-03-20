@@ -14,9 +14,7 @@ class imexexp_1st_order(sweeper):
     First-order IMEXEXP sweeper using implicit/explicit/exponential Euler as base integrator
     In the cardiac electrphysiology community this is known as Rush-Larsen scheme.
 
-    Attributes:
-        QI: implicit Euler integration matrix
-        QE: explicit Euler integration matrix
+    The underlying intergrator is exponential Runge-Kutta, leading to exponential SDC (ESDC).
     """
 
     def __init__(self, params):
@@ -40,45 +38,74 @@ class imexexp_1st_order(sweeper):
         self.lmbda = None
 
         self.lambda_and_phi_outdated = True
-        # compute weights w such that PiQ^(k)(0) = sum_{j=0}^{M-1} w[k,j]*Q[j], k=0,...,M-1
+
+        # Compute weights w such that PiQ^(k)(0) = sum_{j=0}^{M-1} w[k,j]*Q[j], k=0,...,M-1
+        # Used to express the derivatives of a polynomial in x=0 in terms of the values of the polynomial at the collocation nodes
         M = self.coll.num_nodes
         c = self.coll.nodes
         self.w = fornberg.fd_weights_all(c, 0.0, M - 1)
 
-        phi_num_nodes = 5
+        # Define the quadature rule for the evaluation of the phi_i(z) functions. Indeed, we evaluate them as integrals in order to avoid round off errors.
+        phi_num_nodes = 5  # seems to be enough in most cases
         self.phi_coll = CollBase(num_nodes=phi_num_nodes, tleft=0, tright=1, node_type='LEGENDRE', quad_type='GAUSS')
 
     def phi_eval_lists(self, P, factors, indeces, phi, lmbda, update_non_exp_indeces=True):
-        # compute phi[k][i] = phi_{k}(factor_i*lmbda), factor_i in factors, k in indeces
+        """
+        Evaluate the phi_k functions at the points factor_i*lmbda
+
+        Arguments:
+            P: problem class
+            factors: list of factors to multiply lmbda with. len(factors)=len(self.num_nodes)
+            indeces: list of indeces k for the phi_k functions
+            phi: list of lists of dtype_u: some space to store the results
+            lmbda: dtype_u: the value of lmbda
+            update_non_exp_indeces: bool: if True, the phi functions are also evaluated at the non-exponential indeces. Hence, where lambda=0 and thus we return phi_k(0) (using analytical value)
+
+        Returns:
+            list of lists of dtype_u: [[phi_k(factor_i*lambda) for i in range(len(factors))] for k in indeces]
+
+        """
 
         N_fac = len(factors)
         N_ind = len(indeces)
 
         if phi is None:
+            # make some space
             phi = [[P.dtype_u(init=P.init, val=0.0) for i in range(N_fac)] for j in range(N_ind)]
         else:
+            # zero out the provided space
             for n in range(N_fac):
                 for m in range(N_ind):
                     phi[m][n].zero_sub(P.rhs_exp_indeces)
 
         factorials = scipy.special.factorial(np.array(indeces) - 1)
+        # the quadrature rule is used to evaluate the phi functions as integrals. This is not the same as the one used in the ESDC method!!!!
         c = self.phi_coll.nodes
         b = self.phi_coll.weights
+
+        # iterate only over the indeces of the problem having an exponential term
+        # hence we update only the subvectors phi_k(factor*lambda)_i in the vector of vectors phi_k(factor*lambda)
         for i in P.rhs_exp_indeces:
+            # iterate over all the factors
             for n in range(N_fac):
                 factor = factors[n]
+                # compute e^((1-c_j)*factor*lmbda) for nodes c_j on the quadrature rule
                 exp_terms = [
                     np.exp(((1.0 - c[j]) * factor) * lmbda.np_array(i)) for j in range(self.phi_coll.num_nodes)
                 ]
+                # iterate over all the indeces k (phi_k)
                 for m in range(N_ind):
                     k = indeces[m]
-                    km1_fac = factorials[m]
+                    km1_fac = factorials[m]  # (k-1)!
                     if k == 0:
+                        # rmemeber: phi_0(z) = e^z
                         phi[m][n].np_array(i)[:] = np.exp(factor * lmbda.np_array(i))
                     else:
+                        # using the quadrature rule approximate the integral \int_0^1 e^{(1-s)*factor*lambda}*s^{k-1}/(k-1)! ds
                         for j in range(self.phi_coll.num_nodes):
                             phi[m][n].np_array(i)[:] += ((b[j] * c[j] ** (k - 1)) / km1_fac) * exp_terms[j]
 
+        # update the indeces where lambda=0 (i.e. the non-exponential indeces), there phi_k(0) = 1/k!
         if update_non_exp_indeces:
             for n in range(N_fac):
                 for m in range(N_ind):
@@ -91,46 +118,58 @@ class imexexp_1st_order(sweeper):
 
         return phi
 
-    def compute_lambda_and_phi(self):
+    def compute_lambda_phi_Qmat_exp(self):
 
         if not hasattr(self, "old_V"):
-            self.old_V = self.level.prob.dtype_u(init=self.level.prob.init, val=0.0)
+            # make some space for the old value of u[0]
+            self.u_old = self.level.prob.dtype_u(init=self.level.prob.init, val=0.0)
 
-        if abs(self.old_V[0] - self.level.u[0][0]) > 1e-10 * abs(self.level.u[0][0]):
+        # everything that is computed in this if statement depends on u[0] only
+        # To save computations we recompute that only if u[0] has changed.
+        # Also, we check only for the first component u[0][0] of u[0] to save more computations.
+        # Remember that u[0][0] is a sub_vector representing the potential on the whole mesh and is enough to check if u[0] has changed.
+        if abs(self.u_old[0] - self.level.u[0][0]) > 1e-10 * abs(self.level.u[0][0]):
 
-            self.old_V[0].numpy_array[:] = self.level.u[0][0].numpy_array[:]
+            self.u_old[0].numpy_array[:] = self.level.u[0][0].numpy_array[:]
 
             L = self.level
             P = L.prob
             M = self.coll.num_nodes
             c = self.coll.nodes
 
-            # compute lambda
+            # compute lambda(u) of the exponential term f_exp(u)=lmbda(u)*(u-y_inf(u))
             self.lmbda = P.lmbda_eval(L.u[0], L.time)
 
             if not hasattr(self, "phi"):
+                # make some space
                 self.phi = [[P.dtype_u(init=P.init, val=0.0) for i in range(M)] for k in range(M + 1)]
                 self.phi_one = [[P.dtype_u(init=P.init, val=0.0) for i in range(M)]]
+            # evaluate the phi_k(dt*c_i*lambda) functions at the collocation nodes c_i for k=0,...,M
             self.phi = self.phi_eval_lists(P, L.dt * c, list(range(M + 1)), self.phi, self.lmbda, False)
+            # evaluates phi_1(dt*delta_i*lambda) for delta_i = c_i - c_{i-1}
             self.phi_one = self.phi_eval_lists(P, L.dt * self.delta, [1], self.phi_one, self.lmbda, True)
 
-            # compute weight for the integration of \int_0^ci exp(dt*(ci-r)lmbda)*PiQ(r)dr = \sum_{j=0}^{M-1} Qmat_exp[i,j]*Q[j]
+            # compute weight for the integration of \int_0^ci exp(dt*(ci-r)lmbda)*PiQ(r)dr, where PiQ(r) is a polynomial inteprolating
+            # Q(c_i)=Q[i].
+            # We do so as \int_0^ci exp(dt*(ci-r)lmbda)*PiQ(r)dr = \sum_{j=0}^{M-1} Qmat_exp[i,j]*Q[j]
             if not hasattr(self, "Qmat_exp"):
+                # make some space
                 self.Qmat_exp = [[P.dtype_u(init=P.init, val=0.0) for j in range(M)] for i in range(M)]
             for i in range(M):
                 for j in range(M):
+                    # zero out previous values
                     self.Qmat_exp[i][j].zero_sub(P.rhs_exp_indeces)
                     for k in range(M):
+                        # self.Qmat_exp[i][j] += self.w[k, j] * c[i] ** (k + 1) * self.phi[k + 1][i]
                         self.Qmat_exp[i][j].axpy_sub(
                             self.w[k, j] * c[i] ** (k + 1), self.phi[k + 1][i], P.rhs_exp_indeces
                         )
-                        # self.Qmat_exp[i][j] += self.w[k, j] * c[i] ** (k + 1) * self.phi[k + 1][i]
 
             self.lambda_and_phi_outdated = False
 
     def integrate(self):
         """
-        Integrates the right-hand side (here impl + expl + exp)
+        Integrates the right-hand side (here impl + expl + exp) using exponential Runge-Kutta
 
         Returns:
             list of dtype_u: containing the integral as values
@@ -141,13 +180,12 @@ class imexexp_1st_order(sweeper):
         P = L.prob
         M = self.coll.num_nodes
 
-        self.compute_lambda_and_phi()
+        self.compute_lambda_phi_Qmat_exp()
 
         if not hasattr(self, "Q"):
             self.Q = [P.dtype_u(init=P.init, val=0.0) for _ in range(M)]
             self.tmp = P.dtype_u(init=P.init, val=0.0)
 
-        # compute polynomial. remember that L.u[k+1] corresponds to c[k]
         for k in range(M):
             # self.Q[k] = L.f[k + 1].exp + self.lmbda * (L.u[0] - L.u[k + 1])  # at the indeces of the exponential rhs, otherwsie 0
             self.Q[k].zero_sub(P.rhs_exp_indeces)
@@ -195,7 +233,7 @@ class imexexp_1st_order(sweeper):
         for i in range(1, M):
             integral[M - i] -= integral[M - i - 1]
 
-        # do the sweep, method 1
+        # prepare the integral term
         for m in range(M):
             # integral[m] -= L.dt * self.delta[m] * (L.f[m].expl + L.f[m + 1].impl + self.phi_one[0][m] * (L.f[m].exp + self.lmbda * (L.u[0] - L.u[m])))
             integral[m].axpy_sub(-L.dt * self.delta[m], L.f[m + 1].impl, P.rhs_stiff_indeces)
@@ -206,8 +244,10 @@ class imexexp_1st_order(sweeper):
             self.tmp.iadd_sub(L.f[m].exp, P.rhs_exp_indeces)
             self.tmp.imul_sub(self.phi_one[0][m], P.rhs_exp_indeces)
             integral[m].axpy_sub(-L.dt * self.delta[m], self.tmp, P.rhs_exp_indeces)
+
+        # do the sweep
         for m in range(M):
-            # rhs = L.u[m] + integral[m] + L.dt * self.delta[m] * (L.f[m].expl + self.phi_one[0][m] * (L.f[m].exp + self.lmbda * (L.u[0] - L.u[m])))
+            # tmp = L.u[m] + integral[m] + L.dt * self.delta[m] * (L.f[m].expl + self.phi_one[0][m] * (L.f[m].exp + self.lmbda * (L.u[0] - L.u[m])))
             self.tmp.zero()
             self.tmp.copy_sub(L.u[0], P.rhs_exp_indeces)
             self.tmp.axpy_sub(-1.0, L.u[m], P.rhs_exp_indeces)
@@ -289,11 +329,11 @@ class imexexp_1st_order(sweeper):
         L.status.unlocked = True
         L.status.updated = True
 
-        self.update_lmbda_yinf_status(outdated=True)
+    #     self.update_lmbda_yinf_status(outdated=True)
 
-    def update_lmbda_yinf_status(self, outdated):
-        if not self.level.prob.constant_lambda_and_phi and outdated:
-            self.lambda_and_phi_outdated = True
+    # def update_lmbda_yinf_status(self, outdated):
+    #     if not self.level.prob.constant_lambda_and_phi and outdated:
+    #         self.lambda_and_phi_outdated = True
 
     def compute_residual(self, stage=''):
         """
@@ -329,6 +369,7 @@ class imexexp_1st_order(sweeper):
                 res[m] += L.tau[m]
             # use abs function from data type here
             res_norm.append(abs(res[m]))
+            # the different components of the monodomain equation have very different magnitude therefore we use a tailored relative norm here to avoid the cancellation of the smaller components
             rel_res_norm.append(res[m].rel_norm(L.u[0]))
 
         # find maximal residual over the nodes

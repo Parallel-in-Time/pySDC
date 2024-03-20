@@ -1,9 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from matplotlib.animation import FuncAnimation
 from pathlib import Path
 import os
+
+# Script for displaying the solution of the monodomain equation
 
 executed_file_dir = os.path.dirname(os.path.realpath(__file__))
 output_root = executed_file_dir + "/../../../../data/Monodomain/results_tmp/"
@@ -13,6 +14,9 @@ ionic_model = "TTP"
 file_name = "monodomain"
 file_path = Path(output_root + domain_name + "/" + "ref_" + str(refinements) + "/" + ionic_model + "/" + file_name)
 
+
+# no need to modifiy below this line
+# ------------------------------------------------------------------------------
 if not file_path.with_suffix(".npy").is_file():
     print(f"File {str(file_path)} does not exist")
     exit()

@@ -1,23 +1,22 @@
-import numpy as np
 import scipy.fft as fft
 
-from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.projects.Monodomain.datatype_classes.DCT_Vector import DCT_Vector
 
 
 class DCT_to_DCT(space_transfer):
-    def __init__(self, fine_prob, coarse_prob, params):
-        """
-        Initialization routine
+    """
+    Class to transfer data between two meshes using DCT.
+    Restriction is performed by zeroing out high frequency modes, while prolongation is done by zero-padding.
 
-        Args:
+    Arguments:
+    ----------
             fine_prob: fine problem
             coarse_prob: coarse problem
             params: parameters for the transfer operators
-        """
+    """
 
-        # assumes problem has either periodic or neumann-zero boundary conditions
+    def __init__(self, fine_prob, coarse_prob, params):
 
         # invoke super initialization
         super(DCT_to_DCT, self).__init__(fine_prob, coarse_prob, params)
@@ -34,7 +33,7 @@ class DCT_to_DCT(space_transfer):
 
     def restrict(self, F):
         """
-        Restriction implementation
+        Restriction opeartor
         Args:
             F: the fine level data (easier to access than via the fine attribute)
         """
@@ -51,7 +50,7 @@ class DCT_to_DCT(space_transfer):
 
     def prolong(self, G):
         """
-        Prolongation implementation
+        Prolongation opeartor
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
