@@ -37,7 +37,7 @@ The resulting method can be seen as a particular case of ESDC and will be denote
 
 Running the code
 ----------------
-Due to their complexity, ionic models are coded in C++ and wrapped to Python. Therefore, befofore running any example you need to compile the ionic models by running the following command in the root folder:
+Due to their complexity, ionic models are coded in C++ and wrapped to Python. Therefore, before running any example you need to compile the ionic models by running the following command in the root folder:
 
 .. code-block::
 
@@ -53,12 +53,12 @@ Then an example can be run:
 
 Stability
 ---------
-We display here the stability domain of the ESDC method and SDC methods applied to the test problem 
+We display here the stability domain of the ESDC and SDC methods, both with IMEXEXP as correction scheme, applied to the test problem 
 
 .. math:: 
     y'=\lambda_I y+\lambda_E y+\lambda_e y, 
     
-with :math:`\lambda_I,\lambda_E,\lambda_e y` representing :math:`f_I,f_E,f_e`, respectively.
+with :math:`\lambda_I,\lambda_E,\lambda_e` representing :math:`f_I,f_E,f_e`, respectively.
 We fix :math:`\lambda_E=-1` and vary the stiff terms :math:`\lambda_I,\lambda_e` only. We see as the ESDC method is stable for all tested values of :math:`\lambda_I,\lambda_e`, while SDC is not.
 
 .. image:: ../../../data/stability_domain_IMEXEXP_EXPRK.png
@@ -70,6 +70,7 @@ Convergence
 -----------
 Here we verify convergence of the ESDC method for the monodomain equation. 
 We fix the number of collocation nodes to :math:`m=6` and perform a convergence experiment fixing the number of sweeps to either :math:`k=3` or :math:`k=6`.
+We use the ten Tusscher-Panfilov ionic model, which is employed in practical applications.
 We see that we gain one order of accuracy per sweep, as expected. 
 
 .. image:: ../../../data/convergence_ESDC_fixed_iter.png
@@ -84,7 +85,7 @@ Here we consider three methods:
 * MLESDC: This is a multilevel version of ESDC with :math:`m=6` collocation nodes on the fine level and :math:`m=3` nodes on the coarse level.
 * PFASST: Combination of the PFASST parallelization method with MLESDC, using 24 processors.
 
-We dispaly the number of iterations required by each method to reach a given tolerance and the residual at convergence. As ionic model we use the ten Tusscher-Panfilov model, which is used in practical applications.
+We dispaly the number of iterations required by each method to reach a given tolerance and the residual at convergence. As ionic model we use again the ten Tusscher-Panfilov model.
 We see as PFASST requires a reasonalbly small number of iterations, comparable to the serial counterparts ESDC and MLESDC.
 
 .. image:: ../../../data/niter_VS_time.png
