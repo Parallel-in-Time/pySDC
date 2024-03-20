@@ -8,7 +8,7 @@ import os
 
 class Parabolic_DCT(RegisterParams):
     """
-    A class for the spatial discreitzation of the parabolic part of the monodomain equation.
+    A class for the spatial discretization of the parabolic part of the monodomain equation.
     Here we discretize the spatial domain with a uniform mesh and use the discrete cosine transform (DCT)
     to discretize the Laplacian operator. The DCT is a real-to-real type of Fourier transform that is well suited for
     Neumann boundary conditions.

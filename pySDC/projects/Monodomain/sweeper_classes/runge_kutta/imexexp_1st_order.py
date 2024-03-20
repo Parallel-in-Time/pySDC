@@ -11,7 +11,6 @@ class imexexp_1st_order(sweeper):
     First-order IMEXEXP sweeper using implicit/explicit/exponential Euler as base integrator
     In the cardiac electrphysiology community this is known as Rush-Larsen scheme.
 
-    The underlying intergrator is collocation method, leading to standard SDC.
     """
 
     def __init__(self, params):

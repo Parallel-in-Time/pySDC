@@ -59,7 +59,7 @@ We display here the stability domain of the ESDC and SDC methods, both with IMEX
     y'=\lambda_I y+\lambda_E y+\lambda_e y, 
     
 with :math:`\lambda_I,\lambda_E,\lambda_e` representing :math:`f_I,f_E,f_e`, respectively.
-We fix :math:`\lambda_E=-1` and vary the stiff terms :math:`\lambda_I,\lambda_e` only. We see as the ESDC method is stable for all tested values of :math:`\lambda_I,\lambda_e`, while SDC is not.
+We fix :math:`\lambda_E=-1` and vary the stiff terms :math:`\lambda_I,\lambda_e` only. We see that the ESDC method is stable for all tested values of :math:`\lambda_I,\lambda_e`, while SDC is not.
 
 .. image:: ../../../data/stability_domain_IMEXEXP_EXPRK.png
    :scale: 60 %
@@ -85,8 +85,8 @@ Here we consider three methods:
 * MLESDC: This is a multilevel version of ESDC with :math:`m=6` collocation nodes on the fine level and :math:`m=3` nodes on the coarse level.
 * PFASST: Combination of the PFASST parallelization method with MLESDC, using 24 processors.
 
-We dispaly the number of iterations required by each method to reach a given tolerance and the residual at convergence. As ionic model we use again the ten Tusscher-Panfilov model.
-We see as PFASST requires a reasonalbly small number of iterations, comparable to the serial counterparts ESDC and MLESDC.
+We display the number of iterations required by each method to reach a given tolerance and the residual at convergence. As ionic model we use again the ten Tusscher-Panfilov model.
+We see that PFASST requires a reasonalbly small number of iterations, comparable to the serial counterparts ESDC and MLESDC.
 
 .. image:: ../../../data/niter_VS_time.png
    :scale: 100 %

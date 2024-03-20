@@ -128,7 +128,7 @@ class imexexp_1st_order(sweeper):
         # To save computations we recompute that only if u[0] has changed.
         # Also, we check only for the first component u[0][0] of u[0] to save more computations.
         # Remember that u[0][0] is a sub_vector representing the potential on the whole mesh and is enough to check if u[0] has changed.
-        if abs(self.u_old[0] - self.level.u[0][0]) > 1e-10 * abs(self.level.u[0][0]):
+        if not np.allclose(self.u_old[0].numpy_array[:], self.level.u[0][0].numpy_array[:], rtol=1e-10, atol=1e-10):
 
             self.u_old[0].numpy_array[:] = self.level.u[0][0].numpy_array[:]
 
@@ -149,7 +149,7 @@ class imexexp_1st_order(sweeper):
             # evaluates phi_1(dt*delta_i*lambda) for delta_i = c_i - c_{i-1}
             self.phi_one = self.phi_eval_lists(P, L.dt * self.delta, [1], self.phi_one, self.lmbda, True)
 
-            # compute weight for the integration of \int_0^ci exp(dt*(ci-r)lmbda)*PiQ(r)dr, where PiQ(r) is a polynomial inteprolating
+            # compute weight for the integration of \int_0^ci exp(dt*(ci-r)lmbda)*PiQ(r)dr, where PiQ(r) is a polynomial interpolating
             # Q(c_i)=Q[i].
             # We do so as \int_0^ci exp(dt*(ci-r)lmbda)*PiQ(r)dr = \sum_{j=0}^{M-1} Qmat_exp[i,j]*Q[j]
             if not hasattr(self, "Qmat_exp"):
@@ -187,7 +187,7 @@ class imexexp_1st_order(sweeper):
             self.tmp = P.dtype_u(init=P.init, val=0.0)
 
         for k in range(M):
-            # self.Q[k] = L.f[k + 1].exp + self.lmbda * (L.u[0] - L.u[k + 1])  # at the indeces of the exponential rhs, otherwsie 0
+            # self.Q[k] = L.f[k + 1].exp + self.lmbda * (L.u[0] - L.u[k + 1])  # at the indeces of the exponential rhs, otherwise 0
             self.Q[k].zero_sub(P.rhs_exp_indeces)
             self.Q[k].iadd_sub(L.u[0], P.rhs_exp_indeces)
             self.Q[k].axpy_sub(-1.0, L.u[k + 1], P.rhs_exp_indeces)
@@ -293,47 +293,6 @@ class imexexp_1st_order(sweeper):
             raise CollocationError("This option is not implemented yet.")
 
         return None
-
-    def predict(self):
-        """
-        Predictor to fill values at nodes before first sweep
-
-        Default prediction for the sweepers, only copies the values to all collocation nodes
-        and evaluates the RHS of the ODE there
-        """
-
-        # get current level and problem description
-        L = self.level
-        P = L.prob
-
-        # evaluate RHS at left point
-        L.f[0] = P.eval_f(L.u[0], L.time)
-
-        for m in range(1, self.coll.num_nodes + 1):
-            # copy u[0] to all collocation nodes, evaluate RHS
-            if self.params.initial_guess == "spread":
-                L.u[m] = P.dtype_u(L.u[0])
-                L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
-            # start with zero everywhere
-            elif self.params.initial_guess == "zero":
-                L.u[m] = P.dtype_u(init=P.init, val=0.0)
-                L.f[m] = P.dtype_f(init=P.init, val=0.0)
-            # start with random initial guess
-            elif self.params.initial_guess == "random":
-                L.u[m] = P.dtype_u(init=P.init, val=self.rng.rand(1)[0])
-                L.f[m] = P.dtype_f(init=P.init, val=self.rng.rand(1)[0])
-            else:
-                raise ParameterError(f"initial_guess option {self.params.initial_guess} not implemented")
-
-        # indicate that this level is now ready for sweeps
-        L.status.unlocked = True
-        L.status.updated = True
-
-    #     self.update_lmbda_yinf_status(outdated=True)
-
-    # def update_lmbda_yinf_status(self, outdated):
-    #     if not self.level.prob.constant_lambda_and_phi and outdated:
-    #         self.lambda_and_phi_outdated = True
 
     def compute_residual(self, stage=''):
         """

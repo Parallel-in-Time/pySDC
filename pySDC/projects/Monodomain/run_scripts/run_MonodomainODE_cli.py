@@ -25,7 +25,7 @@ def main():
         "--num_nodes",
         default="4",
         type=list_of_ints,
-        help="list of ints (as '5,3', i.e. no brakets): number of collocation nodes per level",
+        help="list of ints (as '5,3', i.e. no brackets): number of collocation nodes per level",
     )
     parser.add_argument("--num_sweeps", default="1", type=list_of_ints, help="list of ints: number of sweeps per level")
     parser.add_argument(

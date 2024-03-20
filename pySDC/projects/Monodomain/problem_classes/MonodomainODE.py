@@ -88,7 +88,7 @@ class MonodomainODE(ptype):
         # create initial value (as vector of vectors). Every variable is constant in space
         u0 = self.dtype_u(self.init, val=self.ionic_model.initial_values())
 
-        # overwwrite the initial value with solution from file if desired
+        # overwrite the initial value with solution from file if desired
         if self.read_init_val:
             read_ok = self.read_reference_solution(u0, self.init_val_name, True)
             assert read_ok, "ERROR: Could not read initial value from file."
@@ -168,7 +168,7 @@ class MonodomainODE(ptype):
         if fh is None:
             fh = self.dtype_f(init=self.init, val=0.0)
 
-        # eval ionic model rhs on u and put result in fh. All indices of the vector of vector fh mush be computed (list(range(self.size))
+        # eval ionic model rhs on u and put result in fh. All indices of the vector of vector fh must be computed (list(range(self.size))
         self.eval_expr(self.ionic_model.f, u, fh, list(range(self.size)), False)
         # apply stimulus
         fh.val_list[0] += self.Istim(t)
