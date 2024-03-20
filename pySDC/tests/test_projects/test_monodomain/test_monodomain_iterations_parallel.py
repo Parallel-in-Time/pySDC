@@ -207,20 +207,6 @@ def check_iterations_parallel(expected_avg_niters, **options):
     return iters_info
 
 
-def move_coverage_folders():
-    import glob
-    import shutil
-
-    path = "pySDC/projects/Monodomain/run_scripts/"
-    folders_pattern = ".coverage*"
-    folders = glob.glob(path + folders_pattern, recursive=False)
-    print(folders)
-
-    for folder in folders:
-        folder_name = os.path.basename(folder)
-        shutil.move(folder, "./" + folder_name)
-
-
 @pytest.mark.monodomain
 def test_monodomain_iterations_ESDC_MLESDC_PFASST():
 
@@ -252,8 +238,6 @@ def test_monodomain_iterations_ESDC_MLESDC_PFASST():
         n_time_ranks=24,
         expected_avg_niters=3.0,
     )
-
-    move_coverage_folders()
 
     iters_info_list = [ESDC_iters_info, MLESDC_iters_info, PFASST_iters_info]
     labels_list = ["ESDC", "MLESDC", "PFASST"]
