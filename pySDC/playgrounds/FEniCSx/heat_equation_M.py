@@ -2,10 +2,8 @@ import numpy as np
 
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-
 # from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import fenics_heat_mass
 from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
-
 # from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
 from pySDC.playgrounds.FEniCSx.HeatEquation_1D_FEniCSx_matrix_forced_2 import fenicsx_heat_mass
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
