@@ -1,7 +1,4 @@
 import numpy as np
-import mpi4py
-
-mpi4py.rc.recv_mprobe = False
 from mpi4py import MPI
 
 from pySDC.core.Controller import controller
