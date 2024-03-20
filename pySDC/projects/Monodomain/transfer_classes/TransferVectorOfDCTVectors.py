@@ -5,7 +5,7 @@ from pySDC.projects.Monodomain.datatype_classes.VectorOfVectors import VectorOfV
 
 class TransferVectorOfDCTVectors(space_transfer):
     """
-    This implementation can restrict and prolong between super vectors
+    This implementation can restrict and prolong VectorOfVectors
     """
 
     def __init__(self, fine_prob, coarse_prob, params):

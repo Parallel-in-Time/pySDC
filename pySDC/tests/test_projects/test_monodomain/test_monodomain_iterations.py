@@ -1,71 +1,46 @@
 import pytest
 
 
-def check_iterations(domain_name, num_nodes, refinements, ionic_model_name, n_time_ranks, expected_avg_niters):
+def check_iterations(expected_avg_niters, **opts):
     from pySDC.projects.Monodomain.run_scripts.run_MonodomainODE import setup_and_run
 
     # define sweeper parameters
-    integrator = "IMEXEXP_EXPRK"
-    num_sweeps = [1]
+    opts["integrator"] = "IMEXEXP_EXPRK"
+    opts["num_sweeps"] = [1]
 
     # set step parameters
-    max_iter = 100
+    opts["max_iter"] = 100
 
     # set level parameters
-    dt = 0.025
+    opts["dt"] = 0.025
 
-    restol = 5e-8  # residual tolerance
+    opts["restol"] = 5e-8  # residual tolerance
 
     # skip residual computation at coarser levels (if any)
-    skip_residual_computation = True
+    opts["skip_residual_computation"] = True
 
     # interpolate or recompute rhs on fine level
-    finter = True
+    opts["finter"] = True
 
     # set time parallelism to True or emulated (False)
-    truly_time_parallel = False
+    opts["truly_time_parallel"] = False
 
     # set monodomain parameters
-    order = 4  # 2 or 4
-    enable_output = False
-    write_database = False
+    opts["order"] = 4  # 2 or 4
+    opts["enable_output"] = False
+    opts["write_database"] = False
 
-    output_root = "results_iterations_pytest"
+    opts["output_root"] = "results_iterations_pytest"
 
-    read_init_val = False
-    init_time = 0.0
-    end_time = 2.0
-    write_as_reference_solution = False
-    write_all_variables = False
-    output_file_name = "monodomain"
-    ref_sol = ""
+    opts["read_init_val"] = False
+    opts["init_time"] = 0.0
+    opts["end_time"] = 2.0
+    opts["write_as_reference_solution"] = False
+    opts["write_all_variables"] = False
+    opts["output_file_name"] = "monodomain"
+    opts["ref_sol"] = ""
 
-    err, rel_err, avg_niters, times, niters, residuals = setup_and_run(
-        integrator,
-        num_nodes,
-        skip_residual_computation,
-        num_sweeps,
-        max_iter,
-        dt,
-        restol,
-        domain_name,
-        refinements,
-        order,
-        ionic_model_name,
-        read_init_val,
-        init_time,
-        enable_output,
-        write_as_reference_solution,
-        write_all_variables,
-        output_root,
-        output_file_name,
-        ref_sol,
-        end_time,
-        truly_time_parallel,
-        n_time_ranks,
-        finter,
-        write_database,
-    )
+    err, rel_err, avg_niters, times, niters, residuals = setup_and_run(**opts)
 
     print(f"Got average number of iterations {avg_niters}, expected was {expected_avg_niters}")
 

@@ -69,81 +69,55 @@ def options_command(options):
 def generate_initial_value(ionic_model_name):
     from pySDC.projects.Monodomain.run_scripts.run_MonodomainODE import setup_and_run
 
+    opts = dict()
+
     # define sweeper parameters
-    integrator = "IMEXEXP_EXPRK"
-    num_nodes = [5]
-    num_sweeps = [1]
+    opts["integrator"] = "IMEXEXP_EXPRK"
+    opts["num_nodes"] = [5]
+    opts["num_sweeps"] = [1]
 
     # set step parameters
-    max_iter = 100
+    opts["max_iter"] = 100
 
     # set level parameters
-    dt = 0.1
+    opts["dt"] = 0.1
 
-    restol = 5e-8  # residual tolerance
+    opts["restol"] = 5e-8  # residual tolerance
 
-    truly_time_parallel = False
-    n_time_ranks = 1
+    opts["truly_time_parallel"] = False
+    opts["n_time_ranks"] = 1
 
     # skip residual computation at coarser levels (if any)
-    skip_residual_computation = True
+    opts["skip_residual_computation"] = True
 
     # interpolate or recompute rhs on fine level
-    finter = False
+    opts["finter"] = False
 
     # set monodomain parameters
-    domain_name = "cuboid_1D_small"
-    refinements = [0]
-    order = 4  # 2 or 4
+    opts["domain_name"] = "cuboid_1D_small"
+    opts["ionic_model_name"] = ionic_model_name
+    opts["refinements"] = [0]
+    opts["order"] = 4  # 2 or 4
 
-    enable_output = False
-    write_database = False
+    opts["enable_output"] = False
+    opts["write_database"] = False
 
-    output_root = "results_iterations_parallel"
+    opts["output_root"] = "results_iterations_parallel"
 
-    read_init_val = False
-    init_time = 0.0
-    end_time = 6.0
-    write_as_reference_solution = True
-    write_all_variables = True
-    output_file_name = "init_val_DCT"
-    ref_sol = ""
+    opts["read_init_val"] = False
+    opts["init_time"] = 0.0
+    opts["end_time"] = 6.0
+    opts["write_as_reference_solution"] = True
+    opts["write_all_variables"] = True
+    opts["output_file_name"] = "init_val_DCT"
+    opts["ref_sol"] = ""
 
-    err, rel_err, avg_niters, times, niters, residuals = setup_and_run(
-        integrator,
-        num_nodes,
-        skip_residual_computation,
-        num_sweeps,
-        max_iter,
-        dt,
-        restol,
-        domain_name,
-        refinements,
-        order,
-        ionic_model_name,
-        read_init_val,
-        init_time,
-        enable_output,
-        write_as_reference_solution,
-        write_all_variables,
-        output_root,
-        output_file_name,
-        ref_sol,
-        end_time,
-        truly_time_parallel,
-        n_time_ranks,
-        finter,
-        write_database,
-    )
+    err, rel_err, avg_niters, times, niters, residuals = setup_and_run(**opts)
 
 
-def check_iterations_parallel(
-    integrator, num_nodes, ionic_model_name, truly_time_parallel, n_time_ranks, expected_avg_niters
-):
+def check_iterations_parallel(expected_avg_niters, **options):
     # define sweeper parameters
-    options = dict()
-    options["integrator"] = integrator
-    options["num_nodes"] = num_nodes
+
     options["num_sweeps"] = [1]
 
     # set step parameters
@@ -153,17 +127,12 @@ def check_iterations_parallel(
     # set level parameters
     options["restol"] = 5e-8
 
-    # set time parallelism to True or emulated (False)
-    options["truly_time_parallel"] = truly_time_parallel
-    options["n_time_ranks"] = n_time_ranks
-
     options["end_time"] = 0.6
 
     # set problem parameters
     options["domain_name"] = "cuboid_1D_small"
     options["refinements"] = [0]
     options["order"] = 4
-    options["ionic_model_name"] = ionic_model_name
     options["read_init_val"] = True
     options["init_time"] = 3.0
     options["enable_output"] = False
@@ -182,7 +151,7 @@ def check_iterations_parallel(
 
     # base_python_command = "coverage run -p run_MonodomainODE_cli.py"
     base_python_command = "coverage run -p " + cwd + "/run_MonodomainODE_cli.py"
-    cmd = f"mpirun -n {n_time_ranks} " + base_python_command + " " + options_command(options)
+    cmd = f"mpirun -n {options['n_time_ranks']} " + base_python_command + " " + options_command(options)
 
     print(f"Running command: {cmd}")
 
@@ -206,7 +175,7 @@ def check_iterations_parallel(
 
     assert (
         process.returncode == 0
-    ), f"ERROR: did not get return code 0, got {process.returncode} with {n_time_ranks} processes"
+    ), f"ERROR: did not get return code 0, got {process.returncode} with {options['n_time_ranks']} processes"
 
     # read the generated data
     executed_file_dir = os.path.dirname(os.path.realpath(__file__))

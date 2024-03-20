@@ -18,13 +18,13 @@ The monodomain equation models the electrical activity in the heart. It is a rea
 plus the boundary conditions, where :math:`V(t,x)\in\mathbb{R}` is the transmembrane potential and :math:`z_E(t,x)\in\mathbb{R}^n`, :math:`z_e(t,x)\in\mathbb{R}^m` are the ionic model state variables. 
 The ionic model right-hand side :math:`g_E` is a general nonlinear term, while :math:`\Lambda_e` is a diagonal matrix. The typical range for the number of unknowns :math:`N=1+n+m` is :math:`N\in [4,50]` and depends on the ionic model of choice. 
 
-Spatial discretiization yields a system of ODEs which can be written in compact form as
+Spatial discretization yields a system of ODEs which can be written in compact form as
 
 .. math::
     \mathbf y'=f_I(\mathbf y)+f_E(\mathbf y)+f_e(\mathbf y),
 
 where :math:`\mathbf y(t)\in\mathbb{R}^{M N}` is the vector of unknowns and :math:`M` the number of mesh nodes. 
-Concerning the right-hand sides, :math:`f_I` is a linear term for the discrete diffusion, :math:`f_E` is a nonlinear but non stiff term for :math:`I_{ion},g_E`, and :math:`f_e` is a severely stiff term for :math:`\Lambda_e(V)(z_e-z_{e,\infty}(V))`.
+Concerning the right-hand sides, :math:`f_I` is a linear term for the discrete diffusion, :math:`f_E` is a nonlinear but non-stiff term for :math:`I_{ion},g_E`, and :math:`f_e` is a severely stiff term for :math:`\Lambda_e(V)(z_e-z_{e,\infty}(V))`.
 
 The standard (serial) way of integrating the monodomain equation is by using a splitting method, where :math:`f_I` is integrated implicitly, :math:`f_E` explicitly, and :math:`f_e` using the exponential Euler method (which is inexpensive due to the diagonal structure of :math:`\Lambda_e`). We denote this method as IMEXEXP.
 
@@ -32,7 +32,7 @@ The ESDC method for the monodomain equation
 -------------------------------------------
 A possible way to parallelize the integration of the monodomain equation is by employing the SDC method in combination with the IMEXEXP approach for the correction scheme (preconditioner).
 However, this approach is unstable due to the severe stiffness of :math:`f_e`. 
-Therefore we propose an hybrid method, where we employ SDC for the :math:`f_I,f_E` terms and ESDC for the :math:`f_e` term. For the correcttion scheme we still use the IMEXEXP method. 
+Therefore we propose a hybrid method, where we employ SDC for the :math:`f_I,f_E` terms and ESDC for the :math:`f_e` term. For the correcttion scheme we still use the IMEXEXP method. 
 The resulting method can be seen as a particular case of ESDC and will be denoted by ESDC in the next figures, for simplicity.
 
 Running the code
