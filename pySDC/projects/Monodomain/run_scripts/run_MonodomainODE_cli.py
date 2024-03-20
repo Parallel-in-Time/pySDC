@@ -9,6 +9,14 @@ def list_of_ints(arg):
     return list(map(int, arg))
 
 
+# This is to run the MonodomainODE example from the command line
+# Pretty much all the parameters can be defined from the command line
+
+# For the refinements, it is possible to set negative values, which yield a mesh coarser than the baseline.
+# To do so in the command line use an underscore _ insteaf of a minus sign -.
+# For example, to solve a 3 level example with meshes refinements 1, 0 and -1, use the option --refinements 1,0,_1
+
+
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     # define sweeper parameters
@@ -39,7 +47,7 @@ def main():
         "--refinements",
         default="0",
         type=list_of_ints,
-        help="list of ints: loads a mesh which has already been pre-refined pre_refinements times.",
+        help="list of ints: number of refinements per level, with respect to a baseline mesh (negative values yield coarser meshes). For negative values use _ instead of -.",
     )
     parser.add_argument(
         "--order", default="4", type=list_of_ints, help="list of ints: order of FEM or FD discretization"
@@ -80,7 +88,7 @@ def main():
     # controller args
     parser.add_argument(
         "--truly_time_parallel",
-        default=True,
+        default=False,
         action=argparse.BooleanOptionalAction,
         help="truly time parallel or emulated",
     )

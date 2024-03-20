@@ -19,6 +19,11 @@ from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1
 )
 from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.imexexp_1st_order import imexexp_1st_order
 
+""" 
+Run the multirate Dahlquist test equation and plot the stability domain of the method.
+We vary only the exponential term and the stiff term, while the non stiff term is kept constant (to allow 2D plots).
+"""
+
 
 def set_logger(controller_params):
     logging.basicConfig(level=controller_params["logger_level"])
@@ -175,9 +180,6 @@ def plot_stability_domain(lmbda_laplacian_list, lmbda_gating_list, R, integrator
 
 def main(integrator, dl, l_min, openmp, n_time_ranks, end_time, num_nodes, check_stability):
 
-    # integrator = "IMEXEXP"
-    # integrator = "IMEXEXP_EXPRK"
-
     # get time integration parameters
     # set maximum number of iterations in SDC/ESDC/MLSDC/etc
     step_params = get_step_params(maxiter=5)
@@ -192,11 +194,13 @@ def main(integrator, dl, l_min, openmp, n_time_ranks, end_time, num_nodes, check
     controller_params = get_controller_params(get_output_root(), logger_level=40)
 
     # set stability test parameters
-    lmbda_others = -1.0
-    lmbda_laplacian_min = l_min
+    lmbda_others = -1.0  # the non stiff term
+    lmbda_laplacian_min = l_min  # the stiff term
     lmbda_laplacian_max = 0.0
-    lmbda_gating_min = l_min
+    lmbda_gating_min = l_min  # the exponential term
     lmbda_gating_max = 0.0
+
+    # define the grid for the stability domain
     n_lmbda_laplacian = np.round((lmbda_laplacian_max - lmbda_laplacian_min) / dl).astype(int) + 1
     n_lmbda_gating = np.round((lmbda_gating_max - lmbda_gating_min) / dl).astype(int) + 1
     lmbda_laplacian_list = np.linspace(lmbda_laplacian_min, lmbda_laplacian_max, n_lmbda_laplacian)
@@ -273,6 +277,7 @@ def main(integrator, dl, l_min, openmp, n_time_ranks, end_time, num_nodes, check
 
 
 if __name__ == "__main__":
+    # Plot stability for exponential SDC coupled with the implicit-explicit-exponential integrator as preconditioner
     main(
         integrator="IMEXEXP_EXPRK",
         dl=2,
@@ -281,8 +286,9 @@ if __name__ == "__main__":
         n_time_ranks=1,
         end_time=1.0,
         num_nodes=[5, 3],
-        check_stability=True,
+        check_stability=True,  # check that the stability function is bounded by 1.0
     )
+    # Plot stability for standard SDC coupled with the implicit-explicit-exponential integrator as preconditioner
     main(
         integrator="IMEXEXP",
         dl=2,
@@ -291,5 +297,5 @@ if __name__ == "__main__":
         n_time_ranks=1,
         end_time=1.0,
         num_nodes=[5, 3],
-        check_stability=False,
+        check_stability=False,  # do not check for stability since we already know that the method is not stable
     )

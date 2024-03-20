@@ -99,8 +99,10 @@ def get_description(
     problem = MultiscaleMonodomainODE
 
     if integrator == "IMEXEXP":
+        # implicit-explicit-exponential integrators in the preconditioner and standard SDC
         description["sweeper_class"] = imexexp_1st_order
     elif integrator == "IMEXEXP_EXPRK":
+        # implicit-explicit-exponential integrators in the preconditioner and exponential SDC
         description["sweeper_class"] = imexexp_1st_order_ExpRK
     else:
         raise ParameterError("Unknown integrator.")
