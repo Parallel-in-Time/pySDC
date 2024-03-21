@@ -120,7 +120,7 @@ class imexexp_1st_order(sweeper):
 
     def compute_lambda_phi_Qmat_exp(self):
 
-        if not hasattr(self, "old_V"):
+        if not hasattr(self, "u_old"):
             # make some space for the old value of u[0]
             self.u_old = self.level.prob.dtype_u(init=self.level.prob.init, val=0.0)
 
