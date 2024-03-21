@@ -234,7 +234,7 @@ class imexexp_1st_order(sweeper):
             integral[M - i] -= integral[M - i - 1]
 
         def myprint(name, v):
-            vtmp = [v.val_list[i][31] for i in range(4)]
+            vtmp = [v.val_list[i].values[31] for i in range(4)]
             vtmp = np.array(vtmp)
             print(f"{name} = {vtmp}")
 
