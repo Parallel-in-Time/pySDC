@@ -357,7 +357,7 @@ def main():
     num_sweeps = [1]
 
     # set step parameters
-    max_iter = 1
+    max_iter = 100
 
     # set level parameters
     dt = 0.05

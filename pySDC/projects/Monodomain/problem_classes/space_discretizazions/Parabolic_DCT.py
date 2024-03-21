@@ -261,7 +261,7 @@ class Parabolic_DCT(RegisterParams):
         """
         Add the discrete Laplacian operator to res: res += A * uh
         """
-        res += sp.fft.idctn(self.diff_dct * sp.fft.dctn(uh.reshape(self.shape))).ravel()
+        res[:] += sp.fft.idctn(self.diff_dct * sp.fft.dctn(uh.reshape(self.shape))).ravel()
 
     def init_output(self, output_folder):
         # Initialize the output parameters and file
