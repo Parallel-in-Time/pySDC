@@ -1,7 +1,7 @@
 import scipy.fft as fft
 
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.projects.Monodomain.datatype_classes.DCT_Vector import DCT_Vector
+from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 class DCT_to_DCT(space_transfer):
@@ -38,12 +38,14 @@ class DCT_to_DCT(space_transfer):
             F: the fine level data (easier to access than via the fine attribute)
         """
 
+        G = mesh(self.coarse_prob.parabolic.init)
+
         if self.same_grid:
-            G = F.copy()
+            G[:] = F
         else:
-            G = DCT_Vector(self.coarse_prob.init)
-            G.values[:] = fft.idctn(
-                fft.dctn(F.values.reshape(self.fine_shape), norm=self.norm), s=self.coarse_shape, norm=self.norm
+
+            G[:] = fft.idctn(
+                fft.dctn(F.reshape(self.fine_shape), norm=self.norm), s=self.coarse_shape, norm=self.norm
             ).ravel()
 
         return G
@@ -55,12 +57,14 @@ class DCT_to_DCT(space_transfer):
             G: the coarse level data (easier to access than via the coarse attribute)
         """
 
+        F = mesh(self.fine_prob.parabolic.init)
+
         if self.same_grid:
-            F = G.copy()
+            F[:] = G
         else:
-            F = DCT_Vector(self.fine_prob.init)
-            F.values[:] = fft.idctn(
-                fft.dctn(G.values.reshape(self.coarse_shape), norm=self.norm), s=self.fine_shape, norm=self.norm
+
+            F[:] = fft.idctn(
+                fft.dctn(G.reshape(self.coarse_shape), norm=self.norm), s=self.fine_shape, norm=self.norm
             ).ravel()
 
         return F

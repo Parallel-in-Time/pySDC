@@ -42,8 +42,8 @@ def get_controller(controller_params, description, time_comm, n_time_ranks, trul
 
 
 def print_dofs_stats(time_rank, controller, P, uinit):
-    tot_dofs = uinit.getSize()
-    mesh_dofs = uinit[0].getSize()
+    tot_dofs = uinit.size
+    mesh_dofs = uinit.shape[1]
     if time_rank == 0:
         controller.logger.info(f"Total dofs: {tot_dofs}, mesh dofs = {mesh_dofs}")
 
