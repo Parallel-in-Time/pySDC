@@ -1,6 +1,7 @@
 from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.projects.Monodomain.transfer_classes.Transfer_DCT_Vector import DCT_to_DCT
-from pySDC.projects.Monodomain.datatype_classes.VectorOfVectors import VectorOfVectors, IMEXEXP_VectorOfVectors
+from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.projects.Monodomain.datatype_classes.my_mesh import imexexp_mesh
 
 
 class TransferVectorOfDCTVectors(space_transfer):
@@ -16,33 +17,24 @@ class TransferVectorOfDCTVectors(space_transfer):
 
     def restrict(self, F):
 
-        u_coarse = VectorOfVectors(
-            init=self.coarse_prob.init,
-            val=0.0,
-            type_sub_vector=self.coarse_prob.vector_type,
-            size=self.coarse_prob.size,
-        )
+        u_coarse = mesh(self.coarse_prob.init)
 
-        for i in range(u_coarse.size):
-            u_coarse.val_list[i].values[:] = self.DCT_to_DCT.restrict(F[i]).values
+        for i in range(self.coarse_prob.size):
+            u_coarse[i][:] = self.DCT_to_DCT.restrict(F[i])
 
         return u_coarse
 
     def prolong(self, G):
 
-        if isinstance(G, VectorOfVectors):
-            u_fine = VectorOfVectors(
-                init=self.fine_prob.init, val=0.0, type_sub_vector=self.fine_prob.vector_type, size=self.fine_prob.size
-            )
-            for i in range(u_fine.size):
-                u_fine.val_list[i].values[:] = self.DCT_to_DCT.prolong(G[i]).values
-        elif isinstance(G, IMEXEXP_VectorOfVectors):
-            u_fine = IMEXEXP_VectorOfVectors(
-                init=self.fine_prob.init, val=0.0, type_sub_vector=self.fine_prob.vector_type, size=self.fine_prob.size
-            )
-            for i in range(u_fine.size):
-                u_fine.impl.val_list[i].values[:] = self.DCT_to_DCT.prolong(G.impl[i]).values
-                u_fine.expl.val_list[i].values[:] = self.DCT_to_DCT.prolong(G.expl[i]).values
-                u_fine.exp.val_list[i].values[:] = self.DCT_to_DCT.prolong(G.exp[i]).values
+        if isinstance(G, imexexp_mesh):
+            u_fine = imexexp_mesh(self.fine_prob.init)
+            for i in range(self.fine_prob.size):
+                u_fine.impl[i][:] = self.DCT_to_DCT.prolong(G.impl[i])
+                u_fine.expl[i][:] = self.DCT_to_DCT.prolong(G.expl[i])
+                u_fine.exp[i][:] = self.DCT_to_DCT.prolong(G.exp[i])
+        elif isinstance(G, mesh):
+            u_fine = mesh(self.fine_prob.init)
+            for i in range(self.fine_prob.size):
+                u_fine[i][:] = self.DCT_to_DCT.prolong(G[i])
 
         return u_fine

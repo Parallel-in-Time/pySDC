@@ -2,7 +2,8 @@ from pathlib import Path
 import logging
 import numpy as np
 from pySDC.core.Problem import ptype
-from pySDC.projects.Monodomain.datatype_classes.VectorOfVectors import VectorOfVectors, IMEXEXP_VectorOfVectors
+from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.projects.Monodomain.datatype_classes.my_mesh import imexexp_mesh, get_np_list
 from pySDC.projects.Monodomain.problem_classes.space_discretizazions.Parabolic_DCT import Parabolic_DCT
 import pySDC.projects.Monodomain.problem_classes.ionicmodels.cpp as ionicmodels
 
@@ -36,31 +37,23 @@ class MonodomainODE(ptype):
 
         self.parabolic = Parabolic_DCT(**problem_params)
 
-        self.init = self.parabolic.init
+        self.define_ionic_model(problem_params["ionic_model_name"])
+
+        self.init = ((self.size, *self.parabolic.init[0]), self.parabolic.init[1], self.parabolic.init[2])
 
         # invoke super init
         super(MonodomainODE, self).__init__(self.init)
         # store all problem params dictionary values as attributes
         self._makeAttributeAndRegister(*problem_params.keys(), localVars=problem_params, readOnly=True)
 
-        self.define_ionic_model()
         self.define_stimulus()
 
         # initial and end time
         self.t0 = 0.0
         self.Tend = 50.0 if self.end_time < 0.0 else self.end_time
 
-        # dtype_u and dtype_f are super vectors of vector_type
-        self.vector_type = self.parabolic.vector_type
-
-        def dtype_u(init, val=None):
-            return VectorOfVectors(init, val, self.vector_type, self.size)
-
-        def dtype_f(init, val=None):
-            return VectorOfVectors(init, val, self.vector_type, self.size)
-
-        self.dtype_u = dtype_u
-        self.dtype_f = dtype_f
+        self.dtype_u = mesh
+        self.dtype_f = mesh
 
         # init output stuff
         self.output_folder = (
@@ -73,20 +66,23 @@ class MonodomainODE(ptype):
 
     def write_solution(self, uh, t):
         # write solution to file, only the potential V=uh[0], not the ionic model variables
-        self.parabolic.write_solution(uh, t, not self.output_V_only)
+        self.parabolic.write_solution(uh[0], t)
 
     def write_reference_solution(self, uh, all=False):
         # write solution to file, only the potential V=uh[0] or all variables if all=True
-        self.parabolic.write_reference_solution(uh, list(range(uh.size)) if all else [0])
+        self.parabolic.write_reference_solution(uh, list(range(self.size)) if all else [0])
 
     def read_reference_solution(self, uh, ref_file_name, all=False):
         # read solution from file, only the potential V=uh[0] or all variables if all=True
         # returns true if read was successful, false else
-        return self.parabolic.read_reference_solution(uh, list(range(uh.size)) if all else [0], ref_file_name)
+        return self.parabolic.read_reference_solution(uh, list(range(self.size)) if all else [0], ref_file_name)
 
     def initial_value(self):
-        # create initial value (as vector of vectors). Every variable is constant in space
-        u0 = self.dtype_u(self.init, val=self.ionic_model.initial_values())
+        # Create initial value. Every variable is constant in space
+        u0 = self.dtype_u(self.init)
+        init_vals = self.ionic_model.initial_values()
+        for i in range(self.size):
+            u0[i][:] = init_vals[i]
 
         # overwrite the initial value with solution from file if desired
         if self.read_init_val:
@@ -106,10 +102,10 @@ class MonodomainODE(ptype):
             error (float): L2 error
             rel_error (float): relative L2 error
         """
-        ref_sol_V = self.vector_type(init=self.init, val=0.0)
-        read_ok = self.read_reference_solution([ref_sol_V], self.ref_sol, False)
+        ref_sol_V = self.dtype_u(init=self.init, val=0.0)
+        read_ok = self.read_reference_solution(ref_sol_V, self.ref_sol, False)
         if read_ok:
-            error_L2, rel_error_L2 = self.parabolic.compute_errors(uh[0], ref_sol_V)
+            error_L2, rel_error_L2 = self.parabolic.compute_errors(uh[0], ref_sol_V[0])
 
             print(f"L2-errors: {error_L2}")
             print(f"Relative L2-errors: {rel_error_L2}")
@@ -118,20 +114,20 @@ class MonodomainODE(ptype):
         else:
             return False, 0.0, 0.0
 
-    def define_ionic_model(self):
+    def define_ionic_model(self, ionic_model_name):
         self.scale_Iion = 0.01  # used to convert currents in uA/cm^2 to uA/mm^2
         # scale_im is applied to the rhs of the ionic model, so that the rhs is in units of mV/ms
         self.scale_im = self.scale_Iion / self.parabolic.Cm
 
-        if self.ionic_model_name in ["HodgkinHuxley", "HH"]:
+        if ionic_model_name in ["HodgkinHuxley", "HH"]:
             self.ionic_model = ionicmodels.HodgkinHuxley(self.scale_im)
-        elif self.ionic_model_name in ["Courtemanche1998", "CRN"]:
+        elif ionic_model_name in ["Courtemanche1998", "CRN"]:
             self.ionic_model = ionicmodels.Courtemanche1998(self.scale_im)
-        elif self.ionic_model_name in ["TenTusscher2006_epi", "TTP"]:
+        elif ionic_model_name in ["TenTusscher2006_epi", "TTP"]:
             self.ionic_model = ionicmodels.TenTusscher2006_epi(self.scale_im)
-        elif self.ionic_model_name in ["TTP_S", "TTP_SMOOTH"]:
+        elif ionic_model_name in ["TTP_S", "TTP_SMOOTH"]:
             self.ionic_model = ionicmodels.TenTusscher2006_epi_smooth(self.scale_im)
-        elif self.ionic_model_name in ["BiStable", "BS"]:
+        elif ionic_model_name in ["BiStable", "BS"]:
             self.ionic_model = ionicmodels.BiStable(self.scale_im)
         else:
             raise Exception("Unknown ionic model.")
@@ -171,7 +167,7 @@ class MonodomainODE(ptype):
         # eval ionic model rhs on u and put result in fh. All indices of the vector of vector fh must be computed (list(range(self.size))
         self.eval_expr(self.ionic_model.f, u, fh, list(range(self.size)), False)
         # apply stimulus
-        fh.val_list[0] += self.Istim(t)
+        fh[0] += self.Istim(t)
 
         # apply diffusion
         self.parabolic.add_disc_laplacian(u[0], fh[0])
@@ -200,14 +196,14 @@ class MonodomainODE(ptype):
         # evaluate the expression expr on u and put the result in fh
         # Here expr is a wrapper on a C++ function that evaluates the rhs of the ionic model (or part of it)
         if expr is not None:
-            expr(u.np_list, fh.np_list)
+            expr(get_np_list(u), get_np_list(fh))
 
         # indeces is a list of integers indicating which variables are modified by the expression expr.
         # This information is known a priori. Here we use it to zero the variables that are not modified by expr (if zero_untouched_indeces is True)
         if zero_untouched_indeces:
             non_indeces = [i for i in range(self.size) if i not in indeces]
             for i in non_indeces:
-                fh[i].zero()
+                fh[i][:] = 0.0
 
 
 class MultiscaleMonodomainODE(MonodomainODE):
@@ -222,14 +218,10 @@ class MultiscaleMonodomainODE(MonodomainODE):
     def __init__(self, **problem_params):
         super(MultiscaleMonodomainODE, self).__init__(**problem_params)
 
-        def dtype_f(init, val=None):
-            return IMEXEXP_VectorOfVectors(init, val, self.vector_type, self.size)
-
-        # Differently from the super class MonodomainODE, dtype_f is a vector of IMEXEXP_VectorOfVectors
-        self.dtype_f = dtype_f
+        # Differently from the super class MonodomainODE, dtype_f is a imexexp_mesh
+        self.dtype_f = imexexp_mesh
 
         self.define_splittings()
-        self.parabolic.define_solver()
 
         self.constant_lambda_and_phi = False
 
@@ -281,7 +273,8 @@ class MultiscaleMonodomainODE(MonodomainODE):
 
         self.rhs_stiff_args = self.im_stiff_args
         self.rhs_stiff_indeces = self.im_stiff_indeces
-        # Add the potential V index 0 to the rhs_stiff_args and rhs_stiff_indeces. Indeed V is used to compute the Laplacian and is affected by the Laplacian, which is the implicit part of the problem.
+        # Add the potential V index 0 to the rhs_stiff_args and rhs_stiff_indeces.
+        # Indeed V is used to compute the Laplacian and is affected by the Laplacian, which is the implicit part of the problem.
         if 0 not in self.rhs_stiff_args:
             self.rhs_stiff_args = [0] + self.rhs_stiff_args
         if 0 not in self.rhs_stiff_indeces:
@@ -326,7 +319,7 @@ class MultiscaleMonodomainODE(MonodomainODE):
 
         if rhs is not u_sol:
             for i in range(1, self.size):
-                u_sol[i].copy(rhs[i])
+                u_sol[i][:] = rhs[i][:]
 
         return u_sol
 
@@ -347,8 +340,6 @@ class MultiscaleMonodomainODE(MonodomainODE):
         if fh is None:
             fh = self.dtype_f(init=self.init, val=0.0)
 
-        u.ghostUpdate(addv="insert", mode="forward")
-
         if eval_expl:
             fh.expl = self.eval_f_nonstiff(u, t, fh.expl, zero_untouched_indeces)
 
@@ -365,10 +356,10 @@ class MultiscaleMonodomainODE(MonodomainODE):
         self.eval_expr(self.im_f_nonstiff, u, fh_nonstiff, self.im_nonstiff_indeces, zero_untouched_indeces)
 
         if not zero_untouched_indeces and 0 not in self.im_nonstiff_indeces:
-            fh_nonstiff[0].zero()
+            fh_nonstiff[0][:] = 0.0
 
         # apply stimulus
-        fh_nonstiff.val_list[0] += self.Istim(t)
+        fh_nonstiff[0] += self.Istim(t)
 
         return fh_nonstiff
 
@@ -377,7 +368,7 @@ class MultiscaleMonodomainODE(MonodomainODE):
         self.eval_expr(self.im_f_stiff, u, fh_stiff, self.im_stiff_indeces, zero_untouched_indeces)
 
         if not zero_untouched_indeces and 0 not in self.im_stiff_indeces:
-            fh_stiff[0].zero()
+            fh_stiff[0][:] = 0.0
 
         # apply diffusion
         self.parabolic.add_disc_laplacian(u[0], fh_stiff[0])
@@ -388,10 +379,10 @@ class MultiscaleMonodomainODE(MonodomainODE):
         # eval ionic model exp terms f_exp(u)= lmbda(u)*(u-yinf(u)
         self.eval_lmbda_yinf_exp(u, self.lmbda, self.yinf)
         for i in self.im_exp_indeces:
-            fh_exp.np_array(i)[:] = self.lmbda.np_array(i) * (u.np_array(i) - self.yinf.np_array(i))
+            fh_exp[i][:] = self.lmbda[i] * (u[i] - self.yinf[i])
 
         if zero_untouched_indeces:
-            fh_exp.zero_sub(self.im_non_exp_indeces)
+            fh_exp[self.im_non_exp_indeces] = 0.0
 
         return fh_exp
 
@@ -401,12 +392,12 @@ class MultiscaleMonodomainODE(MonodomainODE):
 
         self.eval_lmbda_exp(u, lmbda)
 
-        lmbda.zero_sub(self.im_non_exp_indeces)
+        lmbda[self.im_non_exp_indeces] = 0.0
 
         return lmbda
 
     def eval_lmbda_yinf_exp(self, u, lmbda, yinf):
-        self.im_lmbda_yinf_exp(u.np_list, lmbda.np_list, yinf.np_list)
+        self.im_lmbda_yinf_exp(get_np_list(u), get_np_list(lmbda), get_np_list(yinf))
 
     def eval_lmbda_exp(self, u, lmbda):
-        self.im_lmbda_exp(u.np_list, lmbda.np_list)
+        self.im_lmbda_exp(get_np_list(u), get_np_list(lmbda))

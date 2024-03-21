@@ -43,8 +43,8 @@ class imexexp_1st_order(sweeper):
         P.eval_lmbda_yinf_exp(u, self.lmbda, self.yinf)
         phi_f_exp = P.dtype_u(init=P.init, val=0.0)
         for i in P.rhs_exp_indeces:
-            phi_f_exp.np_array(i)[:] = u.np_array(i)[:] - self.yinf.np_array(i)[:]
-            phi_f_exp.np_array(i)[:] *= (np.exp(factor * self.lmbda.np_array(i)) - 1.0) / factor
+            phi_f_exp[i][:] = u[i] - self.yinf[i][:]
+            phi_f_exp[i][:] *= (np.exp(factor * self.lmbda[i]) - 1.0) / factor
 
         return phi_f_exp
 

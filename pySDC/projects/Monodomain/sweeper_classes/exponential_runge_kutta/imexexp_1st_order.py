@@ -76,7 +76,7 @@ class imexexp_1st_order(sweeper):
             # zero out the provided space
             for n in range(N_fac):
                 for m in range(N_ind):
-                    phi[m][n].zero_sub(P.rhs_exp_indeces)
+                    phi[m][n][P.rhs_exp_indeces] = 0.0
 
         factorials = scipy.special.factorial(np.array(indeces) - 1)
         # the quadrature rule is used to evaluate the phi functions as integrals. This is not the same as the one used in the ESDC method!!!!
@@ -90,31 +90,32 @@ class imexexp_1st_order(sweeper):
             for n in range(N_fac):
                 factor = factors[n]
                 # compute e^((1-c_j)*factor*lmbda) for nodes c_j on the quadrature rule
-                exp_terms = [
-                    np.exp(((1.0 - c[j]) * factor) * lmbda.np_array(i)) for j in range(self.phi_coll.num_nodes)
-                ]
+                exp_terms = [np.exp(((1.0 - c[j]) * factor) * lmbda[i]) for j in range(self.phi_coll.num_nodes)]
                 # iterate over all the indeces k (phi_k)
                 for m in range(N_ind):
                     k = indeces[m]
                     km1_fac = factorials[m]  # (k-1)!
                     if k == 0:
                         # rmemeber: phi_0(z) = e^z
-                        phi[m][n].np_array(i)[:] = np.exp(factor * lmbda.np_array(i))
+                        phi[m][n][i][:] = np.exp(factor * lmbda[i])
                     else:
                         # using the quadrature rule approximate the integral \int_0^1 e^{(1-s)*factor*lambda}*s^{k-1}/(k-1)! ds
                         for j in range(self.phi_coll.num_nodes):
-                            phi[m][n].np_array(i)[:] += ((b[j] * c[j] ** (k - 1)) / km1_fac) * exp_terms[j]
+                            phi[m][n][i][:] += ((b[j] * c[j] ** (k - 1)) / km1_fac) * exp_terms[j]
 
         # update the indeces where lambda=0 (i.e. the non-exponential indeces), there phi_k(0) = 1/k!
         if update_non_exp_indeces:
             for n in range(N_fac):
                 for m in range(N_ind):
                     k = indeces[m]
-                    phi[m][n].copy_sub(P.one, P.rhs_non_exp_indeces)
+                    if k == 0:
+                        for i in P.rhs_non_exp_indeces:
+                            phi[m][n][i][:] = 1.0
                     if k > 1:
                         km1_fac = factorials[m]
                         k_fac = km1_fac * k
-                        phi[m][n].imul_sub(1.0 / k_fac, P.rhs_non_exp_indeces)
+                        for i in P.rhs_non_exp_indeces:
+                            phi[m][n][i][:] = 1.0 / k_fac
 
         return phi
 
@@ -128,9 +129,9 @@ class imexexp_1st_order(sweeper):
         # To save computations we recompute that only if u[0] has changed.
         # Also, we check only for the first component u[0][0] of u[0] to save more computations.
         # Remember that u[0][0] is a sub_vector representing the potential on the whole mesh and is enough to check if u[0] has changed.
-        if not np.allclose(self.u_old[0].numpy_array[:], self.level.u[0][0].numpy_array[:], rtol=1e-10, atol=1e-10):
+        if not np.allclose(self.u_old[0], self.level.u[0][0], rtol=1e-10, atol=1e-10):
 
-            self.u_old[0].numpy_array[:] = self.level.u[0][0].numpy_array[:]
+            self.u_old[:] = self.level.u[0]
 
             L = self.level
             P = L.prob
@@ -158,12 +159,14 @@ class imexexp_1st_order(sweeper):
             for i in range(M):
                 for j in range(M):
                     # zero out previous values
-                    self.Qmat_exp[i][j].zero_sub(P.rhs_exp_indeces)
+                    self.Qmat_exp[i][j][P.rhs_exp_indeces] = 0.0
                     for k in range(M):
-                        # self.Qmat_exp[i][j] += self.w[k, j] * c[i] ** (k + 1) * self.phi[k + 1][i]
-                        self.Qmat_exp[i][j].axpy_sub(
-                            self.w[k, j] * c[i] ** (k + 1), self.phi[k + 1][i], P.rhs_exp_indeces
+                        self.Qmat_exp[i][j][P.rhs_exp_indeces] += (
+                            self.w[k, j] * c[i] ** (k + 1) * self.phi[k + 1][i][P.rhs_exp_indeces]
                         )
+                        # self.Qmat_exp[i][j].axpy_sub(
+                        #     self.w[k, j] * c[i] ** (k + 1), self.phi[k + 1][i], P.rhs_exp_indeces
+                        # )
 
             self.lambda_and_phi_outdated = False
 
@@ -187,23 +190,26 @@ class imexexp_1st_order(sweeper):
             self.tmp = P.dtype_u(init=P.init, val=0.0)
 
         for k in range(M):
-            # self.Q[k] = L.f[k + 1].exp + self.lmbda * (L.u[0] - L.u[k + 1])  # at the indeces of the exponential rhs, otherwise 0
-            self.Q[k].zero_sub(P.rhs_exp_indeces)
-            self.Q[k].iadd_sub(L.u[0], P.rhs_exp_indeces)
-            self.Q[k].axpy_sub(-1.0, L.u[k + 1], P.rhs_exp_indeces)
-            self.Q[k].imul_sub(self.lmbda, P.rhs_exp_indeces)
-            self.Q[k].iadd_sub(L.f[k + 1].exp, P.rhs_exp_indeces)
+            # self.Q[k][P.rhs_exp_indeces] = L.f[k + 1].exp[P.rhs_exp_indeces] + self.lmbda[P.rhs_exp_indeces] * (
+            #     L.u[0][P.rhs_exp_indeces] - L.u[k + 1][P.rhs_exp_indeces]
+            # )  # at the indeces of the exponential rhs, otherwise 0
+
+            self.Q[k][P.rhs_exp_indeces] = 0.0
+            self.Q[k][P.rhs_exp_indeces] += L.u[0][P.rhs_exp_indeces]
+            self.Q[k][P.rhs_exp_indeces] -= L.u[k + 1][P.rhs_exp_indeces]
+            self.Q[k][P.rhs_exp_indeces] *= self.lmbda[P.rhs_exp_indeces]
+            self.Q[k][P.rhs_exp_indeces] += L.f[k + 1].exp[P.rhs_exp_indeces]
 
         # integrate RHS over all collocation nodes
         me = [P.dtype_u(init=P.init, val=0.0) for _ in range(M)]
         for m in range(1, self.coll.num_nodes + 1):
             for j in range(1, self.coll.num_nodes + 1):
-                # me[m - 1] += self.coll.Qmat[m, j] * (L.f[j].impl + L.f[j].expl) + self.Qmat_exp[m - 1][j - 1] * (self.Q[j - 1])
-                me[m - 1].axpy_sub(self.coll.Qmat[m, j], L.f[j].impl, P.rhs_stiff_indeces)
-                me[m - 1].axpy_sub(self.coll.Qmat[m, j], L.f[j].expl, P.rhs_nonstiff_indeces)
-                self.tmp.copy_sub(self.Q[j - 1], P.rhs_exp_indeces)
-                self.tmp.imul_sub(self.Qmat_exp[m - 1][j - 1], P.rhs_exp_indeces)
-                me[m - 1].iadd_sub(self.tmp, P.rhs_exp_indeces)
+                me[m - 1][P.rhs_stiff_indeces] += self.coll.Qmat[m, j] * L.f[j].impl[P.rhs_stiff_indeces]
+                me[m - 1][P.rhs_nonstiff_indeces] += self.coll.Qmat[m, j] * L.f[j].expl[P.rhs_nonstiff_indeces]
+                me[m - 1][P.rhs_exp_indeces] += (
+                    self.Qmat_exp[m - 1][j - 1][P.rhs_exp_indeces] * self.Q[j - 1][P.rhs_exp_indeces]
+                )
+
             me[m - 1] *= L.dt
 
         return me
@@ -233,60 +239,42 @@ class imexexp_1st_order(sweeper):
         for i in range(1, M):
             integral[M - i] -= integral[M - i - 1]
 
-        def myprint(name, v):
-            for j in range(len(v)):
-                vtmp = [v[j].val_list[i].values[31] for i in range(12)]
-                print(f"{name}[{j}] = {vtmp}")
-
-        # print("Before Sweep")
-        # myprint("u", L.u)
-        # myprint("integral", integral)
-        # myprint("f.expl", [L.f[i].expl for i in range(M + 1)])
-        # myprint("f.impl", [L.f[i].impl for i in range(M + 1)])
-        # myprint("f.exp", [L.f[i].exp for i in range(M + 1)])
-
         # prepare the integral term
         for m in range(M):
-            # integral[m] -= L.dt * self.delta[m] * (L.f[m].expl + L.f[m + 1].impl + self.phi_one[0][m] * (L.f[m].exp + self.lmbda * (L.u[0] - L.u[m])))
-            integral[m].axpy_sub(-L.dt * self.delta[m], L.f[m + 1].impl, P.rhs_stiff_indeces)
-            integral[m].axpy_sub(-L.dt * self.delta[m], L.f[m].expl, P.rhs_nonstiff_indeces)
-            self.tmp.copy_sub(L.u[0], P.rhs_exp_indeces)
-            self.tmp.axpy_sub(-1.0, L.u[m], P.rhs_exp_indeces)
-            self.tmp.imul_sub(self.lmbda, P.rhs_exp_indeces)
-            self.tmp.iadd_sub(L.f[m].exp, P.rhs_exp_indeces)
-            self.tmp.imul_sub(self.phi_one[0][m], P.rhs_exp_indeces)
-            integral[m].axpy_sub(-L.dt * self.delta[m], self.tmp, P.rhs_exp_indeces)
-
-        # print("After modifying integral")
-        # myprint("integral", integral)
+            integral[m][P.rhs_stiff_indeces] += -L.dt * self.delta[m] * L.f[m + 1].impl[P.rhs_stiff_indeces]
+            integral[m][P.rhs_nonstiff_indeces] += -L.dt * self.delta[m] * L.f[m].expl[P.rhs_nonstiff_indeces]
+            integral[m][P.rhs_exp_indeces] += (
+                -L.dt
+                * self.delta[m]
+                * self.phi_one[0][m][P.rhs_exp_indeces]
+                * (
+                    L.f[m].exp[P.rhs_exp_indeces]
+                    + self.lmbda[P.rhs_exp_indeces] * (L.u[0][P.rhs_exp_indeces] - L.u[m][P.rhs_exp_indeces])
+                )
+            )
 
         # do the sweep
         for m in range(M):
-            # tmp = L.u[m] + integral[m] + L.dt * self.delta[m] * (L.f[m].expl + self.phi_one[0][m] * (L.f[m].exp + self.lmbda * (L.u[0] - L.u[m])))
-            self.tmp.zero()
-            self.tmp.copy_sub(L.u[0], P.rhs_exp_indeces)
-            self.tmp.axpy_sub(-1.0, L.u[m], P.rhs_exp_indeces)
-            self.tmp.imul_sub(self.lmbda, P.rhs_exp_indeces)
-            self.tmp.iadd_sub(L.f[m].exp, P.rhs_exp_indeces)
-            self.tmp.imul_sub(self.phi_one[0][m], P.rhs_exp_indeces)
-            self.tmp.iadd_sub(L.f[m].expl, P.rhs_nonstiff_indeces)
-            self.tmp.aypx(L.dt * self.delta[m], integral[m])
-            self.tmp += L.u[m]
+
+            tmp = L.u[m] + integral[m]
+            tmp[P.rhs_exp_indeces] += (
+                L.dt
+                * self.delta[m]
+                * self.phi_one[0][m][P.rhs_exp_indeces]
+                * (
+                    L.f[m].exp[P.rhs_exp_indeces]
+                    + self.lmbda[P.rhs_exp_indeces] * (L.u[0][P.rhs_exp_indeces] - L.u[m][P.rhs_exp_indeces])
+                )
+            )
+            tmp[P.rhs_nonstiff_indeces] += L.dt * self.delta[m] * L.f[m].expl[P.rhs_nonstiff_indeces]
 
             # implicit solve with prefactor stemming from QI
             L.u[m + 1] = P.solve_system(
-                self.tmp, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m], L.u[m + 1]
+                tmp, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m], L.u[m + 1]
             )
 
             # update function values
             P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m], fh=L.f[m + 1])
-
-        # print("After Sweep")
-        # myprint("u", L.u)
-        # myprint("integral", integral)
-        # myprint("f.expl", [L.f[i].expl for i in range(M + 1)])
-        # myprint("f.impl", [L.f[i].impl for i in range(M + 1)])
-        # myprint("f.exp", [L.f[i].exp for i in range(M + 1)])
 
         # indicate presence of new values at this level
         L.status.updated = True
@@ -315,6 +303,12 @@ class imexexp_1st_order(sweeper):
             raise CollocationError("This option is not implemented yet.")
 
         return None
+
+    def rel_norm(self, a, b):
+        norms = []
+        for i in range(len(a)):
+            norms.append(np.linalg.norm(a[i]) / np.linalg.norm(b[i]))
+        return np.average(norms)
 
     def compute_residual(self, stage=''):
         """
@@ -351,7 +345,7 @@ class imexexp_1st_order(sweeper):
             # use abs function from data type here
             res_norm.append(abs(res[m]))
             # the different components of the monodomain equation have very different magnitude therefore we use a tailored relative norm here to avoid the cancellation of the smaller components
-            rel_res_norm.append(res[m].rel_norm(L.u[0]))
+            rel_res_norm.append(self.rel_norm(res[m], L.u[0]))
 
         # find maximal residual over the nodes
         if L.params.residual_type == 'full_abs':

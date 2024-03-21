@@ -1,7 +1,7 @@
 import numpy as np
 import scipy as sp
 from pySDC.core.Common import RegisterParams
-from pySDC.projects.Monodomain.datatype_classes.DCT_Vector import DCT_Vector
+from pySDC.implementations.datatype_classes.mesh import mesh
 from pathlib import Path
 import os
 
@@ -57,10 +57,8 @@ class Parabolic_DCT(RegisterParams):
         Total number of degrees of freedom
     dim: int
         Dimension of the spatial domain. Can be 1, 2 or 3.
-    init: int
-        Number of degrees of freedom. Used to initialize the DCT_Vector
-    vector_type: DCT_Vector
-        The vector type used in this problem
+    init: tuple
+        Shape of the mesh, None and data type of the mesh (np.double)
     mesh_name: str
         Name of the mesh. Can be cube_ND, cubdoid_ND, cubdoid_ND_smaller, cubdoid_ND_small, cubdoid_ND_large, cubdoid_ND_very_large. Where N=1,2,3.
     diff_dct: array
@@ -103,15 +101,8 @@ class Parabolic_DCT(RegisterParams):
                     np.save(f, xyz[i])
 
     @property
-    def vector_type(self):
-        return DCT_Vector
-
-    @property
     def mesh_name(self):
         return "ref_" + str(self.refinements)
-
-    def define_solver(self):
-        pass
 
     def define_coefficients(self):
         self.chi = 140.0  # mm^-1
@@ -161,7 +152,7 @@ class Parabolic_DCT(RegisterParams):
 
         self.shape = tuple(np.flip([x.size for x in self.grids]))
         self.n_dofs = int(np.prod(self.shape))
-        self.init = self.n_dofs
+        self.init = ((self.n_dofs,), None, np.dtype('float64'))
 
     def define_diffusion(self):
         N = self.n_elems
@@ -219,6 +210,7 @@ class Parabolic_DCT(RegisterParams):
                 )
         else:
             raise NotImplementedError("Only order 2 and 4 are implemented for Parabolic_DCT.")
+
         self.diff_dct = diff_dct
 
     def grids_from_x(self, x):
@@ -248,20 +240,20 @@ class Parabolic_DCT(RegisterParams):
 
         Arguments:
         ----------
-        rhs: DCT_Vector
+        rhs: mesh
             The right-hand side of the linear system
         factor: float
             The factor in the linear system multiplying the Laplacian
-        u0: DCT_Vector
+        u0: mesh
             The initial guess for the solution. Not used here since we use a direct solver.
         t: float
             The current time. Not used here since the Laplacian is time-independent.
-        u_sol: DCT_Vector
+        u_sol: mesh
             The vector to store the solution in.
         """
-        rhs_hat = sp.fft.dctn(rhs.values.reshape(self.shape))
+        rhs_hat = sp.fft.dctn(rhs.reshape(self.shape))
         u_sol_hat = rhs_hat / (1.0 - factor * self.diff_dct)
-        u_sol.values[:] = sp.fft.idctn(u_sol_hat).ravel()
+        u_sol[:] = sp.fft.idctn(u_sol_hat).ravel()
 
         return u_sol
 
@@ -269,7 +261,7 @@ class Parabolic_DCT(RegisterParams):
         """
         Add the discrete Laplacian operator to res: res += A * uh
         """
-        res.values += sp.fft.idctn(self.diff_dct * sp.fft.dctn(uh.values.reshape(self.shape))).ravel()
+        res[:] += sp.fft.idctn(self.diff_dct * sp.fft.dctn(uh.reshape(self.shape))).ravel()
 
     def init_output(self, output_folder):
         # Initialize the output parameters and file
@@ -283,28 +275,25 @@ class Parabolic_DCT(RegisterParams):
             self.output_file = open(self.output_file_path, 'wb')
             self.t_out = []
 
-    def write_solution(self, u, t, all):
+    def write_solution(self, uh, t):
         # Write the solution to file. Meant for visualization, hence we print the time stamp too.
-        # Usually we only write the first component of the solution, hence the electric potential.
+        # Usually we only write the first component of the solution, hence the electric potential V and not the ionic model state variables.
         if self.enable_output:
-            if not all:
-                np.save(self.output_file, u[0].values.reshape(self.shape))
-                self.t_out.append(t)
-            else:
-                raise NotImplementedError("all=True not implemented for Parabolic_FD.write_solution")
+            np.save(self.output_file, uh.reshape(self.shape))
+            self.t_out.append(t)
 
     def write_reference_solution(self, uh, indeces):
         """
         Write the solution to file. This is meant to print solutions that will be used as reference solutions
         and compute errors or as well solutions that will be used as initial values for other simulations.
-        Here we print the model variables listed in indeces.
+        Here we write the model variables listed in indeces.
         """
         if self.output_file_path.is_file():
             os.remove(self.output_file_path)
         if not self.output_file_path.parent.is_dir():
             os.makedirs(self.output_file_path.parent)
         with open(self.output_file_path, 'wb') as file:
-            [np.save(file, uh[i].values.reshape(self.shape)) for i in indeces]
+            [np.save(file, uh[i].reshape(self.shape)) for i in indeces]
 
     def read_reference_solution(self, uh, indeces, ref_file_name):
         """
@@ -318,7 +307,7 @@ class Parabolic_DCT(RegisterParams):
         if ref_sol_path.is_file():
             with open(ref_sol_path, 'rb') as f:
                 for i in indeces:
-                    uh[i].values[:] = np.load(f).ravel()
+                    uh[i][:] = np.load(f).ravel()
             return True
         else:
             return False
@@ -337,12 +326,15 @@ class Parabolic_DCT(RegisterParams):
         for i in range(len(grids)):
             inside_stim_box = np.logical_and(inside_stim_box, coord_inside_stim_box[i])
 
-        return self.vector_type(inside_stim_box.ravel().astype(float))
+        stim = mesh(self.init)
+        stim[:] = inside_stim_box.ravel().astype(float)
+
+        return stim
 
     def compute_errors(self, uh, ref_sol):
         # Compute L2 errors with respect to the reference solution
-        error_L2 = np.linalg.norm(uh.values - ref_sol.values)
-        sol_norm_L2 = np.linalg.norm(ref_sol.values)
+        error_L2 = np.linalg.norm(uh - ref_sol)
+        sol_norm_L2 = np.linalg.norm(ref_sol)
         rel_error_L2 = error_L2 / sol_norm_L2
 
         return error_L2, rel_error_L2

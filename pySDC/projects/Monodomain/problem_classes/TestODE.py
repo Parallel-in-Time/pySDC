@@ -1,8 +1,9 @@
 import logging
+import numpy as np
 from pySDC.core.Problem import ptype
 from pySDC.core.Common import RegisterParams
-from pySDC.projects.Monodomain.datatype_classes.DCT_Vector import DCT_Vector
-from pySDC.projects.Monodomain.datatype_classes.VectorOfVectors import VectorOfVectors, IMEXEXP_VectorOfVectors
+from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.projects.Monodomain.datatype_classes.my_mesh import imexexp_mesh
 
 
 """ 
@@ -14,8 +15,8 @@ Things are done so that it is compatible witht the sweepers.
 class Parabolic(RegisterParams):
     def __init__(self, **problem_params):
         self._makeAttributeAndRegister(*problem_params.keys(), localVars=problem_params, readOnly=True)
-        self.vector_type = DCT_Vector
         self.shape = (1,)
+        self.init = ((1,), None, np.dtype("float64"))
 
 
 class TestODE(ptype):
@@ -23,8 +24,8 @@ class TestODE(ptype):
         self.logger = logging.getLogger("step")
 
         self.parabolic = Parabolic(**problem_params)
-        self.init = 1  # one dof
         self.size = 1  # one state variable
+        self.init = ((self.size, *self.parabolic.init[0]), self.parabolic.init[1], self.parabolic.init[2])
 
         # invoke super init
         super(TestODE, self).__init__(self.init)
@@ -43,16 +44,8 @@ class TestODE(ptype):
         if not hasattr(self, 'lmbda_others'):
             self.lmbda_others = -1.0
 
-        self.vector_type = self.parabolic.vector_type
-
-        def dtype_u(init=None, val=0.0):
-            return VectorOfVectors(init, val, self.vector_type, self.size)
-
-        def dtype_f(init=None, val=0.0):
-            return VectorOfVectors(init, val, self.vector_type, self.size)
-
-        self.dtype_u = dtype_u
-        self.dtype_f = dtype_f
+        self.dtype_u = mesh
+        self.dtype_f = mesh
 
     def initial_value(self):
         u0 = self.dtype_u(self.init, val=1.0)
@@ -63,7 +56,7 @@ class TestODE(ptype):
         if fh is None:
             fh = self.dtype_f(init=self.init, val=0.0)
 
-        fh.val_list[0].values[0] = (self.lmbda_laplacian + self.lmbda_gating + self.lmbda_others) * u[0].values[0]
+        fh[0] = (self.lmbda_laplacian + self.lmbda_gating + self.lmbda_others) * u[0]
 
         return fh
 
@@ -72,10 +65,7 @@ class MultiscaleTestODE(TestODE):
     def __init__(self, **problem_params):
         super(MultiscaleTestODE, self).__init__(**problem_params)
 
-        def dtype_f(init=None, val=0.0):
-            return IMEXEXP_VectorOfVectors(init, val, self.vector_type, self.size)
-
-        self.dtype_f = dtype_f
+        self.dtype_f = imexexp_mesh
 
         self.rhs_stiff_indeces = [0]
         self.rhs_stiff_args = [0]
@@ -93,7 +83,7 @@ class MultiscaleTestODE(TestODE):
         if u_sol is None:
             u_sol = self.dtype_u(init=self.init, val=0.0)
 
-        u_sol[0].values[0] = rhs[0].values[0] / (1 - factor * self.lmbda_laplacian)
+        u_sol[0] = rhs[0] / (1 - factor * self.lmbda_laplacian)
 
         return u_sol
 
@@ -103,24 +93,24 @@ class MultiscaleTestODE(TestODE):
             fh = self.dtype_f(init=self.init, val=0.0)
 
         if eval_expl:
-            fh.expl.val_list[0].values[0] = self.lmbda_others * u[0].values[0]
+            fh.expl[0] = self.lmbda_others * u[0]
 
         if eval_impl:
-            fh.impl.val_list[0].values[0] = self.lmbda_laplacian * u[0].values[0]
+            fh.impl[0] = self.lmbda_laplacian * u[0]
 
         if eval_exp:
-            fh.exp.val_list[0].values[0] = self.lmbda_gating * u[0].values[0]
+            fh.exp[0] = self.lmbda_gating * u[0]
 
         return fh
 
     def eval_lmbda_yinf_exp(self, u, lmbda, yinf):
-        lmbda.val_list[0].values[0] = self.lmbda_gating
-        yinf.val_list[0].values[0] = 0.0
+        lmbda[0] = self.lmbda_gating
+        yinf[0] = 0.0
 
     def lmbda_eval(self, u, t, lmbda=None):
         if lmbda is None:
             lmbda = self.dtype_u(init=self.init, val=0.0)
 
-        lmbda.val_list[0].values[0] = self.lmbda_gating
+        lmbda[0] = self.lmbda_gating
 
         return lmbda
