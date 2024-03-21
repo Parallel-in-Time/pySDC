@@ -247,7 +247,7 @@ class imexexp_1st_order(sweeper):
 
         def myprint(name, v):
             for i in range(len(v)):
-                print(f"{name}[{i}] = {v[i][:4,31]}")
+                print(f"{name}[{i}] = {list(v[i][:12,31])}")
 
         print("Before Sweep")
         myprint("u", L.u)
