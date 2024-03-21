@@ -235,8 +235,7 @@ class imexexp_1st_order(sweeper):
 
         def myprint(name, v):
             for j in range(len(v)):
-                vtmp = [v[j].val_list[i].values[31] for i in range(4)]
-                vtmp = np.array(vtmp)
+                vtmp = [v[j].val_list[i].values[31] for i in range(12)]
                 print(f"{name}[{j}] = {vtmp}")
 
         print("Before Sweep")
