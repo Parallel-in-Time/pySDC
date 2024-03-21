@@ -357,7 +357,7 @@ def main():
     num_sweeps = [1]
 
     # set step parameters
-    max_iter = 100
+    max_iter = 2
 
     # set level parameters
     dt = 0.05
@@ -374,7 +374,7 @@ def main():
     write_as_reference_solution = False
     write_all_variables = False
     write_database = False
-    end_time = 0.1
+    end_time = 0.05
     output_root = "results_tmp"
     output_file_name = "ref_sol" if write_as_reference_solution else "monodomain"
     ref_sol = "ref_sol"
