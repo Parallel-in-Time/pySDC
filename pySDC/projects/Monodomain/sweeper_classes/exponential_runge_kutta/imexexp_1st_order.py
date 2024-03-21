@@ -238,12 +238,12 @@ class imexexp_1st_order(sweeper):
                 vtmp = [v[j].val_list[i].values[31] for i in range(12)]
                 print(f"{name}[{j}] = {vtmp}")
 
-        print("Before Sweep")
-        myprint("u", L.u)
-        myprint("integral", integral)
-        myprint("f.expl", [L.f[i].expl for i in range(M + 1)])
-        myprint("f.impl", [L.f[i].impl for i in range(M + 1)])
-        myprint("f.exp", [L.f[i].exp for i in range(M + 1)])
+        # print("Before Sweep")
+        # myprint("u", L.u)
+        # myprint("integral", integral)
+        # myprint("f.expl", [L.f[i].expl for i in range(M + 1)])
+        # myprint("f.impl", [L.f[i].impl for i in range(M + 1)])
+        # myprint("f.exp", [L.f[i].exp for i in range(M + 1)])
 
         # prepare the integral term
         for m in range(M):
@@ -257,8 +257,8 @@ class imexexp_1st_order(sweeper):
             self.tmp.imul_sub(self.phi_one[0][m], P.rhs_exp_indeces)
             integral[m].axpy_sub(-L.dt * self.delta[m], self.tmp, P.rhs_exp_indeces)
 
-        print("After modifying integral")
-        myprint("integral", integral)
+        # print("After modifying integral")
+        # myprint("integral", integral)
 
         # do the sweep
         for m in range(M):
@@ -281,12 +281,12 @@ class imexexp_1st_order(sweeper):
             # update function values
             P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m], fh=L.f[m + 1])
 
-        print("After Sweep")
-        myprint("u", L.u)
-        myprint("integral", integral)
-        myprint("f.expl", [L.f[i].expl for i in range(M + 1)])
-        myprint("f.impl", [L.f[i].impl for i in range(M + 1)])
-        myprint("f.exp", [L.f[i].exp for i in range(M + 1)])
+        # print("After Sweep")
+        # myprint("u", L.u)
+        # myprint("integral", integral)
+        # myprint("f.expl", [L.f[i].expl for i in range(M + 1)])
+        # myprint("f.impl", [L.f[i].impl for i in range(M + 1)])
+        # myprint("f.exp", [L.f[i].exp for i in range(M + 1)])
 
         # indicate presence of new values at this level
         L.status.updated = True
