@@ -246,9 +246,15 @@ class imexexp_1st_order(sweeper):
             integral[M - i] -= integral[M - i - 1]
 
         def myprint(name, v):
-            print(f"{name} = {v[:4,31]}")
+            for i in range(len(v)):
+                print(f"{name}[{i}] = {v[i][:4,31]}")
 
-        myprint("u[0]", L.u[0])
+        print("Before Sweep")
+        myprint("u", L.u)
+        myprint("integral", integral)
+        myprint("f.expl", [L.f[i].expl for i in range(M + 1)])
+        myprint("f.impl", [L.f[i].impl for i in range(M + 1)])
+        myprint("f.exp", [L.f[i].exp for i in range(M + 1)])
 
         # prepare the integral term
         for m in range(M):
@@ -272,6 +278,10 @@ class imexexp_1st_order(sweeper):
                     + self.lmbda[P.rhs_exp_indeces] * (L.u[0][P.rhs_exp_indeces] - L.u[m][P.rhs_exp_indeces])
                 )
             )
+
+        print("After modifying integral")
+        myprint("integral", integral)
+
         # do the sweep
         for m in range(M):
             # tmp = L.u[m] + integral[m] + L.dt * self.delta[m] * (L.f[m].expl + self.phi_one[0][m] * (L.f[m].exp + self.lmbda * (L.u[0] - L.u[m])))
@@ -304,6 +314,13 @@ class imexexp_1st_order(sweeper):
 
             # update function values
             P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m], fh=L.f[m + 1])
+
+        print("After Sweep")
+        myprint("u", L.u)
+        myprint("integral", integral)
+        myprint("f.expl", [L.f[i].expl for i in range(M + 1)])
+        myprint("f.impl", [L.f[i].impl for i in range(M + 1)])
+        myprint("f.exp", [L.f[i].exp for i in range(M + 1)])
 
         # indicate presence of new values at this level
         L.status.updated = True
