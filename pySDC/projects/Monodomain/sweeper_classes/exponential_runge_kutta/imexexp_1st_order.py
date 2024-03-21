@@ -233,6 +233,13 @@ class imexexp_1st_order(sweeper):
         for i in range(1, M):
             integral[M - i] -= integral[M - i - 1]
 
+        def myprint(name, v):
+            vtmp = [v.val_list[i][31] for i in range(4)]
+            vtmp = np.array(vtmp)
+            print(f"{name} = {vtmp}")
+
+        myprint("u[0]", L.u[0])
+
         # prepare the integral term
         for m in range(M):
             # integral[m] -= L.dt * self.delta[m] * (L.f[m].expl + L.f[m + 1].impl + self.phi_one[0][m] * (L.f[m].exp + self.lmbda * (L.u[0] - L.u[m])))
