@@ -374,7 +374,7 @@ def main():
     write_as_reference_solution = False
     write_all_variables = False
     write_database = False
-    end_time = 0.05
+    end_time = 0.2
     output_root = "results_tmp"
     output_file_name = "ref_sol" if write_as_reference_solution else "monodomain"
     ref_sol = "ref_sol"
