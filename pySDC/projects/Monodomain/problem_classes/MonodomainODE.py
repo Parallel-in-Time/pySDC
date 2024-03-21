@@ -75,7 +75,7 @@ class MonodomainODE(ptype):
     def read_reference_solution(self, uh, ref_file_name, all=False):
         # read solution from file, only the potential V=uh[0] or all variables if all=True
         # returns true if read was successful, false else
-        return self.parabolic.read_reference_solution(uh, list(range(uh.size)) if all else [0], ref_file_name)
+        return self.parabolic.read_reference_solution(uh, list(range(self.size)) if all else [0], ref_file_name)
 
     def initial_value(self):
         # Create initial value. Every variable is constant in space
