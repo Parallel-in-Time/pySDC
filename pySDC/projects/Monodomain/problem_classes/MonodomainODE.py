@@ -70,7 +70,7 @@ class MonodomainODE(ptype):
 
     def write_reference_solution(self, uh, all=False):
         # write solution to file, only the potential V=uh[0] or all variables if all=True
-        self.parabolic.write_reference_solution(uh, list(range(uh.size)) if all else [0])
+        self.parabolic.write_reference_solution(uh, list(range(self.size)) if all else [0])
 
     def read_reference_solution(self, uh, ref_file_name, all=False):
         # read solution from file, only the potential V=uh[0] or all variables if all=True

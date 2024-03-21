@@ -26,15 +26,15 @@ class TransferVectorOfDCTVectors(space_transfer):
 
     def prolong(self, G):
 
-        if isinstance(G, mesh):
-            u_fine = mesh(self.fine_prob.init)
-            for i in range(self.fine_prob.size):
-                u_fine.val_list[i].values[:] = self.DCT_to_DCT.prolong(G[i]).values
-        elif isinstance(G, imexexp_mesh):
+        if isinstance(G, imexexp_mesh):
             u_fine = imexexp_mesh(self.fine_prob.init)
             for i in range(self.fine_prob.size):
                 u_fine.impl[i][:] = self.DCT_to_DCT.prolong(G.impl[i])
                 u_fine.expl[i][:] = self.DCT_to_DCT.prolong(G.expl[i])
                 u_fine.exp[i][:] = self.DCT_to_DCT.prolong(G.exp[i])
+        elif isinstance(G, mesh):
+            u_fine = mesh(self.fine_prob.init)
+            for i in range(self.fine_prob.size):
+                u_fine[i][:] = self.DCT_to_DCT.prolong(G[i])
 
         return u_fine

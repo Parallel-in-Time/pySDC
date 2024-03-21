@@ -190,26 +190,20 @@ class imexexp_1st_order(sweeper):
             self.tmp = P.dtype_u(init=P.init, val=0.0)
 
         for k in range(M):
-            self.Q[k][P.rhs_exp_indeces] = L.f[k + 1].exp[P.rhs_exp_indeces] + self.lmbda[P.rhs_exp_indeces] * (
-                L.u[0][P.rhs_exp_indeces] - L.u[k + 1][P.rhs_exp_indeces]
-            )  # at the indeces of the exponential rhs, otherwise 0
-            # self.Q[k].zero_sub(P.rhs_exp_indeces)
-            # self.Q[k].iadd_sub(L.u[0], P.rhs_exp_indeces)
-            # self.Q[k].axpy_sub(-1.0, L.u[k + 1], P.rhs_exp_indeces)
-            # self.Q[k].imul_sub(self.lmbda, P.rhs_exp_indeces)
-            # self.Q[k].iadd_sub(L.f[k + 1].exp, P.rhs_exp_indeces)
+            # self.Q[k][P.rhs_exp_indeces] = L.f[k + 1].exp[P.rhs_exp_indeces] + self.lmbda[P.rhs_exp_indeces] * (
+            #     L.u[0][P.rhs_exp_indeces] - L.u[k + 1][P.rhs_exp_indeces]
+            # )  # at the indeces of the exponential rhs, otherwise 0
+
+            self.Q[k][P.rhs_exp_indeces] = 0.0
+            self.Q[k][P.rhs_exp_indeces] += L.u[0][P.rhs_exp_indeces]
+            self.Q[k][P.rhs_exp_indeces] -= L.u[k + 1][P.rhs_exp_indeces]
+            self.Q[k][P.rhs_exp_indeces] *= self.lmbda[P.rhs_exp_indeces]
+            self.Q[k][P.rhs_exp_indeces] += L.f[k + 1].exp[P.rhs_exp_indeces]
 
         # integrate RHS over all collocation nodes
         me = [P.dtype_u(init=P.init, val=0.0) for _ in range(M)]
         for m in range(1, self.coll.num_nodes + 1):
             for j in range(1, self.coll.num_nodes + 1):
-                # me[m - 1] += self.coll.Qmat[m, j] * (L.f[j].impl + L.f[j].expl) + self.Qmat_exp[m - 1][j - 1] * (self.Q[j - 1])
-                # me[m - 1].axpy_sub(self.coll.Qmat[m, j], L.f[j].impl, P.rhs_stiff_indeces)
-                # me[m - 1].axpy_sub(self.coll.Qmat[m, j], L.f[j].expl, P.rhs_nonstiff_indeces)
-                # self.tmp.copy_sub(self.Q[j - 1], P.rhs_exp_indeces)
-                # self.tmp.imul_sub(self.Qmat_exp[m - 1][j - 1], P.rhs_exp_indeces)
-                # me[m - 1].iadd_sub(self.tmp, P.rhs_exp_indeces)
-
                 me[m - 1][P.rhs_stiff_indeces] += self.coll.Qmat[m, j] * L.f[j].impl[P.rhs_stiff_indeces]
                 me[m - 1][P.rhs_nonstiff_indeces] += self.coll.Qmat[m, j] * L.f[j].expl[P.rhs_nonstiff_indeces]
                 me[m - 1][P.rhs_exp_indeces] += (
