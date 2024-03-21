@@ -368,8 +368,8 @@ def main():
     refinements = [0]
     order = 4  # 2 or 4
     ionic_model_name = "TTP"
-    read_init_val = False
-    init_time = 0.0
+    read_init_val = True
+    init_time = 3.0
     enable_output = False
     write_as_reference_solution = False
     write_all_variables = False
