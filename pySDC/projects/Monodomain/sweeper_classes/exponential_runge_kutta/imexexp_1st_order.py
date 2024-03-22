@@ -49,7 +49,7 @@ class imexexp_1st_order(sweeper):
         phi_num_nodes = 5  # seems to be enough in most cases
         self.phi_coll = CollBase(num_nodes=phi_num_nodes, tleft=0, tright=1, node_type='LEGENDRE', quad_type='GAUSS')
 
-    def phi_eval_lists(self, factors, indeces, phi, lmbda):
+    def phi_eval(self, factors, indeces, phi, lmbda):
         """
         Evaluate the phi_k functions at the points factor_i*lmbda
 
@@ -67,26 +67,23 @@ class imexexp_1st_order(sweeper):
 
         assert 0 not in indeces, "phi_0 is not implemented, since the integral definition is not valid for k=0."
 
-        # the quadrature rule is used to evaluate the phi functions as integrals. This is not the same as the one used in the ESDC method!!!!
+        # the quadrature rule used to evaluate the phi functions as integrals. This is not the same as the one used in the ESDC method!!!!
         c = self.phi_coll.nodes
         b = self.phi_coll.weights
 
-        # compute e^((1-c_j)*factor*lmbda) for nodes c_j on the quadrature rule
-        exp_terms = np.exp(((1.0 - c[:, None, None, None]) * factors[None, :, None, None]) * lmbda[None, None, :, :])
-
-        # iterate only over the indeces of the problem having an exponential term
-        # hence we update only the subvectors phi_k(factor*lambda)_i in the vector of vectors phi_k(factor*lambda)
-
         k = np.array(indeces)
-        km1_fac = scipy.special.factorial(k - 1)
+        km1_fac = scipy.special.factorial(k - 1)  # (k-1)!
 
-        # using the quadrature rule to approximate the integral
+        # Here we use the quadrature rule to approximate the integral
         # phi_{k}(factor[i]*lmbda[:,:])= \int_0^1 e^{(1-s)*factor[i]*lambda[:,:]}*s^{k-1}/(k-1)! ds
         # the data structure is such that phi[k-1,i,:,:] = phi_{k}(factor[i]*lmbda[:,:])
-        wgt_tmp = (b[None, :] * c[None, :] ** (k[:, None] - 1)) / km1_fac[:, None]
-        phi[:] = np.sum(wgt_tmp[:, :, None, None, None] * exp_terms[None, :, :, :, :], axis=1)
 
-        return phi
+        # First, compute e^((1-c[j])*factor[i]*lmbda[:]) for nodes c[j] on the quadrature rule and all factors[i]
+        exp_terms = np.exp(((1.0 - c[:, None, None, None]) * factors[None, :, None, None]) * lmbda[None, None, :, :])
+        # Then, compute the terms c[j]^{k-1}/(k-1)! for all nodes c[j] and all k and multiply with the weights b[j]
+        wgt_tmp = (b[None, :] * c[None, :] ** (k[:, None] - 1)) / km1_fac[:, None]
+        # Finally, compute the integral by summing over the quadrature nodes
+        phi[:] = np.sum(wgt_tmp[:, :, None, None, None] * exp_terms[None, :, :, :, :], axis=1)
 
     def compute_lambda_phi_Qmat_exp(self):
 
@@ -107,17 +104,18 @@ class imexexp_1st_order(sweeper):
             M = self.coll.num_nodes
             c = self.coll.nodes
 
-            # compute lambda(u) of the exponential term f_exp(u)=lmbda(u)*(u-y_inf(u))
+            # compute lambda(u) of the exponential term f_exp(u)=lmbda(u)*(u-y_inf(u)) and select only the indeces with exponential terms
             self.lmbda = P.lmbda_eval(L.u[0], L.time)[P.rhs_exp_indeces]
 
             if not hasattr(self, "phi"):
                 # make some space
                 self.phi = P.dtype_u(init=P.init_exp_extruded((M, M)), val=0.0)
                 self.phi_one = P.dtype_u(init=P.init_exp_extruded((1, M)), val=0.0)
-            # evaluate the phi_k(dt*c_i*lambda) functions at the collocation nodes c_i for k=0,...,M
-            self.phi = self.phi_eval_lists(L.dt * c, list(range(1, M + 1)), self.phi, self.lmbda)
+
+            # evaluate the phi_k(dt*c_i*lambda) functions at the collocation nodes c_i for k=1,...,M
+            self.phi_eval(L.dt * c, list(range(1, M + 1)), self.phi, self.lmbda)
             # evaluates phi_1(dt*delta_i*lambda) for delta_i = c_i - c_{i-1}
-            self.phi_one = self.phi_eval_lists(L.dt * self.delta, [1], self.phi_one, self.lmbda)
+            self.phi_eval(L.dt * self.delta, [1], self.phi_one, self.lmbda)
 
             # compute weight for the integration of \int_0^ci exp(dt*(ci-r)lmbda)*PiQ(r)dr, where PiQ(r) is a polynomial interpolating
             # Q(c_i)=Q[i].
