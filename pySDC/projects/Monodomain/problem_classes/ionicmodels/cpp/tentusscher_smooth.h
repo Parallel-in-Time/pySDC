@@ -21,10 +21,10 @@ class TenTusscher2006_epi_smooth : public IonicModel
 public:
     TenTusscher2006_epi_smooth(const double scale_);
     ~TenTusscher2006_epi_smooth(){};
-    void f(py::list y, py::list fy);
-    void f_expl(py::list y, py::list fy);
-    void lmbda_exp(py::list y_list, py::list lmbda_list);
-    void lmbda_yinf_exp(py::list y_list, py::list lmbda_list, py::list yinf_list);
+    void f(py::array_t<double> &y, py::array_t<double> &fy);
+    void f_expl(py::array_t<double> &y, py::array_t<double> &fy);
+    void lmbda_exp(py::array_t<double> &y_list, py::array_t<double> &lmbda_list);
+    void lmbda_yinf_exp(py::array_t<double> &y_list, py::array_t<double> &lmbda_list, py::array_t<double> &yinf_list);
     py::list initial_values();
     double rho_f_expl();
 
@@ -120,7 +120,7 @@ py::list TenTusscher2006_epi_smooth::initial_values()
     return y0;
 }
 
-void TenTusscher2006_epi_smooth::f(py::list y_list, py::list fy_list)
+void TenTusscher2006_epi_smooth::f(py::array_t<double> &y_list, py::array_t<double> &fy_list)
 {
     double *y_ptrs[size];
     double *fy_ptrs[size];
@@ -278,7 +278,7 @@ void TenTusscher2006_epi_smooth::f(py::list y_list, py::list fy_list)
     }
 }
 
-void TenTusscher2006_epi_smooth::f_expl(py::list y_list, py::list fy_list)
+void TenTusscher2006_epi_smooth::f_expl(py::array_t<double> &y_list, py::array_t<double> &fy_list)
 {
     double *y_ptrs[size];
     double *fy_ptrs[size];
@@ -354,7 +354,7 @@ void TenTusscher2006_epi_smooth::f_expl(py::list y_list, py::list fy_list)
     }
 }
 
-void TenTusscher2006_epi_smooth::lmbda_yinf_exp(py::list y_list, py::list lmbda_list, py::list yinf_list)
+void TenTusscher2006_epi_smooth::lmbda_yinf_exp(py::array_t<double> &y_list, py::array_t<double> &lmbda_list, py::array_t<double> &yinf_list)
 {
     double *y_ptrs[size];
     double *lmbda_ptrs[size];
@@ -455,7 +455,7 @@ void TenTusscher2006_epi_smooth::lmbda_yinf_exp(py::list y_list, py::list lmbda_
     }
 }
 
-void TenTusscher2006_epi_smooth::lmbda_exp(py::list y_list, py::list lmbda_list)
+void TenTusscher2006_epi_smooth::lmbda_exp(py::array_t<double> &y_list, py::array_t<double> &lmbda_list)
 {
     double *y_ptrs[size];
     double *lmbda_ptrs[size];

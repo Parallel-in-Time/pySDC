@@ -18,18 +18,13 @@ double inline phi_f_from_tau_yinf(double y, double tau, double yinf, double dt)
     return ((exp(-dt / tau) - 1.) / dt) * (y - yinf);
 }
 
-void get_raw_data(const py::list &array_list, double **array_ptrs, size_t &N, size_t &n_dofs)
+void get_raw_data(py::array_t<double> &x, double **array_ptrs, size_t &N, size_t &n_dofs)
 {
-    N = array_list.size();
-    unsigned i = 0;
-    for (py::handle array : array_list)
-    {
-        py::array_t<double> casted_array = py::cast<py::array>(array);
-        auto requestCastedArray = casted_array.request();
-        n_dofs = requestCastedArray.shape[0];
-        array_ptrs[i] = (double *)requestCastedArray.ptr;
-        i++;
-    }
+    auto r = x.unchecked<2>();
+    N = r.shape(0);
+    n_dofs = r.shape(1);
+    for (py::ssize_t i = 0; i < r.shape(0); i++)
+        array_ptrs[i] = (double *)r.data(i, 0);
 };
 
 void assign(py::list l, std::initializer_list<int> a)

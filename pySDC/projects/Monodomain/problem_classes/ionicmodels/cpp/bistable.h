@@ -15,10 +15,10 @@ class BiStable : public IonicModel
 public:
     BiStable(const double scale_);
     ~BiStable(){};
-    void f(py::list y, py::list fy);
-    void f_expl(py::list y, py::list fy);
-    void lmbda_exp(py::list y_list, py::list lmbda_list);
-    void lmbda_yinf_exp(py::list y_list, py::list lmbda_list, py::list yinf_list);
+    void f(py::array_t<double> &y, py::array_t<double> &fy);
+    void f_expl(py::array_t<double> &y, py::array_t<double> &fy);
+    void lmbda_exp(py::array_t<double> &y_list, py::array_t<double> &lmbda_list);
+    void lmbda_yinf_exp(py::array_t<double> &y_list, py::array_t<double> &lmbda_list, py::array_t<double> &yinf_list);
     py::list initial_values();
     double rho_f_expl();
 
@@ -51,7 +51,7 @@ py::list BiStable::initial_values()
     return y0;
 }
 
-void BiStable::f(py::list y_list, py::list fy_list)
+void BiStable::f(py::array_t<double> &y_list, py::array_t<double> &fy_list)
 {
     double *y_ptrs[size];
     double *fy_ptrs[size];
@@ -65,17 +65,17 @@ void BiStable::f(py::list y_list, py::list fy_list)
         fy_ptrs[0][j] = -scale * a * (y_ptrs[0][j] - V_th) * (y_ptrs[0][j] - V_depol) * (y_ptrs[0][j] - V_rest);
 }
 
-void BiStable::f_expl(py::list y_list, py::list fy_list)
+void BiStable::f_expl(py::array_t<double> &y_list, py::array_t<double> &fy_list)
 {
     this->f(y_list, fy_list);
 }
 
-void BiStable::lmbda_exp(py::list y_list, py::list lmbda_list)
+void BiStable::lmbda_exp(py::array_t<double> &y_list, py::array_t<double> &lmbda_list)
 {
     return;
 }
 
-void BiStable::lmbda_yinf_exp(py::list y_list, py::list lmbda_list, py::list yinf_list)
+void BiStable::lmbda_yinf_exp(py::array_t<double> &y_list, py::array_t<double> &lmbda_list, py::array_t<double> &yinf_list)
 {
     return;
 }

@@ -3,7 +3,7 @@ import logging
 import numpy as np
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.projects.Monodomain.datatype_classes.my_mesh import imexexp_mesh, get_np_list
+from pySDC.projects.Monodomain.datatype_classes.my_mesh import imexexp_mesh
 from pySDC.projects.Monodomain.problem_classes.space_discretizazions.Parabolic_DCT import Parabolic_DCT
 import pySDC.projects.Monodomain.problem_classes.ionicmodels.cpp as ionicmodels
 
@@ -203,7 +203,7 @@ class MonodomainODE(ptype):
         # evaluate the expression expr on u and put the result in fh
         # Here expr is a wrapper on a C++ function that evaluates the rhs of the ionic model (or part of it)
         if expr is not None:
-            expr(get_np_list(u), get_np_list(fh))
+            expr(u, fh)
 
         # indeces is a list of integers indicating which variables are modified by the expression expr.
         # This information is known a priori. Here we use it to zero the variables that are not modified by expr (if zero_untouched_indeces is True)
@@ -404,7 +404,7 @@ class MultiscaleMonodomainODE(MonodomainODE):
         return lmbda
 
     def eval_lmbda_yinf_exp(self, u, lmbda, yinf):
-        self.im_lmbda_yinf_exp(get_np_list(u), get_np_list(lmbda), get_np_list(yinf))
+        self.im_lmbda_yinf_exp(u, lmbda, yinf)
 
     def eval_lmbda_exp(self, u, lmbda):
-        self.im_lmbda_exp(get_np_list(u), get_np_list(lmbda))
+        self.im_lmbda_exp(u, lmbda)

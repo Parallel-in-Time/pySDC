@@ -15,10 +15,10 @@ class HodgkinHuxley : public IonicModel
 public:
     HodgkinHuxley(const double scale_);
     ~HodgkinHuxley(){};
-    void f(py::list y, py::list fy);
-    void f_expl(py::list y, py::list fy);
-    void lmbda_exp(py::list y_list, py::list lmbda_list);
-    void lmbda_yinf_exp(py::list y_list, py::list lmbda_list, py::list yinf_list);
+    void f(py::array_t<double> &y, py::array_t<double> &fy);
+    void f_expl(py::array_t<double> &y, py::array_t<double> &fy);
+    void lmbda_exp(py::array_t<double> &y_list, py::array_t<double> &lmbda_list);
+    void lmbda_yinf_exp(py::array_t<double> &y_list, py::array_t<double> &lmbda_list, py::array_t<double> &yinf_list);
     py::list initial_values();
     double rho_f_expl();
 
@@ -58,7 +58,7 @@ py::list HodgkinHuxley::initial_values()
     return y0;
 }
 
-void HodgkinHuxley::f(py::list y_list, py::list fy_list)
+void HodgkinHuxley::f(py::array_t<double> &y_list, py::array_t<double> &fy_list)
 {
     double *y_ptrs[size];
     double *fy_ptrs[size];
@@ -92,7 +92,7 @@ void HodgkinHuxley::f(py::list y_list, py::list fy_list)
     }
 }
 
-void HodgkinHuxley::f_expl(py::list y_list, py::list fy_list)
+void HodgkinHuxley::f_expl(py::array_t<double> &y_list, py::array_t<double> &fy_list)
 {
     double *y_ptrs[size];
     double *fy_ptrs[size];
@@ -112,7 +112,7 @@ void HodgkinHuxley::f_expl(py::list y_list, py::list fy_list)
     }
 }
 
-void HodgkinHuxley::lmbda_exp(py::list y_list, py::list lmbda_list)
+void HodgkinHuxley::lmbda_exp(py::array_t<double> &y_list, py::array_t<double> &lmbda_list)
 {
     double *y_ptrs[size];
     double *lmbda_ptrs[size];
@@ -138,7 +138,7 @@ void HodgkinHuxley::lmbda_exp(py::list y_list, py::list lmbda_list)
     }
 }
 
-void HodgkinHuxley::lmbda_yinf_exp(py::list y_list, py::list lmbda_list, py::list yinf_list)
+void HodgkinHuxley::lmbda_yinf_exp(py::array_t<double> &y_list, py::array_t<double> &lmbda_list, py::array_t<double> &yinf_list)
 {
     double *y_ptrs[size];
     double *lmbda_ptrs[size];
