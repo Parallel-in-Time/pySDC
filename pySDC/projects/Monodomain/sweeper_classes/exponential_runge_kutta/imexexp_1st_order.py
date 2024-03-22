@@ -37,8 +37,6 @@ class imexexp_1st_order(sweeper):
 
         self.lmbda = None
 
-        self.lambda_and_phi_outdated = True
-
         # Compute weights w such that PiQ^(k)(0) = sum_{j=0}^{M-1} w[k,j]*Q[j], k=0,...,M-1
         # Used to express the derivatives of a polynomial in x=0 in terms of the values of the polynomial at the collocation nodes
         M = self.coll.num_nodes
@@ -122,15 +120,12 @@ class imexexp_1st_order(sweeper):
             # We do so as \int_0^ci exp(dt*(ci-r)lmbda)*PiQ(r)dr = \sum_{j=0}^{M-1} Qmat_exp[i,j]*Q[j]
             if not hasattr(self, "Qmat_exp"):
                 # make some space
-                self.Qmat_exp = [[P.dtype_u(init=P.init, val=0.0) for j in range(M)] for i in range(M)]
-            for i in range(M):
-                for j in range(M):
-                    # zero out previous values
-                    self.Qmat_exp[i][j][P.rhs_exp_indeces] = 0.0
-                    for k in range(M):
-                        self.Qmat_exp[i][j][P.rhs_exp_indeces] += self.w[k, j] * c[i] ** (k + 1) * self.phi[k][i]
+                self.Qmat_exp = P.dtype_u(init=P.init_exp_extruded((M, M)), val=0.0)
 
-            self.lambda_and_phi_outdated = False
+            k = np.arange(0, M)
+            wgt_tmp = self.w[:, :, None] * c[None, None, :] ** (k[:, None, None] + 1)
+            for i in range(M):
+                self.Qmat_exp[i, :, :, :] = np.sum(wgt_tmp[:, :, i, None, None] * self.phi[:, None, i, :, :], axis=0)
 
     def integrate(self):
         """
@@ -168,9 +163,7 @@ class imexexp_1st_order(sweeper):
             for j in range(1, M + 1):
                 me[m - 1][P.rhs_stiff_indeces] += self.coll.Qmat[m, j] * L.f[j].impl[P.rhs_stiff_indeces]
                 me[m - 1][P.rhs_nonstiff_indeces] += self.coll.Qmat[m, j] * L.f[j].expl[P.rhs_nonstiff_indeces]
-                me[m - 1][P.rhs_exp_indeces] += (
-                    self.Qmat_exp[m - 1][j - 1][P.rhs_exp_indeces] * self.Q[j - 1][P.rhs_exp_indeces]
-                )
+                me[m - 1][P.rhs_exp_indeces] += self.Qmat_exp[m - 1][j - 1] * self.Q[j - 1][P.rhs_exp_indeces]
 
             me[m - 1] *= L.dt
 
