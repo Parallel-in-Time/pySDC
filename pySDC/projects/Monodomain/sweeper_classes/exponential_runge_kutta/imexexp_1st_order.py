@@ -134,19 +134,12 @@ class imexexp_1st_order(sweeper):
         self.compute_lambda_phi_Qmat_exp()
 
         if not hasattr(self, "Q"):
-            self.Q = [P.dtype_u(init=P.init, val=0.0) for _ in range(M)]
-            self.tmp = P.dtype_u(init=P.init, val=0.0)
+            self.Q = P.dtype_u(init=P.init_exp_extruded((M,)), val=0.0)
 
         for k in range(M):
-            # self.Q[k][P.rhs_exp_indeces] = L.f[k + 1].exp[P.rhs_exp_indeces] + self.lmbda[P.rhs_exp_indeces] * (
-            #     L.u[0][P.rhs_exp_indeces] - L.u[k + 1][P.rhs_exp_indeces]
-            # )  # at the indeces of the exponential rhs, otherwise 0
-
-            self.Q[k][P.rhs_exp_indeces] = 0.0
-            self.Q[k][P.rhs_exp_indeces] += L.u[0][P.rhs_exp_indeces]
-            self.Q[k][P.rhs_exp_indeces] -= L.u[k + 1][P.rhs_exp_indeces]
-            self.Q[k][P.rhs_exp_indeces] *= self.lmbda
-            self.Q[k][P.rhs_exp_indeces] += L.f[k + 1].exp[P.rhs_exp_indeces]
+            self.Q[k][:] = L.f[k + 1].exp[P.rhs_exp_indeces] + self.lmbda * (
+                L.u[0][P.rhs_exp_indeces] - L.u[k + 1][P.rhs_exp_indeces]
+            )
 
         # integrate RHS over all collocation nodes
         me = [P.dtype_u(init=P.init, val=0.0) for _ in range(M)]
@@ -154,7 +147,7 @@ class imexexp_1st_order(sweeper):
             for j in range(1, M + 1):
                 me[m - 1][P.rhs_stiff_indeces] += self.coll.Qmat[m, j] * L.f[j].impl[P.rhs_stiff_indeces]
                 me[m - 1][P.rhs_nonstiff_indeces] += self.coll.Qmat[m, j] * L.f[j].expl[P.rhs_nonstiff_indeces]
-                me[m - 1][P.rhs_exp_indeces] += self.Qmat_exp[m - 1][j - 1] * self.Q[j - 1][P.rhs_exp_indeces]
+            me[m - 1][P.rhs_exp_indeces] += np.sum(self.Qmat_exp[m - 1] * self.Q, axis=0)
 
             me[m - 1] *= L.dt
 
