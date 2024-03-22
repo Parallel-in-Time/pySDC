@@ -49,14 +49,14 @@ class imexexp_1st_order(sweeper):
         phi_num_nodes = 5  # seems to be enough in most cases
         self.phi_coll = CollBase(num_nodes=phi_num_nodes, tleft=0, tright=1, node_type='LEGENDRE', quad_type='GAUSS')
 
-    def phi_eval_lists(self, P, factors, indeces, phi, lmbda, update_non_exp_indeces=True):
+    def phi_eval_lists(self, P, factors, indeces, phi, lmbda):
         """
         Evaluate the phi_k functions at the points factor_i*lmbda
 
         Arguments:
             P: problem class
             factors: list of factors to multiply lmbda with. len(factors)=len(self.num_nodes)
-            indeces: list of indeces k for the phi_k functions
+            indeces: list of indeces k for the phi_k functions. Since we use the integral formulation, k=0 is not allowed.
             phi: list of lists of dtype_u: some space to store the results
             lmbda: dtype_u: the value of lmbda
             update_non_exp_indeces: bool: if True, the phi functions are also evaluated at the non-exponential indeces. Hence, where lambda=0 and thus we return phi_k(0) (using analytical value)
@@ -66,17 +66,10 @@ class imexexp_1st_order(sweeper):
 
         """
 
+        assert 0 not in indeces, "phi_0 is not implemented, since the integral definition is not valid for k=0."
+
         N_fac = len(factors)
         N_ind = len(indeces)
-
-        if phi is None:
-            # make some space
-            phi = [[P.dtype_u(init=P.init, val=0.0) for i in range(N_fac)] for j in range(N_ind)]
-        else:
-            # zero out the provided space
-            for n in range(N_fac):
-                for m in range(N_ind):
-                    phi[m][n][P.rhs_exp_indeces] = 0.0
 
         factorials = scipy.special.factorial(np.array(indeces) - 1)
         # the quadrature rule is used to evaluate the phi functions as integrals. This is not the same as the one used in the ESDC method!!!!
@@ -90,32 +83,14 @@ class imexexp_1st_order(sweeper):
             for n in range(N_fac):
                 factor = factors[n]
                 # compute e^((1-c_j)*factor*lmbda) for nodes c_j on the quadrature rule
-                exp_terms = [np.exp(((1.0 - c[j]) * factor) * lmbda[i]) for j in range(self.phi_coll.num_nodes)]
+                exp_terms = np.exp(((1.0 - c[:, None]) * factor) * lmbda[None, i])
                 # iterate over all the indeces k (phi_k)
                 for m in range(N_ind):
                     k = indeces[m]
                     km1_fac = factorials[m]  # (k-1)!
-                    if k == 0:
-                        # rmemeber: phi_0(z) = e^z
-                        phi[m][n][i][:] = np.exp(factor * lmbda[i])
-                    else:
-                        # using the quadrature rule approximate the integral \int_0^1 e^{(1-s)*factor*lambda}*s^{k-1}/(k-1)! ds
-                        for j in range(self.phi_coll.num_nodes):
-                            phi[m][n][i][:] += ((b[j] * c[j] ** (k - 1)) / km1_fac) * exp_terms[j]
-
-        # update the indeces where lambda=0 (i.e. the non-exponential indeces), there phi_k(0) = 1/k!
-        if update_non_exp_indeces:
-            for n in range(N_fac):
-                for m in range(N_ind):
-                    k = indeces[m]
-                    if k == 0:
-                        for i in P.rhs_non_exp_indeces:
-                            phi[m][n][i][:] = 1.0
-                    if k > 1:
-                        km1_fac = factorials[m]
-                        k_fac = km1_fac * k
-                        for i in P.rhs_non_exp_indeces:
-                            phi[m][n][i][:] = 1.0 / k_fac
+                    # using the quadrature rule to approximate the integral \int_0^1 e^{(1-s)*factor*lambda}*s^{k-1}/(k-1)! ds
+                    wgt_tmp = (b * c ** (k - 1)) / km1_fac
+                    phi[m][n][i] = np.sum(wgt_tmp[:, None] * exp_terms, axis=0)
 
         return phi
 
@@ -146,9 +121,9 @@ class imexexp_1st_order(sweeper):
                 self.phi = [[P.dtype_u(init=P.init, val=0.0) for i in range(M)] for k in range(M + 1)]
                 self.phi_one = [[P.dtype_u(init=P.init, val=0.0) for i in range(M)]]
             # evaluate the phi_k(dt*c_i*lambda) functions at the collocation nodes c_i for k=0,...,M
-            self.phi = self.phi_eval_lists(P, L.dt * c, list(range(M + 1)), self.phi, self.lmbda, False)
+            self.phi = self.phi_eval_lists(P, L.dt * c, list(range(1, M + 1)), self.phi, self.lmbda)
             # evaluates phi_1(dt*delta_i*lambda) for delta_i = c_i - c_{i-1}
-            self.phi_one = self.phi_eval_lists(P, L.dt * self.delta, [1], self.phi_one, self.lmbda, True)
+            self.phi_one = self.phi_eval_lists(P, L.dt * self.delta, [1], self.phi_one, self.lmbda)
 
             # compute weight for the integration of \int_0^ci exp(dt*(ci-r)lmbda)*PiQ(r)dr, where PiQ(r) is a polynomial interpolating
             # Q(c_i)=Q[i].
@@ -162,11 +137,8 @@ class imexexp_1st_order(sweeper):
                     self.Qmat_exp[i][j][P.rhs_exp_indeces] = 0.0
                     for k in range(M):
                         self.Qmat_exp[i][j][P.rhs_exp_indeces] += (
-                            self.w[k, j] * c[i] ** (k + 1) * self.phi[k + 1][i][P.rhs_exp_indeces]
+                            self.w[k, j] * c[i] ** (k + 1) * self.phi[k][i][P.rhs_exp_indeces]
                         )
-                        # self.Qmat_exp[i][j].axpy_sub(
-                        #     self.w[k, j] * c[i] ** (k + 1), self.phi[k + 1][i], P.rhs_exp_indeces
-                        # )
 
             self.lambda_and_phi_outdated = False
 

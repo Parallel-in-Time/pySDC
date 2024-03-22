@@ -364,8 +364,8 @@ def main():
     restol = 5e-8
 
     # set problem parameters
-    domain_name = "cube_1D"
-    refinements = [0, 1]
+    domain_name = "cube_2D"
+    refinements = [-1]
     order = 4  # 2 or 4
     ionic_model_name = "TTP"
     read_init_val = True
@@ -374,7 +374,7 @@ def main():
     write_as_reference_solution = False
     write_all_variables = False
     write_database = False
-    end_time = 0.2
+    end_time = 0.05
     output_root = "results_tmp"
     output_file_name = "ref_sol" if write_as_reference_solution else "monodomain"
     ref_sol = "ref_sol"
