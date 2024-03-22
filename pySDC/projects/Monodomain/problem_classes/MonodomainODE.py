@@ -69,7 +69,6 @@ class MonodomainODE(ptype):
         # ionic model with exponential terms and N is the number of dofs in the mesh.
         # The vector is further extruded to additional dimensions with shape new_dim_shape.
         return ((*new_dim_shape, len(self.rhs_exp_indeces), self.init[0][1]), self.init[1], self.init[2])
-        # return ((*new_dim_shape, self.init[0][0], self.init[0][1]), self.init[1], self.init[2])
 
     def write_solution(self, uh, t):
         # write solution to file, only the potential V=uh[0], not the ionic model variables

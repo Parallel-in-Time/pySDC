@@ -47,6 +47,9 @@ class TestODE(ptype):
         self.dtype_u = mesh
         self.dtype_f = mesh
 
+    def init_exp_extruded(self, new_dim_shape):
+        return ((*new_dim_shape, 1, self.init[0][1]), self.init[1], self.init[2])
+
     def initial_value(self):
         u0 = self.dtype_u(self.init, val=1.0)
 
