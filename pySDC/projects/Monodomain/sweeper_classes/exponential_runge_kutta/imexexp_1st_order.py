@@ -174,8 +174,8 @@ class imexexp_1st_order(sweeper):
 
         # integrate RHS over all collocation nodes
         me = [P.dtype_u(init=P.init, val=0.0) for _ in range(M)]
-        for m in range(1, self.coll.num_nodes + 1):
-            for j in range(1, self.coll.num_nodes + 1):
+        for m in range(1, M + 1):
+            for j in range(1, M + 1):
                 me[m - 1][P.rhs_stiff_indeces] += self.coll.Qmat[m, j] * L.f[j].impl[P.rhs_stiff_indeces]
                 me[m - 1][P.rhs_nonstiff_indeces] += self.coll.Qmat[m, j] * L.f[j].expl[P.rhs_nonstiff_indeces]
                 me[m - 1][P.rhs_exp_indeces] += (
