@@ -35,8 +35,6 @@ class imexexp_1st_order(sweeper):
         self.QI = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.QI)
         self.delta = np.diagonal(self.QI)[1:]
 
-        self.lmbda = None
-
         # Compute weights w such that PiQ^(k)(0) = sum_{j=0}^{M-1} w[k,j]*Q[j], k=0,...,M-1
         # Used to express the derivatives of a polynomial in x=0 in terms of the values of the polynomial at the collocation nodes
         M = self.coll.num_nodes
@@ -49,18 +47,14 @@ class imexexp_1st_order(sweeper):
 
     def phi_eval(self, factors, indeces, phi, lmbda):
         """
-        Evaluate the phi_k functions at the points factor_i*lmbda
+        Evaluate the phi_k functions at the points factors[i]*lmbda, for all k in indeces
 
         Arguments:
             factors: list of factors to multiply lmbda with.
-            indeces: list of indeces k for the phi_k functions. Since we use the integral formulation, k=0 is not allowed.
-            phi: an instance of mesh with shape (len(factors),len(indeces),*lmbda.shape) (some space to store the results)
+            indeces: list of indeces k for the phi_k functions. Since we use the integral formulation, k=0 is not allowed (not needed neither).
+            phi: an instance of mesh with shape (len(factors),len(indeces),*lmbda.shape) (i.e., some space to store the results)
+                 it will filled as: phi[i,k][:] = phi_{indeces[k]}(factor[i]*lmbda[:])
             lmbda: dtype_u: the value of lmbda
-
-        Returns:
-            phi: phi is an instance of mesh with shape (len(factors),len(indeces),*lmbda.shape)
-                 and phi[i,k][:] = phi_{indeces[k]}(factor[i]*lmbda[:])
-
         """
 
         assert 0 not in indeces, "phi_0 is not implemented, since the integral definition is not valid for k=0."
@@ -91,7 +85,7 @@ class imexexp_1st_order(sweeper):
         # everything that is computed in this if statement depends on u[0] only
         # To save computations we recompute that only if u[0] has changed.
         # Also, we check only for the first component u[0][0] of u[0] to save more computations.
-        # Remember that u[0][0] is a sub_vector representing the potential on the whole mesh and is enough to check if u[0] has changed.
+        # Remember that u[0][0] is a vector representing the electric potential on the whole mesh and is enough to check if the whole u[0] has changed.
         if not np.allclose(self.u_old[0], self.level.u[0][0], rtol=1e-10, atol=1e-10):
 
             self.u_old[:] = self.level.u[0]
@@ -101,7 +95,8 @@ class imexexp_1st_order(sweeper):
             M = self.coll.num_nodes
             c = self.coll.nodes
 
-            # compute lambda(u) of the exponential term f_exp(u)=lmbda(u)*(u-y_inf(u)) and select only the indeces with exponential terms
+            # compute lambda(u) of the exponential term f_exp(u)=lmbda(u)*(u-y_inf(u))
+            # and select only the indeces with exponential terms (others are zeros)
             self.lmbda = P.lmbda_eval(L.u[0], L.time)[P.rhs_exp_indeces]
 
             if not hasattr(self, "phi"):
@@ -114,15 +109,14 @@ class imexexp_1st_order(sweeper):
             # evaluates phi_1(dt*delta_i*lambda) for delta_i = c_i - c_{i-1}
             self.phi_eval(L.dt * self.delta, [1], self.phi_one, self.lmbda)
 
-            # compute weight for the integration of \int_0^ci exp(dt*(ci-r)lmbda)*PiQ(r)dr, where PiQ(r) is a polynomial interpolating
-            # Q(c_i)=Q[i].
-            # We do so as \int_0^ci exp(dt*(ci-r)lmbda)*PiQ(r)dr = \sum_{j=0}^{M-1} Qmat_exp[i,j]*Q[j]
-            if not hasattr(self, "Qmat_exp"):  # make some space
-                self.Qmat_exp = P.dtype_u(init=P.init_exp_extruded((M, M)), val=0.0)
+            # compute weight for the integration of \int_0^ci exp(dt*(ci-r)lmbda)*PiQ(r)dr,
+            # where PiQ(r) is a polynomial interpolating some nodal values Q(c_i)=Q[i].
+            # The integral of PiQ will be approximated as:
+            # \int_0^ci exp(dt*(ci-r)lmbda)*PiQ(r)dr ~= \sum_{j=0}^{M-1} Qmat_exp[i,j]*Q[j]
 
             k = np.arange(0, M)
             wgt_tmp = self.w[None, :, :] * c[:, None, None] ** (k[None, None, :] + 1)
-            self.Qmat_exp[:] = np.sum(wgt_tmp[:, :, :, None, None] * self.phi[:, None, :, :, :], axis=2)
+            self.Qmat_exp = np.sum(wgt_tmp[:, :, :, None, None] * self.phi[:, None, :, :, :], axis=2)
 
     def integrate(self):
         """
