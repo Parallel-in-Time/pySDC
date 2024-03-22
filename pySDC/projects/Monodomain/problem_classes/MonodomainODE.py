@@ -32,6 +32,9 @@ class MonodomainODE(ptype):
     read_init_val: If True, the initial value is read from file. If False, the initial value is at equilibrium.
     """
 
+    dtype_u = mesh
+    dtype_f = mesh
+
     def __init__(self, **problem_params):
         self.logger = logging.getLogger("step")
 
@@ -51,9 +54,6 @@ class MonodomainODE(ptype):
         # initial and end time
         self.t0 = 0.0
         self.Tend = 50.0 if self.end_time < 0.0 else self.end_time
-
-        self.dtype_u = mesh
-        self.dtype_f = mesh
 
         # init output stuff
         self.output_folder = (
@@ -222,11 +222,10 @@ class MultiscaleMonodomainODE(MonodomainODE):
     - exp:  The very stiff but diagonal terms of the ionic models, threated exponentially by time integrators.
     """
 
+    dtype_f = imexexp_mesh
+
     def __init__(self, **problem_params):
         super(MultiscaleMonodomainODE, self).__init__(**problem_params)
-
-        # Differently from the super class MonodomainODE, dtype_f is a imexexp_mesh
-        self.dtype_f = imexexp_mesh
 
         self.define_splittings()
 
