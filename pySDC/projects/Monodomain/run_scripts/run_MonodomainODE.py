@@ -364,8 +364,8 @@ def main():
     restol = 5e-8
 
     # set problem parameters
-    domain_name = "cube_1D"
-    refinements = [0]
+    domain_name = "cube_2D"
+    refinements = [-1]
     order = 4  # 2 or 4
     ionic_model_name = "TTP"
     read_init_val = True
