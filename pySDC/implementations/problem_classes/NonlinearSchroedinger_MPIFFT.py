@@ -1,16 +1,11 @@
 import numpy as np
-from scipy.optimize import newton_krylov, root
+from scipy.optimize import newton_krylov
 from scipy.optimize.nonlin import NoConvergence
-import scipy.sparse as sp
-from mpi4py import MPI
-from mpi4py_fft import PFFT
 
 from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.core.Problem import WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 from pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian import IMEX_Laplacian_MPIFFT
-
-from mpi4py_fft import newDistArray
 
 
 class nonlinearschroedinger_imex(IMEX_Laplacian_MPIFFT):
