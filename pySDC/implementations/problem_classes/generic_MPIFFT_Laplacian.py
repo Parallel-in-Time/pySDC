@@ -120,7 +120,7 @@ class IMEX_Laplacian_MPIFFT(ptype):
 
         if self.spectral:
             tmp = self.fft.backward(u)
-            tmpf = self._eval_explicit_part(u, tmp)
+            tmpf = self._eval_explicit_part(tmp, t, tmp)
             f.expl[:] = self.fft.forward(tmpf)
 
         else:

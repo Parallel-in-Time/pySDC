@@ -59,7 +59,8 @@ class nonlinearschroedinger_imex(IMEX_Laplacian_MPIFFT):
         self._makeAttributeAndRegister('c', localVars=locals(), readOnly=True)
 
     def _eval_explicit_part(self, u, t, f_expl):
-        return self.ndim * self.c * 2j * self.xp.absolute(u) ** 2 * u
+        f_expl[:] = self.ndim * self.c * 2j * self.xp.absolute(u) ** 2 * u
+        return f_expl
 
     def u_exact(self, t, **kwargs):
         r"""
