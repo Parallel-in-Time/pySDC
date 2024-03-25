@@ -45,6 +45,8 @@ class IMEX_Laplacian_MPIFFT(ptype):
     dtype_u = mesh
     dtype_f = imex_mesh
 
+    xp = np
+
     def __init__(self, nvars=None, spectral=False, L=2 * np.pi, alpha=1.0, comm=MPI.COMM_WORLD, dtype='d'):
         """Initialization routine"""
 
@@ -69,24 +71,24 @@ class IMEX_Laplacian_MPIFFT(ptype):
         self._makeAttributeAndRegister('nvars', 'spectral', 'L', 'alpha', 'comm', localVars=locals(), readOnly=True)
 
         # get local mesh
-        X = np.ogrid[self.fft.local_slice(False)]
+        X = self.xp.ogrid[self.fft.local_slice(False)]
         N = self.fft.global_shape()
         for i in range(len(N)):
             X[i] = X[i] * self.L[i] / N[i]
-        self.X = [np.broadcast_to(x, self.fft.shape(False)) for x in X]
+        self.X = [self.xp.broadcast_to(x, self.fft.shape(False)) for x in X]
 
         # get local wavenumbers and Laplace operator
         s = self.fft.local_slice()
         N = self.fft.global_shape()
-        k = [np.fft.fftfreq(n, 1.0 / n).astype(int) for n in N]
+        k = [self.xp.fft.fftfreq(n, 1.0 / n).astype(int) for n in N]
         K = [ki[si] for ki, si in zip(k, s)]
-        Ks = np.meshgrid(*K, indexing='ij', sparse=True)
+        Ks = self.xp.meshgrid(*K, indexing='ij', sparse=True)
         Lp = 2 * np.pi / self.L
         for i in range(self.ndim):
             Ks[i] = (Ks[i] * Lp[i]).astype(float)
-        K = [np.broadcast_to(k, self.fft.shape(True)) for k in Ks]
-        K = np.array(K).astype(float)
-        self.K2 = np.sum(K * K, 0, dtype=float)  # Laplacian in spectral space
+        K = [self.xp.broadcast_to(k, self.fft.shape(True)) for k in Ks]
+        K = self.xp.array(K).astype(float)
+        self.K2 = self.xp.sum(K * K, 0, dtype=float)  # Laplacian in spectral space
 
         # Need this for diagnostics
         self.dx = self.L / nvars[0]

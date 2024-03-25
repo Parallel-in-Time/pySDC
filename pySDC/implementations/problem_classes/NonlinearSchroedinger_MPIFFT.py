@@ -59,7 +59,7 @@ class nonlinearschroedinger_imex(IMEX_Laplacian_MPIFFT):
         self._makeAttributeAndRegister('c', localVars=locals(), readOnly=True)
 
     def _eval_explicit_part(self, u, t, f_expl):
-        return self.ndim * self.c * 2j * np.absolute(u) ** 2 * u
+        return self.ndim * self.c * 2j * self.xp.absolute(u) ** 2 * u
 
     def u_exact(self, t, **kwargs):
         r"""
@@ -83,9 +83,9 @@ class nonlinearschroedinger_imex(IMEX_Laplacian_MPIFFT):
         def nls_exact_1D(t, x, c):
             ae = 1.0 / np.sqrt(2.0) * np.exp(1j * t)
             if c != 0:
-                u = ae * ((np.cosh(t) + 1j * np.sinh(t)) / (np.cosh(t) - 1.0 / np.sqrt(2.0) * np.cos(x)) - 1.0)
+                u = ae * ((np.cosh(t) + 1j * np.sinh(t)) / (np.cosh(t) - 1.0 / np.sqrt(2.0) * self.xp.cos(x)) - 1.0)
             else:
-                u = np.sin(x) * np.exp(-t * 1j)
+                u = self.xp.sin(x) * np.exp(-t * 1j)
 
             return u
 
@@ -146,13 +146,13 @@ class nonlinearschroedinger_fully_implicit(nonlinearschroedinger_imex):
 
         if self.spectral:
             tmp = self.fft.backward(u)
-            tmpf = self.ndim * self.c * 2j * np.absolute(tmp) ** 2 * tmp
+            tmpf = self.ndim * self.c * 2j * self.xp.absolute(tmp) ** 2 * tmp
             f[:] = -self.K2 * 1j * u + self.fft.forward(tmpf)
 
         else:
             u_hat = self.fft.forward(u)
             lap_u_hat = -self.K2 * 1j * u_hat
-            f[:] = self.fft.backward(lap_u_hat) + self.ndim * self.c * 2j * np.absolute(u) ** 2 * u
+            f[:] = self.fft.backward(lap_u_hat) + self.ndim * self.c * 2j * self.xp.absolute(u) ** 2 * u
 
         self.work_counters['rhs']()
         return f
