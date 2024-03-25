@@ -1,15 +1,11 @@
 import numpy as np
 from mpi4py import MPI
-from mpi4py_fft import PFFT
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian import IMEX_Laplacian_MPIFFT
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
-from mpi4py_fft import newDistArray
 
-
-class Brusselator(ptype):
+class Brusselator(IMEX_Laplacian_MPIFFT):
     r"""
     Two-dimensional Brusselator from [1]_.
     This is a reaction-diffusion equation with non-autonomous source term:
@@ -30,65 +26,29 @@ class Brusselator(ptype):
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(self, nvars=None, alpha=0.1, comm=MPI.COMM_WORLD):
+    def __init__(self, alpha=0.1, **kwargs):
         """Initialization routine"""
-        nvars = (128,) * 2 if nvars is None else nvars
-        L = 1.0
-
-        if not (isinstance(nvars, tuple) and len(nvars) > 1):
-            raise ProblemError('Need at least two dimensions')
-
-        # Create FFT structure
-        self.ndim = len(nvars)
-        axes = tuple(range(self.ndim))
-        self.fft = PFFT(
-            comm,
-            list(nvars),
-            axes=axes,
-            dtype=np.float64,
-            collapse=True,
-            backend='fftw',
-        )
-
-        # get test data to figure out type and dimensions
-        tmp_u = newDistArray(self.fft, False)
+        super().__init__(spectral=False, L=1.0, dtype='d', alpha=alpha, **kwargs)
 
         # prepare the array with two components
-        shape = (2,) + tmp_u.shape
+        shape = (2,) + (self.init[0])
         self.iU = 0
         self.iV = 1
+        self.init = (shape, self.comm, np.dtype('float'))
 
-        super().__init__(init=(shape, comm, tmp_u.dtype))
-        self._makeAttributeAndRegister('nvars', 'alpha', 'L', 'comm', localVars=locals(), readOnly=True)
+    def _eval_explicit_part(self, u, t, f_expl):
+        iU, iV = self.iU, self.iV
+        x, y = self.X[0], self.X[1]
 
-        L = np.array([self.L] * self.ndim, dtype=float)
+        # evaluate time independent part
+        f_expl[iU, ...] = 1.0 + u[iU] ** 2 * u[iV] - 4.4 * u[iU]
+        f_expl[iV, ...] = 3.4 * u[iU] - u[iU] ** 2 * u[iV]
 
-        # get local mesh for distributed FFT
-        X = np.ogrid[self.fft.local_slice(False)]
-        N = self.fft.global_shape()
-        for i in range(len(N)):
-            X[i] = X[i] * L[i] / N[i]
-        self.X = [np.broadcast_to(x, self.fft.shape(False)) for x in X]
-
-        # get local wavenumbers and Laplace operator
-        s = self.fft.local_slice()
-        N = self.fft.global_shape()
-        k = [np.fft.fftfreq(n, 1.0 / n).astype(int) for n in N[:-1]]
-        k.append(np.fft.rfftfreq(N[-1], 1.0 / N[-1]).astype(int))
-        K = [ki[si] for ki, si in zip(k, s)]
-        Ks = np.meshgrid(*K, indexing='ij', sparse=True)
-        Lp = 2 * np.pi / L
-        for i in range(self.ndim):
-            Ks[i] = (Ks[i] * Lp[i]).astype(float)
-        K = [np.broadcast_to(k, self.fft.shape(True)) for k in Ks]
-        K = np.array(K).astype(float)
-        self.K2 = np.sum(K * K, 0, dtype=float)
-
-        # Need this for diagnostics
-        self.dx = self.L / nvars[0]
-        self.dy = self.L / nvars[1]
-
-        self.work_counters['rhs'] = WorkCounter()
+        # add time-dependent part
+        if t >= 1.1:
+            mask = (x - 0.3) ** 2 + (y - 0.6) ** 2 <= 0.1**2
+            f_expl[iU][mask] += 5.0
+        return f_expl
 
     def eval_f(self, u, t):
         """
@@ -106,25 +66,13 @@ class Brusselator(ptype):
         f : dtype_f
             The right-hand side of the problem.
         """
-        iU, iV = self.iU, self.iV
-        x, y = self.X[0], self.X[1]
-
         f = self.dtype_f(self.init)
 
         # evaluate Laplacian to be solved implicitly
         for i in [self.iU, self.iV]:
-            u_hat = self.fft.forward(u[i, ...])
-            lap_u_hat = -self.alpha * self.K2 * u_hat
-            f.impl[i, ...] = self.fft.backward(lap_u_hat, f.impl[i, ...])
+            f.impl[i, ...] = self._eval_Laplacian(u[i], f.impl[i])
 
-        # evaluate time independent part
-        f.expl[iU, ...] = 1.0 + u[iU] ** 2 * u[iV] - 4.4 * u[iU]
-        f.expl[iV, ...] = 3.4 * u[iU] - u[iU] ** 2 * u[iV]
-
-        # add time-dependent part
-        if t >= 1.1:
-            mask = (x - 0.3) ** 2 + (y - 0.6) ** 2 <= 0.1**2
-            f.expl[iU][mask] += 5.0
+        f.expl[:] = self._eval_explicit_part(u, t, f.expl)
 
         self.work_counters['rhs']()
 
@@ -153,9 +101,7 @@ class Brusselator(ptype):
         me = self.dtype_u(self.init)
 
         for i in [self.iU, self.iV]:
-            rhs_hat = self.fft.forward(rhs[i, ...])
-            rhs_hat /= 1.0 + factor * self.K2 * self.alpha
-            me[i, ...] = self.fft.backward(rhs_hat, me[i, ...])
+            me[i, ...] = self._invert_Laplacian(me[i], factor, rhs[i])
 
         return me
 
@@ -184,8 +130,8 @@ class Brusselator(ptype):
         me = self.dtype_u(self.init, val=0.0)
 
         if t == 0:
-            me[iU, ...] = 22.0 * y * (1 - y / self.L) ** (3.0 / 2.0) / self.L
-            me[iV, ...] = 27.0 * x * (1 - x / self.L) ** (3.0 / 2.0) / self.L
+            me[iU, ...] = 22.0 * y * (1 - y / self.L[0]) ** (3.0 / 2.0) / self.L[0]
+            me[iV, ...] = 27.0 * x * (1 - x / self.L[0]) ** (3.0 / 2.0) / self.L[0]
         else:
 
             def eval_rhs(t, u):
