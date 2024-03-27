@@ -23,7 +23,7 @@ authors:
 
 version: 5.4.3
 doi: 10.5281/zenodo.594191
-date-released: 2024-02-08
+date-released: 2024-03-27
 keywords: 
   - "parallel-in-time"
   - "spectral deferred corrections"
