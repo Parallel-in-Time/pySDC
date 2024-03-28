@@ -5,10 +5,18 @@ import warnings
 
 
 @pytest.mark.mpi4py
-def test_main_serial():
-    from pySDC.projects.AllenCahn_Bayreuth.run_simple_forcing_verification import main, visualize_radii
+@pytest.mark.parametrize('spectral', [True, False])
+@pytest.mark.parametrize('name', ['AC-test-noforce', 'AC-test-constforce', 'AC-test-timeforce'])
+def test_main_serial(name, spectral):
+    from pySDC.projects.AllenCahn_Bayreuth.run_simple_forcing_verification import run_simulation
 
-    main()
+    run_simulation(name=name, spectral=spectral, nprocs_space=None)
+
+
+@pytest.mark.mpi4py
+def test_visualize_radii():
+    from pySDC.projects.AllenCahn_Bayreuth.run_simple_forcing_verification import visualize_radii
+
     visualize_radii()
 
 
