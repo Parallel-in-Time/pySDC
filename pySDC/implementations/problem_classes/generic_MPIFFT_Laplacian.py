@@ -91,8 +91,8 @@ class IMEX_Laplacian_MPIFFT(ptype):
         self.K2 = self.xp.sum(K * K, 0, dtype=float)  # Laplacian in spectral space
 
         # Need this for diagnostics
-        self.dx = self.L / nvars[0]
-        self.dy = self.L / nvars[1]
+        self.dx = self.L[0] / nvars[0]
+        self.dy = self.L[1] / nvars[1]
 
         # work counters
         self.work_counters['rhs'] = WorkCounter()
@@ -120,8 +120,8 @@ class IMEX_Laplacian_MPIFFT(ptype):
 
         if self.spectral:
             tmp = self.fft.backward(u)
-            tmpf = self._eval_explicit_part(tmp, t, tmp)
-            f.expl[:] = self.fft.forward(tmpf)
+            tmp[:] = self._eval_explicit_part(tmp, t, tmp)
+            f.expl[:] = self.fft.forward(tmp)
 
         else:
             f.expl[:] = self._eval_explicit_part(u, t, f.expl)

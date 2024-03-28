@@ -2,7 +2,6 @@ import numpy as np
 from mpi4py import MPI
 
 from pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian import IMEX_Laplacian_MPIFFT
-from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 class Brusselator(IMEX_Laplacian_MPIFFT):
@@ -22,9 +21,6 @@ class Brusselator(IMEX_Laplacian_MPIFFT):
     ----------
     .. [1] https://link.springer.com/book/10.1007/978-3-642-05221-7
     """
-
-    dtype_u = mesh
-    dtype_f = imex_mesh
 
     def __init__(self, alpha=0.1, **kwargs):
         """Initialization routine"""
