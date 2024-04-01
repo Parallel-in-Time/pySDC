@@ -56,6 +56,7 @@ Submodules
    implementations.problem_classes.TestEquation_0D
    implementations.problem_classes.Van_der_Pol_implicit
    implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic
+   implementations.problem_classes.generic_MPIFFT_Laplacian
    implementations.problem_classes.generic_ND_FD
    implementations.problem_classes.nonlinear_ODE_1
    implementations.problem_classes.odeScalar

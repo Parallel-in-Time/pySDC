@@ -51,8 +51,8 @@
 <span id="implementations-problem-classes-brusselator-module"></span><h1>implementations.problem_classes.Brusselator module<a class="headerlink" href="#module-implementations.problem_classes.Brusselator" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.Brusselator.Brusselator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Brusselator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.COMM_WORLD</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Brusselator.html#Brusselator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Brusselator.Brusselator" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Brusselator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Brusselator.html#Brusselator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Brusselator.Brusselator" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">IMEX_Laplacian_MPIFFT</span></code></p>
 <p>Two-dimensional Brusselator from <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.
 This is a reaction-diffusion equation with non-autonomous source term:</p>
 <div class="math notranslate nohighlight">
@@ -68,18 +68,6 @@ Laplacian which we invert implicitly. We treat the reaction and source terms exp
 <p><a class="reference external" href="https://link.springer.com/book/10.1007/978-3-642-05221-7">https://link.springer.com/book/10.1007/978-3-642-05221-7</a></p>
 </aside>
 </aside>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.Brusselator.Brusselator.dtype_f">
-<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.Brusselator.Brusselator.dtype_f" title="Link to this definition">¶</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_mesh</span></code></p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.Brusselator.Brusselator.dtype_u">
-<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.Brusselator.Brusselator.dtype_u" title="Link to this definition">¶</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Brusselator.Brusselator.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Brusselator.html#Brusselator.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Brusselator.Brusselator.eval_f" title="Link to this definition">¶</a></dt>
@@ -191,8 +179,6 @@ Laplacian which we invert implicitly. We treat the reaction and source terms exp
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.Brusselator module</a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.Brusselator.Brusselator"><code class="docutils literal notranslate"><span class="pre">Brusselator</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.problem_classes.Brusselator.Brusselator.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.Brusselator.Brusselator.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Brusselator.Brusselator.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Brusselator.Brusselator.get_fig"><code class="docutils literal notranslate"><span class="pre">get_fig()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Brusselator.Brusselator.plot"><code class="docutils literal notranslate"><span class="pre">plot()</span></code></a></li>

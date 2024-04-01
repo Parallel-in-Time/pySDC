@@ -51,8 +51,8 @@
 <span id="implementations-problem-classes-allencahn-mpifft-module"></span><h1>implementations.problem_classes.AllenCahn_MPIFFT module<a class="headerlink" href="#module-implementations.problem_classes.AllenCahn_MPIFFT" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_imex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectral</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'circle'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.COMM_WORLD</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_MPIFFT.html#allencahn_imex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_imex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'circle'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_MPIFFT.html#allencahn_imex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">IMEX_Laplacian_MPIFFT</span></code></p>
 <p>Example implementing the <span class="math notranslate nohighlight">\(N\)</span>-dimensional Allen-Cahn equation with periodic boundary conditions <span class="math notranslate nohighlight">\(u \in [0, 1]^2\)</span></p>
 <div class="math notranslate nohighlight">
 \[\frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
@@ -141,18 +141,6 @@ side will be treated explicitly using <code class="docutils literal notranslate"
 <p><a class="reference external" href="https://mpi4py-fft.readthedocs.io/en/latest/">https://mpi4py-fft.readthedocs.io/en/latest/</a></p>
 </aside>
 </aside>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.dtype_f">
-<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.dtype_f" title="Link to this definition">¶</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_mesh</span></code></p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.dtype_u">
-<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.dtype_u" title="Link to this definition">¶</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_MPIFFT.html#allencahn_imex.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.eval_f" title="Link to this definition">¶</a></dt>
@@ -169,28 +157,6 @@ side will be treated explicitly using <code class="docutils literal notranslate"
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_f</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.solve_system">
-<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_MPIFFT.html#allencahn_imex.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.solve_system" title="Link to this definition">¶</a></dt>
-<dd><p>Simple FFT solver for the diffusion part.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
-<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the node-to-node stepsize (or any other factor required).</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver (not used here so far).</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
 </dd>
 </dl>
 </dd></dl>
@@ -216,7 +182,7 @@ side will be treated explicitly using <code class="docutils literal notranslate"
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex_timeforcing">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_imex_timeforcing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectral</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'circle'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.COMM_WORLD</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_MPIFFT.html#allencahn_imex_timeforcing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex_timeforcing" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_imex_timeforcing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'circle'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_MPIFFT.html#allencahn_imex_timeforcing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex_timeforcing" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex" title="implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn_imex</span></code></a></p>
 <p>Example implementing the <span class="math notranslate nohighlight">\(N\)</span>-dimensional Allen-Cahn equation with periodic boundary conditions <span class="math notranslate nohighlight">\(u \in [0, 1]^2\)</span>
 using time-dependent forcing</p>
@@ -271,10 +237,7 @@ side will be treated explicitly using <code class="docutils literal notranslate"
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.K2"><code class="docutils literal notranslate"><span class="pre">K2</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.dy"><code class="docutils literal notranslate"><span class="pre">dy</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
 </ul>
 </li>
