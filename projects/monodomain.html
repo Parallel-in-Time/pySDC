@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Exponential SDC for the Monodomain Equation in Cardiac Electrophysiology &#8212; pySDC 5.4.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=e5a863ed"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="core package" href="../pySDC/core.html" />
+    <link rel="prev" title="Spectral Deferred Correction Methods for Second-Order Problems" href="second_order.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../pySDC/core.html" title="core package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="second_order.html" title="Spectral Deferred Correction Methods for Second-Order Problems"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Exponential SDC for the Monodomain Equation in Cardiac Electrophysiology</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="exponential-sdc-for-the-monodomain-equation-in-cardiac-electrophysiology">
+<h1>Exponential SDC for the Monodomain Equation in Cardiac Electrophysiology<a class="headerlink" href="#exponential-sdc-for-the-monodomain-equation-in-cardiac-electrophysiology" title="Link to this heading">¶</a></h1>
+<p>This project implements the exponential spectral deferred correction (ESDC) method for the monodomain equation in cardiac electrophysiology.
+The method proposed here is an adaptation of the <a class="reference external" href="https://doi.org/10.1137/19M1256166">ESDC method proposed by T. Buvoli</a> to the monodomain equation.
+In particular, the implicit-explicit Rush-Larsen method is used as correction scheme. Moreover, not all model components have exponential terms, therefore the resulting method is an hybrid between ESDC and the standard SDC method.</p>
+<section id="monodomain-equation">
+<h2>Monodomain equation<a class="headerlink" href="#monodomain-equation" title="Link to this heading">¶</a></h2>
+<p>The monodomain equation models the electrical activity in the heart. It is a reaction-diffusion equation coupled with an ordinary differential equation for the ionic model and is given by</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{align}
+\chi (C_m\frac{\partial V}{\partial t}+I_{ion}(V,z_E,z_e, t)) &amp;= \nabla \cdot (D \nabla V) &amp; \quad \text{in } &amp;\Omega \times (0,T), \\
+\frac{\partial z_E}{\partial t} &amp;= g_E(V,z_E,z_e) &amp; \quad \text{in } &amp;\Omega \times (0,T), \\
+\frac{\partial z_e}{\partial t} &amp;= \Lambda_e(V)(z_e-z_{e,\infty}(V)) &amp; \quad \text{in } &amp;\Omega \times (0,T), \\
+\end{align}\end{split}\]</div>
+<p>plus the boundary conditions, where <span class="math notranslate nohighlight">\(V(t,x)\in\mathbb{R}\)</span> is the transmembrane potential and <span class="math notranslate nohighlight">\(z_E(t,x)\in\mathbb{R}^n\)</span>, <span class="math notranslate nohighlight">\(z_e(t,x)\in\mathbb{R}^m\)</span> are the ionic model state variables.
+The ionic model right-hand side <span class="math notranslate nohighlight">\(g_E\)</span> is a general nonlinear term, while <span class="math notranslate nohighlight">\(\Lambda_e\)</span> is a diagonal matrix. The typical range for the number of unknowns <span class="math notranslate nohighlight">\(N=1+n+m\)</span> is <span class="math notranslate nohighlight">\(N\in [4,50]\)</span> and depends on the ionic model of choice.</p>
+<p>Spatial discretization yields a system of ODEs which can be written in compact form as</p>
+<div class="math notranslate nohighlight">
+\[\mathbf y'=f_I(\mathbf y)+f_E(\mathbf y)+f_e(\mathbf y),\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf y(t)\in\mathbb{R}^{M N}\)</span> is the vector of unknowns and <span class="math notranslate nohighlight">\(M\)</span> the number of mesh nodes.
+Concerning the right-hand sides, <span class="math notranslate nohighlight">\(f_I\)</span> is a linear term for the discrete diffusion, <span class="math notranslate nohighlight">\(f_E\)</span> is a nonlinear but non-stiff term for <span class="math notranslate nohighlight">\(I_{ion},g_E\)</span>, and <span class="math notranslate nohighlight">\(f_e\)</span> is a severely stiff term for <span class="math notranslate nohighlight">\(\Lambda_e(V)(z_e-z_{e,\infty}(V))\)</span>.</p>
+<p>The standard (serial) way of integrating the monodomain equation is by using a splitting method, where <span class="math notranslate nohighlight">\(f_I\)</span> is integrated implicitly, <span class="math notranslate nohighlight">\(f_E\)</span> explicitly, and <span class="math notranslate nohighlight">\(f_e\)</span> using the exponential Euler method (which is inexpensive due to the diagonal structure of <span class="math notranslate nohighlight">\(\Lambda_e\)</span>). We denote this method as IMEXEXP.</p>
+</section>
+<section id="the-esdc-method-for-the-monodomain-equation">
+<h2>The ESDC method for the monodomain equation<a class="headerlink" href="#the-esdc-method-for-the-monodomain-equation" title="Link to this heading">¶</a></h2>
+<p>A possible way to parallelize the integration of the monodomain equation is by employing the SDC method in combination with the IMEXEXP approach for the correction scheme (preconditioner).
+However, this approach is unstable due to the severe stiffness of <span class="math notranslate nohighlight">\(f_e\)</span>.
+Therefore we propose a hybrid method, where we employ SDC for the <span class="math notranslate nohighlight">\(f_I,f_E\)</span> terms and ESDC for the <span class="math notranslate nohighlight">\(f_e\)</span> term. For the correcttion scheme we still use the IMEXEXP method.
+The resulting method can be seen as a particular case of ESDC and will be denoted by ESDC in the next figures, for simplicity.</p>
+</section>
+<section id="running-the-code">
+<h2>Running the code<a class="headerlink" href="#running-the-code" title="Link to this heading">¶</a></h2>
+<p>Due to their complexity, ionic models are coded in C++ and wrapped to Python. Therefore, before running any example you need to compile the ionic models by running the following command in the root folder:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>export IONIC_MODELS_PATH=pySDC/projects/Monodomain/problem_classes/ionicmodels/cpp
+c++ -O3 -Wall -shared -std=c++11 -fPIC -fvisibility=hidden $(python3 -m pybind11 --includes) ${IONIC_MODELS_PATH}/bindings_definitions.cpp -o ${IONIC_MODELS_PATH}/ionicmodels$(python3-config --extension-suffix)
+</pre></div>
+</div>
+<p>Then an example can be run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">pySDC</span><span class="o">/</span><span class="n">projects</span><span class="o">/</span><span class="n">Monodomain</span><span class="o">/</span><span class="n">run_scripts</span>
+<span class="n">mpirun</span> <span class="o">-</span><span class="n">n</span> <span class="mi">4</span> <span class="n">python</span> <span class="n">run_MonodomainODE_cli</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">dt</span> <span class="mf">0.05</span> <span class="o">--</span><span class="n">end_time</span> <span class="mf">0.2</span> <span class="o">--</span><span class="n">num_nodes</span> <span class="mi">6</span><span class="p">,</span><span class="mi">3</span> <span class="o">--</span><span class="n">domain_name</span> <span class="n">cube_1D</span> <span class="o">--</span><span class="n">refinements</span> <span class="mi">0</span> <span class="o">--</span><span class="n">ionic_model_name</span> <span class="n">TTP</span> <span class="o">--</span><span class="n">truly_time_parallel</span> <span class="o">--</span><span class="n">n_time_ranks</span> <span class="mi">4</span>
+</pre></div>
+</div>
+</section>
+<section id="stability">
+<h2>Stability<a class="headerlink" href="#stability" title="Link to this heading">¶</a></h2>
+<p>We display here the stability domain of the ESDC and SDC methods, both with IMEXEXP as correction scheme, applied to the test problem</p>
+<div class="math notranslate nohighlight">
+\[y'=\lambda_I y+\lambda_E y+\lambda_e y,\]</div>
+<p>with <span class="math notranslate nohighlight">\(\lambda_I,\lambda_E,\lambda_e\)</span> representing <span class="math notranslate nohighlight">\(f_I,f_E,f_e\)</span>, respectively.
+We fix <span class="math notranslate nohighlight">\(\lambda_E=-1\)</span> and vary the stiff terms <span class="math notranslate nohighlight">\(\lambda_I,\lambda_e\)</span> only. We see that the ESDC method is stable for all tested values of <span class="math notranslate nohighlight">\(\lambda_I,\lambda_e\)</span>, while SDC is not.</p>
+<a class="reference internal image-reference" href="../../data/stability_domain_IMEXEXP_EXPRK.png"><img alt="../../data/stability_domain_IMEXEXP_EXPRK.png" src="../../data/stability_domain_IMEXEXP_EXPRK.png" /></a>
+<a class="reference internal image-reference" href="../../data/stability_domain_IMEXEXP.png"><img alt="../../data/stability_domain_IMEXEXP.png" src="../../data/stability_domain_IMEXEXP.png" /></a>
+</section>
+<section id="convergence">
+<h2>Convergence<a class="headerlink" href="#convergence" title="Link to this heading">¶</a></h2>
+<p>Here we verify convergence of the ESDC method for the monodomain equation.
+We fix the number of collocation nodes to <span class="math notranslate nohighlight">\(m=6\)</span> and perform a convergence experiment fixing the number of sweeps to either <span class="math notranslate nohighlight">\(k=3\)</span> or <span class="math notranslate nohighlight">\(k=6\)</span>.
+We use the ten Tusscher-Panfilov ionic model, which is employed in practical applications.
+We see that we gain one order of accuracy per sweep, as expected.</p>
+<a class="reference internal image-reference" href="../../data/convergence_ESDC_fixed_iter.png"><img alt="../../data/convergence_ESDC_fixed_iter.png" src="../../data/convergence_ESDC_fixed_iter.png" /></a>
+</section>
+<section id="iterations">
+<h2>Iterations<a class="headerlink" href="#iterations" title="Link to this heading">¶</a></h2>
+<p>Here we consider three methods:</p>
+<ul class="simple">
+<li><p>ESDC: with <span class="math notranslate nohighlight">\(m=6\)</span> collocation nodes.</p></li>
+<li><p>MLESDC: This is a multilevel version of ESDC with <span class="math notranslate nohighlight">\(m=6\)</span> collocation nodes on the fine level and <span class="math notranslate nohighlight">\(m=3\)</span> nodes on the coarse level.</p></li>
+<li><p>PFASST: Combination of the PFASST parallelization method with MLESDC, using 24 processors.</p></li>
+</ul>
+<p>We display the number of iterations required by each method to reach a given tolerance and the residual at convergence. As ionic model we use again the ten Tusscher-Panfilov model.
+We see that PFASST requires a reasonalbly small number of iterations, comparable to the serial counterparts ESDC and MLESDC.</p>
+<a class="reference internal image-reference" href="../../data/niter_VS_time.png"><img alt="../../data/niter_VS_time.png" src="../../data/niter_VS_time.png" /></a>
+<a class="reference internal image-reference" href="../../data/res_VS_time.png"><img alt="../../data/res_VS_time.png" src="../../data/res_VS_time.png" /></a>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Exponential SDC for the Monodomain Equation in Cardiac Electrophysiology</a><ul>
+<li><a class="reference internal" href="#monodomain-equation">Monodomain equation</a></li>
+<li><a class="reference internal" href="#the-esdc-method-for-the-monodomain-equation">The ESDC method for the monodomain equation</a></li>
+<li><a class="reference internal" href="#running-the-code">Running the code</a></li>
+<li><a class="reference internal" href="#stability">Stability</a></li>
+<li><a class="reference internal" href="#convergence">Convergence</a></li>
+<li><a class="reference internal" href="#iterations">Iterations</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="second_order.html"
+                          title="previous chapter">Spectral Deferred Correction Methods for Second-Order Problems</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="../pySDC/core.html"
+                          title="next chapter">core package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/projects/monodomain.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../pySDC/core.html" title="core package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="second_order.html" title="Spectral Deferred Correction Methods for Second-Order Problems"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Exponential SDC for the Monodomain Equation in Cardiac Electrophysiology</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>
