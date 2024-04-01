@@ -58,6 +58,7 @@ markers = [
     'benchmark: tests for benchmarking',
     'cupy: tests for cupy on GPUs',
     'libpressio: tests using the libpressio library',
+    'monodomain: tests the monodomain project, which requires previous compilation of c++ code',
     ]
 timeout = 300
 
