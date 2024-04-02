@@ -80,7 +80,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
         shape = (2,) + (self.init[0])
         self.iU = 0
         self.iV = 1
-        self.init = (shape, self.comm, np.dtype('float'))
+        self.init = (shape, self.comm, self.xp.dtype('float'))
 
         self._makeAttributeAndRegister('Du', 'Dv', 'A', 'B', localVars=locals(), readOnly=True)
 
@@ -184,13 +184,13 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
 
         # This assumes that the box is [-L/2, L/2]^2
         if self.spectral:
-            tmp = 1.0 - np.exp(-80.0 * ((self.X[0] + 0.05) ** 2 + (self.X[1] + 0.02) ** 2))
+            tmp = 1.0 - self.xp.exp(-80.0 * ((self.X[0] + 0.05) ** 2 + (self.X[1] + 0.02) ** 2))
             me[0, ...] = self.fft.forward(tmp)
-            tmp = np.exp(-80.0 * ((self.X[0] - 0.05) ** 2 + (self.X[1] - 0.02) ** 2))
+            tmp = self.xp.exp(-80.0 * ((self.X[0] - 0.05) ** 2 + (self.X[1] - 0.02) ** 2))
             me[1, ...] = self.fft.forward(tmp)
         else:
-            me[0, ...] = 1.0 - np.exp(-80.0 * ((self.X[0] + 0.05) ** 2 + (self.X[1] + 0.02) ** 2))
-            me[1, ...] = np.exp(-80.0 * ((self.X[0] - 0.05) ** 2 + (self.X[1] - 0.02) ** 2))
+            me[0, ...] = 1.0 - self.xp.exp(-80.0 * ((self.X[0] + 0.05) ** 2 + (self.X[1] + 0.02) ** 2))
+            me[1, ...] = self.xp.exp(-80.0 * ((self.X[0] - 0.05) ** 2 + (self.X[1] - 0.02) ** 2))
 
         return me
 
@@ -490,7 +490,7 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
             tmpgv = tmpv - tmprhsv - factor * (tmpu * tmpv**2 - self.B * tmpv)
 
             # if g is close to 0, then we are done
-            res = max(np.linalg.norm(tmpgu, np.inf), np.linalg.norm(tmpgv, np.inf))
+            res = max(self.xp.linalg.norm(tmpgu, self.xp.inf), self.xp.linalg.norm(tmpgv, self.xp.inf))
             if res < self.newton_tol:
                 break
 
@@ -501,17 +501,19 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
             dg11 = 1 - factor * (2 * tmpu * tmpv - self.B)
 
             # interleave and unravel to put into sparse matrix
-            dg00I = np.ravel(np.kron(dg00, np.array([1, 0])))
-            dg01I = np.ravel(np.kron(dg01, np.array([1, 0])))
-            dg10I = np.ravel(np.kron(dg10, np.array([1, 0])))
-            dg11I = np.ravel(np.kron(dg11, np.array([0, 1])))
+            dg00I = self.xp.ravel(self.xp.kron(dg00, self.xp.array([1, 0])))
+            dg01I = self.xp.ravel(self.xp.kron(dg01, self.xp.array([1, 0])))
+            dg10I = self.xp.ravel(self.xp.kron(dg10, self.xp.array([1, 0])))
+            dg11I = self.xp.ravel(self.xp.kron(dg11, self.xp.array([0, 1])))
 
             # put into sparse matrix
             dg = sp.diags(dg00I, offsets=0) + sp.diags(dg11I, offsets=0)
             dg += sp.diags(dg01I, offsets=1, shape=dg.shape) + sp.diags(dg10I, offsets=-1, shape=dg.shape)
 
             # interleave g terms to apply inverse to it
-            g = np.kron(tmpgu.flatten(), np.array([1, 0])) + np.kron(tmpgv.flatten(), np.array([0, 1]))
+            g = self.xp.kron(tmpgu.flatten(), self.xp.array([1, 0])) + self.xp.kron(
+                tmpgv.flatten(), self.xp.array([0, 1])
+            )
             # invert dg matrix
             b = sp.linalg.spsolve(dg, g)
             # update real space vectors
@@ -522,9 +524,9 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
             n += 1
             self.work_counters['newton']()
 
-        if np.isnan(res) and self.stop_at_nan:
+        if self.xp.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
-        elif np.isnan(res):
+        elif self.xp.isnan(res):
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
         if n == self.newton_maxiter:
@@ -694,7 +696,7 @@ class grayscott_mi_linear(grayscott_imex_linear):
             tmpgv = tmpv - tmprhsv - factor * (tmpu * tmpv**2)
 
             # if g is close to 0, then we are done
-            res = max(np.linalg.norm(tmpgu, np.inf), np.linalg.norm(tmpgv, np.inf))
+            res = max(self.xp.linalg.norm(tmpgu, self.xp.inf), self.xp.linalg.norm(tmpgv, self.xp.inf))
             if res < self.newton_tol:
                 break
 
@@ -705,17 +707,19 @@ class grayscott_mi_linear(grayscott_imex_linear):
             dg11 = 1 - factor * (2 * tmpu * tmpv)
 
             # interleave and unravel to put into sparse matrix
-            dg00I = np.ravel(np.kron(dg00, np.array([1, 0])))
-            dg01I = np.ravel(np.kron(dg01, np.array([1, 0])))
-            dg10I = np.ravel(np.kron(dg10, np.array([1, 0])))
-            dg11I = np.ravel(np.kron(dg11, np.array([0, 1])))
+            dg00I = self.xp.ravel(self.xp.kron(dg00, self.xp.array([1, 0])))
+            dg01I = self.xp.ravel(self.xp.kron(dg01, self.xp.array([1, 0])))
+            dg10I = self.xp.ravel(self.xp.kron(dg10, self.xp.array([1, 0])))
+            dg11I = self.xp.ravel(self.xp.kron(dg11, self.xp.array([0, 1])))
 
             # put into sparse matrix
             dg = sp.diags(dg00I, offsets=0) + sp.diags(dg11I, offsets=0)
             dg += sp.diags(dg01I, offsets=1, shape=dg.shape) + sp.diags(dg10I, offsets=-1, shape=dg.shape)
 
             # interleave g terms to apply inverse to it
-            g = np.kron(tmpgu.flatten(), np.array([1, 0])) + np.kron(tmpgv.flatten(), np.array([0, 1]))
+            g = self.xp.kron(tmpgu.flatten(), self.xp.array([1, 0])) + self.xp.kron(
+                tmpgv.flatten(), self.xp.array([0, 1])
+            )
             # invert dg matrix
             b = sp.linalg.spsolve(dg, g)
             # update real-space vectors
@@ -726,9 +730,9 @@ class grayscott_mi_linear(grayscott_imex_linear):
             n += 1
             self.work_counters['newton']()
 
-        if np.isnan(res) and self.stop_at_nan:
+        if self.xp.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
-        elif np.isnan(res):
+        elif self.xp.isnan(res):
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
         if n == self.newton_maxiter:
