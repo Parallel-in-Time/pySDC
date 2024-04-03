@@ -1,4 +1,3 @@
-import numpy as np
 import scipy.sparse as sp
 from mpi4py import MPI
 from mpi4py_fft import PFFT
@@ -84,6 +83,10 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
 
         self._makeAttributeAndRegister('Du', 'Dv', 'A', 'B', localVars=locals(), readOnly=True)
 
+        # prepare "Laplacians"
+        self.Ku = -self.Du * self.K2
+        self.Kv = -self.Dv * self.K2
+
     def eval_f(self, u, t):
         """
         Routine to evaluate the right-hand side of the problem.
@@ -103,36 +106,29 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
 
         f = self.dtype_f(self.init)
 
-        for i, alpha in zip([self.iU, self.iV], [self.Du, self.Dv]):
-            f.impl[i, ...] = self._eval_Laplacian(u[i], f.impl[i], alpha=alpha)
-
         if self.spectral:
+            f.impl[0, ...] = self.Ku * u[0, ...]
+            f.impl[1, ...] = self.Kv * u[1, ...]
             tmpu = newDistArray(self.fft, False)
             tmpv = newDistArray(self.fft, False)
             tmpu[:] = self.fft.backward(u[0, ...], tmpu)
             tmpv[:] = self.fft.backward(u[1, ...], tmpv)
-            _u = [tmpu, tmpv]
-            tmpu[:] = self._eval_explicit_part_u(_u, t, tmpu)
-            tmpv[:] = self._eval_explicit_part_v(_u, t, tmpv)
-
-            f.expl[0, ...] = self.fft.forward(tmpu)
-            f.expl[1, ...] = self.fft.forward(tmpv)
+            tmpfu = -tmpu * tmpv**2 + self.A * (1 - tmpu)
+            tmpfv = tmpu * tmpv**2 - self.B * tmpv
+            f.expl[0, ...] = self.fft.forward(tmpfu)
+            f.expl[1, ...] = self.fft.forward(tmpfv)
 
         else:
-            f.expl[self.iU] = self._eval_explicit_part_u(u, t, f.expl[self.iU])
-            f.expl[self.iV] = self._eval_explicit_part_v(u, t, f.expl[self.iV])
+            u_hat = self.fft.forward(u[0, ...])
+            lap_u_hat = self.Ku * u_hat
+            f.impl[0, ...] = self.fft.backward(lap_u_hat, f.impl[0, ...])
+            u_hat = self.fft.forward(u[1, ...])
+            lap_u_hat = self.Kv * u_hat
+            f.impl[1, ...] = self.fft.backward(lap_u_hat, f.impl[1, ...])
+            f.expl[0, ...] = -u[0, ...] * u[1, ...] ** 2 + self.A * (1 - u[0, ...])
+            f.expl[1, ...] = u[0, ...] * u[1, ...] ** 2 - self.B * u[1, ...]
 
         self.work_counters['rhs']()
-        return f
-
-    def _eval_explicit_part_u(self, u, t, f):
-        iU, iV = self.iU, self.iV
-        f[:] = -u[iU] * u[iV] ** 2 + self.A * (1 - u[self.iU])
-        return f
-
-    def _eval_explicit_part_v(self, u, t, f):
-        iU, iV = self.iU, self.iV
-        f[:] = u[iU] * u[iV] ** 2 - self.B * u[self.iV]
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -157,9 +153,17 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
         """
 
         me = self.dtype_u(self.init)
+        if self.spectral:
+            me[0, ...] = rhs[0, ...] / (1.0 - factor * self.Ku)
+            me[1, ...] = rhs[1, ...] / (1.0 - factor * self.Kv)
 
-        for i, alpha in zip([self.iU, self.iV], [self.Du, self.Dv]):
-            me[i, ...] = self._invert_Laplacian(me[i], factor, rhs[i], alpha=alpha)
+        else:
+            rhs_hat = self.fft.forward(rhs[0, ...])
+            rhs_hat /= 1.0 - factor * self.Ku
+            me[0, ...] = self.fft.backward(rhs_hat, me[0, ...])
+            rhs_hat = self.fft.forward(rhs[1, ...])
+            rhs_hat /= 1.0 - factor * self.Kv
+            me[1, ...] = self.fft.backward(rhs_hat, me[1, ...])
 
         return me
 
@@ -216,34 +220,10 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
     part is computed in an explicit way).
     """
 
-    def _eval_Laplacian(self, u, f_impl, alpha=None, A=0.0):
-        alpha = alpha if alpha else self.alpha
-        if self.spectral:
-            f_impl[:] = (-alpha * self.K2 - A) * u
-        else:
-            u_hat = self.fft.forward(u)
-            lap_u_hat = (-alpha * self.K2 - A) * u_hat
-            f_impl[:] = self.fft.backward(lap_u_hat, f_impl)
-        return f_impl
-
-    def _invert_Laplacian(self, me, factor, rhs, alpha=None, A=0.0):
-        if self.spectral:
-            me[:] = rhs / (1.0 + factor * (alpha * self.K2 + A))
-
-        else:
-            rhs_hat = self.fft.forward(rhs)
-            rhs_hat /= 1.0 + factor * (alpha * self.K2 + A)
-            me[:] = self.fft.backward(rhs_hat)
-        return me
-
-    def solve_system(self, rhs, factor, u0, t):
-
-        me = self.dtype_u(self.init)
-
-        for i, alpha, A in zip([self.iU, self.iV], [self.Du, self.Dv], [self.A, self.B]):
-            me[i, ...] = self._invert_Laplacian(me[i], factor, rhs[i], alpha=alpha, A=A)
-
-        return me
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.Ku -= self.A
+        self.Kv -= self.B
 
     def eval_f(self, u, t):
         """
@@ -264,36 +244,29 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
 
         f = self.dtype_f(self.init)
 
-        for i, alpha, A in zip([self.iU, self.iV], [self.Du, self.Dv], [self.A, self.B]):
-            f.impl[i, ...] = self._eval_Laplacian(u[i], f.impl[i], alpha=alpha, A=A)
-
         if self.spectral:
+            f.impl[0, ...] = self.Ku * u[0, ...]
+            f.impl[1, ...] = self.Kv * u[1, ...]
             tmpu = newDistArray(self.fft, False)
             tmpv = newDistArray(self.fft, False)
             tmpu[:] = self.fft.backward(u[0, ...], tmpu)
             tmpv[:] = self.fft.backward(u[1, ...], tmpv)
-            _u = [tmpu, tmpv]
-            tmpu[:] = self._eval_explicit_part_u(_u, t, tmpu)
-            tmpv[:] = self._eval_explicit_part_v(_u, t, tmpv)
-
-            f.expl[self.iU, ...] = self.fft.forward(tmpu)
-            f.expl[self.iV, ...] = self.fft.forward(tmpv)
+            tmpfu = -tmpu * tmpv**2 + self.A
+            tmpfv = tmpu * tmpv**2
+            f.expl[0, ...] = self.fft.forward(tmpfu)
+            f.expl[1, ...] = self.fft.forward(tmpfv)
 
         else:
-            f.expl[self.iU] = self._eval_explicit_part_u(u, t, f.expl[self.iU])
-            f.expl[self.iV] = self._eval_explicit_part_v(u, t, f.expl[self.iV])
+            u_hat = self.fft.forward(u[0, ...])
+            lap_u_hat = self.Ku * u_hat
+            f.impl[0, ...] = self.fft.backward(lap_u_hat, f.impl[0, ...])
+            u_hat = self.fft.forward(u[1, ...])
+            lap_u_hat = self.Kv * u_hat
+            f.impl[1, ...] = self.fft.backward(lap_u_hat, f.impl[1, ...])
+            f.expl[0, ...] = -u[0, ...] * u[1, ...] ** 2 + self.A
+            f.expl[1, ...] = u[0, ...] * u[1, ...] ** 2
 
         self.work_counters['rhs']()
-        return f
-
-    def _eval_explicit_part_u(self, u, t, f):
-        iU, iV = self.iU, self.iV
-        f[:] = -u[iU] * u[iV] ** 2 + self.A
-        return f
-
-    def _eval_explicit_part_v(self, u, t, f):
-        iU, iV = self.iU, self.iV
-        f[:] = u[iU] * u[iV] ** 2
         return f
 
 
