@@ -5,6 +5,7 @@ from pySDC.core.Errors import ParameterError
 from pySDC.core.Collocation import CollBase
 from pySDC.core.ConvergenceController import ConvergenceController, Status
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+from pySDC.core.Lagrange import LagrangeApproximation
 
 
 class SwitchEstimator(ConvergenceController):
@@ -294,8 +295,9 @@ class SwitchEstimator(ConvergenceController):
         t_switch : float
            Time point of found event.
         """
-        LagrangeInterpolator = LagrangeInterpolation(t_interp, state_function)
-        p = lambda t: LagrangeInterpolator.eval(t)
+
+        LagrangeInterpolation = LagrangeApproximation(points=t_interp, fValues=state_function)
+        p = lambda t: LagrangeInterpolation.__call__(t)
 
         def fprime(t):
             r"""
@@ -404,47 +406,3 @@ def newton(x0, p, fprime, newton_tol, newton_maxiter):
 
     root = x0
     return root
-
-
-class LagrangeInterpolation(object):
-    def __init__(self, ti, yi):
-        """Initialization routine"""
-        self.ti = np.asarray(ti)
-        self.yi = np.asarray(yi)
-        self.n = len(ti)
-
-    def get_Lagrange_polynomial(self, t, i):
-        """
-        Computes the basis of the i-th Lagrange polynomial.
-
-        Parameters
-        ----------
-        t : float
-            Time where the polynomial is computed at.
-        i : int
-            Index of the Lagrange polynomial
-
-        Returns
-        -------
-        product : float
-            The product of the bases.
-        """
-        product = np.prod([(t - self.ti[k]) / (self.ti[i] - self.ti[k]) for k in range(self.n) if k != i])
-        return product
-
-    def eval(self, t):
-        """
-        Evaluates the Lagrange interpolation at time t.
-
-        Parameters
-        ----------
-        t : float
-            Time where interpolation is computed.
-
-        Returns
-        -------
-        p : float
-            Value of interpolant at time t.
-        """
-        p = np.sum([self.yi[i] * self.get_Lagrange_polynomial(t, i) for i in range(self.n)])
-        return p
