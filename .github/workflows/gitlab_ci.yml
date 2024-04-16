@@ -82,15 +82,13 @@ jobs:
           ref: "${{ env.USED_SHA }}"
           persist-credentials: false
       - name: check if fast-forward merge is possible
+        if: github.event_name == 'pull_request_target'
         run: |
-          if [ "${{ github.event_name }}" == 'pull_request_target' ]
-          then
-            git checkout "${{ GITHUB_BASE_REF }}"
-            git pull
-            echo "MIRROR_BRANCH=TEMPORARY_MERGE_PR_${{ github.event.number }}" >> "$GITHUB_ENV"
-            git checkout -b "${{ github.env.MIRROR_BRANCH }}"
-            git merge --ff-only "${{ github.event.pull_request.head.sha }}"
-          fi
+          git checkout "${{ github.base_ref }}"
+          git pull
+          echo "MIRROR_BRANCH=TEMPORARY_MERGE_PR_${{ github.event.number }}" >> "$GITHUB_ENV"
+          git checkout -b "${{ github.env.MIRROR_BRANCH }}"
+          git merge --ff-only "${{ github.event.pull_request.head.sha }}"
       - name: Mirror and wait for Gitlab-CI
         uses: jakob-fritz/github2lab_action@Iss37_variable_for_checkout
         env:
