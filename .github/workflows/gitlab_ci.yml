@@ -85,9 +85,13 @@ jobs:
         if: github.event_name == 'pull_request_target'
         run: |
           git fetch
+          echo "Checkout of ${{ github.base_ref }}"
           git checkout "${{ github.base_ref }}"
+          echo "Git pull"
           git pull
+          echo "New branch shall be named: TEMPORARY_MERGE_PR_${{ github.event.number }}"
           echo "MIRROR_BRANCH=TEMPORARY_MERGE_PR_${{ github.event.number }}" >> "$GITHUB_ENV"
+          echo "Create new branch $ {{ github.env.MIRROR_BRANCH }} and check it out"
           git checkout -b "${{ github.env.MIRROR_BRANCH }}"
           git merge --ff-only "${{ github.event.pull_request.head.sha }}"
       - name: Mirror and wait for Gitlab-CI
