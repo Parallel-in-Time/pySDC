@@ -84,6 +84,7 @@ jobs:
       - name: check if fast-forward merge is possible
         if: github.event_name == 'pull_request_target'
         run: |
+          git fetch
           git checkout "${{ github.base_ref }}"
           git pull
           echo "MIRROR_BRANCH=TEMPORARY_MERGE_PR_${{ github.event.number }}" >> "$GITHUB_ENV"
