@@ -1,3 +1,5 @@
+---
+
 stages:
   - test
   - benchmark
@@ -40,7 +42,7 @@ test_JUWELS:
     - shell
   parallel:
     matrix:
-      - SHELL_SCRIPT: ['benchmark', 'cupy' ]
+      - SHELL_SCRIPT: ['benchmark', 'cupy']
   artifacts:
     when: always
     paths:
