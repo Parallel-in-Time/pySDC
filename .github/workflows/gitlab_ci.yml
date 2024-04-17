@@ -84,7 +84,11 @@ jobs:
       - name: check if fast-forward merge is possible
         if: github.event_name == 'pull_request_target'
         run: |
-          git fetch --unshallow
+          if $(git rev-parse --is-shallow-repository); then
+            git fetch --unshallow
+          else; then
+            git fetch
+          fi
           echo "Checkout of ${{ github.base_ref }}"
           git checkout "${{ github.base_ref }}"
           echo "Git pull"
