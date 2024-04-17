@@ -86,7 +86,7 @@ jobs:
         run: |
           if $(git rev-parse --is-shallow-repository); then
             git fetch --unshallow
-          else; then
+          else
             git fetch
           fi
           echo "Checkout of ${{ github.base_ref }}"
