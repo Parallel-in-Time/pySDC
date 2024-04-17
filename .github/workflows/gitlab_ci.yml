@@ -84,7 +84,7 @@ jobs:
       - name: check if fast-forward merge is possible
         if: github.event_name == 'pull_request_target'
         run: |
-          git fetch
+          git fetch --unshallow
           echo "Checkout of ${{ github.base_ref }}"
           git checkout "${{ github.base_ref }}"
           echo "Git pull"
@@ -93,6 +93,7 @@ jobs:
           echo MIRROR_BRANCH="$MIRROR_BRANCH" >> $GITHUB_ENV
           echo "Create new branch $MIRROR_BRANCH and check it out"
           git checkout -b "$MIRROR_BRANCH"
+          echo "Merge the two parts of the Merge-Request to test the resulting version"
           git merge --ff-only "${{ github.event.pull_request.head.sha }}"
       - name: Mirror and wait for Gitlab-CI
         uses: jakob-fritz/github2lab_action@Iss37_variable_for_checkout
