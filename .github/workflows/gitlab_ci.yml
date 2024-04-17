@@ -93,6 +93,9 @@ jobs:
           echo MIRROR_BRANCH="$MIRROR_BRANCH" >> $GITHUB_ENV
           echo "Create new branch $MIRROR_BRANCH and check it out"
           git checkout -b "$MIRROR_BRANCH"
+          echo "Setting git committer info, so that merge-commit can be created"
+          git config user.email "unused@example.com"
+          git config user.name "Sync bot"
           echo "Merge the two parts of the Merge-Request to test the resulting version"
           git merge "${{ github.event.pull_request.head.sha }}"
       - name: Mirror and wait for Gitlab-CI
