@@ -81,7 +81,7 @@ jobs:
         with:
           ref: "${{ env.USED_SHA }}"
           persist-credentials: false
-      - name: check if fast-forward merge is possible
+      - name: check if merge is possible (merge is used for testing)
         if: github.event_name == 'pull_request_target'
         run: |
           if $(git rev-parse --is-shallow-repository); then
