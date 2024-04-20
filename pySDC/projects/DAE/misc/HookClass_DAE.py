@@ -31,7 +31,7 @@ class LogGlobalErrorPostStepDifferentialVariable(hooks):
         # compute and save errors
         # Note that the component from which the error is measured is specified here
         upde = P.u_exact(step.time + step.dt)
-        e_global_differential = abs(upde.diff - L.uend.diff)
+        e_global_differential = abs(upde.diff[0] - L.uend.diff[0])
 
         self.add_to_stats(
             process=step.status.slot,
@@ -69,7 +69,7 @@ class LogGlobalErrorPostStepAlgebraicVariable(hooks):
         L.sweep.compute_end_point()
 
         upde = P.u_exact(step.time + step.dt)
-        e_global_algebraic = abs(upde.alg - L.uend.alg)
+        e_global_algebraic = abs(upde.alg[0] - L.uend.alg[0])
 
         self.add_to_stats(
             process=step.status.slot,
