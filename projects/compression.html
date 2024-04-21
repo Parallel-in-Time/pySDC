@@ -7,11 +7,11 @@
 
     <title>Compression in pySDC &#8212; pySDC 5.4.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=e5a863ed"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -87,11 +87,15 @@ While this provides no benefit, it should capture the downsides of compression.
 We measure the local order of accuracy in time and verify that it increases by one with each sweep for an advection problem.
 While the order is typically only maintained up to machine precision or the discretization error, we find now that accuracy now stalls at the error bound that we set for the compressor.
 See below for corresponding figures, where the difference between the colored lines is the number of SDC iterations and the dashed line marks the error bound for SZ3.</p>
-<a class="reference internal image-reference" href="../../data/compression_order_time_advection_d=1.00e-06_n=1_MPI=False.png"><img alt="../../data/compression_order_time_advection_d=1.00e-06_n=1_MPI=False.png" src="../../data/compression_order_time_advection_d=1.00e-06_n=1_MPI=False.png" style="width: 45%;" /></a>
-<a class="reference internal image-reference" href="../../data/compression_order_time_advection_d=1.00e-06_n=1_MPI=True.png"><img alt="../../data/compression_order_time_advection_d=1.00e-06_n=1_MPI=True.png" src="../../data/compression_order_time_advection_d=1.00e-06_n=1_MPI=True.png" style="width: 45%;" /></a>
+<a class="reference internal image-reference" href="../../data/compression_order_time_advection_d=1.00e-06_n=1_MPI=False.png"><img alt="../../data/compression_order_time_advection_d=1.00e-06_n=1_MPI=False.png" src="../../data/compression_order_time_advection_d=1.00e-06_n=1_MPI=False.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="../../data/compression_order_time_advection_d=1.00e-06_n=1_MPI=True.png"><img alt="../../data/compression_order_time_advection_d=1.00e-06_n=1_MPI=True.png" src="../../data/compression_order_time_advection_d=1.00e-06_n=1_MPI=True.png" style="width: 45%;" />
+</a>
 <p>It has recently been <a class="reference external" href="https://tore.tuhh.de/handle/11420/12370">demonstrated</a> that the small scale PinT algorithm Block Gauss Seidel SDC maintains the order of single step SDC, so we can repeat the same test but with multiple processors, each with their own time step to solve:</p>
-<a class="reference internal image-reference" href="../../data/compression_order_time_advection_d=1.00e-06_n=4_MPI=False.png"><img alt="../../data/compression_order_time_advection_d=1.00e-06_n=4_MPI=False.png" src="../../data/compression_order_time_advection_d=1.00e-06_n=4_MPI=False.png" style="width: 45%;" /></a>
-<a class="reference internal image-reference" href="../../data/compression_order_time_advection_d=1.00e-06_n=4_MPI=True.png"><img alt="../../data/compression_order_time_advection_d=1.00e-06_n=4_MPI=True.png" src="../../data/compression_order_time_advection_d=1.00e-06_n=4_MPI=True.png" style="width: 45%;" /></a>
+<a class="reference internal image-reference" href="../../data/compression_order_time_advection_d=1.00e-06_n=4_MPI=False.png"><img alt="../../data/compression_order_time_advection_d=1.00e-06_n=4_MPI=False.png" src="../../data/compression_order_time_advection_d=1.00e-06_n=4_MPI=False.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="../../data/compression_order_time_advection_d=1.00e-06_n=4_MPI=True.png"><img alt="../../data/compression_order_time_advection_d=1.00e-06_n=4_MPI=True.png" src="../../data/compression_order_time_advection_d=1.00e-06_n=4_MPI=True.png" style="width: 45%;" />
+</a>
 <p>The above plots showcase that both time-serial SDC as well as time-parallel Block Gauss-Seidel SDC do not suffer from compression when the compression error bound is below other numerical errors and that both the MPI and simulated parallelism versions work.
 After establishing that the downsides of compression can be controlled, it remains to apply compression in a manner that is beneficial to the algorithm.</p>
 </section>
@@ -133,7 +137,7 @@ After establishing that the downsides of compression can be controlled, it remai
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
@@ -141,7 +145,7 @@ After establishing that the downsides of compression can be controlled, it remai
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
@@ -168,7 +172,7 @@ After establishing that the downsides of compression can be controlled, it remai
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     </div>
   </body>
 </html>

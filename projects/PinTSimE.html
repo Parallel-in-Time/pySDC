@@ -7,11 +7,11 @@
 
     <title>Parallel-in-time simulation for multi-modal energy systems &#8212; pySDC 5.4.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=e5a863ed"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -70,19 +70,22 @@ Here, the discontinuity depends on the system dynamics itself and the time point
 <section id="pi-line">
 <h2>Pi-line<a class="headerlink" href="#pi-line" title="Link to this heading">¶</a></h2>
 <p>The plot below shows the simulation of the pi-line model. There can be seen the two voltages along the capacitor and the current along the coil. Both the voltages and the current settle down over the time. As a background information: the pi-line model serves as transmission line, which transports the energy. The behavior which can be seen in the plot is what we would expect.</p>
-<a class="reference internal image-reference" href="../_images/piline_model_solution.png"><img alt="../_images/piline_model_solution.png" class="align-center" src="../_images/piline_model_solution.png" style="width: 35%;" /></a>
+<a class="reference internal image-reference" href="../_images/piline_model_solution.png"><img alt="../_images/piline_model_solution.png" class="align-center" src="../_images/piline_model_solution.png" style="width: 35%;" />
+</a>
 </section>
 <section id="buck-converter">
 <h2>Buck converter<a class="headerlink" href="#buck-converter" title="Link to this heading">¶</a></h2>
 <p>In the test case of the buck converter there are multiple switches in the considered time domain. In the so-called open-loop control, a controller monitors the actual output voltage. It compares the output with a target output voltage. Regularly, after a fixed number of time steps, the duty cycle to control the switching is recalculated based on the error. The simulation illustrates the switching behavior in the simulation: The voltage values settle down between the reference.</p>
-<a class="reference internal image-reference" href="../../data/buck_model_solution.png"><img alt="../../data/buck_model_solution.png" class="align-center" src="../../data/buck_model_solution.png" style="width: 35%;" /></a>
+<a class="reference internal image-reference" href="../../data/buck_model_solution.png"><img alt="../../data/buck_model_solution.png" class="align-center" src="../../data/buck_model_solution.png" style="width: 35%;" />
+</a>
 </section>
 <section id="battery-drain-model">
 <h2>Battery drain model<a class="headerlink" href="#battery-drain-model" title="Link to this heading">¶</a></h2>
 <p>This model is a simple example for system internal switching, which means switching depends on system dynamics.
 When the capacitor voltage drops below the reference value, the circuit switches to the voltage source.
 An illustration of the process is clarified in the plot below: The capacitor voltage drops down, and after switching the voltage value along the capacitor no longer changes.</p>
-<a class="reference internal image-reference" href="../_images/battery_model_solution.png"><img alt="../_images/battery_model_solution.png" class="align-center" src="../_images/battery_model_solution.png" style="width: 35%;" /></a>
+<a class="reference internal image-reference" href="../_images/battery_model_solution.png"><img alt="../_images/battery_model_solution.png" class="align-center" src="../_images/battery_model_solution.png" style="width: 35%;" />
+</a>
 </section>
 </section>
 
@@ -123,7 +126,7 @@ An illustration of the process is clarified in the plot below: The capacitor vol
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
@@ -131,7 +134,7 @@ An illustration of the process is clarified in the plot below: The capacitor vol
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
@@ -158,7 +161,7 @@ An illustration of the process is clarified in the plot below: The capacitor vol
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     </div>
   </body>
 </html>

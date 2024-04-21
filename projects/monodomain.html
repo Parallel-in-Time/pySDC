@@ -7,11 +7,11 @@
 
     <title>Exponential SDC for the Monodomain Equation in Cardiac Electrophysiology &#8212; pySDC 5.4.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=e5a863ed"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
@@ -95,8 +95,22 @@ c++ -O3 -Wall -shared -std=c++11 -fPIC -fvisibility=hidden $(python3 -m pybind11
 \[y'=\lambda_I y+\lambda_E y+\lambda_e y,\]</div>
 <p>with <span class="math notranslate nohighlight">\(\lambda_I,\lambda_E,\lambda_e\)</span> representing <span class="math notranslate nohighlight">\(f_I,f_E,f_e\)</span>, respectively.
 We fix <span class="math notranslate nohighlight">\(\lambda_E=-1\)</span> and vary the stiff terms <span class="math notranslate nohighlight">\(\lambda_I,\lambda_e\)</span> only. We see that the ESDC method is stable for all tested values of <span class="math notranslate nohighlight">\(\lambda_I,\lambda_e\)</span>, while SDC is not.</p>
-<a class="reference internal image-reference" href="../../data/stability_domain_IMEXEXP_EXPRK.png"><img alt="../../data/stability_domain_IMEXEXP_EXPRK.png" src="../../data/stability_domain_IMEXEXP_EXPRK.png" /></a>
-<a class="reference internal image-reference" href="../../data/stability_domain_IMEXEXP.png"><img alt="../../data/stability_domain_IMEXEXP.png" src="../../data/stability_domain_IMEXEXP.png" /></a>
+<a class="reference internal image-reference" href="../../data/stability_domain_IMEXEXP_EXPRK.png"><img alt="../../data/stability_domain_IMEXEXP_EXPRK.png" src="../../data/stability_domain_IMEXEXP_EXPRK.png" />
+<aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">pySDC/projects/Monodomain/README.rst</span>, line 64)</p>
+<p>Cannot scale image!
+  Could not get size from &quot;../../data/stability_domain_IMEXEXP_EXPRK.png&quot;:
+  [Errno 2] No such file or directory: '/home/runner/work/data/stability_domain_IMEXEXP_EXPRK.png'</p>
+</aside>
+</a>
+<a class="reference internal image-reference" href="../../data/stability_domain_IMEXEXP.png"><img alt="../../data/stability_domain_IMEXEXP.png" src="../../data/stability_domain_IMEXEXP.png" />
+<aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">pySDC/projects/Monodomain/README.rst</span>, line 66)</p>
+<p>Cannot scale image!
+  Could not get size from &quot;../../data/stability_domain_IMEXEXP.png&quot;:
+  [Errno 2] No such file or directory: '/home/runner/work/data/stability_domain_IMEXEXP.png'</p>
+</aside>
+</a>
 </section>
 <section id="convergence">
 <h2>Convergence<a class="headerlink" href="#convergence" title="Link to this heading">¶</a></h2>
@@ -104,7 +118,14 @@ We fix <span class="math notranslate nohighlight">\(\lambda_E=-1\)</span> and va
 We fix the number of collocation nodes to <span class="math notranslate nohighlight">\(m=6\)</span> and perform a convergence experiment fixing the number of sweeps to either <span class="math notranslate nohighlight">\(k=3\)</span> or <span class="math notranslate nohighlight">\(k=6\)</span>.
 We use the ten Tusscher-Panfilov ionic model, which is employed in practical applications.
 We see that we gain one order of accuracy per sweep, as expected.</p>
-<a class="reference internal image-reference" href="../../data/convergence_ESDC_fixed_iter.png"><img alt="../../data/convergence_ESDC_fixed_iter.png" src="../../data/convergence_ESDC_fixed_iter.png" /></a>
+<a class="reference internal image-reference" href="../../data/convergence_ESDC_fixed_iter.png"><img alt="../../data/convergence_ESDC_fixed_iter.png" src="../../data/convergence_ESDC_fixed_iter.png" />
+<aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">pySDC/projects/Monodomain/README.rst</span>, line 76)</p>
+<p>Cannot scale image!
+  Could not get size from &quot;../../data/convergence_ESDC_fixed_iter.png&quot;:
+  [Errno 2] No such file or directory: '/home/runner/work/data/convergence_ESDC_fixed_iter.png'</p>
+</aside>
+</a>
 </section>
 <section id="iterations">
 <h2>Iterations<a class="headerlink" href="#iterations" title="Link to this heading">¶</a></h2>
@@ -116,8 +137,22 @@ We see that we gain one order of accuracy per sweep, as expected.</p>
 </ul>
 <p>We display the number of iterations required by each method to reach a given tolerance and the residual at convergence. As ionic model we use again the ten Tusscher-Panfilov model.
 We see that PFASST requires a reasonalbly small number of iterations, comparable to the serial counterparts ESDC and MLESDC.</p>
-<a class="reference internal image-reference" href="../../data/niter_VS_time.png"><img alt="../../data/niter_VS_time.png" src="../../data/niter_VS_time.png" /></a>
-<a class="reference internal image-reference" href="../../data/res_VS_time.png"><img alt="../../data/res_VS_time.png" src="../../data/res_VS_time.png" /></a>
+<a class="reference internal image-reference" href="../../data/niter_VS_time.png"><img alt="../../data/niter_VS_time.png" src="../../data/niter_VS_time.png" />
+<aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">pySDC/projects/Monodomain/README.rst</span>, line 91)</p>
+<p>Cannot scale image!
+  Could not get size from &quot;../../data/niter_VS_time.png&quot;:
+  [Errno 2] No such file or directory: '/home/runner/work/data/niter_VS_time.png'</p>
+</aside>
+</a>
+<a class="reference internal image-reference" href="../../data/res_VS_time.png"><img alt="../../data/res_VS_time.png" src="../../data/res_VS_time.png" />
+<aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">pySDC/projects/Monodomain/README.rst</span>, line 93)</p>
+<p>Cannot scale image!
+  Could not get size from &quot;../../data/res_VS_time.png&quot;:
+  [Errno 2] No such file or directory: '/home/runner/work/data/res_VS_time.png'</p>
+</aside>
+</a>
 </section>
 </section>
 
@@ -160,7 +195,7 @@ We see that PFASST requires a reasonalbly small number of iterations, comparable
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
@@ -168,7 +203,7 @@ We see that PFASST requires a reasonalbly small number of iterations, comparable
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
@@ -195,7 +230,7 @@ We see that PFASST requires a reasonalbly small number of iterations, comparable
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     </div>
   </body>
 </html>
