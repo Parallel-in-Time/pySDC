@@ -457,7 +457,7 @@ def plotStylingStuff():  # pragma: no cover
     return colors
 
 
-def plotSolution(u_num, prob_cls_name, sweeper_cls_name, use_adaptivity, use_detection):  # pragma: no cover
+def plotSolution(u_num, prob_cls_name, use_adaptivity, use_detection):  # pragma: no cover
     r"""
     Plots the numerical solution for one simulation run.
 
@@ -495,7 +495,7 @@ def plotSolution(u_num, prob_cls_name, sweeper_cls_name, use_adaptivity, use_det
     ax.set_xlabel(r'$t$', fontsize=16)
     ax.set_ylabel(r'$u(t)$', fontsize=16)
 
-    fig.savefig(f'data/{prob_cls_name}_model_solution_{sweeper_cls_name}.png', dpi=300, bbox_inches='tight')
+    fig.savefig(f'data/{prob_cls_name}_model_solution.png', dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig)
 
 
