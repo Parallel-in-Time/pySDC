@@ -214,7 +214,7 @@ class DiscontinuousTestODE(ptype):
                 m_guess = m - 1
                 break
 
-        state_function = [u[m][0] - 5 for m in range(len(u))] if switch_detected else []
+        state_function = [u[m][0] - 5 for m in range(len(u))]
         return switch_detected, m_guess, state_function
 
     def count_switches(self):
@@ -222,3 +222,64 @@ class DiscontinuousTestODE(ptype):
         Setter to update the number of switches if one is found.
         """
         self.nswitches += 1
+
+
+class ExactDiscontinuousTestODE(DiscontinuousTestODE):
+    r"""
+    Dummy ODE problem for testing the ``SwitchEstimator`` class. The problem contains the exact dynamics
+    of the problem class ``DiscontinuousTestODE``.
+    """
+
+    def __init__(self, newton_maxiter=100, newton_tol=1e-8):
+        """Initialization routine"""
+        super().__init__(newton_maxiter, newton_tol)
+
+    def eval_f(self, u, t):
+        """
+        Derivative.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Exact value of u.
+        t : float
+            Time :math:`t`.
+
+        Returns
+        -------
+        f : dtype_f
+            Derivative.
+        """
+
+        f = self.dtype_f(self.init)
+
+        t_switch = np.inf if self.t_switch is None else self.t_switch
+        h = u[0] - 5
+        if h >= 0 or t >= t_switch:
+            f[:] = 1
+        else:
+            f[:] = np.exp(t)
+        return f
+
+    def solve_system(self, rhs, factor, u0, t):
+        """
+        Just return the exact solution...
+
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
+
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
+        """
+
+        return self.u_exact(t)
