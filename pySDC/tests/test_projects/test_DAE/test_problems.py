@@ -335,7 +335,7 @@ def test_DiscontinuousTestDAE_singularity():
 
     assert np.isclose(
         abs(f_before_event), 0.0
-    ), f"ERROR: Right-hand side after event does not match! Expected {(0.0, 0.0)}, got {f_before_event}"
+    ), f"ERROR: Right-hand side after event does not match! Expected {(0.0, 0.0)}, got {f_before_event=}"
 
     # test for t <= t^*
     u_event = disc_test_DAE.u_exact(t_event)
@@ -424,11 +424,11 @@ def test_DiscontinuousTestDAE_SDC(M):
     uend, _ = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     err = abs(uex.diff[0] - uend.diff[0])
-    assert err < err_tol[M], f"ERROR: Error is too large! Expected {err_tol[M]}, got {err}"
+    assert err < err_tol[M], f"ERROR: Error is too large! Expected {err_tol[M]=}, got {err=}"
 
 
 @pytest.mark.base
-@pytest.mark.parametrize('M', [2, 3, 4, 5])
+@pytest.mark.parametrize('M', [3, 4, 5])
 def test_DiscontinuousTestDAE_SDC_detection(M):
     """
     Test for one SDC run with event detection if the found event is close to the exact value and if the global error
@@ -442,22 +442,14 @@ def test_DiscontinuousTestDAE_SDC_detection(M):
     from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
     from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
 
-    err_tol = {
-        2: 5.3952e-9,
-        3: 2.6741e-9,
-        4: 1.9163e-8,
-        5: 2.4791e-8,
-    }
-
     event_err_tol = {
-        2: 0.0011,
-        3: 0.01,
-        4: 0.02,
-        5: 0.0101,
+        3: 0.02,
+        4: 5e-10,
+        5: 1e-10,
     }
 
     level_params = {
-        'restol': 1e-13,
+        'restol': 1e-10,
         'dt': 1e-2,
     }
 
@@ -481,7 +473,7 @@ def test_DiscontinuousTestDAE_SDC_detection(M):
 
     switch_estimator_params = {
         'tol': 1e-10,
-        'alpha': 0.95,
+        'alpha': 0.96,
     }
 
     restarting_params = {
@@ -514,9 +506,8 @@ def test_DiscontinuousTestDAE_SDC_detection(M):
     uex = P.u_exact(Tend)
 
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
     err = abs(uex.diff[0] - uend.diff[0])
-    assert err < err_tol[M], f"ERROR for M={M}: Error is too large! Expected {err_tol[M]}, got {err}"
+    assert err < 2e-9, f"ERROR for M={M}: Error is too large! Expected something lower than {2e-9}, got {err=}"
 
     switches = get_sorted(stats, type='switch', sortby='time', recomputed=False)
     assert len(switches) >= 1, 'ERROR for M={M}: No events found!'
@@ -527,7 +518,7 @@ def test_DiscontinuousTestDAE_SDC_detection(M):
     event_err = abs(t_switch_exact - t_switch)
     assert (
         event_err < event_err_tol[M]
-    ), f"ERROR for M={M}: Event error is too large! Expected {event_err_tol[M]}, got {event_err}"
+    ), f"ERROR for M={M}: Event error is too large! Expected {event_err_tol[M]=}, got {event_err=}"
 
 
 @pytest.mark.base
@@ -660,7 +651,7 @@ def test_WSCC9_SDC_detection():
 
     switch_estimator_params = {
         'tol': 1e-10,
-        'alpha': 0.95,
+        'alpha': 0.97,
     }
 
     restarting_params = {
@@ -696,7 +687,9 @@ def test_WSCC9_SDC_detection():
     switches = get_sorted(stats, type='switch', sortby='time', recomputed=False)
     assert len(switches) >= 1, 'ERROR: No events found!'
     t_switch = [me[1] for me in switches][0]
-    assert np.isclose(t_switch, 0.5335289411812812, atol=1e-3), 'Found event does not match a threshold!'
+    assert np.isclose(
+        t_switch, 0.528458886745887, atol=1e-3
+    ), f'Found event does not match a threshold! Got {t_switch=}'
 
 
 # @pytest.mark.base

@@ -1,6 +1,7 @@
 import numpy as np
 import scipy as sp
 
+from pySDC.core.Errors import ParameterError
 from pySDC.core.Collocation import CollBase
 from pySDC.core.ConvergenceController import ConvergenceController, Status
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
@@ -17,9 +18,11 @@ class SwitchEstimator(ConvergenceController):
         r"""
         Function sets default variables to handle with the event at the beginning. The default params are:
 
-        - control_order : controls the order of the SE's call of convergence controllers
-        - coll.nodes : defines the collocation nodes for interpolation
-        - tol_zero : inner tolerance for SE; state function has to satisfy it to terminate
+        - control_order : controls the order of the SE's call of convergence controllers.
+        - coll.nodes : defines the collocation nodes for interpolation.
+        - tol_zero : inner tolerance for SE; state function has to satisfy it to terminate.
+        - t_interp : interpolation axis with time points.
+        - state_function : List of values from state function.
 
         Parameters
         ----------
@@ -46,7 +49,9 @@ class SwitchEstimator(ConvergenceController):
         defaults = {
             'control_order': 0,
             'nodes': coll.nodes,
-            'tol_zero': 1e-13,
+            'tol_zero': 2.5e-12,
+            't_interp': [],
+            'state_function': [],
         }
         return {**defaults, **params}
 
@@ -89,22 +94,25 @@ class SwitchEstimator(ConvergenceController):
         L = S.levels[0]
 
         if CheckConvergence.check_convergence(S):
-            self.status.switch_detected, m_guess, state_function = L.prob.get_switching_info(L.u, L.time)
+            self.status.switch_detected, m_guess, self.params.state_function = L.prob.get_switching_info(L.u, L.time)
 
             if self.status.switch_detected:
-                t_interp = [L.time + L.dt * self.params.nodes[m] for m in range(len(self.params.nodes))]
-                t_interp, state_function = self.adapt_interpolation_info(
-                    L.time, L.sweep.coll.left_is_node, t_interp, state_function
+                self.params.t_interp = [L.time + L.dt * self.params.nodes[m] for m in range(len(self.params.nodes))]
+                self.params.t_interp, self.params.state_function = self.adapt_interpolation_info(
+                    L.time, L.sweep.coll.left_is_node, self.params.t_interp, self.params.state_function
                 )
 
                 # when the state function is already close to zero the event is already resolved well
-                if abs(state_function[-1]) <= self.params.tol_zero or abs(state_function[0]) <= self.params.tol_zero:
-                    if abs(state_function[0]) <= self.params.tol_zero:
-                        t_switch = t_interp[0]
+                if (
+                    abs(self.params.state_function[-1]) <= self.params.tol_zero
+                    or abs(self.params.state_function[0]) <= self.params.tol_zero
+                ):
+                    if abs(self.params.state_function[0]) <= self.params.tol_zero:
+                        t_switch = self.params.t_interp[0]
                         boundary = 'left'
-                    elif abs(state_function[-1]) <= self.params.tol_zero:
+                    elif abs(self.params.state_function[-1]) <= self.params.tol_zero:
                         boundary = 'right'
-                        t_switch = t_interp[-1]
+                        t_switch = self.params.t_interp[-1]
 
                     msg = f"The value of state function is close to zero, thus event time is already close enough to the {boundary} end point!"
                     self.log(msg, S)
@@ -116,27 +124,19 @@ class SwitchEstimator(ConvergenceController):
                     self.status.is_zero = True
 
                 # intermediate value theorem states that a root is contained in current step
-                if state_function[0] * state_function[-1] < 0 and self.status.is_zero is None:
-                    self.status.t_switch = self.get_switch(t_interp, state_function, m_guess)
+                if self.params.state_function[0] * self.params.state_function[-1] < 0 and self.status.is_zero is None:
+                    self.status.t_switch = self.get_switch(self.params.t_interp, self.params.state_function, m_guess)
 
-                    controller.hooks[0].add_to_stats(
-                        process=S.status.slot,
-                        time=L.time,
-                        level=L.level_index,
-                        iter=0,
-                        sweep=L.status.sweep,
-                        type='switch_all',
-                        value=self.status.t_switch,
+                    self.logging_during_estimation(
+                        controller.hooks[0],
+                        S.status.slot,
+                        L.time,
+                        L.level_index,
+                        L.status.sweep,
+                        self.status.t_switch,
+                        self.params.state_function,
                     )
-                    controller.hooks[0].add_to_stats(
-                        process=S.status.slot,
-                        time=L.time,
-                        level=L.level_index,
-                        iter=0,
-                        sweep=L.status.sweep,
-                        type='h_all',
-                        value=max([abs(item) for item in state_function]),
-                    )
+
                     if L.time < self.status.t_switch < L.time + L.dt:
                         dt_switch = (self.status.t_switch - L.time) * self.params.alpha
 
@@ -256,8 +256,29 @@ class SwitchEstimator(ConvergenceController):
         )
 
     @staticmethod
+    def logging_during_estimation(controller_hooks, process, time, level, sweep, t_switch, state_function):
+        controller_hooks.add_to_stats(
+            process=process,
+            time=time,
+            level=level,
+            iter=0,
+            sweep=sweep,
+            type='switch_all',
+            value=t_switch,
+        )
+        controller_hooks.add_to_stats(
+            process=process,
+            time=time,
+            level=level,
+            iter=0,
+            sweep=sweep,
+            type='h_all',
+            value=max([abs(item) for item in state_function]),
+        )
+
+    @staticmethod
     def get_switch(t_interp, state_function, m_guess):
-        """
+        r"""
         Routine to do the interpolation and root finding stuff.
 
         Parameters
@@ -279,8 +300,13 @@ class SwitchEstimator(ConvergenceController):
         p = lambda t: LagrangeInterpolation.__call__(t)
 
         def fprime(t):
-            """
-            Computes the derivative of the scalar interpolant using finite differences.
+            r"""
+            Computes the derivative of the scalar interpolant using finite difference. Here,
+            the derivative is approximated by the backward difference:
+
+                .. math::
+                \frac{dp}{dt} \approx \frac{25 p(t) - 48 p(t - h) + 36 p(t - 2 h) - 16 p(t - 3h) + 3 p(t - 4 h)}{12 h}
+
 
             Parameters
             ----------
@@ -292,11 +318,14 @@ class SwitchEstimator(ConvergenceController):
             dp : float
                 Derivative of interpolation p at time t.
             """
+
             dt_FD = 1e-10
-            dp = (p(t + dt_FD) - p(t)) / dt_FD  # forward difference
+            dp = (
+                25 * p(t) - 48 * p(t - dt_FD) + 36 * p(t - 2 * dt_FD) - 16 * p(t - 3 * dt_FD) + 3 * p(t - 4 * dt_FD)
+            ) / (12 * dt_FD)
             return dp
 
-        newton_tol, newton_maxiter = 1e-15, 100
+        newton_tol, newton_maxiter = 1e-14, 100
         t_switch = newton(t_interp[m_guess], p, fprime, newton_tol, newton_maxiter)
         return t_switch
 
@@ -347,7 +376,7 @@ def newton(x0, p, fprime, newton_tol, newton_maxiter):
     p : callable
         Interpolated function where Newton's method is applied at.
     fprime : callable
-        Approximated erivative of p using finite differences.
+        Approximated derivative of p using finite differences.
     newton_tol : float
         Tolerance for termination.
     newton_maxiter : int
@@ -361,13 +390,19 @@ def newton(x0, p, fprime, newton_tol, newton_maxiter):
 
     n = 0
     while n < newton_maxiter:
-        if abs(p(x0)) < newton_tol or np.isnan(p(x0)) and np.isnan(fprime(x0)):
+        res = abs(p(x0))
+        if res < newton_tol or np.isnan(p(x0)) and np.isnan(fprime(x0)) or np.isclose(fprime(x0), 0.0):
             break
 
         x0 -= 1.0 / fprime(x0) * p(x0)
 
         n += 1
 
-    root = x0
+    if n == newton_maxiter:
+        msg = f'Newton did not converge after {n} iterations, error is {res}'
+    else:
+        msg = f'Newton did converge after {n} iterations, error for root {x0} is {res}'
+    print(msg)
 
+    root = x0
     return root
