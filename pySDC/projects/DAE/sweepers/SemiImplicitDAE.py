@@ -36,7 +36,7 @@ class SemiImplicitDAE(fully_implicit_DAE):
       :math:`z_m \approx z(\tau_m) \in \mathbb{R}^{N_a}`,
     - and identity matrix :math:`\mathbf{I}_{N_d} \in \mathbb{R}^{N_d \times N_d}`.
 
-    This sweeper treates the differential and the algebraic variables differently by only integrating the differential
+    This sweeper treats the differential and the algebraic variables differently by only integrating the differential
     components. Solving the nonlinear system, :math:`{U,z}` are the unknowns.
 
     The sweeper implementation is based on the ideas mentioned in the KDC publication [1]_.
@@ -122,7 +122,7 @@ class SemiImplicitDAE(fully_implicit_DAE):
                 me[-1].diff[:] += L.dt * self.coll.Qmat[m, j] * L.f[j].diff[:]
 
         return me
-    
+
     def update_nodes(self):
         r"""
         Updates the values of solution ``u`` and their gradient stored in ``f``.
