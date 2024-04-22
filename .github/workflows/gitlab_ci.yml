@@ -1,3 +1,5 @@
+---
+
 name: Mirror to Gitlab to trigger CI
 
 on:
@@ -37,7 +39,7 @@ jobs:
               echo 'Permissions granted'
               exit 0
             else
-              echo 'Not enough permissions'
+              echo 'Not enough permissions. Please ask a member of Parallel-in-Time to rerun the job.'
               exit 1
           fi
       - name: Pass if workflow from push or schedule
@@ -105,7 +107,7 @@ jobs:
       - name: Mirror and wait for Gitlab-CI
         uses: jakob-fritz/github2lab_action@v0.7
         env:
-          MODE: 'all' # Either 'mirror', 'get_status', 'get_artifact', or 'all'
+          MODE: 'all'  # Either 'mirror', 'get_status', 'get_artifact', or 'all'
           GITLAB_TOKEN: ${{ secrets.GITLAB_SECRET }}
           FORCE_PUSH: "true"
           GITLAB_HOSTNAME: "gitlab.jsc.fz-juelich.de"
