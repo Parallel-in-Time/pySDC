@@ -103,33 +103,35 @@ pytest -v pySDC/tests
 > pytest -v pySDC/tests/test_nodes.py  # only test nodes generation
 > ```
 
-## Running CI on HPC from Pull-Requests
+## Running CI on HPC from pull requests
 
-With syncing the Github repository to a certain Gitlab instance, CI-Jobs can be run on HPC mashines. This can be helpfull for benchmarks or when hardware is needed that is not available in Github-Runners (e.g. access to GPUs)
+By syncing the GitHub repository to a certain Gitlab instance, CI-Jobs can be run on HPC machines. This can be helpful for benchmarks or when running on accelerators that are not available as GitHub runners.
 
-In order to use the synchronization, a few steps need to be done:
+For security and accounting reasons, a few extra steps are needed in order to run the contents of a pull request on HPC:
 
-- For Pull-Requests to the Parallel-in-Time PySDC repository:
-        - The Pull-Request needs to have the tag "gitlab-mirror" assigned to it.
-        - A person with write-permission (for the Parallel-in-Time pySDC repository) needs to trigger the workflow. This means, that a rerun might be needed if originally another person started the workflow.
-        - The workflow checks if the code can be merged. If this is not the case, the code is not mirrored and the workflow fails. If the code can be merged, this is done, so that the merged result is subject to the tests in Gitlab (as it is also implicitly done in Github)
-- For direct pushes to the Parallel-in-Time PySDC repository:
-        - No tags needed
-        - The code is mirrored to Gitlab, which triggers a new pipeline (as the code was changed)
+- The pull request needs to have the tag "gitlab-mirror" assigned to it.
+- A person with write-permission for the Parallel-in-Time pySDC repository needs to trigger the workflow. Ask for someone with the required permissions to rerun the workflow if needed.
+- The workflow checks if the code can be merged. If this is not the case, the code is not mirrored and the workflow fails. In this case, please merge upstream changes, fix all conflicts, and rerun the workflow.
 
-Regardless of why the Gitlab-Pipeline was triggered, the following holds true:
+> :bell: Note that direct pushes to Parallel-in-Time/pySDC will always trigger the HPC pipeline on Gitlab
 
-- The return-state from Gitlab is transmitted to Github (Success/Failure) leading to the same result in Github
-- Logs from Gitlab are also transferred. The full logs of all jobs can be read from within Github. For better overview, these are folded, so unfolding is needed before reading.
-- Artifacts from Gitlab-Jobs are also transferred back to Github
-- Information, such as coverage is transferred to Github, but not yet merged across multiple Github workflows. Therefore, there is no complete summary of e.g. coverage-reports across all jobs in all workflows.
+Regardless of why the Gitlab pipeline was triggered, the following holds true:
 
-### New HPC test-environment
+- The return-state from Gitlab is transmitted to GitHub (Success/Failure) leading to the same result in GitHub
+- Logs from Gitlab are also transferred. The full logs of all jobs can be read from within GitHub. For better overview, these are folded, so unfolding is needed before reading.
+- Artifacts from Gitlab jobs are also transferred back to GitHub
+- Information, such as coverage is transferred to GitHub, but not yet merged across multiple GitHub workflows. Therefore, there is no complete summary of e.g. coverage-reports across all jobs in all workflows.
 
-In order to create a new HPC test environment, the following steps need to be completed:
+> :warning: The coverage report from the HPC tests is not yet merged with other reports. The test coverage will not show up on the respective website or in the badge. We are working on this.
+
+### HPC test environments
+
+In order to run tests on GPUs, please use the pytest marker `cupy`.
+
+If you want to create a new HPC test environment, the following steps need to be completed:
 
 - Create a new slurm job-script in `etc/juwels_*.sh`. The name and location of the file is important.
-- Adapt the `.gitlab-ci.yml` to include the new job-script. For this, add a name in the job "test_JUWELS" in the section `parallel: matrix: SHELL_SCRIPT`. The name there must match the name of the newly created file.
+- Adapt `.gitlab-ci.yml` to include the new job-script. For this, add a name in the job "test_JUWELS" in the section `parallel: matrix: SHELL_SCRIPT`. The name there must match the name of the newly created file.
 As a starting point it is recommended to copy and adapt an existing file (e.g. `etc/juwels_cupy.sh`).
 
 ## Code coverage
