@@ -60,8 +60,6 @@ test_JUWELS:
     - module load mpi4py
     - module load SciPy-Stack
     - module load CuPy
-    - pwd
-    - ls -lah
     - pip install -e .
     - pip install pytest-benchmark coverage
   script:
@@ -76,7 +74,6 @@ test_JUWELS:
     - cat sbatch.err
     - echo "Following was written to stdout:"
     - cat sbatch.out
-    - ls -lh .
 
 
 # test_kit:
