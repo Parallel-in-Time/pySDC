@@ -110,12 +110,12 @@ With syncing the Github repository to a certain Gitlab instance, CI-Jobs can be 
 In order to use the synchronization, a few steps need to be done:
 
 - For Pull-Requests to the Parallel-in-Time PySDC repository:
-        - The Pull-Request needs to have the tag "gitlab-mirror" assigned to it.
-        - A person with write-permission (for the Parallel-in-Time pySDC repository) needs to trigger the workflow. This means, that a rerun might be needed if originally another person started the workflow.
-        - The workflow checks if the code can be merged. If this is not the case, the code is not mirrored and the workflow fails. If the code can be merged, this is done, so that the merged result is subject to the tests in Gitlab (as it is also implicitly done in Github)
+    - The Pull-Request needs to have the tag "gitlab-mirror" assigned to it.
+    - A person with write-permission (for the Parallel-in-Time pySDC repository) needs to trigger the workflow. This means, that a rerun might be needed if originally another person started the workflow.
+    - The workflow checks if the code can be merged. If this is not the case, the code is not mirrored and the workflow fails. If the code can be merged, this is done, so that the merged result is subject to the tests in Gitlab (as it is also implicitly done in Github)
 - For direct pushes to the Parallel-in-Time PySDC repository:
-        - No tags needed
-        - The code is mirrored to Gitlab, which triggers a new pipeline (as the code was changed)
+    - No tags needed
+    - The code is mirrored to Gitlab, which triggers a new pipeline (as the code was changed)
 
 Regardless of why the Gitlab-Pipeline was triggered, the following holds true:
 
