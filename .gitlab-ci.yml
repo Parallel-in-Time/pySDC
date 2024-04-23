@@ -3,28 +3,7 @@
 stages:
   - test
   - benchmark
-  - execute
   - upload
-
-
-# job_juwels_compute:
-#   stage: execute
-#   variables:
-#     SCHEDULER_PARAMETERS: '--account=cstma --nodes=1 --partition=devel'
-#   tags:
-#     - juwels
-#     - jacamar
-#     - compute
-#     - slurm
-#   artifacts:
-#     paths:
-#       - test.file
-#   script:
-#     - echo $SYSTEMNAME
-#     - touch test.file
-#   after_script:
-#     - hostname
-#     - id
 
 
 variables:
@@ -76,7 +55,7 @@ test_JUWELS:
     - cat sbatch.out
 
 
-# test_kit:
+#test_kit:
 #  image: rcaspart/micromamba-cuda
 #  stage: benchmark
 #  variables:
@@ -107,7 +86,7 @@ test_JUWELS:
 #    - mv data data_${PYTHON}
 
 
-# test_kit_bare:
+#test_kit_bare:
 #  stage: test
 #  rules:
 #    - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-GPU\].*/
@@ -155,7 +134,7 @@ benchmark:
     - mkdir -p benchmarks
     - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json=benchmarks/output.json
 
-# benchmark_kit:
+#benchmark_kit:
 #  image: rcaspart/micromamba
 #  stage: benchmark
 #  variables:
@@ -180,7 +159,7 @@ benchmark:
 #    - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json=benchmarks/output.json
 
 
-# bundle:
+#bundle:
 #  image: mambaorg/micromamba
 #  stage: upload
 #  artifacts:
