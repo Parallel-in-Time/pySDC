@@ -8,7 +8,6 @@ dependencies:
   - sympy>=1.0
   - pytorch
   - matplotlib>=3.0
-  - dill
   - pytest
   - pytest-benchmark
   - pytest-timeout

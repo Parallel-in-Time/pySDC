@@ -1,6 +1,4 @@
 import pytest
-import dill
-import os
 
 results = {}
 
@@ -21,6 +19,8 @@ def test_AllenCahn_contracting_circle(variant, inexact):
 @pytest.mark.base
 @pytest.mark.order(2)
 def test_show_results():
+    import dill
+    import os
     from pySDC.projects.TOMS.AllenCahn_contracting_circle import show_results
 
     # dump result
