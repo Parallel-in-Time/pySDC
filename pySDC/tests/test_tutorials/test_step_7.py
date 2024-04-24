@@ -120,3 +120,10 @@ def test_C_2x2():
     for line in p.stderr:
         print(line)
     assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (p.returncode, num_procs)
+
+
+@pytest.mark.pytorch
+def test_D():
+    from pySDC.tutorial.step_7.D_pySDC_with_PyTorch import train_at_collocation_nodes
+
+    train_at_collocation_nodes()

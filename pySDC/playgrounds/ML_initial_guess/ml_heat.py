@@ -79,6 +79,7 @@ class HeatEquationModel(nn.Module):
     def __init__(self, problem, hidden_size=64):
         self.input_size = problem.nvars * 3
         self.output_size = problem.nvars
+        self.problem = problem
 
         super().__init__()
 
@@ -93,8 +94,8 @@ class HeatEquationModel(nn.Module):
     def forward(self, x, t, dt):
         # prepare individual tensors
         x = x.float()
-        _t = torch.ones_like(x) * t
-        _dt = torch.ones_like(x) * dt
+        _t = torch.ones(x.shape) * dt
+        _dt = torch.ones(x.shape) * dt
 
         # Concatenate t and dt with the input x
         _x = torch.cat((x, _t, _dt), dim=0)
@@ -103,6 +104,11 @@ class HeatEquationModel(nn.Module):
         _x = self.relu(_x)
         _x = self.fc2(_x)
         return _x
+
+    def __call__(self, *args, **kwargs):
+        me = self.problem.u_init
+        me[:] = super().__call__(*args, **kwargs)
+        return me
 
 
 def train_at_collocation_nodes():

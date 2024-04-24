@@ -61,7 +61,7 @@ jobs:
     strategy:
       matrix:
         python: ['3.8', '3.9', '3.10']
-        env: ['base', 'fenics', 'mpi4py', 'petsc']
+        env: ['base', 'fenics', 'mpi4py', 'petsc', 'pytorch']
 
     defaults:
       run:

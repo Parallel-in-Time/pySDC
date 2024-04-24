@@ -4,9 +4,6 @@ import torch
 from pySDC.core.Errors import DataError
 
 try:
-    # TODO : mpi4py cannot be imported before dolfin when using fenics mesh
-    # see https://github.com/Parallel-in-Time/pySDC/pull/285#discussion_r1145850590
-    # This should be dealt with at some point
     from mpi4py import MPI
 except ImportError:
     MPI = None
@@ -26,7 +23,7 @@ class Tensor(torch.Tensor):
     @staticmethod
     def __new__(cls, init, val=0.0, *args, **kwargs):
         """
-        Instantiates new datatype. This ensures that even when manipulating data, the result is still a mesh.
+        Instantiates new datatype. This ensures that even when manipulating data, the result is still a tensor.
 
         Args:
             init: either another mesh or a tuple containing the dimensions, the communicator and the dtype
@@ -52,20 +49,37 @@ class Tensor(torch.Tensor):
             raise NotImplementedError(type(init))
         return obj
 
+    def __add__(self, *args, **kwargs):
+        res = super().__add__(*args, **kwargs)
+        res._comm = self.comm
+        return res
+
+    def __sub__(self, *args, **kwargs):
+        res = super().__sub__(*args, **kwargs)
+        res._comm = self.comm
+        return res
+
+    def __lmul__(self, *args, **kwargs):
+        res = super().__lmul__(*args, **kwargs)
+        res._comm = self.comm
+        return res
+
+    def __rmul__(self, *args, **kwargs):
+        res = super().__rmul__(*args, **kwargs)
+        res._comm = self.comm
+        return res
+
+    def __mul__(self, *args, **kwargs):
+        res = super().__mul__(*args, **kwargs)
+        res._comm = self.comm
+        return res
+
     @property
     def comm(self):
         """
         Getter for the communicator
         """
         return self._comm
-
-    def __array_finalize__(self, obj):
-        """
-        Finalizing the datatype. Without this, new datatypes do not 'inherit' the communicator.
-        """
-        if obj is None:
-            return
-        self._comm = getattr(obj, '_comm', None)
 
     def __abs__(self):
         """
