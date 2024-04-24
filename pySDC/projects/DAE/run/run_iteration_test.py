@@ -6,7 +6,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
 from pySDC.projects.DAE.problems.transistor_amplifier import one_transistor_amplifier
 from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-from pySDC.projects.DAE.misc.HookClass_DAE import error_hook
+from pySDC.projects.DAE.misc.HookClass_DAE import LogGlobalErrorPostStepDifferentialVariable
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.helpers.stats_helper import filter_stats
 
@@ -32,7 +32,6 @@ def setup():
     # Absolute termination tollerance for implicit solver
     # Exactly how this is used can be adjusted in update_nodes() in the fully implicit sweeper
     problem_params['newton_tol'] = 1e-7
-    problem_params['nvars'] = 3
 
     # This comes as read-in for the step class
     step_params = dict()
@@ -40,7 +39,7 @@ def setup():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = error_hook
+    controller_params['hook_class'] = LogGlobalErrorPostStepDifferentialVariable
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -98,7 +97,7 @@ def run(description, controller_params, run_params):
                 uend, stats = controller.run(u0=uinit, t0=run_params['t0'], Tend=run_params['tend'])
 
                 # compute exact solution and compare
-                err = get_sorted(stats, type='error_post_step', sortby='time')
+                err = get_sorted(stats, type='e_global_differential_post_step', sortby='time')
                 residual = get_sorted(stats, type='residual_post_step', sortby='time')
                 niter = filter_stats(stats, type='niter')
 

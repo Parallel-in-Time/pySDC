@@ -1,8 +1,11 @@
+import numpy as np
+import scipy.sparse as nsp
+
 from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.implementations.datatype_classes.mesh import mesh
 
 
-# noinspection PyUnusedLocal
-class testequation0dXPU(ptype):
+class testequation0d(ptype):
     r"""
     This class implements the simple test equation of the form
 
@@ -10,9 +13,6 @@ class testequation0dXPU(ptype):
         \frac{d u(t)}{dt} = A u(t)
 
     for :math:`A = diag(\lambda_1, .. ,\lambda_n)`.
-
-    It is compatible with both CPU and GPU, but requires setting class attributes to select the corresponding numerical
-    library. Use the classmethod `get_XPU_version` to get a runnable problem class.
 
     Parameters
     ----------
@@ -27,71 +27,48 @@ class testequation0dXPU(ptype):
         Diagonal matrix containing :math:`\lambda_1,..,\lambda_n`.
     """
 
+    xp = np
+    xsp = nsp
+    dtype_u = mesh
+    dtype_f = mesh
+
     @classmethod
-    def get_XPU_version(cls, version='CPU'):
+    def setup_GPU(cls):
         """
-        Get a runnable version for either CPU or GPU by specifying this as `version`.
-
-        Parameters
-        ----------
-        version : str
-            Supply "GPU" or "CPU" to obtain the desired implementation
-
-        Returns
-        -------
-        pySDC.Problem
-            A problem class implementing the desired implementation
+        Switch to GPU modules
         """
-        if version == 'CPU':
-            return testequation0d
-        elif version == 'GPU':
-            from pySDC.implementations.problem_classes.TestEquation_0D_GPU import testequation0dGPU
+        from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
+        import cupy as cp
+        import cupyx.scipy.sparse as csp
 
-            return testequation0dGPU
-        else:
-            from pySDC.core.Errors import ParameterError
+        cls.xp = cp
+        cls.xsp = csp
+        cls.dtype_u = cupy_mesh
+        cls.dtype_f = cupy_mesh
 
-            raise ParameterError(f'Don\'t know version {version}! Please choose \'CPU\' or \'GPU\'!')
-
-    def __init__(self, lambdas=None, u0=0.0):
+    def __init__(self, lambdas=None, u0=0.0, useGPU=False):
         """Initialization routine"""
+        if useGPU:
+            self.setup_GPU()
+
         if lambdas is None:
             re = self.xp.linspace(-30, 19, 50)
             im = self.xp.linspace(-50, 49, 50)
             lambdas = self.xp.array([[complex(re[i], im[j]) for i in range(len(re))] for j in range(len(im))]).reshape(
                 (len(re) * len(im))
             )
-
-        assert not any(isinstance(i, list) for i in lambdas), 'ERROR: expect flat list here, got %s' % lambdas
-        nvars = len(lambdas)
-        assert nvars > 0, 'ERROR: expect at least one lambda parameter here'
+        lambdas = self.xp.asarray(lambdas)
+        assert lambdas.ndim == 1, f'expect flat list here, got {lambdas}'
+        nvars = lambdas.size
+        assert nvars > 0, 'expect at least one lambda parameter here'
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, self.xp.dtype('complex128')))
 
         lambdas = self.xp.array(lambdas)
-        self.A = self.__get_A(lambdas, self.xsp)
-        self._makeAttributeAndRegister('nvars', 'lambdas', 'u0', localVars=locals(), readOnly=True)
+        self.A = self.xsp.diags(lambdas)
+        self._makeAttributeAndRegister('nvars', 'lambdas', 'u0', 'useGPU', localVars=locals(), readOnly=True)
         self.work_counters['rhs'] = WorkCounter()
-
-    @staticmethod
-    def __get_A(lambdas, xsp):
-        """
-        Helper function to assemble FD matrix A in sparse format.
-
-        Parameters
-        ----------
-        lambdas : sequence of array_like
-            List of lambda parameters.
-
-        Returns
-        -------
-        scipy.sparse.csc_matrix
-            Diagonal matrix A in CSC format.
-        """
-
-        A = xsp.diags(lambdas)
-        return A
 
     def eval_f(self, u, t):
         """
@@ -111,7 +88,8 @@ class testequation0dXPU(ptype):
         """
 
         f = self.dtype_f(self.init)
-        f[:] = self.A.dot(u)
+        f[:] = u
+        f *= self.lambdas
         self.work_counters['rhs']()
         return f
 
@@ -135,10 +113,11 @@ class testequation0dXPU(ptype):
         me : dtype_u
             The solution as mesh.
         """
-
         me = self.dtype_u(self.init)
-        L = self.splu(self.xsp.eye(self.nvars, format='csc') - factor * self.A)
-        me[:] = L.solve(rhs)
+        L = 1 - factor * self.lambdas
+        L[L == 0] = 1  # to avoid potential divisions by zeros
+        me[:] = rhs
+        me /= L
         return me
 
     def u_exact(self, t, u_init=None, t_init=None):
@@ -166,18 +145,3 @@ class testequation0dXPU(ptype):
         me = self.dtype_u(self.init)
         me[:] = u_init * self.xp.exp((t - t_init) * self.lambdas)
         return me
-
-
-class testequation0d(testequation0dXPU):
-    """
-    CPU implementation of `testequation0dXPU`
-    """
-
-    from pySDC.implementations.datatype_classes.mesh import mesh
-    import numpy as xp
-    import scipy.sparse as xsp
-    from scipy.sparse.linalg import splu as _splu
-
-    dtype_u = mesh
-    dtype_f = mesh
-    splu = staticmethod(_splu)

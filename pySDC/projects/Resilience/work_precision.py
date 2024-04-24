@@ -836,7 +836,7 @@ def get_configs(mode, problem):
 
         for num_procs in [4, 1]:
             plotting_params = (
-                {'ls': ls[num_procs], 'label': fr'$\Delta t$ adaptivity $N$={num_procs}x1'} if num_procs > 1 else {}
+                {'ls': ls[num_procs], 'label': fr'$\Delta t$-adaptivity $N$={num_procs}x1'} if num_procs > 1 else {}
             )
             configurations[num_procs] = {
                 'strategies': [AdaptivityStrategy(useMPI=True)],
@@ -853,7 +853,7 @@ def get_configs(mode, problem):
                 'num_procs': num_procs,
                 'plotting_params': {
                     'ls': ls.get(num_procs * 3, '-'),
-                    'label': rf'$\Delta t$-$k$ adaptivity $N$={num_procs}x3',
+                    'label': rf'$\Delta t$-$k$-adaptivity $N$={num_procs}x3',
                 },
             }
 
@@ -1104,7 +1104,7 @@ def get_configs(mode, problem):
             'strategies': [AdaptivityPolynomialError(useMPI=True)],
             'num_procs': 1,
             'num_procs_sweeper': 3,
-            'plotting_params': {'label': r'$\Delta t$-$k$ adaptivity $N$=1x3'},
+            'plotting_params': {'label': r'$\Delta t$-$k$-adaptivity $N$=1x3'},
         }
         configurations[-1] = {
             'strategies': [
@@ -1121,7 +1121,7 @@ def get_configs(mode, problem):
             'strategies': [AdaptivityStrategy(useMPI=True)],
             'custom_description': desc,
             'num_procs': 4,
-            'plotting_params': {'label': r'$\Delta t$ adaptivity $N$=4x1'},
+            'plotting_params': {'label': r'$\Delta t$-adaptivity $N$=4x1'},
         }
 
     elif mode == 'RK_comp_high_order':
@@ -1274,6 +1274,7 @@ def save_fig(
         ncols=ncols if ncols else 3 if len(handles) % 3 == 0 else 4,
         frameon=False,
         fancybox=True,
+        handlelength=2.2,
     )
 
     path = f'{base_path}/wp-{name}-{work_key}-{precision_key}.{format}'

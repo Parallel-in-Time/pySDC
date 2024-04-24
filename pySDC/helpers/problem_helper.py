@@ -156,7 +156,7 @@ def get_finite_difference_matrix(
 
             # -- boundary condition parameters
             bc_params[iS] = {**bc_params_defaults, **bc_params[iS]}
-            par = bc_params[iS]
+            par = bc_params[iS].copy()
 
             # -- extract parameters and raise an error if additionals
             val = par.pop('val')

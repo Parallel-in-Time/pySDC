@@ -51,6 +51,8 @@ Projects
    projects/Resilience.rst   
    projects/DAE.rst
    projects/compression.rst
+   projects/second_order.rst
+   projects/monodomain.rst
 
 
 API documentation

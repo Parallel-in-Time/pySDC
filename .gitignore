@@ -8,6 +8,8 @@ data/*
 step_*.png
 *.pkl
 *.swp
+*_data.json
+!_dataRef.json
 
 # Created by https://www.gitignore.io
 
@@ -158,3 +160,7 @@ Temporary Items
 .vscode
 *.cpp
 pySDC/playgrounds/FEniCS/jitfailure-dolfin_expression_fc28530d435fa2de045af3312fc07c3b/recompile.sh
+
+# videos
+*.mp4
+*.mkv

@@ -2,7 +2,7 @@ import numpy as np
 from scipy.optimize import root
 
 from pySDC.core.Problem import ptype, WorkCounter
-from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
 
 
 class ptype_dae(ptype):
@@ -25,8 +25,8 @@ class ptype_dae(ptype):
         in work_counters['rhs']
     """
 
-    dtype_u = mesh
-    dtype_f = mesh
+    dtype_u = DAEMesh
+    dtype_f = DAEMesh
 
     def __init__(self, nvars, newton_tol):
         """Initialization routine"""
@@ -54,14 +54,18 @@ class ptype_dae(ptype):
         me : dtype_u
             Numerical solution.
         """
-
         me = self.dtype_u(self.init)
+
+        def implSysFlatten(unknowns, **kwargs):
+            sys = impl_sys(unknowns.reshape(me.shape).view(type(u0)), **kwargs)
+            return sys.flatten()
+
         opt = root(
-            impl_sys,
+            implSysFlatten,
             u0,
             method='hybr',
             tol=self.newton_tol,
         )
-        me[:] = opt.x
+        me[:] = opt.x.reshape(me.shape)
         self.work_counters['newton'].niter += opt.nfev
         return me

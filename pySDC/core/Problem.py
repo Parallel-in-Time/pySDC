@@ -135,3 +135,32 @@ class ptype(RegisterParams):
 
         u_shape = u_init.shape
         return solve_ivp(eval_rhs, (t_init, t), u_init.flatten(), **kwargs).y[:, -1].reshape(u_shape)
+
+    def get_fig(self):
+        """
+        Get a figure suitable to plot the solution of this problem
+
+        Returns
+        -------
+        self.fig : matplotlib.pyplot.figure.Figure
+        """
+        raise NotImplementedError
+
+    def plot(self, u, t=None, fig=None):
+        r"""
+        Plot the solution. Please supply a figure with the same structure as returned by ``self.get_fig``.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Solution to be plotted
+        t : float
+            Time to display at the top of the figure
+        fig : matplotlib.pyplot.figure.Figure
+            Figure with the correct structure
+
+        Returns
+        -------
+        None
+        """
+        raise NotImplementedError

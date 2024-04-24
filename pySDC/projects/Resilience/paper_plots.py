@@ -214,9 +214,9 @@ def compare_recovery_rate_problems(**kwargs):  # pragma: no cover
         ax.get_legend().remove()
 
     if kwargs.get('strategy_type', 'SDC') == 'SDC':
-        axs[1, 1].legend(frameon=False)
+        axs[1, 1].legend(frameon=False, loc="lower right")
     else:
-        axs[0, 1].legend(frameon=False)
+        axs[0, 1].legend(frameon=False, loc="lower right")
     axs[0, 0].set_ylim((-0.05, 1.05))
     axs[1, 0].set_ylabel('recovery rate')
     axs[0, 0].set_ylabel('recovery rate')
@@ -236,7 +236,6 @@ def plot_adaptivity_stuff():  # pragma: no cover
     Returns:
         None
     """
-    from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedError
     from pySDC.implementations.hooks.log_errors import LogLocalErrorPostStep
     from pySDC.implementations.hooks.log_work import LogWork
     from pySDC.projects.Resilience.hook import LogData
@@ -402,8 +401,8 @@ def plot_quench_solution():  # pragma: no cover
     u = get_sorted(stats, type='u', recomputed=False)
 
     ax.plot([me[0] for me in u], [max(me[1]) for me in u], color='black', label='$T$')
-    ax.axhline(prob.u_thresh, label='$T_\mathrm{thresh}$', ls='--', color='grey', zorder=-1)
-    ax.axhline(prob.u_max, label='$T_\mathrm{max}$', ls=':', color='grey', zorder=-1)
+    ax.axhline(prob.u_thresh, label=r'$T_\mathrm{thresh}$', ls='--', color='grey', zorder=-1)
+    ax.axhline(prob.u_max, label=r'$T_\mathrm{max}$', ls=':', color='grey', zorder=-1)
 
     ax.set_xlabel(r'$t$')
     ax.legend(frameon=False)
@@ -470,14 +469,6 @@ def plot_vdp_solution():  # pragma: no cover
 def work_precision():  # pragma: no cover
     from pySDC.projects.Resilience.work_precision import (
         all_problems,
-        single_problem,
-        ODEs,
-        get_fig,
-        execute_configurations,
-        save_fig,
-        get_configs,
-        MPI,
-        vdp_stiffness_plot,
     )
 
     all_params = {
@@ -490,47 +481,6 @@ def work_precision():  # pragma: no cover
 
     for mode in ['compare_strategies', 'parallel_efficiency', 'RK_comp']:
         all_problems(**all_params, mode=mode)
-
-    # # Quench stuff
-    # fig, axs = get_fig(x=3, y=1, figsize=figsize_by_journal('Springer_Numerical_Algorithms', 1, 0.47))
-    # quench_params = {
-    #     **all_params,
-    #     'problem': run_quench,
-    #     'decorate': True,
-    #     'configurations': get_configs('step_size_limiting', run_quench),
-    #     'num_procs': 1,
-    #     'runs': 1,
-    #     'comm_world': MPI.COMM_WORLD,
-    #     'mode': 'step_size_limiting',
-    # }
-    # quench_params.pop('base_path', None)
-    # execute_configurations(**{**quench_params, 'work_key': 'k_SDC', 'precision_key': 'k_Newton'}, ax=axs[2])
-    # execute_configurations(**{**quench_params, 'work_key': 'param', 'precision_key': 'restart'}, ax=axs[1])
-    # execute_configurations(**{**quench_params, 'work_key': 't', 'precision_key': 'e_global_rel'}, ax=axs[0])
-    # axs[1].set_yscale('linear')
-    # # axs[2].set_yscale('linear')
-    # axs[2].set_xscale('linear')
-    # axs[1].set_xlabel(r'$e_\mathrm{tol}$')
-    # # axs[0].set_xticks([1e0, 3e0], [r'$10^{0}$', r'$3\times 10^{0}$'], minor=False)
-
-    # for ax in axs:
-    #     ax.set_title(ax.get_ylabel())
-    #     ax.set_ylabel('')
-    # fig.suptitle('Quench')
-
-    # axs[1].set_yticks([4.0, 6.0, 8.0, 10.0, 12.0], minor=False)
-
-    # save_fig(
-    #     fig=fig,
-    #     name=f'{run_quench.__name__}',
-    #     work_key='step-size',
-    #     precision_key='limiting',
-    #     legend=True,
-    #     base_path=all_params["base_path"],
-    # )
-    # End Quench stuff
-
-    # vdp_stiffness_plot(base_path='data/paper')
 
 
 def make_plots_for_TIME_X_website():  # pragma: no cover

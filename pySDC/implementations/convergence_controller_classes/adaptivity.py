@@ -179,7 +179,8 @@ class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
                 description=description,
                 params={},
             )
-        self.interpolator = controller.convergence_controllers[-1]
+        if self.params.interpolate_between_restarts:
+            self.interpolator = controller.convergence_controllers[-1]
         return None
 
     def get_convergence(self, controller, S, **kwargs):
@@ -207,6 +208,7 @@ class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
             'residual_max_tol': 1e9,
             'maxiter': description['sweeper_params'].get('maxiter', 99),
             'interpolate_between_restarts': True,
+            'abort_at_growing_residual': True,
             **super().setup(controller, params, description, **kwargs),
         }
         if defaults['restol_rel']:
@@ -231,7 +233,12 @@ class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
                 self.trigger_restart_upon_nonconvergence(S)
             elif self.get_local_error_estimate(controller, S, **kwargs) > self.params.e_tol:
                 S.status.restart = True
-        elif S.status.time_size == 1 and self.res_last_iter < S.levels[0].status.residual and S.status.iter > 0:
+        elif (
+            S.status.time_size == 1
+            and self.res_last_iter < S.levels[0].status.residual
+            and S.status.iter > 0
+            and self.params.abort_at_growing_residual
+        ):
             self.trigger_restart_upon_nonconvergence(S)
         elif S.levels[0].status.residual > self.params.residual_max_tol:
             self.trigger_restart_upon_nonconvergence(S)

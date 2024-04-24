@@ -9,6 +9,7 @@ SWEEPER_NAMES = [
     'RK4',
     'Cash_Karp',
     'ESDIRK53',
+    'ESDIRK43',
     'DIRK43',
     'Heun_Euler',
     'ARK548L2SAESDIRK',
@@ -68,13 +69,14 @@ def single_run(sweeper_name, dt, lambdas, use_RK_sweeper=True, Tend=None, useGPU
 
         problem_params = {}
     else:
-        from pySDC.implementations.problem_classes.TestEquation_0D import testequation0dXPU
+        from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
 
-        problem_class = testequation0dXPU.get_XPU_version(version='GPU' if useGPU else 'CPU')
+        problem_class = testequation0d
 
         problem_params = {
             'lambdas': lambdas,
             'u0': 1.0 + 0.0j,
+            'useGPU': useGPU,
         }
 
     sweeper_params = {
@@ -134,6 +136,7 @@ def test_order(sweeper_name, useGPU=False):
         'CrankNicholson': 3,
         'Cash_Karp': 6,
         'ESDIRK53': 6,
+        'ESDIRK43': 5,
         'DIRK43': 5,
         'Heun_Euler': 3,
         'ARK548L2SAERK': 6,
@@ -217,6 +220,7 @@ def test_stability(sweeper_name, useGPU=False):
         'CrankNicholson': True,
         'Cash_Karp': False,
         'ESDIRK53': True,
+        'ESDIRK43': True,
         'DIRK43': True,
         'Heun_Euler': False,
         'ARK548L2SAESDIRK': True,

@@ -32,8 +32,7 @@ implemented.
 -   Continuous integration via [GitHub
     Actions](https://github.com/Parallel-in-Time/pySDC/actions) and
     [Gitlab CI](https://gitlab.hzdr.de/r.speck/pysdc/-/pipelines)
--   Fully compatible with Python 3.7 - 3.10, runs at least on Ubuntu and
-    MacOS
+-   Fully compatible with Python 3.8 - 3.10, runs at least on Ubuntu
 
 ## Getting started
 
@@ -106,7 +105,7 @@ The JU receives support from the European Union's Horizon 2020 research
 and innovation programme and Belgium, France, Germany, and Switzerland.
 This project also received funding from the [German Federal Ministry of
 Education and Research](https://www.bmbf.de/bmbf/en/home/home_node.html)
-(BMBF) grant 16HPC047. The project also received help from the
+(BMBF) grants  16HPC047 and 16ME0679K. Supported by the European Union - NextGenerationEU. The project also received help from the
 [Helmholtz Platform for Research Software Engineering - Preparatory
 Study (HiRSE_PS)](https://www.helmholtz-hirse.de/).
 

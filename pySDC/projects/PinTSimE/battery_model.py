@@ -167,10 +167,13 @@ def generateDescription(
         'convergence_controllers': convergence_controllers,
     }
 
-    return description, controller_params
+    # instantiate controller
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+
+    return description, controller_params, controller
 
 
-def controllerRun(description, controller_params, t0, Tend, exact_event_time_avail=False):
+def controllerRun(description, controller_params, controller, t0, Tend, exact_event_time_avail=False):
     """
     Executes a controller run for a problem defined in the description.
 
@@ -180,6 +183,8 @@ def controllerRun(description, controller_params, t0, Tend, exact_event_time_ava
         Contains all information for a controller run.
     controller_params : dict
         Parameters needed for a controller run.
+    controller : pySDC.core.Controller
+        Controller to do the stuff.
     t0 : float
         Starting time of simulation.
     Tend : float
@@ -192,9 +197,6 @@ def controllerRun(description, controller_params, t0, Tend, exact_event_time_ava
     stats : dict
         Raw statistics from a controller run.
     """
-
-    # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -233,7 +235,7 @@ def main():
         'max_restarts': 50,
         'recomputed': False,
         'tol_event': 1e-10,
-        'alpha': 1.0,
+        'alpha': 0.96,
         'exact_event_time_avail': None,
     }
 
@@ -244,8 +246,8 @@ def main():
 
     hook_class = [LogSolution, LogEventBattery, LogEmbeddedErrorEstimate, LogStepSize]
 
-    use_detection = [True]
-    use_adaptivity = [True]
+    use_detection = [True, False]
+    use_adaptivity = [True, False]
 
     for problem, sweeper in zip([battery, battery_implicit], [imex_1st_order, generic_implicit]):
         for defaults in [False, True]:
@@ -360,7 +362,7 @@ def runSimulation(problem, sweeper, all_params, use_adaptivity, use_detection, h
 
                     restol = -1 if use_A else handling_params['restol']
 
-                    description, controller_params = generateDescription(
+                    description, controller_params, controller = generateDescription(
                         dt=dt,
                         problem=problem,
                         sweeper=sweeper,
@@ -381,6 +383,7 @@ def runSimulation(problem, sweeper, all_params, use_adaptivity, use_detection, h
                     stats, t_switch_exact = controllerRun(
                         description=description,
                         controller_params=controller_params,
+                        controller=controller,
                         t0=interval[0],
                         Tend=interval[-1],
                         exact_event_time_avail=handling_params['exact_event_time_avail'],
@@ -492,7 +495,7 @@ def plotSolution(u_num, prob_cls_name, use_adaptivity, use_detection):  # pragma
     ax.set_xlabel(r'$t$', fontsize=16)
     ax.set_ylabel(r'$u(t)$', fontsize=16)
 
-    fig.savefig('data/{}_model_solution.png'.format(prob_cls_name), dpi=300, bbox_inches='tight')
+    fig.savefig(f'data/{prob_cls_name}_model_solution.png', dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig)
 
 

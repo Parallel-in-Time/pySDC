@@ -1,4 +1,4 @@
-# It checks whether data folder exicits or not
+# This code checks if the "data" folder exists or not.
 exec(open("check_data_folder.py").read())
 
 import matplotlib.pyplot as plt
@@ -11,7 +11,7 @@ from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
 from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
 from pySDC.projects.Second_orderSDC.penningtrap_HookClass import particles_output
 from pySDC.implementations.sweeper_classes.Runge_Kutta_Nystrom import RKN
-from pySDC.projects.Second_orderSDC.penningtrap_Simulation import fixed_plot_params
+from pySDC.projects.Second_orderSDC.plot_helper import set_fixed_plot_params
 
 
 def main(dt, tend, maxiter, M, sweeper):  # pragma: no cover
@@ -97,7 +97,7 @@ def plot_Hamiltonian_error(K, M, dt):  # pragma: no cover
         M: number of quadrature nodes
         dt: time step
     """
-    fixed_plot_params()
+    set_fixed_plot_params()
     # Define final time
     time = 1e6
     tn = dt

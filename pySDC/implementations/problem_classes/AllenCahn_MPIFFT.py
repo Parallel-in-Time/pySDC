@@ -1,15 +1,11 @@
 import numpy as np
 from mpi4py import MPI
-from mpi4py_fft import PFFT
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
-
+from pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian import IMEX_Laplacian_MPIFFT
 from mpi4py_fft import newDistArray
 
 
-class allencahn_imex(ptype):
+class allencahn_imex(IMEX_Laplacian_MPIFFT):
     r"""
     Example implementing the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [0, 1]^2`
 
@@ -64,68 +60,21 @@ class allencahn_imex(ptype):
     .. [1] https://mpi4py-fft.readthedocs.io/en/latest/
     """
 
-    dtype_u = mesh
-    dtype_f = imex_mesh
-
     def __init__(
         self,
-        nvars=None,
         eps=0.04,
         radius=0.25,
-        spectral=None,
         dw=0.0,
-        L=1.0,
         init_type='circle',
-        comm=MPI.COMM_WORLD,
+        **kwargs,
     ):
-        """Initialization routine"""
+        kwargs['L'] = kwargs.get('L', 1.0)
+        super().__init__(alpha=1.0, dtype=np.dtype('float'), **kwargs)
+        self._makeAttributeAndRegister('eps', 'radius', 'dw', 'init_type', localVars=locals(), readOnly=True)
 
-        if nvars is None:
-            nvars = (128, 128)
-
-        if not (isinstance(nvars, tuple) and len(nvars) > 1):
-            raise ProblemError('Need at least two dimensions')
-
-        # Creating FFT structure
-        ndim = len(nvars)
-        axes = tuple(range(ndim))
-        self.fft = PFFT(comm, list(nvars), axes=axes, dtype=np.float64, collapse=True)
-
-        # get test data to figure out type and dimensions
-        tmp_u = newDistArray(self.fft, spectral)
-
-        # invoke super init, passing the communicator and the local dimensions as init
-        super().__init__(init=(tmp_u.shape, comm, tmp_u.dtype))
-        self._makeAttributeAndRegister(
-            'nvars', 'eps', 'radius', 'spectral', 'dw', 'L', 'init_type', 'comm', localVars=locals(), readOnly=True
-        )
-
-        L = np.array([self.L] * ndim, dtype=float)
-
-        # get local mesh
-        X = np.ogrid[self.fft.local_slice(False)]
-        N = self.fft.global_shape()
-        for i in range(len(N)):
-            X[i] = X[i] * L[i] / N[i]
-        self.X = [np.broadcast_to(x, self.fft.shape(False)) for x in X]
-
-        # get local wavenumbers and Laplace operator
-        s = self.fft.local_slice()
-        N = self.fft.global_shape()
-        k = [np.fft.fftfreq(n, 1.0 / n).astype(int) for n in N[:-1]]
-        k.append(np.fft.rfftfreq(N[-1], 1.0 / N[-1]).astype(int))
-        K = [ki[si] for ki, si in zip(k, s)]
-        Ks = np.meshgrid(*K, indexing='ij', sparse=True)
-        Lp = 2 * np.pi / L
-        for i in range(ndim):
-            Ks[i] = (Ks[i] * Lp[i]).astype(float)
-        K = [np.broadcast_to(k, self.fft.shape(True)) for k in Ks]
-        K = np.array(K).astype(float)
-        self.K2 = np.sum(K * K, 0, dtype=float)
-
-        # Need this for diagnostics
-        self.dx = self.L / nvars[0]
-        self.dy = self.L / nvars[1]
+    def _eval_explicit_part(self, u, t, f_expl):
+        f_expl[:] = -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u) - 6.0 * self.dw * u * (1.0 - u)
+        return f_expl
 
     def eval_f(self, u, t):
         """
@@ -146,55 +95,23 @@ class allencahn_imex(ptype):
 
         f = self.dtype_f(self.init)
 
+        f.impl[:] = self._eval_Laplacian(u, f.impl)
+
         if self.spectral:
             f.impl = -self.K2 * u
 
             if self.eps > 0:
                 tmp = self.fft.backward(u)
-                tmpf = -2.0 / self.eps**2 * tmp * (1.0 - tmp) * (1.0 - 2.0 * tmp) - 6.0 * self.dw * tmp * (1.0 - tmp)
-                f.expl[:] = self.fft.forward(tmpf)
+                tmp[:] = self._eval_explicit_part(tmp, t, tmp)
+                f.expl[:] = self.fft.forward(tmp)
 
         else:
-            u_hat = self.fft.forward(u)
-            lap_u_hat = -self.K2 * u_hat
-            f.impl[:] = self.fft.backward(lap_u_hat, f.impl)
 
             if self.eps > 0:
-                f.expl = -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u) - 6.0 * self.dw * u * (1.0 - u)
+                f.expl[:] = self._eval_explicit_part(u, t, f.expl)
 
+        self.work_counters['rhs']()
         return f
-
-    def solve_system(self, rhs, factor, u0, t):
-        """
-        Simple FFT solver for the diffusion part.
-
-        Parameters
-        ----------
-        rhs : dtype_f
-            Right-hand side for the linear system.
-        factor : float
-            Abbrev. for the node-to-node stepsize (or any other factor required).
-        u0 : dtype_u
-            Initial guess for the iterative solver (not used here so far).
-        t : float
-            Current time (e.g. for time-dependent BCs).
-
-        Returns
-        -------
-        me : dtype_u
-            The solution as mesh.
-        """
-
-        if self.spectral:
-            me = rhs / (1.0 + factor * self.K2)
-
-        else:
-            me = self.dtype_u(self.init)
-            rhs_hat = self.fft.forward(rhs)
-            rhs_hat /= 1.0 + factor * self.K2
-            me[:] = self.fft.backward(rhs_hat)
-
-        return me
 
     def u_exact(self, t):
         r"""
@@ -216,18 +133,18 @@ class allencahn_imex(ptype):
         if self.init_type == 'circle':
             r2 = (self.X[0] - 0.5) ** 2 + (self.X[1] - 0.5) ** 2
             if self.spectral:
-                tmp = 0.5 * (1.0 + np.tanh((self.radius - np.sqrt(r2)) / (np.sqrt(2) * self.eps)))
+                tmp = 0.5 * (1.0 + self.xp.tanh((self.radius - self.xp.sqrt(r2)) / (np.sqrt(2) * self.eps)))
                 me[:] = self.fft.forward(tmp)
             else:
-                me[:] = 0.5 * (1.0 + np.tanh((self.radius - np.sqrt(r2)) / (np.sqrt(2) * self.eps)))
+                me[:] = 0.5 * (1.0 + self.xp.tanh((self.radius - self.xp.sqrt(r2)) / (np.sqrt(2) * self.eps)))
         elif self.init_type == 'circle_rand':
             ndim = len(me.shape)
-            L = int(self.L)
+            L = int(self.L[0])
             # get random radii for circles/spheres
-            np.random.seed(1)
+            self.xp.random.seed(1)
             lbound = 3.0 * self.eps
             ubound = 0.5 - self.eps
-            rand_radii = (ubound - lbound) * np.random.random_sample(size=tuple([L] * ndim)) + lbound
+            rand_radii = (ubound - lbound) * self.xp.random.random_sample(size=tuple([L] * ndim)) + lbound
             # distribute circles/spheres
             tmp = newDistArray(self.fft, False)
             if ndim == 2:
@@ -236,14 +153,14 @@ class allencahn_imex(ptype):
                         # build radius
                         r2 = (self.X[0] + i - L + 0.5) ** 2 + (self.X[1] + j - L + 0.5) ** 2
                         # add this blob, shifted by 1 to avoid issues with adding up negative contributions
-                        tmp += np.tanh((rand_radii[i, j] - np.sqrt(r2)) / (np.sqrt(2) * self.eps)) + 1
+                        tmp += self.xp.tanh((rand_radii[i, j] - np.sqrt(r2)) / (np.sqrt(2) * self.eps)) + 1
             # normalize to [0,1]
             tmp *= 0.5
-            assert np.all(tmp <= 1.0)
+            assert self.xp.all(tmp <= 1.0)
             if self.spectral:
                 me[:] = self.fft.forward(tmp)
             else:
-                me[:] = tmp[:]
+                self.xp.copyto(me, tmp)
         else:
             raise NotImplementedError('type of initial value not implemented, got %s' % self.init_type)
 
@@ -289,8 +206,9 @@ class allencahn_imex_timeforcing(allencahn_imex):
 
         f = self.dtype_f(self.init)
 
+        f.impl[:] = self._eval_Laplacian(u, f.impl)
+
         if self.spectral:
-            f.impl = -self.K2 * u
 
             tmp = newDistArray(self.fft, False)
             tmp[:] = self.fft.backward(u, tmp)
@@ -301,14 +219,14 @@ class allencahn_imex_timeforcing(allencahn_imex):
                 tmpf = self.dtype_f(self.init, val=0.0)
 
             # build sum over RHS without driving force
-            Rt_local = float(np.sum(self.fft.backward(f.impl) + tmpf))
+            Rt_local = float(self.xp.sum(self.fft.backward(f.impl) + tmpf))
             if self.comm is not None:
                 Rt_global = self.comm.allreduce(sendobj=Rt_local, op=MPI.SUM)
             else:
                 Rt_global = Rt_local
 
             # build sum over driving force term
-            Ht_local = float(np.sum(6.0 * tmp * (1.0 - tmp)))
+            Ht_local = float(self.xp.sum(6.0 * tmp * (1.0 - tmp)))
             if self.comm is not None:
                 Ht_global = self.comm.allreduce(sendobj=Ht_local, op=MPI.SUM)
             else:
@@ -324,22 +242,19 @@ class allencahn_imex_timeforcing(allencahn_imex):
             f.expl[:] = self.fft.forward(tmpf)
 
         else:
-            u_hat = self.fft.forward(u)
-            lap_u_hat = -self.K2 * u_hat
-            f.impl[:] = self.fft.backward(lap_u_hat, f.impl)
 
             if self.eps > 0:
                 f.expl = -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u)
 
             # build sum over RHS without driving force
-            Rt_local = float(np.sum(f.impl + f.expl))
+            Rt_local = float(self.xp.sum(f.impl + f.expl))
             if self.comm is not None:
                 Rt_global = self.comm.allreduce(sendobj=Rt_local, op=MPI.SUM)
             else:
                 Rt_global = Rt_local
 
             # build sum over driving force term
-            Ht_local = float(np.sum(6.0 * u * (1.0 - u)))
+            Ht_local = float(self.xp.sum(6.0 * u * (1.0 - u)))
             if self.comm is not None:
                 Ht_global = self.comm.allreduce(sendobj=Ht_local, op=MPI.SUM)
             else:
@@ -353,4 +268,5 @@ class allencahn_imex_timeforcing(allencahn_imex):
 
             f.expl -= 6.0 * dw * u * (1.0 - u)
 
+        self.work_counters['rhs']()
         return f
