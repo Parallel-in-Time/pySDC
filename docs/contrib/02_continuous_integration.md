@@ -110,6 +110,37 @@ pytest -v pySDC/tests
 > pytest -v pySDC/tests/test_nodes.py::test_nodesGeneration[LEGENDRE]   # only test_nodesGeneration with LEGENDRE nodes
 > ```
 
+## Running CI on HPC from pull requests
+
+By syncing the GitHub repository to a certain Gitlab instance, CI-Jobs can be run on HPC machines. This can be helpful for benchmarks or when running on accelerators that are not available as GitHub runners.
+
+For security and accounting reasons, a few extra steps are needed in order to run the contents of a pull request on HPC:
+
+- The pull request needs to have the tag "gitlab-mirror" assigned to it.
+- A person with write-permission for the Parallel-in-Time pySDC repository needs to trigger the workflow. Ask for someone with the required permissions to rerun the workflow if needed.
+- The workflow checks if the code can be merged. If this is not the case, the code is not mirrored and the workflow fails. In this case, please merge upstream changes, fix all conflicts, and rerun the workflow.
+
+> :bell: Note that direct pushes to Parallel-in-Time/pySDC will always trigger the HPC pipeline on Gitlab
+
+Regardless of why the Gitlab pipeline was triggered, the following holds true:
+
+- The return-state from Gitlab is transmitted to GitHub (Success/Failure) leading to the same result in GitHub
+- Logs from Gitlab are also transferred. The full logs of all jobs can be read from within GitHub. For better overview, these are folded, so unfolding is needed before reading.
+- Artifacts from Gitlab jobs are also transferred back to GitHub
+- Information, such as coverage is transferred to GitHub, but not yet merged across multiple GitHub workflows. Therefore, there is no complete summary of e.g. coverage-reports across all jobs in all workflows.
+
+> :warning: The coverage report from the HPC tests is not yet merged with other reports. The test coverage will not show up on the respective website or in the badge. We are working on this.
+
+### HPC test environments
+
+In order to run tests on GPUs, please use the pytest marker `cupy`.
+
+If you want to create a new HPC test environment, the following steps need to be completed:
+
+- Create a new slurm job-script in `etc/juwels_*.sh`. The name and location of the file is important.
+- Adapt `.gitlab-ci.yml` to include the new job-script. For this, add a name in the job "test_JUWELS" in the section `parallel: matrix: SHELL_SCRIPT`. The name there must match the name of the newly created file.
+As a starting point it is recommended to copy and adapt an existing file (e.g. `etc/juwels_cupy.sh`).
+
 ## Code coverage
 
 This stage allows to checks how much of the `pySDC` code is tested by the previous stage. It is based on the [coverage](https://pypi.org/project/coverage/) library and currently applied to the following directories :
