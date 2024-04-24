@@ -138,7 +138,7 @@ class SemiImplicitDAE(fully_implicit_DAE):
         integral = self.integrate()
         # build the rest of the known solution u_0 + del_t(Q - Q_del)U_k
         for m in range(1, M + 1):
-            for j in range(1, M + 1):
+            for j in range(1, m + 1):
                 integral[m - 1].diff[:] -= L.dt * self.QI[m, j] * L.f[j].diff[:]
             integral[m - 1].diff[:] += L.u[0].diff
 

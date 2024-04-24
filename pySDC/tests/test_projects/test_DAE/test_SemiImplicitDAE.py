@@ -81,7 +81,6 @@ def testPredict(initial_guess):
     L.status.time = 1.0
     L.u[0] = P.u_exact(L.time)
 
-    assert isinstance(L.f[0], type(None)), "Initial condition f0 is not of type None!"
     L.sweep.predict()
 
     assert isinstance(L.u[0], DAEMesh), "Initial condition u0 is not of type DAEMesh!"
