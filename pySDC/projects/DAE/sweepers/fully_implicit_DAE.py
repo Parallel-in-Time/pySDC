@@ -74,7 +74,6 @@ class fully_implicit_DAE(generic_implicit):
         assert L.status.unlocked
 
         M = self.coll.num_nodes
-        u_0 = L.u[0]
 
         # get QU^k where U = u'
         integral = self.integrate()
@@ -82,7 +81,7 @@ class fully_implicit_DAE(generic_implicit):
         for m in range(1, M + 1):
             for j in range(1, M + 1):
                 integral[m - 1] -= L.dt * self.QI[m, j] * L.f[j]
-            integral[m - 1] += u_0
+            integral[m - 1] += L.u[0]
 
         # do the sweep
         for m in range(1, M + 1):
@@ -125,7 +124,7 @@ class fully_implicit_DAE(generic_implicit):
         # Update solution approximation
         integral = self.integrate()
         for m in range(M):
-            L.u[m + 1] = u_0 + integral[m]
+            L.u[m + 1] = L.u[0] + integral[m]
 
         # indicate presence of new values at this level
         L.status.updated = True
