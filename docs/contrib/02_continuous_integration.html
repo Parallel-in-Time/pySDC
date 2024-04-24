@@ -135,6 +135,39 @@ pytest<span class="w"> </span>-v<span class="w"> </span>pySDC/tests/test_nodes.p
 </div>
 </div></blockquote>
 </section>
+<section id="running-ci-on-hpc-from-pull-requests">
+<span id="docs-contrib-02-continuous-integration-running-ci-on-hpc-from-pull-requests"></span><h2>Running CI on HPC from pull requests<a class="headerlink" href="#running-ci-on-hpc-from-pull-requests" title="Link to this heading">¶</a></h2>
+<p>By syncing the GitHub repository to a certain Gitlab instance, CI-Jobs can be run on HPC machines. This can be helpful for benchmarks or when running on accelerators that are not available as GitHub runners.</p>
+<p>For security and accounting reasons, a few extra steps are needed in order to run the contents of a pull request on HPC:</p>
+<ul class="simple">
+<li><p>The pull request needs to have the tag “gitlab-mirror” assigned to it.</p></li>
+<li><p>A person with write-permission for the Parallel-in-Time pySDC repository needs to trigger the workflow. Ask for someone with the required permissions to rerun the workflow if needed.</p></li>
+<li><p>The workflow checks if the code can be merged. If this is not the case, the code is not mirrored and the workflow fails. In this case, please merge upstream changes, fix all conflicts, and rerun the workflow.</p></li>
+</ul>
+<blockquote>
+<div><p>🔔 Note that direct pushes to Parallel-in-Time/pySDC will always trigger the HPC pipeline on Gitlab</p>
+</div></blockquote>
+<p>Regardless of why the Gitlab pipeline was triggered, the following holds true:</p>
+<ul class="simple">
+<li><p>The return-state from Gitlab is transmitted to GitHub (Success/Failure) leading to the same result in GitHub</p></li>
+<li><p>Logs from Gitlab are also transferred. The full logs of all jobs can be read from within GitHub. For better overview, these are folded, so unfolding is needed before reading.</p></li>
+<li><p>Artifacts from Gitlab jobs are also transferred back to GitHub</p></li>
+<li><p>Information, such as coverage is transferred to GitHub, but not yet merged across multiple GitHub workflows. Therefore, there is no complete summary of e.g. coverage-reports across all jobs in all workflows.</p></li>
+</ul>
+<blockquote>
+<div><p>⚠️ The coverage report from the HPC tests is not yet merged with other reports. The test coverage will not show up on the respective website or in the badge. We are working on this.</p>
+</div></blockquote>
+<section id="hpc-test-environments">
+<span id="docs-contrib-02-continuous-integration-hpc-test-environments"></span><h3>HPC test environments<a class="headerlink" href="#hpc-test-environments" title="Link to this heading">¶</a></h3>
+<p>In order to run tests on GPUs, please use the pytest marker <code class="docutils literal notranslate"><span class="pre">cupy</span></code>.</p>
+<p>If you want to create a new HPC test environment, the following steps need to be completed:</p>
+<ul class="simple">
+<li><p>Create a new slurm job-script in <code class="docutils literal notranslate"><span class="pre">etc/juwels_*.sh</span></code>. The name and location of the file is important.</p></li>
+<li><p>Adapt <code class="docutils literal notranslate"><span class="pre">.gitlab-ci.yml</span></code> to include the new job-script. For this, add a name in the job “test_JUWELS” in the section <code class="docutils literal notranslate"><span class="pre">parallel:</span> <span class="pre">matrix:</span> <span class="pre">SHELL_SCRIPT</span></code>. The name there must match the name of the newly created file.
+As a starting point it is recommended to copy and adapt an existing file (e.g. <code class="docutils literal notranslate"><span class="pre">etc/juwels_cupy.sh</span></code>).</p></li>
+</ul>
+</section>
+</section>
 <section id="code-coverage">
 <span id="docs-contrib-02-continuous-integration-code-coverage"></span><h2>Code coverage<a class="headerlink" href="#code-coverage" title="Link to this heading">¶</a></h2>
 <p>This stage allows to checks how much of the <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> code is tested by the previous stage. It is based on the <a class="reference external" href="https://pypi.org/project/coverage/">coverage</a> library and currently applied to the following directories :</p>
@@ -224,6 +257,10 @@ This approach can be considered for local testing of your contribution when it d
 <li><a class="reference internal" href="#">Continuous Integration in pySDC</a><ul>
 <li><a class="reference internal" href="#code-linting">Code linting</a></li>
 <li><a class="reference internal" href="#code-testing">Code testing</a></li>
+<li><a class="reference internal" href="#running-ci-on-hpc-from-pull-requests">Running CI on HPC from pull requests</a><ul>
+<li><a class="reference internal" href="#hpc-test-environments">HPC test environments</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#code-coverage">Code coverage</a><ul>
 <li><a class="reference internal" href="#coverage-exceptions">Coverage exceptions</a></li>
 </ul>
