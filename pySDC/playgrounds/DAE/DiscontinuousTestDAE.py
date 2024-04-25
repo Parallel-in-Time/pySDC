@@ -86,8 +86,8 @@ def plotSolution(stats):
 
     u_val = get_sorted(stats, type='u', sortby='time')
     t = np.array([me[0] for me in u_val])
-    y = [me[1].diff[0] for me in u_val]
-    z = [me[1].alg[0] for me in u_val]
+    y = np.array([me[1].diff[0] for me in u_val])
+    z = np.array([me[1].alg[0] for me in u_val])
 
     plt.figure(figsize=(8.5, 8.5))
     plt.plot(t, y, label='Differential variable y')
