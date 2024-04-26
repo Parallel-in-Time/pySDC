@@ -50,7 +50,7 @@ class imex_1st_order(sweeper):
         for m in range(1, self.coll.num_nodes + 1):
             me.append(P.dtype_u(P.init, val=0.0))
             for j in range(1, self.coll.num_nodes + 1):
-                me[m - 1][:] = me[m - 1] + L.dt * self.coll.Qmat[m, j] * (L.f[j].impl + L.f[j].expl)
+                me[m - 1] += L.dt * self.coll.Qmat[m, j] * (L.f[j].impl + L.f[j].expl)
 
         return me
 
