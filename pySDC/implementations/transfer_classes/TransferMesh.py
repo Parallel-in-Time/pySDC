@@ -9,7 +9,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_m
 
 class mesh_to_mesh(space_transfer):
     """
-    Custon base_transfer class, implements Transfer.py
+    Custom base_transfer class, implements Transfer.py
 
     This implementation can restrict and prolong between nd meshes with dirichlet-0 or periodic boundaries
     via matrix-vector products
@@ -153,7 +153,7 @@ class mesh_to_mesh(space_transfer):
         Args:
             F: the fine level data (easier to access than via the fine attribute)
         """
-        if isinstance(F, mesh):
+        if type(F).__name__ == 'mesh':
             G = self.coarse_prob.dtype_u(self.coarse_prob.init)
             if hasattr(self.fine_prob, 'ncomp'):
                 for i in range(self.fine_prob.ncomp):
@@ -164,7 +164,7 @@ class mesh_to_mesh(space_transfer):
                 tmpF = F.flatten()
                 tmpG = self.Rspace.dot(tmpF)
                 G[:] = tmpG.reshape(self.coarse_prob.nvars)
-        elif isinstance(F, imex_mesh):
+        elif type(F).__name__ == 'imex_mesh':
             G = self.coarse_prob.dtype_f(self.coarse_prob.init)
             if hasattr(self.fine_prob, 'ncomp'):
                 for i in range(self.fine_prob.ncomp):
@@ -181,7 +181,7 @@ class mesh_to_mesh(space_transfer):
                 tmpF = F.expl.flatten()
                 tmpG = self.Rspace.dot(tmpF)
                 G.expl[:] = tmpG.reshape(self.coarse_prob.nvars)
-        elif isinstance(F, comp2_mesh):
+        elif type(F).__name__ == 'comp2_mesh':
             G = self.coarse_prob.dtype_f(self.coarse_prob.init)
             if hasattr(self.fine_prob, 'ncomp'):
                 for i in range(self.fine_prob.ncomp):
@@ -208,7 +208,7 @@ class mesh_to_mesh(space_transfer):
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
-        if isinstance(G, mesh):
+        if type(G).__name__ == 'mesh':
             F = self.fine_prob.dtype_u(self.fine_prob.init)
             if hasattr(self.fine_prob, 'ncomp'):
                 for i in range(self.fine_prob.ncomp):
@@ -219,7 +219,7 @@ class mesh_to_mesh(space_transfer):
                 tmpG = G.flatten()
                 tmpF = self.Pspace.dot(tmpG)
                 F[:] = tmpF.reshape(self.fine_prob.nvars)
-        elif isinstance(G, imex_mesh):
+        elif type(G).__name__ == 'imex_mesh':
             F = self.fine_prob.dtype_f(self.fine_prob.init)
             if hasattr(self.fine_prob, 'ncomp'):
                 for i in range(self.fine_prob.ncomp):
@@ -236,7 +236,7 @@ class mesh_to_mesh(space_transfer):
                 tmpG = G.expl.flatten()
                 tmpF = self.Pspace.dot(tmpG)
                 F.expl[:] = tmpF.reshape(self.fine_prob.nvars)
-        elif isinstance(G, comp2_mesh):
+        elif type(G).__name__ == 'comp2_mesh':
             F = self.fine_prob.dtype_f(self.fine_prob.init)
             if hasattr(self.fine_prob, 'ncomp'):
                 for i in range(self.fine_prob.ncomp):

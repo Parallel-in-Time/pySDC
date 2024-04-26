@@ -6,7 +6,7 @@ from mpi4py_fft import PFFT, newDistArray
 
 class fft_to_fft(space_transfer):
     """
-    Custon base_transfer class, implements Transfer.py
+    Custom base_transfer class, implements Transfer.py
 
     This implementation can restrict and prolong between PMESH datatypes meshes with FFT for periodic boundaries
 
@@ -22,7 +22,7 @@ class fft_to_fft(space_transfer):
             params: parameters for the transfer operators
         """
         # invoke super initialization
-        super(fft_to_fft, self).__init__(fine_prob, coarse_prob, params)
+        super().__init__(fine_prob, coarse_prob, params)
 
         assert self.fine_prob.spectral == self.coarse_prob.spectral
 
