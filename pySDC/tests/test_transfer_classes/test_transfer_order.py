@@ -99,10 +99,9 @@ def test_order(name, order, L):
             num_order = abs(
                 xp.log(value[mask][1:] / value[mask][:-1]) / xp.log(resolutions[mask][1:] / resolutions[mask][:-1])
             )
-            print(key, value, num_order)
             assert xp.isclose(
                 xp.median(num_order), order, atol=0.3
-            ), f'Got unexpected order {xp.median(num_order):.2f} when expecting {order} in {key}'
+            ), f'Got unexpected order {xp.median(num_order):.2f} when expecting {order} in {key}. Errors: {value}'
 
 
 if __name__ == '__main__':
