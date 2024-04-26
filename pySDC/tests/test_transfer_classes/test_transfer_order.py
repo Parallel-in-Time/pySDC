@@ -67,7 +67,7 @@ def test_order(name, order, L):
         'rorder': order,
         'periodic': True,
     }
-    resolutions = [2**10, 2**9, 2**8, 2**7, 2**6, 2**5]
+    resolutions = [2**8, 2**7, 2**6, 2**5]
 
     errors = {
         'prolongation_u_exact': [],

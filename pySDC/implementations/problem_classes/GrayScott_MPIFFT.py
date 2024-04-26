@@ -79,6 +79,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
         shape = (2,) + (self.init[0])
         self.iU = 0
         self.iV = 1
+        self.ncomp = 2  # needed for transfer class
         self.init = (shape, self.comm, self.xp.dtype('float'))
 
         self._makeAttributeAndRegister('Du', 'Dv', 'A', 'B', localVars=locals(), readOnly=True)
