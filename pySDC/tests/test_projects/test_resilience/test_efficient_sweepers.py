@@ -134,7 +134,7 @@ def run_Schroedinger(efficient=False, num_procs=1, skip_residual_computation=Fal
     return stats
 
 
-@pytest.mark.base
+@pytest.mark.Resilience
 def test_generic_implicit_efficient(skip_residual_computation=False):
     stats_normal = run_Lorenz(efficient=False, skip_residual_computation=skip_residual_computation)
     stats_efficient = run_Lorenz(efficient=True, skip_residual_computation=skip_residual_computation)
@@ -142,7 +142,7 @@ def test_generic_implicit_efficient(skip_residual_computation=False):
     assert_benefit(stats_normal, stats_efficient)
 
 
-@pytest.mark.base
+@pytest.mark.Resilience
 def test_residual_skipping():
     stats_normal = run_Lorenz(efficient=True, skip_residual_computation=False)
     stats_efficient = run_Lorenz(efficient=True, skip_residual_computation=True)

@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.base
+@pytest.mark.Resilience
 @pytest.mark.parametrize("ks", [[2], [3], [4]])
 @pytest.mark.parametrize("serial", [True, False])
 def test_order_fixed_step_size(ks, serial):
@@ -11,7 +11,7 @@ def test_order_fixed_step_size(ks, serial):
     plot_all_errors(ax, ks, serial, Tend_fixed=1.0)
 
 
-@pytest.mark.base
+@pytest.mark.Resilience
 @pytest.mark.parametrize("ks", [[2], [3]])
 @pytest.mark.parametrize("serial", [True, False])
 def test_order_adaptive_step_size(ks, serial):

@@ -16,7 +16,7 @@ def getParamsRun():
     return restol, alpha, maxiter, max_restarts, useA, useSE, exact_event_time_avail
 
 
-@pytest.mark.base
+@pytest.mark.PinTSimE
 def testExactDummyProblem():
     r"""
     Test for dummy problems. The test verifies that the dummy problems exactly returns the dynamics of
@@ -61,7 +61,7 @@ def testExactDummyProblem():
     assert np.allclose(fExactOdeEvent, fOdeEvent), "Right-hand sides at event do not match!"
 
 
-@pytest.mark.base
+@pytest.mark.PinTSimE
 @pytest.mark.parametrize('quad_type', ['LOBATTO', 'RADAU-RIGHT'])
 def testAdaptInterpolationInfo(quad_type):
     r"""
@@ -162,7 +162,7 @@ def testAdaptInterpolationInfo(quad_type):
         ), f'Number of values on interpolation axis does not match. Expected {num_nodes + 1=}, got {len(t_interp)}'
 
 
-@pytest.mark.base
+@pytest.mark.PinTSimE
 @pytest.mark.parametrize('num_nodes', [3, 4, 5])
 def testDetectionBoundary(num_nodes):
     """
@@ -230,7 +230,7 @@ def testDetectionBoundary(num_nodes):
     assert sum_restarts == 0, 'Event occurs at boundary, but restart(s) are executed anyway!'
 
 
-@pytest.mark.base
+@pytest.mark.PinTSimE
 @pytest.mark.parametrize('tol', [10 ** (-m) for m in range(8, 13)])
 @pytest.mark.parametrize('num_nodes', [3, 4, 5])
 @pytest.mark.parametrize('quad_type', ['LOBATTO', 'RADAU-RIGHT'])
@@ -310,7 +310,7 @@ def testDetectionODE(tol, num_nodes, quad_type):
     assert np.isclose(event_err, 0, atol=1.2e-11), f'Event time error {event_err=} is not small enough!'
 
 
-@pytest.mark.base
+@pytest.mark.PinTSimE
 @pytest.mark.parametrize('num_nodes', [3, 4, 5])
 def testDetectionDAE(num_nodes):
     r"""

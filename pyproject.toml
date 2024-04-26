@@ -59,6 +59,10 @@ markers = [
     'cupy: tests for cupy on GPUs',
     'libpressio: tests using the libpressio library',
     'monodomain: tests the monodomain project, which requires previous compilation of c++ code',
+    'DAE: tests for the DAE project',
+    'PinTSimE: tests for the PinTSimE project',
+    'Resilience: tests for the resilience project',
+    'parallelSDC_reloaded: tests for the parallelSDC_reloaded project',
     ]
 timeout = 300
 

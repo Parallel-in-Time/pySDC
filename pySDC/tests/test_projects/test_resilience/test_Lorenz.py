@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.base
+@pytest.mark.Resilience
 def test_main():
     from pySDC.projects.Resilience.Lorenz import main
 

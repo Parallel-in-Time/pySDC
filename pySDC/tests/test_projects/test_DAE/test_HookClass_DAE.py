@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 @pytest.mark.parametrize('M', [2, 3, 4])
 def testHookClassDiffAlgComps(M):
     """

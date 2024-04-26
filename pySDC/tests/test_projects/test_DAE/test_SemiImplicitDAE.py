@@ -46,7 +46,7 @@ def getTestSetup(problem, sweeper, hook_class):
     return description, controller_params
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 @pytest.mark.parametrize('initial_guess', ['spread', 'zero', 'random'])
 def testPredict(initial_guess):
     r"""
@@ -104,7 +104,7 @@ def testPredict(initial_guess):
         assert all(abs(fRandomItem) > 0.0 for fRandomItem in fRandom), "Gradient needs to be spreaded as zero!"
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 @pytest.mark.parametrize('residual_type', ['full_abs', 'last_abs', 'full_rel', 'last_rel', 'else'])
 def testComputeResidual(residual_type):
     r"""
@@ -162,7 +162,7 @@ def testComputeResidual(residual_type):
         assert L.status.residual == resNormRef[-1] / abs(uRef)
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 @pytest.mark.parametrize('quad_type', ['RADAU-RIGHT', 'RADAU-LEFT'])
 def testComputeEndpoint(quad_type):
     r"""
@@ -210,7 +210,7 @@ def testComputeEndpoint(quad_type):
         assert np.isclose(L.u[-1], L.uend), "Endpoint is not computed correctly!"
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 @pytest.mark.parametrize('M', [2, 3])
 def testCompareResults(M):
     r"""
@@ -260,7 +260,7 @@ def testCompareResults(M):
     assert np.allclose(errSI, errFI), "Errors does not match!"
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 @pytest.mark.parametrize('case', [0, 1])
 @pytest.mark.parametrize('M', [2, 3])
 @pytest.mark.parametrize('QI', ['IE', 'LU'])

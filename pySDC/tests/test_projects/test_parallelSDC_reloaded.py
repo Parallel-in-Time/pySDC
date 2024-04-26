@@ -9,7 +9,7 @@ import sys
 import pytest
 
 
-@pytest.mark.base
+@pytest.mark.parallelSDC_reloaded
 @pytest.mark.parametrize(
     "sName",
     [
@@ -25,7 +25,7 @@ def test_script(sName):
         raise ImportError(f"error when executing {sName}.py : {e}")
 
 
-@pytest.mark.base
+@pytest.mark.parallelSDC_reloaded
 @pytest.mark.parametrize("sType", ["setup", "accuracy"])
 @pytest.mark.parametrize(
     "pName",
@@ -47,7 +47,7 @@ def test_playgrounds(pName, sType):
         raise ImportError(f"error when executing {pName}_{sType}.py : {e}")
 
 
-@pytest.mark.base
+@pytest.mark.parallelSDC_reloaded
 def test_script_fig01_conv():
     from pySDC.projects.parallelSDC_reloaded.scripts import fig01_conv
 
@@ -61,7 +61,7 @@ def test_script_fig01_conv():
     ]
 
 
-@pytest.mark.base
+@pytest.mark.parallelSDC_reloaded
 def test_script_fig02_stab():
     from pySDC.projects.parallelSDC_reloaded.scripts import fig02_stab
 
@@ -75,7 +75,7 @@ def test_script_fig02_stab():
     ]
 
 
-@pytest.mark.base
+@pytest.mark.parallelSDC_reloaded
 def test_script_fig03_lorenz():
     from pySDC.projects.parallelSDC_reloaded.scripts import fig03_lorenz
 
@@ -88,7 +88,7 @@ def test_script_fig03_lorenz():
     ]
 
 
-@pytest.mark.base
+@pytest.mark.parallelSDC_reloaded
 def test_script_fig04_protheroRobinson():
     from pySDC.projects.parallelSDC_reloaded.scripts import fig04_protheroRobinson
 
@@ -100,7 +100,7 @@ def test_script_fig04_protheroRobinson():
     ]
 
 
-@pytest.mark.base
+@pytest.mark.parallelSDC_reloaded
 def test_script_fig05_allenCahn():
     # Test fails for python < 3.8, so avoid it
     if sys.version_info.minor < 8:

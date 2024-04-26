@@ -107,7 +107,7 @@ def test_strategy_MPI(strategy_name, num_procs=1):
     single_test(strategy_name=strategy_name, useMPI=True, num_procs=num_procs)
 
 
-@pytest.mark.base
+@pytest.mark.Resilience
 @pytest.mark.parametrize('strategy_name', STRATEGY_NAMES + STRATEGY_NAMES_NONMPIONLY)
 def test_strategy_nonMPI(strategy_name, num_procs=1):
     single_test(strategy_name=strategy_name, useMPI=False, num_procs=num_procs)

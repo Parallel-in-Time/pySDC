@@ -18,7 +18,7 @@ def get_random_float():
     return rand
 
 
-@pytest.mark.base
+@pytest.mark.Resilience
 def test_float_conversion():
     """
     Method to test the float conversion by converting to bytes and back and by flipping bits where we know what the
@@ -53,7 +53,7 @@ def test_float_conversion():
         print(f'When flipping bits, we got nan {nan_counter} times out of {num_tests} tests')
 
 
-@pytest.mark.base
+@pytest.mark.Resilience
 def test_complex_conversion():
     """
     Test conversion of complex numbers to and from binary
@@ -72,7 +72,7 @@ def test_complex_conversion():
         ), f"Conversion between bytes and float failed for {rand_complex}: result: {res}"
 
 
-@pytest.mark.base
+@pytest.mark.Resilience
 def test_fault_injection():
     from pySDC.projects.Resilience.fault_injection import FaultInjector
 

@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.base
+@pytest.mark.Resilience
 @pytest.mark.parametrize("equation", ['heat', 'advection'])
 def test_FD_eigenvalues(equation):
     """

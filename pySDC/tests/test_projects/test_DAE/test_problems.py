@@ -3,7 +3,7 @@ import warnings
 import numpy as np
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 def test_pendulum_u_exact_main():
     from pySDC.projects.DAE.problems.simple_DAE import pendulum_2d
 
@@ -18,7 +18,7 @@ def test_pendulum_u_exact_main():
     assert np.isclose(abs(u_test), 0.0)
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 def test_one_transistor_amplifier_u_exact_main():
     from pySDC.projects.DAE.problems.transistor_amplifier import one_transistor_amplifier
 
@@ -33,7 +33,7 @@ def test_one_transistor_amplifier_u_exact_main():
     assert np.array_equal(abs(u_test), 0.0)
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 def test_two_transistor_amplifier_u_exact_main():
     from pySDC.projects.DAE.problems.transistor_amplifier import two_transistor_amplifier
 
@@ -51,7 +51,7 @@ def test_two_transistor_amplifier_u_exact_main():
 #
 #   Explicit test for the pendulum example
 #
-@pytest.mark.base
+@pytest.mark.DAE
 def test_pendulum_main():
     from pySDC.projects.DAE.problems.simple_DAE import pendulum_2d
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -109,7 +109,7 @@ def test_pendulum_main():
     assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 def test_one_transistor_amplifier_main():
     from pySDC.projects.DAE.problems.transistor_amplifier import one_transistor_amplifier
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -168,7 +168,7 @@ def test_one_transistor_amplifier_main():
     assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 def test_two_transistor_amplifier_main():
     from pySDC.projects.DAE.problems.transistor_amplifier import two_transistor_amplifier
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -236,7 +236,7 @@ def test_two_transistor_amplifier_main():
     assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 def test_synchgen_infinite_bus_main():
     from pySDC.projects.DAE.problems.synchronous_machine import synchronous_machine_infinite_bus
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -313,7 +313,7 @@ def test_synchgen_infinite_bus_main():
     assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 def test_DiscontinuousTestDAE_singularity():
     """
     Test if the event occurs at the correct time and proves if the right-hand side has with the correct values at the event.
@@ -361,7 +361,7 @@ def test_DiscontinuousTestDAE_singularity():
     ), f"ERROR: Right-hand side after event does not match! Expected {(7 * np.sqrt(51), 0.0)}, got {(f_after_event.diff[0], f_after_event.alg[0])}"
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 @pytest.mark.parametrize('M', [2, 3, 4, 5])
 def test_DiscontinuousTestDAE_SDC(M):
     """
@@ -427,7 +427,7 @@ def test_DiscontinuousTestDAE_SDC(M):
     assert err < err_tol[M], f"ERROR: Error is too large! Expected {err_tol[M]=}, got {err=}"
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 @pytest.mark.parametrize('M', [3, 4, 5])
 def test_DiscontinuousTestDAE_SDC_detection(M):
     """
@@ -521,7 +521,7 @@ def test_DiscontinuousTestDAE_SDC_detection(M):
     ), f"ERROR for M={M}: Event error is too large! Expected {event_err_tol[M]=}, got {event_err=}"
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 def test_WSCC9_evaluation():
     r"""
     Test for WSCC9 bus test case. The class is written for components :math:`m = 3`, :math:`n = 9`.
@@ -547,7 +547,7 @@ def test_WSCC9_evaluation():
     assert len(f.diff) == nvars and len(f.alg) == nvars, 'Shape of f does not match with shape it is supposed to be!'
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 def test_WSCC9_update_YBus():
     """
     Test if YBus is updated at time 0.05. For this SDC performs one time step.
@@ -612,7 +612,7 @@ def test_WSCC9_update_YBus():
     ), 'YBus after line outage does not match with the one it should supposed to!'
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 def test_WSCC9_SDC_detection():
     """
     Test if state function states a root.
@@ -692,7 +692,7 @@ def test_WSCC9_SDC_detection():
     ), f'Found event does not match a threshold! Got {t_switch=}'
 
 
-# @pytest.mark.base
+# @pytest.mark.DAE
 # def test_WSCC9_SDC_detection():
 #     """
 #     Test for one SDC run with event detection if the found event is close to the exact value and if the global error

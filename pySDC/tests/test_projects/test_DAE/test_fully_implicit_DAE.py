@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 def test_predict_main():
     from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
@@ -63,7 +63,7 @@ def test_predict_main():
         assert abs(L.f[i + 1]) > 0.0
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 def test_residual_main():
     from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
@@ -149,7 +149,7 @@ def test_residual_main():
     assert L.status.residual == ref_norm[-1] / abs(L.u[0]), "ERROR: incorrect norm used"
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 def test_compute_end_point_main():
     from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE

@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 @pytest.mark.parametrize('shape', [(6,), (4, 6), (4, 6, 8)])
 def testInitialization(shape):
     """
@@ -20,7 +20,7 @@ def testInitialization(shape):
     assert len(mesh.components) == len(mesh), 'ERROR: Mesh does not contain two component arrays!'
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 def testInitializationGivenMesh():
     """
     Tests if for a given mesh the initialization results in the same mesh.
@@ -42,7 +42,7 @@ def testInitializationGivenMesh():
     ), 'ERROR: Components in initialized meshes do not match!'
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 @pytest.mark.parametrize('shape', [(6,), (4, 6), (4, 6, 8)])
 def testArrayUFuncOperator(shape):
     """

@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.base
+@pytest.mark.Resilience
 @pytest.mark.parametrize('leak_type', ['linear', 'exponential'])
 def test_imex_vs_fully_implicit_quench(leak_type):
     """
@@ -12,7 +12,7 @@ def test_imex_vs_fully_implicit_quench(leak_type):
     compare_imex_full(plotting=False, leak_type=leak_type)
 
 
-@pytest.mark.base
+@pytest.mark.Resilience
 def test_crossing_time_computation():
     from pySDC.projects.Resilience.quench import run_quench, get_crossing_time
 

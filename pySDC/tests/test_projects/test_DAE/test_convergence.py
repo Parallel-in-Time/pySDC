@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 
 
-@pytest.mark.base
+@pytest.mark.DAE
 def test_main():
     from pySDC.projects.DAE.run.run_convergence_test import setup, run
 
