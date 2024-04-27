@@ -199,7 +199,7 @@ class MultiComponentMesh(mesh):
     def __getattr__(self, name):
         if name in self.components:
             if self.shape[0] == len(self.components):
-                return self[self.components.index(name)]
+                return self[self.components.index(name)].view(mesh)
             else:
                 raise AttributeError(f'Cannot access {name!r} in {type(self)!r} because the shape is unexpected.')
         else:

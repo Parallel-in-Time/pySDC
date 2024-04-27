@@ -138,7 +138,7 @@ def restriction_matrix_1d(fine_grid, coarse_grid, k=2, periodic=False, pad=1):
 
 def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, periodic=False, pad=1, equidist_nested=True):
     """
-    Function to contruct the restriction matrix in 1d using barycentric interpolation
+    Function to construct the restriction matrix in 1d using barycentric interpolation
 
     Args:
         fine_grid (np.ndarray): a one dimensional 1d array containing the nodes of the fine grid
