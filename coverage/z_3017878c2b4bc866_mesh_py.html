@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_3017878c2b4bc866_particles_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.5.0">coverage.py v7.5.0</a>,
-            created at 2024-04-26 10:16 +0000
+            created at 2024-04-27 18:43 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -281,7 +281,7 @@
     <p class="run"><span class="n"><a id="t199" href="#t199">199</a></span><span class="t">    <span class="key">def</span> <span class="nam">__getattr__</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">name</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t200" href="#t200">200</a></span><span class="t">        <span class="key">if</span> <span class="nam">name</span> <span class="key">in</span> <span class="nam">self</span><span class="op">.</span><span class="nam">components</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t201" href="#t201">201</a></span><span class="t">            <span class="key">if</span> <span class="nam">self</span><span class="op">.</span><span class="nam">shape</span><span class="op">[</span><span class="num">0</span><span class="op">]</span> <span class="op">==</span> <span class="nam">len</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">components</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t202" href="#t202">202</a></span><span class="t">                <span class="key">return</span> <span class="nam">self</span><span class="op">[</span><span class="nam">self</span><span class="op">.</span><span class="nam">components</span><span class="op">.</span><span class="nam">index</span><span class="op">(</span><span class="nam">name</span><span class="op">)</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t202" href="#t202">202</a></span><span class="t">                <span class="key">return</span> <span class="nam">self</span><span class="op">[</span><span class="nam">self</span><span class="op">.</span><span class="nam">components</span><span class="op">.</span><span class="nam">index</span><span class="op">(</span><span class="nam">name</span><span class="op">)</span><span class="op">]</span><span class="op">.</span><span class="nam">view</span><span class="op">(</span><span class="nam">mesh</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t203" href="#t203">203</a></span><span class="t">            <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t204" href="#t204">204</a></span><span class="t">                <span class="key">raise</span> <span class="nam">AttributeError</span><span class="op">(</span><span class="fst">f'</span><span class="fst">Cannot access </span><span class="op">{</span><span class="nam">name</span><span class="op">!</span><span class="nam">r</span><span class="op">}</span><span class="fst"> in </span><span class="op">{</span><span class="nam">type</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">!</span><span class="nam">r</span><span class="op">}</span><span class="fst"> because the shape is unexpected.</span><span class="fst">'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t205" href="#t205">205</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -303,7 +303,7 @@
             <a class="nav" href="z_3017878c2b4bc866_particles_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.5.0">coverage.py v7.5.0</a>,
-            created at 2024-04-26 10:16 +0000
+            created at 2024-04-27 18:43 +0000
         </p>
     </div>
 </footer>
