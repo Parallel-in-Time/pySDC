@@ -32,7 +32,7 @@ prepare_JUWELS:
     - pip install -e .
     - pip install pytest-benchmark coverage
     - export current_dir=$(pwd)
-    - mkdir ../mpi4py_fft
+    - mkdir -p ../mpi4py_fft
     - cd ../mpi4py_fft
     - git init
     - git remote add fork https://github.com/brownbaerchen/mpi4py-fft.git
