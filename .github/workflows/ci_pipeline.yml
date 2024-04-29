@@ -43,7 +43,7 @@ jobs:
     strategy:
       matrix:
         python: ['3.8', '3.9', '3.10']
-        env: ['fenics', 'mpi4py', 'petsc']
+        env: ['fenics', 'mpi4py', 'petsc', 'monodomain']
 
     defaults:
       run:
@@ -97,7 +97,7 @@ jobs:
           # - GPU
           - Hamiltonian
           - matrixPFASST
-          - Monodomain
+          # - Monodomain
           - parallelSDC
           - parallelSDC_reloaded
           - PinTSimE
@@ -128,7 +128,7 @@ jobs:
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
-          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/${{ matrix.env }}/tests -m 'not fenics and not mpi4py and not petsc'
+          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/${{ matrix.env }}/tests -m 'base'
 
       - name: Make coverage report
         run: |
