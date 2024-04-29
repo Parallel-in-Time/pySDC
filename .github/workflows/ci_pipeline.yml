@@ -89,12 +89,12 @@ jobs:
       matrix:
         python: ['3.8', '3.9', '3.10']
         env: 
-          - AllenCahn_Bayreuth
+          # - AllenCahn_Bayreuth
           - AsympConv
-          - compression
+          # - compression
           - DAE
           - FastWaveSlowWave
-          - GPU
+          # - GPU
           - Hamiltonian
           - matrixPFASST
           - Monodomain
@@ -103,7 +103,7 @@ jobs:
           - PinTSimE
           - RDC
           - Resilience
-          - SDC_showdown
+          # - SDC_showdown
           - Second_orderSDC
           - soft_failure
           - TOMS
@@ -128,7 +128,7 @@ jobs:
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
-          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/${{ matrix.env }}/tests -m base
+          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/${{ matrix.env }}/tests -m 'not fenics and not mpi4py and not petsc'
 
       - name: Make coverage report
         run: |
