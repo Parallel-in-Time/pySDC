@@ -32,6 +32,12 @@ class fft_to_fft(space_transfer):
         self.ratio = [int(nf / nc) for nf, nc in zip(Nf, Nc)]
         axes = tuple(range(len(Nf)))
 
+        fft_args = {}
+        useGPU = 'cupy' in self.fine_prob.dtype_u.__name__.lower()
+        if useGPU:
+            fft_args['backend'] = 'cupy'
+            fft_args['comm_backend'] = 'NCCL'
+
         self.fft_pad = PFFT(
             self.coarse_prob.comm,
             Nc,
@@ -39,6 +45,7 @@ class fft_to_fft(space_transfer):
             axes=axes,
             dtype=self.coarse_prob.fft.dtype(False),
             slab=True,
+            **fft_args,
         )
 
     def restrict(self, F):
