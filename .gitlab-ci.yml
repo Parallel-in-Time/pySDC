@@ -31,11 +31,6 @@ prepare_JUWELS:
     - module load CuPy
     - pip install -e .
     - pip install pytest-benchmark coverage
-    - git submodule add -f https://github.com/brownbaerchen/mpi4py-fft.git
-    - cd mpi4py-fft
-    - git checkout cupy_implementation
-    - FFTW_LIBRARY_DIR="/p/software/juwels/stages/2024/software/FFTW/3.3.10-GCC-12.3.0/lib64" pip install --force-reinstall -e .
-    - cd ../
 
 
 test_JUWELS:
@@ -68,7 +63,11 @@ test_JUWELS:
     - module load mpi4py
     - module load SciPy-Stack
     - module load CuPy
-    - FFTW_LIBRARY_DIR="/p/software/juwels/stages/2024/software/FFTW/3.3.10-GCC-12.3.0/lib64" pip install --force-reinstall -e ./mpi4py-fft
+    - git submodule add -f https://github.com/brownbaerchen/mpi4py-fft.git
+    - cd mpi4py-fft
+    - git checkout cupy_implementation
+    - FFTW_LIBRARY_DIR="/p/software/juwels/stages/2024/software/FFTW/3.3.10-GCC-12.3.0/lib64" pip install --force-reinstall -e .
+    - cd ../
   script:
     # - touch benchmarks/output.json
     - echo $SYSTEMNAME
