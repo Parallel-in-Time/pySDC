@@ -31,8 +31,15 @@ prepare_JUWELS:
     - module load CuPy
     - pip install -e .
     - pip install pytest-benchmark coverage
-    - git clone https://github.com/brownbaerchen/mpi4py-fft.git ../mpi4py_fft
-    - FFTW_LIBRARY_DIR="/p/software/juwels/stages/2024/software/FFTW/3.3.10-GCC-12.3.0/lib64" pip install --force-reinstall -e ../mpi4py_fft/.
+    - export current_dir=$(pwd)
+    - mkdir ../mpi4py_fft
+    - cd ../mpi4py_fft
+    - git init
+    - git remote add fork https://github.com/brownbaerchen/mpi4py-fft.git
+    - git fetch fork
+    - git checkout fork/master
+    - FFTW_LIBRARY_DIR="/p/software/juwels/stages/2024/software/FFTW/3.3.10-GCC-12.3.0/lib64" pip install --force-reinstall -e .
+    - cd $current_dir
 
 
 test_JUWELS:
