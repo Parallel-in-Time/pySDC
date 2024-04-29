@@ -43,7 +43,7 @@ jobs:
     strategy:
       matrix:
         python: ['3.8', '3.9', '3.10']
-        env: ['base', 'fenics', 'mpi4py', 'petsc']
+        env: ['fenics', 'mpi4py', 'petsc']
 
     defaults:
       run:
@@ -65,7 +65,70 @@ jobs:
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
-          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
+          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests pySDC/projects/*/tests -m ${{ matrix.env }}
+
+      - name: Make coverage report
+        run: |
+          mv data data_${{ matrix.python }}
+          coverage combine
+          mv .coverage coverage_${{ matrix.env }}_${{ matrix.python }}.dat
+
+      - name: Uploading artifacts
+        uses: actions/upload-artifact@v3
+        if: matrix.python == '3.10'
+        with:
+          name: cpu-test-artifacts
+          path: |
+            data_3.10
+            coverage_${{ matrix.env }}_3.10.dat
+
+  project_cpu_tests_linux:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: ['3.8', '3.9', '3.10']
+        env: 
+          - AllenCahn_Bayreuth
+          - AsympConv
+          - compression
+          - DAE
+          - FastWaveSlowWave
+          - GPU
+          - Hamiltonian
+          - matrixPFASST
+          - Monodomain
+          - parallelSDC
+          - parallelSDC_reloaded
+          - PinTSimE
+          - RDC
+          - Resilience
+          - SDC_showdown
+          - Second_orderSDC
+          - soft_failure
+          - TOMS
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-file: "etc/environment-base.yml"
+          create-args: >-
+              python=${{ matrix.python }}
+
+      - name: Run pytest for CPU stuff
+        run: |
+          echo "print('Loading sitecustomize.py...')
+          import coverage
+          coverage.process_startup() " > sitecustomize.py
+          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/${{ matrix.env }}/tests -m base
 
       - name: Make coverage report
         run: |
