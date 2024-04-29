@@ -47,7 +47,7 @@ test_JUWELS:
     - shell
   parallel:
     matrix:
-      - SHELL_SCRIPT: ['benchmark']
+      - SHELL_SCRIPT: ['benchmark', 'cupy']
   artifacts:
     when: always
     paths:
