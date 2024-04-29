@@ -37,7 +37,7 @@ prepare_JUWELS:
     - git init
     - git remote add fork https://github.com/brownbaerchen/mpi4py-fft.git
     - git fetch fork
-    - git checkout fork/master
+    - git checkout fork/cupy_implementation
     - FFTW_LIBRARY_DIR="/p/software/juwels/stages/2024/software/FFTW/3.3.10-GCC-12.3.0/lib64" pip install --force-reinstall -e .
     - cd $current_dir
 
