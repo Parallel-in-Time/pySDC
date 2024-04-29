@@ -32,7 +32,7 @@ prepare_JUWELS:
     - pip install -e .
     - pip install pytest-benchmark coverage
     - git clone https://github.com/brownbaerchen/mpi4py-fft.git ../mpi4py_fft
-    - FFTW_LIBRARY_DIR="/p/software/juwels/stages/2024/software/FFTW/3.3.10-GCC-12.3.0/lib64" pip install -e ../mpi4py_fft/.
+    - FFTW_LIBRARY_DIR="/p/software/juwels/stages/2024/software/FFTW/3.3.10-GCC-12.3.0/lib64" pip install --force-reinstall -e ../mpi4py_fft/.
 
 
 test_JUWELS:

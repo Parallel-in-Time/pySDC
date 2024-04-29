@@ -1,6 +1,5 @@
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 from mpi4py_fft import PFFT, newDistArray
 
 
@@ -77,7 +76,7 @@ class fft_to_fft(space_transfer):
         if hasattr(type(F), 'components'):
             for comp in F.components:
                 _restrict(F.__getattr__(comp), G.__getattr__(comp))
-        elif type(F).__name__ == 'mesh':
+        elif type(F).__name__ in ['mesh', 'cupy_mesh']:
             _restrict(F, G)
         else:
             raise TransferError('Wrong data type for restriction, got %s' % type(F))
@@ -121,7 +120,7 @@ class fft_to_fft(space_transfer):
         if hasattr(type(F), 'components'):
             for comp in F.components:
                 _prolong(G.__getattr__(comp), F.__getattr__(comp))
-        elif type(G).__name__ == 'mesh':
+        elif type(G).__name__ in ['mesh', 'cupy_mesh']:
             _prolong(G, F)
 
         else:

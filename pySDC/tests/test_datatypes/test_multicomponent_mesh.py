@@ -4,60 +4,73 @@ import pytest
 @pytest.mark.base
 @pytest.mark.parametrize('shape', [1, (3,), (2, 4)])
 def test_MultiComponentMesh(shape):
-    from pySDC.implementations.datatype_classes.mesh import MultiComponentMesh
-    import numpy as np
+    from pySDC.implementations.datatype_classes.mesh import MultiComponentMesh as MultiComponentMeshClass
+    import numpy as xp
 
-    class TestMesh(MultiComponentMesh):
+    single_test(shape, xp, MultiComponentMeshClass)
+
+
+@pytest.mark.cupy
+@pytest.mark.parametrize('shape', [1, (3,), (2, 4)])
+def test_CuPyMultiComponentMesh(shape):
+    from pySDC.implementations.datatype_classes.cupy_mesh import CuPyMultiComponentMesh as MultiComponentMeshClass
+    import cupy as xp
+
+    single_test(shape, xp, MultiComponentMeshClass)
+
+
+def single_test(shape, xp, MultiComponentMeshClass):
+    class TestMesh(MultiComponentMeshClass):
         components = ['a', 'b']
 
     # instantiate meshes
-    init = (shape, None, np.dtype('D'))
+    init = (shape, None, xp.dtype('D'))
     A = TestMesh(init)
     B = TestMesh(A)
 
     # fill part of the meshes with values
-    a = np.random.random(shape)
-    b = np.random.random(shape)
-    zero = np.zeros_like(a)
+    a = xp.random.random(shape)
+    b = xp.random.random(shape)
+    zero = xp.zeros_like(a)
     A.a[:] = a
     B.a[:] = b
 
     # check that the meshes have been prepared appropriately
     for M, m in zip([A, B], [a, b]):
         assert M.shape == (len(TestMesh.components),) + ((shape,) if type(shape) is int else shape)
-        assert np.allclose(M.a, m)
-        assert np.allclose(M.b, zero)
-        assert np.shares_memory(M, M.a)
-        assert np.shares_memory(M, M.b)
-        assert not np.shares_memory(M.a, m)
+        assert xp.allclose(M.a, m)
+        assert xp.allclose(M.b, zero)
+        assert xp.shares_memory(M, M.a)
+        assert xp.shares_memory(M, M.b)
+        assert not xp.shares_memory(M.a, m)
 
     # check that various computations give the desired results
-    assert np.allclose(A.a + B.a, a + b)
-    assert np.allclose((A + B).a, a + b)
-    assert np.allclose((A + B).b, zero)
+    assert xp.allclose(A.a + B.a, a + b)
+    assert xp.allclose((A + B).a, a + b)
+    assert xp.allclose((A + B).b, zero)
 
     C = A - B
-    assert np.allclose(C.a, a - b)
-    assert np.allclose(C.b, zero)
-    assert not np.shares_memory(A, C)
-    assert not np.shares_memory(B, C)
+    assert xp.allclose(C.a, a - b)
+    assert xp.allclose(C.b, zero)
+    assert not xp.shares_memory(A, C)
+    assert not xp.shares_memory(B, C)
 
-    D = np.exp(A)
+    D = xp.exp(A)
     assert type(D) == TestMesh
-    assert np.allclose(D.a, np.exp(a))
-    assert np.allclose(D.b, zero + 1)
-    assert not np.shares_memory(A, D)
+    assert xp.allclose(D.a, xp.exp(a))
+    assert xp.allclose(D.b, zero + 1)
+    assert not xp.shares_memory(A, D)
 
     B *= A
-    assert np.allclose(B.a, a * b)
-    assert np.allclose(A.a, a)
-    assert np.allclose(B.b, zero)
-    assert np.allclose(A.b, zero)
-    assert not np.shares_memory(A, B)
+    assert xp.allclose(B.a, a * b)
+    assert xp.allclose(A.a, a)
+    assert xp.allclose(B.b, zero)
+    assert xp.allclose(A.b, zero)
+    assert not xp.shares_memory(A, B)
 
     A /= 10.0
-    assert np.allclose(A.a, a / 10)
-    assert np.allclose(A.b, zero)
+    assert xp.allclose(A.a, a / 10)
+    assert xp.allclose(A.b, zero)
 
 
 if __name__ == '__main__':
