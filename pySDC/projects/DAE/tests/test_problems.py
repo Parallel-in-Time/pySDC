@@ -611,6 +611,7 @@ def test_WSCC9_update_YBus():
         YBus_line_outage, YBus_line6_8_outage
     ), 'YBus after line outage does not match with the one it should supposed to!'
 
+
 @pytest.mark.timeout(360)
 @pytest.mark.base
 def test_WSCC9_SDC_detection():

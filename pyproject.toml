@@ -98,6 +98,7 @@ omit = ['*/pySDC/tests/*', '*/data/*', '*/pySDC/playgrounds/*', '*/pySDC/project
 relative_files = true
 concurrency = ['multiprocessing']
 source = ['pySDC']
+parallel = true
 
 [tool.coverage.report]
 skip_empty = true
