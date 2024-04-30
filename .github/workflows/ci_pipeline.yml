@@ -43,7 +43,7 @@ jobs:
     strategy:
       matrix:
         python: ['3.8', '3.9', '3.10']
-        env: ['fenics', 'mpi4py', 'petsc', 'monodomain']
+        env: ['fenics', 'mpi4py', 'petsc']
 
     defaults:
       run:
@@ -97,7 +97,6 @@ jobs:
           # - GPU
           - Hamiltonian
           - matrixPFASST
-          # - Monodomain
           - parallelSDC
           - parallelSDC_reloaded
           - PinTSimE
