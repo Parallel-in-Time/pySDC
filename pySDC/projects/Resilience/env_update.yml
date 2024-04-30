@@ -3,5 +3,5 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - mpi4py
-  - mpi4py-fft
+  - mpi4py>=3.0.0
+  - mpi4py-fft>=2.0.2
