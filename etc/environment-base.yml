@@ -12,6 +12,6 @@ dependencies:
   - pytest
   - pytest-benchmark
   - pytest-timeout
-  - pytest-order
+  - pytest-parallel
   - coverage[toml]
   - sphinx
