@@ -1,0 +1,6 @@
+name: pySDC
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - petsc4py

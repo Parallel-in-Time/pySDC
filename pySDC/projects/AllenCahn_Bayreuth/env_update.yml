@@ -1,0 +1,6 @@
+name: pySDC
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - mpi4py
