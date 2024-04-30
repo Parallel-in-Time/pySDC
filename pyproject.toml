@@ -94,11 +94,10 @@ skip-string-normalization = true
 exclude = '''playgrounds/'''
 
 [tool.coverage.run]
-omit = ['*/pySDC/tests/*', '*/data/*', '*/pySDC/playgrounds/*', '*/pySDC/projects/deprecated/*']
+omit = ['*/pySDC/tests/*', '*/data/*', '*/pySDC/playgrounds/*', '*/pySDC/projects/deprecated/*', '*/pySDC/projects/*/tests/*']
 relative_files = true
 concurrency = ['multiprocessing']
 source = ['pySDC']
-parallel = true
 
 [tool.coverage.report]
 skip_empty = true
