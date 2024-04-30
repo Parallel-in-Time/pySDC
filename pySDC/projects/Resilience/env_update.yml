@@ -4,3 +4,4 @@ channels:
   - defaults
 dependencies:
   - mpi4py
+  - mpi4py-fft
