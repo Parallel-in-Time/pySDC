@@ -287,6 +287,7 @@ jobs:
     needs:
       - lint
       - user_cpu_tests_linux
+      - project_cpu_tests_linux
       - user_libpressio_tests
       - user_monodomain_tests_linux
 #       - wait_for_gitlab
@@ -302,7 +303,7 @@ jobs:
       - name: Install Conda environment with Micromamba
         uses: mamba-org/setup-micromamba@v1
         with:
-          environment-file: "etc/environment-base.yml"
+          environment-file: "etc/environment-tests.yml"
 
       - name: Downloading artifacts
         uses: actions/download-artifact@v3
