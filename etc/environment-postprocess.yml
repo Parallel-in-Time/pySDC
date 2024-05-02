@@ -3,8 +3,5 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - pytest
-  - pytest-benchmark
-  - pytest-timeout
-  - pytest-order
   - coverage[toml]
+  - sphinx
