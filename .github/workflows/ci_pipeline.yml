@@ -124,7 +124,7 @@ jobs:
       - name: Install Conda environment with Micromamba
         uses: mamba-org/setup-micromamba@v1
         with:
-          environment-file: "pySDC/projects/${{ matrix.env }}/env_update.yml"
+          environment-file: "pySDC/projects/${{ matrix.env }}/environment.yml"
           create-args: >-
               python=${{ matrix.python }}
 
