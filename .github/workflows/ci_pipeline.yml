@@ -61,6 +61,10 @@ jobs:
           create-args: >-
               python=${{ matrix.python }}
 
+      - name: Install additional packages as needed
+        run: |
+          micromamba install -y --file etc/envrionment-tests.yml --freeze-installed
+
       - name: Run pytest for CPU stuff
         run: |
           echo "print('Loading sitecustomize.py...')
@@ -126,7 +130,7 @@ jobs:
 
       - name: Install additional packages as needed
         run: |
-          micromamba install -y --file pySDC/projects/${{ matrix.env }}/env_update.yml --freeze-installed
+          micromamba install -y --file pySDC/projects/${{ matrix.env }}/env_update.yml --file etc/envrionment-tests.yml --freeze-installed
 
       - name: Run pytest for CPU stuff
         run: |

@@ -10,6 +10,3 @@ dependencies:
   - mpich
   - mpi4py-fft>=2.0.2
   - mpi4py>=3.0.0
-  - pytest
-  - pytest-cov
-  - pytest-timeout

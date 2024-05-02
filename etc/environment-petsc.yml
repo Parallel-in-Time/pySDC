@@ -10,7 +10,3 @@ dependencies:
   - mpich
   - petsc4py<3.20
   - mpi4py>=3.0.0
-  - pytest
-  - pytest-cov
-  - pytest-timeout
-  - pytest-order

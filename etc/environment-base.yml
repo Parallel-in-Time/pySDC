@@ -9,8 +9,3 @@ dependencies:
   - sympy>=1.0
   - numba>=0.35
   - dill>=0.2.6
-  - pytest
-  - pytest-benchmark
-  - pytest-timeout
-  - coverage[toml]
-  - sphinx
