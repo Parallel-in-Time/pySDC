@@ -74,9 +74,7 @@ def run(use_MPI, num_nodes, quad_type, residual_type, imex, init_guess, useNCCL,
     description['level_params'] = {'dt': dt, 'residual_type': residual_type}
     description['step_params'] = {'maxiter': 1}
 
-    from mpi4py import MPI
-
-    controller = controller_nonMPI(1, {'logger_level': 35 if MPI.COMM_WORLD.rank == 0 else 30}, description)
+    controller = controller_nonMPI(1, {'logger_level': 30}, description)
 
     if imex:
         u0 = controller.MS[0].levels[0].prob.u_exact(0)
@@ -220,5 +218,4 @@ if __name__ == '__main__':
     parser.add_argument('--init_guess', type=str, help='Initial guess', choices=['spread', 'copy', 'zero'])
     args = parser.parse_args()
 
-    kwargs = {me[0]: me[1] for me in args._get_kwargs()}
-    individual_test(**kwargs)
+    individual_test(**vars(args))
