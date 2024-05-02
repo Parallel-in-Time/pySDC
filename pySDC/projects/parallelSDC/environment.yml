@@ -4,3 +4,7 @@ channels:
   - defaults
 dependencies:
   - mpi4py
+  - numpy
+  - matplotlib>=3.0
+  - dill>=0.2.6
+  - scipy>=0.17.1

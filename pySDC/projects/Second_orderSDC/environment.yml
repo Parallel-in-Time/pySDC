@@ -1,0 +1,10 @@
+name: pySDC
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy
+  - numba>=0.35
+  - dill>=0.2.6
+  - matplotlib>=3.0
+  - scipy>=0.17.1

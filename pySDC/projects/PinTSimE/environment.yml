@@ -3,4 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - pytest
+  - numpy
+  - scipy>=0.17.1
+  - dill>=0.2.6
+  - matplotlib>=3.0

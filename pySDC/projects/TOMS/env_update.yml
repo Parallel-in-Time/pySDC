@@ -1,6 +1,0 @@
-name: pySDC
-channels:
-  - conda-forge
-  - defaults
-dependencies:
-  - pytest-order
