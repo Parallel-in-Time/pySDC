@@ -90,4 +90,4 @@ A more detailed example is given [here ...](https://sphinxcontrib-napoleon.readt
 
 :arrow_left: [Back to custom implementations](./04_custom_implementations.md) ---
 :arrow_up: [Contributing Summary](./../../CONTRIBUTING.md) ---
-:arrow_right: [Next to a cute picture of cat](https://www.vecteezy.com/photo/2098203-silver-tabby-cat-sitting-on-green-background)
+:arrow_right: [Next to Adding a new project](./06_new_project.md)
