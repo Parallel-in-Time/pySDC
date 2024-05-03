@@ -6,7 +6,7 @@ import pytest
 @pytest.mark.slow
 @pytest.mark.mpi4py
 @pytest.mark.timeout(0)
-@pytest.mark.parametrize('num_procs', [3,5])
+@pytest.mark.parametrize('num_procs', [3, 5])
 def test_preconditioner_playground_MPI(num_procs):
     # Set python path once
     my_env = os.environ.copy()
