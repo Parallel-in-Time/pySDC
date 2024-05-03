@@ -80,13 +80,15 @@ class base_transfer_MPI(base_transfer):
         # build tau correction
         G.tau[CG.rank] = tauFG - tauG
 
-        if F.tau[0] is not None:
-            tmp_tau = self.space_transfer.restrict(F.tau[CF.rank + 1])
+        if F.tau[CF.rank] is not None:
+            tmp_tau = self.space_transfer.restrict(F.tau[CF.rank])
 
             # restrict possible tau correction from fine in collocation
+            recvBuf = [None for _ in range(SG.coll.num_nodes)]
+            recvBuf[CG.rank] = PG.u_init
             for n in range(SG.coll.num_nodes):
-                recvBuf = G.tau[n] if n == CG.rank else None
-                CF.Reduce(self.Rcoll[n, CF.rank] * tmp_tau, recvBuf, root=n, op=MPI.SUM)
+                CF.Reduce(self.Rcoll[n, CF.rank] * tmp_tau, recvBuf[CG.rank], root=n, op=MPI.SUM)
+            G.tau[CG.rank] += recvBuf[CG.rank]
         else:
             pass
 

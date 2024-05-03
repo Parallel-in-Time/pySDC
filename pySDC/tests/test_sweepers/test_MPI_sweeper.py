@@ -13,7 +13,7 @@ def run(use_MPI, num_nodes, quad_type, residual_type, imex, init_guess, useNCCL,
         imex (bool): Use IMEX sweeper or not
         init_guess (str): which initial guess should be used
         useNCCL (bool): ...
-        ML (bool): Multi-level in space toggle
+        ML (int): Number of levels in space
 
     Returns:
         pySDC.Level.level: The level containing relevant data
@@ -56,12 +56,12 @@ def run(use_MPI, num_nodes, quad_type, residual_type, imex, init_guess, useNCCL,
         sweeper_params['comm'] = NCCLComm(MPI.COMM_WORLD)
         problem_params['useGPU'] = True
 
-    if ML:
+    if ML > 1:
         from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
         description['space_transfer_class'] = mesh_to_mesh
 
-        problem_params['nvars'] = [64, 32]
+        problem_params['nvars'] = [2 ** (ML - i) for i in range(ML)]
         if use_MPI:
             from pySDC.implementations.transfer_classes.BaseTransferMPI import base_transfer_MPI
 
@@ -143,7 +143,7 @@ def individual_test(launch=False, **kwargs):
 @pytest.mark.parametrize("residual_type", ['last_abs', 'full_rel'])
 @pytest.mark.parametrize("imex", [True, False])
 @pytest.mark.parametrize("init_guess", ['spread', 'copy', 'zero'])
-@pytest.mark.parametrize("ML", [True, False])
+@pytest.mark.parametrize("ML", [1, 2, 3])
 def test_sweeper(num_nodes, quad_type, residual_type, imex, init_guess, ML, launch=True):
     """
     Make a test if the result matches between the MPI and non-MPI versions of a sweeper.
@@ -194,7 +194,7 @@ def test_sweeper_NCCL(num_nodes, quad_type, residual_type, imex, init_guess, lau
         imex=imex,
         init_guess=init_guess,
         useNCCL=True,
-        ML=False,
+        ML=1,
         launch=launch,
     )
 
@@ -204,7 +204,7 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--ML', type=str_to_bool, help='Multilevel toogle', choices=[True, False])
+    parser.add_argument('--ML', type=int, help='Number of levels in space')
     parser.add_argument('--num_nodes', type=int, help='Number of collocation nodes')
     parser.add_argument('--quad_type', type=str, help='Quadrature rule', choices=['GAUSS', 'RADAU-RIGHT', 'RADAU-LEFT'])
     parser.add_argument(
