@@ -43,8 +43,7 @@ jobs:
     strategy:
       matrix:
         env: ['base', 'fenics', 'mpi4py', 'petsc']
-        # python: ['3.8', '3.9', '3.10']
-        python: ['3.10']
+        python: ['3.8', '3.9', '3.10', '3.11', '3.12']
 
     defaults:
       run:
@@ -110,8 +109,7 @@ jobs:
           - Second_orderSDC
           - soft_failure
           - TOMS
-        # python: ['3.8', '3.9', '3.10']
-        python: ['3.10']
+        python: ['3.8', '3.9', '3.10', '3.11', '3.12']
 
     defaults:
       run:
