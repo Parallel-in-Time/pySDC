@@ -37,7 +37,9 @@ please add the correct channel to the list.
 
 ## Add tests to the project
 
-In order to automatically find the tests of your project, please add the tests to a subdirectory called `tests` in the directory of your project. Furthermore, the files should start with `test_` and the functions should also start with that. For more information see the documentation of pytest on [test discovery](<https://docs.pytest.org/en/8.2.x/explanation/goodpractices.html#tests-as-part-of-application-code>).
+In order to automatically find the tests of your project, please add the tests to a subdirectory called `tests` in the directory of your project.
+Furthermore, the files should start with `test_` and the functions should also start with that.
+For more information see the documentation of pytest on [test discovery](<https://docs.pytest.org/en/8.2.x/explanation/goodpractices.html#tests-as-part-of-application-code>).
 
 ## Add the project to the continuous integration pipeline
 
@@ -45,6 +47,13 @@ To run the tests of all projects in parallel, the projects are explicitly mentio
 In order to run the tests of your project, please add the name of your project **as your directory is named**
 in the [CI-File](./../../.github/workflows/ci_pipeline.yml)
 in the job `project_cpu_tests_linux` in the list `strategy/matrix/env`.
+
+## Getting a DOI of pySDC for publication
+
+If your project is published and you need a dedicated pySDC version with a DOI, please get in touch with us and/or open a new issue.
+We will help you with this as soon as possible.
+Note that a final DOI is usually only necessary once a paper is accepted and the final proofs are due.
+We strongly encourage to describe and cite the current version of pySDC already during initial submission, though.
 
 :arrow_left: [Back to Documenting Code](./05_documenting_code.md) ---
 :arrow_up: [Contributing Summary](./../../CONTRIBUTING.md) ---
