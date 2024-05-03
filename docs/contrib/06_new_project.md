@@ -6,9 +6,6 @@ To that end, please write extensive tests for your code and add them to the proj
 See the [contribution guide](./../../CONTRIBUTING.md) for general advice on testing etc.
 This guide will detail only how to add a project to pySDC.
 
-When adding a new project to pySDC, it needs to be tested.
-In order to run those tests as fast as possible, a few steps are needed, that are given below.
-
 ## Add a directory in 'pySDC/projects'
 
 First, create a new directory in `pySDC/projects` with the name of your project.
