@@ -22,5 +22,6 @@ This follows a specific OOP framework, you can look at the page on :doc:`custom 
 #. :doc:`Naming Conventions <./docs/contrib/03_naming_conventions>`
 #. :doc:`Custom Implementations <./docs/contrib/04_custom_implementations>`
 #. :doc:`Documenting Code <./docs/contrib/05_documenting_code>`
+#. :doc:`Adding a project <./docs/contrib/06_new_project>`
 
 |:arrow_left:| :doc:`Back to main page <./index>`

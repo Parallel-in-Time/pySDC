@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Adding a project to pySDC (and automatic testing) &#8212; pySDC 5.4.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=def86cc0" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../_static/documentation_options.js?v=e5a863ed"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Adding a project to pySDC (and automatic testing)</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="adding-a-project-to-pysdc-and-automatic-testing">
+<span id="docs-contrib-06-new-project-adding-a-project-to-pysdc-and-automatic-testing"></span><h1>Adding a project to pySDC (and automatic testing)<a class="headerlink" href="#adding-a-project-to-pysdc-and-automatic-testing" title="Link to this heading">¶</a></h1>
+<p>When you do a project with pySDC we appreciate it if you merge it back to the main repository.
+We are committed to keeping your work reproducible and prevent it from fading into oblivion.
+To that end, please write extensive tests for your code and add them to the project.
+See the <a class="reference internal" href="../../CONTRIBUTING.html"><span class="doc">contribution guide</span></a> for general advice on testing etc.
+This guide will detail only how to add a project to pySDC.</p>
+<section id="add-a-directory-in-pysdc-projects">
+<span id="docs-contrib-06-new-project-add-a-directory-in-pysdc-projects"></span><h2>Add a directory in ‘pySDC/projects’<a class="headerlink" href="#add-a-directory-in-pysdc-projects" title="Link to this heading">¶</a></h2>
+<p>First, create a new directory in <code class="docutils literal notranslate"><span class="pre">pySDC/projects</span></code> with the name of your project.
+The code of the new project should go into that newly created directory.</p>
+</section>
+<section id="add-an-environment-file">
+<span id="docs-contrib-06-new-project-add-an-environment-file"></span><h2>Add an environment-file<a class="headerlink" href="#add-an-environment-file" title="Link to this heading">¶</a></h2>
+<p>The testing pipeline uses <a class="reference external" href="https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html">micromamba</a>
+and requires an environment file for setup.
+This includes the dependencies that are required for your project to run.
+The file needs to be named <code class="docutils literal notranslate"><span class="pre">environment.yml</span></code> and needs to follow the structure shown below:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pySDC</span>
+<span class="nt">channels</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda-forge</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">defaults</span>
+<span class="nt">dependencies</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">numpy</span>
+</pre></div>
+</div>
+<p>The list of dependencies can be extended as needed.
+The name should stay <code class="docutils literal notranslate"><span class="pre">pySDC</span></code>. The channels cover most of the usual packages.
+If a package is needed that cannot be found in those channels by conda (or mamba),
+please add the correct channel to the list.</p>
+</section>
+<section id="add-tests-to-the-project">
+<span id="docs-contrib-06-new-project-add-tests-to-the-project"></span><h2>Add tests to the project<a class="headerlink" href="#add-tests-to-the-project" title="Link to this heading">¶</a></h2>
+<p>In order to automatically find the tests of your project, please add the tests to a subdirectory called <code class="docutils literal notranslate"><span class="pre">tests</span></code> in the directory of your project.
+Furthermore, the files should start with <code class="docutils literal notranslate"><span class="pre">test_</span></code> and the functions should also start with that.
+For more information see the documentation of pytest on <a class="reference external" href="https://docs.pytest.org/en/8.2.x/explanation/goodpractices.html#tests-as-part-of-application-code">test discovery</a>.</p>
+</section>
+<section id="add-the-project-to-the-continuous-integration-pipeline">
+<span id="docs-contrib-06-new-project-add-the-project-to-the-continuous-integration-pipeline"></span><h2>Add the project to the continuous integration pipeline<a class="headerlink" href="#add-the-project-to-the-continuous-integration-pipeline" title="Link to this heading">¶</a></h2>
+<p>To run the tests of all projects in parallel, the projects are explicitly mentioned in the CI-file.
+In order to run the tests of your project, please add the name of your project <strong>as your directory is named</strong>
+in the <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/.github/workflows/ci_pipeline.yml">CI-File</a>
+in the job <code class="docutils literal notranslate"><span class="pre">project_cpu_tests_linux</span></code> in the list <code class="docutils literal notranslate"><span class="pre">strategy/matrix/env</span></code>.</p>
+</section>
+<section id="getting-a-doi-of-pysdc-for-publication">
+<span id="docs-contrib-06-new-project-getting-a-doi-of-pysdc-for-publication"></span><h2>Getting a DOI of pySDC for publication<a class="headerlink" href="#getting-a-doi-of-pysdc-for-publication" title="Link to this heading">¶</a></h2>
+<p>If your project is published and you need a dedicated pySDC version with a DOI, please get in touch with us and/or open a new issue.
+We will help you with this as soon as possible.
+Note that a final DOI is usually only necessary once a paper is accepted and the final proofs are due.
+We strongly encourage to describe and cite the current version of pySDC already during initial submission, though.</p>
+<p>⬅️ <a class="reference internal" href="05_documenting_code.html"><span class="doc">Back to Documenting Code</span></a> —
+⬆️ <a class="reference internal" href="../../CONTRIBUTING.html"><span class="doc">Contributing Summary</span></a> —
+➡️ <a class="reference external" href="https://www.vecteezy.com/photo/2098203-silver-tabby-cat-sitting-on-green-background">Next to a cute picture of cat</a></p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Adding a project to pySDC (and automatic testing)</a><ul>
+<li><a class="reference internal" href="#add-a-directory-in-pysdc-projects">Add a directory in ‘pySDC/projects’</a></li>
+<li><a class="reference internal" href="#add-an-environment-file">Add an environment-file</a></li>
+<li><a class="reference internal" href="#add-tests-to-the-project">Add tests to the project</a></li>
+<li><a class="reference internal" href="#add-the-project-to-the-continuous-integration-pipeline">Add the project to the continuous integration pipeline</a></li>
+<li><a class="reference internal" href="#getting-a-doi-of-pysdc-for-publication">Getting a DOI of pySDC for publication</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/docs/contrib/06_new_project.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Adding a project to pySDC (and automatic testing)</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>
