@@ -1,7 +1,86 @@
+---
+
 stages:
   - test
   - benchmark
   - upload
+
+
+variables:
+  JUWELS_ACCOUNT: "cstma"
+
+
+prepare_JUWELS:
+  stage: benchmark
+  rules:
+    - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
+  tags:
+    - jacamar
+    - juwels
+    - login
+    - shell
+  script:
+    - mkdir -p benchmarks
+    - module --force purge
+    - module load Stages/2024
+    - module load GCC
+    - module load OpenMPI
+    - module load FFTW
+    - module load mpi4py
+    - module load SciPy-Stack
+    - module load CuPy
+    - pip install -e .
+    - pip install pytest-benchmark coverage
+
+
+test_JUWELS:
+  stage: benchmark
+  needs:
+    - prepare_JUWELS
+  rules:
+    - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
+  tags:
+    - jacamar
+    - juwels
+    - login
+    - shell
+  parallel:
+    matrix:
+      - SHELL_SCRIPT: ['benchmark', 'cupy']
+  artifacts:
+    when: always
+    paths:
+      - coverage_*.dat
+      - sbatch.err
+      - sbatch.out
+  before_script:
+    - mkdir -p benchmarks
+    - module --force purge
+    - module load Stages/2024
+    - module load GCC
+    - module load OpenMPI
+    - module load FFTW
+    - module load mpi4py
+    - module load SciPy-Stack
+    - module load CuPy
+    - git submodule add -f https://github.com/brownbaerchen/mpi4py-fft.git
+    - cd mpi4py-fft
+    - git checkout cupy_implementation
+    - FFTW_LIBRARY_DIR="/p/software/juwels/stages/2024/software/FFTW/3.3.10-GCC-12.3.0/lib64" pip install --force-reinstall -e .
+    - cd ../
+  script:
+    # - touch benchmarks/output.json
+    - echo $SYSTEMNAME
+    - sbatch --wait etc/juwels_${SHELL_SCRIPT}.sh
+    - touch .coverage.empty
+    - python -m coverage combine
+    - mv .coverage coverage_${SHELL_SCRIPT}.dat
+  after_script:
+    - echo "Following Errors occured:"
+    - cat sbatch.err
+    - echo "Following was written to stdout:"
+    - cat sbatch.out
+
 
 #test_kit:
 #  image: rcaspart/micromamba-cuda
@@ -64,6 +143,9 @@ stages:
 benchmark:
   image: mambaorg/micromamba
   stage: benchmark
+  when: manual
+  tags:
+    - docker
   rules:
     - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
   artifacts:

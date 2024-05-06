@@ -1,0 +1,117 @@
+---
+
+name: Mirror to Gitlab to trigger CI
+
+on:
+  push:
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled]
+  schedule:
+    - cron: '1 5 2 * *'
+
+jobs:
+  check_permission:
+    runs-on: ubuntu-latest
+    if: >-
+        (github.repository_owner == 'Parallel-in-Time') &&
+        ((github.event_name == 'push') ||
+         (github.event_name == 'schedule') ||
+         ((github.event_name == 'pull_request_target') &&
+          (contains(github.event.pull_request.labels.*.name, 'gitlab-mirror'))
+         )
+        )
+    steps:
+      - name: Query permissions of triggering actor
+        id: query_permission_triggering_actor
+        if: github.event_name == 'pull_request_target'
+        uses: actions-cool/check-user-permission@v2
+        with:
+          username: ${{ github.triggering_actor }}
+          require: 'write'
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Interpret the queried result
+        if: github.event_name == 'pull_request_target'
+        run: |
+          echo "Current permission level is ${{ steps.query_permission_triggering_actor.outputs.user-permission }}"
+          echo "Job originally triggered by ${{ github.actor }}"
+          echo "Checking permission returned ${{ steps.query_permission_triggering_actor.outputs.require-result }}"
+          if ${{ steps.query_permission_triggering_actor.outputs.require-result }}
+            then
+              echo 'Permissions granted'
+              exit 0
+            else
+              echo 'Not enough permissions. Please ask a member of Parallel-in-Time to rerun the job.'
+              exit 1
+          fi
+      - name: Pass if workflow from push or schedule
+        if: >-
+          (github.event_name == 'push') ||
+          (github.event_name == 'schedule')
+        run: exit 0
+      # - name: Fail for other triggers
+      #   if: >-
+      #     (github.event_name != 'push') &&
+      #     (github.event_name != 'schedule') &&
+      #     (github.event_name != 'pull_request_target')
+      #   run: exit 1
+
+  mirror_to_gitlab:
+    runs-on: ubuntu-latest
+    if: >-
+        (github.repository_owner == 'Parallel-in-Time') &&
+        ((github.event_name == 'push') ||
+         (github.event_name == 'schedule') ||
+         ((github.event_name == 'pull_request_target') &&
+          (contains(github.event.pull_request.labels.*.name, 'gitlab-mirror'))
+         )
+        )
+    needs:
+      - check_permission
+    steps:
+      - name: set proper sha
+        run: |
+          echo "${{ github.event_name }}"
+          if [ "${{ github.event_name }}" == 'push' ] || [ "${{ github.event_name }}" == 'schedule' ]
+          then
+            echo "USED_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
+          fi
+          if [ "${{ github.event_name }}" == 'pull_request_target' ]
+          then
+            echo "USED_SHA=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
+          fi
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: "${{ env.USED_SHA }}"
+          persist-credentials: false
+      - name: check if merge is possible (merge is used for testing)
+        if: github.event_name == 'pull_request_target'
+        run: |
+          if $(git rev-parse --is-shallow-repository); then
+            git fetch --unshallow
+          else
+            git fetch
+          fi
+          echo "Checkout of ${{ github.base_ref }}"
+          git checkout "${{ github.base_ref }}"
+          echo "Git pull"
+          git pull
+          MIRROR_BRANCH="TEMPORARY_MERGE_PR_${{ github.event.number }}"
+          echo MIRROR_BRANCH="$MIRROR_BRANCH" >> $GITHUB_ENV
+          echo "Create new branch $MIRROR_BRANCH and check it out"
+          git checkout -b "$MIRROR_BRANCH"
+          echo "Setting git committer info, so that merge-commit can be created"
+          git config user.email "unused@example.com"
+          git config user.name "Sync bot"
+          echo "Merge the two parts of the Merge-Request to test the resulting version"
+          git merge "${{ github.event.pull_request.head.sha }}"
+      - name: Mirror and wait for Gitlab-CI
+        uses: jakob-fritz/github2lab_action@v0.7
+        env:
+          MODE: 'all'  # Either 'mirror', 'get_status', 'get_artifact', or 'all'
+          GITLAB_TOKEN: ${{ secrets.GITLAB_SECRET }}
+          FORCE_PUSH: "true"
+          GITLAB_HOSTNAME: "gitlab.jsc.fz-juelich.de"
+          GITLAB_PROJECT_ID: "6029"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MIRROR_BRANCH: ${{ env.MIRROR_BRANCH }}

@@ -4,15 +4,14 @@ import scipy.sparse as sp
 import pySDC.helpers.transfer_helper as th
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_mesh
 
 
 class mesh_to_mesh(space_transfer):
     """
-    Custon base_transfer class, implements Transfer.py
+    Custom base_transfer class, implements Transfer.py
 
     This implementation can restrict and prolong between nd meshes with dirichlet-0 or periodic boundaries
-    via matrix-vector products
+    via matrix-vector products.
 
     Attributes:
         Rspace: spatial restriction matrix, dim. Nf x Nc
@@ -30,7 +29,7 @@ class mesh_to_mesh(space_transfer):
         """
 
         # invoke super initialization
-        super(mesh_to_mesh, self).__init__(fine_prob, coarse_prob, params)
+        super().__init__(fine_prob, coarse_prob, params)
 
         if self.params.rorder % 2 != 0:
             raise TransferError('Need even order for restriction')
@@ -153,51 +152,31 @@ class mesh_to_mesh(space_transfer):
         Args:
             F: the fine level data (easier to access than via the fine attribute)
         """
-        if isinstance(F, mesh):
-            G = self.coarse_prob.dtype_u(self.coarse_prob.init)
+        G = type(F)(self.coarse_prob.init)
+
+        def _restrict(fine, coarse):
             if hasattr(self.fine_prob, 'ncomp'):
                 for i in range(self.fine_prob.ncomp):
-                    tmpF = F[..., i].flatten()
-                    tmpG = self.Rspace.dot(tmpF)
-                    G[..., i] = tmpG.reshape(self.coarse_prob.nvars)
+                    if fine.shape[-1] == self.fine_prob.ncomp:
+                        tmpF = fine[..., i].flatten()
+                        tmpG = self.Rspace.dot(tmpF)
+                        coarse[..., i] = tmpG.reshape(self.coarse_prob.nvars)
+                    elif fine.shape[0] == self.fine_prob.ncomp:
+                        tmpF = fine[i, ...].flatten()
+                        tmpG = self.Rspace.dot(tmpF)
+                        coarse[i, ...] = tmpG.reshape(self.coarse_prob.nvars)
+                    else:
+                        raise TransferError('Don\'t know how to restrict for this problem with multiple components')
             else:
-                tmpF = F.flatten()
+                tmpF = fine.flatten()
                 tmpG = self.Rspace.dot(tmpF)
-                G[:] = tmpG.reshape(self.coarse_prob.nvars)
-        elif isinstance(F, imex_mesh):
-            G = self.coarse_prob.dtype_f(self.coarse_prob.init)
-            if hasattr(self.fine_prob, 'ncomp'):
-                for i in range(self.fine_prob.ncomp):
-                    tmpF = F.impl[..., i].flatten()
-                    tmpG = self.Rspace.dot(tmpF)
-                    G.impl[..., i] = tmpG.reshape(self.coarse_prob.nvars)
-                    tmpF = F.expl[..., i].flatten()
-                    tmpG = self.Rspace.dot(tmpF)
-                    G.expl[..., i] = tmpG.reshape(self.coarse_prob.nvars)
-            else:
-                tmpF = F.impl.flatten()
-                tmpG = self.Rspace.dot(tmpF)
-                G.impl[:] = tmpG.reshape(self.coarse_prob.nvars)
-                tmpF = F.expl.flatten()
-                tmpG = self.Rspace.dot(tmpF)
-                G.expl[:] = tmpG.reshape(self.coarse_prob.nvars)
-        elif isinstance(F, comp2_mesh):
-            G = self.coarse_prob.dtype_f(self.coarse_prob.init)
-            if hasattr(self.fine_prob, 'ncomp'):
-                for i in range(self.fine_prob.ncomp):
-                    tmpF = F.comp1[..., i].flatten()
-                    tmpG = self.Rspace.dot(tmpF)
-                    G.comp1[..., i] = tmpG.reshape(self.coarse_prob.nvars)
-                    tmpF = F.comp2[..., i].flatten()
-                    tmpG = self.Rspace.dot(tmpF)
-                    G.comp2[..., i] = tmpG.reshape(self.coarse_prob.nvars)
-            else:
-                tmpF = F.comp1.flatten()
-                tmpG = self.Rspace.dot(tmpF)
-                G.comp1[:] = tmpG.reshape(self.coarse_prob.nvars)
-                tmpF = F.comp2.flatten()
-                tmpG = self.Rspace.dot(tmpF)
-                G.comp2[:] = tmpG.reshape(self.coarse_prob.nvars)
+                coarse[:] = tmpG.reshape(self.coarse_prob.nvars)
+
+        if hasattr(type(F), 'components'):
+            for comp in F.components:
+                _restrict(F.__getattr__(comp), G.__getattr__(comp))
+        elif type(F).__name__ == 'mesh':
+            _restrict(F, G)
         else:
             raise TransferError('Wrong data type for restriction, got %s' % type(F))
         return G
@@ -208,51 +187,32 @@ class mesh_to_mesh(space_transfer):
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
-        if isinstance(G, mesh):
-            F = self.fine_prob.dtype_u(self.fine_prob.init)
+        F = type(G)(self.fine_prob.init)
+
+        def _prolong(coarse, fine):
             if hasattr(self.fine_prob, 'ncomp'):
                 for i in range(self.fine_prob.ncomp):
-                    tmpG = G[..., i].flatten()
-                    tmpF = self.Pspace.dot(tmpG)
-                    F[..., i] = tmpF.reshape(self.fine_prob.nvars)
+                    if coarse.shape[-1] == self.fine_prob.ncomp:
+                        tmpG = coarse[..., i].flatten()
+                        tmpF = self.Pspace.dot(tmpG)
+                        fine[..., i] = tmpF.reshape(self.fine_prob.nvars)
+                    elif coarse.shape[0] == self.fine_prob.ncomp:
+                        tmpG = coarse[i, ...].flatten()
+                        tmpF = self.Pspace.dot(tmpG)
+                        fine[i, ...] = tmpF.reshape(self.fine_prob.nvars)
+                    else:
+                        raise TransferError('Don\'t know how to prolong for this problem with multiple components')
             else:
-                tmpG = G.flatten()
+                tmpG = coarse.flatten()
                 tmpF = self.Pspace.dot(tmpG)
-                F[:] = tmpF.reshape(self.fine_prob.nvars)
-        elif isinstance(G, imex_mesh):
-            F = self.fine_prob.dtype_f(self.fine_prob.init)
-            if hasattr(self.fine_prob, 'ncomp'):
-                for i in range(self.fine_prob.ncomp):
-                    tmpG = G.impl[..., i].flatten()
-                    tmpF = self.Pspace.dot(tmpG)
-                    F.impl[..., i] = tmpF.reshape(self.fine_prob.nvars)
-                    tmpG = G.expl[..., i].flatten()
-                    tmpF = self.Rspace.dot(tmpG)
-                    F.expl[..., i] = tmpF.reshape(self.fine_prob.nvars)
-            else:
-                tmpG = G.impl.flatten()
-                tmpF = self.Pspace.dot(tmpG)
-                F.impl[:] = tmpF.reshape(self.fine_prob.nvars)
-                tmpG = G.expl.flatten()
-                tmpF = self.Pspace.dot(tmpG)
-                F.expl[:] = tmpF.reshape(self.fine_prob.nvars)
-        elif isinstance(G, comp2_mesh):
-            F = self.fine_prob.dtype_f(self.fine_prob.init)
-            if hasattr(self.fine_prob, 'ncomp'):
-                for i in range(self.fine_prob.ncomp):
-                    tmpG = G.comp1[..., i].flatten()
-                    tmpF = self.Pspace.dot(tmpG)
-                    F.comp1[..., i] = tmpF.reshape(self.fine_prob.nvars)
-                    tmpG = G.comp2[..., i].flatten()
-                    tmpF = self.Rspace.dot(tmpG)
-                    F.comp2[..., i] = tmpF.reshape(self.fine_prob.nvars)
-            else:
-                tmpG = G.comp1.flatten()
-                tmpF = self.Pspace.dot(tmpG)
-                F.comp1[:] = tmpF.reshape(self.fine_prob.nvars)
-                tmpG = G.comp2.flatten()
-                tmpF = self.Pspace.dot(tmpG)
-                F.comp2[:] = tmpF.reshape(self.fine_prob.nvars)
+                fine[:] = tmpF.reshape(self.fine_prob.nvars)
+            return fine
+
+        if hasattr(type(F), 'components'):
+            for comp in G.components:
+                _prolong(G.__getattr__(comp), F.__getattr__(comp))
+        elif type(G).__name__ == 'mesh':
+            F[:] = _prolong(G, F)
         else:
             raise TransferError('Wrong data type for prolongation, got %s' % type(G))
         return F

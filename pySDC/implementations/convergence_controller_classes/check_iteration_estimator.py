@@ -6,7 +6,7 @@ from pySDC.implementations.convergence_controller_classes.store_uold import Stor
 class CheckIterationEstimatorNonMPI(ConvergenceController):
     def __init__(self, controller, params, description, **kwargs):
         """
-        Initalization routine
+        Initialization routine
 
         Args:
             controller (pySDC.Controller): The controller

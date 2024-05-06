@@ -30,6 +30,7 @@ class Brusselator(IMEX_Laplacian_MPIFFT):
         shape = (2,) + (self.init[0])
         self.iU = 0
         self.iV = 1
+        self.ncomp = 2  # needed for transfer class
         self.init = (shape, self.comm, np.dtype('float'))
 
     def _eval_explicit_part(self, u, t, f_expl):

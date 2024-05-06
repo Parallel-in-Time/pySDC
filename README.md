@@ -4,6 +4,7 @@
 [![zenodo](https://zenodo.org/badge/26165004.svg)](https://zenodo.org/badge/latestdoi/26165004)
 [![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green)](https://fair-software.eu)
 [![SQAaaS badge shields.io](https://img.shields.io/badge/sqaaas%20software-silver-lightgrey)](https://api.eu.badgr.io/public/assertions/aS8J0NDTTjCyYP6iVufviQ "SQAaaS silver badge achieved")
+
 # Welcome to pySDC!
 
 The `pySDC` project is a Python implementation of the
@@ -31,7 +32,7 @@ implemented.
 -   Continuous integration via [GitHub
     Actions](https://github.com/Parallel-in-Time/pySDC/actions) and
     [Gitlab CI](https://gitlab.hzdr.de/r.speck/pysdc/-/pipelines)
--   Fully compatible with Python 3.8 - 3.10, runs at least on Ubuntu
+-   Fully compatible with Python 3.8 - 3.10 (and mostly up to 3.12), runs at least on Ubuntu
 
 ## Getting started
 
@@ -92,9 +93,8 @@ The current software release can be cited using Zenodo:
 and is now maintained and developed by a small community of scientists interested in SDC methods.
 Checkout the [Changelog](./CHANGELOG.md) to see pySDC's evolution since 2016.
 
-Any contribution is dearly welcome ! If you want to take part of this, please take the time to read our [Contribution Guidelines](./CONTRIBUTING.md)
+Any contribution is dearly welcome! If you want to contribute, please take the time to read our [Contribution Guidelines](./CONTRIBUTING.md)
 (and don't forget to take a peek at our nice [Code of Conduct](./CODE_OF_CONDUCT.md) :wink:).
-
 
 ## Acknowledgements
 

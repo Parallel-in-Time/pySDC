@@ -1,0 +1,12 @@
+name: pySDC
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - coverage[toml]
+  - sphinx
+  - numpy
+  - scipy
+  - matplotlib
+  - dill
+  - numba

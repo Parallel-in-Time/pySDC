@@ -1,12 +1,11 @@
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 from mpi4py_fft import PFFT, newDistArray
 
 
 class fft_to_fft(space_transfer):
     """
-    Custon base_transfer class, implements Transfer.py
+    Custom base_transfer class, implements Transfer.py
 
     This implementation can restrict and prolong between PMESH datatypes meshes with FFT for periodic boundaries
 
@@ -22,7 +21,7 @@ class fft_to_fft(space_transfer):
             params: parameters for the transfer operators
         """
         # invoke super initialization
-        super(fft_to_fft, self).__init__(fine_prob, coarse_prob, params)
+        super().__init__(fine_prob, coarse_prob, params)
 
         assert self.fine_prob.spectral == self.coarse_prob.spectral
 
@@ -33,6 +32,12 @@ class fft_to_fft(space_transfer):
         self.ratio = [int(nf / nc) for nf, nc in zip(Nf, Nc)]
         axes = tuple(range(len(Nf)))
 
+        fft_args = {}
+        useGPU = 'cupy' in self.fine_prob.dtype_u.__name__.lower()
+        if useGPU:
+            fft_args['backend'] = 'cupy'
+            fft_args['comm_backend'] = 'NCCL'
+
         self.fft_pad = PFFT(
             self.coarse_prob.comm,
             Nc,
@@ -40,6 +45,7 @@ class fft_to_fft(space_transfer):
             axes=axes,
             dtype=self.coarse_prob.fft.dtype(False),
             slab=True,
+            **fft_args,
         )
 
     def restrict(self, F):
@@ -49,24 +55,38 @@ class fft_to_fft(space_transfer):
         Args:
             F: the fine level data (easier to access than via the fine attribute)
         """
-        if isinstance(F, mesh):
+        G = type(F)(self.coarse_prob.init)
+
+        def _restrict(fine, coarse):
             if self.spectral:
-                G = self.coarse_prob.dtype_u(self.coarse_prob.init)
                 if hasattr(self.fine_prob, 'ncomp'):
                     for i in range(self.fine_prob.ncomp):
-                        tmpF = newDistArray(self.fine_prob.fft, False)
-                        tmpF = self.fine_prob.fft.backward(F[..., i], tmpF)
-                        tmpG = tmpF[:: int(self.ratio[0]), :: int(self.ratio[1])]
-                        G[..., i] = self.coarse_prob.fft.forward(tmpG, G[..., i])
+                        if fine.shape[-1] == self.fine_prob.ncomp:
+                            tmpF = newDistArray(self.fine_prob.fft, False)
+                            tmpF = self.fine_prob.fft.backward(fine[..., i], tmpF)
+                            tmpG = tmpF[:: int(self.ratio[0]), :: int(self.ratio[1])]
+                            coarse[..., i] = self.coarse_prob.fft.forward(tmpG, coarse[..., i])
+                        elif fine.shape[0] == self.fine_prob.ncomp:
+                            tmpF = newDistArray(self.fine_prob.fft, False)
+                            tmpF = self.fine_prob.fft.backward(fine[i, ...], tmpF)
+                            tmpG = tmpF[:: int(self.ratio[0]), :: int(self.ratio[1])]
+                            coarse[i, ...] = self.coarse_prob.fft.forward(tmpG, coarse[i, ...])
+                        else:
+                            raise TransferError('Don\'t know how to restrict for this problem with multiple components')
                 else:
-                    tmpF = self.fine_prob.fft.backward(F)
+                    tmpF = self.fine_prob.fft.backward(fine)
                     tmpG = tmpF[:: int(self.ratio[0]), :: int(self.ratio[1])]
-                    G[:] = self.coarse_prob.fft.forward(tmpG, G)
+                    coarse[:] = self.coarse_prob.fft.forward(tmpG, coarse)
             else:
-                G = self.coarse_prob.dtype_u(self.coarse_prob.init)
-                G[:] = F[:: int(self.ratio[0]), :: int(self.ratio[1])]
+                coarse[:] = fine[:: int(self.ratio[0]), :: int(self.ratio[1])]
+
+        if hasattr(type(F), 'components'):
+            for comp in F.components:
+                _restrict(F.__getattr__(comp), G.__getattr__(comp))
+        elif type(F).__name__ in ['mesh', 'cupy_mesh']:
+            _restrict(F, G)
         else:
-            raise TransferError('Unknown data type, got %s' % type(F))
+            raise TransferError('Wrong data type for restriction, got %s' % type(F))
 
         return G
 
@@ -77,52 +97,39 @@ class fft_to_fft(space_transfer):
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
-        if isinstance(G, mesh):
+        F = type(G)(self.fine_prob.init)
+
+        def _prolong(coarse, fine):
             if self.spectral:
-                F = self.fine_prob.dtype_u(self.fine_prob.init)
                 if hasattr(self.fine_prob, 'ncomp'):
                     for i in range(self.fine_prob.ncomp):
-                        tmpF = self.fft_pad.backward(G[..., i])
-                        F[..., i] = self.fine_prob.fft.forward(tmpF, F[..., i])
+                        if coarse.shape[-1] == self.fine_prob.ncomp:
+                            tmpF = self.fft_pad.backward(coarse[..., i])
+                            fine[..., i] = self.fine_prob.fft.forward(tmpF, fine[..., i])
+                        elif coarse.shape[0] == self.fine_prob.ncomp:
+                            tmpF = self.fft_pad.backward(coarse[i, ...])
+                            fine[i, ...] = self.fine_prob.fft.forward(tmpF, fine[i, ...])
+                        else:
+                            raise TransferError('Don\'t know how to prolong for this problem with multiple components')
+
                 else:
-                    tmpF = self.fft_pad.backward(G)
-                    F[:] = self.fine_prob.fft.forward(tmpF, F)
+                    tmpF = self.fft_pad.backward(coarse)
+                    fine[:] = self.fine_prob.fft.forward(tmpF, fine)
             else:
-                F = self.fine_prob.dtype_u(self.fine_prob.init)
                 if hasattr(self.fine_prob, 'ncomp'):
                     for i in range(self.fine_prob.ncomp):
-                        G_hat = self.coarse_prob.fft.forward(G[..., i])
-                        F[..., i] = self.fft_pad.backward(G_hat, F[..., i])
+                        G_hat = self.coarse_prob.fft.forward(coarse[..., i])
+                        fine[..., i] = self.fft_pad.backward(G_hat, fine[..., i])
                 else:
-                    G_hat = self.coarse_prob.fft.forward(G)
-                    F[:] = self.fft_pad.backward(G_hat, F)
-        elif isinstance(G, imex_mesh):
-            if self.spectral:
-                F = self.fine_prob.dtype_f(self.fine_prob.init)
-                if hasattr(self.fine_prob, 'ncomp'):
-                    for i in range(self.fine_prob.ncomp):
-                        tmpF = self.fft_pad.backward(G.impl[..., i])
-                        F.impl[..., i] = self.fine_prob.fft.forward(tmpF, F.impl[..., i])
-                        tmpF = self.fft_pad.backward(G.expl[..., i])
-                        F.expl[..., i] = self.fine_prob.fft.forward(tmpF, F.expl[..., i])
-                else:
-                    tmpF = self.fft_pad.backward(G.impl)
-                    F.impl[:] = self.fine_prob.fft.forward(tmpF, F.impl)
-                    tmpF = self.fft_pad.backward(G.expl)
-                    F.expl[:] = self.fine_prob.fft.forward(tmpF, F.expl)
-            else:
-                F = self.fine_prob.dtype_f(self.fine_prob.init)
-                if hasattr(self.fine_prob, 'ncomp'):
-                    for i in range(self.fine_prob.ncomp):
-                        G_hat = self.coarse_prob.fft.forward(G.impl[..., i])
-                        F.impl[..., i] = self.fft_pad.backward(G_hat, F.impl[..., i])
-                        G_hat = self.coarse_prob.fft.forward(G.expl[..., i])
-                        F.expl[..., i] = self.fft_pad.backward(G_hat, F.expl[..., i])
-                else:
-                    G_hat = self.coarse_prob.fft.forward(G.impl)
-                    F.impl[:] = self.fft_pad.backward(G_hat, F.impl)
-                    G_hat = self.coarse_prob.fft.forward(G.expl)
-                    F.expl[:] = self.fft_pad.backward(G_hat, F.expl)
+                    G_hat = self.coarse_prob.fft.forward(coarse)
+                    fine[:] = self.fft_pad.backward(G_hat, fine)
+
+        if hasattr(type(F), 'components'):
+            for comp in F.components:
+                _prolong(G.__getattr__(comp), F.__getattr__(comp))
+        elif type(G).__name__ in ['mesh', 'cupy_mesh']:
+            _prolong(G, F)
+
         else:
             raise TransferError('Unknown data type, got %s' % type(G))
 

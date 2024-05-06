@@ -250,4 +250,3 @@ def test_mesh_to_mesh_2d_periodic():
 
 if __name__ == "__main__":
     test_mesh_to_mesh_1d_dirichlet()
-    pass
