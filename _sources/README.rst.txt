@@ -60,7 +60,7 @@ Features
 * Continuous integration via `GitHub
   Actions <https://github.com/Parallel-in-Time/pySDC/actions>`_ and
   `Gitlab CI <https://gitlab.hzdr.de/r.speck/pysdc/-/pipelines>`_
-* Fully compatible with Python 3.8 - 3.10, runs at least on Ubuntu
+* Fully compatible with Python 3.8 - 3.10 (and mostly up to 3.12), runs at least on Ubuntu
 
 Getting started
 ---------------
@@ -131,7 +131,7 @@ Contributing
 and is now maintained and developed by a small community of scientists interested in SDC methods.
 Checkout the :doc:`Changelog <./CHANGELOG>` to see pySDC's evolution since 2016.
 
-Any contribution is dearly welcome ! If you want to take part of this, please take the time to read our :doc:`Contribution Guidelines <./CONTRIBUTING>`
+Any contribution is dearly welcome! If you want to contribute, please take the time to read our :doc:`Contribution Guidelines <./CONTRIBUTING>`
 (and don't forget to take a peek at our nice :doc:`Code of Conduct <./CODE_OF_CONDUCT>` |:wink:|).
 
 Acknowledgements
