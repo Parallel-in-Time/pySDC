@@ -9,9 +9,3 @@ dependencies:
   - pytorch
   - matplotlib>=3.0
   - dill
-  - pytest
-  - pytest-benchmark
-  - pytest-timeout
-  - pytest-order
-  - coverage[toml]
-  - sphinx
