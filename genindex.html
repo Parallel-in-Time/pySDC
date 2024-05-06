@@ -448,17 +448,19 @@
 </li>
       <li><a href="pySDC/core.Errors.html#core.Errors.CommunicationError">CommunicationError</a>
 </li>
-      <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.comp2_cupy_mesh.comp1">comp1 (comp2_cupy_mesh attribute)</a>
-</li>
-      <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.comp2_cupy_mesh.comp2">comp2 (comp2_cupy_mesh attribute)</a>
-</li>
       <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.comp2_cupy_mesh">comp2_cupy_mesh (class in implementations.datatype_classes.cupy_mesh)</a>
 </li>
       <li><a href="pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.comp2_mesh">comp2_mesh (class in implementations.datatype_classes.mesh)</a>
 </li>
-      <li><a href="pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.comp2_mesh.components">components (comp2_mesh attribute)</a>
+      <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.comp2_cupy_mesh.components">components (comp2_cupy_mesh attribute)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.comp2_mesh.components">(comp2_mesh attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.CuPyMultiComponentMesh.components">(CuPyMultiComponentMesh attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.imex_cupy_mesh.components">(imex_cupy_mesh attribute)</a>
+</li>
         <li><a href="pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.imex_mesh.components">(imex_mesh attribute)</a>
 </li>
         <li><a href="pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.MultiComponentMesh.components">(MultiComponentMesh attribute)</a>
@@ -644,6 +646,8 @@
       <li><a href="pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.CrashBase">CrashBase (class in implementations.convergence_controller_classes.crash)</a>
 </li>
       <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.cupy_mesh">cupy_mesh (class in implementations.datatype_classes.cupy_mesh)</a>
+</li>
+      <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.CuPyMultiComponentMesh">CuPyMultiComponentMesh (class in implementations.datatype_classes.cupy_mesh)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1225,11 +1229,9 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.ExactDiscontinuousTestODE">ExactDiscontinuousTestODE (class in implementations.problem_classes.DiscontinuousTestODE)</a>
 </li>
-      <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.imex_cupy_mesh.expl">expl (imex_cupy_mesh attribute)</a>
+      <li><a href="pySDC/implementations.datatype_classes.petsc_vec.html#implementations.datatype_classes.petsc_vec.petsc_vec_comp2.expl">expl (petsc_vec_comp2 attribute)</a>
 
       <ul>
-        <li><a href="pySDC/implementations.datatype_classes.petsc_vec.html#implementations.datatype_classes.petsc_vec.petsc_vec_comp2.expl">(petsc_vec_comp2 attribute)</a>
-</li>
         <li><a href="pySDC/implementations.datatype_classes.petsc_vec.html#implementations.datatype_classes.petsc_vec.petsc_vec_imex.expl">(petsc_vec_imex attribute)</a>
 </li>
         <li><a href="pySDC/implementations.datatype_classes.fenics_mesh.html#implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh.expl">(rhs_fenics_mesh attribute)</a>
@@ -1325,8 +1327,6 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.FermiPastaUlamTsingou.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou">fermi_pasta_ulam_tsingou (class in implementations.problem_classes.FermiPastaUlamTsingou)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_MPIFFT.html#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.fft">fft (allencahn_imex attribute)</a>
 
       <ul>
@@ -1341,6 +1341,12 @@
         <li><a href="pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.fft">(nonlinearschroedinger_imex attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/implementations.problem_classes.generic_MPIFFT_Laplacian.html#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.fft_backend">fft_backend (IMEX_Laplacian_MPIFFT attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.problem_classes.generic_MPIFFT_Laplacian.html#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.fft_comm_backend">fft_comm_backend (IMEX_Laplacian_MPIFFT attribute)</a>
+</li>
       <li><a href="pySDC/implementations.transfer_classes.TransferMesh_MPIFFT.html#implementations.transfer_classes.TransferMesh_MPIFFT.fft_to_fft">fft_to_fft (class in implementations.transfer_classes.TransferMesh_MPIFFT)</a>
 </li>
       <li><a href="pySDC/implementations.datatype_classes.particles.html#implementations.datatype_classes.particles.fields">fields (class in implementations.datatype_classes.particles)</a>
@@ -1843,11 +1849,9 @@
 </li>
       <li><a href="pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.imex_mesh">imex_mesh (class in implementations.datatype_classes.mesh)</a>
 </li>
-      <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.imex_cupy_mesh.impl">impl (imex_cupy_mesh attribute)</a>
+      <li><a href="pySDC/implementations.datatype_classes.petsc_vec.html#implementations.datatype_classes.petsc_vec.petsc_vec_comp2.impl">impl (petsc_vec_comp2 attribute)</a>
 
       <ul>
-        <li><a href="pySDC/implementations.datatype_classes.petsc_vec.html#implementations.datatype_classes.petsc_vec.petsc_vec_comp2.impl">(petsc_vec_comp2 attribute)</a>
-</li>
         <li><a href="pySDC/implementations.datatype_classes.petsc_vec.html#implementations.datatype_classes.petsc_vec.petsc_vec_imex.impl">(petsc_vec_imex attribute)</a>
 </li>
         <li><a href="pySDC/implementations.datatype_classes.fenics_mesh.html#implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh.impl">(rhs_fenics_mesh attribute)</a>
@@ -2252,8 +2256,6 @@
         <li><a href="pySDC/implementations.problem_classes.FullSolarSystem.html#module-implementations.problem_classes.FullSolarSystem">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.GeneralizedFisher_1D_FD_implicit
 
@@ -2261,6 +2263,8 @@
         <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.html#module-implementations.problem_classes.GeneralizedFisher_1D_FD_implicit">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.GeneralizedFisher_1D_PETSc
 
@@ -3872,8 +3876,12 @@
       </ul></li>
       <li><a href="pySDC/core.Controller.html#core.Controller.controller.setup_convergence_controllers">setup_convergence_controllers() (controller method)</a>
 </li>
-      <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.setup_GPU">setup_GPU() (testequation0d class method)</a>
+      <li><a href="pySDC/implementations.problem_classes.generic_MPIFFT_Laplacian.html#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.setup_GPU">setup_GPU() (IMEX_Laplacian_MPIFFT class method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.setup_GPU">(testequation0d class method)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/helpers.plot_helper.html#helpers.plot_helper.setup_mpl">setup_mpl() (in module helpers.plot_helper)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptive_collocation.html#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.setup_status_variables">setup_status_variables() (AdaptiveCollocation method)</a>
