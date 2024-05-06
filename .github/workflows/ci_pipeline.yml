@@ -41,9 +41,10 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
-        python: ['3.8', '3.9', '3.10']
         env: ['base', 'fenics', 'mpi4py', 'petsc']
+        python: ['3.8', '3.9', '3.10', '3.11', '3.12']
 
     defaults:
       run:
@@ -60,12 +61,87 @@ jobs:
           create-args: >-
               python=${{ matrix.python }}
 
+      - name: Install additional packages as needed
+        run: |
+          micromamba install -y --file etc/environment-tests.yml --freeze-installed
+
       - name: Run pytest for CPU stuff
         run: |
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
           coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
+
+      - name: Make coverage report
+        run: |
+          mv data data_${{ matrix.python }}
+          coverage combine
+          mv .coverage coverage_${{ matrix.env }}_${{ matrix.python }}.dat
+
+      - name: Uploading artifacts
+        uses: actions/upload-artifact@v3
+        if: matrix.python == '3.10'
+        with:
+          name: cpu-test-artifacts
+          path: |
+            data_3.10
+            coverage_${{ matrix.env }}_3.10.dat
+
+  project_cpu_tests_linux:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        env: 
+          - AllenCahn_Bayreuth
+          - AsympConv
+          - DAE
+          - FastWaveSlowWave
+          # - GPU
+          - Hamiltonian
+          - matrixPFASST
+          - parallelSDC
+          - parallelSDC_reloaded
+          - PinTSimE
+          - RDC
+          - Resilience
+          - SDC_showdown
+          - Second_orderSDC
+          - soft_failure
+          - TOMS
+        python: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        exclude:
+          - env: parallelSDC
+            python: '3.11'
+          - env: parallelSDC
+            python: '3.12'
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-file: "pySDC/projects/${{ matrix.env }}/environment.yml"
+          create-args: >-
+              python=${{ matrix.python }}
+
+      - name: Install additional packages as needed
+        run: |
+          micromamba install -y --file etc/environment-tests.yml --freeze-installed
+
+      - name: Run pytest for CPU stuff
+        run: |
+          echo "print('Loading sitecustomize.py...')
+          import coverage
+          coverage.process_startup() " > sitecustomize.py
+          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/${{ matrix.env }}/tests
 
       - name: Make coverage report
         run: |
@@ -108,7 +184,7 @@ jobs:
           source /opt/spack/share/spack/setup-env.sh
           spack load libpressio
            
-          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m libpressio
+          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/compression/tests -m libpressio
 
       - name: Make coverage report
         run: |
@@ -156,7 +232,7 @@ jobs:
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
-          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m monodomain
+          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/Monodomain/tests -m monodomain
 
       - name: Make coverage report
         run: |
@@ -215,6 +291,7 @@ jobs:
     needs:
       - lint
       - user_cpu_tests_linux
+      - project_cpu_tests_linux
       - user_libpressio_tests
       - user_monodomain_tests_linux
 #       - wait_for_gitlab
@@ -230,7 +307,7 @@ jobs:
       - name: Install Conda environment with Micromamba
         uses: mamba-org/setup-micromamba@v1
         with:
-          environment-file: "etc/environment-base.yml"
+          environment-file: "etc/environment-postprocess.yml"
 
       - name: Downloading artifacts
         uses: actions/download-artifact@v3
