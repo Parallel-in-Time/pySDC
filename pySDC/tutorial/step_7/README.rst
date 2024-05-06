@@ -51,3 +51,16 @@ Important things to note:
 - Below, we run the code 3 times: with 1 and 2 processors in space as well as 4 processors (2 in time and 2 in space). Do not expect scaling due to the CI environment.
 
 .. include:: doc_step_7_C.rst
+
+
+Part D: pySDC and PyTorch
+-------------------------
+
+PyTorch is a library for machine learning. The data structure is called tensor and allows to run on CPUs as well as GPUs in addition to access to various machine learning methods.
+Since the potential for use in pySDC is very large, we have started on a datatype that allows to use PyTorch tensors throughout pySDC.
+
+This example trains a network to predict the results of implicit Euler solves for the heat equation. It is too simple to do anything useful, but demonstrates how to use tensors in pySDC and then apply the enormous PyTorch infrastructure.
+This is work in progress in very early stages! The tensor datatype is the simplest possible implementation, rather than an efficient one.
+If you want to work on this, your input is appreciated!
+
+.. include:: doc_step_7_D.rst
