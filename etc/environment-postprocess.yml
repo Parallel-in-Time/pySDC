@@ -7,3 +7,6 @@ dependencies:
   - sphinx
   - numpy
   - scipy
+  - matplotlib
+  - dill
+  - numba
