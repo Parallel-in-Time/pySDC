@@ -149,12 +149,6 @@ jobs:
           coverage combine
           mv .coverage coverage_${{ matrix.env }}_${{ matrix.python }}.dat
 
-      - name: Print for Debugging
-        if: matrix.python == '3.10'
-        run: |
-          pwd
-          ls -lah data_3.10
-
       - name: Uploading artifacts
         uses: actions/upload-artifact@v3
         if: matrix.python == '3.10'
