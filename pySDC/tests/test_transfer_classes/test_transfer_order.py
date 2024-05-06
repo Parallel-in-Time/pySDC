@@ -1,7 +1,7 @@
 import pytest
 
 
-def get_problem(nvars, xp, L, mpifft=False, spectral=False, x0=0):
+def get_problem(nvars, xp, L, mpifft=False, spectral=False, x0=0, useGPU=False):
     """
     Get a dummy problem to test interpolation
 
@@ -61,7 +61,7 @@ def get_problem(nvars, xp, L, mpifft=False, spectral=False, x0=0):
                 me[:] = self._fill()
                 return me
 
-        return DummyProblemMPIFFT(nvars=(nvars, nvars), spectral=spectral, x0=x0, L=L)
+        return DummyProblemMPIFFT(nvars=(nvars, nvars), spectral=spectral, x0=x0, L=L, useGPU=useGPU)
 
     return DummyProblem(nvars)
 
@@ -104,7 +104,15 @@ def test_fft_to_fft(L, spectral, x0):
     single_test('fft_to_fft', -1, L, mpifft=True, spectral=spectral, x0=x0)
 
 
-def single_test(name, order, L, mpifft, spectral=False, x0=0):
+@pytest.mark.cupy
+@pytest.mark.parametrize('L', [1.0, 6.283185307179586])
+@pytest.mark.parametrize('spectral', [True, False])
+@pytest.mark.parametrize('x0', [0.0, -3.141592653589793])
+def test_fft_to_fft_GPU(L, spectral, x0):
+    single_test('fft_to_fft', -1, L, mpifft=True, spectral=spectral, x0=x0, useGPU=True)
+
+
+def single_test(name, order, L, mpifft, spectral=False, x0=0, useGPU=False):
     import numpy as xp
 
     params = {
@@ -122,10 +130,9 @@ def single_test(name, order, L, mpifft, spectral=False, x0=0):
     }
 
     for function_name in ['u_exact', 'eval_f']:
-
         for res in resolutions[::-1]:
-            fine = get_problem(res, xp, L, mpifft=mpifft, spectral=spectral, x0=x0)
-            coarse = get_problem(res // 2, xp, L, mpifft=mpifft, spectral=spectral, x0=x0)
+            fine = get_problem(res, xp, L, mpifft=mpifft, spectral=spectral, x0=x0, useGPU=useGPU)
+            coarse = get_problem(res // 2, xp, L, mpifft=mpifft, spectral=spectral, x0=x0, useGPU=useGPU)
             transfer = get_transfer_class(name)(fine, coarse, params)
 
             fine_exact = fine.__getattribute__(function_name)(t=0)

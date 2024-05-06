@@ -46,9 +46,30 @@ class IMEX_Laplacian_MPIFFT(ptype):
     dtype_f = imex_mesh
 
     xp = np
+    fft_backend = 'fftw'
+    fft_comm_backend = 'MPI'
 
-    def __init__(self, nvars=None, spectral=False, L=2 * np.pi, alpha=1.0, comm=MPI.COMM_WORLD, dtype='d', x0=0.0):
+    @classmethod
+    def setup_GPU(cls):
+        """switch to GPU modules"""
+        import cupy as cp
+        from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh
+
+        cls.xp = cp
+
+        cls.dtype_u = cupy_mesh
+        cls.dtype_f = imex_cupy_mesh
+
+        cls.fft_backend = 'cupy'
+        cls.fft_comm_backend = 'NCCL'
+
+    def __init__(
+        self, nvars=None, spectral=False, L=2 * np.pi, alpha=1.0, comm=MPI.COMM_WORLD, dtype='d', useGPU=False, x0=0.0
+    ):
         """Initialization routine"""
+
+        if useGPU:
+            self.setup_GPU()
 
         if nvars is None:
             nvars = (128, 128)
@@ -59,7 +80,15 @@ class IMEX_Laplacian_MPIFFT(ptype):
         # Creating FFT structure
         self.ndim = len(nvars)
         axes = tuple(range(self.ndim))
-        self.fft = PFFT(comm, list(nvars), axes=axes, dtype=dtype, collapse=True)
+        self.fft = PFFT(
+            comm,
+            list(nvars),
+            axes=axes,
+            dtype=dtype,
+            collapse=True,
+            backend=self.fft_backend,
+            comm_backend=self.fft_comm_backend,
+        )
 
         # get test data to figure out type and dimensions
         tmp_u = newDistArray(self.fft, spectral)
