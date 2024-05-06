@@ -42,7 +42,7 @@ For more information see the documentation of pytest on [test discovery](<https:
 
 To run the tests of all projects in parallel, the projects are explicitly mentioned in the CI-file.
 In order to run the tests of your project, please add the name of your project **as your directory is named**
-in the [CI-File](./../../.github/workflows/ci_pipeline.yml)
+in the [CI-File](<https://github.com/Parallel-in-Time/pySDC/blob/master/.github/workflows/ci_pipeline.yml>)
 in the job `project_cpu_tests_linux` in the list `strategy/matrix/env`.
 
 ## Getting a DOI of pySDC for publication
