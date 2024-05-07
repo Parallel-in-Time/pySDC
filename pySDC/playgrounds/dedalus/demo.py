@@ -15,7 +15,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 
 coords = d3.CartesianCoordinates('x')
 dist = d3.Distributor(coords, dtype=np.float64)
-xbasis = d3.RealFourier(coords['x'], size=16, bounds=(0, 2*np.pi))
+xbasis = d3.RealFourier(coords['x'], size=64, bounds=(0, 2*np.pi))
 u = dist.Field(name='u', bases=xbasis)
 
 # Initial solution
@@ -25,8 +25,8 @@ u0 = np.sum([np.cos(k*x) for k in listK], axis=0)
 np.copyto(u['g'], u0)
 
 plt.figure('Initial solution')
-plt.plot(u['g'], label='Real space')
-plt.plot(u['c'], 'o', label='Coefficient space')
+plt.plot(u['g'], label='Real space (u0)')
+plt.plot(u['c'], 'o', label='Coefficient space (u0)')
 plt.legend()
 plt.grid()
 
@@ -37,11 +37,11 @@ problem.add_equation("dt(u) + dx(u) = 0")
 
 nSweeps = 3
 nNodes = 4
-tEnd = 0.1
-nSteps = 1
+tEnd = 1
+nSteps = 10
+dt = tEnd / nSteps
 
-
-# pySDC controler settings
+# pySDC controller settings
 description = {
     # Sweeper and its parameters
     "sweeper_class": DedalusSweeperIMEX,
@@ -61,6 +61,7 @@ description = {
     },
     # Level parameters
     "level_params": {
+        "dt": dt,
         "restol": -1,
         "nsweeps": nSweeps,
     },
@@ -71,21 +72,16 @@ description = {
     }
 }
 
-dt = tEnd / nSteps
-
 controller = controller_nonMPI(
     num_procs=1, controller_params={'logger_level': 30},
     description=description)
 
 prob = controller.MS[0].levels[0].prob
-
-uInit = prob.u_exact(0)
-uTmp = uInit.copy()
-
-uSDC = np.zeros((nSteps + 1, uInit.size), dtype=uInit.dtype)
-uSDC[0] = uInit
+uSol = prob.solver.state
 tVals = np.linspace(0, tEnd, nSteps + 1)
 
 for i in range(nSteps):
-    uTmp[:] = uSDC[i]
-    uSDC[i + 1], _ = controller.run(u0=uTmp, t0=tVals[i], Tend=tVals[i + 1])
+    uSol, _ = controller.run(u0=uSol, t0=tVals[i], Tend=tVals[i + 1])
+
+plt.plot(uSol[0]['g'], label='pySDC solution (u(t=1))')
+plt.legend()

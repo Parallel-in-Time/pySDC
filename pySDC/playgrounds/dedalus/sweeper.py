@@ -19,6 +19,27 @@ class DedalusSweeperIMEX(sweeper):
         self.QI = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.QI)
         self.QE = self.get_Qdelta_explicit(coll=self.coll, qd_type=self.params.QE)
 
+    def predict(self):
+
+        L = self.level
+        t0, dt, wall_time = L.time, L.dt, 0.0
+
+        P:DedalusProblem = L.prob
+        assert type(P) == DedalusProblem
+        P.firstEval = True
+
+        Fk, LXk = P.F[0], P.LX[0]
+
+        P.evalLX(LXk[0])
+        P.evalF(Fk[0], t0, dt, wall_time)
+        for m in range(1, self.coll.num_nodes):
+            np.copyto(LXk[m].data, LXk[0].data)
+            np.copyto(Fk[m].data, Fk[0].data)
+
+        # indicate that this level is now ready for sweeps
+        L.status.unlocked = True
+        L.status.updated = True
+
 
     def update_nodes(self):
         """
@@ -75,7 +96,7 @@ class DedalusSweeperIMEX(sweeper):
 
             # Solve system and store node solution in solver state
             P.solveAndStoreState(m)
-            L.u[m] = P.stateCopy()
+            L.u[m+1] = P.stateCopy()
 
             # Evaluate and store LX with current state
             P.evalLX(LXk1[m])
@@ -86,36 +107,6 @@ class DedalusSweeperIMEX(sweeper):
         # ie making the new evaluation the old for next iteration
         P.F.rotate()
         P.LX.rotate()
-
-        # # gather all terms which are known already (e.g. from the previous iteration)
-        # # this corresponds to u0 + QF(u^k) - QIFI(u^k) - QEFE(u^k) + tau
-
-        # # get QF(u^k)
-        # integral = self.integrate()
-        # for m in range(M):
-        #     # subtract QIFI(u^k)_m + QEFE(u^k)_m
-        #     for j in range(1, M + 1):
-        #         integral[m] -= L.dt * (self.QI[m + 1, j] * L.f[j].impl + self.QE[m + 1, j] * L.f[j].expl)
-        #     # add initial value
-        #     integral[m] += L.u[0]
-        #     # add tau if associated
-        #     if L.tau[m] is not None:
-        #         integral[m] += L.tau[m]
-
-        # # do the sweep
-        # for m in range(0, M):
-        #     # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
-        #     rhs = P.dtype_u(integral[m])
-        #     for j in range(1, m + 1):
-        #         rhs += L.dt * (self.QI[m + 1, j] * L.f[j].impl + self.QE[m + 1, j] * L.f[j].expl)
-
-        #     # implicit solve with prefactor stemming from QI
-        #     L.u[m + 1] = P.solve_system(
-        #         rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m]
-        #     )
-
-        #     # update function values
-        #     L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
         # indicate presence of new values at this level
         L.status.updated = True
