@@ -20,21 +20,36 @@ class DedalusSweeperIMEX(sweeper):
         self.QE = self.get_Qdelta_explicit(coll=self.coll, qd_type=self.params.QE)
 
     def predict(self):
+        """Copy for now ..."""
 
         L = self.level
-        t0, dt, wall_time = L.time, L.dt, 0.0
+        t0, dt = L.time, L.dt
+        qI = self.QI[1:, 1:]
 
         P:DedalusProblem = L.prob
         assert type(P) == DedalusProblem
+        assert self.coll.num_nodes == P.M
+
         P.firstEval = True
+        P.solver.sim_time = t0
+        P.solver.dt = dt
+
+        # for f0, f in zip(L.u[0], P.solver.state):
+        #     np.copyto(f.data, f0.data)
+
+        P.updateLHS(dt, qI)
+        P.computeMX0()
 
         Fk, LXk = P.F[0], P.LX[0]
-
         P.evalLX(LXk[0])
-        P.evalF(Fk[0], t0, dt, wall_time)
-        for m in range(1, self.coll.num_nodes):
+        P.evalF(t0, Fk[0])
+        for m in range(1, P.M):
             np.copyto(LXk[m].data, LXk[0].data)
             np.copyto(Fk[m].data, Fk[0].data)
+
+        # additional stuff for pySDC, which stores solution at each nodes
+        # for m in range(1, self.coll.num_nodes + 1):
+        #     L.u[m] = P.stateCopy()
 
         # indicate that this level is now ready for sweeps
         L.status.unlocked = True
@@ -47,30 +62,23 @@ class DedalusSweeperIMEX(sweeper):
         """
         # get current level and problem description
         L = self.level
-        P:DedalusProblem = L.prob
-        assert type(P) == DedalusProblem
-        P.firstEval = True
-        solver = P.solver
-
         # only if the level has been touched before
         assert L.status.unlocked
+
+        t0, dt = L.time, L.dt
+        tau, qI, qE, q = self.coll.nodes, self.QI[1:, 1:], self.QE[1:, 1:], self.coll.Qmat[1:, 1:]
+
+        P:DedalusProblem = L.prob
+        assert type(P) == DedalusProblem
 
         # get number of collocation nodes for easier access
         M = self.coll.num_nodes
         assert M == P.M
 
-        solver.state = L.u[0]
-
-
         # Attribute references
-        tau, qI, qE, q = self.coll.nodes, self.QI[1:, 1:], self.QE[1:, 1:], self.coll.Qmat[1:, 1:]
-        t0, dt, wall_time = L.time, L.dt, 0.0
         RHS, MX0 = P.RHS, P.MX0
         Fk, LXk, Fk1, LXk1 = P.F[0], P.LX[0], P.F[1], P.LX[1]
         axpy = P.axpy
-
-        P.updateLHS(dt, qI)
-        P.computeMX0(solver.state, MX0)
 
         # Loop on all quadrature nodes
         for m in range(M):
@@ -96,12 +104,14 @@ class DedalusSweeperIMEX(sweeper):
 
             # Solve system and store node solution in solver state
             P.solveAndStoreState(m)
-            L.u[m+1] = P.stateCopy()
 
             # Evaluate and store LX with current state
             P.evalLX(LXk1[m])
             # Evaluate and store F(X, t) with current state
-            P.evalF(Fk1[m], t0+dt*tau[m], dt, wall_time)
+            P.evalF(t0+dt*tau[m], Fk1[m])
+
+            # Update u for pySDC
+            # L.u[m+1] = P.stateCopy()
 
         # Inverse position for iterate k and k+1 in storage
         # ie making the new evaluation the old for next iteration
@@ -124,12 +134,13 @@ class DedalusSweeperIMEX(sweeper):
 
         # get current level and problem description
         L = self.level
-        P = L.prob
+        t0, dt = L.time, L.dt
+        P:DedalusProblem = L.prob
 
         # check if Mth node is equal to right point and do_coll_update is false, perform a simple copy
         if self.coll.right_is_node and not self.params.do_coll_update:
             # a copy is sufficient
-            L.uend = [f.copy() for f in L.u[-1]]
+            L.uend = P.state
         else:
             raise NotImplementedError()
             # start with u0 and add integral over the full interval (using coll.weights)
@@ -140,4 +151,5 @@ class DedalusSweeperIMEX(sweeper):
             if L.tau[-1] is not None:
                 L.uend += L.tau[-1]
 
-        return None
+        P.solver.sim_time = t0 + dt
+        P.firstEval = True

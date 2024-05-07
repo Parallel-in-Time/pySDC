@@ -17,7 +17,7 @@ from dedalus.tools.array import apply_sparse
 
 
 def State(cls, fields):
-    return [f.copy() for f in fields]
+    return fields
 
 
 class DedalusProblem(ptype):
@@ -64,19 +64,25 @@ class DedalusProblem(ptype):
                 sp.M_solver = solver.matsolver(sp.LHS, solver)
         self.collUpdate = collUpdate
 
+    @property
+    def state(self):
+        return self.solver.state
+
     def stateCopy(self):
-        return [u.copy() for u in self.solver.state]
+        return [f.copy() for f in self.solver.state]
 
 
-    def computeMX0(self, state, MX0):
+    def computeMX0(self):
         """
         Compute MX0 term used in RHS of both initStep and sweep methods
 
         Update the MX0 attribute of the timestepper object.
         """
+        MX0 = self.MX0
+        state = self.solver.state
+
         self.evaluator.require_coeff_space(state)
         # Compute and store MX0
-        MX0.data.fill(0)
         for sp in self.subproblems:
             spX = sp.gather_inputs(state)
             apply_sparse(sp.M_min, spX, axis=0, out=MX0.get_subdata(sp))
@@ -105,7 +111,7 @@ class DedalusProblem(ptype):
         # Update LHS and LHS solvers for each subproblems
         for sp in solver.subproblems:
             if self.init:
-                # Eventually instanciate list of solver (ony first time step)
+                # Eventually instanciate list of solvers (ony first time step)
                 sp.LHS_solvers = [None] * self.M
                 self.init = False
             for i in range(self.M):
@@ -132,17 +138,14 @@ class DedalusProblem(ptype):
         None.
 
         """
-        # Attribute references
-        solver = self.solver
-
-        self.evaluator.require_coeff_space(solver.state)
+        self.evaluator.require_coeff_space(self.solver.state)
         # Evaluate matrix vector product and store
-        for sp in solver.subproblems:
-            spX = sp.gather_inputs(solver.state)
+        for sp in self.solver.subproblems:
+            spX = sp.gather_inputs(self.solver.state)
             apply_sparse(sp.L_min, spX, axis=0, out=LX.get_subdata(sp))
 
 
-    def evalF(self, F, time, dt, wall_time):
+    def evalF(self, time, F):
         """
         Evaluate the F operator from the current solver state
 
@@ -156,21 +159,15 @@ class DedalusProblem(ptype):
             Time of evaluation.
         F : dedalus.core.system.CoeffSystem
             Where to store the evaluated fields.
-        dt : float
-            Current time step.
-        wall_time : float
-            Current wall time.
         """
-
         solver = self.solver
-
         # Evaluate non linear term on current state
         t0 = solver.sim_time
         solver.sim_time = time
         if self.firstEval:
             solver.evaluator.evaluate_scheduled(
-                wall_time=wall_time, timestep=dt, sim_time=time,
-                iteration=solver.iteration)
+                sim_time=time, timestep=solver.dt,
+                iteration=0, wall_time=0)
             self.firstEval = False
         else:
             solver.evaluator.evaluate_group('F')
@@ -180,7 +177,7 @@ class DedalusProblem(ptype):
         # Put back initial solver simulation time
         solver.sim_time = t0
 
-    def solveAndStoreState(self, iNode):
+    def solveAndStoreState(self, m):
         """
         Solve LHS * X = RHS using the LHS associated to a given node,
         and store X into the solver state.
@@ -188,7 +185,7 @@ class DedalusProblem(ptype):
 
         Parameters
         ----------
-        iNode : int
+        m : int
             Index of the nodes.
         """
         # Attribute references
@@ -202,5 +199,5 @@ class DedalusProblem(ptype):
         for sp in solver.subproblems:
             # Slice out valid subdata, skipping invalid components
             spRHS = RHS.get_subdata(sp)
-            spX = sp.LHS_solvers[iNode].solve(spRHS)  # CREATES TEMPORARY
+            spX = sp.LHS_solvers[m].solve(spRHS)  # CREATES TEMPORARY
             sp.scatter_inputs(spX, solver.state)
