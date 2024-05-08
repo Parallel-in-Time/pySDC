@@ -68,10 +68,10 @@ jobs:
           coverage combine
           mv .coverage coverage_${{ matrix.env }}_${{ matrix.python }}.dat
       - name: Uploading artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: matrix.python == '3.10'
         with:
-          name: cpu-test-artifacts
+          name: cpu-test-artifacts-${{ matrix.env }}
           path: |
             data_3.10
             coverage_${{ matrix.env }}_3.10.dat
@@ -131,10 +131,10 @@ jobs:
           coverage combine
           mv .coverage coverage_${{ matrix.env }}_${{ matrix.python }}.dat
       - name: Uploading artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: matrix.python == '3.10'
         with:
-          name: cpu-test-artifacts
+          name: project-test-artifacts-${{ matrix.env }}
           path: |
             data_3.10
             coverage_${{ matrix.env }}_3.10.dat
@@ -171,7 +171,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: cpu-test-artifacts
+          name: libpressio-test-artifacts
           path: |
             data_libpressio
             coverage_libpressio_3.10.dat
@@ -212,7 +212,7 @@ jobs:
       - name: Uploading artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: cpu-test-artifacts
+          name: monodomain-test-artifacts
           path: |
             data_monodomain
             coverage_monodomain_3.10.dat
@@ -273,9 +273,10 @@ jobs:
         with:
           environment-file: "etc/environment-postprocess.yml"
       - name: Downloading artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: .
+          merge-multiple: true
       - name: Prepare artifacts
         run: |
           ls -artl cpu-test-artifacts
