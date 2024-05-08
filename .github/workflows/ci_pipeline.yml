@@ -68,7 +68,7 @@ jobs:
           coverage combine
           mv .coverage coverage_${{ matrix.env }}_${{ matrix.python }}.dat
       - name: Uploading artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         if: matrix.python == '3.10'
         with:
           name: cpu-test-artifacts
@@ -131,7 +131,7 @@ jobs:
           coverage combine
           mv .coverage coverage_${{ matrix.env }}_${{ matrix.python }}.dat
       - name: Uploading artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         if: matrix.python == '3.10'
         with:
           name: cpu-test-artifacts
