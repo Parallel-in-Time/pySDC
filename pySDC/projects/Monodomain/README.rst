@@ -61,9 +61,9 @@ We display here the stability domain of the ESDC and SDC methods, both with IMEX
 with :math:`\lambda_I,\lambda_E,\lambda_e` representing :math:`f_I,f_E,f_e`, respectively.
 We fix :math:`\lambda_E=-1` and vary the stiff terms :math:`\lambda_I,\lambda_e` only. We see that the ESDC method is stable for all tested values of :math:`\lambda_I,\lambda_e`, while SDC is not.
 
-.. image:: ../../../data/stability_domain_IMEXEXP_EXPRK.png
+.. image:: ../../../data_monodomain/stability_domain_IMEXEXP_EXPRK.png
    :scale: 60 %
-.. image:: ../../../data/stability_domain_IMEXEXP.png
+.. image:: ../../../data_monodomain/stability_domain_IMEXEXP.png
    :scale: 60 %
 
 Convergence
@@ -73,7 +73,7 @@ We fix the number of collocation nodes to :math:`m=6` and perform a convergence 
 We use the ten Tusscher-Panfilov ionic model, which is employed in practical applications.
 We see that we gain one order of accuracy per sweep, as expected. 
 
-.. image:: ../../../data/convergence_ESDC_fixed_iter.png
+.. image:: ../../../data_monodomain/convergence_ESDC_fixed_iter.png
    :scale: 100 %
 
 
@@ -88,7 +88,7 @@ Here we consider three methods:
 We display the number of iterations required by each method to reach a given tolerance and the residual at convergence. As ionic model we use again the ten Tusscher-Panfilov model.
 We see that PFASST requires a reasonalbly small number of iterations, comparable to the serial counterparts ESDC and MLESDC.
 
-.. image:: ../../../data/niter_VS_time.png
+.. image:: ../../../data_monodomain/niter_VS_time.png
    :scale: 100 %
-.. image:: ../../../data/res_VS_time.png
+.. image:: ../../../data_monodomain/res_VS_time.png
    :scale: 100 %
