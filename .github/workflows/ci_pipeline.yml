@@ -45,7 +45,7 @@ jobs:
         shell: bash -l {0}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Conda environment with Micromamba
         uses: mamba-org/setup-micromamba@v1
         with:
@@ -107,7 +107,7 @@ jobs:
         shell: bash -l {0}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Conda environment with Micromamba
         uses: mamba-org/setup-micromamba@v1
         with:
@@ -148,7 +148,7 @@ jobs:
         shell: bash -l {0}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install pySDC and pytest
         run: |
           source /pySDC/pySDC/projects/compression/Docker/install_pySDC.sh
@@ -181,7 +181,7 @@ jobs:
         shell: bash -l {0}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Conda environment with Micromamba
         uses: mamba-org/setup-micromamba@v1
         with:
@@ -229,7 +229,7 @@ jobs:
 #
 #    steps:
 #      - name: Checkout
-#        uses: actions/checkout@v3
+#        uses: actions/checkout@v4
 #
 #      - name: Install Conda environment with Micromamba
 #        uses: mamba-org/setup-micromamba@v1
@@ -265,7 +265,7 @@ jobs:
         shell: bash -l {0}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Conda environment with Micromamba
         uses: mamba-org/setup-micromamba@v1
         with:
@@ -355,13 +355,13 @@ jobs:
 #
 #    steps:
 #      - name: Checkout
-#        uses: actions/checkout@v3
+#        uses: actions/checkout@v4
 #        with:
 #          fetch-depth: 0
 #          ref: ${{ github.event.pull_request.head.sha }}
 #
 #      - name: Checkout benchmark repository
-#        uses: actions/checkout@v3
+#        uses: actions/checkout@v4
 #        if: ${{ github.event_name == 'push' }}
 #        with:
 #          repository: Parallel-in-Time/pySDC-benchmarks
