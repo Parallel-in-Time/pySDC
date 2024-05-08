@@ -1,3 +1,5 @@
+---
+
 name: CI pipeline for pySDC
 
 on:
@@ -10,74 +12,60 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
-
     env:
       YML: 'etc/environment-lint.yml'
-
     defaults:
       run:
         shell: bash -l {0}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-
       - name: Install Conda environment with Micromamba
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: ${{ env.YML }}
           create-args: >-
               python=3.10
-
       - name: Code reformatting with black
         run: |
           black pySDC  --check --diff --color
-
       - name: Linting with flakeheaven
         run: |
           flakeheaven lint --benchmark pySDC
 
   user_cpu_tests_linux:
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
         env: ['base', 'fenics', 'mpi4py', 'petsc', 'pytorch']
         python: ['3.8', '3.9', '3.10', '3.11', '3.12']
-
     defaults:
       run:
         shell: bash -l {0}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
       - name: Install Conda environment with Micromamba
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: "etc/environment-${{ matrix.env }}.yml"
           create-args: >-
               python=${{ matrix.python }}
-
       - name: Install additional packages as needed
         run: |
           micromamba install -y --file etc/environment-tests.yml --freeze-installed
-
       - name: Run pytest for CPU stuff
         run: |
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
           coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
-
       - name: Make coverage report
         run: |
           mv data data_${{ matrix.python }}
           coverage combine
           mv .coverage coverage_${{ matrix.env }}_${{ matrix.python }}.dat
-
       - name: Uploading artifacts
         uses: actions/upload-artifact@v3
         if: matrix.python == '3.10'
@@ -89,7 +77,6 @@ jobs:
 
   project_cpu_tests_linux:
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
@@ -98,7 +85,6 @@ jobs:
           - AsympConv
           - DAE
           - FastWaveSlowWave
-          # - GPU
           - Hamiltonian
           - matrixPFASST
           - parallelSDC
@@ -116,39 +102,32 @@ jobs:
             python: '3.11'
           - env: parallelSDC
             python: '3.12'
-
     defaults:
       run:
         shell: bash -l {0}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
       - name: Install Conda environment with Micromamba
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: "pySDC/projects/${{ matrix.env }}/environment.yml"
           create-args: >-
               python=${{ matrix.python }}
-
       - name: Install additional packages as needed
         run: |
           micromamba install -y --file etc/environment-tests.yml --freeze-installed
-
       - name: Run pytest for CPU stuff
         run: |
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
           coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/${{ matrix.env }}/tests
-
       - name: Make coverage report
         run: |
           mv data data_${{ matrix.python }}
           coverage combine
           mv .coverage coverage_${{ matrix.env }}_${{ matrix.python }}.dat
-
       - name: Uploading artifacts
         uses: actions/upload-artifact@v3
         if: matrix.python == '3.10'
@@ -160,32 +139,25 @@ jobs:
 
   user_libpressio_tests:
     runs-on: ubuntu-latest
-
     container:
       image: brownbaerchen/libpressio:amd64_2
       volumes:
         - ${{ github.workspace }}:/pySDC
-
     defaults:
       run:
         shell: bash -l {0}
-
     steps:
-           
       - name: Checkout
         uses: actions/checkout@v3
-           
       - name: Install pySDC and pytest
         run: |
           source /pySDC/pySDC/projects/compression/Docker/install_pySDC.sh
-
       - name: Run pytest
         run: |
           source /opt/spack/share/spack/setup-env.sh
           spack load libpressio
            
           coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/compression/tests -m libpressio
-
       - name: Make coverage report
         run: |
           source /opt/spack/share/spack/setup-env.sh
@@ -194,7 +166,6 @@ jobs:
           mv data data_libpressio
           coverage combine
           mv .coverage coverage_libpressio_3.10.dat
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -205,41 +176,37 @@ jobs:
          
   user_monodomain_tests_linux:
     runs-on: ubuntu-latest
-
     defaults:
       run:
         shell: bash -l {0}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
       - name: Install Conda environment with Micromamba
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: "pySDC/projects/Monodomain/etc/environment-monodomain.yml"
           create-args: >-
               python=3.10
-
       - name: Compile C++ ionic models
         env:
           IONIC_MODELS_PATH: "pySDC/projects/Monodomain/problem_classes/ionicmodels/cpp"
-        run: |
-          c++ -O3 -Wall -shared -std=c++11 -fPIC -fvisibility=hidden $(python3 -m pybind11 --includes) ${IONIC_MODELS_PATH}/bindings_definitions.cpp -o ${IONIC_MODELS_PATH}/ionicmodels$(python3-config --extension-suffix)
-      
+        run: >
+          c++ -O3 -Wall -shared -std=c++11 -fPIC -fvisibility=hidden
+          $(python3 -m pybind11 --includes)
+          ${IONIC_MODELS_PATH}/bindings_definitions.cpp
+          -o ${IONIC_MODELS_PATH}/ionicmodels$(python3-config --extension-suffix)
       - name: Run pytest for CPU stuff
         run: |
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
           coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/Monodomain/tests -m monodomain
-
       - name: Make coverage report
         run: |
           mv data data_monodomain
           coverage combine
           mv .coverage coverage_monodomain_3.10.dat
-
       - name: Uploading artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -285,9 +252,7 @@ jobs:
 
   post-processing:
     runs-on: ubuntu-latest
-
     if: ${{ github.repository_owner == 'Parallel-in-Time'}}
-
     needs:
       - lint
       - user_cpu_tests_linux
@@ -295,25 +260,20 @@ jobs:
       - user_libpressio_tests
       - user_monodomain_tests_linux
 #       - wait_for_gitlab
-
     defaults:
       run:
         shell: bash -l {0}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
       - name: Install Conda environment with Micromamba
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: "etc/environment-postprocess.yml"
-
       - name: Downloading artifacts
         uses: actions/download-artifact@v3
         with:
           path: .
-
       - name: Prepare artifacts
         run: |
           ls -artl cpu-test-artifacts
@@ -321,12 +281,10 @@ jobs:
           python -m coverage combine cpu-test-artifacts/coverage_*_3.10.dat
           python -m coverage xml
           python -m coverage html
-
       - name: Generate Coverage badge
         run: |
           pip install genbadge[all]
           genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
-          
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         
@@ -372,10 +330,12 @@ jobs:
         with:
           name: docs
           path: docs/build/html
-
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
-        if: ${{ github.event_name == 'push' && github.repository_owner == 'Parallel-in-Time' && github.ref == 'refs/heads/master' }}
+        if: >-
+          ${{ github.event_name == 'push'
+          && github.repository_owner == 'Parallel-in-Time'
+          && github.ref == 'refs/heads/master' }}
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: docs/build/html # The folder the action should deploy.
