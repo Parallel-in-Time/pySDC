@@ -71,7 +71,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: matrix.python == '3.10'
         with:
-          name: cpu-test-artifacts-${{ matrix.env }}
+          name: test-artifacts-cpu-${{ matrix.env }}
           path: |
             data_3.10
             coverage_${{ matrix.env }}_3.10.dat
@@ -134,7 +134,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: matrix.python == '3.10'
         with:
-          name: project-test-artifacts-${{ matrix.env }}
+          name: test-artifacts-project-${{ matrix.env }}
           path: |
             data_3.10
             coverage_${{ matrix.env }}_3.10.dat
@@ -171,7 +171,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: libpressio-test-artifacts
+          name: test-artifacts-libpressio
           path: |
             data_libpressio
             coverage_libpressio_3.10.dat
@@ -212,7 +212,7 @@ jobs:
       - name: Uploading artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: monodomain-test-artifacts
+          name: test-artifacts-monodomain
           path: |
             data_monodomain
             coverage_monodomain_3.10.dat
@@ -279,9 +279,8 @@ jobs:
           merge-multiple: true
       - name: Prepare artifacts
         run: |
-          ls -artl cpu-test-artifacts
-          cp cpu-test-artifacts/data_3.10/* data/.
-          python -m coverage combine cpu-test-artifacts/coverage_*_3.10.dat
+          cp test-artifacts-*/data_3.10/* data/.
+          python -m coverage combine test-artifacts-*/coverage_*_3.10.dat
           python -m coverage xml
           python -m coverage html
       - name: Generate Coverage badge
