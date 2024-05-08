@@ -15,17 +15,16 @@ from sweeper import DedalusSweeperIMEX
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 
-from dedalus.core.field import Field
 # Parameters
-Lx = 5
-Nx = 256
+Lx = 10
+Nx = 1024
 a = 1e-4
 b = 2e-4
 dealias = 3/2
 dtype = np.float64
 
-tEnd = 2
-nSteps = 2000
+tEnd = 10
+nSteps = 10000
 
 
 # Bases
@@ -41,7 +40,7 @@ dx = lambda A: d3.Differentiate(A, xcoord)
 
 # Problem
 problem = d3.IVP([u], namespace=locals())
-problem.add_equation("dt(u) = - dx(u)")
+problem.add_equation("dt(u) - a*dx(dx(u)) - b*dx(dx(dx(u))) = - u*dx(u)")
 
 # Initial conditions
 x = dist.local_grid(xbasis)
@@ -50,7 +49,7 @@ u['g'] = np.log(1 + np.cosh(n)**2/np.cosh(n*(x-0.2*Lx))**2) / (2*n)
 
 # pySDC parameters
 dt = tEnd / nSteps
-nSweeps = 4
+nSweeps = 1
 nNodes = 4
 
 description = {
@@ -103,7 +102,8 @@ for i in range(nSteps):
     print(f"step {i+1}/{nSteps}")
     uSol, _ = controller.run(u0=uSol, t0=tVals[i], Tend=tVals[i + 1])
     if (i+1) % 25 == 0:
-        u_list.append(np.copy(u['g'][:size]))
+        u.change_scales(1)
+        u_list.append(np.copy(u['g']))
         t_list.append(tVals[i])
 
 
@@ -116,5 +116,3 @@ plt.xlabel('x')
 plt.ylabel('t')
 plt.title(f'KdV-Burgers, (a,b)=({a},{b})')
 plt.tight_layout()
-plt.savefig('kdv_burgers.pdf')
-plt.savefig('kdv_burgers.png', dpi=200)

@@ -14,6 +14,7 @@ import dedalus.public as d3
 from dedalus.core.system import CoeffSystem
 from dedalus.core.evaluator import Evaluator
 from dedalus.tools.array import apply_sparse
+from dedalus.core.field import Field
 
 
 def State(cls, fields):
@@ -33,6 +34,8 @@ class DedalusProblem(ptype):
             self.solver = solver
 
     def __init__(self, problem:d3.IVP, nNodes, collUpdate=False):
+
+        self.DedalusTimeStepper.stages = nNodes
         solver = problem.build_solver(self.DedalusTimeStepper)
         self.solver = solver
 
@@ -79,9 +82,12 @@ class DedalusProblem(ptype):
         Update the MX0 attribute of the timestepper object.
         """
         MX0 = self.MX0
-        state = self.solver.state
+        state:list[Field] = self.solver.state
 
-        self.evaluator.require_coeff_space(state)
+        # Require coefficient space
+        for f in state:
+            f.require_coeff_space()
+
         # Compute and store MX0
         for sp in self.subproblems:
             spX = sp.gather_inputs(state)
@@ -138,7 +144,11 @@ class DedalusProblem(ptype):
         None.
 
         """
-        self.evaluator.require_coeff_space(self.solver.state)
+        state:list[Field] = self.solver.state
+        # Require coefficient space
+        for f in state:
+            f.require_coeff_space()
+
         # Evaluate matrix vector product and store
         for sp in self.solver.subproblems:
             spX = sp.gather_inputs(self.solver.state)

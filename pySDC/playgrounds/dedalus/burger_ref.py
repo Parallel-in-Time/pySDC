@@ -19,15 +19,21 @@ import dedalus.public as d3
 import logging
 logger = logging.getLogger(__name__)
 
+from sdc import SpectralDeferredCorrectionIMEX
+
+SpectralDeferredCorrectionIMEX.setParameters(
+    nSweep=1, M=4)
+
+useSDC = True
 
 # Parameters
-Lx = 5
-Nx = 256
+Lx = 10
+Nx = 1024
 a = 1e-4
 b = 2e-4
 dealias = 3/2
-stop_sim_time = 2
-timestepper = d3.SBDF2
+stop_sim_time = 10
+timestepper = SpectralDeferredCorrectionIMEX if useSDC else d3.SBDF2
 timestep = 1e-3
 dtype = np.float64
 
@@ -44,7 +50,7 @@ dx = lambda A: d3.Differentiate(A, xcoord)
 
 # Problem
 problem = d3.IVP([u], namespace=locals())
-problem.add_equation("dt(u) = - dx(u)")
+problem.add_equation("dt(u) - a*dx(dx(u)) - b*dx(dx(dx(u))) = - u*dx(u)")
 
 # Initial conditions
 x = dist.local_grid(xbasis)
@@ -59,6 +65,7 @@ solver.stop_sim_time = stop_sim_time
 u.change_scales(1)
 u_list = [np.copy(u['g'])]
 t_list = [solver.sim_time]
+i = 0
 while solver.proceed:
     solver.step(timestep)
     if solver.iteration % 100 == 0:
@@ -67,6 +74,7 @@ while solver.proceed:
         u.change_scales(1)
         u_list.append(np.copy(u['g']))
         t_list.append(solver.sim_time)
+    i += 1
 
 # Plot
 plt.figure(figsize=(6, 4))
@@ -77,5 +85,3 @@ plt.xlabel('x')
 plt.ylabel('t')
 plt.title(f'KdV-Burgers, (a,b)=({a},{b})')
 plt.tight_layout()
-plt.savefig('kdv_burgers.pdf')
-plt.savefig('kdv_burgers.png', dpi=200)

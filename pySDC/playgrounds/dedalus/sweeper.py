@@ -37,6 +37,11 @@ class DedalusSweeperIMEX(sweeper):
         # for f0, f in zip(L.u[0], P.solver.state):
         #     np.copyto(f.data, f0.data)
 
+        # for f in P.solver.state:
+        #     f.change_scales(f.domain.dealias)
+        # P.solver.evaluator.require_grid_space(P.solver.state)
+        # P.solver.evaluator.require_coeff_space(P.solver.state)
+
         P.updateLHS(dt, qI)
         P.computeMX0()
 
