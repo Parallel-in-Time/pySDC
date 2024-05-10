@@ -74,7 +74,7 @@ Since the derivative :math:`u'(t)` cannot be isolated the Picard formulation use
      F\left(u_0+\int_0^tU(\tau)d\tau, U(t), t\right) = 0.
   \end{eqnarray}
 
-The solution :math:`u(t)` can then be recovered using an quadrature step. This approach is also called the _yp-formulation_.
+The solution :math:`u(t)` can then be recovered using an quadrature step. This approach is also called the *yp-formulation*.
 
 Based on this equation and an initial approximate solution :math:`\tilde{U}`, the following error equation is formed 
 
