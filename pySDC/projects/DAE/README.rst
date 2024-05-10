@@ -66,7 +66,7 @@ A fully implicit representation of a system of differential equations takes the 
 
 A special case of such an implicit differential equation arises when the Jacobian :math:`\partial_{u'}F` is singular. This implies that the derivative of some of the components of :math:`u(t)` do not appear in the system of equations. The system is thus denoted a differential algebraic system of equations. 
 
-Since the derivative :math:`u'(t)` cannot be isolated the Picard formulation used in SDC for ordinary differential algebraic equations (ODEs) cannot be used here. Instead the derivative, henceforth denoted by :math:`U(t)`, is cast as the new unknown solution and the implicit system of equations is written as 
+Since the derivative :math:`u'(t)` cannot be isolated the Picard formulation used in SDC for ordinary differential equations (ODEs) cannot be used here. Instead the derivative, henceforth denoted by :math:`U(t)`, is cast as the new unknown solution and the implicit system of equations is written as 
 
 .. math::
   
@@ -148,8 +148,8 @@ Let us consider the fully-implicit DAE
 
 .. math::
 
-  y' (t) + \eta t z' (t) + (1 + \eta) z (t) &= g (t) \\
-  y (t) + \eta t z (t) &= f (t)
+  y' (t) + \eta t z' (t) + (1 + \eta) z (t) &= \cos (t) \\
+  y (t) + \eta t z (t) &= \sin (t)
 
 which is of the general form
 
