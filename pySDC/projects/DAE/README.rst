@@ -168,7 +168,7 @@ The imports
     from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
     from pySDC.implementations.datatype_classes.mesh import mesh
 
-are necessary for implementing this problem. We start with implementing the class (can also be found `here <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/DAE/problems/simple_DAE.py#L214>`_) and their constructor:
+are necessary for implementing this problem. We start with implementing the class (can also be found `here <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/DAE/problems/simple_DAE.py#L214>`_):
 
 .. code-block:: python
 
@@ -196,6 +196,51 @@ are necessary for implementing this problem. We start with implementing the clas
             super().__init__(nvars=2, newton_tol=newton_tol)
             self._makeAttributeAndRegister('eta', localVars=locals())
 
+        def eval_f(self, u, du, t):
+            """
+            Routine to evaluate right-hand side of DAE.
+
+            Parameters
+            ----------
+            u : dtype_u
+                Current values of the numerical solution at time t.
+            du : dtype_u
+                Current values of the derivative of the numerical solution at time t.
+            t : float
+                Current time of the numerical solution.
+
+            Returns
+            -------
+            f : dtype_f
+                Current value of the right-hand side of f.
+            """
+
+            f = self.dtype_f(self.init)
+            f[:] = (
+                u[0] + self.eta * t * u[1] - np.sin(t),
+                du[0] + self.eta * t * du[1] + (1 + self.eta) * u[1] - np.cos(t),
+            )
+            return f
+
+        def u_exact(self, t):
+            """
+            Routine for the exact solution.
+
+            Parameters
+            ----------
+            t : float
+                The time of the reference solution.
+
+            Returns
+            -------
+
+            me : dtype_u
+                The reference solution as mesh object containing two components.
+            """
+            me = self.dtype_u(self.init)
+            me[:] = (np.sin(t), 0)
+            return me
+
 The problem class inherits from the parent ``ptype_dae`` that
 has the ``solve_system`` method solving the (non)-linear system to find the root, i.e., updating the value of the unknown derivative. All DAE problem classes should therefore inherit from this class.
 For this general type of DAEs the datatype ``mesh`` is used here for both, ``u`` and ``f``.
@@ -203,59 +248,9 @@ Further, the constructor requires at least the parameter ``newton_tol`` (the tol
 Possibly other problem-specific parameters are needed. Our example class also needs a constant ``eta`` set to :math:`1` and storing it as an attribute using ``self._makeAttributeAndRegister('eta', localVars=locals())``.
 The system of DAEs consists of two equations, i.e., two unknowns. Thus, the number of variables ``nvars`` needs to be set to :math:`2`.
 
-Implementing this system of equations the problem class also requires the ``eval_f`` method of the form
+Implementing this system of equations the problem class also requires the ``eval_f`` method. As it can be seen, the method returns the right-hand side function :math:`F` of the DAE in the way to have a function for which the root is sought.
 
-.. code-block:: python
-
-    def eval_f(self, u, du, t):
-        """
-        Routine to evaluate right-hand side of DAE.
-
-        Parameters
-        ----------
-        u : dtype_u
-            Current values of the numerical solution at time t.
-        du : dtype_u
-            Current values of the derivative of the numerical solution at time t.
-        t : float
-            Current time of the numerical solution.
-
-        Returns
-        -------
-        f : dtype_f
-            Current value of the right-hand side of f.
-        """
-
-        f = self.dtype_f(self.init)
-        f[:] = (
-            u[0] + self.eta * t * u[1] - np.sin(t),
-            du[0] + self.eta * t * du[1] + (1 + self.eta) * u[1] - np.cos(t),
-        )
-        return f
-
-As it can be seen, the method returns the right-hand side function :math:`F` of the DAE in the way to have a function for which the root is sought.
-
-Since the exact solution is known for this problem, the method ``u_exact`` returns it for each time `t`:
-
-.. code-block:: python
-
-    """
-    Routine for the exact solution.
-
-    Parameters
-    ----------
-    t : float
-        The time of the reference solution.
-
-    Returns
-    -------
-
-    me : dtype_u
-        The reference solution as mesh object containing two components.
-    """
-    me = self.dtype_u(self.init)
-    me[:] = (np.sin(t), 0)
-    return me
+Since the exact solution is known for this problem, the method ``u_exact`` returns it for each time `t`.
 
 The second large class of DAEs is the one of semi-explicit form
 
@@ -274,16 +269,14 @@ We want to implement such an equation and consider the example
   0 &= (t + 2) u_1 (t) + (t^2 - 4) u_2 (t) - (t^2 + t - 2) e^t.
 
 This example has two differential variables :math:`u_1`, :math:`u_2` (two differential equations) and one algebraic variable :math:`z` (thus one algebraic equation).
-In ``pySDC`` defining a problem class for semi-explicit DAEs is slightly different to those of fully-implicit form. For the example the imports
+In ``pySDC`` defining a problem class for semi-explicit DAEs is slightly different to those of fully-implicit form. Additionally to ``numpy`` for the example the imports
 
 .. code-block:: python
-
-    import numpy as np
 
     from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
     from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
 
-are needed. Again, we start with implementing the class and their constructor:
+are needed. Again, we start with implementing the class:
 
 .. code-block:: python
 
@@ -317,7 +310,55 @@ are needed. Again, we start with implementing the class and their constructor:
             super().__init__(nvars=3, newton_tol=newton_tol)
             self._makeAttributeAndRegister('a', localVars=locals())
 
-This problem class inherits again from ``ptype_dae``. In constrast, for the solution ``u`` and the right-hand side of the ``f``
+        def eval_f(self, u, du, t):
+            r"""
+            Routine to evaluate the right-hand side of the problem.
+
+            Parameters
+            ----------
+            u : dtype_u
+                Current values of the numerical solution at time t.
+            du : dtype_u
+                Current values of the derivative of the numerical solution at time t.
+            t : float
+                Current time of the numerical solution.
+
+            Returns
+            -------
+            f : dtype_f
+                Current value of the right-hand side of f.
+            """
+
+            f = self.dtype_f(self.init)
+            f.diff[:2] = (
+                (self.a - 1 / (2 - t)) * u.diff[0] + (2 - t) * self.a * u.alg[0] + (3 - t) / (2 - t) * np.exp(t) - du.diff[0],
+                (1 - self.a) / (t - 2) * u.diff[0] - u.diff[1] + (self.a - 1) * u.alg[0] + 2 * np.exp(t) - du.diff[1],
+            )
+            f.alg[0] = (t + 2) * u.diff[0] + (t**2 - 4) * u.diff[1] - (t**2 + t - 2) * np.exp(t)
+            self.work_counters['rhs']()
+            return f
+
+        def u_exact(self, t):
+            """
+            Routine for the exact solution.
+
+            Parameters
+            ----------
+            t : float
+                The time of the reference solution.
+
+            Returns
+            -------
+            me : dtype_u
+                The reference solution as mesh object containing three components.
+            """
+
+            me = self.dtype_u(self.init)
+            me.diff[:2] = (np.exp(t), np.exp(t))
+            me.alg[0] = -np.exp(t) / (2 - t)
+            return me
+
+This problem class inherits again from ``ptype_dae``. In contrast, for the solution ``u`` and the right-hand side of the ``f``
 a different datatype ``DAEMesh`` is used that allows to separate between the differential variables and the algebraic variables as well
 as for the equations. The tolerance for the root solver is passed with a default value of ``1e-10`` and the number of unknowns is :math:`3`, i.e., ``nvars=3``.
 The problem-specific parameter ``a`` has a default value of ``10.0``.
@@ -331,40 +372,7 @@ The problem-specific parameter ``a`` has a default value of ``10.0``.
 
 can be skipped.
 
-In the ``eval_f`` method the equations and the variables are now separated using the components of the ``DAEMesh``:
-
-.. code-block:: python
-
-    def eval_f(self, u, du, t):
-        r"""
-        Routine to evaluate the right-hand side of the problem.
-
-        Parameters
-        ----------
-        u : dtype_u
-            Current values of the numerical solution at time t.
-        du : dtype_u
-            Current values of the derivative of the numerical solution at time t.
-        t : float
-            Current time of the numerical solution.
-
-        Returns
-        -------
-        f : dtype_f
-            Current value of the right-hand side of f.
-        """
-
-        f = self.dtype_f(self.init)
-        f.diff[:2] = (
-            (self.a - 1 / (2 - t)) * u.diff[0] + (2 - t) * self.a * u.alg[0] + (3 - t) / (2 - t) * np.exp(t) - du.diff[0],
-            (1 - self.a) / (t - 2) * u.diff[0] - u.diff[1] + (self.a - 1) * u.alg[0] + 2 * np.exp(t) - du.diff[1],
-        )
-        f.alg[0] = (t + 2) * u.diff[0] + (t**2 - 4) * u.diff[1] - (t**2 + t - 2) * np.exp(t)
-        self.work_counters['rhs']()
-        return f
-
-Recall that ``eval_f`` returns the right-hand side function so that we have a root problem. However, for this semi-explicit DAE this is not the case, but we can
-change that by rewriting the system to
+In the ``eval_f`` method the equations and the variables are now separated using the components of the ``DAEMesh``. Recall that ``eval_f`` returns the right-hand side function so that we have a root problem. However, for this semi-explicit DAE this is not the case, but we can change that by rewriting the system to
 
 .. math::
 
@@ -375,28 +383,6 @@ In the example above the differential variables are :math:`u_1` and :math:`u_2` 
 The algebraic variable :math:`z` is stored in ``u.alg[0]``. The corresponding derivatives for :math:`u_1` and :math:`u_2` are stored in ``du.diff[0]`` and ``du.diff[1]``.
 It is also possible to separate the differential and algebraic equations by assigning the corresponding equations to ``f.diff[0]`` and ``f.diff[1]``, and ``f.alg[0]``, respectively.
 
-In the same way the method to access the exact solution can be implemented by
-
-.. code-block:: python
-
-    def u_exact(self, t):
-        """
-        Routine for the exact solution.
-
-        Parameters
-        ----------
-        t : float
-            The time of the reference solution.
-
-        Returns
-        -------
-        me : dtype_u
-            The reference solution as mesh object containing three components.
-        """
-
-        me = self.dtype_u(self.init)
-        me.diff[:2] = (np.exp(t), np.exp(t))
-        me.alg[0] = -np.exp(t) / (2 - t)
-        return me
+In the same way the method ``u_exact`` to access the exact solution can be implemented.
 
 The problem class of the example can be found `here <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/DAE/problems/simple_DAE.py#L122>`_.
