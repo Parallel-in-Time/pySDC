@@ -69,3 +69,21 @@ class ptype_dae(ptype):
         me[:] = opt.x.reshape(me.shape)
         self.work_counters['newton'].niter += opt.nfev
         return me
+
+    def du_exact(self, t, **kwargs):
+        r"""
+        Routine for the derivative of the exact solution at time :math:`t \leq 1`.
+        For this problem, the exact solution is piecewise.
+
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
+
+        Returns
+        -------
+        me : dtype_u
+            Derivative of exact solution.
+        """
+
+        raise NotImplementedError('ERROR: problem has to implement du_exact(self, t)!')

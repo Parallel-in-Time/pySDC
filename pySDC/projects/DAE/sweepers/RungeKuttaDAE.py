@@ -39,6 +39,9 @@ class RungeKuttaDAE(RungeKutta):
 
     Note
     ----
+    When using a RK sweeper to simulate a problem make sure the DAE problem class has a ``du_exact`` method since RK methods needs an initial
+    condition for :math:`u'(t_0)` as well.
+
     In order to implement a new RK method for DAEs a new tableau can be added in ``pySDC.implementations.sweeper_classes.Runge_Kutta.py``.
     For example, a new method called ``newRungeKuttaMethod`` with nodes :math:`c=(c_1, c_2, c_3)`, weights :math:`b=(b_1, b_2, b_3)` and
     coefficient matrix
