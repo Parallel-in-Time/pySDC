@@ -593,7 +593,7 @@ class DIRK43(RungeKutta):
 class DIRK43_2(RungeKutta):
     """
     L-stable Diagonally Implicit RK method with four stages of order 3.
-    Taken from https://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods
+    Taken from [here](https://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods).
     """
 
     nodes = np.array([0.5, 2.0 / 3.0, 0.5, 1.0])
