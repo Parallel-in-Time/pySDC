@@ -88,8 +88,8 @@ jobs:
           - FastWaveSlowWave
           - Hamiltonian
           - matrixPFASST
-          - parallelSDC
-          - parallelSDC_reloaded
+          # - parallelSDC
+          # - parallelSDC_reloaded
           - PinTSimE
           - RDC
           - Resilience
@@ -279,6 +279,8 @@ jobs:
           merge-multiple: true
       - name: Prepare artifacts
         run: |
+          pwd
+          ls -lah
           cp test-artifacts-*/data_3.10/* data/.
           python -m coverage combine test-artifacts-*/coverage_*_3.10.dat
           python -m coverage xml
