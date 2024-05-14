@@ -34,6 +34,10 @@ def getTestSetup(problem, sweeper, hook_class):
 
     Parameters
     ----------
+    problem : pySDC.projects.DAE.misc.ptype_dae
+        Problem class.
+    sweeper : pySDC.projects.DAE.sweepers.RungeKuttaDAE
+        Sweeper passed to the controller.
     hook_class : list
         Hook classes to log statistics such as errors.
 
@@ -163,6 +167,8 @@ def testOrderAccuracySemiExplicitIndexTwo(sweeper_name):
     tested for a semi-explicit differential algebraic equation (DAE)
     of index two. Here, order is tested in differential and algebraic
     part.
+
+    Note that order reduction in the algebraic variable is expected.
     """
 
     from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1

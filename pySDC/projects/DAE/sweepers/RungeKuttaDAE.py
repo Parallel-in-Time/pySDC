@@ -39,7 +39,7 @@ class RungeKuttaDAE(RungeKutta):
 
     Note
     ----
-    When using a RK sweeper to simulate a problem make sure the DAE problem class has a ``du_exact`` method since RK methods needs an initial
+    When using a RK sweeper to simulate a problem make sure the DAE problem class has a ``du_exact`` method since RK methods need an initial
     condition for :math:`u'(t_0)` as well.
 
     In order to implement a new RK method for DAEs a new tableau can be added in ``pySDC.implementations.sweeper_classes.Runge_Kutta.py``.
@@ -64,9 +64,9 @@ class RungeKuttaDAE(RungeKutta):
     >>>     matrix[0, 0] = a11
     >>>     matrix[1, :2] = [a21, a22]
     >>>     matrix[2, :] = [a31, a32, a33]
-    >>>     ButcherTabelauClass = ButcherTableau
+    >>>     ButcherTableauClass = ButcherTableau
 
-    The new class ``newRungeKuttaMethodDAE`` can then be used by defining the DAE class inheriting from this base class and class containing
+    The new class ``newRungeKuttaMethodDAE`` can then be used by defining the DAE class inheriting from both, this base class and class containing
     the Butcher tableau:
 
     >>> class newRungeKuttaMethodDAE(RungeKuttaDAE, newRungeKuttaMethod):
