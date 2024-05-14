@@ -13,3 +13,8 @@ dependencies:
   - dill
   - numba
   - cupy
+  - pip
+  - pip:
+    - sphinxemoji
+    - m2r2
+    - genbadge[all]
