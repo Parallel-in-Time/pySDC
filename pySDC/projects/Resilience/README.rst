@@ -9,7 +9,7 @@ The first strategy we try is `Adaptivity <https://github.com/Parallel-in-Time/py
 The second strategy is `Hot Rod <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/Resilience/HotRod.ipynb>`_, which is designed purely as a detector for soft faults.
 
 We have also simulated faults in the van der Pol problem and tried recovering them with the strategies `here <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/Resilience/ResilienceStatistics.ipynb>`_.
-We also experimented with faults in the Lorenz attractor problem `here <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/Resilience/notes/LorenzResilience.md>`_.
+We also experimented with faults in the Lorenz attractor problem. See `Resilience in the Lorenz Attractor <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/Resilience/notes/LorenzResilience.md>`_.
 
 Tests
 -----
