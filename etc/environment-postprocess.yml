@@ -1,3 +1,5 @@
+---
+
 name: pySDC
 channels:
   - conda-forge
@@ -10,3 +12,9 @@ dependencies:
   - matplotlib
   - dill
   - numba
+  - cupy
+  - pip
+  - pip:
+    - sphinxemoji
+    - m2r2
+    - genbadge[all]

@@ -36,7 +36,7 @@ Buck converter
 --------------
 In the test case of the buck converter there are multiple switches in the considered time domain. In the so-called open-loop control, a controller monitors the actual output voltage. It compares the output with a target output voltage. Regularly, after a fixed number of time steps, the duty cycle to control the switching is recalculated based on the error. The simulation illustrates the switching behavior in the simulation: The voltage values settle down between the reference. 
 
-.. image:: ../../../data/buck_model_solution.png
+.. image:: ../../../data/buck_converter_model_solution.png
     :width: 35%
     :align: center
 
