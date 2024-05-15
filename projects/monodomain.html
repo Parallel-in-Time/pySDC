@@ -95,21 +95,9 @@ c++ -O3 -Wall -shared -std=c++11 -fPIC -fvisibility=hidden $(python3 -m pybind11
 \[y'=\lambda_I y+\lambda_E y+\lambda_e y,\]</div>
 <p>with <span class="math notranslate nohighlight">\(\lambda_I,\lambda_E,\lambda_e\)</span> representing <span class="math notranslate nohighlight">\(f_I,f_E,f_e\)</span>, respectively.
 We fix <span class="math notranslate nohighlight">\(\lambda_E=-1\)</span> and vary the stiff terms <span class="math notranslate nohighlight">\(\lambda_I,\lambda_e\)</span> only. We see that the ESDC method is stable for all tested values of <span class="math notranslate nohighlight">\(\lambda_I,\lambda_e\)</span>, while SDC is not.</p>
-<a class="reference internal image-reference" href="../../data/stability_domain_IMEXEXP_EXPRK.png"><img alt="../../data/stability_domain_IMEXEXP_EXPRK.png" src="../../data/stability_domain_IMEXEXP_EXPRK.png" />
-<aside class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">pySDC/projects/Monodomain/README.rst</span>, line 64)</p>
-<p>Cannot scale image!
-  Could not get size from &quot;../../data/stability_domain_IMEXEXP_EXPRK.png&quot;:
-  [Errno 2] No such file or directory: '/home/runner/work/data/stability_domain_IMEXEXP_EXPRK.png'</p>
-</aside>
+<a class="reference internal image-reference" href="../_images/stability_domain_IMEXEXP_EXPRK.png"><img alt="../_images/stability_domain_IMEXEXP_EXPRK.png" src="../_images/stability_domain_IMEXEXP_EXPRK.png" style="width: 327.59999999999997px; height: 255.0px;" />
 </a>
-<a class="reference internal image-reference" href="../../data/stability_domain_IMEXEXP.png"><img alt="../../data/stability_domain_IMEXEXP.png" src="../../data/stability_domain_IMEXEXP.png" />
-<aside class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">pySDC/projects/Monodomain/README.rst</span>, line 66)</p>
-<p>Cannot scale image!
-  Could not get size from &quot;../../data/stability_domain_IMEXEXP.png&quot;:
-  [Errno 2] No such file or directory: '/home/runner/work/data/stability_domain_IMEXEXP.png'</p>
-</aside>
+<a class="reference internal image-reference" href="../_images/stability_domain_IMEXEXP.png"><img alt="../_images/stability_domain_IMEXEXP.png" src="../_images/stability_domain_IMEXEXP.png" style="width: 327.59999999999997px; height: 255.0px;" />
 </a>
 </section>
 <section id="convergence">
@@ -118,13 +106,7 @@ We fix <span class="math notranslate nohighlight">\(\lambda_E=-1\)</span> and va
 We fix the number of collocation nodes to <span class="math notranslate nohighlight">\(m=6\)</span> and perform a convergence experiment fixing the number of sweeps to either <span class="math notranslate nohighlight">\(k=3\)</span> or <span class="math notranslate nohighlight">\(k=6\)</span>.
 We use the ten Tusscher-Panfilov ionic model, which is employed in practical applications.
 We see that we gain one order of accuracy per sweep, as expected.</p>
-<a class="reference internal image-reference" href="../../data/convergence_ESDC_fixed_iter.png"><img alt="../../data/convergence_ESDC_fixed_iter.png" src="../../data/convergence_ESDC_fixed_iter.png" />
-<aside class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">pySDC/projects/Monodomain/README.rst</span>, line 76)</p>
-<p>Cannot scale image!
-  Could not get size from &quot;../../data/convergence_ESDC_fixed_iter.png&quot;:
-  [Errno 2] No such file or directory: '/home/runner/work/data/convergence_ESDC_fixed_iter.png'</p>
-</aside>
+<a class="reference internal image-reference" href="../_images/convergence_ESDC_fixed_iter.png"><img alt="../_images/convergence_ESDC_fixed_iter.png" src="../_images/convergence_ESDC_fixed_iter.png" style="width: 287.0px; height: 183.0px;" />
 </a>
 </section>
 <section id="iterations">
@@ -137,21 +119,9 @@ We see that we gain one order of accuracy per sweep, as expected.</p>
 </ul>
 <p>We display the number of iterations required by each method to reach a given tolerance and the residual at convergence. As ionic model we use again the ten Tusscher-Panfilov model.
 We see that PFASST requires a reasonalbly small number of iterations, comparable to the serial counterparts ESDC and MLESDC.</p>
-<a class="reference internal image-reference" href="../../data/niter_VS_time.png"><img alt="../../data/niter_VS_time.png" src="../../data/niter_VS_time.png" />
-<aside class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">pySDC/projects/Monodomain/README.rst</span>, line 91)</p>
-<p>Cannot scale image!
-  Could not get size from &quot;../../data/niter_VS_time.png&quot;:
-  [Errno 2] No such file or directory: '/home/runner/work/data/niter_VS_time.png'</p>
-</aside>
+<a class="reference internal image-reference" href="../_images/niter_VS_time.png"><img alt="../_images/niter_VS_time.png" src="../_images/niter_VS_time.png" style="width: 269.0px; height: 198.0px;" />
 </a>
-<a class="reference internal image-reference" href="../../data/res_VS_time.png"><img alt="../../data/res_VS_time.png" src="../../data/res_VS_time.png" />
-<aside class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">pySDC/projects/Monodomain/README.rst</span>, line 93)</p>
-<p>Cannot scale image!
-  Could not get size from &quot;../../data/res_VS_time.png&quot;:
-  [Errno 2] No such file or directory: '/home/runner/work/data/res_VS_time.png'</p>
-</aside>
+<a class="reference internal image-reference" href="../_images/res_VS_time.png"><img alt="../_images/res_VS_time.png" src="../_images/res_VS_time.png" style="width: 294.0px; height: 198.0px;" />
 </a>
 </section>
 </section>
