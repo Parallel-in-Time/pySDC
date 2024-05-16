@@ -54,8 +54,8 @@
             </div>
         </aside>
         <h2>
-            <span class="text">12 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">12<span class="text"> run</span></button>
+            <span class="text">18 statements &nbsp;</span>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">18<span class="text"> run</span></button>
             <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">0<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_91faa57f8583c837_AcousticAdvection_1D_FD_imex_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.5.1">coverage.py v7.5.1</a>,
-            created at 2024-05-15 10:34 +0000
+            created at 2024-05-16 14:07 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -135,6 +135,30 @@
     <p class="pln"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">                <span class="nam">type</span><span class="op">=</span><span class="fst">f'</span><span class="fst">work_</span><span class="op">{</span><span class="nam">key</span><span class="op">}</span><span class="fst">'</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t">                <span class="nam">value</span><span class="op">=</span><span class="nam">L</span><span class="op">.</span><span class="nam">prob</span><span class="op">.</span><span class="nam">work_counters</span><span class="op">[</span><span class="nam">key</span><span class="op">]</span><span class="op">.</span><span class="nam">niter</span> <span class="op">-</span> <span class="nam">self</span><span class="op">.</span><span class="nam">__work_last_step</span><span class="op">[</span><span class="nam">step</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">slot</span><span class="op">]</span><span class="op">[</span><span class="nam">level_number</span><span class="op">]</span><span class="op">[</span><span class="nam">key</span><span class="op">]</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t">            <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t56" href="#t56">56</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t"><span class="key">class</span> <span class="nam">LogSDCIterations</span><span class="op">(</span><span class="nam">hooks</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t"><span class="str">    Log the number of SDC iterations between steps.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t61" href="#t61">61</a></span><span class="t"><span class="str">    You can control the name in the stats via the class attribute ``name``.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t64" href="#t64">64</a></span><span class="t">    <span class="nam">name</span> <span class="op">=</span> <span class="str">'k'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t65" href="#t65">65</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t66" href="#t66">66</a></span><span class="t">    <span class="key">def</span> <span class="nam">post_step</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">step</span><span class="op">,</span> <span class="nam">level_number</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t67" href="#t67">67</a></span><span class="t">        <span class="nam">super</span><span class="op">(</span><span class="op">)</span><span class="op">.</span><span class="nam">post_step</span><span class="op">(</span><span class="nam">step</span><span class="op">,</span> <span class="nam">level_number</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t68" href="#t68">68</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t69" href="#t69">69</a></span><span class="t">        <span class="nam">L</span> <span class="op">=</span> <span class="nam">step</span><span class="op">.</span><span class="nam">levels</span><span class="op">[</span><span class="nam">level_number</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t70" href="#t70">70</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">increment_stats</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t71" href="#t71">71</a></span><span class="t">            <span class="nam">process</span><span class="op">=</span><span class="nam">step</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">slot</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t72" href="#t72">72</a></span><span class="t">            <span class="nam">process_sweeper</span><span class="op">=</span><span class="nam">L</span><span class="op">.</span><span class="nam">sweep</span><span class="op">.</span><span class="nam">rank</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t73" href="#t73">73</a></span><span class="t">            <span class="nam">time</span><span class="op">=</span><span class="nam">L</span><span class="op">.</span><span class="nam">time</span> <span class="op">+</span> <span class="nam">L</span><span class="op">.</span><span class="nam">dt</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t74" href="#t74">74</a></span><span class="t">            <span class="nam">level</span><span class="op">=</span><span class="nam">L</span><span class="op">.</span><span class="nam">level_index</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t75" href="#t75">75</a></span><span class="t">            <span class="nam">iter</span><span class="op">=</span><span class="nam">step</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">iter</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t76" href="#t76">76</a></span><span class="t">            <span class="nam">sweep</span><span class="op">=</span><span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">sweep</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t77" href="#t77">77</a></span><span class="t">            <span class="nam">type</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t78" href="#t78">78</a></span><span class="t">            <span class="nam">value</span><span class="op">=</span><span class="nam">step</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">iter</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t79" href="#t79">79</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
@@ -144,7 +168,7 @@
             <a class="nav" href="z_91faa57f8583c837_AcousticAdvection_1D_FD_imex_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.5.1">coverage.py v7.5.1</a>,
-            created at 2024-05-15 10:34 +0000
+            created at 2024-05-16 14:07 +0000
         </p>
     </div>
 </footer>
