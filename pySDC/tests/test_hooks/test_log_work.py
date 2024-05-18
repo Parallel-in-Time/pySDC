@@ -2,7 +2,7 @@ import pytest
 
 
 def run_Lorenz(useMPI, maxiter=4, newton_maxiter=5, num_procs=1):
-    from pySDC.implementations.hooks.log_work import LogWork
+    from pySDC.implementations.hooks.log_work import LogWork, LogSDCIterations
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
     from pySDC.implementations.problem_classes.Lorenz import LorenzAttractor
     from pySDC.helpers.stats_helper import get_sorted
@@ -32,7 +32,7 @@ def run_Lorenz(useMPI, maxiter=4, newton_maxiter=5, num_procs=1):
     # initialize controller parameters
     controller_params = {}
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = LogWork
+    controller_params['hook_class'] = [LogWork, LogSDCIterations]
     controller_params['mssdc_jac'] = False
 
     # fill description dictionary for easy step instantiation
@@ -69,13 +69,16 @@ def run_Lorenz(useMPI, maxiter=4, newton_maxiter=5, num_procs=1):
 
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=num_steps * num_procs * level_params['dt'])
 
+    # print(stats)
     for i in range(num_procs):
         res = {
             key: [me[1] for me in get_sorted(stats, type=key, comm=comm, process=i)]
-            for key in ['work_newton', 'work_rhs']
+            for key in ['work_newton', 'work_rhs', LogSDCIterations.name]
         }
 
         expected = {}
+        expected[LogSDCIterations.name] = maxiter
+
         if i == 0:
             # we evaluate all nodes when beginning the step and then every node except the initial conditions in every iteration
             expected['work_rhs'] = maxiter * sweeper_params['num_nodes'] + sweeper_params['num_nodes'] + 1
