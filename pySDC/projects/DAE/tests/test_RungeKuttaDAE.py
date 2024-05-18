@@ -152,11 +152,11 @@ def testOrderAccuracySemiExplicitIndexOne(sweeper_name):
     )
 
     assert np.isclose(
-        orderDiff, expectedOrderDiff[get_sweeper(sweeper_name).__name__], atol=1e0
-    ), f"Expected order {expectedOrderDiff[get_sweeper(sweeper_name).__name__]} in differential variable, got {orderDiff}"
+        orderDiff, expectedOrderDiff[sweeper_name], atol=1e0
+    ), f"Expected order {expectedOrderDiff[sweeper_name]} in differential variable, got {orderDiff}"
     assert np.isclose(
-        orderAlg, expectedOrderAlg[get_sweeper(sweeper_name).__name__], atol=1e0
-    ), f"Expected order {expectedOrderAlg[get_sweeper(sweeper_name).__name__]} in algebraic variable, got {orderAlg}"
+        orderAlg, expectedOrderAlg[sweeper_name], atol=1e0
+    ), f"Expected order {expectedOrderAlg[sweeper_name]} in algebraic variable, got {orderAlg}"
 
 
 @pytest.mark.base
@@ -237,11 +237,11 @@ def testOrderAccuracySemiExplicitIndexTwo(sweeper_name):
     )
 
     assert np.isclose(
-        orderDiff, expectedOrderDiff[get_sweeper(sweeper_name).__name__], atol=1e0
-    ), f"Expected order {expectedOrderDiff[get_sweeper(sweeper_name).__name__]} in differential variable, got {orderDiff}"
+        orderDiff, expectedOrderDiff[sweeper_name], atol=1e0
+    ), f"Expected order {expectedOrderDiff[sweeper_name]} in differential variable, got {orderDiff}"
     assert np.isclose(
-        orderAlg, expectedOrderAlg[get_sweeper(sweeper_name).__name__], atol=1e0
-    ), f"Expected order {expectedOrderAlg[get_sweeper(sweeper_name).__name__]} in algebraic variable, got {orderAlg}"
+        orderAlg, expectedOrderAlg[sweeper_name], atol=1e0
+    ), f"Expected order {expectedOrderAlg[sweeper_name]} in algebraic variable, got {orderAlg}"
 
 
 @pytest.mark.base
@@ -301,5 +301,5 @@ def testOrderAccuracyFullyImplicitIndexTwo(sweeper_name):
     )
 
     assert np.isclose(
-        order, expectedOrder[get_sweeper(sweeper_name).__name__], atol=1e0
-    ), f"Expected order {expectedOrder[get_sweeper(sweeper_name).__name__]} in differential variable, got {order}"
+        order, expectedOrder[sweeper_name], atol=1e0
+    ), f"Expected order {expectedOrder[sweeper_name]} in differential variable, got {order}"

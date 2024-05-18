@@ -81,13 +81,12 @@ class RungeKuttaDAE(RungeKutta):
 
     def predict(self):
         """
-        Predictor to fill values at nodes before first sweep.
+        Predictor to fill values with zeros at nodes before first sweep.
         """
 
         # get current level and problem
         lvl = self.level
         prob = lvl.prob
-
         du_init = self.du_init[:] if self.du_init is not None else prob.du_exact(lvl.time)[:]
         lvl.f[0] = prob.dtype_f(du_init)
         for m in range(1, self.coll.num_nodes + 1):
@@ -140,18 +139,17 @@ class RungeKuttaDAE(RungeKutta):
                 sys : dtype_f
                     System to be solved.
                 """
-                du_mesh = prob.dtype_f(du)
+                local_du_approx = prob.dtype_f(du)
 
                 local_u_approx = prob.dtype_u(u_approx)
 
-                # defines the "implicit" factor, note that for explicit RK the diagonal element is zero
-                local_u_approx += lvl.dt * self.QI[m + 1, m + 1] * du_mesh
+                local_u_approx += lvl.dt * self.QI[m + 1, m + 1] * local_du_approx
 
-                sys = prob.eval_f(local_u_approx, du_mesh, lvl.time + lvl.dt * self.coll.nodes[m + 1])
+                sys = prob.eval_f(local_u_approx, local_du_approx, lvl.time + lvl.dt * self.coll.nodes[m + 1])
                 return sys
 
-            finit = prob.dtype_f(lvl.f[m])
-            lvl.f[m + 1][:] = prob.solve_system(F, finit.flatten(), lvl.time + lvl.dt * self.coll.nodes[m + 1])
+            finit = lvl.f[m].flatten()
+            lvl.f[m + 1][:] = prob.solve_system(F, finit, lvl.time + lvl.dt * self.coll.nodes[m + 1])
 
         # Update numerical solution - update value only at last node
         lvl.u[-1][:] = lvl.u[0]
