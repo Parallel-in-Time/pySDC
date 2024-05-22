@@ -84,16 +84,6 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
         self.coeff.u = [None] * self.params.n
         self.coeff.f = [0.0] * self.params.n
 
-        self.reset_status_variables(controller, **kwargs)
-        return None
-
-    def add_status_variables(self, *args, **kwargs):
-        """
-        Add variable for extrapolated error
-
-        Returns:
-            None
-        """
         self.add_status_variable_to_level('error_extrapolation_estimate')
 
     def check_parameters(self, controller, params, description, **kwargs):

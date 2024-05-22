@@ -59,3 +59,9 @@ class FrozenClass(object):
             __dict__.get(key, default)
         """
         return self.__dict__.get(key, default)
+
+    def __dir__(self):
+        """
+        My hope is that some editors can use this for dynamic autocompletion.
+        """
+        return super().__dir__() + self.attrs
