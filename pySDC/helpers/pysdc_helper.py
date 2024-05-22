@@ -6,6 +6,8 @@ class FrozenClass(object):
         __isfrozen: Flag to freeze a class
     """
 
+    attrs = []
+
     __isfrozen = False
 
     def __setattr__(self, key, value):
@@ -18,9 +20,26 @@ class FrozenClass(object):
         """
 
         # check if attribute exists and if class is frozen
-        if self.__isfrozen and not hasattr(self, key):
-            raise TypeError("%r is a frozen class" % self)
+        if self.__isfrozen and not (key in self.attrs or hasattr(self, key)):
+            raise TypeError(
+                f'{type(self).__name__!r} is a frozen class with attributes {self.attrs}, cannot modify attribute {key!r}'
+            )
+
         object.__setattr__(self, key, value)
+        type(self).add_attr(key)
+
+    @classmethod
+    def add_attr(cls, key, raise_error_if_exists=False):
+        """
+        Add a key to the allowed attributes of this class.
+
+        Args:
+            key (str): The key to add
+            raise_error_if_exists (bool): Raise an error if the attribute already exists in the class
+        """
+        if key in cls.attrs and raise_error_if_exists:
+            raise TypeError(f'Attribute {key!r} already exists in {cls.__name__}!')
+        cls.attrs += [key]
 
     def _freeze(self):
         """

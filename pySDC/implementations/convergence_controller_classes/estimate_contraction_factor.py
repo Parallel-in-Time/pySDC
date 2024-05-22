@@ -39,41 +39,17 @@ class EstimateContractionFactor(ConvergenceController):
             description=description,
         )
 
-    def setup_status_variables(self, controller, **kwargs):
+    def setup_status_variables(self, *args, **kwargs):
         """
         Add the embedded error, contraction factor and iterations to convergence variable to the status of the levels.
 
-        Args:
-            controller (pySDC.Controller): The controller
-
         Returns:
             None
         """
-        if 'comm' in kwargs.keys():
-            steps = [controller.S]
-        else:
-            if 'active_slots' in kwargs.keys():
-                steps = [controller.MS[i] for i in kwargs['active_slots']]
-            else:
-                steps = controller.MS
-        where = ["levels", "status"]
-        for S in steps:
-            self.add_variable(S, name='error_embedded_estimate_last_iter', where=where, init=None)
-            self.add_variable(S, name='contraction_factor', where=where, init=None)
-            if self.params.e_tol is not None:
-                self.add_variable(S, name='iter_to_convergence', where=where, init=None)
-
-    def reset_status_variables(self, controller, **kwargs):
-        """
-        Reinitialize new status variables for the levels.
-
-        Args:
-            controller (pySDC.controller): The controller
-
-        Returns:
-            None
-        """
-        self.setup_status_variables(controller, **kwargs)
+        self.add_status_variable_to_level('error_embedded_estimate_last_iter')
+        self.add_status_variable_to_level('contraction_factor')
+        if self.params.e_tol is not None:
+            self.add_status_variable_to_level('iter_to_convergence')
 
     def post_iteration_processing(self, controller, S, **kwargs):
         """
