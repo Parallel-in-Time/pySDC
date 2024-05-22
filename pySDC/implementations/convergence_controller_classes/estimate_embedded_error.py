@@ -350,6 +350,3 @@ class EstimateEmbeddedErrorCollocation(ConvergenceController):
         self.status.iter = []  # the iteration in which the solution converged
 
         self.add_status_variable_to_level('error_embedded_estimate_collocation')
-
-    def reset_status_variables(self, controller, **kwargs):
-        self.setup_status_variables(controller, **kwargs)

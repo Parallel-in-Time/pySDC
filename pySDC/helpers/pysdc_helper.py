@@ -21,12 +21,16 @@ class FrozenClass(object):
 
         # check if attribute exists and if class is frozen
         if self.__isfrozen and not (key in self.attrs or hasattr(self, key)):
-            raise TypeError(
-                f'{type(self).__name__!r} is a frozen class with attributes {self.attrs}, cannot modify attribute {key!r}'
-            )
+            raise TypeError(f'{type(self).__name__!r} is a frozen class, cannot add attribute {key!r}')
 
         object.__setattr__(self, key, value)
-        type(self).add_attr(key)
+
+    def __getattr__(self, key):
+        """
+        This is needed in case the variables have not been initialized after adding.
+        """
+        if key in self.attrs:
+            return None
 
     @classmethod
     def add_attr(cls, key, raise_error_if_exists=False):
@@ -62,6 +66,6 @@ class FrozenClass(object):
 
     def __dir__(self):
         """
-        My hope is that some editors can use this for dynamic autocompletion.
+        My hope is that some editors can use this for dynamic autocompletion. Mine can't atm.
         """
         return super().__dir__() + self.attrs
