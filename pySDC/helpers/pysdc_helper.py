@@ -31,6 +31,8 @@ class FrozenClass(object):
         """
         if key in self.attrs:
             return None
+        else:
+            super().__getattr__(key)
 
     @classmethod
     def add_attr(cls, key, raise_error_if_exists=False):
@@ -66,6 +68,6 @@ class FrozenClass(object):
 
     def __dir__(self):
         """
-        My hope is that some editors can use this for dynamic autocompletion. Mine can't atm.
+        My hope is that some editors can use this for dynamic autocompletion.
         """
         return super().__dir__() + self.attrs
