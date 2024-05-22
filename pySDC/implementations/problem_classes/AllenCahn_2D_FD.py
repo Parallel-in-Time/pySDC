@@ -286,10 +286,9 @@ class allencahn_fullyimplicit(ptype):
             me[:] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init)
 
         else:
-            for i in range(self.nvars[0]):
-                for j in range(self.nvars[1]):
-                    r2 = self.xvalues[i] ** 2 + self.xvalues[j] ** 2
-                    me[i, j] = np.tanh((self.radius - np.sqrt(r2)) / (np.sqrt(2) * self.eps))
+            X, Y = np.meshgrid(self.xvalues, self.xvalues)
+            r2 = X**2 + Y**2
+            me[:] = np.tanh((self.radius - np.sqrt(r2)) / (np.sqrt(2) * self.eps))
 
         return me
 
