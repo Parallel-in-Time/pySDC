@@ -1,3 +1,4 @@
+from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
 from pySDC.implementations.sweeper_classes.Runge_Kutta import (
     RungeKutta,
     BackwardEuler,
@@ -122,41 +123,14 @@ class RungeKuttaDAE(RungeKutta):
             for j in range(1, m + 1):
                 u_approx += lvl.dt * self.QI[m + 1, j] * lvl.f[j][:]
 
-            def F(du):
-                r"""
-                This function builds the implicit system to be solved for a DAE of the form
-
-                .. math::
-                    0 = F(u, u', t)
-
-                Applying a RK method yields the (non)-linear system to be solved
-
-                .. math::
-                    0 = F(u_0 + \Delta t \sum_{j=1}^m a_{ij} U_j, U_m, \tau_m),
-
-                which is solved for the derivative of u.
-
-                Parameters
-                ----------
-                du : dtype_u
-                    Unknowns of the system (derivative of solution u).
-
-                Returns
-                -------
-                sys : dtype_f
-                    System to be solved.
-                """
-                local_du_approx = prob.dtype_f(du)
-
-                local_u_approx = prob.dtype_u(u_approx)
-
-                local_u_approx += lvl.dt * self.QI[m + 1, m + 1] * local_du_approx
-
-                sys = prob.eval_f(local_u_approx, local_du_approx, lvl.time + lvl.dt * self.coll.nodes[m + 1])
-                return sys
-
             finit = lvl.f[m].flatten()
-            lvl.f[m + 1][:] = prob.solve_system(F, finit, lvl.time + lvl.dt * self.coll.nodes[m + 1])
+            lvl.f[m + 1][:] = prob.solve_system(
+                fully_implicit_DAE.F,
+                u_approx,
+                lvl.dt * self.QI[m + 1, m + 1],
+                finit,
+                lvl.time + lvl.dt * self.coll.nodes[m + 1],
+            )
 
         # Update numerical solution - update value only at last node
         lvl.u[-1][:] = lvl.u[0]
