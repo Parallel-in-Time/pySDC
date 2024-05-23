@@ -90,13 +90,11 @@ class RungeKuttaDAE(RungeKutta):
         lvl = self.level
         prob = lvl.prob
 
-        if self.fully_initialized:
-            du_init = self.du_init[:]
-        else:
-            du_init = prob.du_exact(lvl.time)[:]
+        if not self.fully_initialized:
+            self.du_init = prob.du_exact(lvl.time)
             self.fully_initialized = True
 
-        lvl.f[0] = prob.dtype_f(du_init)
+        lvl.f[0] = prob.dtype_f(self.du_init)
         for m in range(1, self.coll.num_nodes + 1):
             lvl.u[m] = prob.dtype_u(init=prob.init, val=0.0)
             lvl.f[m] = prob.dtype_f(init=prob.init, val=0.0)
