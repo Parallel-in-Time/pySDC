@@ -78,6 +78,7 @@ class RungeKuttaDAE(RungeKutta):
     def __init__(self, params):
         super().__init__(params)
         self.du_init = None
+        self.fully_initialized = False
 
     def predict(self):
         """
@@ -87,7 +88,13 @@ class RungeKuttaDAE(RungeKutta):
         # get current level and problem
         lvl = self.level
         prob = lvl.prob
-        du_init = self.du_init[:] if self.du_init is not None else prob.du_exact(lvl.time)[:]
+
+        if self.fully_initialized:
+            du_init = self.du_init[:]
+        else:
+            du_init = prob.du_exact(lvl.time)[:]
+            self.fully_initialized = True
+
         lvl.f[0] = prob.dtype_f(du_init)
         for m in range(1, self.coll.num_nodes + 1):
             lvl.u[m] = prob.dtype_u(init=prob.init, val=0.0)
