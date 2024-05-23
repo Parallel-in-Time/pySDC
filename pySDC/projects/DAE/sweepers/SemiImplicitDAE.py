@@ -148,33 +148,10 @@ class SemiImplicitDAE(fully_implicit_DAE):
             for j in range(1, m):
                 u_approx.diff[:] += L.dt * self.QI[m, j] * L.f[j].diff[:]
 
-            def implSystem(unknowns):
-                """
-                Build implicit system to solve in order to find the unknowns.
-
-                Parameters
-                ----------
-                unknowns : dtype_u
-                    Unknowns of the system.
-
-                Returns
-                -------
-                sys :
-                    System to be solved as implicit function.
-                """
-
-                unknowns_mesh = P.dtype_f(unknowns)
-
-                local_u_approx = P.dtype_u(u_approx)
-                local_u_approx.diff[:] += L.dt * self.QI[m, m] * unknowns_mesh.diff[:]
-                local_u_approx.alg[:] = unknowns_mesh.alg[:]
-
-                sys = P.eval_f(local_u_approx, unknowns_mesh, L.time + L.dt * self.coll.nodes[m - 1])
-                return sys
-
             u0 = P.dtype_u(P.init)
             u0.diff[:], u0.alg[:] = L.f[m].diff[:], L.u[m].alg[:]
-            u_new = P.solve_system(implSystem, u0, L.time + L.dt * self.coll.nodes[m - 1])
+            u_new = P.solve_system(self.F, u_approx, L.dt * self.QI[m, m], u0, L.time + L.dt * self.coll.nodes[m - 1])
+
             # ---- update U' and z ----
             L.f[m].diff[:] = u_new.diff[:]
             L.u[m].alg[:] = u_new.alg[:]
@@ -188,3 +165,53 @@ class SemiImplicitDAE(fully_implicit_DAE):
         L.status.updated = True
 
         return None
+
+    @staticmethod
+    def F(du, P, factor, u_approx, t):
+        r"""
+        This function builds the implicit system to be solved for a semi-explicit
+        DAE of the form
+
+        .. math::
+            u' = f(u, z, t),
+
+        .. math::
+            0 = g(u, z, t)
+
+        Applying semi-implicit SDC yields the (non)-linear system to be solved
+
+        .. math::
+            0 = U_m^{k+1} - f(u_0 + \sum_{j=1}^M (q_{mj}-\tilde{q}_{mj}) U_j^k
+            + \sum_{j=1}^m \tilde{q}_{mj} U_j^{k+1}, z_m^{k+1}, \tau_m)
+            0 = g(u_0 + \sum_{j=1}^M (q_{mj}-\tilde{q}_{mj}) U_j^k
+            + \sum_{j=1}^m \tilde{q}_{mj} U_j^{k+1}, z_m^{k+1}, \tau_m)
+
+        which is solved for the derivative of u and the algebraic variable z.
+
+        Parameters
+        ----------
+        du : dtype_u
+            Unknowns of the system (derivative of solution u).
+        P : pySDC.projects.DAE.misc.ProblemDAE
+            Problem class.
+        factor : float
+            Abbrev. for the node-to-node stepsize.
+        u_approx : dtype_u
+            Approximation to numerical solution :math:`u`.
+        t : float
+            Current time :math:`t`.
+
+        Returns
+        -------
+        sys : dtype_f
+            System to be solved.
+        """
+
+        local_du_approx = P.dtype_f(du)
+
+        local_u_approx = P.dtype_u(u_approx)
+        local_u_approx.diff[:] += factor * local_du_approx.diff[:]
+        local_u_approx.alg[:] = local_du_approx.alg[:]
+
+        sys = P.eval_f(local_u_approx, local_du_approx, t)
+        return sys

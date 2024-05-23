@@ -90,36 +90,10 @@ class fully_implicit_DAE(generic_implicit):
             for j in range(1, m):
                 u_approx += L.dt * self.QI[m, j] * L.f[j]
 
-            # params contains U = u'
-            def implSystem(params):
-                """
-                Build implicit system to solve in order to find the unknowns.
-
-                Parameters
-                ----------
-                params : dtype_u
-                    Unknowns of the system.
-
-                Returns
-                -------
-                sys :
-                    System to be solved as implicit function.
-                """
-
-                params_mesh = P.dtype_f(params)
-
-                # build parameters to pass to implicit function
-                local_u_approx = P.dtype_f(u_approx)
-
-                # note that derivatives of algebraic variables are taken into account here too
-                # these do not directly affect the output of eval_f but rather indirectly via QI
-                local_u_approx += L.dt * self.QI[m, m] * params_mesh
-
-                sys = P.eval_f(local_u_approx, params_mesh, L.time + L.dt * self.coll.nodes[m - 1])
-                return sys
-
             # update gradient (recall L.f is being used to store the gradient)
-            L.f[m] = P.solve_system(implSystem, L.f[m], L.time + L.dt * self.coll.nodes[m - 1])
+            L.f[m] = P.solve_system(
+                self.F, u_approx, L.dt * self.QI[m, m], L.f[m], L.time + L.dt * self.coll.nodes[m - 1]
+            )
 
         # Update solution approximation
         integral = self.integrate()
@@ -232,3 +206,56 @@ class fully_implicit_DAE(generic_implicit):
             raise NotImplementedError()
 
         super().compute_end_point()
+
+    @staticmethod
+    def F(du, P, factor, u_approx, t):
+        r"""
+        This function builds the implicit system to be solved for a DAE of the form
+
+        .. math::
+            0 = F(u, u', t)
+
+        Applying SDC yields the (non)-linear system to be solved
+
+        .. math::
+            0 = F(u_0 + \sum_{j=1}^M (q_{mj}-\tilde{q}_{mj}) U_j
+            + \sum_{j=1}^m \tilde{q}_{mj} U_j, U_m, \tau_m),
+
+        which is solved for the derivative of u.
+
+        Note
+        ----
+        This function is also used for Runge-Kutta methods since only
+        the argument ``u_approx`` differs. However, the implicit system to be solved
+        is the same.
+
+        Parameters
+        ----------
+        du : dtype_u
+            Unknowns of the system (derivative of solution u).
+        P : pySDC.projects.DAE.misc.ProblemDAE
+            Problem class.
+        factor : float
+            Abbrev. for the node-to-node stepsize.
+        u_approx : dtype_u
+            Approximation to numerical solution :math:`u`.
+        t : float
+            Current time :math:`t`.
+
+        Returns
+        -------
+        sys : dtype_f
+            System to be solved.
+        """
+
+        local_du_approx = P.dtype_f(du)
+
+        # build parameters to pass to implicit function
+        local_u_approx = P.dtype_f(u_approx)
+
+        # note that derivatives of algebraic variables are taken into account here too
+        # these do not directly affect the output of eval_f but rather indirectly via QI
+        local_u_approx += factor * local_du_approx
+
+        sys = P.eval_f(local_u_approx, local_du_approx, t)
+        return sys

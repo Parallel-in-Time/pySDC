@@ -128,6 +128,33 @@ class DiscontinuousTestDAE(ptype_dae):
             me.alg[0] = np.sinh(self.t_switch_exact)
         return me
 
+    def du_exact(self, t, **kwargs):
+        r"""
+        Routine for the derivative of the exact solution at time :math:`t \leq 1`.
+        For this problem, the exact solution is piecewise.
+
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
+
+        Returns
+        -------
+        me : dtype_u
+            Derivative of exact solution.
+        """
+
+        assert t >= 1, 'ERROR: u_exact only available for t>=1'
+
+        me = self.dtype_u(self.init)
+        if t <= self.t_switch_exact:
+            me.diff[0] = np.sinh(t)
+            me.alg[0] = np.cosh(t)
+        else:
+            me.diff[0] = np.sinh(self.t_switch_exact)
+            me.alg[0] = np.cosh(self.t_switch_exact)
+        return me
+
     def get_switching_info(self, u, t):
         r"""
         Provides information about the state function of the problem. A change in sign of the state function
