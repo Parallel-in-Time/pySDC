@@ -713,6 +713,44 @@
 
 
 
+<div class="viewcode-block" id="DIRK43_2">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.DIRK43_2">[docs]</a>
+<span class="k">class</span> <span class="nc">DIRK43_2</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    L-stable Diagonally Implicit RK method with four stages of order 3.</span>
+<span class="sd">    Taken from [here](https://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableau</span></div>
+
+
+
+<div class="viewcode-block" id="EDIRK4">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.EDIRK4">[docs]</a>
+<span class="k">class</span> <span class="nc">EDIRK4</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stiffly accurate, fourth-order EDIRK with four stages. Taken from</span>
+<span class="sd">    [here](https://ntrs.nasa.gov/citations/20160005923), second one in eq. (216).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">7.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">13.0</span><span class="p">,</span> <span class="mf">84.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">125.0</span><span class="p">,</span> <span class="mf">70.0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">42.0</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="mf">4.0</span><span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">447.0</span> <span class="o">/</span> <span class="mf">675.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">357.0</span> <span class="o">/</span> <span class="mf">675.0</span><span class="p">,</span> <span class="mf">855.0</span> <span class="o">/</span> <span class="mf">675.0</span><span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">13.0</span> <span class="o">/</span> <span class="mf">42.0</span><span class="p">,</span> <span class="mf">84.0</span> <span class="o">/</span> <span class="mf">42.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">125.0</span> <span class="o">/</span> <span class="mf">42.0</span><span class="p">,</span> <span class="mf">70.0</span> <span class="o">/</span> <span class="mf">42.0</span><span class="p">]</span>
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableau</span></div>
+
+
+
 <div class="viewcode-block" id="ESDIRK53">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ESDIRK53">[docs]</a>
 <span class="k">class</span> <span class="nc">ESDIRK53</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>

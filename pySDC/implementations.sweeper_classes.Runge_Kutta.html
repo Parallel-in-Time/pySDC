@@ -372,6 +372,64 @@ This method is part of the IMEX method ARK548L2SA.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.DIRK43_2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DIRK43_2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#DIRK43_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43_2" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
+<p>L-stable Diagonally Implicit RK method with four stages of order 3.
+Taken from [here](<a class="reference external" href="https://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods">https://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods</a>).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.DIRK43_2.ButcherTableauClass">
+<span class="sig-name descname"><span class="pre">ButcherTableauClass</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43_2.ButcherTableauClass" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableau" title="implementations.sweeper_classes.Runge_Kutta.ButcherTableau"><code class="xref py py-class docutils literal notranslate"><span class="pre">ButcherTableau</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.DIRK43_2.matrix">
+<span class="sig-name descname"><span class="pre">matrix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[</span> <span class="pre">0.5</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[</span> <span class="pre">0.16666667,</span>&#160; <span class="pre">0.5</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[-0.5</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.5</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.5</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[</span> <span class="pre">1.5</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span> <span class="pre">-1.5</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.5</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.5</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">]])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43_2.matrix" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.DIRK43_2.nodes">
+<span class="sig-name descname"><span class="pre">nodes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.5</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span> <span class="pre">0.66666667,</span> <span class="pre">0.5</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span> <span class="pre">1.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43_2.nodes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.DIRK43_2.weights">
+<span class="sig-name descname"><span class="pre">weights</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([</span> <span class="pre">1.5,</span> <span class="pre">-1.5,</span>&#160; <span class="pre">0.5,</span>&#160; <span class="pre">0.5])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43_2.weights" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.EDIRK4">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EDIRK4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#EDIRK4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.EDIRK4" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
+<p>Stiffly accurate, fourth-order EDIRK with four stages. Taken from
+[here](<a class="reference external" href="https://ntrs.nasa.gov/citations/20160005923">https://ntrs.nasa.gov/citations/20160005923</a>), second one in eq. (216).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.EDIRK4.ButcherTableauClass">
+<span class="sig-name descname"><span class="pre">ButcherTableauClass</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.EDIRK4.ButcherTableauClass" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableau" title="implementations.sweeper_classes.Runge_Kutta.ButcherTableau"><code class="xref py py-class docutils literal notranslate"><span class="pre">ButcherTableau</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.EDIRK4.matrix">
+<span class="sig-name descname"><span class="pre">matrix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[</span> <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[</span> <span class="pre">0.75</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.75</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[</span> <span class="pre">0.66222222,</span> <span class="pre">-0.52888889,</span>&#160; <span class="pre">1.26666667,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[</span> <span class="pre">0.30952381,</span>&#160; <span class="pre">2.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span> <span class="pre">-2.97619048,</span>&#160; <span class="pre">1.66666667]])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.EDIRK4.matrix" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.EDIRK4.nodes">
+<span class="sig-name descname"><span class="pre">nodes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.</span> <span class="pre">,</span> <span class="pre">1.5,</span> <span class="pre">1.4,</span> <span class="pre">1.</span> <span class="pre">])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.EDIRK4.nodes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.EDIRK4.weights">
+<span class="sig-name descname"><span class="pre">weights</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([</span> <span class="pre">0.30952381,</span>&#160; <span class="pre">2.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span> <span class="pre">-2.97619048,</span>&#160; <span class="pre">1.66666667])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.EDIRK4.weights" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ESDIRK43">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ESDIRK43</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ESDIRK43"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK43" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
@@ -842,6 +900,20 @@ method, which does not require us to solve a system of equations to compute the 
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43.weights"><code class="docutils literal notranslate"><span class="pre">weights</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43_2"><code class="docutils literal notranslate"><span class="pre">DIRK43_2</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43_2.ButcherTableauClass"><code class="docutils literal notranslate"><span class="pre">ButcherTableauClass</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43_2.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43_2.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43_2.weights"><code class="docutils literal notranslate"><span class="pre">weights</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.EDIRK4"><code class="docutils literal notranslate"><span class="pre">EDIRK4</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.EDIRK4.ButcherTableauClass"><code class="docutils literal notranslate"><span class="pre">ButcherTableauClass</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.EDIRK4.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.EDIRK4.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.EDIRK4.weights"><code class="docutils literal notranslate"><span class="pre">weights</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK43"><code class="docutils literal notranslate"><span class="pre">ESDIRK43</span></code></a><ul>
