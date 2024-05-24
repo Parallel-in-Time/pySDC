@@ -148,6 +148,13 @@ class SweeperMPI(sweeper):
         L.status.unlocked = True
         L.status.updated = True
 
+    def communicate_tau_correction_for_full_interval(self):
+        L = self.level
+        P = L.prob
+        if self.rank < self.comm.size - 1:
+            L.tau[-1] = P.u_init
+        self.comm.Bcast(L.tau[-1], root=self.comm.size - 1)
+
 
 class generic_implicit_MPI(SweeperMPI, generic_implicit):
     """
@@ -250,6 +257,7 @@ class generic_implicit_MPI(SweeperMPI, generic_implicit):
             L.uend += L.u[0]
 
             # add up tau correction of the full interval (last entry)
-            if L.tau[-1] is not None:
+            if L.tau[self.rank] is not None:
+                self.communicate_tau_correction_for_full_interval()
                 L.uend += L.tau[-1]
         return None

@@ -45,7 +45,6 @@ class base_transfer(object):
         # set up logger
         self.logger = logging.getLogger('transfer')
 
-        # just copy by object
         self.fine = fine_level
         self.coarse = coarse_level
 

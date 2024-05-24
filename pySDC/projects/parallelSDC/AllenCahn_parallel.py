@@ -11,7 +11,7 @@ from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_full
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh_FFT2D import mesh_to_mesh_fft2d
 from pySDC.playgrounds.Allen_Cahn.AllenCahn_monitor import monitor
-from pySDC.projects.parallelSDC.BaseTransfer_MPI import base_transfer_MPI
+from pySDC.implementations.transfer_classes.BaseTransferMPI import base_transfer_MPI
 from pySDC.implementations.sweeper_classes.generic_implicit_MPI import generic_implicit_MPI
 
 

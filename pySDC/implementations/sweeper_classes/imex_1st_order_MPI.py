@@ -107,6 +107,7 @@ class imex_1st_order_MPI(SweeperMPI, imex_1st_order):
             L.uend += L.u[0]
 
             # add up tau correction of the full interval (last entry)
-            if L.tau[-1] is not None:
+            if L.tau[self.rank] is not None:
+                self.communicate_tau_correction_for_full_interval()
                 L.uend += L.tau[-1]
         return None
