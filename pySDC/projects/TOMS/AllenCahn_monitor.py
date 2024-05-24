@@ -4,37 +4,45 @@ from pySDC.core.Hooks import hooks
 
 
 class monitor(hooks):
+    phase_thresh = 0.0  # count everything above this threshold to the high phase.
+
     def __init__(self):
         """
         Initialization of Allen-Cahn monitoring
         """
-        super(monitor, self).__init__()
+        super().__init__()
 
         self.init_radius = None
 
+    def get_exact_radius(self, t):
+        return np.sqrt(max(self.init_radius**2 - 2.0 * t, 0))
+
+    @classmethod
+    def get_radius(cls, u, dx):
+        c = np.count_nonzero(u > cls.phase_thresh)
+        return np.sqrt(c / np.pi) * dx
+
+    @staticmethod
+    def get_interface_width(u, L):
+        # TODO: How does this generalize to different phase transitions?
+        rows1 = np.where(u[L.prob.init[0][0] // 2, : L.prob.init[0][0] // 2] > -0.99)
+        rows2 = np.where(u[L.prob.init[0][0] // 2, : L.prob.init[0][0] // 2] < 0.99)
+
+        return (rows2[0][-1] - rows1[0][0]) * L.prob.dx / L.prob.eps
+
     def pre_run(self, step, level_number):
         """
-        Overwrite standard pre run hook
+        Record radius of the blob, exact radius and interface width.
 
         Args:
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
-        super(monitor, self).pre_run(step, level_number)
+        super().pre_run(step, level_number)
         L = step.levels[0]
 
-        c = np.count_nonzero(L.u[0] > 0.0)
-        radius = np.sqrt(c / np.pi) * L.prob.dx
-
-        radius1 = 0
-        rows, cols = np.where(L.u[0] > 0.0)
-        for r in rows:
-            radius1 = max(radius1, abs(L.prob.xvalues[r]))
-
-        rows1 = np.where(L.u[0][int((L.prob.init[0][0]) / 2), : int((L.prob.init[0][0]) / 2)] > -0.99)
-        rows2 = np.where(L.u[0][int((L.prob.init[0][0]) / 2), : int((L.prob.init[0][0]) / 2)] < 0.99)
-        interface_width = (rows2[0][-1] - rows1[0][0]) * L.prob.dx / L.prob.eps
-
+        radius = self.get_radius(L.u[0], L.prob.dx)
+        interface_width = self.get_interface_width(L.u[0], L)
         self.init_radius = L.prob.radius
 
         if L.time == 0.0:
@@ -68,24 +76,21 @@ class monitor(hooks):
 
     def post_step(self, step, level_number):
         """
-        Overwrite standard post step hook
+        Record radius of the blob, exact radius and interface width.
 
         Args:
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
-        super(monitor, self).post_step(step, level_number)
+        super().post_step(step, level_number)
 
         # some abbreviations
         L = step.levels[0]
 
-        c = np.count_nonzero(L.uend >= 0.0)
-        radius = np.sqrt(c / np.pi) * L.prob.dx
+        radius = self.get_radius(L.uend, L.prob.dx)
+        interface_width = self.get_interface_width(L.uend, L)
 
-        exact_radius = np.sqrt(max(self.init_radius**2 - 2.0 * (L.time + L.dt), 0))
-        rows1 = np.where(L.uend[int((L.prob.init[0][0]) / 2), : int((L.prob.init[0][0]) / 2)] > -0.99)
-        rows2 = np.where(L.uend[int((L.prob.init[0][0]) / 2), : int((L.prob.init[0][0]) / 2)] < 0.99)
-        interface_width = (rows2[0][-1] - rows1[0][0]) * L.prob.dx / L.prob.eps
+        exact_radius = self.get_exact_radius(L.time + L.dt)
 
         self.add_to_stats(
             process=step.status.slot,
