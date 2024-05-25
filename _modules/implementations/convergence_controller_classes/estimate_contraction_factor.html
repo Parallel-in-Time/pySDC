@@ -88,44 +88,17 @@
 
 <div class="viewcode-block" id="EstimateContractionFactor.setup_status_variables">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_contraction_factor.html#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.setup_status_variables">[docs]</a>
-    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add the embedded error, contraction factor and iterations to convergence variable to the status of the levels.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            controller (pySDC.Controller): The controller</span>
-
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s1">&#39;comm&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">steps</span> <span class="o">=</span> <span class="p">[</span><span class="n">controller</span><span class="o">.</span><span class="n">S</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;active_slots&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">steps</span> <span class="o">=</span> <span class="p">[</span><span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;active_slots&#39;</span><span class="p">]]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">steps</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span>
-        <span class="n">where</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;levels&quot;</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;error_embedded_estimate_last_iter&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;contraction_factor&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;iter_to_convergence&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="EstimateContractionFactor.reset_status_variables">
-<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_contraction_factor.html#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.reset_status_variables">[docs]</a>
-    <span class="k">def</span> <span class="nf">reset_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reinitialize new status variables for the levels.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            controller (pySDC.controller): The controller</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setup_status_variables</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_status_variable_to_level</span><span class="p">(</span><span class="s1">&#39;error_embedded_estimate_last_iter&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_status_variable_to_level</span><span class="p">(</span><span class="s1">&#39;contraction_factor&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_status_variable_to_level</span><span class="p">(</span><span class="s1">&#39;iter_to_convergence&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="EstimateContractionFactor.post_iteration_processing">

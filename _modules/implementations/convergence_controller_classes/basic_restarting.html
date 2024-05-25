@@ -125,39 +125,29 @@
 
 <div class="viewcode-block" id="BasicRestarting.setup_status_variables">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.setup_status_variables">[docs]</a>
-    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add status variables for whether to restart now and how many times the step has been restarted in a row to the</span>
 <span class="sd">        Steps</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            controller (pySDC.Controller): The controller</span>
-<span class="sd">            reset (bool): Whether the function is called for the first time or to reset</span>
-
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">where</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;S&quot;</span> <span class="k">if</span> <span class="s1">&#39;comm&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;MS&quot;</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;restart&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_status_variable_to_step</span><span class="p">(</span><span class="s1">&#39;restart&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_status_variable_to_step</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BasicRestarting.reset_status_variables">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.reset_status_variables">[docs]</a>
-    <span class="k">def</span> <span class="nf">reset_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">reset_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add status variables for whether to restart now and how many times the step has been restarted in a row to the</span>
 <span class="sd">        Steps</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            controller (pySDC.Controller): The controller</span>
-<span class="sd">            reset (bool): Whether the function is called for the first time or to reset</span>
-
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">where</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;S&quot;</span> <span class="k">if</span> <span class="s1">&#39;comm&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;MS&quot;</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reset_variable</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;restart&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_step_status_variable</span><span class="p">(</span><span class="s1">&#39;restart&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BasicRestarting.dependencies">

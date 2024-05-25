@@ -152,13 +152,17 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.helper_classes.html#implementations.problem_classes.boussinesq_helpers.helper_classes.logging.add">add() (logging method)</a>
 </li>
+      <li><a href="pySDC/helpers.pysdc_helper.html#helpers.pysdc_helper.FrozenClass.add_attr">add_attr() (FrozenClass class method)</a>
+</li>
       <li><a href="pySDC/core.Controller.html#core.Controller.controller.add_convergence_controller">add_convergence_controller() (controller method)</a>
 </li>
       <li><a href="pySDC/core.Controller.html#core.Controller.controller.add_hook">add_hook() (controller method)</a>
 </li>
-      <li><a href="pySDC/core.Hooks.html#core.Hooks.hooks.add_to_stats">add_to_stats() (hooks method)</a>
+      <li><a href="pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.add_status_variable_to_level">add_status_variable_to_level() (ConvergenceController method)</a>
 </li>
-      <li><a href="pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.add_variable">add_variable() (ConvergenceController method)</a>
+      <li><a href="pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.add_status_variable_to_step">add_status_variable_to_step() (ConvergenceController method)</a>
+</li>
+      <li><a href="pySDC/core.Hooks.html#core.Hooks.hooks.add_to_stats">add_to_stats() (hooks method)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.html#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex">advectiondiffusion1d_imex (class in implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT)</a>
 </li>
@@ -263,6 +267,8 @@
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK">ARK548L2SAESDIRK (class in implementations.sweeper_classes.Runge_Kutta)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2">ARK548L2SAESDIRK2 (class in implementations.sweeper_classes.Runge_Kutta)</a>
+</li>
+      <li><a href="pySDC/helpers.pysdc_helper.html#helpers.pysdc_helper.FrozenClass.attrs">attrs (FrozenClass attribute)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.Auzinger_implicit.html#implementations.problem_classes.Auzinger_implicit.auzinger">auzinger (class in implementations.problem_classes.Auzinger_implicit)</a>
 </li>
@@ -3788,20 +3794,10 @@
 </li>
         <li><a href="pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.reset_status_variables">(ConvergenceController method)</a>
 </li>
-        <li><a href="pySDC/implementations.convergence_controller_classes.estimate_contraction_factor.html#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.reset_status_variables">(EstimateContractionFactor method)</a>
-</li>
-        <li><a href="pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.reset_status_variables">(EstimateEmbeddedError method)</a>
-</li>
-        <li><a href="pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.reset_status_variables">(EstimateEmbeddedErrorCollocation method)</a>
-</li>
-        <li><a href="pySDC/implementations.convergence_controller_classes.estimate_extrapolation_error.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.reset_status_variables">(EstimateExtrapolationErrorBase method)</a>
-</li>
         <li><a href="pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.html#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.reset_status_variables">(EstimatePolynomialError method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/core.Step.html#core.Step.step.reset_step">reset_step() (step method)</a>
-</li>
-      <li><a href="pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.reset_variable">reset_variable() (ConvergenceController method)</a>
 </li>
       <li><a href="pySDC/implementations.controller_classes.controller_MPI.html#implementations.controller_classes.controller_MPI.controller_MPI.restart_block">restart_block() (controller_MPI method)</a>
 
@@ -3809,8 +3805,6 @@
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.restart_block">(controller_nonMPI method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.BaseTransfer.html#core.BaseTransfer.base_transfer.restrict">restrict() (base_transfer method)</a>
 
       <ul>
@@ -3835,6 +3829,8 @@
         <li><a href="pySDC/core.SpaceTransfer.html#core.SpaceTransfer.space_transfer.restrict">(space_transfer method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/helpers.transfer_helper.html#helpers.transfer_helper.restriction_matrix_1d">restriction_matrix_1d() (in module helpers.transfer_helper)</a>
 </li>
       <li><a href="pySDC/core.Controller.html#core.Controller.controller.return_stats">return_stats() (controller method)</a>
@@ -3909,7 +3905,11 @@
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.send_full">(controller_nonMPI method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.set_level_status_variable">set_level_status_variable() (ConvergenceController method)</a>
+</li>
       <li><a href="pySDC/implementations.convergence_controller_classes.inexactness.html#implementations.convergence_controller_classes.inexactness.NewtonInexactness.set_maxiter">set_maxiter() (NewtonInexactness method)</a>
+</li>
+      <li><a href="pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.set_step_status_variable">set_step_status_variable() (ConvergenceController method)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.inexactness.html#implementations.convergence_controller_classes.inexactness.NewtonInexactness.set_tolerance">set_tolerance() (NewtonInexactness method)</a>
 </li>

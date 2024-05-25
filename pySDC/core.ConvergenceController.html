@@ -90,35 +90,14 @@ count and time step size.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.add_variable">
-<span class="sig-name descname"><span class="pre">add_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MPI</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">place</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.add_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.add_variable" title="Link to this definition">¶</a></dt>
-<dd><p>Add a variable to a frozen class.</p>
-<p>This function goes through the path to the destination of the variable recursively and adds it to all instances
-that are possible in the path. For example, giving <cite>where = [“MS”, “levels”, “status”]</cite> will result in adding a
-variable to the status object of all levels of all steps of the controller.</p>
-<p>Part of the functionality of the frozen class is to separate initialization and setting of variables. By
-enforcing this, you can make sure not to overwrite already existing variables. Since this function is called
-outside of the <cite>__init__</cite> function of the status objects, this can otherwise lead to bugs that are hard to find.
-For this reason, you need to specifically set <cite>allow_overwrite = True</cite> if you want to forgo the check if the
-variable already exists. This can be useful when resetting variables between steps, but make sure to set it to
-<cite>allow_overwrite = False</cite> the first time you add a variable.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
-<li><p><strong>name</strong> (<em>str</em>) – The name of the variable</p></li>
-<li><p><strong>MPI</strong> (<em>bool</em>) – Whether to use MPI controller</p></li>
-<li><p><strong>place</strong> (<em>object</em>) – The object you want to add the variable to</p></li>
-<li><p><strong>where</strong> (<em>list</em>) – List of strings containing a path to where you want to add the variable</p></li>
-<li><p><strong>init</strong> – Initial value of the variable</p></li>
-<li><p><strong>allow_overwrite</strong> (<em>bool</em>) – Allow overwriting the variables if they already exist or raise an exception</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.add_status_variable_to_level">
+<span class="sig-name descname"><span class="pre">add_status_variable_to_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.add_status_variable_to_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.add_status_variable_to_level" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.add_status_variable_to_step">
+<span class="sig-name descname"><span class="pre">add_status_variable_to_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.add_status_variable_to_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.add_status_variable_to_step" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.check_iteration_status">
@@ -416,28 +395,6 @@ This is called in the <cite>restart_block</cite> function.
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.reset_variable">
-<span class="sig-name descname"><span class="pre">reset_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MPI</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">place</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.reset_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.reset_variable" title="Link to this definition">¶</a></dt>
-<dd><p>Utility function for resetting variables. This function will call the <cite>add_variable</cite> function with all the same
-arguments, but with <cite>allow_overwrite = True</cite>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
-<li><p><strong>name</strong> (<em>str</em>) – The name of the variable</p></li>
-<li><p><strong>MPI</strong> (<em>bool</em>) – Whether to use MPI controller</p></li>
-<li><p><strong>place</strong> (<em>object</em>) – The object you want to reset the variable of</p></li>
-<li><p><strong>where</strong> (<em>list</em>) – List of strings containing a path to where you want to reset the variable</p></li>
-<li><p><strong>init</strong> – Initial value of the variable</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.send">
 <span class="sig-name descname"><span class="pre">send</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.send"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.send" title="Link to this definition">¶</a></dt>
 <dd><p>Send data to a different rank</p>
@@ -455,6 +412,16 @@ arguments, but with <cite>allow_overwrite = True</cite>.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.set_level_status_variable">
+<span class="sig-name descname"><span class="pre">set_level_status_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.set_level_status_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.set_level_status_variable" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.set_step_status_variable">
+<span class="sig-name descname"><span class="pre">set_step_status_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.set_step_status_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.set_step_status_variable" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.setup">
@@ -542,7 +509,8 @@ relevant information about the controller are known.</p>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController"><code class="docutils literal notranslate"><span class="pre">ConvergenceController</span></code></a><ul>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.Recv"><code class="docutils literal notranslate"><span class="pre">Recv()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.Send"><code class="docutils literal notranslate"><span class="pre">Send()</span></code></a></li>
-<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.add_variable"><code class="docutils literal notranslate"><span class="pre">add_variable()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.add_status_variable_to_level"><code class="docutils literal notranslate"><span class="pre">add_status_variable_to_level()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.add_status_variable_to_step"><code class="docutils literal notranslate"><span class="pre">add_status_variable_to_step()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.check_iteration_status"><code class="docutils literal notranslate"><span class="pre">check_iteration_status()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.check_parameters"><code class="docutils literal notranslate"><span class="pre">check_parameters()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.convergence_control"><code class="docutils literal notranslate"><span class="pre">convergence_control()</span></code></a></li>
@@ -561,8 +529,9 @@ relevant information about the controller are known.</p>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.recv"><code class="docutils literal notranslate"><span class="pre">recv()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI"><code class="docutils literal notranslate"><span class="pre">reset_buffers_nonMPI()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.reset_status_variables"><code class="docutils literal notranslate"><span class="pre">reset_status_variables()</span></code></a></li>
-<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.reset_variable"><code class="docutils literal notranslate"><span class="pre">reset_variable()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.send"><code class="docutils literal notranslate"><span class="pre">send()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.set_level_status_variable"><code class="docutils literal notranslate"><span class="pre">set_level_status_variable()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.set_step_status_variable"><code class="docutils literal notranslate"><span class="pre">set_step_status_variable()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.setup_status_variables"><code class="docutils literal notranslate"><span class="pre">setup_status_variables()</span></code></a></li>
 </ul>
