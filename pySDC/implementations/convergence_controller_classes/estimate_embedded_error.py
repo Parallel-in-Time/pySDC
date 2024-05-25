@@ -114,19 +114,7 @@ class EstimateEmbeddedError(ConvergenceController):
         Args:
             controller (pySDC.Controller): The controller
         """
-        if 'comm' in kwargs.keys():
-            steps = [controller.S]
-        else:
-            if 'active_slots' in kwargs.keys():
-                steps = [controller.MS[i] for i in kwargs['active_slots']]
-            else:
-                steps = controller.MS
-        where = ["levels", "status"]
-        for S in steps:
-            self.add_variable(S, name='error_embedded_estimate', where=where, init=None)
-
-    def reset_status_variables(self, controller, **kwargs):
-        self.setup_status_variables(controller, **kwargs)
+        self.add_status_variable_to_level('error_embedded_estimate')
 
     def post_iteration_processing(self, controller, S, **kwargs):
         """
@@ -350,7 +338,7 @@ class EstimateEmbeddedErrorCollocation(ConvergenceController):
                     max([np.finfo(float).eps, abs(self.status.u[-1] - self.status.u[-2])]),
                 )
 
-    def setup_status_variables(self, controller, **kwargs):
+    def setup_status_variables(self, *args, **kwargs):
         """
         Add the embedded error variable to the levels and add a status variable for previous steps.
 
@@ -361,16 +349,4 @@ class EstimateEmbeddedErrorCollocation(ConvergenceController):
         self.status.u = []  # the solutions of converged collocation problems
         self.status.iter = []  # the iteration in which the solution converged
 
-        if 'comm' in kwargs.keys():
-            steps = [controller.S]
-        else:
-            if 'active_slots' in kwargs.keys():
-                steps = [controller.MS[i] for i in kwargs['active_slots']]
-            else:
-                steps = controller.MS
-        where = ["levels", "status"]
-        for S in steps:
-            self.add_variable(S, name='error_embedded_estimate_collocation', where=where, init=None)
-
-    def reset_status_variables(self, controller, **kwargs):
-        self.setup_status_variables(controller, **kwargs)
+        self.add_status_variable_to_level('error_embedded_estimate_collocation')

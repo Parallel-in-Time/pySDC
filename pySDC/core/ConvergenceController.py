@@ -42,6 +42,7 @@ class ConvergenceController(object):
             params (dict): The params passed for this specific convergence controller
             description (dict): The description object used to instantiate the controller
         """
+        self.controller = controller
         self.params = Pars(self.setup(controller, params, description))
         params_ok, msg = self.check_parameters(controller, params, description)
         assert params_ok, f'{type(self).__name__} -- {msg}'
@@ -425,94 +426,43 @@ class ConvergenceController(object):
 
         return data
 
-    def reset_variable(self, controller, name, MPI=False, place=None, where=None, init=None):
-        """
-        Utility function for resetting variables. This function will call the `add_variable` function with all the same
-        arguments, but with `allow_overwrite = True`.
-
-        Args:
-            controller (pySDC.Controller): The controller
-            name (str): The name of the variable
-            MPI (bool): Whether to use MPI controller
-            place (object): The object you want to reset the variable of
-            where (list): List of strings containing a path to where you want to reset the variable
-            init: Initial value of the variable
-
-        Returns:
-            None
-        """
-        self.add_variable(controller, name, MPI, place, where, init, allow_overwrite=True)
-
-    def add_variable(self, controller, name, MPI=False, place=None, where=None, init=None, allow_overwrite=False):
-        """
-        Add a variable to a frozen class.
-
-        This function goes through the path to the destination of the variable recursively and adds it to all instances
-        that are possible in the path. For example, giving `where = ["MS", "levels", "status"]` will result in adding a
-        variable to the status object of all levels of all steps of the controller.
-
-        Part of the functionality of the frozen class is to separate initialization and setting of variables. By
-        enforcing this, you can make sure not to overwrite already existing variables. Since this function is called
-        outside of the `__init__` function of the status objects, this can otherwise lead to bugs that are hard to find.
-        For this reason, you need to specifically set `allow_overwrite = True` if you want to forgo the check if the
-        variable already exists. This can be useful when resetting variables between steps, but make sure to set it to
-        `allow_overwrite = False` the first time you add a variable.
-
-        Args:
-            controller (pySDC.Controller): The controller
-            name (str): The name of the variable
-            MPI (bool): Whether to use MPI controller
-            place (object): The object you want to add the variable to
-            where (list): List of strings containing a path to where you want to add the variable
-            init: Initial value of the variable
-            allow_overwrite (bool): Allow overwriting the variables if they already exist or raise an exception
-
-        Returns:
-            None
-        """
-        where = ["S" if MPI else "MS", "levels", "status"] if where is None else where
-        place = controller if place is None else place
-
-        # check if we have arrived at the end of the path to the variable
-        if len(where) == 0:
-            variable_exitsts = name in place.__dict__.keys()
-            # check if the variable already exists and raise an error in case we are about to introduce a bug
-            if not allow_overwrite and variable_exitsts:
-                raise ValueError(f"Key \"{name}\" already exists in {place}! Please rename the variable in {self}")
-            # if we allow overwriting, but the variable does not exist already, we are violating the intended purpose
-            # of this function, so we also raise an error if someone should be so mad as to attempt this
-            elif allow_overwrite and not variable_exitsts:
-                raise ValueError(f"Key \"{name}\" is supposed to be overwritten in {place}, but it does not exist!")
-
-            # actually add or overwrite the variable
-            place.__dict__[name] = init
-
-        # follow the path to the final destination recursively
+    def add_status_variable_to_step(self, key, value=None):
+        if type(self.controller).__name__ == 'controller_MPI':
+            steps = [self.controller.S]
         else:
-            # get all possible new places to continue the path
-            new_places = place.__dict__[where[0]]
+            steps = self.controller.MS
 
-            # continue all possible paths
-            if type(new_places) == list:
-                # loop through all possibilities
-                for new_place in new_places:
-                    self.add_variable(
-                        controller,
-                        name,
-                        MPI=MPI,
-                        place=new_place,
-                        where=where[1:],
-                        init=init,
-                        allow_overwrite=allow_overwrite,
-                    )
-            else:
-                # go to the only possible possibility
-                self.add_variable(
-                    controller,
-                    name,
-                    MPI=MPI,
-                    place=new_places,
-                    where=where[1:],
-                    init=init,
-                    allow_overwrite=allow_overwrite,
-                )
+        steps[0].status.add_attr(key)
+
+        if value is not None:
+            self.set_step_status_variable(key, value)
+
+    def set_step_status_variable(self, key, value):
+        if type(self.controller).__name__ == 'controller_MPI':
+            steps = [self.controller.S]
+        else:
+            steps = self.controller.MS
+
+        for S in steps:
+            S.status.__dict__[key] = value
+
+    def add_status_variable_to_level(self, key, value=None):
+        if type(self.controller).__name__ == 'controller_MPI':
+            steps = [self.controller.S]
+        else:
+            steps = self.controller.MS
+
+        steps[0].levels[0].status.add_attr(key)
+
+        if value is not None:
+            self.set_level_status_variable(key, value)
+
+    def set_level_status_variable(self, key, value):
+        if type(self.controller).__name__ == 'controller_MPI':
+            steps = [self.controller.S]
+        else:
+            steps = self.controller.MS
+
+        for S in steps:
+            for L in S.levels:
+                L.status.__dict__[key] = value
