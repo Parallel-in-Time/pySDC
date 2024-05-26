@@ -5,7 +5,7 @@ import numpy as np
 
 @pytest.mark.base
 def test_pendulum_u_exact_main():
-    from pySDC.projects.DAE.problems.simple_DAE import pendulum_2d
+    from pySDC.projects.DAE.problems.pendulum2D import pendulum_2d
 
     # initialize problem parameters
     problem_params = dict()
@@ -53,7 +53,7 @@ def test_two_transistor_amplifier_u_exact_main():
 #
 @pytest.mark.base
 def test_pendulum_main():
-    from pySDC.projects.DAE.problems.simple_DAE import pendulum_2d
+    from pySDC.projects.DAE.problems.pendulum2D import pendulum_2d
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
 
@@ -526,7 +526,7 @@ def test_WSCC9_evaluation():
     r"""
     Test for WSCC9 bus test case. The class is written for components :math:`m = 3`, :math:`n = 9`.
     """
-    from pySDC.core.Errors import ParameterError
+
     from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem
 
     problem_params = {
@@ -620,7 +620,7 @@ def test_WSCC9_SDC_detection():
     """
 
     from pySDC.helpers.stats_helper import get_sorted
-    from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem, get_initial_Ybus, get_event_Ybus
+    from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator

@@ -255,7 +255,7 @@ def testOrderAccuracyFullyImplicitIndexTwo(sweeper_name):
     Note that for index two problems order reduction is expected.
     """
 
-    from pySDC.projects.DAE.problems.simple_DAE import problematic_f
+    from pySDC.projects.DAE.problems.problematicF import problematic_f
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostStep
 
