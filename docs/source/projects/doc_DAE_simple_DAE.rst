@@ -1,0 +1,1 @@
+.. literalinclude:: ../../../pySDC/projects/DAE/problems/simple_DAE.py
