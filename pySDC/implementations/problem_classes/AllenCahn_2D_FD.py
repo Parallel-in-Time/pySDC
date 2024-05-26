@@ -134,41 +134,6 @@ class allencahn_fullyimplicit(ptype):
         self.work_counters['rhs'] = WorkCounter()
         self.work_counters['linear'] = WorkCounter()
 
-    @staticmethod
-    def __get_A(N, dx):
-        """
-        Helper function to assemble FD matrix A in sparse format.
-
-        Parameters
-        ----------
-        N : list
-            Number of degrees of freedom.
-        dx : float
-            Distance between two spatial nodes.
-
-        Returns
-        -------
-        A : scipy.sparse.csc_matrix
-            Matrix in CSC format.
-        """
-
-        stencil = [1, -2, 1]
-        zero_pos = 2
-
-        dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
-        offsets = np.concatenate(
-            (
-                [N[0] - i - 1 for i in reversed(range(zero_pos - 1))],
-                [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))],
-            )
-        )
-        doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N[0]))
-
-        A = sp.diags(dstencil, doffsets, shape=(N[0], N[0]), format='csc')
-        A = sp.kron(A, sp.eye(N[0])) + sp.kron(sp.eye(N[1]), A)
-        A *= 1.0 / (dx**2)
-        return A
-
     # noinspection PyTypeChecker
     def solve_system(self, rhs, factor, u0, t):
         """
@@ -286,10 +251,9 @@ class allencahn_fullyimplicit(ptype):
             me[:] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init)
 
         else:
-            for i in range(self.nvars[0]):
-                for j in range(self.nvars[1]):
-                    r2 = self.xvalues[i] ** 2 + self.xvalues[j] ** 2
-                    me[i, j] = np.tanh((self.radius - np.sqrt(r2)) / (np.sqrt(2) * self.eps))
+            X, Y = np.meshgrid(self.xvalues, self.xvalues)
+            r2 = X**2 + Y**2
+            me[:] = np.tanh((self.radius - np.sqrt(r2)) / (np.sqrt(2) * self.eps))
 
         return me
 

@@ -1,7 +1,7 @@
 import pytest
 
 
-def run(use_MPI, num_nodes, quad_type, residual_type, imex, initGuess, useNCCL):
+def run(use_MPI, num_nodes, quad_type, residual_type, imex, init_guess, useNCCL, ML):
     """
     Run a single sweep for a problem and compute the solution at the end point with a sweeper as specified.
 
@@ -11,8 +11,9 @@ def run(use_MPI, num_nodes, quad_type, residual_type, imex, initGuess, useNCCL):
         quad_type (str): Type of nodes
         residual_type (str): Type of residual computation
         imex (bool): Use IMEX sweeper or not
-        initGuess (str): which initial guess should be used
+        init_guess (str): which initial guess should be used
         useNCCL (bool): ...
+        ML (int): Number of levels in space
 
     Returns:
         pySDC.Level.level: The level containing relevant data
@@ -25,7 +26,10 @@ def run(use_MPI, num_nodes, quad_type, residual_type, imex, initGuess, useNCCL):
         else:
             from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit as sweeper_class
 
-        from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d as problem_class
+        if ML:
+            from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced as problem_class
+        else:
+            from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d as problem_class
     else:
         if use_MPI:
             from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as sweeper_class
@@ -35,12 +39,13 @@ def run(use_MPI, num_nodes, quad_type, residual_type, imex, initGuess, useNCCL):
         from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced as problem_class
 
     dt = 1e-1
+    description = {}
     sweeper_params = {
         'num_nodes': num_nodes,
         'quad_type': quad_type,
         'QI': 'IEpar',
         'QE': 'PIC',
-        "initial_guess": initGuess,
+        "initial_guess": init_guess,
     }
     problem_params = {}
 
@@ -51,7 +56,17 @@ def run(use_MPI, num_nodes, quad_type, residual_type, imex, initGuess, useNCCL):
         sweeper_params['comm'] = NCCLComm(MPI.COMM_WORLD)
         problem_params['useGPU'] = True
 
-    description = {}
+    if ML > 1:
+        from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
+
+        description['space_transfer_class'] = mesh_to_mesh
+
+        problem_params['nvars'] = [2 ** (ML - i) for i in range(ML)]
+        if use_MPI:
+            from pySDC.implementations.transfer_classes.BaseTransferMPI import base_transfer_MPI
+
+            description['base_transfer_class'] = base_transfer_MPI
+
     description['problem_class'] = problem_class
     description['problem_params'] = problem_params
     description['sweeper_class'] = sweeper_class
@@ -70,20 +85,17 @@ def run(use_MPI, num_nodes, quad_type, residual_type, imex, initGuess, useNCCL):
     return controller.MS[0].levels[0]
 
 
-def individual_test(num_nodes, quad_type, residual_type, imex, initGuess, useNCCL, launch=True):
+def individual_test(launch=False, **kwargs):
     """
     Make a test if the result matches between the MPI and non-MPI versions of a sweeper.
     Tests solution at the right end point and the residual.
 
     Args:
-        num_nodes (int): The number of nodes to use
-        quad_type (str): Type of nodes
-        residual_type (str): Type of residual computation
-        imex (bool): Use IMEX sweeper or not
-        initGuess (str): which initial guess should be used
-        useNCCL (bool): ...
         launch (bool): If yes, it will launch `mpirun` with the required number of processes
     """
+    num_nodes = kwargs['num_nodes']
+    useNCCL = kwargs['useNCCL']
+
     if launch:
         import os
         import subprocess
@@ -93,9 +105,11 @@ def individual_test(num_nodes, quad_type, residual_type, imex, initGuess, useNCC
         my_env['PYTHONPATH'] = '../../..:.'
         my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
 
-        cmd = f"mpirun -np {num_nodes} python {__file__} --test_sweeper {num_nodes} {quad_type} {residual_type} {imex} {initGuess} {useNCCL}".split()
+        cmd = f"mpirun -np {num_nodes} python {__file__}"
 
-        p = subprocess.Popen(cmd, env=my_env, cwd=".")
+        for key, value in kwargs.items():
+            cmd += f' --{key}={value}'
+        p = subprocess.Popen(cmd.split(), env=my_env, cwd=".")
 
         p.wait()
         assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
@@ -109,25 +123,17 @@ def individual_test(num_nodes, quad_type, residual_type, imex, initGuess, useNCC
             import numpy as xp
 
         MPI = run(
+            **kwargs,
             use_MPI=True,
-            num_nodes=int(num_nodes),
-            quad_type=quad_type,
-            residual_type=residual_type,
-            imex=imex,
-            initGuess=initGuess,
-            useNCCL=useNCCL,
         )
         nonMPI = run(
+            **kwargs,
             use_MPI=False,
-            num_nodes=int(num_nodes),
-            quad_type=quad_type,
-            residual_type=residual_type,
-            imex=imex,
-            initGuess=initGuess,
-            useNCCL=False,
         )
 
-        assert xp.allclose(MPI.uend, nonMPI.uend, atol=1e-14), 'Got different solutions at end point!'
+        assert xp.allclose(
+            MPI.uend, nonMPI.uend, atol=1e-14
+        ), f'Got different solutions at end point! {MPI.uend=} {nonMPI.uend=}'
         assert xp.allclose(MPI.status.residual, nonMPI.status.residual, atol=1e-14), 'Got different residuals!'
 
 
@@ -136,8 +142,9 @@ def individual_test(num_nodes, quad_type, residual_type, imex, initGuess, useNCC
 @pytest.mark.parametrize("quad_type", ['GAUSS', 'RADAU-RIGHT'])
 @pytest.mark.parametrize("residual_type", ['last_abs', 'full_rel'])
 @pytest.mark.parametrize("imex", [True, False])
-@pytest.mark.parametrize("initGuess", ['spread', 'copy', 'zero'])
-def test_sweeper(num_nodes, quad_type, residual_type, imex, initGuess, launch=True):
+@pytest.mark.parametrize("init_guess", ['spread', 'copy', 'zero'])
+@pytest.mark.parametrize("ML", [1, 2, 3])
+def test_sweeper(num_nodes, quad_type, residual_type, imex, init_guess, ML, launch=True):
     """
     Make a test if the result matches between the MPI and non-MPI versions of a sweeper.
     Tests solution at the right end point and the residual.
@@ -149,7 +156,16 @@ def test_sweeper(num_nodes, quad_type, residual_type, imex, initGuess, launch=Tr
         imex (bool): Use IMEX sweeper or not
         launch (bool): If yes, it will launch `mpirun` with the required number of processes
     """
-    individual_test(num_nodes, quad_type, residual_type, imex, initGuess, useNCCL=False, launch=launch)
+    individual_test(
+        num_nodes=num_nodes,
+        quad_type=quad_type,
+        residual_type=residual_type,
+        imex=imex,
+        init_guess=init_guess,
+        useNCCL=False,
+        ML=ML,
+        launch=launch,
+    )
 
 
 @pytest.mark.cupy
@@ -158,8 +174,8 @@ def test_sweeper(num_nodes, quad_type, residual_type, imex, initGuess, launch=Tr
 @pytest.mark.parametrize("quad_type", ['GAUSS', 'RADAU-RIGHT'])
 @pytest.mark.parametrize("residual_type", ['last_abs', 'full_rel'])
 @pytest.mark.parametrize("imex", [False])
-@pytest.mark.parametrize("initGuess", ['spread', 'copy', 'zero'])
-def test_sweeper_NCCL(num_nodes, quad_type, residual_type, imex, initGuess, launch=True):
+@pytest.mark.parametrize("init_guess", ['spread', 'copy', 'zero'])
+def test_sweeper_NCCL(num_nodes, quad_type, residual_type, imex, init_guess, launch=True):
     """
     Make a test if the result matches between the MPI and non-MPI versions of a sweeper.
     Tests solution at the right end point and the residual.
@@ -171,15 +187,35 @@ def test_sweeper_NCCL(num_nodes, quad_type, residual_type, imex, initGuess, laun
         imex (bool): Use IMEX sweeper or not
         launch (bool): If yes, it will launch `mpirun` with the required number of processes
     """
-    individual_test(num_nodes, quad_type, residual_type, imex, initGuess, useNCCL=True, launch=launch)
+    individual_test(
+        num_nodes=num_nodes,
+        quad_type=quad_type,
+        residual_type=residual_type,
+        imex=imex,
+        init_guess=init_guess,
+        useNCCL=True,
+        ML=1,
+        launch=launch,
+    )
 
 
 if __name__ == '__main__':
-    import sys
+    str_to_bool = lambda me: False if me == 'False' else True
+    import argparse
 
-    if '--test_sweeper' in sys.argv:
-        imex = False if sys.argv[-3] == 'False' else True
-        useNCCL = False if sys.argv[-1] == 'False' else True
-        individual_test(
-            sys.argv[-6], sys.argv[-5], sys.argv[-4], imex=imex, initGuess=sys.argv[-2], useNCCL=useNCCL, launch=False
-        )
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--ML', type=int, help='Number of levels in space')
+    parser.add_argument('--num_nodes', type=int, help='Number of collocation nodes')
+    parser.add_argument('--quad_type', type=str, help='Quadrature rule', choices=['GAUSS', 'RADAU-RIGHT', 'RADAU-LEFT'])
+    parser.add_argument(
+        '--residual_type',
+        type=str,
+        help='Way of computing the residual',
+        choices=['full_rel', 'last_abs', 'full_abs', 'last_rel'],
+    )
+    parser.add_argument('--imex', type=str_to_bool, help='Toggle for IMEX', choices=[True, False])
+    parser.add_argument('--useNCCL', type=str_to_bool, help='Toggle for NCCL communicator', choices=[True, False])
+    parser.add_argument('--init_guess', type=str, help='Initial guess', choices=['spread', 'copy', 'zero'])
+    args = parser.parse_args()
+
+    individual_test(**vars(args))

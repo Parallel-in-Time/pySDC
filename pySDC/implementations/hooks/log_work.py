@@ -53,3 +53,27 @@ class LogWork(hooks):
                 type=f'work_{key}',
                 value=L.prob.work_counters[key].niter - self.__work_last_step[step.status.slot][level_number][key],
             )
+
+
+class LogSDCIterations(hooks):
+    """
+    Log the number of SDC iterations between steps.
+    You can control the name in the stats via the class attribute ``name``.
+    """
+
+    name = 'k'
+
+    def post_step(self, step, level_number):
+        super().post_step(step, level_number)
+
+        L = step.levels[level_number]
+        self.increment_stats(
+            process=step.status.slot,
+            process_sweeper=L.sweep.rank,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type=self.name,
+            value=step.status.iter,
+        )
