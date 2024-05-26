@@ -161,7 +161,7 @@ which is of the general form
      F\left(u (t), u' (t), t\right) = 0
   \end{eqnarray}
 
-.. literalinclude:: /problems/problematicF.py
+.. literalinclude:: problems/problematicF.py
 
 The imports for the classes ``ptype_dae`` and ``mesh`` are necessary for implementing this problem.
 
@@ -200,7 +200,7 @@ We want to implement such an equation and consider the example
 This example has two differential variables :math:`u_1`, :math:`u_2` (two differential equations) and one algebraic variable :math:`z` (thus one algebraic equation).
 In ``pySDC`` defining a problem class for semi-explicit DAEs is slightly different to those of fully-implicit form. Additionally to ``numpy`` for the example the imports for the classes ``ptype_dae`` and ``DAEMesh`` are needed.
 
-.. literalinclude:: /problems/simple_DAE.py
+.. literalinclude:: problems/simple_DAE.py
 
 This problem class inherits again from ``ptype_dae``. In contrast, for the solution ``u`` and the right-hand side of the ``f``
 a different datatype ``DAEMesh`` is used that allows to separate between the differential variables and the algebraic variables as well
