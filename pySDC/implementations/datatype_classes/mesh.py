@@ -1,7 +1,5 @@
 import numpy as np
 
-from pySDC.core.Errors import DataError
-
 try:
     # TODO : mpi4py cannot be imported before dolfin when using fenics mesh
     # see https://github.com/Parallel-in-Time/pySDC/pull/285#discussion_r1145850590
@@ -20,7 +18,9 @@ class mesh(np.ndarray):
         _comm: MPI communicator or None
     """
 
-    def __new__(cls, init, val=0.0, offset=0, buffer=None, strides=None, order=None):
+    _comm = None
+
+    def __new__(cls, init, val=0.0, **kwargs):
         """
         Instantiates new datatype. This ensures that even when manipulating data, the result is still a mesh.
 
@@ -33,19 +33,14 @@ class mesh(np.ndarray):
 
         """
         if isinstance(init, mesh):
-            obj = np.ndarray.__new__(
-                cls, shape=init.shape, dtype=init.dtype, buffer=buffer, offset=offset, strides=strides, order=order
-            )
+            obj = np.ndarray.__new__(cls, shape=init.shape, dtype=init.dtype, **kwargs)
             obj[:] = init[:]
-            obj._comm = init._comm
         elif (
             isinstance(init, tuple)
             and (init[1] is None or isinstance(init[1], MPI.Intracomm))
             and isinstance(init[2], np.dtype)
         ):
-            obj = np.ndarray.__new__(
-                cls, init[0], dtype=init[2], buffer=buffer, offset=offset, strides=strides, order=order
-            )
+            obj = np.ndarray.__new__(cls, init[0], dtype=init[2], **kwargs)
             obj.fill(val)
             obj._comm = init[1]
         else:
@@ -59,30 +54,18 @@ class mesh(np.ndarray):
         """
         return self._comm
 
-    def __array_finalize__(self, obj):
-        """
-        Finalizing the datatype. Without this, new datatypes do not 'inherit' the communicator.
-        """
-        if obj is None:
-            return
-        self._comm = getattr(obj, '_comm', None)
-
     def __array_ufunc__(self, ufunc, method, *inputs, out=None, **kwargs):
         """
         Overriding default ufunc, cf. https://numpy.org/doc/stable/user/basics.subclassing.html#array-ufunc-for-ufuncs
         """
         args = []
-        comm = None
         for _, input_ in enumerate(inputs):
             if isinstance(input_, mesh):
                 args.append(input_.view(np.ndarray))
-                comm = input_.comm
             else:
                 args.append(input_)
 
-        results = super(mesh, self).__array_ufunc__(ufunc, method, *args, **kwargs).view(type(self))
-        if type(self) == type(results):
-            results._comm = comm
+        results = super().__array_ufunc__(ufunc, method, *args, **kwargs).view(type(self))
         return results
 
     def __abs__(self):
