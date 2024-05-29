@@ -33,15 +33,20 @@ class Tensor(torch.Tensor):
             obj of type mesh
 
         """
-        if isinstance(init, Tensor):
-            obj = super().__new__(cls, init)
+        # TODO: The cloning of tensors going in is likely slow
+
+        if isinstance(init, torch.Tensor):
+            obj = super().__new__(cls, init.clone())
             obj[:] = init[:]
         elif (
             isinstance(init, tuple)
             and (init[1] is None or isinstance(init[1], MPI.Intracomm))
             # and isinstance(init[2], np.dtype)
         ):
-            obj = super().__new__(cls, *init[0])
+            if isinstance(init[0][0], torch.Tensor):
+                obj = super().__new__(cls, init[0].clone())
+            else:
+                obj = super().__new__(cls, *init[0])
             obj.fill_(val)
             cls.comm = init[1]
         else:
