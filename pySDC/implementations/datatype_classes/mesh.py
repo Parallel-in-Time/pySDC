@@ -47,6 +47,20 @@ class mesh(np.ndarray):
             raise NotImplementedError(type(init))
         return obj
 
+    def __array_ufunc__(self, ufunc, method, *inputs, out=None, **kwargs):
+        """
+        Overriding default ufunc, cf. https://numpy.org/doc/stable/user/basics.subclassing.html#array-ufunc-for-ufuncs
+        """
+        args = []
+        for _, input_ in enumerate(inputs):
+            if isinstance(input_, mesh):
+                args.append(input_.view(np.ndarray))
+            else:
+                args.append(input_)
+
+        results = super().__array_ufunc__(ufunc, method, *args, **kwargs).view(type(self))
+        return results
+
     def __abs__(self):
         """
         Overloading the abs operator
