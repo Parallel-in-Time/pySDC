@@ -15,10 +15,10 @@ class mesh(np.ndarray):
     Can include a communicator and expects a dtype to allow complex data.
 
     Attributes:
-        _comm: MPI communicator or None
+        comm: MPI communicator or None
     """
 
-    _comm = None
+    comm = None
 
     def __new__(cls, init, val=0.0, **kwargs):
         """
@@ -42,31 +42,10 @@ class mesh(np.ndarray):
         ):
             obj = np.ndarray.__new__(cls, init[0], dtype=init[2], **kwargs)
             obj.fill(val)
-            obj._comm = init[1]
+            cls.comm = init[1]
         else:
             raise NotImplementedError(type(init))
         return obj
-
-    @property
-    def comm(self):
-        """
-        Getter for the communicator
-        """
-        return self._comm
-
-    def __array_ufunc__(self, ufunc, method, *inputs, out=None, **kwargs):
-        """
-        Overriding default ufunc, cf. https://numpy.org/doc/stable/user/basics.subclassing.html#array-ufunc-for-ufuncs
-        """
-        args = []
-        for _, input_ in enumerate(inputs):
-            if isinstance(input_, mesh):
-                args.append(input_.view(np.ndarray))
-            else:
-                args.append(input_)
-
-        results = super().__array_ufunc__(ufunc, method, *args, **kwargs).view(type(self))
-        return results
 
     def __abs__(self):
         """
