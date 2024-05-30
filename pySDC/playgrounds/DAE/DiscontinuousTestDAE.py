@@ -74,7 +74,7 @@ def simulateDAE():
     plotSolution(stats)
 
 
-def plotSolution(stats):
+def plotSolution(stats, file_name='data/solution.png'):
     r"""
     Here, the solution of the DAE is plotted.
 
@@ -96,7 +96,7 @@ def plotSolution(stats):
     plt.xlabel(r"Time $t$")
     plt.ylabel(r"Solution $y(t)$, $z(t)$")
 
-    plt.savefig('data/solution.png', dpi=300, bbox_inches='tight')
+    plt.savefig(file_name, dpi=300, bbox_inches='tight')
     plt.close()
 
 

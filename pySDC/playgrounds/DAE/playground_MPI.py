@@ -12,9 +12,11 @@ from pySDC.implementations.hooks.log_solution import LogSolution
 
 def run():
     r"""
-    Routine to do a run using the semi-implicit SDC-DAE sweeper enabling parallelization across the nodes. To run the script use the command 
+    Routine to do a run using the semi-implicit SDC-DAE sweeper enabling parallelization across the nodes. The number of processes that is used to run this file is the number of collocation nodes used! When you run the script with the command 
 
     >>> mpiexec -n 3 python3 playground_MPI.py
+
+    then 3 collocation nodes are used for SDC.
     """
 
     # This communicator is needed for the SDC-DAE sweeper
@@ -34,7 +36,7 @@ def run():
     # initialize sweeper parameters
     sweeper_params = {
         'quad_type': 'RADAU-RIGHT',
-        'num_nodes': 3,
+        'num_nodes': comm.Get_size(),
         'QI': 'MIN-SR-S',  # use a diagonal Q_Delta here!
         'initial_guess': 'spread',
         'comm': comm,
@@ -80,7 +82,8 @@ def run():
 
     # only process with index 0 should plot
     if comm.Get_rank() == 0:
-        plotSolution(stats)
+        file_name = 'data/solution_MPI.png'
+        plotSolution(stats, file_name)
 
 
 if __name__ == "__main__":
