@@ -8,3 +8,5 @@ dependencies:
   - numpy
   - scipy>=0.17.1
   - dill>=0.2.6
+  - mpich
+  - mpi4py>=3.0.0
