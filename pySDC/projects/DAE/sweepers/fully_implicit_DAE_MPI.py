@@ -13,7 +13,7 @@ class SweeperDAEMPI(SweeperMPI):
 
     >>> class fully_implicit_DAE_MPI(SweeperDAEMPI, generic_implicit_MPI, fully_implicit_DAE):
 
-    Be careful with ordering of the class where the child class should inherit from! Due to multple inheritance several methods are overwritten here. In the example above (which is the class below) the class first inherits the methods 
+    Be careful with ordering of classes where the child class should inherit from! Due to multple inheritance several methods are overwritten here. In the example above (which is the class below) the class first inherits the methods
 
     - compute_residual()
     - predict()
@@ -141,9 +141,31 @@ class SweeperDAEMPI(SweeperMPI):
 
 
 class fully_implicit_DAE_MPI(SweeperDAEMPI, generic_implicit_MPI, fully_implicit_DAE):
-    """
-    Fully implicit DAE sweeper parallelized across the nodes.
-    Please supply a communicator as `comm` to the parameters!
+    r"""
+    Custom sweeper class to implement the fully-implicit SDC parallelized across the nodes for solving fully-implicit DAE problems of the form
+
+    .. math::
+        F(t, u, u') = 0.
+
+    More detailed description can be found in ``fully_implicit_DAE.py``.
+
+    This sweeper uses diagonal matrices :math:`\mathbf{Q}_\Delta` to
+    solve the implicit system on each node in parallel. First diagonal matrices were first developed and applied in [1]_. Years later intensive theory in [2]_ is developed to that topic. Ideas of parallelizing SDC across the method are basically applied for the DAE case here.
+
+    Note
+    ----
+    Please supply a communicator as `comm` to the parameters! The number of processes used to parallelize needs to be equal to the number of collocation nodes used. For example, three collocation nodes are used and passed to the sweeper via
+
+    >>> sweeper_params = {'num_nodes': 3}
+
+    running a script ``example_mpi.py`` using ``mpi4py`` that is used to enable parallelism have to be done by using the command
+
+    >>> mpiexec -n 3 python3 example.py
+
+    Reference
+    ---------
+    .. [1] R. Speck. Parallelizing spectral deferred corrections across the method. Comput. Vis. Sci. 19, No. 3-4, 75-83 (2018).
+    .. [2] G. Čaklović,  T. Lunet, S. Götschel, D. Ruprecht. Improving Efficiency of Parallel Across the Method Spectral Deferred Corrections. Preprint, arXiv:2403.18641 [math.NA] (2024).
     """
 
     def integrate(self, last_only=False):
@@ -167,15 +189,9 @@ class fully_implicit_DAE_MPI(SweeperDAEMPI, generic_implicit_MPI, fully_implicit
 
         me = P.dtype_u(P.init, val=0.0)
         for m in [self.coll.num_nodes - 1] if last_only else range(self.coll.num_nodes):
-            recvBufDiff = me.diff[:] if m == self.rank else None
-            recvBufAlg = me.alg[:] if m == self.rank else None
-            integral = L.dt * self.coll.Qmat[m + 1, self.rank + 1] * L.f[self.rank + 1]
-            self.comm.Reduce(
-                integral.diff, recvBufDiff, root=m, op=MPI.SUM
-            )
-            self.comm.Reduce(
-                integral.alg, recvBufAlg, root=m, op=MPI.SUM
-            )
+            integral = L.dt * self.coll.Qmat[m + 1, self.rank + 1] * L.f[self.rank + 1][:]
+            recvBuf = me[:] if m == self.rank else None
+            self.comm.Reduce(integral, recvBuf, root=m, op=MPI.SUM)
 
         return me
 
