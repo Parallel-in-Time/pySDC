@@ -16,7 +16,7 @@ def testOrder(num_procs):
     my_env['PYTHONPATH'] = '../../..:.'
     my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
     cwd = '.'
-    print(my_env['PYTHONPATH'])
+
     cmd = ('mpirun -np ' + str(num_procs) + ' python pySDC/projects/DAE/run/accuracy_check_MPI.py').split()
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
 
