@@ -50,12 +50,10 @@ class SemiImplicitDAEMPI(SweeperDAEMPI, SemiImplicitDAE):
 
         me = P.dtype_u(P.init, val=0.0)
         for m in [self.coll.num_nodes - 1] if last_only else range(self.coll.num_nodes):
-            recvBufDiff = me.diff[:] if m == self.rank else None
-            recvBufAlg = me.alg[:] if m == self.rank else None
             integral = P.dtype_u(P.init, val=0.0)
             integral.diff[:] = L.dt * self.coll.Qmat[m + 1, self.rank + 1] * L.f[self.rank + 1].diff[:]
-            self.comm.Reduce(integral.diff[:], recvBufDiff, root=m, op=MPI.SUM)
-            self.comm.Reduce(integral.alg[:], recvBufAlg, root=m, op=MPI.SUM)
+            recvBuf = me[:] if m == self.rank else None
+            self.comm.Reduce(integral, recvBuf, root=m, op=MPI.SUM)
 
         return me
 

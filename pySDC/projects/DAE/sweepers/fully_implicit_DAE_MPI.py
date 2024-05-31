@@ -13,13 +13,12 @@ class SweeperDAEMPI(SweeperMPI):
 
     >>> class fully_implicit_DAE_MPI(SweeperDAEMPI, generic_implicit_MPI, fully_implicit_DAE):
 
-    Be careful with ordering of classes where the child class should inherit from! Due to multple inheritance several methods are overwritten here. In the example above (which is the class below) the class first inherits the methods
+    Be careful with ordering of classes where the child class should inherit from! Due to multiple inheritance several methods are overwritten here. In the example above (which is the class below) the class first inherits the methods
 
     - compute_residual()
     - predict()
-    - compute_end_point()
 
-    from ``SweeperDAEMPI``. From second inherited class ``generic_implicit_MPI`` the methods
+    from ``SweeperDAEMPI``. ``compute_end_point()`` is inherited from ``SweeperMPI``. From second inherited class ``generic_implicit_MPI`` the methods
 
     - integrate()
     - update_nodes()
@@ -31,9 +30,6 @@ class SweeperDAEMPI(SweeperMPI):
     params : dict
         Parameters passed to the sweeper.
     """
-
-    def __init__(self, params):
-        super().__init__(params)
 
     def compute_residual(self, stage=None):
         r"""
@@ -109,35 +105,6 @@ class SweeperDAEMPI(SweeperMPI):
         # indicate that this level is now ready for sweeps
         L.status.unlocked = True
         L.status.updated = True
-
-    def compute_end_point(self):
-        """
-        Compute u at the right point of the interval.
-
-        The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False
-
-        Returns
-        -------
-        None
-        """
-
-        L = self.level
-        P = L.prob
-        L.uend = P.dtype_u(P.init, val=0.0)
-
-        # check if Mth node is equal to right point and do_coll_update is false, perform a simple copy
-        if self.coll.right_is_node and not self.params.do_coll_update:
-            # a copy is sufficient
-            root = self.comm.Get_size() - 1
-            if self.comm.rank == root:
-                L.uend = P.dtype_u(L.u[-1])
-            # broadcast diff parts and alg parts separately
-            self.comm.Bcast(L.uend.diff, root=root)
-            self.comm.Bcast(L.uend.alg, root=root)
-        else:
-            raise NotImplementedError()
-
-        return None
 
 
 class fully_implicit_DAE_MPI(SweeperDAEMPI, generic_implicit_MPI, fully_implicit_DAE):
