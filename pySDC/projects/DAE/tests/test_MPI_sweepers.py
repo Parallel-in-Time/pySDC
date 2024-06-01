@@ -34,7 +34,7 @@ def testOrder(num_procs):
 
 @pytest.mark.mpi4py
 @pytest.mark.parametrize("num_nodes", [2])
-@pytest.mark.parametrize("residual_type", ['full_abs', 'last_abs', 'full_abs', 'last_rel'])
+@pytest.mark.parametrize("residual_type", ['full_abs', 'last_abs', 'full_rel', 'last_rel'])
 @pytest.mark.parametrize("semi_implicit", [True, False])
 @pytest.mark.parametrize("index_case", [1, 2])
 @pytest.mark.parametrize("initial_guess", ['spread', 'zero', 'something_else'])
