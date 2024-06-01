@@ -9,7 +9,7 @@ from pySDC.projects.DAE.misc.HookClass_DAE import (
 from pySDC.helpers.stats_helper import get_sorted
 
 
-def run(dt, num_nodes, use_MPI, semi_implicit, residual_type, index_case, comm=None):
+def run(dt, num_nodes, use_MPI, semi_implicit, residual_type, index_case, initial_guess='spread', comm=None):
     r"""
     Prepares the controller with all the description needed. Here, the function decides to choose the correct sweeper
     for the test.
@@ -28,6 +28,8 @@ def run(dt, num_nodes, use_MPI, semi_implicit, residual_type, index_case, comm=N
         Choose how to compute the residual.
     index_case : int
         Denotes the index case of a DAE to be tested here, can be either ``1`` or ``2``.
+    initial_guess : str, optional
+        Type of initial guess for simulation.
     comm : mpi4py.MPI.COMM_WORLD
         Communicator.
     """
@@ -78,7 +80,7 @@ def run(dt, num_nodes, use_MPI, semi_implicit, residual_type, index_case, comm=N
         'quad_type': 'RADAU-RIGHT',
         'num_nodes': num_nodes,
         'QI': 'MIN-SR-S',  # use a diagonal Q_Delta here!
-        'initial_guess': 'spread',
+        'initial_guess': initial_guess,
     }
 
     # check if number of processes requested matches with number of nodes
@@ -134,7 +136,15 @@ def check_order(comm):
 
             errorsDiff, errorsAlg = np.zeros(len(dt_list)), np.zeros(len(dt_list))
             for i, dt in enumerate(dt_list):
-                _, _, stats = run(dt, num_nodes, use_MPI, semi_implicit, residual_type, index_case, comm)
+                _, _, stats = run(
+                    dt=dt,
+                    num_nodes=num_nodes,
+                    use_MPI=use_MPI,
+                    semi_implicit=semi_implicit,
+                    residual_type=residual_type,
+                    index_case=index_case,
+                    comm=comm,
+                )
 
                 errorsDiff[i] = max(
                     np.array(
