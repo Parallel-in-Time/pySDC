@@ -1,1 +1,0 @@
-.. literalinclude:: ../../../pySDC/projects/DAE/problems/problematicF.py

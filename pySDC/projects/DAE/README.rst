@@ -26,6 +26,10 @@ Project overview
 - problems
     - | ``DiscontinousTestDAE``
       | Simple nonlinear semi-explicit index-1 DAE with discrete state event whose event time is known.
+    - | ``pendulum2D.py``
+      | Example of the pendulum described by a semi-implicit DAE of index 3.
+    - | ``problematicF.py``
+      | Fully-implicit DAE of index 2 which is not solvable for numerically solvable for certain choices of parameter :math:`\eta`.
     - | ``simple_DAE.py`` 
       | A number of simple examples of differential algebraic equations are implemented here: a linear index-2 system with known analytical solution, the 2D pendulum as an index-3 system and a very simple fully implicit index-2 system that is not solvable by most numerical methods for certain values of a parameter.
     - | ``synchronous_machine.py`` 
@@ -161,7 +165,7 @@ which is of the general form
      F\left(u (t), u' (t), t\right) = 0
   \end{eqnarray}
 
-.. include:: doc_DAE_problematicF.rst
+.. literalinclude:: problems/problematicF.py
 
 The imports for the classes ``ptype_dae`` and ``mesh`` are necessary for implementing this problem.
 
@@ -200,7 +204,7 @@ We want to implement such an equation and consider the example
 This example has two differential variables :math:`u_1`, :math:`u_2` (two differential equations) and one algebraic variable :math:`z` (thus one algebraic equation).
 In ``pySDC`` defining a problem class for semi-explicit DAEs is slightly different to those of fully-implicit form. Additionally to ``numpy`` for the example the imports for the classes ``ptype_dae`` and ``DAEMesh`` are needed.
 
-.. include:: doc_DAE_simple_DAE.rst
+.. literalinclude:: problems/simple_DAE.py
 
 This problem class inherits again from ``ptype_dae``. In contrast, for the solution ``u`` and the right-hand side of the ``f``
 a different datatype ``DAEMesh`` is used that allows to separate between the differential variables and the algebraic variables as well
