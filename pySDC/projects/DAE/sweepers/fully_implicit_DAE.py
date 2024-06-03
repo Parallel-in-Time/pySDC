@@ -148,7 +148,7 @@ class fully_implicit_DAE(generic_implicit):
         .. math::
             ||F(t, u, u')||
 
-        for computing the residual.
+        for computing the residual in a chosen norm.
 
         Parameters
         ----------
@@ -194,7 +194,7 @@ class fully_implicit_DAE(generic_implicit):
 
     def compute_end_point(self):
         """
-        Compute u at the right point of the interval
+        Compute u at the right point of the interval.
 
         The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False
 

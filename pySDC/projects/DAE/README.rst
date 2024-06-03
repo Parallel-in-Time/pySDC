@@ -35,11 +35,19 @@ Project overview
     - | ``fully_implicit_dae_playground.py``
       | Testing arena for the fully implicit sweeper. 
     - | ``synchronous_machine_playground.py``
-      | Testing arena for the synchronous machine model. 
+      | Testing arena for the synchronous machine model.
+    - | ``accuracy_check_MPI.py``
+      | Script checking the order of accuracy of MPI sweepers for DAEs of different indices.
 
 - sweepers
     - | ``fully_implicit_DAE.py`` 
       | Sweeper that accepts a fully implicit formulation of a system of differential equations and applies to it a modified version of spectral deferred correction
+    - | ``SemiImplicitDAE.py``
+      | SDC sweeper especially for semi-explicit DAEs. This sweeper is based on ideas mentioned in `Huang et al. (2007) <https://www.sciencedirect.com/science/article/abs/pii/S0021999106003147>`_.
+    - | ``fully_implicit_DAE_MPI.py``
+      | MPI version of fully-implicit SDC-DAE sweeper.
+    - | ``SemiImplicitDAEMPI.py``
+      | MPI version of semi-implicit SDC-DAE sweeper.
  
 Theoretical details 
 ----------------------
