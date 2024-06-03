@@ -127,6 +127,11 @@
 <div class="line">Testing arena for the synchronous machine model.</div>
 </div>
 </li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">accuracy_check_MPI.py</span></code></div>
+<div class="line">Script checking the order of accuracy of MPI sweepers for DAEs of different indices.</div>
+</div>
+</li>
 </ul>
 </dd>
 </dl>
@@ -136,6 +141,21 @@
 <li><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">fully_implicit_DAE.py</span></code></div>
 <div class="line">Sweeper that accepts a fully implicit formulation of a system of differential equations and applies to it a modified version of spectral deferred correction</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">SemiImplicitDAE.py</span></code></div>
+<div class="line">SDC sweeper especially for semi-explicit DAEs. This sweeper is based on ideas mentioned in <a class="reference external" href="https://www.sciencedirect.com/science/article/abs/pii/S0021999106003147">Huang et al. (2007)</a>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">fully_implicit_DAE_MPI.py</span></code></div>
+<div class="line">MPI version of fully-implicit SDC-DAE sweeper.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">SemiImplicitDAEMPI.py</span></code></div>
+<div class="line">MPI version of semi-implicit SDC-DAE sweeper.</div>
 </div>
 </li>
 </ul>
