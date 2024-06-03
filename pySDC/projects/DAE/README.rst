@@ -31,7 +31,7 @@ Project overview
     - | ``problematicF.py``
       | Fully-implicit DAE of index 2 which is not solvable for numerically solvable for certain choices of parameter :math:`\eta`.
     - | ``simple_DAE.py`` 
-      | A number of simple examples of differential algebraic equations are implemented here: a linear index-2 system with known analytical solution, the 2D pendulum as an index-3 system and a very simple fully implicit index-2 system that is not solvable by most numerical methods for certain values of a parameter.
+      | Linear semi-explicit index-2 system of Hessenberg form with known analytical solution.
     - | ``synchronous_machine.py`` 
       | Synchronous machine model attached to an infinite bus undergoing torque disturbance test. Results in an index-1 system. 
     - | ``transistor_amplifier.py``
