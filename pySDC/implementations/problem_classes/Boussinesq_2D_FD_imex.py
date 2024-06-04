@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.sparse.linalg import gmres
 
-from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 from pySDC.implementations.problem_classes.boussinesq_helpers.build2DFDMatrix import get2DMesh
@@ -263,8 +262,8 @@ class boussinesq_2d_imex(ptype):
         """
 
         f = self.dtype_f(self.init)
-        f.impl = self.__eval_fimpl(u, t)
-        f.expl = self.__eval_fexpl(u, t)
+        f.impl[:] = self.__eval_fimpl(u, t)
+        f.expl[:] = self.__eval_fexpl(u, t)
         return f
 
     def u_exact(self, t):
