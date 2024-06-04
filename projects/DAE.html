@@ -47,7 +47,7 @@
             
   <section id="solving-differential-algebraic-equations-with-sdc">
 <h1>Solving differential algebraic equations with SDC<a class="headerlink" href="#solving-differential-algebraic-equations-with-sdc" title="Link to this heading">¶</a></h1>
-<p>This project contains the sweepers, hooks, example problems, plotting and simulation scripts for a Master’s thesis investigating the usage of SDC methods to solve differential algebraic equations.</p>
+<p>This project contains the sweepers, hooks, example problems, plotting and simulation scripts for a Master’s thesis investigating the usage of SDC methods to solve differential algebraic equations (DAEs).</p>
 <p>To run the scripts contained in this project a standard installation of pySDC should suffice.</p>
 <section id="project-overview">
 <h2>Project overview<a class="headerlink" href="#project-overview" title="Link to this heading">¶</a></h2>
@@ -55,8 +55,18 @@
 <li><dl>
 <dt>misc</dt><dd><ul>
 <li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">DAEMesh.py</span></code></div>
+<div class="line">Datatype for semi-explicit DAE problem classes differential and algebraic parts to have a clean treatment.</div>
+</div>
+</li>
+<li><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">HookClass_DAE.py</span></code></div>
 <div class="line">Simple hook classes to read out the approximate solution and error after each time step.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">ProblemDAE.py</span></code></div>
+<div class="line">Parent class for DAE problems containing the method to solve the (non)-linear system at each node/stage.</div>
 </div>
 </li>
 </ul>
@@ -87,8 +97,23 @@
 <li><dl>
 <dt>problems</dt><dd><ul>
 <li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">DiscontinousTestDAE</span></code></div>
+<div class="line">Simple nonlinear semi-explicit index-1 DAE with discrete state event whose event time is known.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">pendulum2D.py</span></code></div>
+<div class="line">Example of the pendulum described by a semi-implicit DAE of index 3.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">problematicF.py</span></code></div>
+<div class="line">Fully-implicit DAE of index 2 which is not solvable for numerically solvable for certain choices of parameter <span class="math notranslate nohighlight">\(\eta\)</span>.</div>
+</div>
+</li>
+<li><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">simple_DAE.py</span></code></div>
-<div class="line">A number of simple examples of differential algebraic equations are implemented here: a linear index-2 system with known analytical solution, the 2D pendulum as an index-3 system and a very simple fully implicit index-2 system that is not solvable by most numerical methods for certain values of a parameter.</div>
+<div class="line">Linear semi-explicit index-2 system of Hessenberg form with known analytical solution.</div>
 </div>
 </li>
 <li><div class="line-block">
@@ -99,6 +124,11 @@
 <li><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">transistor_amplifier.py</span></code></div>
 <div class="line">A two transistor amplifier model that results in an index-1 differential algebraic system. A nice example of a system resulting from a common real world situation.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">WSCC9BusSystem.py</span></code></div>
+<div class="line">Large power system test case with three reduced model synchronous machines and nine buses. It is also part of the <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/tree/master/pySDC/projects/PinTSimE">PinTSimE project</a>.</div>
 </div>
 </li>
 </ul>
@@ -158,7 +188,17 @@
 <div class="line">MPI version of semi-implicit SDC-DAE sweeper.</div>
 </div>
 </li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">RungeKuttaDAE.py</span></code></div>
+<div class="line">Runge-Kutta methods that can be used to solve DAEs in pySDC in a fully-implicit description.</div>
+</div>
+</li>
 </ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>tests</dt><dd><p>Here, all tests for the project can be found.</p>
 </dd>
 </dl>
 </li>
@@ -168,41 +208,107 @@
 <h2>Theoretical details<a class="headerlink" href="#theoretical-details" title="Link to this heading">¶</a></h2>
 <p>A fully implicit representation of a system of differential equations takes the form</p>
 <div class="math notranslate nohighlight">
-\[F(u'(t), u(t), t) = 0.\]</div>
+\[\begin{eqnarray}
+   F(u(t), u'(t), t) = 0.
+\end{eqnarray}\]</div>
 <p>A special case of such an implicit differential equation arises when the Jacobian <span class="math notranslate nohighlight">\(\partial_{u'}F\)</span> is singular. This implies that the derivative of some of the components of <span class="math notranslate nohighlight">\(u(t)\)</span> do not appear in the system of equations. The system is thus denoted a differential algebraic system of equations.</p>
-<p>Since the derivative <span class="math notranslate nohighlight">\(u'(t)\)</span> cannot be isolated the Picard formulation used in ordinary SDC cannot be used here. Instead the derivative, henceforth denoted by <span class="math notranslate nohighlight">\(U(t)\)</span>, is cast as the new unknown solution and the implicit system of equations is written as</p>
+<p>Since the derivative <span class="math notranslate nohighlight">\(u'(t)\)</span> cannot be isolated the Picard formulation used in SDC for ordinary differential equations (ODEs) cannot be used here. Instead the derivative, henceforth denoted by <span class="math notranslate nohighlight">\(U(t)\)</span>, is cast as the new unknown solution and the implicit system of equations is written as</p>
 <div class="math notranslate nohighlight">
-\[F\left(u_0+\int_0^tU(\tau)d\tau, U(t), t\right) = 0.\]</div>
-<p>Based on this equation and an initial approximate solution <span class="math notranslate nohighlight">\(tilde{U}\)</span>, the following error equation is formed</p>
+\[\begin{eqnarray}
+   F\left(u_0+\int_0^tU(\tau)d\tau, U(t), t\right) = 0.
+\end{eqnarray}\]</div>
+<p>The solution <span class="math notranslate nohighlight">\(u(t)\)</span> can then be recovered using an quadrature step. This approach is also called the <em>yp-formulation</em>.</p>
+<p>Based on this equation and an initial approximate solution <span class="math notranslate nohighlight">\(\tilde{U}\)</span>, the following error equation is formed</p>
 <div class="math notranslate nohighlight">
-\[F\left(u_0+\int_0^t(\tilde{U}(t)+\delta(\tau))d\tau,\;\tilde{U}(t)+\delta(t),\;\right)=0.\]</div>
+\[\begin{eqnarray}
+   F\left(u_0+\int_0^t(\tilde{U}(t)+\delta(\tau))d\tau,\;\tilde{U}(t)+\delta(t)\;\right)=0.
+\end{eqnarray}\]</div>
 <p>This results directly in</p>
 <div class="math notranslate nohighlight">
-\[F\left(u_0+\int_0^{t_{m+1}}\tilde{U}(\tau)d\tau +\left(\int_0^{t_m} + \int_{t_m}^{t_{m+1}}\right)\delta(\tau)d\tau ,\;\tilde{U}(t_{m+1})+\delta(t_{m+1}),\;t_{m+1}\right)=0\]</div>
+\[\begin{eqnarray}
+   F\left(u_0+\int_0^{t_{m+1}}\tilde{U}(\tau)d\tau +\left(\int_0^{t_m} + \int_{t_m}^{t_{m+1}}\right)\delta(\tau)d\tau ,\;\tilde{U}(t_{m+1})+\delta(t_{m+1}),\;t_{m+1}\right)=0
+\end{eqnarray}\]</div>
 <p>from which the following time marching discretisation becomes obvious</p>
 <div class="math notranslate nohighlight">
-\[F\left(u_0+[\Delta t\mathbf{Q}\tilde{U}]_{m+1} + \sum_{l=1}^{m+1}\Delta t\tilde{\delta}_l,\;\tilde{U}_{m+1}+\tilde{\delta}_{m+1},\;t_{m+1}\right) = 0.\]</div>
+\[\begin{eqnarray}
+   F\left(u_0+[\Delta t\mathbf{Q}\tilde{U}]_{m+1} + \sum_{l=1}^{m+1}\Delta t\tilde{\delta}_l,\;\tilde{U}_{m+1}+\tilde{\delta}_{m+1},\;t_{m+1}\right) = 0.
+\end{eqnarray}\]</div>
 <p>The spectral integration matrix <span class="math notranslate nohighlight">\(\mathbf{Q}\)</span> is used to approximate the integral of the current approximation <span class="math notranslate nohighlight">\(\tilde{U}\)</span> and a low order approximation, in this case implicit Euler, is used for the unknown error <span class="math notranslate nohighlight">\(\delta(t)\)</span>.
 Combining each step in the time marching scheme into a vector results in the following matrix formulation</p>
 <div class="math notranslate nohighlight">
-\[\mathbf{F}\left(\mathbf{u}_0+\Delta t\mathbf{Q}\tilde{\mathbf{U}} + \Delta t\mathbf{Q}_\Delta\tilde{\mathbf{\delta}},\;\tilde{\mathbf{U}}+\tilde{\mathbf{\delta}},\;\mathbf{t}\right) = \mathbf{0}\]</div>
+\[\begin{eqnarray}
+   \mathbf{F}\left(\mathbf{u}_0+\Delta t\mathbf{Q}\tilde{\mathbf{U}} + \Delta t\mathbf{Q}_\Delta\tilde{\mathbf{\delta}},\;\tilde{\mathbf{U}}+\tilde{\mathbf{\delta}},\;\mathbf{t}\right) = \mathbf{0}
+\end{eqnarray}\]</div>
 <p>with the integration matrix of the implicit Euler method</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\mathbf{Q}_\Delta=
-\begin{pmatrix}
-\Delta t_1&amp;0&amp;\dots&amp;0&amp;0\\
-\Delta t_1&amp;\Delta t_2&amp;\dots&amp;0&amp;0\\
-.&amp;.&amp;\dots&amp;0&amp;0\\
-\Delta t_1&amp;\Delta t_2&amp;\dots&amp;\Delta t_{M-2}&amp;0\\
-\Delta t_1&amp;\Delta t_2&amp;\dots&amp;\Delta t_{M-2}&amp;\Delta t_{M-1}\\
-\end{pmatrix}\end{split}\]</div>
+  \begin{pmatrix}
+  \Delta t_1&amp;0&amp;\dots&amp;0&amp;0\\
+  \Delta t_1&amp;\Delta t_2&amp;\dots&amp;0&amp;0\\
+  .&amp;.&amp;\dots&amp;0&amp;0\\
+  \Delta t_1&amp;\Delta t_2&amp;\dots&amp;\Delta t_{M-2}&amp;0\\
+  \Delta t_1&amp;\Delta t_2&amp;\dots&amp;\Delta t_{M-2}&amp;\Delta t_{M-1}\\
+  \end{pmatrix}\end{split}\]</div>
 <p>Finally, the iterative nature of the method is made clear by considering that the approximate solution can be updated repeatedly with a <span class="math notranslate nohighlight">\(\tilde{\mathbf{\delta}}\)</span> that is recalculated after each iteration and using the previously updated solution as the initial condition for the next iteration. In this way, reformulation of the previous equation as</p>
 <div class="math notranslate nohighlight">
-\[\mathbf{F}\left(\mathbf{u}_0+\Delta t(\mathbf{Q}-\mathbf{Q}_\Delta)\tilde{\mathbf{U}} + \Delta t\mathbf{Q}_\Delta(\tilde{\mathbf{U}} + \tilde{\mathbf{\delta}}),\;\tilde{\mathbf{U}}+\tilde{\mathbf{\delta}},\;\mathbf{t}\right) = \mathbf{0}\]</div>
+\[\begin{eqnarray}
+   \mathbf{F}\left(\mathbf{u}_0+\Delta t(\mathbf{Q}-\mathbf{Q}_\Delta)\tilde{\mathbf{U}} + \Delta t\mathbf{Q}_\Delta(\tilde{\mathbf{U}} + \tilde{\mathbf{\delta}}),\;\tilde{\mathbf{U}}+\tilde{\mathbf{\delta}},\;\mathbf{t}\right) = \mathbf{0}
+\end{eqnarray}\]</div>
 <p>results in the following iterative scheme</p>
 <div class="math notranslate nohighlight">
-\[\mathbf{F}\left(\mathbf{u}_0+\Delta t(\mathbf{Q}-\mathbf{Q}_\Delta)\mathbf{U}^{k}+ \Delta t\mathbf{Q}_\Delta\mathbf{U}^{k+1},\;\mathbf{U}^{k+1},\;\mathbf{t}\right) = \mathbf{0}.\]</div>
+\[\begin{eqnarray}
+   \mathbf{F}\left(\mathbf{u}_0+\Delta t(\mathbf{Q}-\mathbf{Q}_\Delta)\mathbf{U}^{k}+ \Delta t\mathbf{Q}_\Delta\mathbf{U}^{k+1},\;\mathbf{U}^{k+1},\;\mathbf{t}\right) = \mathbf{0}.
+\end{eqnarray}\]</div>
 <p>In practice each iteration is carried out line by line and the resulting implicit equation for <span class="math notranslate nohighlight">\(U_{m+1}^{k+1}\)</span> is solved using the familiar <code class="docutils literal notranslate"><span class="pre">scipy.optimize.root()</span></code> function.</p>
+</section>
+<section id="how-to-implement-a-dae-problem-in-pysdc">
+<h2>How to implement a DAE problem in pySDC?<a class="headerlink" href="#how-to-implement-a-dae-problem-in-pysdc" title="Link to this heading">¶</a></h2>
+<p>Different from all other ODE problem classes in <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> the DAE problem classes use the <em>yp-formulation</em> where the derivative is the unknown and the solution <span class="math notranslate nohighlight">\(u\)</span> is recovered using quadrature. Interested readers about the different formulations for spectral deferred corrections are referred to <a class="reference external" href="https://link.springer.com/article/10.1007/s10915-015-0146-9">Qu et al. (2015)</a>.</p>
+<p>Let us consider the fully-implicit DAE</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}y' (t) + \eta t z' (t) + (1 + \eta) z (t) &amp;= \cos (t) \\
+y (t) + \eta t z (t) &amp;= \sin (t)\end{split}\]</div>
+<p>which is of the general form</p>
+<div class="math notranslate nohighlight">
+\[\begin{eqnarray}
+   F\left(u (t), u' (t), t\right) = 0
+\end{eqnarray}\]</div>
+<p>The imports for the classes <code class="docutils literal notranslate"><span class="pre">ptype_dae</span></code> and <code class="docutils literal notranslate"><span class="pre">mesh</span></code> are necessary for implementing this problem.</p>
+<p>The problem class inherits from the parent <code class="docutils literal notranslate"><span class="pre">ptype_dae</span></code> that
+has the <code class="docutils literal notranslate"><span class="pre">solve_system</span></code> method solving the (non)-linear system to find the root, i.e., updating the values of the unknown derivative. All DAE problem classes should therefore inherit from this class.
+For this general type of DAEs the datatype <code class="docutils literal notranslate"><span class="pre">mesh</span></code> is used here for both, <code class="docutils literal notranslate"><span class="pre">u</span></code> and <code class="docutils literal notranslate"><span class="pre">f</span></code>.
+Further, the constructor requires at least the parameter <code class="docutils literal notranslate"><span class="pre">newton_tol</span></code>, the tolerance passed to the root solver. It is possible to set a default value (which is set to <code class="docutils literal notranslate"><span class="pre">1e-8</span></code> in the example above).</p>
+<p><strong>Note:</strong> The name <code class="docutils literal notranslate"><span class="pre">newton_tol</span></code> could be confusing. The implicit system is not solved by Newton but rather by a root solver from <code class="docutils literal notranslate"><span class="pre">SciPy</span></code>. Different quasi-Newton methods can be chosen (see the [documentation](<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root.html">https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root.html</a>)). Default here is <code class="docutils literal notranslate"><span class="pre">'hybr'</span></code> that uses modified Powell hybrid method. To change to solver it is possible to overload the <code class="docutils literal notranslate"><span class="pre">solve_system</span></code> method in a new implemented problem class.</p>
+<p>Possibly other problem-specific parameters are needed. Our example class also needs a constant <code class="docutils literal notranslate"><span class="pre">eta</span></code> set to <span class="math notranslate nohighlight">\(1\)</span> and storing it as an attribute using <code class="docutils literal notranslate"><span class="pre">self._makeAttributeAndRegister('eta',</span> <span class="pre">localVars=locals())</span></code>.
+The system of DAEs consists of two equations, i.e., two unknowns. Thus, the number of variables <code class="docutils literal notranslate"><span class="pre">nvars</span></code> needs to be set to <span class="math notranslate nohighlight">\(2\)</span>.</p>
+<p>Implementing this system of equations the problem class also requires the <code class="docutils literal notranslate"><span class="pre">eval_f</span></code> method. As it can be seen, the method returns the right-hand side function <span class="math notranslate nohighlight">\(F\)</span> of the DAE in the way to have a function for which the root is sought.</p>
+<p>Since the exact solution is known for this problem, the method <code class="docutils literal notranslate"><span class="pre">u_exact</span></code> returns it for each time <cite>t</cite>.</p>
+<p>For Runge-Kutta methods, an initial condition for the derivatives at initial time <span class="math notranslate nohighlight">\(t_0\)</span> <span class="math notranslate nohighlight">\(y'(t_0)\)</span> and <span class="math notranslate nohighlight">\(z'(t_0)\)</span> are needed as well. They are implemented using the <code class="docutils literal notranslate"><span class="pre">du_exact</span></code> method.</p>
+<p>The second large class of DAEs is the one of semi-explicit form</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}y' (t) &amp;= f \left(y (t), z (t), t\right) \\
+0 &amp;= g \left(y (t), z (t), t\right)\end{split}\]</div>
+<p>which is also called a <em>constrained differential equation</em>. <span class="math notranslate nohighlight">\(y\)</span> is the differential variable and <span class="math notranslate nohighlight">\(z\)</span> denotes the algebraic variable since no corresponding integration is in the problem.
+We want to implement such an equation and consider the example</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}u_1' (t) &amp;= (\alpha - \frac{1}{2 - t}) u_1 (t) + (2 - t) \alpha z (t) + \frac{3 - t}{2 - t}, \\
+u_2' (t) &amp;= \frac{1 - \alpha}{t - 2} u_1 (t) - u_2 (t) + (\alpha - 1) z (t) + 2 e^t, \\
+0 &amp;= (t + 2) u_1 (t) + (t^2 - 4) u_2 (t) - (t^2 + t - 2) e^t.\end{split}\]</div>
+<p>This example has two differential variables <span class="math notranslate nohighlight">\(u_1\)</span>, <span class="math notranslate nohighlight">\(u_2\)</span> (two differential equations) and one algebraic variable <span class="math notranslate nohighlight">\(z\)</span> (thus one algebraic equation).
+In <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> defining a problem class for semi-explicit DAEs is slightly different to those of fully-implicit form. Additionally to <code class="docutils literal notranslate"><span class="pre">numpy</span></code> for the example the imports for the classes <code class="docutils literal notranslate"><span class="pre">ptype_dae</span></code> and <code class="docutils literal notranslate"><span class="pre">DAEMesh</span></code> are needed.</p>
+<p>This problem class inherits again from <code class="docutils literal notranslate"><span class="pre">ptype_dae</span></code>. In contrast, for the solution <code class="docutils literal notranslate"><span class="pre">u</span></code> and the right-hand side of the <code class="docutils literal notranslate"><span class="pre">f</span></code>
+a different datatype <code class="docutils literal notranslate"><span class="pre">DAEMesh</span></code> is used that allows to separate between the differential variables and the algebraic variables as well
+as for the equations. The tolerance for the root solver is passed with a default value of <code class="docutils literal notranslate"><span class="pre">1e-10</span></code> and the number of unknowns is <span class="math notranslate nohighlight">\(3\)</span>, i.e., <code class="docutils literal notranslate"><span class="pre">nvars=3</span></code>.
+The problem-specific parameter <code class="docutils literal notranslate"><span class="pre">a</span></code> has a default value of <code class="docutils literal notranslate"><span class="pre">10.0</span></code>.</p>
+<p>In the <code class="docutils literal notranslate"><span class="pre">eval_f</span></code> method the equations and the variables are now separated using the components of the <code class="docutils literal notranslate"><span class="pre">DAEMesh</span></code>. Recall that <code class="docutils literal notranslate"><span class="pre">eval_f</span></code> returns the right-hand side function so that we have a root problem. However, for this semi-explicit DAE this is not the case, but we can change that by rewriting the system to</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}0 &amp;= f \left(y (t), z (t), t\right) - y' (t) \\
+0 &amp;= g \left(y (t), z (t), t\right).\end{split}\]</div>
+<p>In the example above the differential variables are <span class="math notranslate nohighlight">\(u_1\)</span> and <span class="math notranslate nohighlight">\(u_2\)</span> which can be accessed using <code class="docutils literal notranslate"><span class="pre">u.diff[0]</span></code> and <code class="docutils literal notranslate"><span class="pre">u.diff[1]</span></code>.
+The algebraic variable <span class="math notranslate nohighlight">\(z\)</span> is stored in <code class="docutils literal notranslate"><span class="pre">u.alg[0]</span></code>. The corresponding derivatives for <span class="math notranslate nohighlight">\(u_1\)</span> and <span class="math notranslate nohighlight">\(u_2\)</span> are stored in <code class="docutils literal notranslate"><span class="pre">du.diff[0]</span></code> and <code class="docutils literal notranslate"><span class="pre">du.diff[1]</span></code>.
+It is also possible to separate the differential and algebraic equations by assigning the corresponding equations to <code class="docutils literal notranslate"><span class="pre">f.diff[0]</span></code> and <code class="docutils literal notranslate"><span class="pre">f.diff[1]</span></code>, and <code class="docutils literal notranslate"><span class="pre">f.alg[0]</span></code>, respectively.</p>
+<p>In the same way the method <code class="docutils literal notranslate"><span class="pre">u_exact</span></code> to access the exact solution can be implemented.</p>
+<p>This example class also have an <code class="docutils literal notranslate"><span class="pre">du_exact</span></code> method to implement initial conditions for <span class="math notranslate nohighlight">\(u_1'(t_0)\)</span>, <span class="math notranslate nohighlight">\(u_2'(t_0)\)</span>, and <span class="math notranslate nohighlight">\(z'(t_0)\)</span>.</p>
 </section>
 </section>
 
@@ -219,6 +325,7 @@ Combining each step in the time marching scheme into a vector results in the fol
 <li><a class="reference internal" href="#">Solving differential algebraic equations with SDC</a><ul>
 <li><a class="reference internal" href="#project-overview">Project overview</a></li>
 <li><a class="reference internal" href="#theoretical-details">Theoretical details</a></li>
+<li><a class="reference internal" href="#how-to-implement-a-dae-problem-in-pysdc">How to implement a DAE problem in pySDC?</a></li>
 </ul>
 </li>
 </ul>
