@@ -115,13 +115,13 @@ leads to all kinds of trouble throughout the code. But here you really cannot ge
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.datatype_classes.mesh.mesh">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
 <p>Numpy-based datatype for serial or parallel meshes.
 Can include a communicator and expects a dtype to allow complex data.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.mesh._comm">
-<span class="sig-name descname"><span class="pre">_comm</span></span><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh._comm" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.mesh.comm">
+<span class="sig-name descname"><span class="pre">comm</span></span><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh.comm" title="Link to this definition">¶</a></dt>
 <dd><p>MPI communicator or None</p>
 </dd></dl>
 
@@ -142,11 +142,10 @@ Can include a communicator and expects a dtype to allow complex data.</p>
 </dl>
 </dd></dl>
 
-<dl class="py property">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.mesh.comm">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">comm</span></span><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh.comm" title="Link to this definition">¶</a></dt>
-<dd><p>Getter for the communicator</p>
-</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">comm</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.datatype_classes.mesh.mesh.irecv">
@@ -212,9 +211,9 @@ Can include a communicator and expects a dtype to allow complex data.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh"><code class="docutils literal notranslate"><span class="pre">mesh</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh._comm"><code class="docutils literal notranslate"><span class="pre">_comm</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh.bcast"><code class="docutils literal notranslate"><span class="pre">bcast()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh.comm"><code class="docutils literal notranslate"><span class="pre">comm</span></code></a></li>
+<li><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh.bcast"><code class="docutils literal notranslate"><span class="pre">bcast()</span></code></a></li>
+<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">comm</span></code></a></li>
 <li><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh.irecv"><code class="docutils literal notranslate"><span class="pre">irecv()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh.isend"><code class="docutils literal notranslate"><span class="pre">isend()</span></code></a></li>
 </ul>
