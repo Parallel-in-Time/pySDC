@@ -11,3 +11,5 @@ dependencies:
   - pytorch
   - matplotlib>=3.0
   - dill
+  - mpich
+  - mpi4py>=3.0.0
