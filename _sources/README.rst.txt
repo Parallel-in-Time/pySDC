@@ -30,6 +30,11 @@
    :alt: SQAaaS badge shields.io
 
 
+.. image:: https://img.shields.io/pypi/dm/pySDC?logo=pypi
+   :target: https://pypistats.org/packages/pysdc
+   :alt: PyPI - Downloads
+
+
 Welcome to pySDC!
 =================
 
