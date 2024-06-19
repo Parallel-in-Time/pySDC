@@ -102,7 +102,7 @@ class IMEX_Laplacian_MPIFFT(ptype):
         )
 
         # get local mesh
-        X = self.xp.ogrid[self.fft.local_slice(False)]
+        X = list(self.xp.ogrid[self.fft.local_slice(False)])
         N = self.fft.global_shape()
         for i in range(len(N)):
             X[i] = x0 + (X[i] * L[i] / N[i])
@@ -113,7 +113,7 @@ class IMEX_Laplacian_MPIFFT(ptype):
         N = self.fft.global_shape()
         k = [self.xp.fft.fftfreq(n, 1.0 / n).astype(int) for n in N]
         K = [ki[si] for ki, si in zip(k, s)]
-        Ks = self.xp.meshgrid(*K, indexing='ij', sparse=True)
+        Ks = list(self.xp.meshgrid(*K, indexing='ij', sparse=True))
         Lp = 2 * np.pi / self.L
         for i in range(self.ndim):
             Ks[i] = (Ks[i] * Lp[i]).astype(float)

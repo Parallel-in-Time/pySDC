@@ -207,7 +207,7 @@ def testComputeEndpoint(quad_type):
 
         L.sweep.compute_end_point()
 
-        assert np.isclose(L.u[-1], L.uend), "Endpoint is not computed correctly!"
+        assert np.allclose(L.u[-1], L.uend), "Endpoint is not computed correctly!"
 
 
 @pytest.mark.base

@@ -123,7 +123,7 @@ class allencahn_temp_imex(ptype):
         L = np.array([self.L] * ndim, dtype=float)
 
         # get local mesh
-        X = np.ogrid[self.fft.local_slice(False)]
+        X = list(np.ogrid[self.fft.local_slice(False)])
         N = self.fft.global_shape()
         for i in range(len(N)):
             X[i] = X[i] * L[i] / N[i]
@@ -135,7 +135,7 @@ class allencahn_temp_imex(ptype):
         k = [np.fft.fftfreq(n, 1.0 / n).astype(int) for n in N[:-1]]
         k.append(np.fft.rfftfreq(N[-1], 1.0 / N[-1]).astype(int))
         K = [ki[si] for ki, si in zip(k, s)]
-        Ks = np.meshgrid(*K, indexing='ij', sparse=True)
+        Ks = list(np.meshgrid(*K, indexing='ij', sparse=True))
         Lp = 2 * np.pi / L
         for i in range(ndim):
             Ks[i] = (Ks[i] * Lp[i]).astype(float)
