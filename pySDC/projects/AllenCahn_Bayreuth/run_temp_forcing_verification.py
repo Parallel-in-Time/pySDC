@@ -182,7 +182,9 @@ def main(nprocs_space=None, cwd='.'):
         print(f'Order of accuracy: {orders[-1]:4.2f}\n')
 
     assert errors[2 + 1] < 8e-10, f'Errors are too high, got {errors[2 + 1]}'
-    assert np.isclose(orders[1], 4.6, rtol=7e-02), f'Order of accuracy is not within tolerance, got {orders[1]}'
+    assert np.isclose(
+        orders[1].view(np.ndarray), 4.6, rtol=7e-02
+    ), f'Order of accuracy is not within tolerance, got {orders[1]}'
 
 
 if __name__ == "__main__":
