@@ -74,11 +74,10 @@ class sweeper(object):
 
         self.parallelizable = False
 
-    def get_Qdelta_implicit(self, coll: CollBase, qd_type, k=None):
-
-        QDmat = np.zeros(coll.Qmat.shape)
+    def setupGenerator(self, coll: CollBase, qd_type):
         try:
             assert QDELTA_GENERATORS[qd_type] == type(self.generator)
+            assert self.generator.QDelta.shape[0] == coll.Qmat.shape[0] - 1
         except (AssertionError, AttributeError):
             self.generator = QDELTA_GENERATORS[qd_type](
                 # for algebraic types (LU, ...)
@@ -92,18 +91,24 @@ class sweeper(object):
             )
         except Exception as e:
             raise ValueError(f"could not generate {qd_type=!r} with qmat, got error : {e}")
+
+    def get_Qdelta_implicit(self, coll: CollBase, qd_type, k=None):
+        QDmat = np.zeros(coll.Qmat.shape)
+        self.setupGenerator(coll, qd_type)
         QDmat[1:, 1:] = self.generator.genCoeffs(k=k)
 
         # check if we got not more than a lower triangular matrix
         np.testing.assert_array_equal(
             np.triu(QDmat, k=1), np.zeros(QDmat.shape), err_msg='Lower triangular matrix expected!'
         )
-
         return QDmat
 
-    def get_Qdelta_explicit(self, coll, qd_type):
-        QDmat = self.get_Qdelta_implicit(coll, qd_type)
-        # check if we got not more than a lower triangular matrix
+    def get_Qdelta_explicit(self, coll, qd_type, k=None):
+        QDmat = np.zeros(coll.Qmat.shape)
+        self.setupGenerator(coll, qd_type)
+        QDmat[1:, 1:], QDmat[1:, 0] = self.generator.genCoeffs(k=k, dTau=True)
+
+        # check if we got not more than a strictly lower triangular matrix
         np.testing.assert_array_equal(
             np.triu(QDmat, k=0), np.zeros(QDmat.shape), err_msg='Strictly lower triangular matrix expected!'
         )
