@@ -124,7 +124,7 @@ class TestImexSweeper(unittest.TestCase):
             unew = np.linalg.inv(LHS).dot(u0full + RHS.dot(u0full))
             usweep = np.array([level.u[l].flatten() for l in range(1, nnodes + 1)])
             assert (
-                np.linalg.norm(unew - usweep, np.infty) < 1e-14
+                np.linalg.norm(unew - usweep, np.inf) < 1e-14
             ), "Single SDC sweeps in matrix and node-to-node formulation yield different results"
 
     #
@@ -152,7 +152,7 @@ class TestImexSweeper(unittest.TestCase):
             else:
                 uend_mat = ustages[-1]
             assert (
-                np.linalg.norm(uend_sweep - uend_mat, np.infty) < 1e-14
+                np.linalg.norm(uend_sweep - uend_mat, np.inf) < 1e-14
             ), "Update formula in sweeper gives different result than matrix update formula"
 
     #
@@ -189,12 +189,12 @@ class TestImexSweeper(unittest.TestCase):
             # Make sure both matrix and node-to-node sweep leave collocation unaltered
             unew = np.linalg.inv(LHS).dot(u0full + RHS.dot(ucoll))
             assert (
-                np.linalg.norm(unew - ucoll, np.infty) < 1e-14
+                np.linalg.norm(unew - ucoll, np.inf) < 1e-14
             ), "Collocation solution not invariant under matrix SDC sweep"
             unew_sweep = np.array([level.u[l].flatten() for l in range(1, nnodes + 1)])
-            print(np.linalg.norm(unew_sweep - ucoll, np.infty))
+            print(np.linalg.norm(unew_sweep - ucoll, np.inf))
             assert (
-                np.linalg.norm(unew_sweep - ucoll, np.infty) < 1e-14
+                np.linalg.norm(unew_sweep - ucoll, np.inf) < 1e-14
             ), "Collocation solution not invariant under node-to-node sweep"
 
     #
@@ -222,13 +222,13 @@ class TestImexSweeper(unittest.TestCase):
                 unew = np.linalg.inv(LHS).dot(u0full + RHS.dot(unew))
 
             assert (
-                np.linalg.norm(unew - usweep, np.infty) < 1e-14
+                np.linalg.norm(unew - usweep, np.inf) < 1e-14
             ), "Doing multiple node-to-node sweeps yields different result than same number of matrix-form sweeps"
 
             Mat_sweep = level.sweep.get_scalar_problems_manysweep_mat(nsweeps=K, lambdas=lambdas)
             usweep_onematrix = Mat_sweep.dot(u0full)
             assert (
-                np.linalg.norm(usweep_onematrix - usweep, np.infty) < 1e-14
+                np.linalg.norm(usweep_onematrix - usweep, np.inf) < 1e-14
             ), "Single-matrix multiple sweep formulation yields different result than multiple sweeps in node-to-node or matrix form form"
 
     #
@@ -317,5 +317,5 @@ class TestImexSweeper(unittest.TestCase):
             q[nnodes - 1] = 1.0
             uend_mat = q.dot(ustages)
             assert (
-                np.linalg.norm(uend_sweep - uend_mat, np.infty) < 1e-14
+                np.linalg.norm(uend_sweep - uend_mat, np.inf) < 1e-14
             ), "For do_coll_update=False, update formula in sweeper gives different result than matrix update formula with q=(0,..,0,1)"

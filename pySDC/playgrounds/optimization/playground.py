@@ -49,7 +49,7 @@ for prec in prec_list:
     for i, ldt in enumerate(ldt_list):
 
         R = np.linalg.matrix_power(ldt * np.linalg.inv(np.eye(M) - ldt * QDelta).dot(Q - QDelta), 1)
-        result_Rnorm[i] = np.linalg.norm(R, np.infty)
+        result_Rnorm[i] = np.linalg.norm(R, np.inf)
         result_Rrho[i] = np.amax(abs(np.linalg.eigvals(R)))
         # result_est[i] = abs(ldt) * np.linalg.norm(np.linalg.inv(np.eye(M) - ldt * QDelta), np.inf) * np.linalg.norm(Q - QDelta, np.inf)
         # result_est[i] = abs(ldt) * np.linalg.norm(np.linalg.inv(np.eye(M) - ldt * QDD), np.inf) * np.linalg.norm(np.linalg.inv(np.eye(M) - ldt * np.linalg.inv(np.eye(M) - ldt * QDD).dot(QDL)), np.inf) * np.linalg.norm(Q - QDelta, np.inf)
