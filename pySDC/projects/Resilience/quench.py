@@ -248,7 +248,7 @@ def get_crossing_time(stats, controller, num_points=5, inter_points=50, temperat
     Returns:
         float: The time when the temperature threshold is crossed
     """
-    from pySDC.core.Lagrange import LagrangeApproximation
+    from qmat.lagrange import LagrangeApproximation
     from pySDC.core.Collocation import CollBase
 
     P = controller.MS[0].levels[0].prob

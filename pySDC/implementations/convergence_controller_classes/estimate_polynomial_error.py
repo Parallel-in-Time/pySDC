@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.core.Lagrange import LagrangeApproximation
+from qmat.lagrange import LagrangeApproximation
 from pySDC.core.ConvergenceController import ConvergenceController
 
 

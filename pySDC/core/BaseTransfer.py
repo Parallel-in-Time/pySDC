@@ -4,7 +4,7 @@ import scipy.sparse as sp
 
 from pySDC.core.Errors import UnlockError
 from pySDC.helpers.pysdc_helper import FrozenClass
-from pySDC.core.Lagrange import LagrangeApproximation
+from qmat.lagrange import LagrangeApproximation
 
 
 # short helper class to add params as attributes

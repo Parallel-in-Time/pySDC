@@ -1,9 +1,8 @@
 import logging
 import numpy as np
+from qmat import Q_GENERATORS
 
-from pySDC.core.Nodes import NodesGenerator
 from pySDC.core.Errors import CollocationError
-from pySDC.core.Lagrange import LagrangeApproximation
 
 
 class CollBase(object):
@@ -25,30 +24,12 @@ class CollBase(object):
     - LEGENDRE : distribution from Legendre polynomials
     - CHEBY-{1,2,3,4} : distribution from Chebyshev polynomials of a given kind
 
-    The type of quadrature cann be GAUSS (only inner nodes), RADAU-LEFT
+    The type of quadrature can be GAUSS (only inner nodes), RADAU-LEFT
     (inclusion of the left boundary), RADAU-RIGHT (inclusion of the right
     boundary) and LOBATTO (inclusion of left and right boundary).
 
-    Here is the equivalency table with the (old) original classes implemented
-    in pySDC :
-
-    +-------------------------+-----------+-------------+
-    | Original Class          | node_type | quad_type   |
-    +=========================+===========+=============+
-    | Equidistant             | EQUID     | LOBATTO     |
-    +-------------------------+-----------+-------------+
-    | EquidistantInner        | EQUID     | GAUSS       |
-    +-------------------------+-----------+-------------+
-    | EquidistantNoLeft       | EQUID     | RADAU-RIGHT |
-    +-------------------------+-----------+-------------+
-    | CollGaussLegendre       | LEGENDRE  | GAUSS       |
-    +-------------------------+-----------+-------------+
-    | CollGaussLobatto        | LEGENDRE  | LOBATTO     |
-    +-------------------------+-----------+-------------+
-    | CollGaussRadau_Left     | LEGENDRE  | RADAU-LEFT  |
-    +-------------------------+-----------+-------------+
-    | CollGaussRadau_Right    | LEGENDRE  | RADAU-RIGHT |
-    +-------------------------+-----------+-------------+
+    All coefficients are generated using
+    [qmat](https://qmat.readthedocs.io/en/latest/autoapi/qmat/qcoeff/collocation/index.html)
 
     Attributes:
         num_nodes (int): number of collocation nodes
@@ -74,39 +55,47 @@ class CollBase(object):
         """
 
         if not num_nodes > 0:
-            raise CollocationError('At least one quadrature node required, got %s' % num_nodes)
+            raise CollocationError('at least one quadrature node required, got %s' % num_nodes)
         if not tleft < tright:
-            raise CollocationError('Interval boundaries are corrupt, got %s and %s' % (tleft, tright))
+            raise CollocationError('interval boundaries are corrupt, got %s and %s' % (tleft, tright))
 
         self.logger = logging.getLogger('collocation')
+        try:
+            self.generator = Q_GENERATORS["Collocation"](
+                nNodes=num_nodes, nodeType=node_type, quadType=quad_type, tLeft=tleft, tRight=tright
+            )
+        except Exception as e:
+            raise CollocationError(f"could not instantiate qmat generator, got error : {e}")
 
-        # Set number of nodes, left and right interval boundaries
+        # Set base attributes
         self.num_nodes = num_nodes
         self.tleft = tleft
         self.tright = tright
-
         self.node_type = node_type
         self.quad_type = quad_type
-
-        # Instantiate attributes
-        self.nodeGenerator = NodesGenerator(self.node_type, self.quad_type)
-        if self.node_type == 'EQUID':
-            self.order = num_nodes
-        else:
-            if self.quad_type == 'GAUSS':
-                self.order = 2 * num_nodes
-            elif self.quad_type.startswith('RADAU'):
-                self.order = 2 * num_nodes - 1
-            elif self.quad_type == 'LOBATTO':
-                self.order = 2 * num_nodes - 2
-
         self.left_is_node = self.quad_type in ['LOBATTO', 'RADAU-LEFT']
         self.right_is_node = self.quad_type in ['LOBATTO', 'RADAU-RIGHT']
 
-        self.nodes = self._getNodes
-        self.weights = self._getWeights(tleft, tright)
-        self.Qmat = self._gen_Qmatrix
-        self.Smat = self._gen_Smatrix
+        # Integration order
+        self.order = self.generator.order
+
+        # Compute coefficients
+        self.nodes = self.generator.nodes
+        self.weights = self.generator.weights
+
+        Q = np.zeros([num_nodes + 1, num_nodes + 1], dtype=float)
+        Q[1:, 1:] = self.generator.Q
+        self.Qmat = Q
+
+        S = np.zeros([num_nodes + 1, num_nodes + 1], dtype=float)
+        S[1:, 1:] = super(self.generator.__class__, self.generator).S
+        # Note : qmat redefines the S matrix for collocation with integrals,
+        # instead of differences of the Q matrix coefficients.
+        # This does not passes the pySDC tests ... however the default S computation
+        # in qmat uses Q matrix coefficients differences, and that's what we
+        # use by using the parent property from the generator object.
+        self.Smat = S
+
         self.delta_m = self._gen_deltas
 
     @staticmethod
@@ -125,100 +114,6 @@ class CollBase(object):
             raise CollocationError("Input size does not match number of weights, but is %s" % np.size(data))
 
         return np.dot(weights, data)
-
-    def _getWeights(self, a, b):
-        """
-        Computes weights using barycentric interpolation
-
-        Args:
-            a (float): left interval boundary
-            b (float): right interval boundary
-
-        Returns:
-            numpy.ndarray: weights of the collocation formula given by the nodes
-        """
-        if self.nodes is None:
-            raise CollocationError(f"Need nodes before computing weights, got {self.nodes}")
-
-        # Instantiate the Lagrange interpolator object
-        approx = LagrangeApproximation(self.nodes)
-
-        # Compute weights
-        tLeft = np.ravel(self.tleft)[0]
-        tRight = np.ravel(self.tright)[0]
-        weights = approx.getIntegrationMatrix([(tLeft, tRight)], numQuad='FEJER')
-
-        return np.ravel(weights)
-
-    @property
-    def _getNodes(self):
-        """
-        Computes nodes using an internal NodesGenerator object
-
-        Returns:
-            np.ndarray: array of Gauss-Legendre nodes
-        """
-        # Generate normalized nodes in [-1, 1]
-        nodes = self.nodeGenerator.getNodes(self.num_nodes)
-
-        # Scale nodes to [tleft, tright]
-        a = self.tleft
-        b = self.tright
-        nodes += 1.0
-        nodes /= 2.0
-        nodes *= b - a
-        nodes += a
-
-        if self.left_is_node:
-            nodes[0] = self.tleft
-        if self.right_is_node:
-            nodes[-1] = self.tright
-
-        return nodes
-
-    @property
-    def _gen_Qmatrix(self):
-        """
-        Compute tleft-to-node integration matrix for later use in collocation formulation
-
-        Returns:
-            numpy.ndarray: matrix containing the weights for tleft to node
-        """
-        if self.nodes is None:
-            raise CollocationError(f"Need nodes before computing weights, got {self.nodes}")
-        M = self.num_nodes
-        Q = np.zeros([M + 1, M + 1])
-
-        # Instantiate the Lagrange interpolator object
-        approx = LagrangeApproximation(self.nodes)
-
-        # Compute tleft-to-node integration matrix
-        tLeft = np.ravel(self.tleft)[0]
-        intervals = [(tLeft, tau) for tau in self.nodes]
-        intQ = approx.getIntegrationMatrix(intervals, numQuad='FEJER')
-
-        # Store into Q matrix
-        Q[1:, 1:] = intQ
-
-        return Q
-
-    @property
-    def _gen_Smatrix(self):
-        """
-        Compute node-to-node integration matrix for later use in collocation formulation
-
-        Returns:
-            numpy.ndarray: matrix containing the weights for node to node
-        """
-        M = self.num_nodes
-        Q = self.Qmat
-        S = np.zeros([M + 1, M + 1])
-
-        S[1, :] = Q[1, :]
-        for m in np.arange(2, M + 1):
-            S[m, :] = Q[m, :] - Q[m - 1, :]
-
-        return S
 
     @property
     def _gen_deltas(self):

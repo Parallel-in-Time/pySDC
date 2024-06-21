@@ -1,8 +1,7 @@
 import pytest
 
 from pySDC.core.Hooks import hooks
-from pySDC.core.Lagrange import LagrangeApproximation
-from pySDC.core.Collocation import CollBase
+from qmat.lagrange import LagrangeApproximation
 import numpy as np
 
 

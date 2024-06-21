@@ -8,8 +8,8 @@ Created on Fri Sep 23 10:17:08 2022
 import numpy as np
 from scipy.linalg import lu
 
-from pySDC.core.Nodes import NodesGenerator
-from pySDC.core.Lagrange import LagrangeApproximation
+from qmat.nodes import NodesGenerator
+from qmat.lagrange import LagrangeApproximation
 
 # Storage for diagonaly optimized QDelta matrices
 OPT_COEFFS = {

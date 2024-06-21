@@ -1,6 +1,6 @@
 import numpy as np
 from pySDC.core.ConvergenceController import ConvergenceController, Status
-from pySDC.core.Lagrange import LagrangeApproximation
+from qmat.lagrange import LagrangeApproximation
 
 
 class InterpolateBetweenRestarts(ConvergenceController):

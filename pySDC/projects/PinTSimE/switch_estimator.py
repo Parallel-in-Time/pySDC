@@ -5,7 +5,7 @@ from pySDC.core.Errors import ParameterError
 from pySDC.core.Collocation import CollBase
 from pySDC.core.ConvergenceController import ConvergenceController, Status
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
-from pySDC.core.Lagrange import LagrangeApproximation
+from qmat.lagrange import LagrangeApproximation
 
 
 class SwitchEstimator(ConvergenceController):
