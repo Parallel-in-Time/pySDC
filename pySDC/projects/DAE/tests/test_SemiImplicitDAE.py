@@ -261,9 +261,9 @@ def testCompareResults(M):
 
 
 @pytest.mark.base
-@pytest.mark.parametrize('case', [0, 1])
-@pytest.mark.parametrize('M', [2, 3])
 @pytest.mark.parametrize('QI', ['IE', 'LU'])
+@pytest.mark.parametrize('M', [2, 3])
+@pytest.mark.parametrize('case', [0, 1])
 def testOrderAccuracy(case, M, QI):
     r"""
     In this test, the order of accuracy of the ``SemiImplicitDAE`` sweeper is tested for an index-1 DAE

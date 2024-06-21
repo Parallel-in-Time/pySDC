@@ -80,8 +80,8 @@ class CollBase(object):
         self.order = self.generator.order
 
         # Compute coefficients
-        self.nodes = self.generator.nodes
-        self.weights = self.generator.weights
+        self.nodes = self._getNodes = self.generator.nodes.copy()
+        self.weights = self.generator.weights.copy()
 
         Q = np.zeros([num_nodes + 1, num_nodes + 1], dtype=float)
         Q[1:, 1:] = self.generator.Q
@@ -94,7 +94,7 @@ class CollBase(object):
         # This does not passes the pySDC tests ... however the default S computation
         # in qmat uses Q matrix coefficients differences, and that's what we
         # use by using the parent property from the generator object.
-        self.Smat = S
+        self.Smat = self._gen_Smatrix = S
 
         self.delta_m = self._gen_deltas
 

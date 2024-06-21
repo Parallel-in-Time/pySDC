@@ -88,12 +88,13 @@ class sweeper(object):
                 quadType=coll.quad_type,
                 # for time-stepping types, MIN-SR-NS
                 nodes=coll.nodes,
+                tLeft=coll.tleft,
             )
         except Exception as e:
             raise ValueError(f"could not generate {qd_type=!r} with qmat, got error : {e}")
 
     def get_Qdelta_implicit(self, coll: CollBase, qd_type, k=None):
-        QDmat = np.zeros(coll.Qmat.shape)
+        QDmat = np.zeros(coll.Qmat.shape, dtype=float)
         self.setupGenerator(coll, qd_type)
         QDmat[1:, 1:] = self.generator.genCoeffs(k=k)
 
@@ -101,10 +102,12 @@ class sweeper(object):
         np.testing.assert_array_equal(
             np.triu(QDmat, k=1), np.zeros(QDmat.shape), err_msg='Lower triangular matrix expected!'
         )
+        if np.allclose(np.diag(np.diag(QDmat)), QDmat):
+            self.parallelizable = True
         return QDmat
 
     def get_Qdelta_explicit(self, coll, qd_type, k=None):
-        QDmat = np.zeros(coll.Qmat.shape)
+        QDmat = np.zeros(coll.Qmat.shape, dtype=float)
         self.setupGenerator(coll, qd_type)
         QDmat[1:, 1:], QDmat[1:, 0] = self.generator.genCoeffs(k=k, dTau=True)
 
