@@ -74,7 +74,7 @@ class sweeper(object):
 
         self.parallelizable = False
 
-    def get_Qdelta_implicit(self, coll:CollBase, qd_type, k=None):
+    def get_Qdelta_implicit(self, coll: CollBase, qd_type, k=None):
 
         QDmat = np.zeros(coll.Qmat.shape)
         try:
@@ -84,10 +84,12 @@ class sweeper(object):
                 # for algebraic types (LU, ...)
                 Q=coll.generator.Q,
                 # for MIN in tables, MIN-SR-S ...
-                nNodes=coll.num_nodes, nodeType=coll.node_type, quadType=coll.quad_type,
+                nNodes=coll.num_nodes,
+                nodeType=coll.node_type,
+                quadType=coll.quad_type,
                 # for time-stepping types, MIN-SR-NS
-                nodes=coll.nodes,  
-                )
+                nodes=coll.nodes,
+            )
         except Exception as e:
             raise ValueError(f"could not generate {qd_type=!r} with qmat, got error : {e}")
         QDmat[1:, 1:] = self.generator.genCoeffs(k=k)
