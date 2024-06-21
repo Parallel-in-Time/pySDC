@@ -78,7 +78,12 @@ class sweeper(object):
         try:
             assert QDELTA_GENERATORS[qd_type] == type(self.generator)
             assert self.generator.QDelta.shape[0] == coll.Qmat.shape[0] - 1
-            raise AssertionError()  # because some project change coll dynamically ...
+            # Note : the following projects change coll dynamically :
+            # - DAE
+            # - Resilience
+            # Storing the QDelta generator (and the QDelta) make the tests for those projects fail
+            # => we force the re-instantiation of the generator, until some fix is found for those projects
+            raise AssertionError()
         except (AssertionError, AttributeError):
             self.generator = QDELTA_GENERATORS[qd_type](
                 # for algebraic types (LU, ...)
