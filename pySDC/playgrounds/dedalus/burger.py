@@ -99,9 +99,11 @@ uSol = prob.solver.state
 tVals = np.linspace(0, tEnd, nSteps + 1)
 
 for i in range(nSteps):
-    print(f"step {i+1}/{nSteps}")
     uSol, _ = controller.run(u0=uSol, t0=tVals[i], Tend=tVals[i + 1])
+    if (i+1) % 100 == 0:
+        print(f"step {i+1}/{nSteps}")
     if (i+1) % 25 == 0:
+
         u.change_scales(1)
         u_list.append(np.copy(u['g']))
         t_list.append(tVals[i])
@@ -116,3 +118,4 @@ plt.xlabel('x')
 plt.ylabel('t')
 plt.title(f'KdV-Burgers, (a,b)=({a},{b})')
 plt.tight_layout()
+plt.savefig("KdV_Burgers_pySDC.pdf")
