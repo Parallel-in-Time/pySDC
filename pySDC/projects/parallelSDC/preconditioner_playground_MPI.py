@@ -162,6 +162,7 @@ def main(comm=None):
         assert os.path.isfile('data/parallelSDC_iterations_precond_MPI.pkl'), 'ERROR: pickle did not create file'
 
 
+# pragma: no cover
 def plot_iterations():
     """
     Helper routine to plot iteration counts
