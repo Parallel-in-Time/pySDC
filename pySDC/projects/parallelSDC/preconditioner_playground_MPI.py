@@ -6,6 +6,7 @@ import numpy as np
 from mpi4py import MPI
 
 import matplotlib as mpl
+
 mpl.use("Agg")
 import pySDC.helpers.plot_helper as plt_helper
 from pySDC.helpers.stats_helper import get_sorted
