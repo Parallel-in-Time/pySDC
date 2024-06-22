@@ -28,7 +28,7 @@ class imexexp_1st_order(sweeper):
         super(imexexp_1st_order, self).__init__(params)
 
         # IMEX integration matrices
-        self.QI = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.QI)
+        self.QI = self.get_Qdelta_implicit(qd_type=self.params.QI)
         self.delta = np.diagonal(self.QI)[1:]
 
     def eval_phi_f_exp(self, u, factor):

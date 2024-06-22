@@ -74,7 +74,8 @@ class sweeper(object):
 
         self.parallelizable = False
 
-    def setupGenerator(self, coll: CollBase, qd_type):
+    def setupGenerator(self, qd_type):
+        coll = self.coll
         try:
             assert QDELTA_GENERATORS[qd_type] == type(self.generator)
             assert self.generator.QDelta.shape[0] == coll.Qmat.shape[0] - 1
@@ -93,28 +94,27 @@ class sweeper(object):
         except Exception as e:
             raise ValueError(f"could not generate {qd_type=!r} with qmat, got error : {e}")
 
-    def get_Qdelta_implicit(self, coll: CollBase, qd_type, k=None):
-        QDmat = np.zeros(coll.Qmat.shape, dtype=float)
-        self.setupGenerator(coll, qd_type)
+    def get_Qdelta_implicit(self, qd_type, k=None):
+        QDmat = np.zeros_like(self.coll.Qmat)
+        self.setupGenerator(qd_type)
         QDmat[1:, 1:] = self.generator.genCoeffs(k=k)
 
-        # check if we got not more than a lower triangular matrix
-        np.testing.assert_array_equal(
-            np.triu(QDmat, k=1), np.zeros(QDmat.shape), err_msg='Lower triangular matrix expected!'
-        )
+        err_msg = 'Lower triangular matrix expected!'
+        np.testing.assert_array_equal(np.triu(QDmat, k=1), np.zeros(QDmat.shape), err_msg=err_msg)
         if np.allclose(np.diag(np.diag(QDmat)), QDmat):
             self.parallelizable = True
         return QDmat
 
-    def get_Qdelta_explicit(self, coll, qd_type, k=None):
+    def get_Qdelta_explicit(self, qd_type, k=None):
+        coll = self.coll
         QDmat = np.zeros(coll.Qmat.shape, dtype=float)
         self.setupGenerator(coll, qd_type)
         QDmat[1:, 1:], QDmat[1:, 0] = self.generator.genCoeffs(k=k, dTau=True)
 
-        # check if we got not more than a strictly lower triangular matrix
-        np.testing.assert_array_equal(
-            np.triu(QDmat, k=0), np.zeros(QDmat.shape), err_msg='Strictly lower triangular matrix expected!'
-        )
+        err_msg = 'Strictly lower triangular matrix expected!'
+        np.testing.assert_array_equal(np.triu(QDmat, k=0), np.zeros(QDmat.shape), err_msg=err_msg)
+        if np.allclose(np.diag(np.diag(QDmat)), QDmat):
+            self.parallelizable = True  # for PIC ;)
         return QDmat
 
     def predict(self):

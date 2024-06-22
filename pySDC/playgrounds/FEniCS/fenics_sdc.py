@@ -77,8 +77,8 @@ g = df.Expression(
 params = {'num_nodes': nnodes, 'quad_type': quad_type, 'node_type': node_type}
 sweeper = Sweeper(params)
 Q = sweeper.coll.Qmat
-QI = sweeper.get_Qdelta_implicit(sweeper.coll, qd_type)
-QE = sweeper.get_Qdelta_explicit(sweeper.coll, 'EE')
+QI = sweeper.get_Qdelta_implicit(qd_type)
+QE = sweeper.get_Qdelta_explicit('EE')
 
 u = [df.Function(V) for _ in range(nnodes + 1)]
 fimpl = [df.Function(V) for _ in range(nnodes + 1)]

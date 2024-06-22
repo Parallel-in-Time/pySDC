@@ -96,7 +96,7 @@ class SemiImplicitDAE(fully_implicit_DAE):
         if self.coll.left_is_node:
             raise ParameterError(msg)
 
-        self.QI = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.QI)
+        self.QI = self.get_Qdelta_implicit(qd_type=self.params.QI)
 
     def integrate(self):
         r"""

@@ -24,7 +24,7 @@ class explicit(sweeper):
         super(explicit, self).__init__(params)
 
         # integration matrix
-        self.QE = self.get_Qdelta_explicit(coll=self.coll, qd_type=self.params.QE)
+        self.QE = self.get_Qdelta_explicit(qd_type=self.params.QE)
 
     def integrate(self):
         """

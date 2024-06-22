@@ -40,11 +40,11 @@ for m in nNodes:
     Q = s.coll.Qmat[1:, 1:]
     nodes = s.coll.nodes
 
-    qDelta = s.get_Qdelta_implicit(s.coll, qd_type="MIN-SR-S")
+    qDelta = s.get_Qdelta_implicit(qd_type="MIN-SR-S")
     d = np.diag(qDelta)[1:]
     nil_MIN_SR_S.append([nilpotencyS(d, Q), nilpotencyNS(d, Q)])
 
-    qDelta = s.get_Qdelta_implicit(s.coll, qd_type="MIN-SR-NS")
+    qDelta = s.get_Qdelta_implicit(qd_type="MIN-SR-NS")
     d = np.diag(qDelta)[1:]
     nil_MIN_SR_NS.append([nilpotencyS(d, Q), nilpotencyNS(d, Q)])
 

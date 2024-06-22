@@ -19,9 +19,9 @@ results = {}
 for prec in prec_list:
     sw = sweeper({'collocation_class': CollGaussRadau_Right, 'num_nodes': M})
     if prec != 'EE':
-        QDelta = sw.get_Qdelta_implicit(sw.coll, prec)[1:, 1:]
+        QDelta = sw.get_Qdelta_implicit(prec)[1:, 1:]
     else:
-        QDelta = sw.get_Qdelta_explicit(sw.coll, prec)[1:, 1:]
+        QDelta = sw.get_Qdelta_explicit(prec)[1:, 1:]
     QDL = np.tril(QDelta, -1)
     QDD = np.diag(np.diag(QDelta))
     Q = sw.coll.Qmat[1:, 1:]

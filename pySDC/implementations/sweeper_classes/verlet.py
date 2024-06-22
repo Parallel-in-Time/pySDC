@@ -49,8 +49,8 @@ class verlet(sweeper):
         """
 
         # set implicit and explicit Euler matrices
-        QI = self.get_Qdelta_implicit(self.coll, self.params.QI)
-        QE = self.get_Qdelta_explicit(self.coll, self.params.QE)
+        QI = self.get_Qdelta_implicit(self.params.QI)
+        QE = self.get_Qdelta_explicit(self.params.QE)
 
         # trapezoidal rule
         QT = 0.5 * (QI + QE)

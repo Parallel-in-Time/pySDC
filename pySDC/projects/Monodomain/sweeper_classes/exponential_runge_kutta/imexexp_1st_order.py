@@ -32,7 +32,7 @@ class imexexp_1st_order(sweeper):
         super(imexexp_1st_order, self).__init__(params)
 
         # IMEX integration matrices
-        self.QI = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.QI)
+        self.QI = self.get_Qdelta_implicit(qd_type=self.params.QI)
         self.delta = np.diagonal(self.QI)[1:]
 
         # Compute weights w such that PiQ^(k)(0) = sum_{j=0}^{M-1} w[k,j]*Q[j], k=0,...,M-1

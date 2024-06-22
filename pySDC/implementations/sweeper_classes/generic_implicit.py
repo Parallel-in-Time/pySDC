@@ -24,7 +24,7 @@ class generic_implicit(sweeper):
         super().__init__(params)
 
         # get QI matrix
-        self.QI = self.get_Qdelta_implicit(self.coll, qd_type=self.params.QI)
+        self.QI = self.get_Qdelta_implicit(qd_type=self.params.QI)
 
     def integrate(self):
         """
@@ -67,7 +67,7 @@ class generic_implicit(sweeper):
 
         # update the MIN-SR-FLEX preconditioner
         if self.params.QI == 'MIN-SR-FLEX':
-            self.QI = self.get_Qdelta_implicit(self.coll, qd_type="MIN-SR-FLEX", k=L.status.sweep)
+            self.QI = self.get_Qdelta_implicit(qd_type="MIN-SR-FLEX", k=L.status.sweep)
 
         # gather all terms which are known already (e.g. from the previous iteration)
         # this corresponds to u0 + QF(u^k) - QdF(u^k) + tau
