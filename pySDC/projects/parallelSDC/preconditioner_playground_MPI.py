@@ -244,10 +244,7 @@ def plot_iterations():
 
 
 if __name__ == "__main__":
-    import sys
-
     comm = MPI.COMM_WORLD
-    if not sys.argv[-1] == "--noRun":
-        main(comm=comm)
-    if not sys.argv[-1] == "--noPlot" and comm.Get_rank() == 0:
-        plot_iterations()
+    main(comm=comm)
+    # if comm.Get_rank() == 0:
+    #     plot_iterations()
