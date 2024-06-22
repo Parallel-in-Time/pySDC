@@ -88,7 +88,7 @@ for qDeltaList, nSweeps in config:
 
         plt.figure(figNameConv)
         plt.loglog(dtVals, errors, sym + ls, label=qDelta)
-        data.storeAndCheck(f"{figNameConv}_{qDelta}", errors, rtol=1e-2)
+        data.storeAndCheck(f"{figNameConv}_{qDelta}", errors)
 
         plt.figure(figNameCost)
         plt.loglog(costs, errors, sym + ls, label=qDelta)
