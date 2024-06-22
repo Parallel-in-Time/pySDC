@@ -18,8 +18,6 @@ from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unfo
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit_MPI import generic_implicit_MPI
 
-# from pySDC.projects.parallelSDC.BaseTransfer_MPI import base_transfer_mpi
-
 ID = namedtuple('ID', ['setup', 'qd_type', 'param'])
 
 
@@ -246,7 +244,10 @@ def plot_iterations():
 
 
 if __name__ == "__main__":
+    import sys
+
     comm = MPI.COMM_WORLD
-    main(comm=comm)
-    if comm.Get_rank() == 0:
+    if not sys.argv[-1] == "--noRun":
+        main(comm=comm)
+    if not sys.argv[-1] == "--noPlot" and comm.Get_rank() == 0:
         plot_iterations()
