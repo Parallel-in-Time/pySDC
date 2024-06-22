@@ -454,6 +454,7 @@ class ForwardEuler(RungeKutta):
 
     Not very stable first order method.
     """
+
     generator = RK_SCHEMES["FE"]()
     nodes, weights, matrix = generator.genCoeffs()
 
@@ -464,6 +465,7 @@ class BackwardEuler(RungeKutta):
 
     A-stable first order method.
     """
+
     generator = RK_SCHEMES["BE"]()
     nodes, weights, matrix = generator.genCoeffs()
 
@@ -472,6 +474,7 @@ class CrankNicholson(RungeKutta):
     """
     Implicit Runge-Kutta method of second order, A-stable.
     """
+
     generator = RK_SCHEMES["CN"]()
     nodes, weights, matrix = generator.genCoeffs()
 
@@ -480,6 +483,7 @@ class ExplicitMidpointMethod(RungeKutta):
     """
     Explicit Runge-Kutta method of second order.
     """
+
     generator = RK_SCHEMES["RK2"]()
     nodes, weights, matrix = generator.genCoeffs()
 
@@ -488,6 +492,7 @@ class ImplicitMidpointMethod(RungeKutta):
     """
     Implicit Runge-Kutta method of second order.
     """
+
     generator = RK_SCHEMES["IMP"]()
     nodes, weights, matrix = generator.genCoeffs()
 
@@ -496,13 +501,16 @@ class RK4(RungeKutta):
     """
     Explicit Runge-Kutta of fourth order: Everybody's darling.
     """
+
     generator = RK_SCHEMES["RK4"]()
     nodes, weights, matrix = generator.genCoeffs()
+
 
 class Heun_Euler(RungeKutta):
     """
     Second order explicit embedded Runge-Kutta method.
     """
+
     generator = RK_SCHEMES["HEUN"]()
     nodes, weights, matrix = generator.genCoeffs()
 
@@ -515,6 +523,7 @@ class Cash_Karp(RungeKutta):
     """
     Fifth order explicit embedded Runge-Kutta. See [here](https://doi.org/10.1145/79505.79507).
     """
+
     generator = RK_SCHEMES["CashKarp"]()
     nodes, weights, matrix = generator.genCoeffs(embedded=True)
     ButcherTableauClass = ButcherTableauEmbedded
@@ -565,6 +574,7 @@ class ESDIRK53(RungeKutta):
     A-stable embedded RK pair of orders 5 and 3, ESDIRK5(3)6L[2]SA.
     Taken from [here](https://ntrs.nasa.gov/citations/20160005923)
     """
+
     generator = RK_SCHEMES["ESDIRK53"]()
     nodes, weights, matrix = generator.genCoeffs(embedded=True)
     ButcherTableauClass = ButcherTableauEmbedded
@@ -597,7 +607,7 @@ class ARK548L2SAERK(RungeKutta):
     generator = RK_SCHEMES["ARK548L2SAERK"]()
     nodes, weights, matrix = generator.genCoeffs(embedded=True)
     ButcherTableauClass = ButcherTableauEmbedded
-    
+
     @classmethod
     def get_update_order(cls):
         return 5
@@ -607,8 +617,10 @@ class ARK548L2SAESDIRK(ARK548L2SAERK):
     """
     Implicit part of the ARK54 scheme. Be careful with the embedded scheme. It seems that both schemes are order 5 as opposed to 5 and 4 as claimed. This may cause issues when doing adaptive time-stepping.
     """
+
     generator_IMP = RK_SCHEMES["ARK548L2SAESDIRK"]()
     matrix = generator_IMP.Q
+
 
 class ARK54(RungeKuttaIMEX):
     """
@@ -634,10 +646,10 @@ class ARK548L2SAESDIRK2(RungeKutta):
     Stiffly accurate singly diagonally L-stable implicit embedded Runge-Kutta pair of orders 5 and 4 with explicit first stage from [here](https://doi.org/10.1016/j.apnum.2018.10.007).
     This method is part of the IMEX method ARK548L2SA.
     """
+
     generator = RK_SCHEMES["ARK548L2SAESDIRK2"]()
     nodes, weights, matrix = generator.genCoeffs(embedded=True)
     ButcherTableauClass = ButcherTableauEmbedded
-    
 
     @classmethod
     def get_update_order(cls):
