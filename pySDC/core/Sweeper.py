@@ -108,7 +108,7 @@ class sweeper(object):
     def get_Qdelta_explicit(self, qd_type, k=None):
         coll = self.coll
         QDmat = np.zeros(coll.Qmat.shape, dtype=float)
-        self.setupGenerator(coll, qd_type)
+        self.setupGenerator(qd_type)
         QDmat[1:, 1:], QDmat[1:, 0] = self.generator.genCoeffs(k=k, dTau=True)
 
         err_msg = 'Strictly lower triangular matrix expected!'
