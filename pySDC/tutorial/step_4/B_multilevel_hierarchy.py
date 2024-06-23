@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pySDC.core.Step import step
+from pySDC.core.step import Step
 
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
@@ -51,7 +51,7 @@ def main():
     description['space_transfer_params'] = space_transfer_params
 
     # now the description contains more or less everything we need to create a step with multiple levels
-    S = step(description=description)
+    S = Step(description=description)
 
     # print out and check
     Path("data").mkdir(parents=True, exist_ok=True)

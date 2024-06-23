@@ -1,10 +1,10 @@
 from mpi4py import MPI
 
-from pySDC.core.Errors import UnlockError
-from pySDC.core.BaseTransfer import base_transfer
+from pySDC.core.errors import UnlockError
+from pySDC.core.base_transfer import BaseTransfer
 
 
-class base_transfer_MPI(base_transfer):
+class base_transfer_MPI(BaseTransfer):
     """
     Standard base_transfer class
 

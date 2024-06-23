@@ -1,6 +1,6 @@
 import numpy as np
 from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
-from pySDC.core.Errors import ParameterError
+from pySDC.core.errors import ParameterError
 
 
 def WSCC9Bus():

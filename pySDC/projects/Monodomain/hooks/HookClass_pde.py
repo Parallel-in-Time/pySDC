@@ -1,7 +1,7 @@
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class pde_hook(hooks):
+class pde_hook(Hooks):
     """
     Hook class to write the solution to file.
     """

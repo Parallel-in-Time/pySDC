@@ -1,7 +1,7 @@
 import numpy as np
 from petsc4py import PETSc
 
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_vec_imex, petsc_vec_comp2
 
 
@@ -282,7 +282,7 @@ class GS_reaction(object):
         return PETSc.Mat.Structure.SAME_NONZERO_PATTERN
 
 
-class petsc_grayscott_multiimplicit(ptype):
+class petsc_grayscott_multiimplicit(Problem):
     r"""
     The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
     where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,

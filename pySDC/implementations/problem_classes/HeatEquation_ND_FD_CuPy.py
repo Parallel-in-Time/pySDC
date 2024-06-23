@@ -3,13 +3,13 @@ import cupy as cp
 import cupyx.scipy.sparse as csp
 from cupyx.scipy.sparse.linalg import spsolve, cg  # , gmres, minres
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.errors import ProblemError
+from pySDC.core.problem import Problem
 from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh
 
 
-class heatNd_forced(ptype):  # pragma: no cover
+class heatNd_forced(Problem):  # pragma: no cover
     r"""
     This class implements the unforced :math:`N`-dimensional heat equation with periodic boundary conditions
 

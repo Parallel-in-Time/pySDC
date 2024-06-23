@@ -43,7 +43,7 @@ def test_capture_errors_and_warnings(caplog):
     Test that checks if the errors in the problem classes are raised.
     """
     import numpy as np
-    from pySDC.core.Errors import ProblemError
+    from pySDC.core.errors import ProblemError
     from pySDC.implementations.problem_classes.DiscontinuousTestODE import DiscontinuousTestODE
 
     problem_params = {

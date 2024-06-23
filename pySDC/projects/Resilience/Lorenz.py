@@ -6,7 +6,7 @@ from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.problem_classes.Lorenz import LorenzAttractor
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
-from pySDC.core.Errors import ConvergenceError
+from pySDC.core.errors import ConvergenceError
 from pySDC.projects.Resilience.hook import LogData, hook_collection
 from pySDC.projects.Resilience.strategies import merge_descriptions
 from pySDC.projects.Resilience.sweepers import generic_implicit_efficient

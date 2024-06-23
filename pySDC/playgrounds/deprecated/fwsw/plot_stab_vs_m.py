@@ -5,9 +5,9 @@ from pySDC.implementations.problem_classes.FastWaveSlowWave_Scalar import swfw_s
 from pylab import rcParams
 
 from pySDC.core import CollocationClasses as collclass
-from pySDC.core import Hooks as hookclass
-from pySDC.core import Level as lvl
-from pySDC.core import Step as stepclass
+from pySDC.core import hooks as hookclass
+from pySDC.core import level as lvl
+from pySDC.core import step as stepclass
 from pySDC.implementations.datatype_classes import mesh, rhs_imex_mesh
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
 
@@ -35,8 +35,8 @@ if __name__ == "__main__":
         #
         # ...this is functionality copied from test_imexsweeper. Ideally, it should be available in one place.
         #
-        step = stepclass.step(params={})
-        L = lvl.level(
+        step = stepclass.Step(params={})
+        L = lvl.Level(
             problem_class=swfw_scalar,
             problem_params=pparams,
             dtype_u=mesh,
@@ -44,7 +44,7 @@ if __name__ == "__main__":
             sweeper_class=imex,
             sweeper_params=swparams,
             level_params={},
-            hook_class=hookclass.hooks,
+            hook_class=hookclass.Hooks,
             id="stability",
         )
         step.register_level(L)

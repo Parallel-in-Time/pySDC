@@ -1,12 +1,12 @@
 import numpy as np
 
-from pySDC.core.Errors import TransferError
-from pySDC.core.SpaceTransfer import space_transfer
+from pySDC.core.errors import TransferError
+from pySDC.core.space_transfer import SpaceTransfer
 
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
-class dedalus_field_transfer(space_transfer):
+class dedalus_field_transfer(SpaceTransfer):
     """
     Custon base_transfer class, implements Transfer.py
 

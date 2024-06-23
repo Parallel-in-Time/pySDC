@@ -1,9 +1,9 @@
 import numpy as np
 
-from pySDC.core.Sweeper import sweeper
+from pySDC.core.sweeper import Sweeper
 
 
-class verlet(sweeper):
+class verlet(Sweeper):
     """
     Custom sweeper class, implements Sweeper.py
 

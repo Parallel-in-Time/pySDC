@@ -1,9 +1,9 @@
 import numpy as np
 
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class dump_energy(hooks):
+class dump_energy(Hooks):
     def __init__(self):
         """
         Initialization of output

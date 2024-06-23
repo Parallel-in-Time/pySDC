@@ -1,7 +1,7 @@
 import dolfin as df
 import numpy as np
-from pySDC.core.Collocation import CollBase
-from pySDC.core.Sweeper import sweeper as Sweeper
+from pySDC.core.collocation import CollBase
+from pySDC.core.sweeper import Sweeper as Sweeper
 
 c_nvars = 128
 refinements = 1

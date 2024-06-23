@@ -12,10 +12,10 @@ class TestImexSweeper(unittest.TestCase):
     # Some auxiliary functions which are not tests themselves
     #
     def setupLevelStepProblem(self):
-        from pySDC.core import Step as stepclass
+        from pySDC.core import step as stepclass
 
         self.description['sweeper_params'] = self.swparams
-        step = stepclass.step(description=self.description)
+        step = stepclass.Step(description=self.description)
         level = step.levels[0]
         level.status.time = 0.0
         u0 = step.levels[0].prob.u_exact(step.time)
@@ -56,27 +56,27 @@ class TestImexSweeper(unittest.TestCase):
     # Check that a level object can be instantiated
     #
     def test_caninstantiate(self):
-        from pySDC.core import Step as stepclass
+        from pySDC.core import step as stepclass
         from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
 
         for node_type, quad_type in zip(node_types, quad_types):
             self.swparams['node_type'] = node_type
             self.swparams['quad_type'] = quad_type
             self.description['sweeper_params'] = self.swparams
-            S = stepclass.step(description=self.description)
+            S = stepclass.Step(description=self.description)
             assert isinstance(S.levels[0].sweep, imex), "sweeper in generated level is not an object of type imex"
 
     #
     # Check that a level object can be registered in a step object (needed as prerequiste to execute update_nodes
     #
     def test_canregisterlevel(self):
-        from pySDC.core import Step as stepclass
+        from pySDC.core import step as stepclass
 
         for node_type, quad_type in zip(node_types, quad_types):
             self.swparams['node_type'] = node_type
             self.swparams['quad_type'] = quad_type
             self.description['sweeper_params'] = self.swparams
-            step = stepclass.step(description=self.description)
+            step = stepclass.Step(description=self.description)
             L = step.levels[0]
             with self.assertRaises(Exception):
                 L.sweep.predict()

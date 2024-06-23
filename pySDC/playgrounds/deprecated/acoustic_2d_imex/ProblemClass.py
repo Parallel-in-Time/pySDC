@@ -4,11 +4,11 @@ from build2DFDMatrix import get2DMesh
 from buildWave2DMatrix import getWave2DMatrix, getWave2DUpwindMatrix
 from unflatten import unflatten
 
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes import mesh, rhs_imex_mesh
 
 
-class acoustic_2d_imex(ptype):
+class acoustic_2d_imex(Problem):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 

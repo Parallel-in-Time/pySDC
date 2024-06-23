@@ -1,10 +1,10 @@
 import numpy as np
 
-from pySDC.core.Errors import TransferError
-from pySDC.core.SpaceTransfer import space_transfer
+from pySDC.core.errors import TransferError
+from pySDC.core.space_transfer import SpaceTransfer
 
 
-class mesh_to_mesh_fft(space_transfer):
+class mesh_to_mesh_fft(SpaceTransfer):
     """
     Custom base_transfer class, implements Transfer.py
 

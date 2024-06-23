@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from pySDC.core.Sweeper import sweeper as Sweeper
+from pySDC.core.sweeper import Sweeper as Sweeper
 
 node_types = ['EQUID', 'LEGENDRE'] + [f'CHEBY-{i}' for i in [1, 2, 3, 4]]
 quad_types = ['GAUSS', 'LOBATTO', 'RADAU-RIGHT', 'RADAU-LEFT']

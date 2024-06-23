@@ -41,14 +41,14 @@ def generate_stats_for_recomputed_test(num_procs=1, test_type=1, comm=None):
     Returns:
         dict: The stats generated from the pretend run
     """
-    from pySDC.core.Hooks import hooks
+    from pySDC.core.hooks import Hooks
 
     if comm:
         ranks = [comm.rank]
     else:
         ranks = range(num_procs)
 
-    hook = hooks()
+    hook = Hooks()
 
     step_size = 1.0
 

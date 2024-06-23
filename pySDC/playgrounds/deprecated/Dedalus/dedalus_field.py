@@ -3,7 +3,7 @@ from mpi4py import MPI
 
 from dedalus import public as de
 
-from pySDC.core.Errors import DataError
+from pySDC.core.errors import DataError
 
 
 class dedalus_field(object):

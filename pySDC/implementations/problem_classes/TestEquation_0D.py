@@ -1,11 +1,11 @@
 import numpy as np
 import scipy.sparse as nsp
 
-from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
-class testequation0d(ptype):
+class testequation0d(Problem):
     r"""
     This class implements the simple test equation of the form
 

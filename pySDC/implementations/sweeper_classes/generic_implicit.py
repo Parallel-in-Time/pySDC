@@ -1,7 +1,7 @@
-from pySDC.core.Sweeper import sweeper
+from pySDC.core.sweeper import Sweeper
 
 
-class generic_implicit(sweeper):
+class generic_implicit(Sweeper):
     """
     Generic implicit sweeper, expecting lower triangular matrix type as input
 

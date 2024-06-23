@@ -80,7 +80,7 @@ def single_test(MPIsweeper=False, MPIcontroller=False):
     machine precision.
     """
     import numpy as np
-    from pySDC.core.Errors import ConvergenceError
+    from pySDC.core.errors import ConvergenceError
 
     args = {
         'MPIsweeper': MPIsweeper,

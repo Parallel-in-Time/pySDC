@@ -1,8 +1,8 @@
-from pySDC.core.ConvergenceController import ConvergenceController, Pars
+from pySDC.core.convergence_controller import ConvergenceController, Pars
 from pySDC.implementations.convergence_controller_classes.spread_step_sizes import (
     SpreadStepSizesBlockwise,
 )
-from pySDC.core.Errors import ConvergenceError
+from pySDC.core.errors import ConvergenceError
 import numpy as np
 
 

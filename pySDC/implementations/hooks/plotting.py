@@ -1,8 +1,8 @@
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 import matplotlib.pyplot as plt
 
 
-class PlottingHook(hooks):  # pragma: no cover
+class PlottingHook(Hooks):  # pragma: no cover
     save_plot = None  # Supply a string to the path where you want to save
     live_plot = 1e-9  # Supply `None` if you don't want live plotting
 

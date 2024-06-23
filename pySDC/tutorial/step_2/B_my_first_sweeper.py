@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pySDC.core.Step import step
+from pySDC.core.step import Step
 
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
@@ -41,7 +41,7 @@ def main():
     description['step_params'] = step_params
 
     # instantiate the step we are going to work on
-    S = step(description=description)
+    S = Step(description=description)
 
     # run IMEX SDC test and check error, residual and number of iterations
     err, res, niter = run_imex_sdc(S)

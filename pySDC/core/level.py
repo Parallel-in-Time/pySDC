@@ -35,7 +35,7 @@ class _Status(FrozenClass):
         self._freeze()
 
 
-class level(FrozenClass):
+class Level(FrozenClass):
     """
     Level class containing all management functionality for a single level
 

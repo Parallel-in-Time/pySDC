@@ -9,7 +9,7 @@ with increasing number of nodes.
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pySDC.core.Sweeper import sweeper
+from pySDC.core.sweeper import Sweeper
 
 quadType = "LOBATTO"
 nodeType = "LEGENDRE"
@@ -36,7 +36,7 @@ nil_MIN_SR_S = []
 nil_MIN_SR_NS = []
 nNodes = range(2, 20)
 for m in nNodes:
-    s = sweeper({"num_nodes": m, "quad_type": quadType, "node_type": nodeType})
+    s = Sweeper({"num_nodes": m, "quad_type": quadType, "node_type": nodeType})
     Q = s.coll.Qmat[1:, 1:]
     nodes = s.coll.nodes
 

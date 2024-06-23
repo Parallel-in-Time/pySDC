@@ -1,12 +1,12 @@
 import numpy as np
 
-from pySDC.core.Errors import ParameterError
-from pySDC.core.Problem import ptype
+from pySDC.core.errors import ParameterError
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.particles import particles, acceleration
 
 
 # noinspection PyUnusedLocal
-class fermi_pasta_ulam_tsingou(ptype):
+class fermi_pasta_ulam_tsingou(Problem):
     r"""
     The Fermi-Pasta-Ulam-Tsingou (FPUT) problem was one of the first computer experiments.  E. Fermi, J. Pasta
     and S. Ulam investigated the behavior of a vibrating spring with a weak correction term (which is quadratic

@@ -1,7 +1,7 @@
 import logging
 import numpy as np
-from pySDC.core.Problem import ptype
-from pySDC.core.Common import RegisterParams
+from pySDC.core.problem import Problem
+from pySDC.core.common import RegisterParams
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.projects.Monodomain.datatype_classes.my_mesh import imexexp_mesh
 
@@ -19,7 +19,7 @@ class Parabolic(RegisterParams):
         self.init = ((1,), None, np.dtype("float64"))
 
 
-class TestODE(ptype):
+class TestODE(Problem):
     def __init__(self, **problem_params):
         self.logger = logging.getLogger("step")
 

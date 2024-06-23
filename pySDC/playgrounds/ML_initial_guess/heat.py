@@ -2,8 +2,8 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import gmres, spsolve, cg
 import torch
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.core.errors import ProblemError
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.playgrounds.ML_initial_guess.tensor import Tensor
@@ -13,7 +13,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.playgrounds.ML_initial_guess.ml_heat import HeatEquationModel
 
 
-class Heat1DFDTensor(ptype):
+class Heat1DFDTensor(Problem):
     """
     Very simple 1-dimensional finite differences implementation of a heat equation using the pySDC-PyTorch interface.
     Still includes some mess.

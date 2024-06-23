@@ -3,11 +3,11 @@ from clawpack import pyclaw
 from clawpack import riemann
 from unflatten import unflatten
 
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes import mesh, rhs_imex_mesh
 
 
-class advection_2d_explicit(ptype):
+class advection_2d_explicit(Problem):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 

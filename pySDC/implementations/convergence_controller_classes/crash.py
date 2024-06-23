@@ -1,5 +1,5 @@
-from pySDC.core.ConvergenceController import ConvergenceController
-from pySDC.core.Errors import ConvergenceError
+from pySDC.core.convergence_controller import ConvergenceController
+from pySDC.core.errors import ConvergenceError
 import numpy as np
 import time
 

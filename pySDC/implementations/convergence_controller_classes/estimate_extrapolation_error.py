@@ -1,8 +1,8 @@
 import numpy as np
 from scipy.special import factorial
 
-from pySDC.core.ConvergenceController import ConvergenceController, Status
-from pySDC.core.Errors import DataError
+from pySDC.core.convergence_controller import ConvergenceController, Status
+from pySDC.core.errors import DataError
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 from pySDC.implementations.hooks.log_extrapolated_error_estimate import LogExtrapolationErrorEstimate
 

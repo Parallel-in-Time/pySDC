@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.core.ConvergenceController import ConvergenceController
+from pySDC.core.convergence_controller import ConvergenceController
 
 
 class HotRod(ConvergenceController):

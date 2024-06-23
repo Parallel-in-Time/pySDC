@@ -3,7 +3,7 @@ import matplotlib.pylab as plt
 import numpy as np
 import scipy.optimize as opt
 
-from pySDC.core.Collocation import CollBase
+from pySDC.core.collocation import CollBase
 
 
 def main():

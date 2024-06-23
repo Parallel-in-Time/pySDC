@@ -1,10 +1,10 @@
 import numpy as np
 
-from pySDC.core.Sweeper import sweeper
-from pySDC.core.Errors import CollocationError
+from pySDC.core.sweeper import Sweeper
+from pySDC.core.errors import CollocationError
 
 
-class imexexp_1st_order(sweeper):
+class imexexp_1st_order(Sweeper):
     """
     Custom sweeper class, implements Sweeper.py
 

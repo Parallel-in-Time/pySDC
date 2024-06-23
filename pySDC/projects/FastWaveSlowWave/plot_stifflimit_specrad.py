@@ -10,7 +10,7 @@ from pySDC.implementations.problem_classes.FastWaveSlowWave_0D import swfw_scala
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 
-from pySDC.core.Step import step
+from pySDC.core.step import Step
 
 
 # noinspection PyShadowingNames
@@ -58,7 +58,7 @@ def compute_specrad():
         description['sweeper_params'] = sweeper_params  # pass sweeper parameters
 
         # now the description contains more or less everything we need to create a step
-        S = step(description=description)
+        S = Step(description=description)
 
         L = S.levels[0]
         P = L.prob

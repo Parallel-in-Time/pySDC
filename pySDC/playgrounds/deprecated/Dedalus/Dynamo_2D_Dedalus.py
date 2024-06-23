@@ -2,13 +2,13 @@ import numpy as np
 
 from dedalus import public as de
 
-from pySDC.core.Problem import ptype
-from pySDC.core.Errors import ParameterError
+from pySDC.core.problem import Problem
+from pySDC.core.errors import ParameterError
 
 from pySDC.playgrounds.Dedalus.dedalus_field import dedalus_field, rhs_imex_dedalus_field
 
 
-class dynamo_2d_dedalus(ptype):
+class dynamo_2d_dedalus(Problem):
     """ """
 
     def __init__(self, problem_params, dtype_u=dedalus_field, dtype_f=rhs_imex_dedalus_field):

@@ -2,10 +2,10 @@ from __future__ import division
 
 import numpy as np
 
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class fault_hook(hooks):
+class fault_hook(Hooks):
     def __init__(self):
         """
         Initialization of fault hooks

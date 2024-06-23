@@ -2,7 +2,7 @@
 from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 from pySDC.helpers.stats_helper import get_sorted
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,7 +14,7 @@ from pySDC.implementations.hooks.log_step_size import LogStepSize
 from pySDC.projects.Resilience.strategies import merge_descriptions
 
 
-class LogLambdas(hooks):
+class LogLambdas(Hooks):
     """
     Store the lambda values at the beginning of the run
     """
@@ -25,14 +25,14 @@ class LogLambdas(hooks):
         self.add_to_stats(process=0, time=0, level=0, iter=0, sweep=0, type='lambdas', value=L.prob.lambdas)
 
 
-hooks = [LogLambdas, LogSolutionAfterIteration, LogStepSize]
+Hooks = [LogLambdas, LogSolutionAfterIteration, LogStepSize]
 
 
 def run_dahlquist(
     custom_description=None,
     num_procs=1,
     Tend=1.0,
-    hook_class=hooks,
+    hook_class=Hooks,
     fault_stuff=None,
     custom_controller_params=None,
     **kwargs,

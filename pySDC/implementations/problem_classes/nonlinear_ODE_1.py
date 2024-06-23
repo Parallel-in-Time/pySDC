@@ -1,12 +1,12 @@
 import numpy as np
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.errors import ProblemError
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 # noinspection PyUnusedLocal
-class nonlinear_ODE_1(ptype):
+class nonlinear_ODE_1(Problem):
     r"""
     This class implements a simple nonlinear ODE with a singularity in the derivative, taken from
     https://www.osti.gov/servlets/purl/6111421 (Problem E-4). For :math:`0 \leq t \leq 5`, the problem is

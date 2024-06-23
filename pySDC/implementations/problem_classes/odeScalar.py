@@ -12,12 +12,12 @@ on parallel computers. SIAM journal on scientific and statistical computing,
 """
 import numpy as np
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.core.errors import ProblemError
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
-class ProtheroRobinson(ptype):
+class ProtheroRobinson(Problem):
     r"""
     Implement the Prothero-Robinson problem:
 

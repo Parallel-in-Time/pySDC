@@ -1,7 +1,7 @@
 from mpi4py import MPI
 import numpy as np
 
-from pySDC.core.Errors import DataError
+from pySDC.core.errors import DataError
 
 
 class pmesh_datatype(object):

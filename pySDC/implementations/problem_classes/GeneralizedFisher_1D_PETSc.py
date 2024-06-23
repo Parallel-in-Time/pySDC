@@ -1,7 +1,7 @@
 import numpy as np
 from petsc4py import PETSc
 
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_vec_imex, petsc_vec_comp2
 
 
@@ -226,7 +226,7 @@ class Fisher_reaction(object):
         return PETSc.Mat.Structure.SAME_NONZERO_PATTERN
 
 
-class petsc_fisher_multiimplicit(ptype):
+class petsc_fisher_multiimplicit(Problem):
     r"""
     The following one-dimensional problem is an example of a reaction-diffusion equation with traveling waves, and can
     be seen as a generalized Fisher equation. This class implements a special case of the Kolmogorov-Petrovskii-Piskunov

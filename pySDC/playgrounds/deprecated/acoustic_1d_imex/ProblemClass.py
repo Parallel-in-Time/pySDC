@@ -14,7 +14,7 @@ import numpy as np
 import scipy.sparse.linalg as LA
 from buildWave1DMatrix import getWave1DMatrix, getWave1DAdvectionMatrix
 
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 
 
@@ -25,7 +25,7 @@ def u_initial(x):
 #    return np.exp(-0.5*(x-0.5)**2/0.1**2)
 
 
-class acoustic_1d_imex(ptype):
+class acoustic_1d_imex(Problem):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 

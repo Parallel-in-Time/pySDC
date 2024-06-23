@@ -1,9 +1,9 @@
 import numpy as np
 
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class monitor(hooks):
+class monitor(Hooks):
     phase_thresh = 0.0  # count everything above this threshold to the high phase.
 
     def __init__(self):

@@ -1,8 +1,8 @@
 import numpy as np
 from scipy.sparse.linalg import spsolve
 
-from pySDC.core.Errors import ParameterError
-from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.core.errors import ParameterError
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 from pySDC.implementations.problem_classes.acoustic_helpers.buildWave1DMatrix import (
     getWave1DMatrix,
@@ -11,7 +11,7 @@ from pySDC.implementations.problem_classes.acoustic_helpers.buildWave1DMatrix im
 
 
 # noinspection PyUnusedLocal
-class acoustic_1d_imex(ptype):
+class acoustic_1d_imex(Problem):
     r"""
     This class implements the one-dimensional acoustics advection equation on a periodic domain :math:`[0, 1]`
     fully investigated in [1]_. The equations are given by

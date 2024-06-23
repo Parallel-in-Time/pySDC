@@ -3,13 +3,13 @@ import copy as cp
 import numpy as np
 import dill
 
-from pySDC.core.Controller import controller
-from pySDC.core import Step as stepclass
-from pySDC.core.Errors import ControllerError, CommunicationError
+from pySDC.core.controller import Controller
+from pySDC.core import step as stepclass
+from pySDC.core.errors import ControllerError, CommunicationError
 from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
 
 
-class controller_nonMPI(controller):
+class controller_nonMPI(Controller):
     """
 
     PFASST controller, running serialized version of PFASST in blocks (MG-style)
@@ -32,7 +32,7 @@ class controller_nonMPI(controller):
         # call parent's initialization routine
         super().__init__(controller_params, description, useMPI=False)
 
-        self.MS = [stepclass.step(description)]
+        self.MS = [stepclass.Step(description)]
 
         # try to initialize via dill.copy (much faster for many time-steps)
         try:
@@ -42,7 +42,7 @@ class controller_nonMPI(controller):
         except (dill.PicklingError, TypeError) as error:
             self.logger.warning(f'Need to initialize steps separately due to pickling error: {error}')
             for _ in range(num_procs - 1):
-                self.MS.append(stepclass.step(description))
+                self.MS.append(stepclass.Step(description))
 
         self.base_convergence_controllers += [BasicRestarting.get_implementation(useMPI=False)]
         for convergence_controller in self.base_convergence_controllers:

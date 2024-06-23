@@ -1,11 +1,11 @@
 import numpy as np
 
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.particles import particles, acceleration
 
 
 # noinspection PyUnusedLocal
-class henon_heiles(ptype):
+class henon_heiles(Problem):
     r"""
     This class implements the second-order Hénon-Heiles system
 

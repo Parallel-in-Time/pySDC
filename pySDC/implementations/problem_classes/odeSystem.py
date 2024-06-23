@@ -12,12 +12,12 @@ on parallel computers. SIAM journal on scientific and statistical computing,
 """
 import numpy as np
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.core.errors import ProblemError
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
-class ProtheroRobinsonAutonomous(ptype):
+class ProtheroRobinsonAutonomous(Problem):
     r"""
     Implement the Prothero-Robinson problem into autonomous form:
 
@@ -235,7 +235,7 @@ class ProtheroRobinsonAutonomous(ptype):
         return u
 
 
-class Kaps(ptype):
+class Kaps(Problem):
     r"""
     Implement the Kaps problem:
 
@@ -390,7 +390,7 @@ class Kaps(ptype):
         return u
 
 
-class ChemicalReaction3Var(ptype):
+class ChemicalReaction3Var(Problem):
     r"""
     Chemical reaction with three components, modeled by the non-linear system:
 
@@ -741,7 +741,7 @@ class ChemicalReaction3Var(ptype):
         return u
 
 
-class JacobiElliptic(ptype):
+class JacobiElliptic(Problem):
     r"""
     Implement the Jacobi Elliptic non-linear problem:
 

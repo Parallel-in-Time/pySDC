@@ -2,8 +2,8 @@ import numpy as np
 from scipy.optimize import newton_krylov
 from scipy.optimize.nonlin import NoConvergence
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import WorkCounter
+from pySDC.core.errors import ProblemError
+from pySDC.core.problem import WorkCounter
 from pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian import IMEX_Laplacian_MPIFFT
 from pySDC.implementations.datatype_classes.mesh import mesh
 

@@ -24,8 +24,8 @@ def run_problem(
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
     from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
     from pySDC.implementations.convergence_controller_classes.spread_step_sizes import SpreadStepSizesBlockwise
-    from pySDC.core.Hooks import hooks
-    from pySDC.core.ConvergenceController import ConvergenceController
+    from pySDC.core.hooks import Hooks
+    from pySDC.core.convergence_controller import ConvergenceController
     from pySDC.implementations.hooks.log_step_size import LogStepSize
     from pySDC.implementations.hooks.log_restarts import LogRestarts
 
@@ -55,7 +55,7 @@ def run_problem(
                     first_updated = np.min(np.arange(len(updated))[updated])
                     self.restart_times = kwargs['comm'].bcast(self.restart_times, root=first_updated)
 
-    class ArtificialAdaptivity(hooks):
+    class ArtificialAdaptivity(Hooks):
         def __init__(self):
             super().__init__()
             self.min_dt = [] if min_dt is None else min_dt.copy()

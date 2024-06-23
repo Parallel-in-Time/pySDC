@@ -1,8 +1,8 @@
 import logging
 
-from pySDC.core import Level as levclass
-from pySDC.core.BaseTransfer import base_transfer
-from pySDC.core.Errors import ParameterError
+from pySDC.core import level as levclass
+from pySDC.core.base_transfer import BaseTransfer
+from pySDC.core.errors import ParameterError
 from pySDC.helpers.pysdc_helper import FrozenClass
 
 
@@ -41,7 +41,7 @@ class _Status(FrozenClass):
         self._freeze()
 
 
-class step(FrozenClass):
+class Step(FrozenClass):
     """
     Step class, referencing most of the structure needed for the time-stepping
 
@@ -115,7 +115,7 @@ class step(FrozenClass):
 
         descr['problem_params'] = descr.get('problem_params', {})
         # check if base_transfer class is specified
-        descr['base_transfer_class'] = descr.get('base_transfer_class', base_transfer)
+        descr['base_transfer_class'] = descr.get('base_transfer_class', BaseTransfer)
         # check if base_transfer parameters are needed
         descr['base_transfer_params'] = descr.get('base_transfer_params', {})
         # check if space_transfer class is specified
@@ -143,13 +143,13 @@ class step(FrozenClass):
             raise ParameterError(msg)
 
         if len(descr_list) == 1 and (
-            descr_new['space_transfer_class'] or descr_new['base_transfer_class'] is not base_transfer
+            descr_new['space_transfer_class'] or descr_new['base_transfer_class'] is not BaseTransfer
         ):
             self.logger.warning('you have specified transfer classes, but only a single level')
 
         # generate levels, register and connect if needed
         for l in range(len(descr_list)):
-            L = levclass.level(
+            L = levclass.Level(
                 problem_class=descr_list[l]['problem_class'],
                 problem_params=descr_list[l]['problem_params'],
                 sweeper_class=descr_list[l]['sweeper_class'],

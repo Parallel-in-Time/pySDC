@@ -1,8 +1,8 @@
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 import numpy as np
 
 
-class particles_output(hooks):
+class particles_output(Hooks):
     def __init__(self):
         """
         Initialization of particles output

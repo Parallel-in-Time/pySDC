@@ -9,7 +9,7 @@ import numpy as np
 import os.path
 import scipy.sparse as sp
 
-from pySDC.core.Collocation import CollBase
+from pySDC.core.collocation import CollBase
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 
 # setup id for gathering the results (will sort by dt)

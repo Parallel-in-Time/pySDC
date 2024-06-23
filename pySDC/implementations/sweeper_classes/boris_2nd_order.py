@@ -1,9 +1,9 @@
 import numpy as np
 
-from pySDC.core.Sweeper import sweeper
+from pySDC.core.sweeper import Sweeper
 
 
-class boris_2nd_order(sweeper):
+class boris_2nd_order(Sweeper):
     """
     Custom sweeper class, implements Sweeper.py
 

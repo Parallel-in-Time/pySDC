@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import optimize
 
-from pySDC.core.Errors import ParameterError
+from pySDC.core.errors import ParameterError
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
 

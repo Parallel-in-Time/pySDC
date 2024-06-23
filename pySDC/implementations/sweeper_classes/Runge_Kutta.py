@@ -2,9 +2,9 @@ import numpy as np
 import logging
 from qmat.qcoeff.butcher import RK_SCHEMES
 
-from pySDC.core.Sweeper import sweeper, _Pars
-from pySDC.core.Errors import ParameterError
-from pySDC.core.Level import level
+from pySDC.core.sweeper import Sweeper, _Pars
+from pySDC.core.errors import ParameterError
+from pySDC.core.level import Level
 
 
 class ButcherTableau(object):
@@ -122,7 +122,7 @@ class ButcherTableauEmbedded(object):
         self.implicit = any(matrix[i, i] != 0 for i in range(self.num_nodes - self.num_solution_stages))
 
 
-class RungeKutta(sweeper):
+class RungeKutta(Sweeper):
     nodes = None
     weights = None
     matrix = None
@@ -317,7 +317,7 @@ class RungeKutta(sweeper):
         Args:
             lvl (pySDC.Level.level): Current level
         """
-        assert isinstance(lvl, level), f"You tried to set the sweeper's level with an instance of {type(lvl)}!"
+        assert isinstance(lvl, Level), f"You tried to set the sweeper's level with an instance of {type(lvl)}!"
         if lvl.params.restol > 0:
             lvl.params.restol = -1
             self.logger.warning(

@@ -1,9 +1,9 @@
-from pySDC.core.Errors import TransferError
-from pySDC.core.SpaceTransfer import space_transfer
+from pySDC.core.errors import TransferError
+from pySDC.core.space_transfer import SpaceTransfer
 from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_vec_imex, petsc_vec_comp2
 
 
-class mesh_to_mesh_petsc_dmda(space_transfer):
+class mesh_to_mesh_petsc_dmda(SpaceTransfer):
     """
     This implementation can restrict and prolong between PETSc DMDA grids
     """

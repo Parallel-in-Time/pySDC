@@ -2,7 +2,7 @@ import logging
 import numpy as np
 from qmat import Q_GENERATORS
 
-from pySDC.core.Errors import CollocationError
+from pySDC.core.errors import CollocationError
 
 
 class CollBase(object):
@@ -29,7 +29,7 @@ class CollBase(object):
     boundary) and LOBATTO (inclusion of left and right boundary).
 
     All coefficients are generated using
-    [qmat](https://qmat.readthedocs.io/en/latest/autoapi/qmat/qcoeff/collocation/index.html)
+    `qmat <https://qmat.readthedocs.io/en/latest/autoapi/qmat/qdelta/index.html>`_.
 
     Attributes:
         num_nodes (int): number of collocation nodes

@@ -1,11 +1,11 @@
 import numpy as np
 
-from pySDC.core.Errors import ParameterError, ProblemError
-from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.core.errors import ParameterError, ProblemError
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
-class battery_n_capacitors(ptype):
+class battery_n_capacitors(Problem):
     r"""
     Example implementing the battery drain model with :math:`N` capacitors, where :math:`N` is an arbitrary integer greater than zero.
     First, the capacitor :math:`C` serves as a battery and provides energy. When the voltage of the capacitor :math:`v_{C_n}` for

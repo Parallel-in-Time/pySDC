@@ -1,6 +1,6 @@
 import numpy as np
 import scipy as sp
-from pySDC.core.Common import RegisterParams
+from pySDC.core.common import RegisterParams
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pathlib import Path
 import os

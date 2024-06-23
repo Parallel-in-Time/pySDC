@@ -1,6 +1,6 @@
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced as heat_cpu
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD_CuPy import heatNd_forced as heat_gpu
-from pySDC.core.Collocation import CollBase as Collocation
+from pySDC.core.collocation import CollBase as Collocation
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.helpers.stats_helper import filter_stats, sort_stats

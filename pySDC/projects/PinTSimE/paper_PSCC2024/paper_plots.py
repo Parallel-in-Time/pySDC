@@ -2,7 +2,7 @@ from pathlib import Path
 import numpy as np
 import dill
 
-from pySDC.core.Errors import ParameterError
+from pySDC.core.errors import ParameterError
 
 from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
 from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE

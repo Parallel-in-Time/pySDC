@@ -1,7 +1,7 @@
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class LogStepSize(hooks):
+class LogStepSize(Hooks):
     """
     Store the step size at the end of each step as "dt".
     """

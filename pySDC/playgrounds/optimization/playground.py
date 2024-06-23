@@ -1,4 +1,4 @@
-from pySDC.core.Sweeper import sweeper
+from pySDC.core.sweeper import Sweeper
 from matplotlib import pyplot as plt
 import scipy.optimize as opt
 import numpy as np
@@ -17,7 +17,7 @@ ldt_list = np.arange(-2, 0.1, 0.1)
 results = {}
 
 for prec in prec_list:
-    sw = sweeper({'collocation_class': CollGaussRadau_Right, 'num_nodes': M})
+    sw = Sweeper({'collocation_class': CollGaussRadau_Right, 'num_nodes': M})
     if prec != 'EE':
         QDelta = sw.get_Qdelta_implicit(prec)[1:, 1:]
     else:

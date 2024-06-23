@@ -2,10 +2,10 @@ import numpy as np
 import json
 from mpi4py import MPI
 from mpi4py_fft import newDistArray
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class dump(hooks):
+class dump(Hooks):
     def __init__(self):
         """
         Initialization of Allen-Cahn monitoring

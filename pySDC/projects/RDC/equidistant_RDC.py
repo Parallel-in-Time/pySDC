@@ -2,8 +2,8 @@ import numpy as np
 from scipy.special import roots_legendre
 from scipy.interpolate import BarycentricInterpolator
 
-from pySDC.core.Errors import CollocationError, ParameterError
-from pySDC.core.Collocation import CollBase
+from pySDC.core.errors import CollocationError, ParameterError
+from pySDC.core.collocation import CollBase
 
 
 class MyBarycentricInterpolator(BarycentricInterpolator):

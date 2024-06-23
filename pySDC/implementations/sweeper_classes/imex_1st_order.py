@@ -1,9 +1,9 @@
 import numpy as np
 
-from pySDC.core.Sweeper import sweeper
+from pySDC.core.sweeper import Sweeper
 
 
-class imex_1st_order(sweeper):
+class imex_1st_order(Sweeper):
     """
     Custom sweeper class, implements Sweeper.py
 

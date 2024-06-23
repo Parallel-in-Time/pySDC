@@ -9,12 +9,12 @@ from matplotlib import pyplot as plt
 
 import numpy as np
 
-from pySDC.core.Errors import ParameterError
-from pySDC.core.Problem import ptype
+from pySDC.core.errors import ParameterError
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 # noinspection PyUnusedLocal
-class fenicsx_heat(ptype):
+class fenicsx_heat(Problem):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 

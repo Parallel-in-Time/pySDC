@@ -1,13 +1,13 @@
 import numpy as np
 
-from pySDC.core.Sweeper import sweeper
-from pySDC.core.Errors import CollocationError, ParameterError
-from pySDC.core.Collocation import CollBase
+from pySDC.core.sweeper import Sweeper
+from pySDC.core.errors import CollocationError, ParameterError
+from pySDC.core.collocation import CollBase
 import numdifftools.fornberg as fornberg
 import scipy
 
 
-class imexexp_1st_order(sweeper):
+class imexexp_1st_order(Sweeper):
     """
     Custom sweeper class, implements Sweeper.py
 

@@ -79,7 +79,7 @@ def testVersions(num_nodes, residual_type, semi_implicit, index_case, initial_gu
     else:
         import numpy as np
         from pySDC.projects.DAE.run.accuracy_check_MPI import run
-        from pySDC.core.Errors import ParameterError
+        from pySDC.core.errors import ParameterError
 
         semi_implicit = False if semi_implicit == 'False' else True
 

@@ -1,12 +1,12 @@
 import numpy as np
 
-from pySDC.core.Errors import ParameterError
-from pySDC.core.Problem import ptype
+from pySDC.core.errors import ParameterError
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 # noinspection PyUnusedLocal
-class swfw_scalar(ptype):
+class swfw_scalar(Problem):
     r"""
     This class implements the fast-wave-slow-wave scalar problem fully investigated in [1]_. It is defined by
 

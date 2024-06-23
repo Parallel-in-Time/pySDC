@@ -3,12 +3,12 @@ import logging
 import dolfin as df
 import numpy as np
 
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_fenics_mesh
 
 
 # noinspection PyUnusedLocal
-class fenics_vortex_2d(ptype):
+class fenics_vortex_2d(Problem):
     r"""
     This class implements the vorticity-velocity problem in two dimensions with periodic boundary conditions
     in :math:`[0, 1]^2`

@@ -1,5 +1,5 @@
 import numpy as np
-from pySDC.core.ConvergenceController import ConvergenceController, Status
+from pySDC.core.convergence_controller import ConvergenceController, Status
 from qmat.lagrange import LagrangeApproximation
 
 

@@ -1,13 +1,13 @@
 import numpy as np
 from petsc4py import PETSc
 
-from pySDC.core.Errors import ParameterError, ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.errors import ParameterError, ProblemError
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_vec_imex
 
 
 # noinspection PyUnusedLocal
-class heat2d_petsc_forced(ptype):
+class heat2d_petsc_forced(Problem):
     r"""
     Example implementing the forced two-dimensional heat equation with Dirichlet boundary conditions
     :math:`(x, y) \in [0,1]^2`

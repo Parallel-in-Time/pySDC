@@ -1,7 +1,7 @@
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class LogEmbeddedErrorEstimate(hooks):
+class LogEmbeddedErrorEstimate(Hooks):
     """
     Store the embedded error estimate at the end of each step as "error_embedded_estimate".
     """

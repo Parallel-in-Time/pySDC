@@ -1,4 +1,4 @@
-from pySDC.core.Sweeper import sweeper
+from pySDC.core.sweeper import Sweeper
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -7,7 +7,7 @@ def iteration_vs_estimate():
 
     M = 5
     K = 10
-    swee = sweeper({'collocation_class': CollGaussRadau_Right, 'num_nodes': M})
+    swee = Sweeper({'collocation_class': CollGaussRadau_Right, 'num_nodes': M})
     Q = swee.coll.Qmat[1:, 1:]
     Qd = swee.get_Qdelta_implicit('IE')[1:, 1:]
     # Qd = swee.get_Qdelta_implicit('LU')[1:, 1:]
@@ -65,7 +65,7 @@ def iteration_vs_estimate():
 def estimates_over_lambda():
     M = 5
     K = 10
-    swee = sweeper({'collocation_class': CollGaussRadau_Right, 'num_nodes': M})
+    swee = Sweeper({'collocation_class': CollGaussRadau_Right, 'num_nodes': M})
     Q = swee.coll.Qmat[1:, 1:]
     # Qd = swee.get_Qdelta_implicit('IE')[1:, 1:]
     Qd = swee.get_Qdelta_implicit('LU')[1:, 1:]

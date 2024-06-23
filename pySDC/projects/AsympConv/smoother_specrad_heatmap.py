@@ -6,7 +6,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 
-from pySDC.core.Collocation import CollBase
+from pySDC.core.collocation import CollBase
 
 
 def compute_and_plot_specrad():

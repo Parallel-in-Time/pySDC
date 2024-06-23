@@ -1,11 +1,11 @@
 import numpy as np
 
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 # noinspection PyUnusedLocal
-class auzinger(ptype):
+class auzinger(Problem):
     r"""
     This class implements the Auzinger equation [1]_ as initial value problem. The system of two ordinary differential equations
     (ODEs) is given by

@@ -1,7 +1,7 @@
-from pySDC.core.Sweeper import sweeper
+from pySDC.core.sweeper import Sweeper
 
 
-class multi_implicit(sweeper):
+class multi_implicit(Sweeper):
     """
     Custom sweeper class, implements Sweeper.py
 

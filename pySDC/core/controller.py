@@ -3,7 +3,7 @@ import os
 import sys
 import numpy as np
 
-from pySDC.core.BaseTransfer import base_transfer
+from pySDC.core.base_transfer import BaseTransfer
 from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
 from pySDC.implementations.hooks.default_hook import DefaultHooks
@@ -27,7 +27,7 @@ class _Pars(FrozenClass):
         self._freeze()
 
 
-class controller(object):
+class Controller(object):
     """
     Base abstract controller class
     """
@@ -203,7 +203,7 @@ class controller(object):
             out += '-->                 Collocation: %s\n' % L.sweep.coll.__class__
 
         if len(step.levels) > 1:
-            if 'base_transfer_class' in description and description['base_transfer_class'] is not base_transfer:
+            if 'base_transfer_class' in description and description['base_transfer_class'] is not BaseTransfer:
                 out += '-->     Base Transfer: %s\n' % step.base_transfer.__class__
             else:
                 out += '        Base Transfer: %s\n' % step.base_transfer.__class__

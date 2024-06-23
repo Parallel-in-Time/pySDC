@@ -1,12 +1,12 @@
 import numpy as np
 
-from pySDC.core.Errors import ParameterError, ProblemError
-from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.core.errors import ParameterError, ProblemError
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 # noinspection PyUnusedLocal
-class advectiondiffusion1d_imex(ptype):
+class advectiondiffusion1d_imex(Problem):
     r"""
     Example implementing the unforced one-dimensional advection diffusion equation
 

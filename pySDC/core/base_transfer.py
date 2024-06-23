@@ -2,7 +2,7 @@ import logging
 
 import scipy.sparse as sp
 
-from pySDC.core.Errors import UnlockError
+from pySDC.core.errors import UnlockError
 from pySDC.helpers.pysdc_helper import FrozenClass
 from qmat.lagrange import LagrangeApproximation
 
@@ -17,7 +17,7 @@ class _Pars(FrozenClass):
         self._freeze()
 
 
-class base_transfer(object):
+class BaseTransfer(object):
     """
     Standard base_transfer class
 

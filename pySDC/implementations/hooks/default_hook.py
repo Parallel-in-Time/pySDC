@@ -1,8 +1,8 @@
 import time
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class DefaultHooks(hooks):
+class DefaultHooks(Hooks):
     """
     Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)
 

@@ -2,7 +2,7 @@ import pytest
 
 
 def getLevel(nvars, num_nodes, index, useMPI):
-    from pySDC.core.Level import level
+    from pySDC.core.level import Level
     from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 
     if useMPI:
@@ -18,7 +18,7 @@ def getLevel(nvars, num_nodes, index, useMPI):
     level_params['level_params'] = {'dt': 1.0}
     level_params['level_index'] = index
 
-    L = level(**level_params)
+    L = Level(**level_params)
 
     L.status.time = 0.0
     L.status.unlocked = True
@@ -33,7 +33,7 @@ def get_base_transfer(nvars, num_nodes, useMPI):
     if useMPI:
         from pySDC.implementations.transfer_classes.BaseTransferMPI import base_transfer_MPI as transfer_class
     else:
-        from pySDC.core.BaseTransfer import base_transfer as transfer_class
+        from pySDC.core.base_transfer import BaseTransfer as transfer_class
 
     params = {}
     params['fine_level'] = getLevel(nvars[0], num_nodes[0], 0, useMPI)

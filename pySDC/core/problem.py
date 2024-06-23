@@ -9,7 +9,7 @@ Module containing the base Problem class for pySDC
 
 import logging
 
-from pySDC.core.Common import RegisterParams
+from pySDC.core.common import RegisterParams
 
 
 class WorkCounter(object):
@@ -39,7 +39,7 @@ class WorkCounter(object):
         return f'{self.niter}'
 
 
-class ptype(RegisterParams):
+class Problem(RegisterParams):
     """
     Prototype class for problems, just defines the attributes essential to get started.
 

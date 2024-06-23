@@ -2,9 +2,9 @@ import logging
 import numpy as np
 from qmat import QDELTA_GENERATORS
 
-from pySDC.core.Errors import ParameterError
-from pySDC.core.Level import level
-from pySDC.core.Collocation import CollBase
+from pySDC.core.errors import ParameterError
+from pySDC.core.level import Level
+from pySDC.core.collocation import CollBase
 from pySDC.helpers.pysdc_helper import FrozenClass
 
 
@@ -22,9 +22,21 @@ class _Pars(FrozenClass):
         self._freeze()
 
 
-class sweeper(object):
+class Sweeper(object):
     """
-    Base abstract sweeper class
+    Base abstract sweeper class, provides two base methods to generate QDelta matrices :
+
+    - get_Qdelta_implicit(qd_type):
+        Returns a (pySDC-type) QDelta matrix of **implicit type**,
+        *i.e* lower triangular with zeros on the first collumn.
+    - get_Qdelta_explicit(qd_type):
+        Returns a (pySDC-type) QDelta matrix of **explicit type**,
+        *i.e* strictly lower triangular with first node distance to zero on the first collumn.
+
+
+    All possible QDelta matrix coefficients are generated with
+    `qmat <https://qmat.readthedocs.io/en/latest/autoapi/qmat/qdelta/index.html>`_,
+    check it out to see all available coefficient types.
 
     Attributes:
         logger: custom logger for sweeper-related logging
@@ -245,7 +257,7 @@ class sweeper(object):
         Args:
             L (pySDC.Level.level): current level
         """
-        assert isinstance(L, level)
+        assert isinstance(L, Level)
         self.__level = L
 
     @property

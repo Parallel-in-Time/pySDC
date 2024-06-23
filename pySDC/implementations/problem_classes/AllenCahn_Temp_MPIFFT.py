@@ -1,14 +1,14 @@
 import numpy as np
 from mpi4py_fft import PFFT
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.errors import ProblemError
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 from mpi4py_fft import newDistArray
 
 
-class allencahn_temp_imex(ptype):
+class allencahn_temp_imex(Problem):
     r"""
     This class implements the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [0, 1]^2`
 
