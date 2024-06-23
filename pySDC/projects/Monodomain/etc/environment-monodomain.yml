@@ -26,4 +26,4 @@ dependencies:
   - pymp-pypi
   - pip
   - pip:
-    - qmat
+    - qmat>=0.1.8

@@ -18,4 +18,4 @@ dependencies:
     - sphinxemoji
     - m2r2
     - genbadge[all]
-    - qmat
+    - qmat>=0.1.8

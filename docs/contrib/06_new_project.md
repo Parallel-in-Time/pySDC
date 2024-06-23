@@ -27,7 +27,7 @@ dependencies:
   - numpy
   - pip
   - pip:
-    - qmat
+    - qmat>=0.1.8
 ```
 
 The list of dependencies can be extended as needed.

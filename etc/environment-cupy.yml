@@ -12,4 +12,4 @@ dependencies:
   - cupy
   - pip
   - pip:
-    - qmat
+    - qmat>=0.1.8

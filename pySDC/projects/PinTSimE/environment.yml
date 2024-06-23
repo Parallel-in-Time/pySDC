@@ -11,4 +11,4 @@ dependencies:
   - matplotlib>=3.0
   - pip
   - pip:
-    - qmat
+    - qmat>=0.1.8
