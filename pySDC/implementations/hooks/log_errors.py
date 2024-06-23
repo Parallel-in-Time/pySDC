@@ -167,7 +167,7 @@ class LogGlobalErrorPostRun(Hooks):
             None
         """
         super().post_run(step, level_number)
-        self._hooks__num_restarts = self.num_restarts
+        self._Hooks__num_restarts = self.num_restarts
 
         if level_number == 0 and step.status.last:
             L = step.levels[level_number]

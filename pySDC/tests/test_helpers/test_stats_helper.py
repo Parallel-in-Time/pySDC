@@ -23,7 +23,7 @@ def time_step(hook, time, step_size, restart, **kwargs):
     hook.add_to_stats(**base_values, time=time + step_size, value=not restart, type='end')
 
     if restart:
-        hook._hooks__num_restarts += 1
+        hook._Hooks__num_restarts += 1
 
     for t in [time, time + step_size]:
         hook.add_to_stats(process=-1, time=t, level=-1, iter=-1, sweep=-1, type='_recomputed', value=restart)
