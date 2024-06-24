@@ -8,12 +8,18 @@ stages:
 
 variables:
   JUWELS_ACCOUNT: "cstma"
+  JUWELS_PROJECT: "ccstma"
 
 
 prepare_JUWELS:
   stage: benchmark
   rules:
     - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
+  id_tokens:
+    CI_JOB_JWT:
+      aud: https://gitlab.jsc.fz-juelich.de
+    SITE_ID_TOKEN:
+      aud: https://gitlab.jsc.fz-juelich.de
   tags:
     - jacamar
     - juwels
@@ -29,8 +35,16 @@ prepare_JUWELS:
     - module load mpi4py
     - module load SciPy-Stack
     - module load CuPy
+    - jutil env activate -p ${JUWELS_PROJECT}
+    - python -m venv --clear $SCRATCH/.venv/pySDC
+    - source $SCRATCH/.venv/pySDC/bin/activate
     - pip install -e .
     - pip install pytest-benchmark coverage
+    - git submodule add -f https://github.com/brownbaerchen/mpi4py-fft.git
+    - cd mpi4py-fft
+    - git checkout cupy_implementation
+    - FFTW_LIBRARY_DIR="/p/software/juwels/stages/2024/software/FFTW/3.3.10-GCC-12.3.0/lib64" pip install --force-reinstall .
+    - cd ../
 
 
 test_JUWELS:
@@ -39,6 +53,11 @@ test_JUWELS:
     - prepare_JUWELS
   rules:
     - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
+  id_tokens:
+    CI_JOB_JWT:
+      aud: https://gitlab.jsc.fz-juelich.de
+    SITE_ID_TOKEN:
+      aud: https://gitlab.jsc.fz-juelich.de
   tags:
     - jacamar
     - juwels
@@ -63,11 +82,8 @@ test_JUWELS:
     - module load mpi4py
     - module load SciPy-Stack
     - module load CuPy
-    - git submodule add -f https://github.com/brownbaerchen/mpi4py-fft.git
-    - cd mpi4py-fft
-    - git checkout cupy_implementation
-    - FFTW_LIBRARY_DIR="/p/software/juwels/stages/2024/software/FFTW/3.3.10-GCC-12.3.0/lib64" pip install --force-reinstall -e .
-    - cd ../
+    - jutil env activate -p ${JUWELS_PROJECT}
+    - source $SCRATCH/.venv/pySDC/bin/activate
   script:
     # - touch benchmarks/output.json
     - echo $SYSTEMNAME
@@ -88,6 +104,11 @@ benchmark:
   when: manual
   tags:
     - docker
+  id_tokens:
+    CI_JOB_JWT:
+      aud: https://gitlab.jsc.fz-juelich.de
+    SITE_ID_TOKEN:
+      aud: https://gitlab.jsc.fz-juelich.de
   rules:
     - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
   artifacts:
