@@ -2,6 +2,10 @@
 
 :arrow_left: [Back to main page](./README.md)
 
+-   June 24, 2024: Major summer cleanup with Version 5.5. [\@tlunet](https://github.com/tlunet) extracted all quadrature-related stuff into his new standalone code 
+    [qmat](https://github.com/Parallel-in-Time/qmat), which makes pySDC much more focussed and both parts easier to maintain. 
+    [\@lisawim](https://github.com/lisawim) worked a lot on the DAE sweepers (including an MPI-parallel version), while [\@brownbaerchen](https://github.com/brownbaerchen) has fun with GPUs.
+    We also appreciate [\@jakob-fritz](https://github.com/jakob-fritz) working hard on improving the CI pipeline.
 -   January 24, 2024: Version 5.4.0 contains the code for the [second order SDC paper](https://arxiv.org/abs/2310.08352) by [\@ikrom96git](https://github.com/ikrom96git). It also has some changes to the FEniCS
     part, including correct treatment of boundary conditions and first steps with FEniCS-x.
 -   July 28, 2023: For Version 5.3 a lot of pull requests got merged, thanks to [\@brownbaerchen](https://github.com/brownbaerchen),
