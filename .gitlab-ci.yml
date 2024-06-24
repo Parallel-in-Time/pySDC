@@ -17,6 +17,8 @@ prepare_JUWELS:
   id_tokens:
     CI_JOB_JWT:
       aud: https://gitlab.jsc.fz-juelich.de
+    SITE_ID_TOKEN:
+      aud: https://gitlab.jsc.fz-juelich.de
   tags:
     - jacamar
     - juwels
@@ -32,8 +34,8 @@ prepare_JUWELS:
     - module load mpi4py
     - module load SciPy-Stack
     - module load CuPy
-    - python -m venv --clear ./.venv/pySDC
-    - source ./.venv/pySDC/bin/activate
+    - python -m venv --clear $SCRATCH/.venv/pySDC
+    - source $SCRATCH/.venv/pySDC/bin/activate
     - pip install -e .
     - pip install pytest-benchmark coverage
     - git submodule add -f https://github.com/brownbaerchen/mpi4py-fft.git
@@ -51,6 +53,8 @@ test_JUWELS:
     - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
   id_tokens:
     CI_JOB_JWT:
+      aud: https://gitlab.jsc.fz-juelich.de
+    SITE_ID_TOKEN:
       aud: https://gitlab.jsc.fz-juelich.de
   tags:
     - jacamar
@@ -76,7 +80,7 @@ test_JUWELS:
     - module load mpi4py
     - module load SciPy-Stack
     - module load CuPy
-    - source ./.venv/pySDC/bin/activate
+    - source $SCRATCH/.venv/pySDC/bin/activate
   script:
     # - touch benchmarks/output.json
     - echo $SYSTEMNAME
@@ -99,6 +103,8 @@ benchmark:
     - docker
   id_tokens:
     CI_JOB_JWT:
+      aud: https://gitlab.jsc.fz-juelich.de
+    SITE_ID_TOKEN:
       aud: https://gitlab.jsc.fz-juelich.de
   rules:
     - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
