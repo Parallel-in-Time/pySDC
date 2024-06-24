@@ -38,7 +38,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        env: ['base', 'fenics', 'mpi4py', 'petsc', 'pytorch']
+        #env: ['base', 'fenics', 'mpi4py', 'petsc', 'pytorch', 'benchmark']
+        env: ['base', 'benchmark']
         python: ['3.8', '3.9', '3.10', '3.11', '3.12']
     defaults:
       run:
