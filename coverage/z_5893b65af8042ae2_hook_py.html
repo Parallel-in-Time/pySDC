@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_5893b65af8042ae2_paper_plots_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.5.3">coverage.py v7.5.3</a>,
-            created at 2024-06-15 08:49 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.5.4">coverage.py v7.5.4</a>,
+            created at 2024-06-24 08:36 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -80,7 +80,7 @@
     </div>
 </header>
 <main id="source">
-    <p class="run"><span class="n"><a id="t1" href="#t1">1</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">core</span><span class="op">.</span><span class="nam">Hooks</span> <span class="key">import</span> <span class="nam">hooks</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t1" href="#t1">1</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">core</span><span class="op">.</span><span class="nam">hooks</span> <span class="key">import</span> <span class="nam">Hooks</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t2" href="#t2">2</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">hooks</span><span class="op">.</span><span class="nam">log_solution</span> <span class="key">import</span> <span class="nam">LogSolution</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t3" href="#t3">3</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">hooks</span><span class="op">.</span><span class="nam">log_embedded_error_estimate</span> <span class="key">import</span> <span class="nam">LogEmbeddedErrorEstimate</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t4" href="#t4">4</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">hooks</span><span class="op">.</span><span class="nam">log_extrapolated_error_estimate</span> <span class="key">import</span> <span class="nam">LogExtrapolationErrorEstimate</span>&nbsp;</span><span class="r"></span></p>
@@ -90,7 +90,7 @@
     <p class="run"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t"><span class="nam">hook_collection</span> <span class="op">=</span> <span class="op">[</span><span class="nam">LogSolution</span><span class="op">,</span> <span class="nam">LogEmbeddedErrorEstimate</span><span class="op">,</span> <span class="nam">LogExtrapolationErrorEstimate</span><span class="op">,</span> <span class="nam">LogStepSize</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t"><span class="key">class</span> <span class="nam">LogData</span><span class="op">(</span><span class="nam">hooks</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t"><span class="key">class</span> <span class="nam">LogData</span><span class="op">(</span><span class="nam">Hooks</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="str">    Record data required for analysis of problems in the resilience project</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
@@ -133,7 +133,7 @@
     <p class="pln"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t"><span class="key">class</span> <span class="nam">LogUold</span><span class="op">(</span><span class="nam">hooks</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t"><span class="key">class</span> <span class="nam">LogUold</span><span class="op">(</span><span class="nam">Hooks</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t56" href="#t56">56</a></span><span class="t"><span class="str">    Log last iterate at the end of the step. Since the hook comes after override of uold, we need to do this in each</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t"><span class="str">    iteration. But we don't know which will be the last, so we just do `iter=-1` to override the previous value.</span>&nbsp;</span><span class="r"></span></p>
@@ -153,7 +153,7 @@
     <p class="pln"><span class="n"><a id="t71" href="#t71">71</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t72" href="#t72">72</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t73" href="#t73">73</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t74" href="#t74">74</a></span><span class="t"><span class="key">class</span> <span class="nam">LogUAllIter</span><span class="op">(</span><span class="nam">hooks</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t74" href="#t74">74</a></span><span class="t"><span class="key">class</span> <span class="nam">LogUAllIter</span><span class="op">(</span><span class="nam">Hooks</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t75" href="#t75">75</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t76" href="#t76">76</a></span><span class="t"><span class="str">    Log solution and errors after each iteration</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t77" href="#t77">77</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
@@ -199,8 +199,8 @@
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_5893b65af8042ae2_paper_plots_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.5.3">coverage.py v7.5.3</a>,
-            created at 2024-06-15 08:49 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.5.4">coverage.py v7.5.4</a>,
+            created at 2024-06-24 08:36 +0000
         </p>
     </div>
 </footer>

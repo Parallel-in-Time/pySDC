@@ -5,12 +5,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>&lt;no title&gt; &#8212; pySDC 5.4.3 documentation</title>
+    <title>&lt;no title&gt; &#8212; pySDC 5.5.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script src="../_static/documentation_options.js?v=e5a863ed"></script>
+    <script src="../_static/documentation_options.js?v=a385a3de"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     
@@ -26,7 +26,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
       </ul>
     </div>  
@@ -44,6 +44,9 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
 
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+
+<span class="n">mpl</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;Agg&quot;</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
 <span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
 
@@ -53,8 +56,6 @@
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.Van_der_Pol_implicit</span> <span class="kn">import</span> <span class="n">vanderpol</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit_MPI</span> <span class="kn">import</span> <span class="n">generic_implicit_MPI</span>
-
-<span class="c1"># from pySDC.projects.parallelSDC.BaseTransfer_MPI import base_transfer_mpi</span>
 
 <span class="n">ID</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span> <span class="s1">&#39;qd_type&#39;</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">])</span>
 
@@ -200,6 +201,7 @@
         <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;data/parallelSDC_iterations_precond_MPI.pkl&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: pickle did not create file&#39;</span>
 
 
+<span class="c1"># pragma: no cover</span>
 <span class="k">def</span> <span class="nf">plot_iterations</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper routine to plot iteration counts</span>
@@ -284,18 +286,42 @@
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
     <span class="n">main</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">plot_iterations</span><span class="p">()</span>
+    <span class="c1"># if comm.Get_rank() == 0:</span>
+    <span class="c1">#     plot_iterations()</span>
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_heat.png"><img alt="../_images/parallelSDC_preconditioner_MPI_heat.png" src="../_images/parallelSDC_preconditioner_MPI_heat.png" style="width: 269.0px; height: 185.0px;" />
+<a class="reference internal image-reference" href="../../data/parallelSDC_preconditioner_MPI_heat.png"><img alt="../../data/parallelSDC_preconditioner_MPI_heat.png" src="../../data/parallelSDC_preconditioner_MPI_heat.png" />
+<aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">/home/runner/work/pySDC/pySDC/docs/source/projects/doc_parallelSDC_preconditioner_MPI.rst</span>, line 7)</p>
+<p>Cannot scale image!
+  Could not get size from &quot;../../data/parallelSDC_preconditioner_MPI_heat.png&quot;:
+  [Errno 2] No such file or directory: '/home/runner/work/data/parallelSDC_preconditioner_MPI_heat.png'</p>
+</aside>
 </a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_advection.png"><img alt="../_images/parallelSDC_preconditioner_MPI_advection.png" src="../_images/parallelSDC_preconditioner_MPI_advection.png" style="width: 269.0px; height: 185.0px;" />
+<a class="reference internal image-reference" href="../../data/parallelSDC_preconditioner_MPI_advection.png"><img alt="../../data/parallelSDC_preconditioner_MPI_advection.png" src="../../data/parallelSDC_preconditioner_MPI_advection.png" />
+<aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">/home/runner/work/pySDC/pySDC/docs/source/projects/doc_parallelSDC_preconditioner_MPI.rst</span>, line 10)</p>
+<p>Cannot scale image!
+  Could not get size from &quot;../../data/parallelSDC_preconditioner_MPI_advection.png&quot;:
+  [Errno 2] No such file or directory: '/home/runner/work/data/parallelSDC_preconditioner_MPI_advection.png'</p>
+</aside>
 </a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" src="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" style="width: 269.0px; height: 187.0px;" />
+<a class="reference internal image-reference" href="../../data/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="../../data/parallelSDC_preconditioner_MPI_vanderpol.png" src="../../data/parallelSDC_preconditioner_MPI_vanderpol.png" />
+<aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">/home/runner/work/pySDC/pySDC/docs/source/projects/doc_parallelSDC_preconditioner_MPI.rst</span>, line 13)</p>
+<p>Cannot scale image!
+  Could not get size from &quot;../../data/parallelSDC_preconditioner_MPI_vanderpol.png&quot;:
+  [Errno 2] No such file or directory: '/home/runner/work/data/parallelSDC_preconditioner_MPI_vanderpol.png'</p>
+</aside>
 </a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../_images/parallelSDC_preconditioner_MPI_fisher.png" src="../_images/parallelSDC_preconditioner_MPI_fisher.png" style="width: 269.0px; height: 188.0px;" />
+<a class="reference internal image-reference" href="../../data/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../../data/parallelSDC_preconditioner_MPI_fisher.png" src="../../data/parallelSDC_preconditioner_MPI_fisher.png" />
+<aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">/home/runner/work/pySDC/pySDC/docs/source/projects/doc_parallelSDC_preconditioner_MPI.rst</span>, line 16)</p>
+<p>Cannot scale image!
+  Could not get size from &quot;../../data/parallelSDC_preconditioner_MPI_fisher.png&quot;:
+  [Errno 2] No such file or directory: '/home/runner/work/data/parallelSDC_preconditioner_MPI_fisher.png'</p>
+</aside>
 </a>
 
 
@@ -335,7 +361,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
       </ul>
     </div>

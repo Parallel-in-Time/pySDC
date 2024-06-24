@@ -144,14 +144,14 @@ Acknowledgements
 
 This project has received funding from the `European High-Performance
 Computing Joint Undertaking <https://eurohpc-ju.europa.eu/>`_ (JU) under
-grant agreement No 955701 (\ `TIME-X <https://www.time-x-eurohpc.eu/>`_\ ).
+grant agreement No 955701 (\ `TIME-X <https://www.time-x-eurohpc.eu/>`_\ )
+and grant agreement No 101118139.
 The JU receives support from the European Union's Horizon 2020 research
 and innovation programme and Belgium, France, Germany, and Switzerland.
 This project also received funding from the `German Federal Ministry of
 Education and Research <https://www.bmbf.de/bmbf/en/home/home_node.html>`_
-(BMBF) grants  16HPC047 and 16ME0679K. Supported by the European Union - NextGenerationEU. The project also received help from the
-`Helmholtz Platform for Research Software Engineering - Preparatory
-Study (HiRSE_PS) <https://www.helmholtz-hirse.de/>`_.
+(BMBF) grants  16HPC047 and 16ME0679K. Supported by the European Union - NextGenerationEU. 
+The project also received help from the `Helmholtz Platform for Research Software Engineering - Preparatory Study (HiRSE_PS) <https://www.helmholtz-hirse.de/>`_.
 
 
 .. raw:: html

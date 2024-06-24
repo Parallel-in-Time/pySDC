@@ -4,12 +4,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>implementations.convergence_controller_classes.estimate_polynomial_error &#8212; pySDC 5.4.3 documentation</title>
+    <title>implementations.convergence_controller_classes.estimate_polynomial_error &#8212; pySDC 5.5.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=def86cc0" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script src="../../../_static/documentation_options.js?v=e5a863ed"></script>
+    <script src="../../../_static/documentation_options.js?v=a385a3de"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
@@ -25,7 +25,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.estimate_polynomial_error</a></li> 
       </ul>
@@ -39,8 +39,8 @@
   <h1>Source code for implementations.convergence_controller_classes.estimate_polynomial_error</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.core.Lagrange</span> <span class="kn">import</span> <span class="n">LagrangeApproximation</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.ConvergenceController</span> <span class="kn">import</span> <span class="n">ConvergenceController</span>
+<span class="kn">from</span> <span class="nn">qmat.lagrange</span> <span class="kn">import</span> <span class="n">LagrangeApproximation</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.convergence_controller</span> <span class="kn">import</span> <span class="n">ConvergenceController</span>
 
 
 <div class="viewcode-block" id="EstimatePolynomialError">
@@ -94,7 +94,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">check_convergence</span> <span class="o">=</span> <span class="n">CheckConvergence</span><span class="o">.</span><span class="n">check_convergence</span>
 
         <span class="k">if</span> <span class="n">quad_type</span> <span class="o">!=</span> <span class="s1">&#39;GAUSS&#39;</span> <span class="ow">and</span> <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;estimate_on_node&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">num_nodes</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ParameterError</span>
+            <span class="kn">from</span> <span class="nn">pySDC.core.errors</span> <span class="kn">import</span> <span class="n">ParameterError</span>
 
             <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span>
                 <span class="s1">&#39;You cannot interpolate with lower accuracy to the end point if the end point is a node!&#39;</span>
@@ -261,7 +261,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.estimate_polynomial_error</a></li> 
       </ul>

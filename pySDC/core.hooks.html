@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>core.hooks module &#8212; pySDC 5.5.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=a385a3de"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="core.level module" href="core.level.html" />
+    <link rel="prev" title="core.errors module" href="core.errors.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="core.level.html" title="core.level module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="core.errors.html" title="core.errors module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="core.html" accesskey="U">core package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.hooks module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-core.hooks">
+<span id="core-hooks-module"></span><h1>core.hooks module<a class="headerlink" href="#module-core.hooks" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.hooks.Entry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_sweeper</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_restarts</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.hooks.Entry" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.hooks.Entry.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><a class="headerlink" href="#core.hooks.Entry.iter" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.hooks.Entry.level">
+<span class="sig-name descname"><span class="pre">level</span></span><a class="headerlink" href="#core.hooks.Entry.level" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.hooks.Entry.num_restarts">
+<span class="sig-name descname"><span class="pre">num_restarts</span></span><a class="headerlink" href="#core.hooks.Entry.num_restarts" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 7</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.hooks.Entry.process">
+<span class="sig-name descname"><span class="pre">process</span></span><a class="headerlink" href="#core.hooks.Entry.process" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.hooks.Entry.process_sweeper">
+<span class="sig-name descname"><span class="pre">process_sweeper</span></span><a class="headerlink" href="#core.hooks.Entry.process_sweeper" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.hooks.Entry.sweep">
+<span class="sig-name descname"><span class="pre">sweep</span></span><a class="headerlink" href="#core.hooks.Entry.sweep" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.hooks.Entry.time">
+<span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#core.hooks.Entry.time" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.hooks.Entry.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#core.hooks.Entry.type" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 6</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.hooks.Hooks">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Hooks</span></span><a class="reference internal" href="../_modules/core/hooks.html#Hooks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)</p>
+<p>When deriving a custom hook from this class make sure to always call the parent method using e.g.
+<cite>super().post_step(step, level_number)</cite>. Otherwise bugs may arise when using <cite>filer_recomputed</cite> from the stats
+helper for post processing.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.hooks.Hooks.logger">
+<span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#core.hooks.Hooks.logger" title="Link to this definition">¶</a></dt>
+<dd><p>logger instance for output</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.hooks.Hooks.__num_restarts">
+<span class="sig-name descname"><span class="pre">__num_restarts</span></span><a class="headerlink" href="#core.hooks.Hooks.__num_restarts" title="Link to this definition">¶</a></dt>
+<dd><p>number of restarts of the current step</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.hooks.Hooks.__stats">
+<span class="sig-name descname"><span class="pre">__stats</span></span><a class="headerlink" href="#core.hooks.Hooks.__stats" title="Link to this definition">¶</a></dt>
+<dd><p>dictionary for gathering the statistics of a run</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.hooks.Hooks.entry">
+<span class="sig-name descname"><span class="pre">entry</span></span><a class="headerlink" href="#core.hooks.Hooks.entry" title="Link to this definition">¶</a></dt>
+<dd><p>statistics entry containing all information to identify the value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>namedtuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.hooks.Hooks.add_to_stats">
+<span class="sig-name descname"><span class="pre">add_to_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/hooks.html#Hooks.add_to_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks.add_to_stats" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to add data to the statistics dict. Please supply the metadata as keyword arguments in accordance with
+the entry class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> – the actual data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">entry</span></span><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#core.hooks.Entry" title="core.hooks.Entry"><code class="xref py py-class docutils literal notranslate"><span class="pre">Entry</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.hooks.Hooks.increment_stats">
+<span class="sig-name descname"><span class="pre">increment_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/hooks.html#Hooks.increment_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks.increment_stats" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to increment data to the statistics dict. If the data is not yet created, it will be initialized to
+initialize if applicable and to value otherwise. Please supply metadata as keyword arguments in accordance with
+the entry class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – the actual data</p></li>
+<li><p><strong>initialize</strong> – if supplied and data does not exist already, this will be used over value</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.hooks.Hooks.meta_data">
+<span class="sig-name descname"><span class="pre">meta_data</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'iter':</span> <span class="pre">None,</span> <span class="pre">'level':</span> <span class="pre">None,</span> <span class="pre">'num_restarts':</span> <span class="pre">None,</span> <span class="pre">'process':</span> <span class="pre">None,</span> <span class="pre">'process_sweeper':</span> <span class="pre">None,</span> <span class="pre">'sweep':</span> <span class="pre">None,</span> <span class="pre">'time':</span> <span class="pre">None,</span> <span class="pre">'type':</span> <span class="pre">None}</span></em><a class="headerlink" href="#core.hooks.Hooks.meta_data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.hooks.Hooks.post_comm">
+<span class="sig-name descname"><span class="pre">post_comm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_to_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/hooks.html#Hooks.post_comm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks.post_comm" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called after each communication</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+<li><p><strong>add_to_stats</strong> (<em>bool</em>) – set if result should go to stats object</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.hooks.Hooks.post_iteration">
+<span class="sig-name descname"><span class="pre">post_iteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/hooks.html#Hooks.post_iteration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks.post_iteration" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called after each iteration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.hooks.Hooks.post_predict">
+<span class="sig-name descname"><span class="pre">post_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/hooks.html#Hooks.post_predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks.post_predict" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called after each predictor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.hooks.Hooks.post_run">
+<span class="sig-name descname"><span class="pre">post_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/hooks.html#Hooks.post_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks.post_run" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called after each run</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.hooks.Hooks.post_setup">
+<span class="sig-name descname"><span class="pre">post_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/hooks.html#Hooks.post_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks.post_setup" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called after setup</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.hooks.Hooks.post_step">
+<span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/hooks.html#Hooks.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks.post_step" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called after each step or block</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.hooks.Hooks.post_sweep">
+<span class="sig-name descname"><span class="pre">post_sweep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/hooks.html#Hooks.post_sweep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks.post_sweep" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called after each sweep</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.hooks.Hooks.pre_comm">
+<span class="sig-name descname"><span class="pre">pre_comm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/hooks.html#Hooks.pre_comm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks.pre_comm" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called before communication starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.hooks.Hooks.pre_iteration">
+<span class="sig-name descname"><span class="pre">pre_iteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/hooks.html#Hooks.pre_iteration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks.pre_iteration" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called before iteration starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.hooks.Hooks.pre_predict">
+<span class="sig-name descname"><span class="pre">pre_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/hooks.html#Hooks.pre_predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks.pre_predict" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called before predictor starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.hooks.Hooks.pre_run">
+<span class="sig-name descname"><span class="pre">pre_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/hooks.html#Hooks.pre_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks.pre_run" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called before time-loop starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.hooks.Hooks.pre_setup">
+<span class="sig-name descname"><span class="pre">pre_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/hooks.html#Hooks.pre_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks.pre_setup" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called before setup starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.hooks.Hooks.pre_step">
+<span class="sig-name descname"><span class="pre">pre_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/hooks.html#Hooks.pre_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks.pre_step" title="Link to this definition">¶</a></dt>
+<dd><p>Hook called before each step</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.hooks.Hooks.pre_sweep">
+<span class="sig-name descname"><span class="pre">pre_sweep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/hooks.html#Hooks.pre_sweep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks.pre_sweep" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called before sweep starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.hooks.Hooks.reset_stats">
+<span class="sig-name descname"><span class="pre">reset_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/hooks.html#Hooks.reset_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks.reset_stats" title="Link to this definition">¶</a></dt>
+<dd><p>Function to reset the stats for multiple runs</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.hooks.Hooks.return_stats">
+<span class="sig-name descname"><span class="pre">return_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/hooks.html#Hooks.return_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks.return_stats" title="Link to this definition">¶</a></dt>
+<dd><p>Getter for the stats</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>stats</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">core.hooks module</a><ul>
+<li><a class="reference internal" href="#core.hooks.Entry"><code class="docutils literal notranslate"><span class="pre">Entry</span></code></a><ul>
+<li><a class="reference internal" href="#core.hooks.Entry.iter"><code class="docutils literal notranslate"><span class="pre">iter</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Entry.level"><code class="docutils literal notranslate"><span class="pre">level</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Entry.num_restarts"><code class="docutils literal notranslate"><span class="pre">num_restarts</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Entry.process"><code class="docutils literal notranslate"><span class="pre">process</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Entry.process_sweeper"><code class="docutils literal notranslate"><span class="pre">process_sweeper</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Entry.sweep"><code class="docutils literal notranslate"><span class="pre">sweep</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Entry.time"><code class="docutils literal notranslate"><span class="pre">time</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Entry.type"><code class="docutils literal notranslate"><span class="pre">type</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core.hooks.Hooks"><code class="docutils literal notranslate"><span class="pre">Hooks</span></code></a><ul>
+<li><a class="reference internal" href="#core.hooks.Hooks.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.__num_restarts"><code class="docutils literal notranslate"><span class="pre">__num_restarts</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.__stats"><code class="docutils literal notranslate"><span class="pre">__stats</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.entry"><code class="docutils literal notranslate"><span class="pre">entry</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.add_to_stats"><code class="docutils literal notranslate"><span class="pre">add_to_stats()</span></code></a></li>
+<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">entry</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.increment_stats"><code class="docutils literal notranslate"><span class="pre">increment_stats()</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.meta_data"><code class="docutils literal notranslate"><span class="pre">meta_data</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.post_comm"><code class="docutils literal notranslate"><span class="pre">post_comm()</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.post_iteration"><code class="docutils literal notranslate"><span class="pre">post_iteration()</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.post_predict"><code class="docutils literal notranslate"><span class="pre">post_predict()</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.post_run"><code class="docutils literal notranslate"><span class="pre">post_run()</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.post_setup"><code class="docutils literal notranslate"><span class="pre">post_setup()</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.post_step"><code class="docutils literal notranslate"><span class="pre">post_step()</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.post_sweep"><code class="docutils literal notranslate"><span class="pre">post_sweep()</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.pre_comm"><code class="docutils literal notranslate"><span class="pre">pre_comm()</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.pre_iteration"><code class="docutils literal notranslate"><span class="pre">pre_iteration()</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.pre_predict"><code class="docutils literal notranslate"><span class="pre">pre_predict()</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.pre_run"><code class="docutils literal notranslate"><span class="pre">pre_run()</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.pre_setup"><code class="docutils literal notranslate"><span class="pre">pre_setup()</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.pre_step"><code class="docutils literal notranslate"><span class="pre">pre_step()</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.pre_sweep"><code class="docutils literal notranslate"><span class="pre">pre_sweep()</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.reset_stats"><code class="docutils literal notranslate"><span class="pre">reset_stats()</span></code></a></li>
+<li><a class="reference internal" href="#core.hooks.Hooks.return_stats"><code class="docutils literal notranslate"><span class="pre">return_stats()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="core.errors.html"
+                          title="previous chapter">core.errors module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="core.level.html"
+                          title="next chapter">core.level module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/core.hooks.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="core.level.html" title="core.level module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="core.errors.html" title="core.errors module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="core.html" >core package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.hooks module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>

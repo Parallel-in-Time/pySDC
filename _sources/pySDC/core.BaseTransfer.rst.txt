@@ -1,7 +1,0 @@
-core.BaseTransfer module
-========================
-
-.. automodule:: core.BaseTransfer
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -1,7 +1,0 @@
-core.Sweeper module
-===================
-
-.. automodule:: core.Sweeper
-   :members:
-   :undoc-members:
-   :show-inheritance:

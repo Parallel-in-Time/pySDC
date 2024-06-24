@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>core.base_transfer module &#8212; pySDC 5.5.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=a385a3de"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="core.collocation module" href="core.collocation.html" />
+    <link rel="prev" title="core package" href="core.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="core.collocation.html" title="core.collocation module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="core.html" title="core package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="core.html" accesskey="U">core package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.base_transfer module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-core.base_transfer">
+<span id="core-base-transfer-module"></span><h1>core.base_transfer module<a class="headerlink" href="#module-core.base_transfer" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.base_transfer.BaseTransfer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BaseTransfer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fine_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coarse_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_transfer_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_transfer_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_transfer_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/base_transfer.html#BaseTransfer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.base_transfer.BaseTransfer" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Standard base_transfer class</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.base_transfer.BaseTransfer.logger">
+<span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#core.base_transfer.BaseTransfer.logger" title="Link to this definition">¶</a></dt>
+<dd><p>custom logger for sweeper-related logging</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.base_transfer.BaseTransfer.params">
+<span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#core.base_transfer.BaseTransfer.params" title="Link to this definition">¶</a></dt>
+<dd><p>parameter object containing the custom parameters passed by the user</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>__Pars</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.base_transfer.BaseTransfer.fine">
+<span class="sig-name descname"><span class="pre">fine</span></span><a class="headerlink" href="#core.base_transfer.BaseTransfer.fine" title="Link to this definition">¶</a></dt>
+<dd><p>reference to the fine level</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pySDC.Level.level</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.base_transfer.BaseTransfer.coarse">
+<span class="sig-name descname"><span class="pre">coarse</span></span><a class="headerlink" href="#core.base_transfer.BaseTransfer.coarse" title="Link to this definition">¶</a></dt>
+<dd><p>reference to the coarse level</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pySDC.Level.level</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.base_transfer.BaseTransfer.get_transfer_matrix_Q">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_transfer_matrix_Q</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_nodes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/base_transfer.html#BaseTransfer.get_transfer_matrix_Q"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.base_transfer.BaseTransfer.get_transfer_matrix_Q" title="Link to this definition">¶</a></dt>
+<dd><p>Helper routine to quickly define transfer matrices from a coarse set
+to a fine set of nodes (fully Lagrangian)
+:param f_nodes: fine nodes (size nF)
+:param c_nodes: coarse nodes (size nC)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matrix containing the interpolation weights (shape (nF, nC))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.base_transfer.BaseTransfer.prolong">
+<span class="sig-name descname"><span class="pre">prolong</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/base_transfer.html#BaseTransfer.prolong"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.base_transfer.BaseTransfer.prolong" title="Link to this definition">¶</a></dt>
+<dd><p>Space-time prolongation routine</p>
+<p>This routine applies the spatial prolongation routine to the difference between the computed and the restricted
+values on the coarse level and then adds this difference to the fine values as coarse correction.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.base_transfer.BaseTransfer.prolong_f">
+<span class="sig-name descname"><span class="pre">prolong_f</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/base_transfer.html#BaseTransfer.prolong_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.base_transfer.BaseTransfer.prolong_f" title="Link to this definition">¶</a></dt>
+<dd><p>Space-time prolongation routine w.r.t. the rhs f</p>
+<p>This routine applies the spatial prolongation routine to the difference between the computed and the restricted
+values on the coarse level and then adds this difference to the fine values as coarse correction.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.base_transfer.BaseTransfer.restrict">
+<span class="sig-name descname"><span class="pre">restrict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/base_transfer.html#BaseTransfer.restrict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.base_transfer.BaseTransfer.restrict" title="Link to this definition">¶</a></dt>
+<dd><p>Space-time restriction routine</p>
+<p>The routine applies the spatial restriction operator to the fine values on the fine nodes, then reevaluates f
+on the coarse level. This is used for the first part of the FAS correction tau via integration. The second part
+is the integral over the fine values, restricted to the coarse level. Finally, possible tau corrections on the
+fine level are restricted as well.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">core.base_transfer module</a><ul>
+<li><a class="reference internal" href="#core.base_transfer.BaseTransfer"><code class="docutils literal notranslate"><span class="pre">BaseTransfer</span></code></a><ul>
+<li><a class="reference internal" href="#core.base_transfer.BaseTransfer.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
+<li><a class="reference internal" href="#core.base_transfer.BaseTransfer.params"><code class="docutils literal notranslate"><span class="pre">params</span></code></a></li>
+<li><a class="reference internal" href="#core.base_transfer.BaseTransfer.fine"><code class="docutils literal notranslate"><span class="pre">fine</span></code></a></li>
+<li><a class="reference internal" href="#core.base_transfer.BaseTransfer.coarse"><code class="docutils literal notranslate"><span class="pre">coarse</span></code></a></li>
+<li><a class="reference internal" href="#core.base_transfer.BaseTransfer.get_transfer_matrix_Q"><code class="docutils literal notranslate"><span class="pre">get_transfer_matrix_Q()</span></code></a></li>
+<li><a class="reference internal" href="#core.base_transfer.BaseTransfer.prolong"><code class="docutils literal notranslate"><span class="pre">prolong()</span></code></a></li>
+<li><a class="reference internal" href="#core.base_transfer.BaseTransfer.prolong_f"><code class="docutils literal notranslate"><span class="pre">prolong_f()</span></code></a></li>
+<li><a class="reference internal" href="#core.base_transfer.BaseTransfer.restrict"><code class="docutils literal notranslate"><span class="pre">restrict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="core.html"
+                          title="previous chapter">core package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="core.collocation.html"
+                          title="next chapter">core.collocation module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/core.base_transfer.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="core.collocation.html" title="core.collocation module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="core.html" title="core package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="core.html" >core package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.base_transfer module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>

@@ -15,6 +15,14 @@ Others are specific conventions chosen for the pySDC library, that may follow Py
 Finally, while ``pySDC`` provides many base functionalities that implement classical flavors of SDC, it also allows problem-specific applications through Object-Oriented Programming (OOP) and the implementation of custom inherited classes.
 This follows a specific OOP framework, you can look at the page on :doc:`custom implementations <./docs/contrib/04_custom_implementations>` for more details. Additional guideline are also given on how to :doc:`document the code <./docs/contrib/05_documenting_code>` in ``pySDC``.
 
+..
+
+   📣 Some core components (collocation matrix, $Q-\Delta$ coefficients, Lagrange barycentric interpolation) 
+   are implemented and developed in the `\ ``qmat`` companion package <https://github.com/Parallel-in-Time/qmat>`_.
+   Checkout its own `contributing guide <https://qmat.readthedocs.io/en/latest/contributing.html>`_
+   to add any new coefficient / feature on this part.
+
+
 
 #. `GitHub Forks and Pull Requests <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/getting-started/about-collaborative-development-models>`_
 #. :doc:`Pull Requests Recommendations <./docs/contrib/01_pull_requests>`

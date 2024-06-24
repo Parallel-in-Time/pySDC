@@ -4,12 +4,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>implementations.problem_classes.AllenCahn_Temp_MPIFFT &#8212; pySDC 5.4.3 documentation</title>
+    <title>implementations.problem_classes.AllenCahn_Temp_MPIFFT &#8212; pySDC 5.5.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=def86cc0" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script src="../../../_static/documentation_options.js?v=e5a863ed"></script>
+    <script src="../../../_static/documentation_options.js?v=a385a3de"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
@@ -25,7 +25,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.AllenCahn_Temp_MPIFFT</a></li> 
       </ul>
@@ -40,8 +40,8 @@
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">mpi4py_fft</span> <span class="kn">import</span> <span class="n">PFFT</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ProblemError</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.Problem</span> <span class="kn">import</span> <span class="n">ptype</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.errors</span> <span class="kn">import</span> <span class="n">ProblemError</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.problem</span> <span class="kn">import</span> <span class="n">Problem</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
 
 <span class="kn">from</span> <span class="nn">mpi4py_fft</span> <span class="kn">import</span> <span class="n">newDistArray</span>
@@ -49,7 +49,7 @@
 
 <div class="viewcode-block" id="allencahn_temp_imex">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex">[docs]</a>
-<span class="k">class</span> <span class="nc">allencahn_temp_imex</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">allencahn_temp_imex</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class implements the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [0, 1]^2`</span>
 
@@ -164,7 +164,7 @@
         <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">]</span> <span class="o">*</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
 
         <span class="c1"># get local mesh</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ogrid</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">local_slice</span><span class="p">(</span><span class="kc">False</span><span class="p">)]</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ogrid</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">local_slice</span><span class="p">(</span><span class="kc">False</span><span class="p">)])</span>
         <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">global_shape</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">N</span><span class="p">)):</span>
             <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">L</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">N</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -176,7 +176,7 @@
         <span class="n">k</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftfreq</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">N</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
         <span class="n">k</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfftfreq</span><span class="p">(</span><span class="n">N</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">N</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
         <span class="n">K</span> <span class="o">=</span> <span class="p">[</span><span class="n">ki</span><span class="p">[</span><span class="n">si</span><span class="p">]</span> <span class="k">for</span> <span class="n">ki</span><span class="p">,</span> <span class="n">si</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">s</span><span class="p">)]</span>
-        <span class="n">Ks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="o">*</span><span class="n">K</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s1">&#39;ij&#39;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">Ks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="o">*</span><span class="n">K</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s1">&#39;ij&#39;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
         <span class="n">Lp</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">L</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">):</span>
             <span class="n">Ks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">Ks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">Lp</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
@@ -479,7 +479,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.AllenCahn_Temp_MPIFFT</a></li> 
       </ul>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>core.controller &#8212; pySDC 5.5.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=def86cc0" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../_static/documentation_options.js?v=a385a3de"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.controller</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for core.controller</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.core.base_transfer</span> <span class="kn">import</span> <span class="n">BaseTransfer</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.pysdc_helper</span> <span class="kn">import</span> <span class="n">FrozenClass</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.check_convergence</span> <span class="kn">import</span> <span class="n">CheckConvergence</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.hooks.default_hook</span> <span class="kn">import</span> <span class="n">DefaultHooks</span>
+
+
+<span class="c1"># short helper class to add params as attributes</span>
+<span class="k">class</span> <span class="nc">_Pars</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mssdc_jac</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">predict_type</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_to_done</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger_level</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_to_file</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dump_setup</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;run_pid&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">())</span> <span class="o">+</span> <span class="s1">&#39;.log&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_iteration_estimator</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_freeze</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="Controller">
+<a class="viewcode-back" href="../../pySDC/core.controller.html#core.controller.Controller">[docs]</a>
+<span class="k">class</span> <span class="nc">Controller</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base abstract controller class</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">useMPI</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization routine for the base controller</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller_params (dict): parameter set for the controller and the steps</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">useMPI</span> <span class="o">=</span> <span class="n">useMPI</span>
+
+        <span class="c1"># check if we have a hook on this list. If not, use default class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__hooks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">hook_classes</span> <span class="o">=</span> <span class="p">[</span><span class="n">DefaultHooks</span><span class="p">]</span>
+        <span class="n">user_hooks</span> <span class="o">=</span> <span class="n">controller_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;hook_class&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">hook_classes</span> <span class="o">+=</span> <span class="n">user_hooks</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">user_hooks</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="k">else</span> <span class="p">[</span><span class="n">user_hooks</span><span class="p">]</span>
+        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">hook</span><span class="p">)</span> <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="n">hook_classes</span><span class="p">]</span>
+        <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;hook_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">controller_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;hook_class&#39;</span><span class="p">,</span> <span class="n">hook_classes</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+            <span class="n">hook</span><span class="o">.</span><span class="n">pre_setup</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">_Pars</span><span class="p">(</span><span class="n">controller_params</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__setup_custom_logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">logger_level</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">log_to_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">fname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;controller&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_iteration_estimator</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">all_to_done</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;all_to_done and use_iteration_estimator set, will ignore all_to_done&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_convergence_controllers</span> <span class="o">=</span> <span class="p">[</span><span class="n">CheckConvergence</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_convergence_controllers</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__setup_custom_logger</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log_to_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function to set main parameters for the logging facility</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            level (int): level of logging</span>
+<span class="sd">            log_to_file (bool): flag to turn on/off logging to file</span>
+<span class="sd">            fname (str):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">level</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span>
+
+        <span class="c1"># specify formats and handlers</span>
+        <span class="k">if</span> <span class="n">log_to_file</span><span class="p">:</span>
+            <span class="n">file_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span>
+                <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> - </span><span class="si">%(module)s</span><span class="s1"> - </span><span class="si">%(funcName)s</span><span class="s1"> - </span><span class="si">%(lineno)d</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+                <span class="n">file_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">file_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+            <span class="n">file_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">file_formatter</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">file_handler</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">std_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(name)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">std_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+        <span class="n">std_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">std_formatter</span><span class="p">)</span>
+
+        <span class="c1"># instantiate logger</span>
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="c1"># remove handlers from previous calls to controller</span>
+        <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">[:]:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">removeHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">std_handler</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">log_to_file</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">file_handler</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+<div class="viewcode-block" id="Controller.add_hook">
+<a class="viewcode-back" href="../../pySDC/core.controller.html#core.controller.Controller.add_hook">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hook</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a hook to the controller which will be called in addition to all other hooks whenever something happens.</span>
+<span class="sd">        The hook is only added if a hook of the same class is not already present.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            hook (pySDC.Hook): A hook class that is derived from the core hook class</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">hook</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">me</span><span class="p">)</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__hooks</span> <span class="o">+=</span> <span class="p">[</span><span class="n">hook</span><span class="p">()]</span></div>
+
+
+<div class="viewcode-block" id="Controller.welcome_message">
+<a class="viewcode-back" href="../../pySDC/core.controller.html#core.controller.Controller.welcome_message">[docs]</a>
+    <span class="k">def</span> <span class="nf">welcome_message</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;Welcome to the one and only, really very astonishing and 87.3% bug free&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;                                 _____ _____   _____ &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;                                / ____|  __ \ / ____|&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;                    _ __  _   _| (___ | |  | | |     &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;                   | &#39;_ \| | | |\___ \| |  | | |     &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;                   | |_) | |_| |____) | |__| | |____ &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;                   | .__/ \__, |_____/|_____/ \_____|&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;                   | |     __/ |                     &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;                   |_|    |___/                      &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;                                                     &quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Controller.dump_setup">
+<a class="viewcode-back" href="../../pySDC/core.controller.html#core.controller.Controller.dump_setup">[docs]</a>
+    <span class="k">def</span> <span class="nf">dump_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function to dump the setup used for this controller</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the step instance (will/should be the first one only)</span>
+<span class="sd">            controller_params (dict): controller parameters</span>
+<span class="sd">            description (dict): description of the problem</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">welcome_message</span><span class="p">()</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Setup overview (--&gt; user-defined, -&gt; dependency) -- BEGIN&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;----------------------------------------------------------------------------------------------------</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;Controller: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">controller_params</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;--&gt; </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;    </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Step: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">step</span><span class="o">.</span><span class="vm">__class__</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]:</span>
+                    <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;--&gt; </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;    </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;    Number of steps: </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">time_size</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;    Level: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="vm">__class__</span>
+        <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;        Level </span><span class="si">%2i</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">L</span><span class="o">.</span><span class="n">level_index</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]:</span>
+                        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;--&gt;         </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;            </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;--&gt;         Problem: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="vm">__class__</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]:</span>
+                    <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;--&gt;             </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;                </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;--&gt;             Data type u: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;--&gt;             Data type f: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_f</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;--&gt;             Sweeper: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="vm">__class__</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]:</span>
+                        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;--&gt;                 </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;                    </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;--&gt;                 Collocation: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="vm">__class__</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;base_transfer_class&#39;</span> <span class="ow">in</span> <span class="n">description</span> <span class="ow">and</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;base_transfer_class&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">BaseTransfer</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;--&gt;     Base Transfer: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">step</span><span class="o">.</span><span class="n">base_transfer</span><span class="o">.</span><span class="vm">__class__</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;        Base Transfer: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">step</span><span class="o">.</span><span class="n">base_transfer</span><span class="o">.</span><span class="vm">__class__</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">base_transfer</span><span class="o">.</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;base_transfer_params&#39;</span><span class="p">]:</span>
+                        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;--&gt;         </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;            </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;--&gt;     Space Transfer: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">step</span><span class="o">.</span><span class="n">base_transfer</span><span class="o">.</span><span class="n">space_transfer</span><span class="o">.</span><span class="vm">__class__</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">base_transfer</span><span class="o">.</span><span class="n">space_transfer</span><span class="o">.</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">]:</span>
+                        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;--&gt;         </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;            </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_convergence_controllers_as_table</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;----------------------------------------------------------------------------------------------------&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Setup overview (--&gt; user-defined, -&gt; dependency) -- END</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Controller.run">
+<a class="viewcode-back" href="../../pySDC/core.controller.html#core.controller.Controller.run">[docs]</a>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Abstract interface to the run() method</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u0: initial values</span>
+<span class="sd">            t0 (float): starting time</span>
+<span class="sd">            Tend (float): ending time</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;ERROR: controller has to implement run(self, u0, t0, Tend)&#39;</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">hooks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter for the hooks</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pySDC.Hooks.hooks: hooks</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__hooks</span>
+
+<div class="viewcode-block" id="Controller.setup_convergence_controllers">
+<a class="viewcode-back" href="../../pySDC/core.controller.html#core.controller.Controller.setup_convergence_controllers">[docs]</a>
+    <span class="k">def</span> <span class="nf">setup_convergence_controllers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Setup variables needed for convergence controllers, notably a list containing all of them and a list containing</span>
+<span class="sd">        their order. Also, we add the `CheckConvergence` convergence controller, which takes care of maximum iteration</span>
+<span class="sd">        count or a residual based stopping criterion, as well as all convergence controllers added to the description.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">conv_classes</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;convergence_controllers&#39;</span><span class="p">,</span> <span class="p">{})</span>
+
+        <span class="c1"># instantiate the convergence controllers</span>
+        <span class="k">for</span> <span class="n">conv_class</span><span class="p">,</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">conv_classes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span><span class="n">conv_class</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Controller.add_convergence_controller">
+<a class="viewcode-back" href="../../pySDC/core.controller.html#core.controller.Controller.add_convergence_controller">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_convergence_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">convergence_controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_double</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Add an individual convergence controller to the list of convergence controllers and instantiate it.</span>
+<span class="sd">        Afterwards, the order of the convergence controllers is updated.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            convergence_controller (pySDC.ConvergenceController): The convergence controller to be added</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+<span class="sd">            params (dict): Parameters for the convergence controller</span>
+<span class="sd">            allow_double (bool): Allow adding the same convergence controller multiple times</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># check if we passed any sort of special params</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="p">({}</span> <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">params</span><span class="p">),</span> <span class="s1">&#39;useMPI&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">useMPI</span><span class="p">}</span>
+
+        <span class="c1"># check if we already have the convergence controller or if we want to have it multiple times</span>
+        <span class="k">if</span> <span class="n">convergence_controller</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">me</span><span class="p">)</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">]</span> <span class="ow">or</span> <span class="n">allow_double</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">convergence_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">))</span>
+
+            <span class="c1"># update ordering</span>
+            <span class="n">orders</span> <span class="o">=</span> <span class="p">[</span><span class="n">C</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">control_order</span> <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">))[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">orders</span><span class="p">)]</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Controller.get_convergence_controllers_as_table">
+<a class="viewcode-back" href="../../pySDC/core.controller.html#core.controller.Controller.get_convergence_controllers_as_table">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_convergence_controllers_as_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This function is for debugging purposes to keep track of the different convergence controllers and their order.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            description (dict): Description of the problem</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Table of convergence controllers as a string</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Active convergence controllers:&#39;</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">    |  # | order | convergence controller&#39;</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">----+----+-------+---------------------------------------------------------------------------------------&#39;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">)):</span>
+            <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+
+            <span class="c1"># figure out how the convergence controller was added</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="ow">in</span> <span class="n">description</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;convergence_controllers&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>  <span class="c1"># added by user</span>
+                <span class="n">user_added</span> <span class="o">=</span> <span class="s1">&#39;--&gt; &#39;</span>
+            <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_convergence_controllers</span><span class="p">:</span>  <span class="c1"># added by default</span>
+                <span class="n">user_added</span> <span class="o">=</span> <span class="s1">&#39;    &#39;</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># added as dependency</span>
+                <span class="n">user_added</span> <span class="o">=</span> <span class="s1">&#39; -&gt; &#39;</span>
+
+            <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="n">user_added</span><span class="si">}</span><span class="s1">|</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s1">3</span><span class="si">}</span><span class="s1"> | </span><span class="si">{</span><span class="n">C</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">control_order</span><span class="si">:</span><span class="s1">5</span><span class="si">}</span><span class="s1"> | </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">C</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span>
+
+        <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="Controller.return_stats">
+<a class="viewcode-back" href="../../pySDC/core.controller.html#core.controller.Controller.return_stats">[docs]</a>
+    <span class="k">def</span> <span class="nf">return_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the merged stats from all hooks</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Merged stats from all hooks</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+            <span class="n">stats</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">stats</span><span class="p">,</span> <span class="o">**</span><span class="n">hook</span><span class="o">.</span><span class="n">return_stats</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="n">stats</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.controller</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>

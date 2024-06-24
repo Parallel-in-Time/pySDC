@@ -4,12 +4,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>implementations.sweeper_classes.explicit &#8212; pySDC 5.4.3 documentation</title>
+    <title>implementations.sweeper_classes.explicit &#8212; pySDC 5.5.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=def86cc0" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script src="../../../_static/documentation_options.js?v=e5a863ed"></script>
+    <script src="../../../_static/documentation_options.js?v=a385a3de"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
@@ -25,7 +25,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.explicit</a></li> 
       </ul>
@@ -37,12 +37,12 @@
           <div class="body" role="main">
             
   <h1>Source code for implementations.sweeper_classes.explicit</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pySDC.core.Sweeper</span> <span class="kn">import</span> <span class="n">sweeper</span>
+<span></span><span class="kn">from</span> <span class="nn">pySDC.core.sweeper</span> <span class="kn">import</span> <span class="n">Sweeper</span>
 
 
 <div class="viewcode-block" id="explicit">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.explicit.html#implementations.sweeper_classes.explicit.explicit">[docs]</a>
-<span class="k">class</span> <span class="nc">explicit</span><span class="p">(</span><span class="n">sweeper</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">explicit</span><span class="p">(</span><span class="n">Sweeper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Custom sweeper class, implements Sweeper.py</span>
 
@@ -65,7 +65,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">explicit</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
         <span class="c1"># integration matrix</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">QE</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Qdelta_explicit</span><span class="p">(</span><span class="n">coll</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="p">,</span> <span class="n">qd_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QE</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">QE</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Qdelta_explicit</span><span class="p">(</span><span class="n">qd_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QE</span><span class="p">)</span>
 
 <div class="viewcode-block" id="explicit.integrate">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.explicit.html#implementations.sweeper_classes.explicit.explicit.integrate">[docs]</a>
@@ -207,7 +207,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.explicit</a></li> 
       </ul>

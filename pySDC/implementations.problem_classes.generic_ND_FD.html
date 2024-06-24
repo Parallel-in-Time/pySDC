@@ -5,12 +5,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>implementations.problem_classes.generic_ND_FD module &#8212; pySDC 5.4.3 documentation</title>
+    <title>implementations.problem_classes.generic_ND_FD module &#8212; pySDC 5.5.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script src="../_static/documentation_options.js?v=e5a863ed"></script>
+    <script src="../_static/documentation_options.js?v=a385a3de"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.generic_MPIFFT_Laplacian.html" title="implementations.problem_classes.generic_MPIFFT_Laplacian module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.generic_ND_FD module</a></li> 
@@ -53,7 +53,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GenericNDimFinDiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">derivative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'center'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lintol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liniter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'direct'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'periodic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bcParams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_ND_FD.html#GenericNDimFinDiff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
 <p>Base class for finite difference spatial discretisation in <span class="math notranslate nohighlight">\(N\)</span> dimensions</p>
 <div class="math notranslate nohighlight">
 \[\frac{d u}{dt} = A u,\]</div>
@@ -286,7 +286,7 @@ side.</p>
         <li class="right" >
           <a href="implementations.problem_classes.generic_MPIFFT_Laplacian.html" title="implementations.problem_classes.generic_MPIFFT_Laplacian module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.generic_ND_FD module</a></li> 

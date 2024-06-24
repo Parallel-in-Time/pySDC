@@ -1,0 +1,7 @@
+core.base\_transfer module
+==========================
+
+.. automodule:: core.base_transfer
+   :members:
+   :undoc-members:
+   :show-inheritance:

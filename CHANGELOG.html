@@ -5,12 +5,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Changelog &#8212; pySDC 5.4.3 documentation</title>
+    <title>Changelog &#8212; pySDC 5.5.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css?v=def86cc0" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=c40552b6" />
     
-    <script src="_static/documentation_options.js?v=e5a863ed"></script>
+    <script src="_static/documentation_options.js?v=a385a3de"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     
@@ -26,7 +26,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pySDC 5.5.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Changelog</a></li> 
       </ul>
     </div>  
@@ -40,6 +40,10 @@
 <span id="changelog-changelog"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
 <p>⬅️ <a class="reference internal" href="index.html"><span class="doc">Back to main page</span></a></p>
 <ul>
+<li><p>June 24, 2024: Major summer cleanup with Version 5.5. <a class="reference external" href="https://github.com/tlunet">&#64;tlunet</a> extracted all quadrature-related stuff into his new standalone code
+<a class="reference external" href="https://github.com/Parallel-in-Time/qmat">qmat</a>, which makes pySDC much more focussed and both parts easier to maintain.
+<a class="reference external" href="https://github.com/lisawim">&#64;lisawim</a> worked a lot on the DAE sweepers (including an MPI-parallel version), while <a class="reference external" href="https://github.com/brownbaerchen">&#64;brownbaerchen</a> has fun with GPUs.
+We also appreciate <a class="reference external" href="https://github.com/jakob-fritz">&#64;jakob-fritz</a> working hard on improving the CI pipeline.</p></li>
 <li><p>January 24, 2024: Version 5.4.0 contains the code for the <a class="reference external" href="https://arxiv.org/abs/2310.08352">second order SDC paper</a> by <a class="reference external" href="https://github.com/ikrom96git">&#64;ikrom96git</a>. It also has some changes to the FEniCS
 part, including correct treatment of boundary conditions and first steps with FEniCS-x.</p></li>
 <li><p>July 28, 2023: For Version 5.3 a lot of pull requests got merged, thanks to <a class="reference external" href="https://github.com/brownbaerchen">&#64;brownbaerchen</a>,
@@ -323,7 +327,7 @@ simplicity</p></li>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pySDC 5.5.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Changelog</a></li> 
       </ul>
     </div>

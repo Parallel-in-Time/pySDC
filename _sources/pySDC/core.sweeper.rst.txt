@@ -1,0 +1,7 @@
+core.sweeper module
+===================
+
+.. automodule:: core.sweeper
+   :members:
+   :undoc-members:
+   :show-inheritance:

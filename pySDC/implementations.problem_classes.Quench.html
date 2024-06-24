@@ -5,12 +5,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>implementations.problem_classes.Quench module &#8212; pySDC 5.4.3 documentation</title>
+    <title>implementations.problem_classes.Quench module &#8212; pySDC 5.5.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script src="../_static/documentation_options.js?v=e5a863ed"></script>
+    <script src="../_static/documentation_options.js?v=a385a3de"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.Piline.html" title="implementations.problem_classes.Piline module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.Quench module</a></li> 
@@ -52,7 +52,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.Quench.Quench">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Quench</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Cv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Q_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leak_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.45,</span> <span class="pre">0.55)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leak_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leak_transition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'step'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'center'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'neumann-zero'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lintol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liniter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct_solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inexact_linear_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_lintol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_sol_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'scipy'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Quench.html#Quench"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Quench.Quench" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
 <p>This is a toy problem <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> to emulate a magnet that has been cooled to temperatures where superconductivity is possible.
 However, there is a leak! Some point in the domain is constantly heated and when this has heated up its environment
 sufficiently, there will be a runaway effect heating up the entire magnet.
@@ -429,7 +429,7 @@ leak itself.</p>
         <li class="right" >
           <a href="implementations.problem_classes.Piline.html" title="implementations.problem_classes.Piline module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.Quench module</a></li> 

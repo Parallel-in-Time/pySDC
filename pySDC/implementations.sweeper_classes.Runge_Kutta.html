@@ -5,12 +5,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>implementations.sweeper_classes.Runge_Kutta module &#8212; pySDC 5.4.3 documentation</title>
+    <title>implementations.sweeper_classes.Runge_Kutta module &#8212; pySDC 5.5.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script src="../_static/documentation_options.js?v=e5a863ed"></script>
+    <script src="../_static/documentation_options.js?v=a385a3de"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     
@@ -34,7 +34,7 @@
         <li class="right" >
           <a href="implementations.sweeper_classes.Multistep.html" title="implementations.sweeper_classes.Multistep module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.sweeper_classes.html" accesskey="U">implementations.sweeper_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.Runge_Kutta module</a></li> 
@@ -152,6 +152,11 @@ as of now. And we are not aware of higher order ones. This one is newer then the
 <dd><p>alias of <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded" title="implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded"><code class="xref py py-class docutils literal notranslate"><span class="pre">ButcherTableauEmbedded</span></code></a></p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK.generator">
+<span class="sig-name descname"><span class="pre">generator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.ARK548L2SAERK</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK.generator" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK.get_update_order">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ARK548L2SAERK.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK.get_update_order" title="Link to this definition">¶</a></dt>
@@ -182,6 +187,11 @@ as of now. And we are not aware of higher order ones. This one is newer then the
 <p>Explicit embedded pair of Runge-Kutta methods of orders 5 and 4 from [here](<a class="reference external" href="https://doi.org/10.1016/j.apnum.2018.10.007">https://doi.org/10.1016/j.apnum.2018.10.007</a>).
 This method is part of the IMEX method ARK548L2SA.</p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK2.generator_EXP">
+<span class="sig-name descname"><span class="pre">generator_EXP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.ARK548L2SAERK2</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK2.generator_EXP" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK2.matrix">
 <span class="sig-name descname"><span class="pre">matrix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[</span> <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[</span> <span class="pre">0.44444444,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[</span> <span class="pre">0.11111111,</span>&#160; <span class="pre">0.64760301,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[</span> <span class="pre">0.09182987,</span>&#160; <span class="pre">0.03544857,</span> <span class="pre">-0.012009</span>&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[-0.34252355,</span> <span class="pre">-0.26767786,</span>&#160; <span class="pre">0.11056894,</span>&#160; <span class="pre">0.85638959,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[-0.00977228,</span>&#160; <span class="pre">0.21070865,</span>&#160; <span class="pre">0.07592412,</span>&#160; <span class="pre">0.20765519,</span>&#160; <span class="pre">0.23548432,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[</span> <span class="pre">0.46686371,</span>&#160; <span class="pre">1.29035988,</span>&#160; <span class="pre">0.37840597,</span> <span class="pre">-0.56345584,</span> <span class="pre">-0.28832383,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">-0.32884988,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[</span> <span class="pre">0.61439672,</span>&#160; <span class="pre">0.61439672,</span>&#160; <span class="pre">0.3174778</span> <span class="pre">,</span> <span class="pre">-0.71215206,</span>&#160; <span class="pre">0.11498708,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">0.09139032,</span> <span class="pre">-0.04049657,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">]])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK2.matrix" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -193,6 +203,11 @@ This method is part of the IMEX method ARK548L2SA.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ARK548L2SAESDIRK</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ARK548L2SAESDIRK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK" title="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK"><code class="xref py py-class docutils literal notranslate"><span class="pre">ARK548L2SAERK</span></code></a></p>
 <p>Implicit part of the ARK54 scheme. Be careful with the embedded scheme. It seems that both schemes are order 5 as opposed to 5 and 4 as claimed. This may cause issues when doing adaptive time-stepping.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK.generator_IMP">
+<span class="sig-name descname"><span class="pre">generator_IMP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.ARK548L2SAESDIRK</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK.generator_IMP" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK.matrix">
 <span class="sig-name descname"><span class="pre">matrix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[</span> <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[</span> <span class="pre">0.205</span>&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.205</span>&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[</span> <span class="pre">0.1025</span>&#160;&#160;&#160; <span class="pre">,</span> <span class="pre">-0.04757042,</span>&#160; <span class="pre">0.205</span>&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[</span> <span class="pre">0.07389944,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span> <span class="pre">-0.08074895,</span>&#160; <span class="pre">0.205</span>&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[</span> <span class="pre">0.29921812,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">2.46382067,</span> <span class="pre">-2.04803878,</span>&#160; <span class="pre">0.205</span>&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[</span> <span class="pre">0.14689238,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.11740333,</span> <span class="pre">-0.22170197,</span> <span class="pre">-0.00759375,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">0.205</span>&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[</span> <span class="pre">0.1784573</span> <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">1.01974675,</span> <span class="pre">-0.22154535,</span> <span class="pre">-0.03612492,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">-0.54553377,</span>&#160; <span class="pre">0.205</span>&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[-0.09554859,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160; <span class="pre">2.3386928</span> <span class="pre">,</span> <span class="pre">-0.14043176,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">-2.07058771,</span>&#160; <span class="pre">0.76287525,</span>&#160; <span class="pre">0.205</span>&#160;&#160;&#160;&#160; <span class="pre">]])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK.matrix" title="Link to this definition">¶</a></dt>
@@ -213,8 +228,8 @@ This method is part of the IMEX method ARK548L2SA.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.gamma">
-<span class="sig-name descname"><span class="pre">gamma</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.2222222222222222</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.gamma" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.generator">
+<span class="sig-name descname"><span class="pre">generator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.ARK548L2SAESDIRK2</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.generator" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -222,11 +237,6 @@ This method is part of the IMEX method ARK548L2SA.</p>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ARK548L2SAESDIRK2.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.get_update_order" title="Link to this definition">¶</a></dt>
 <dd><p>Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</p>
 </dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.i">
-<span class="sig-name descname"><span class="pre">i</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.i" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.matrix">
@@ -251,6 +261,11 @@ This method is part of the IMEX method ARK548L2SA.</p>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
 <p>Backward Euler. A favorite among true connoisseurs of the heat equation.</p>
 <p>A-stable first order method.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.BackwardEuler.generator">
+<span class="sig-name descname"><span class="pre">generator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.BE</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.BackwardEuler.generator" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.BackwardEuler.matrix">
 <span class="sig-name descname"><span class="pre">matrix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[1.]])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.BackwardEuler.matrix" title="Link to this definition">¶</a></dt>
@@ -291,6 +306,11 @@ This method is part of the IMEX method ARK548L2SA.</p>
 <dd><p>alias of <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded" title="implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded"><code class="xref py py-class docutils literal notranslate"><span class="pre">ButcherTableauEmbedded</span></code></a></p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.Cash_Karp.generator">
+<span class="sig-name descname"><span class="pre">generator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.CashKarp</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.generator" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.Cash_Karp.get_update_order">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#Cash_Karp.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.get_update_order" title="Link to this definition">¶</a></dt>
@@ -320,13 +340,18 @@ This method is part of the IMEX method ARK548L2SA.</p>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
 <p>Implicit Runge-Kutta method of second order, A-stable.</p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.CrankNicholson.generator">
+<span class="sig-name descname"><span class="pre">generator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.TRAP</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.generator" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.CrankNicholson.matrix">
 <span class="sig-name descname"><span class="pre">matrix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.5,</span> <span class="pre">0.5]])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.matrix" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.CrankNicholson.nodes">
-<span class="sig-name descname"><span class="pre">nodes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0,</span> <span class="pre">1])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.nodes" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">nodes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.,</span> <span class="pre">1.])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.nodes" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -347,6 +372,11 @@ This method is part of the IMEX method ARK548L2SA.</p>
 <span class="sig-name descname"><span class="pre">ButcherTableauClass</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43.ButcherTableauClass" title="Link to this definition">¶</a></dt>
 <dd><p>alias of <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded" title="implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded"><code class="xref py py-class docutils literal notranslate"><span class="pre">ButcherTableauEmbedded</span></code></a></p>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.DIRK43.generator">
+<span class="sig-name descname"><span class="pre">generator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.EDIRK43</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43.generator" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.DIRK43.get_update_order">
@@ -378,10 +408,9 @@ This method is part of the IMEX method ARK548L2SA.</p>
 <p>L-stable Diagonally Implicit RK method with four stages of order 3.
 Taken from [here](<a class="reference external" href="https://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods">https://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods</a>).</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.DIRK43_2.ButcherTableauClass">
-<span class="sig-name descname"><span class="pre">ButcherTableauClass</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43_2.ButcherTableauClass" title="Link to this definition">¶</a></dt>
-<dd><p>alias of <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableau" title="implementations.sweeper_classes.Runge_Kutta.ButcherTableau"><code class="xref py py-class docutils literal notranslate"><span class="pre">ButcherTableau</span></code></a></p>
-</dd></dl>
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.DIRK43_2.generator">
+<span class="sig-name descname"><span class="pre">generator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.DIRK43</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43_2.generator" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.DIRK43_2.matrix">
@@ -407,10 +436,9 @@ Taken from [here](<a class="reference external" href="https://en.wikipedia.org/w
 <p>Stiffly accurate, fourth-order EDIRK with four stages. Taken from
 [here](<a class="reference external" href="https://ntrs.nasa.gov/citations/20160005923">https://ntrs.nasa.gov/citations/20160005923</a>), second one in eq. (216).</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.EDIRK4.ButcherTableauClass">
-<span class="sig-name descname"><span class="pre">ButcherTableauClass</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.EDIRK4.ButcherTableauClass" title="Link to this definition">¶</a></dt>
-<dd><p>alias of <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableau" title="implementations.sweeper_classes.Runge_Kutta.ButcherTableau"><code class="xref py py-class docutils literal notranslate"><span class="pre">ButcherTableau</span></code></a></p>
-</dd></dl>
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.EDIRK4.generator">
+<span class="sig-name descname"><span class="pre">generator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.EDIRK4</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.EDIRK4.generator" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.EDIRK4.matrix">
@@ -441,6 +469,11 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 <dd><p>alias of <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded" title="implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded"><code class="xref py py-class docutils literal notranslate"><span class="pre">ButcherTableauEmbedded</span></code></a></p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ESDIRK43.generator">
+<span class="sig-name descname"><span class="pre">generator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.ESDIRK43</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK43.generator" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ESDIRK43.get_update_order">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ESDIRK43.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK43.get_update_order" title="Link to this definition">¶</a></dt>
@@ -455,11 +488,6 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ESDIRK43.nodes">
 <span class="sig-name descname"><span class="pre">nodes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span> <span class="pre">0.5</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span> <span class="pre">0.14644661,</span> <span class="pre">0.625</span>&#160;&#160;&#160;&#160; <span class="pre">,</span> <span class="pre">1.04</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">1.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK43.nodes" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ESDIRK43.s2">
-<span class="sig-name descname"><span class="pre">s2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.4142135623730951</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK43.s2" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -480,6 +508,11 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 <span class="sig-name descname"><span class="pre">ButcherTableauClass</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK53.ButcherTableauClass" title="Link to this definition">¶</a></dt>
 <dd><p>alias of <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded" title="implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded"><code class="xref py py-class docutils literal notranslate"><span class="pre">ButcherTableauEmbedded</span></code></a></p>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ESDIRK53.generator">
+<span class="sig-name descname"><span class="pre">generator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.ESDIRK53</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK53.generator" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ESDIRK53.get_update_order">
@@ -510,6 +543,11 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
 <p>Explicit Runge-Kutta method of second order.</p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod.generator">
+<span class="sig-name descname"><span class="pre">generator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.RK2</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod.generator" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod.matrix">
 <span class="sig-name descname"><span class="pre">matrix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.5,</span> <span class="pre">0.</span> <span class="pre">]])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod.matrix" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -521,7 +559,7 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod.weights">
-<span class="sig-name descname"><span class="pre">weights</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0,</span> <span class="pre">1])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod.weights" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">weights</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.,</span> <span class="pre">1.])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod.weights" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -532,6 +570,11 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
 <p>Forward Euler. Still a classic.</p>
 <p>Not very stable first order method.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ForwardEuler.generator">
+<span class="sig-name descname"><span class="pre">generator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.FE</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ForwardEuler.generator" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ForwardEuler.matrix">
 <span class="sig-name descname"><span class="pre">matrix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[0.]])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ForwardEuler.matrix" title="Link to this definition">¶</a></dt>
@@ -555,10 +598,9 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
 <p>Second order explicit embedded Runge-Kutta method.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.Heun_Euler.ButcherTableauClass">
-<span class="sig-name descname"><span class="pre">ButcherTableauClass</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.ButcherTableauClass" title="Link to this definition">¶</a></dt>
-<dd><p>alias of <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded" title="implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded"><code class="xref py py-class docutils literal notranslate"><span class="pre">ButcherTableauEmbedded</span></code></a></p>
-</dd></dl>
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.Heun_Euler.generator">
+<span class="sig-name descname"><span class="pre">generator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.HEUN2</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.generator" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.Heun_Euler.get_update_order">
@@ -573,12 +615,12 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.Heun_Euler.nodes">
-<span class="sig-name descname"><span class="pre">nodes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0,</span> <span class="pre">1])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.nodes" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">nodes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.,</span> <span class="pre">1.])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.nodes" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.Heun_Euler.weights">
-<span class="sig-name descname"><span class="pre">weights</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[0.5,</span> <span class="pre">0.5],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[1.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">]])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.weights" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">weights</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.5,</span> <span class="pre">0.5])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.weights" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -588,6 +630,11 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ImplicitMidpointMethod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ImplicitMidpointMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
 <p>Implicit Runge-Kutta method of second order.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod.generator">
+<span class="sig-name descname"><span class="pre">generator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.MidPoint</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod.generator" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod.matrix">
 <span class="sig-name descname"><span class="pre">matrix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[0.5]])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod.matrix" title="Link to this definition">¶</a></dt>
@@ -600,7 +647,7 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod.weights">
-<span class="sig-name descname"><span class="pre">weights</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([1])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod.weights" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">weights</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([1.])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod.weights" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -610,6 +657,11 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RK4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RK4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RK4" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
 <p>Explicit Runge-Kutta of fourth order: Everybody’s darling.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RK4.generator">
+<span class="sig-name descname"><span class="pre">generator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.RK4</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RK4.generator" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RK4.matrix">
 <span class="sig-name descname"><span class="pre">matrix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.5,</span> <span class="pre">0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.</span> <span class="pre">,</span> <span class="pre">0.5,</span> <span class="pre">0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">,</span> <span class="pre">1.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">]])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RK4.matrix" title="Link to this definition">¶</a></dt>
@@ -630,7 +682,7 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RungeKutta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RungeKutta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sweeper</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Sweeper</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.ButcherTableauClass">
 <span class="sig-name descname"><span class="pre">ButcherTableauClass</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.ButcherTableauClass" title="Link to this definition">¶</a></dt>
@@ -848,6 +900,7 @@ method, which does not require us to solve a system of equations to compute the 
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK"><code class="docutils literal notranslate"><span class="pre">ARK548L2SAERK</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK.ButcherTableauClass"><code class="docutils literal notranslate"><span class="pre">ButcherTableauClass</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK.generator"><code class="docutils literal notranslate"><span class="pre">generator</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK.get_update_order"><code class="docutils literal notranslate"><span class="pre">get_update_order()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
@@ -855,24 +908,26 @@ method, which does not require us to solve a system of equations to compute the 
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK2"><code class="docutils literal notranslate"><span class="pre">ARK548L2SAERK2</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK2.generator_EXP"><code class="docutils literal notranslate"><span class="pre">generator_EXP</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK2.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK"><code class="docutils literal notranslate"><span class="pre">ARK548L2SAESDIRK</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK.generator_IMP"><code class="docutils literal notranslate"><span class="pre">generator_IMP</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2"><code class="docutils literal notranslate"><span class="pre">ARK548L2SAESDIRK2</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.ButcherTableauClass"><code class="docutils literal notranslate"><span class="pre">ButcherTableauClass</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.gamma"><code class="docutils literal notranslate"><span class="pre">gamma</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.generator"><code class="docutils literal notranslate"><span class="pre">generator</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.get_update_order"><code class="docutils literal notranslate"><span class="pre">get_update_order()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.i"><code class="docutils literal notranslate"><span class="pre">i</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.weights"><code class="docutils literal notranslate"><span class="pre">weights</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.BackwardEuler"><code class="docutils literal notranslate"><span class="pre">BackwardEuler</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.BackwardEuler.generator"><code class="docutils literal notranslate"><span class="pre">generator</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.BackwardEuler.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.BackwardEuler.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.BackwardEuler.weights"><code class="docutils literal notranslate"><span class="pre">weights</span></code></a></li>
@@ -882,6 +937,7 @@ method, which does not require us to solve a system of equations to compute the 
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded"><code class="docutils literal notranslate"><span class="pre">ButcherTableauEmbedded</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp"><code class="docutils literal notranslate"><span class="pre">Cash_Karp</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.ButcherTableauClass"><code class="docutils literal notranslate"><span class="pre">ButcherTableauClass</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.generator"><code class="docutils literal notranslate"><span class="pre">generator</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.get_update_order"><code class="docutils literal notranslate"><span class="pre">get_update_order()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
@@ -889,6 +945,7 @@ method, which does not require us to solve a system of equations to compute the 
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson"><code class="docutils literal notranslate"><span class="pre">CrankNicholson</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.generator"><code class="docutils literal notranslate"><span class="pre">generator</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.weights"><code class="docutils literal notranslate"><span class="pre">weights</span></code></a></li>
@@ -896,6 +953,7 @@ method, which does not require us to solve a system of equations to compute the 
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43"><code class="docutils literal notranslate"><span class="pre">DIRK43</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43.ButcherTableauClass"><code class="docutils literal notranslate"><span class="pre">ButcherTableauClass</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43.generator"><code class="docutils literal notranslate"><span class="pre">generator</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43.get_update_order"><code class="docutils literal notranslate"><span class="pre">get_update_order()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
@@ -903,14 +961,14 @@ method, which does not require us to solve a system of equations to compute the 
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43_2"><code class="docutils literal notranslate"><span class="pre">DIRK43_2</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43_2.ButcherTableauClass"><code class="docutils literal notranslate"><span class="pre">ButcherTableauClass</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43_2.generator"><code class="docutils literal notranslate"><span class="pre">generator</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43_2.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43_2.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43_2.weights"><code class="docutils literal notranslate"><span class="pre">weights</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.EDIRK4"><code class="docutils literal notranslate"><span class="pre">EDIRK4</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.EDIRK4.ButcherTableauClass"><code class="docutils literal notranslate"><span class="pre">ButcherTableauClass</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.EDIRK4.generator"><code class="docutils literal notranslate"><span class="pre">generator</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.EDIRK4.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.EDIRK4.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.EDIRK4.weights"><code class="docutils literal notranslate"><span class="pre">weights</span></code></a></li>
@@ -918,15 +976,16 @@ method, which does not require us to solve a system of equations to compute the 
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK43"><code class="docutils literal notranslate"><span class="pre">ESDIRK43</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK43.ButcherTableauClass"><code class="docutils literal notranslate"><span class="pre">ButcherTableauClass</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK43.generator"><code class="docutils literal notranslate"><span class="pre">generator</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK43.get_update_order"><code class="docutils literal notranslate"><span class="pre">get_update_order()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK43.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK43.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK43.s2"><code class="docutils literal notranslate"><span class="pre">s2</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK43.weights"><code class="docutils literal notranslate"><span class="pre">weights</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK53"><code class="docutils literal notranslate"><span class="pre">ESDIRK53</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK53.ButcherTableauClass"><code class="docutils literal notranslate"><span class="pre">ButcherTableauClass</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK53.generator"><code class="docutils literal notranslate"><span class="pre">generator</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK53.get_update_order"><code class="docutils literal notranslate"><span class="pre">get_update_order()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK53.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK53.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
@@ -934,19 +993,21 @@ method, which does not require us to solve a system of equations to compute the 
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod"><code class="docutils literal notranslate"><span class="pre">ExplicitMidpointMethod</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod.generator"><code class="docutils literal notranslate"><span class="pre">generator</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod.weights"><code class="docutils literal notranslate"><span class="pre">weights</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ForwardEuler"><code class="docutils literal notranslate"><span class="pre">ForwardEuler</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ForwardEuler.generator"><code class="docutils literal notranslate"><span class="pre">generator</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ForwardEuler.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ForwardEuler.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ForwardEuler.weights"><code class="docutils literal notranslate"><span class="pre">weights</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler"><code class="docutils literal notranslate"><span class="pre">Heun_Euler</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.ButcherTableauClass"><code class="docutils literal notranslate"><span class="pre">ButcherTableauClass</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.generator"><code class="docutils literal notranslate"><span class="pre">generator</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.get_update_order"><code class="docutils literal notranslate"><span class="pre">get_update_order()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
@@ -954,12 +1015,14 @@ method, which does not require us to solve a system of equations to compute the 
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod"><code class="docutils literal notranslate"><span class="pre">ImplicitMidpointMethod</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod.generator"><code class="docutils literal notranslate"><span class="pre">generator</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod.weights"><code class="docutils literal notranslate"><span class="pre">weights</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RK4"><code class="docutils literal notranslate"><span class="pre">RK4</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RK4.generator"><code class="docutils literal notranslate"><span class="pre">generator</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RK4.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RK4.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RK4.weights"><code class="docutils literal notranslate"><span class="pre">weights</span></code></a></li>
@@ -1041,7 +1104,7 @@ method, which does not require us to solve a system of equations to compute the 
         <li class="right" >
           <a href="implementations.sweeper_classes.Multistep.html" title="implementations.sweeper_classes.Multistep module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.4.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.sweeper_classes.html" >implementations.sweeper_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.Runge_Kutta module</a></li> 

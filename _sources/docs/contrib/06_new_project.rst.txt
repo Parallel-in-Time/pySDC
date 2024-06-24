@@ -38,6 +38,9 @@ The file needs to be named ``environment.yml`` and needs to follow the structure
      - defaults
    dependencies:
      - numpy
+     - pip
+     - pip:
+       - qmat>=0.1.8
 
 The list of dependencies can be extended as needed.
 The name should stay ``pySDC``. The channels cover most of the usual packages.

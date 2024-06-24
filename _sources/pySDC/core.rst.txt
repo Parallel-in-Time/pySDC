@@ -7,20 +7,18 @@ Submodules
 .. toctree::
    :maxdepth: 2
 
-   core.BaseTransfer
-   core.Collocation
-   core.Common
-   core.Controller
-   core.ConvergenceController
-   core.Errors
-   core.Hooks
-   core.Lagrange
-   core.Level
-   core.Nodes
-   core.Problem
-   core.SpaceTransfer
-   core.Step
-   core.Sweeper
+   core.base_transfer
+   core.collocation
+   core.common
+   core.controller
+   core.convergence_controller
+   core.errors
+   core.hooks
+   core.level
+   core.problem
+   core.space_transfer
+   core.step
+   core.sweeper
 
 Module contents
 ---------------

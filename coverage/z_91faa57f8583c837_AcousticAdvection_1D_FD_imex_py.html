@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_91faa57f8583c837_AdvectionDiffusionEquation_1D_FFT_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.5.3">coverage.py v7.5.3</a>,
-            created at 2024-06-15 08:49 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.5.4">coverage.py v7.5.4</a>,
+            created at 2024-06-24 08:36 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -83,8 +83,8 @@
     <p class="run"><span class="n"><a id="t1" href="#t1">1</a></span><span class="t"><span class="key">import</span> <span class="nam">numpy</span> <span class="key">as</span> <span class="nam">np</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t2" href="#t2">2</a></span><span class="t"><span class="key">from</span> <span class="nam">scipy</span><span class="op">.</span><span class="nam">sparse</span><span class="op">.</span><span class="nam">linalg</span> <span class="key">import</span> <span class="nam">spsolve</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t3" href="#t3">3</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t4" href="#t4">4</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">core</span><span class="op">.</span><span class="nam">Errors</span> <span class="key">import</span> <span class="nam">ParameterError</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t5" href="#t5">5</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">core</span><span class="op">.</span><span class="nam">Problem</span> <span class="key">import</span> <span class="nam">ptype</span><span class="op">,</span> <span class="nam">WorkCounter</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t4" href="#t4">4</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">core</span><span class="op">.</span><span class="nam">errors</span> <span class="key">import</span> <span class="nam">ParameterError</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t5" href="#t5">5</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">core</span><span class="op">.</span><span class="nam">problem</span> <span class="key">import</span> <span class="nam">Problem</span><span class="op">,</span> <span class="nam">WorkCounter</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t6" href="#t6">6</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">datatype_classes</span><span class="op">.</span><span class="nam">mesh</span> <span class="key">import</span> <span class="nam">mesh</span><span class="op">,</span> <span class="nam">imex_mesh</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">problem_classes</span><span class="op">.</span><span class="nam">acoustic_helpers</span><span class="op">.</span><span class="nam">buildWave1DMatrix</span> <span class="key">import</span> <span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t">    <span class="nam">getWave1DMatrix</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
@@ -93,7 +93,7 @@
     <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="com"># noinspection PyUnusedLocal</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="key">class</span> <span class="nam">acoustic_1d_imex</span><span class="op">(</span><span class="nam">ptype</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="key">class</span> <span class="nam">acoustic_1d_imex</span><span class="op">(</span><span class="nam">Problem</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t">    <span class="str">r"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="str">    This class implements the one-dimensional acoustics advection equation on a periodic domain :math:`[0, 1]`</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t"><span class="str">    fully investigated in [1]_. The equations are given by</span>&nbsp;</span><span class="r"></span></p>
@@ -308,8 +308,8 @@
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_91faa57f8583c837_AdvectionDiffusionEquation_1D_FFT_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.5.3">coverage.py v7.5.3</a>,
-            created at 2024-06-15 08:49 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.5.4">coverage.py v7.5.4</a>,
+            created at 2024-06-24 08:36 +0000
         </p>
     </div>
 </footer>
