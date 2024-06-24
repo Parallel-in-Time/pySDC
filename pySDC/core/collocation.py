@@ -12,17 +12,17 @@ class CollBase(object):
     It can be used to produce many kind of quadrature nodes from various
     distribution (awesome!).
 
-    It is based on the two main parameters that define the nodes :
+    It is based on the two main parameters that define the nodes:
 
-    - node_type : the node distribution used for the collocation method
-    - quad_type : the type of quadrature used (inclusion of not of boundary)
+    - node_type: the node distribution used for the collocation method
+    - quad_type: the type of quadrature used (inclusion of not of boundary)
 
     Current implementation provides the following available parameter values
-    for node_type :
+    for node_type:
 
-    - EQUID : equidistant node distribution
-    - LEGENDRE : distribution from Legendre polynomials
-    - CHEBY-{1,2,3,4} : distribution from Chebyshev polynomials of a given kind
+    - EQUID: equidistant node distribution
+    - LEGENDRE: distribution from Legendre polynomials
+    - CHEBY-{1,2,3,4}: distribution from Chebyshev polynomials of a given kind
 
     The type of quadrature can be GAUSS (only inner nodes), RADAU-LEFT
     (inclusion of the left boundary), RADAU-RIGHT (inclusion of the right
