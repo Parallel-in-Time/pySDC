@@ -32,6 +32,8 @@ prepare_JUWELS:
     - module load mpi4py
     - module load SciPy-Stack
     - module load CuPy
+    - python -m venv --clear ./.venv/pySDC
+    - source ./.venv/pySDC/bin/activate
     - pip install -e .
     - pip install pytest-benchmark coverage
     - git submodule add -f https://github.com/brownbaerchen/mpi4py-fft.git
@@ -74,6 +76,7 @@ test_JUWELS:
     - module load mpi4py
     - module load SciPy-Stack
     - module load CuPy
+    - source ./.venv/pySDC/bin/activate
   script:
     # - touch benchmarks/output.json
     - echo $SYSTEMNAME
