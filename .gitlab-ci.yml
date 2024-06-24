@@ -35,7 +35,7 @@ prepare_JUWELS:
     - module load mpi4py
     - module load SciPy-Stack
     - module load CuPy
-    - jutil env activate -p ${{ JUWELS_PROJECT }}
+    - jutil env activate -p ${JUWELS_PROJECT}
     - python -m venv --clear $SCRATCH/.venv/pySDC
     - source $SCRATCH/.venv/pySDC/bin/activate
     - pip install -e .
@@ -82,7 +82,7 @@ test_JUWELS:
     - module load mpi4py
     - module load SciPy-Stack
     - module load CuPy
-    - jutil env activate -p ${{ JUWELS_PROJECT }}
+    - jutil env activate -p ${JUWELS_PROJECT}
     - source $SCRATCH/.venv/pySDC/bin/activate
   script:
     # - touch benchmarks/output.json
