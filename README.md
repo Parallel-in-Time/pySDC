@@ -32,7 +32,7 @@ implemented.
     [petsc4py](https://bitbucket.org/petsc/petsc4py))
 -   Continuous integration via [GitHub
     Actions](https://github.com/Parallel-in-Time/pySDC/actions) and
-    [Gitlab CI](https://gitlab.hzdr.de/r.speck/pysdc/-/pipelines)
+    [Gitlab CI](https://gitlab.hzdr.de/r.speck/pysdc/-/pipelines) (through the [GitHub2Gitlab Action](https://github.com/jakob-fritz/github2lab_action))
 -   Fully compatible with Python 3.8 - 3.10 (and mostly up to 3.12), runs at least on Ubuntu
 
 ## Getting started
