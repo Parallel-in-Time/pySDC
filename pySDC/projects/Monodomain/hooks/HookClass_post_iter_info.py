@@ -1,8 +1,8 @@
 import time
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class post_iter_info_hook(hooks):
+class post_iter_info_hook(Hooks):
     """
     Hook class to write additional iteration information to the command line.
     It is used to print the final residual, after u[0] has been updated with the new value from the previous step.

@@ -8,15 +8,15 @@ from pySDC.implementations.problem_classes.NonlinearSchroedinger_MPIFFT import (
 from pySDC.projects.Resilience.hook import LogData, hook_collection
 from pySDC.projects.Resilience.strategies import merge_descriptions
 from pySDC.projects.Resilience.sweepers import imex_1st_order_efficient, generic_implicit_efficient
-from pySDC.core.Errors import ConvergenceError
+from pySDC.core.errors import ConvergenceError
 
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
-class live_plotting_with_error(hooks):  # pragma: no cover
+class live_plotting_with_error(Hooks):  # pragma: no cover
     def __init__(self):
         super().__init__()
         self.fig, self.axs = plt.subplots(1, 2, sharex=True, sharey=True, figsize=(12, 7))
@@ -44,7 +44,7 @@ class live_plotting_with_error(hooks):  # pragma: no cover
         plt.pause(1e-9)
 
 
-class live_plotting(hooks):  # pragma: no cover
+class live_plotting(Hooks):  # pragma: no cover
     def __init__(self):
         super().__init__()
         self.fig, self.ax = plt.subplots()

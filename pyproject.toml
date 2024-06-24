@@ -15,9 +15,7 @@ authors=[
     {name='Lisa Wimmer', email='wimmer@uni-wuppertal.de'},
     {name='Ikrom Akramov', email='ikrom.akramov@tuhh.de'},
     ]
-homepage = "http://www.parallel-in-time.org/pySDC/"
-repository = "https://github.com/Parallel-in-Time/pySDC/"
-documentation = "http://www.parallel-in-time.org/pySDC/"
+
 
 classifiers = [
     "Topic :: Scientific/Engineering :: Mathematics",
@@ -30,7 +28,14 @@ dependencies = [
     'sympy>=1.0',
     'numba>=0.35',
     'dill>=0.2.6',
+    'qmat>=0.1.8',
     ]
+
+[project.urls]
+Homepage = "http://www.parallel-in-time.org/pySDC/"
+Repository = "https://github.com/Parallel-in-Time/pySDC/"
+Documentation = "http://www.parallel-in-time.org/pySDC/"
+Tracker = "https://github.com/Parallel-in-Time/pySDC/issues"
 
 [project.optional-dependencies]
 apps = [

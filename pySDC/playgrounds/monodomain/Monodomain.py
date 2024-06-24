@@ -1,12 +1,12 @@
 import numpy as np
 
-from pySDC.core.Errors import ParameterError, ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.errors import ParameterError, ProblemError
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 # noinspection PyUnusedLocal
-class monodomain2d_imex(ptype):
+class monodomain2d_imex(Problem):
     """
     Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping
 

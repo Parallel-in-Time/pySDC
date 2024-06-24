@@ -1,7 +1,7 @@
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class stop_at_error_hook(hooks):
+class stop_at_error_hook(Hooks):
     def post_sweep(self, step, level_number):
         """
         Overwrite standard post iteration hook

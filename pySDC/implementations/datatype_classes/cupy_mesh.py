@@ -1,5 +1,5 @@
 import cupy as cp
-from pySDC.core.Errors import DataError
+from pySDC.core.errors import DataError
 
 try:
     from mpi4py import MPI

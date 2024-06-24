@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pySDC.core.Collocation import CollBase
+from pySDC.core.collocation import CollBase
 from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
 
 

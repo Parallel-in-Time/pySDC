@@ -5,6 +5,9 @@ from collections import namedtuple
 import numpy as np
 from mpi4py import MPI
 
+import matplotlib as mpl
+
+mpl.use("Agg")
 import pySDC.helpers.plot_helper as plt_helper
 from pySDC.helpers.stats_helper import get_sorted
 
@@ -14,8 +17,6 @@ from pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit impo
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit_MPI import generic_implicit_MPI
-
-# from pySDC.projects.parallelSDC.BaseTransfer_MPI import base_transfer_mpi
 
 ID = namedtuple('ID', ['setup', 'qd_type', 'param'])
 
@@ -161,6 +162,7 @@ def main(comm=None):
         assert os.path.isfile('data/parallelSDC_iterations_precond_MPI.pkl'), 'ERROR: pickle did not create file'
 
 
+# pragma: no cover
 def plot_iterations():
     """
     Helper routine to plot iteration counts
@@ -245,5 +247,5 @@ def plot_iterations():
 if __name__ == "__main__":
     comm = MPI.COMM_WORLD
     main(comm=comm)
-    if comm.Get_rank() == 0:
-        plot_iterations()
+    # if comm.Get_rank() == 0:
+    #     plot_iterations()

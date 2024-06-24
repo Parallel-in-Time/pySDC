@@ -12,7 +12,7 @@ from pySDC.implementations.convergence_controller_classes.adaptive_collocation i
 from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import (
     EstimateEmbeddedErrorCollocation,
 )
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 from pySDC.implementations.hooks.log_errors import LogLocalErrorPostIter
 from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimatePostIter
 
@@ -56,7 +56,7 @@ special_params = {
 
 
 # define a few hooks
-class LogSweeperParams(hooks):
+class LogSweeperParams(Hooks):
     """
     Log the sweeper parameters after every iteration to check if the adaptive collocation convergence controller is
     doing what it's supposed to.

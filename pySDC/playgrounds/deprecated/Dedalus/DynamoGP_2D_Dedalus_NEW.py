@@ -2,13 +2,13 @@ import numpy as np
 
 from dedalus import public as de
 
-from pySDC.core.Problem import ptype
-from pySDC.core.Errors import ParameterError
+from pySDC.core.problem import Problem
+from pySDC.core.errors import ParameterError
 
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
-class dynamogp_2d_dedalus(ptype):
+class dynamogp_2d_dedalus(Problem):
     """ """
 
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):

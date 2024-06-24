@@ -1,9 +1,9 @@
 import numpy as np
 
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class particle_hook(hooks):
+class particle_hook(Hooks):
     def __init__(self):
         """
         Initialization of particles output

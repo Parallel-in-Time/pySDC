@@ -25,6 +25,9 @@ channels:
   - defaults
 dependencies:
   - numpy
+  - pip
+  - pip:
+    - qmat>=0.1.8
 ```
 
 The list of dependencies can be extended as needed.

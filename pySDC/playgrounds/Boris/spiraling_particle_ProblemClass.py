@@ -1,10 +1,10 @@
 import numpy as np
 
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.particles import particles, fields, acceleration
 
 
-class planewave_single(ptype):
+class planewave_single(Problem):
     """
     Example implementing a single particle spiraling in a trap
     """

@@ -1,11 +1,11 @@
 import dolfin as df
 
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 file = df.File('output1d/grayscott.pvd')  # dirty, but this has to be unique (and not per step or level)
 
 
-class fenics_output(hooks):
+class fenics_output(Hooks):
     """
     Hook class to add output to FEniCS runs
     """

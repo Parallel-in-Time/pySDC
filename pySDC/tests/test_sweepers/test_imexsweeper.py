@@ -12,10 +12,10 @@ class TestImexSweeper(unittest.TestCase):
     # Some auxiliary functions which are not tests themselves
     #
     def setupLevelStepProblem(self):
-        from pySDC.core import Step as stepclass
+        from pySDC.core import step as stepclass
 
         self.description['sweeper_params'] = self.swparams
-        step = stepclass.step(description=self.description)
+        step = stepclass.Step(description=self.description)
         level = step.levels[0]
         level.status.time = 0.0
         u0 = step.levels[0].prob.u_exact(step.time)
@@ -56,27 +56,27 @@ class TestImexSweeper(unittest.TestCase):
     # Check that a level object can be instantiated
     #
     def test_caninstantiate(self):
-        from pySDC.core import Step as stepclass
+        from pySDC.core import step as stepclass
         from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
 
         for node_type, quad_type in zip(node_types, quad_types):
             self.swparams['node_type'] = node_type
             self.swparams['quad_type'] = quad_type
             self.description['sweeper_params'] = self.swparams
-            S = stepclass.step(description=self.description)
+            S = stepclass.Step(description=self.description)
             assert isinstance(S.levels[0].sweep, imex), "sweeper in generated level is not an object of type imex"
 
     #
     # Check that a level object can be registered in a step object (needed as prerequiste to execute update_nodes
     #
     def test_canregisterlevel(self):
-        from pySDC.core import Step as stepclass
+        from pySDC.core import step as stepclass
 
         for node_type, quad_type in zip(node_types, quad_types):
             self.swparams['node_type'] = node_type
             self.swparams['quad_type'] = quad_type
             self.description['sweeper_params'] = self.swparams
-            step = stepclass.step(description=self.description)
+            step = stepclass.Step(description=self.description)
             L = step.levels[0]
             with self.assertRaises(Exception):
                 L.sweep.predict()
@@ -124,7 +124,7 @@ class TestImexSweeper(unittest.TestCase):
             unew = np.linalg.inv(LHS).dot(u0full + RHS.dot(u0full))
             usweep = np.array([level.u[l].flatten() for l in range(1, nnodes + 1)])
             assert (
-                np.linalg.norm(unew - usweep, np.infty) < 1e-14
+                np.linalg.norm(unew - usweep, np.inf) < 1e-14
             ), "Single SDC sweeps in matrix and node-to-node formulation yield different results"
 
     #
@@ -152,7 +152,7 @@ class TestImexSweeper(unittest.TestCase):
             else:
                 uend_mat = ustages[-1]
             assert (
-                np.linalg.norm(uend_sweep - uend_mat, np.infty) < 1e-14
+                np.linalg.norm(uend_sweep - uend_mat, np.inf) < 1e-14
             ), "Update formula in sweeper gives different result than matrix update formula"
 
     #
@@ -189,12 +189,12 @@ class TestImexSweeper(unittest.TestCase):
             # Make sure both matrix and node-to-node sweep leave collocation unaltered
             unew = np.linalg.inv(LHS).dot(u0full + RHS.dot(ucoll))
             assert (
-                np.linalg.norm(unew - ucoll, np.infty) < 1e-14
+                np.linalg.norm(unew - ucoll, np.inf) < 1e-14
             ), "Collocation solution not invariant under matrix SDC sweep"
             unew_sweep = np.array([level.u[l].flatten() for l in range(1, nnodes + 1)])
-            print(np.linalg.norm(unew_sweep - ucoll, np.infty))
+            print(np.linalg.norm(unew_sweep - ucoll, np.inf))
             assert (
-                np.linalg.norm(unew_sweep - ucoll, np.infty) < 1e-14
+                np.linalg.norm(unew_sweep - ucoll, np.inf) < 1e-14
             ), "Collocation solution not invariant under node-to-node sweep"
 
     #
@@ -222,13 +222,13 @@ class TestImexSweeper(unittest.TestCase):
                 unew = np.linalg.inv(LHS).dot(u0full + RHS.dot(unew))
 
             assert (
-                np.linalg.norm(unew - usweep, np.infty) < 1e-14
+                np.linalg.norm(unew - usweep, np.inf) < 1e-14
             ), "Doing multiple node-to-node sweeps yields different result than same number of matrix-form sweeps"
 
             Mat_sweep = level.sweep.get_scalar_problems_manysweep_mat(nsweeps=K, lambdas=lambdas)
             usweep_onematrix = Mat_sweep.dot(u0full)
             assert (
-                np.linalg.norm(usweep_onematrix - usweep, np.infty) < 1e-14
+                np.linalg.norm(usweep_onematrix - usweep, np.inf) < 1e-14
             ), "Single-matrix multiple sweep formulation yields different result than multiple sweeps in node-to-node or matrix form form"
 
     #
@@ -317,5 +317,5 @@ class TestImexSweeper(unittest.TestCase):
             q[nnodes - 1] = 1.0
             uend_mat = q.dot(ustages)
             assert (
-                np.linalg.norm(uend_sweep - uend_mat, np.infty) < 1e-14
+                np.linalg.norm(uend_sweep - uend_mat, np.inf) < 1e-14
             ), "For do_coll_update=False, update formula in sweeper gives different result than matrix update formula with q=(0,..,0,1)"

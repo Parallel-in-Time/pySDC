@@ -8,3 +8,6 @@ dependencies:
   - matplotlib>=3.0
   - scipy>=0.17.1
   - dill>=0.2.6
+  - pip
+  - pip:
+    - qmat>=0.1.8

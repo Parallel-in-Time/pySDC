@@ -1,9 +1,9 @@
-from pySDC.core.Errors import TransferError
-from pySDC.core.SpaceTransfer import space_transfer
+from pySDC.core.errors import TransferError
+from pySDC.core.space_transfer import SpaceTransfer
 from pySDC.implementations.datatype_classes.particles import particles, fields, acceleration
 
 
-class particles_to_particles(space_transfer):
+class particles_to_particles(SpaceTransfer):
     """
     Custon transfer class, implements SpaceTransfer.py
 

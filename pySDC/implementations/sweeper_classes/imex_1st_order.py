@@ -1,9 +1,9 @@
 import numpy as np
 
-from pySDC.core.Sweeper import sweeper
+from pySDC.core.sweeper import Sweeper
 
 
-class imex_1st_order(sweeper):
+class imex_1st_order(Sweeper):
     """
     Custom sweeper class, implements Sweeper.py
 
@@ -31,8 +31,8 @@ class imex_1st_order(sweeper):
         super().__init__(params)
 
         # IMEX integration matrices
-        self.QI = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.QI)
-        self.QE = self.get_Qdelta_explicit(coll=self.coll, qd_type=self.params.QE)
+        self.QI = self.get_Qdelta_implicit(qd_type=self.params.QI)
+        self.QE = self.get_Qdelta_explicit(qd_type=self.params.QE)
 
     def integrate(self):
         """

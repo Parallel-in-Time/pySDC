@@ -3,12 +3,12 @@ import logging
 import dolfin as df
 import numpy as np
 
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_fenics_mesh
 
 
 # noinspection PyUnusedLocal
-class fenics_heat(ptype):
+class fenics_heat(Problem):
     r"""
     Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions
 

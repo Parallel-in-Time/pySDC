@@ -1,9 +1,10 @@
 import numpy as np
 import logging
+from qmat.qcoeff.butcher import RK_SCHEMES
 
-from pySDC.core.Sweeper import sweeper, _Pars
-from pySDC.core.Errors import ParameterError
-from pySDC.core.Level import level
+from pySDC.core.sweeper import Sweeper, _Pars
+from pySDC.core.errors import ParameterError
+from pySDC.core.level import Level
 
 
 class ButcherTableau(object):
@@ -121,7 +122,7 @@ class ButcherTableauEmbedded(object):
         self.implicit = any(matrix[i, i] != 0 for i in range(self.num_nodes - self.num_solution_stages))
 
 
-class RungeKutta(sweeper):
+class RungeKutta(Sweeper):
     nodes = None
     weights = None
     matrix = None
@@ -316,7 +317,7 @@ class RungeKutta(sweeper):
         Args:
             lvl (pySDC.Level.level): Current level
         """
-        assert isinstance(lvl, level), f"You tried to set the sweeper's level with an instance of {type(lvl)}!"
+        assert isinstance(lvl, Level), f"You tried to set the sweeper's level with an instance of {type(lvl)}!"
         if lvl.params.restol > 0:
             lvl.params.restol = -1
             self.logger.warning(
@@ -454,13 +455,8 @@ class ForwardEuler(RungeKutta):
     Not very stable first order method.
     """
 
-    nodes = np.array([0.0])
-    weights = np.array([1.0])
-    matrix = np.array(
-        [
-            [0.0],
-        ]
-    )
+    generator = RK_SCHEMES["FE"]()
+    nodes, weights, matrix = generator.genCoeffs()
 
 
 class BackwardEuler(RungeKutta):
@@ -470,13 +466,8 @@ class BackwardEuler(RungeKutta):
     A-stable first order method.
     """
 
-    nodes = np.array([1.0])
-    weights = np.array([1.0])
-    matrix = np.array(
-        [
-            [1.0],
-        ]
-    )
+    generator = RK_SCHEMES["BE"]()
+    nodes, weights, matrix = generator.genCoeffs()
 
 
 class CrankNicholson(RungeKutta):
@@ -484,11 +475,8 @@ class CrankNicholson(RungeKutta):
     Implicit Runge-Kutta method of second order, A-stable.
     """
 
-    nodes = np.array([0, 1])
-    weights = np.array([0.5, 0.5])
-    matrix = np.zeros((2, 2))
-    matrix[1, 0] = 0.5
-    matrix[1, 1] = 0.5
+    generator = RK_SCHEMES["CN"]()
+    nodes, weights, matrix = generator.genCoeffs()
 
 
 class ExplicitMidpointMethod(RungeKutta):
@@ -496,10 +484,8 @@ class ExplicitMidpointMethod(RungeKutta):
     Explicit Runge-Kutta method of second order.
     """
 
-    nodes = np.array([0, 0.5])
-    weights = np.array([0, 1])
-    matrix = np.zeros((2, 2))
-    matrix[1, 0] = 0.5
+    generator = RK_SCHEMES["RK2"]()
+    nodes, weights, matrix = generator.genCoeffs()
 
 
 class ImplicitMidpointMethod(RungeKutta):
@@ -507,10 +493,8 @@ class ImplicitMidpointMethod(RungeKutta):
     Implicit Runge-Kutta method of second order.
     """
 
-    nodes = np.array([0.5])
-    weights = np.array([1])
-    matrix = np.zeros((1, 1))
-    matrix[0, 0] = 1.0 / 2.0
+    generator = RK_SCHEMES["IMP"]()
+    nodes, weights, matrix = generator.genCoeffs()
 
 
 class RK4(RungeKutta):
@@ -518,12 +502,8 @@ class RK4(RungeKutta):
     Explicit Runge-Kutta of fourth order: Everybody's darling.
     """
 
-    nodes = np.array([0, 0.5, 0.5, 1])
-    weights = np.array([1.0, 2.0, 2.0, 1.0]) / 6.0
-    matrix = np.zeros((4, 4))
-    matrix[1, 0] = 0.5
-    matrix[2, 1] = 0.5
-    matrix[3, 2] = 1.0
+    generator = RK_SCHEMES["RK4"]()
+    nodes, weights, matrix = generator.genCoeffs()
 
 
 class Heun_Euler(RungeKutta):
@@ -531,11 +511,8 @@ class Heun_Euler(RungeKutta):
     Second order explicit embedded Runge-Kutta method.
     """
 
-    nodes = np.array([0, 1])
-    weights = np.array([[0.5, 0.5], [1, 0]])
-    matrix = np.zeros((2, 2))
-    matrix[1, 0] = 1
-    ButcherTableauClass = ButcherTableauEmbedded
+    generator = RK_SCHEMES["HEUN"]()
+    nodes, weights, matrix = generator.genCoeffs()
 
     @classmethod
     def get_update_order(cls):
@@ -547,19 +524,8 @@ class Cash_Karp(RungeKutta):
     Fifth order explicit embedded Runge-Kutta. See [here](https://doi.org/10.1145/79505.79507).
     """
 
-    nodes = np.array([0, 0.2, 0.3, 0.6, 1.0, 7.0 / 8.0])
-    weights = np.array(
-        [
-            [37.0 / 378.0, 0.0, 250.0 / 621.0, 125.0 / 594.0, 0.0, 512.0 / 1771.0],
-            [2825.0 / 27648.0, 0.0, 18575.0 / 48384.0, 13525.0 / 55296.0, 277.0 / 14336.0, 1.0 / 4.0],
-        ]
-    )
-    matrix = np.zeros((6, 6))
-    matrix[1, 0] = 1.0 / 5.0
-    matrix[2, :2] = [3.0 / 40.0, 9.0 / 40.0]
-    matrix[3, :3] = [0.3, -0.9, 1.2]
-    matrix[4, :4] = [-11.0 / 54.0, 5.0 / 2.0, -70.0 / 27.0, 35.0 / 27.0]
-    matrix[5, :5] = [1631.0 / 55296.0, 175.0 / 512.0, 575.0 / 13824.0, 44275.0 / 110592.0, 253.0 / 4096.0]
+    generator = RK_SCHEMES["CashKarp"]()
+    nodes, weights, matrix = generator.genCoeffs(embedded=True)
     ButcherTableauClass = ButcherTableauEmbedded
 
     @classmethod
@@ -574,15 +540,8 @@ class DIRK43(RungeKutta):
     Taken from [here](https://doi.org/10.1007/BF01934920).
     """
 
-    nodes = np.array([5.0 / 6.0, 10.0 / 39.0, 0, 1.0 / 6.0])
-    weights = np.array(
-        [[61.0 / 150.0, 2197.0 / 2100.0, 19.0 / 100.0, -9.0 / 14.0], [32.0 / 75.0, 169.0 / 300.0, 1.0 / 100.0, 0.0]]
-    )
-    matrix = np.zeros((4, 4))
-    matrix[0, 0] = 5.0 / 6.0
-    matrix[1, :2] = [-15.0 / 26.0, 5.0 / 6.0]
-    matrix[2, :3] = [215.0 / 54.0, -130.0 / 27.0, 5.0 / 6.0]
-    matrix[3, :] = [4007.0 / 6075.0, -31031.0 / 24300.0, -133.0 / 2700.0, 5.0 / 6.0]
+    generator = RK_SCHEMES["EDIRK43"]()
+    nodes, weights, matrix = generator.genCoeffs(embedded=True)
     ButcherTableauClass = ButcherTableauEmbedded
 
     @classmethod
@@ -596,14 +555,8 @@ class DIRK43_2(RungeKutta):
     Taken from [here](https://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods).
     """
 
-    nodes = np.array([0.5, 2.0 / 3.0, 0.5, 1.0])
-    weights = np.array([3.0 / 2.0, -3.0 / 2.0, 0.5, 0.5])
-    matrix = np.zeros((4, 4))
-    matrix[0, 0] = 0.5
-    matrix[1, :2] = [1.0 / 6.0, 0.5]
-    matrix[2, :3] = [-0.5, 0.5, 0.5]
-    matrix[3, :] = [3.0 / 2.0, -3.0 / 2.0, 0.5, 0.5]
-    ButcherTableauClass = ButcherTableau
+    generator = RK_SCHEMES["DIRK43"]()
+    nodes, weights, matrix = generator.genCoeffs()
 
 
 class EDIRK4(RungeKutta):
@@ -612,14 +565,8 @@ class EDIRK4(RungeKutta):
     [here](https://ntrs.nasa.gov/citations/20160005923), second one in eq. (216).
     """
 
-    nodes = np.array([0.0, 3.0 / 2.0, 7.0 / 5.0, 1.0])
-    weights = np.array([13.0, 84.0, -125.0, 70.0]) / 42.0
-    matrix = np.zeros((4, 4))
-    matrix[0, 0] = 0
-    matrix[1, :2] = [3.0 / 4.0, 3.0 / 4.0]
-    matrix[2, :3] = [447.0 / 675.0, -357.0 / 675.0, 855.0 / 675.0]
-    matrix[3, :] = [13.0 / 42.0, 84.0 / 42.0, -125.0 / 42.0, 70.0 / 42.0]
-    ButcherTableauClass = ButcherTableau
+    generator = RK_SCHEMES["EDIRK4"]()
+    nodes, weights, matrix = generator.genCoeffs()
 
 
 class ESDIRK53(RungeKutta):
@@ -628,58 +575,8 @@ class ESDIRK53(RungeKutta):
     Taken from [here](https://ntrs.nasa.gov/citations/20160005923)
     """
 
-    nodes = np.array(
-        [0, 4024571134387.0 / 7237035672548.0, 14228244952610.0 / 13832614967709.0, 1.0 / 10.0, 3.0 / 50.0, 1.0]
-    )
-    matrix = np.zeros((6, 6))
-    matrix[1, :2] = [3282482714977.0 / 11805205429139.0, 3282482714977.0 / 11805205429139.0]
-    matrix[2, :3] = [
-        606638434273.0 / 1934588254988,
-        2719561380667.0 / 6223645057524,
-        3282482714977.0 / 11805205429139.0,
-    ]
-    matrix[3, :4] = [
-        -651839358321.0 / 6893317340882,
-        -1510159624805.0 / 11312503783159,
-        235043282255.0 / 4700683032009.0,
-        3282482714977.0 / 11805205429139.0,
-    ]
-    matrix[4, :5] = [
-        -5266892529762.0 / 23715740857879,
-        -1007523679375.0 / 10375683364751,
-        521543607658.0 / 16698046240053.0,
-        514935039541.0 / 7366641897523.0,
-        3282482714977.0 / 11805205429139.0,
-    ]
-    matrix[5, :] = [
-        -6225479754948.0 / 6925873918471,
-        6894665360202.0 / 11185215031699,
-        -2508324082331.0 / 20512393166649,
-        -7289596211309.0 / 4653106810017.0,
-        39811658682819.0 / 14781729060964.0,
-        3282482714977.0 / 11805205429139,
-    ]
-
-    weights = np.array(
-        [
-            [
-                -6225479754948.0 / 6925873918471,
-                6894665360202.0 / 11185215031699.0,
-                -2508324082331.0 / 20512393166649,
-                -7289596211309.0 / 4653106810017,
-                39811658682819.0 / 14781729060964.0,
-                3282482714977.0 / 11805205429139,
-            ],
-            [
-                -2512930284403.0 / 5616797563683,
-                5849584892053.0 / 8244045029872,
-                -718651703996.0 / 6000050726475.0,
-                -18982822128277.0 / 13735826808854.0,
-                23127941173280.0 / 11608435116569.0,
-                2847520232427.0 / 11515777524847.0,
-            ],
-        ]
-    )
+    generator = RK_SCHEMES["ESDIRK53"]()
+    nodes, weights, matrix = generator.genCoeffs(embedded=True)
     ButcherTableauClass = ButcherTableauEmbedded
 
     @classmethod
@@ -693,58 +590,8 @@ class ESDIRK43(RungeKutta):
     Taken from [here](https://ntrs.nasa.gov/citations/20160005923)
     """
 
-    s2 = 2**0.5
-
-    nodes = np.array([0, 1 / 2, (2 - 2**0.5) / 4, 5 / 8, 26 / 25, 1.0])
-    matrix = np.zeros((6, 6))
-    matrix[1, :2] = [1 / 4, 1 / 4]
-    matrix[2, :3] = [
-        (1 - 2**0.5) / 8,
-        (1 - 2**0.5) / 8,
-        1 / 4,
-    ]
-    matrix[3, :4] = [
-        (5 - 7 * s2) / 64,
-        (5 - 7 * s2) / 64,
-        7 * (1 + s2) / 32,
-        1 / 4,
-    ]
-    matrix[4, :5] = [
-        (-13796 - 54539 * s2) / 125000,
-        (-13796 - 54539 * s2) / 125000,
-        (506605 + 132109 * s2) / 437500,
-        166 * (-97 + 376 * s2) / 109375,
-        1 / 4,
-    ]
-    matrix[5, :] = [
-        (1181 - 987 * s2) / 13782,
-        (1181 - 987 * s2) / 13782,
-        47 * (-267 + 1783 * s2) / 273343,
-        -16 * (-22922 + 3525 * s2) / 571953,
-        -15625 * (97 + 376 * s2) / 90749876,
-        1 / 4,
-    ]
-
-    weights = np.array(
-        [
-            [
-                (1181 - 987 * s2) / 13782,
-                (1181 - 987 * s2) / 13782,
-                47 * (-267 + 1783 * s2) / 273343,
-                -16 * (-22922 + 3525 * s2) / 571953,
-                -15625 * (97 + 376 * s2) / 90749876,
-                1 / 4,
-            ],
-            [
-                -480923228411.0 / 4982971448372,
-                -480923228411.0 / 4982971448372,
-                6709447293961.0 / 12833189095359,
-                3513175791894.0 / 6748737351361.0,
-                -498863281070.0 / 6042575550617.0,
-                2077005547802.0 / 8945017530137.0,
-            ],
-        ]
-    )
+    generator = RK_SCHEMES["ESDIRK43"]()
+    nodes, weights, matrix = generator.genCoeffs(embedded=True)
     ButcherTableauClass = ButcherTableauEmbedded
 
     @classmethod
@@ -757,79 +604,9 @@ class ARK548L2SAERK(RungeKutta):
     Explicit part of the ARK54 scheme.
     """
 
+    generator = RK_SCHEMES["ARK548L2SAERK"]()
+    nodes, weights, matrix = generator.genCoeffs(embedded=True)
     ButcherTableauClass = ButcherTableauEmbedded
-    weights = np.array(
-        [
-            [
-                -872700587467.0 / 9133579230613.0,
-                0.0,
-                0.0,
-                22348218063261.0 / 9555858737531.0,
-                -1143369518992.0 / 8141816002931.0,
-                -39379526789629.0 / 19018526304540.0,
-                32727382324388.0 / 42900044865799.0,
-                41.0 / 200.0,
-            ],
-            [
-                -975461918565.0 / 9796059967033.0,
-                0.0,
-                0.0,
-                78070527104295.0 / 32432590147079.0,
-                -548382580838.0 / 3424219808633.0,
-                -33438840321285.0 / 15594753105479.0,
-                3629800801594.0 / 4656183773603.0,
-                4035322873751.0 / 18575991585200.0,
-            ],
-        ]
-    )
-
-    nodes = np.array(
-        [
-            0,
-            41.0 / 100.0,
-            2935347310677.0 / 11292855782101.0,
-            1426016391358.0 / 7196633302097.0,
-            92.0 / 100.0,
-            24.0 / 100.0,
-            3.0 / 5.0,
-            1.0,
-        ]
-    )
-
-    matrix = np.zeros((8, 8))
-    matrix[1, 0] = 41.0 / 100.0
-    matrix[2, :2] = [367902744464.0 / 2072280473677.0, 677623207551.0 / 8224143866563.0]
-    matrix[3, :3] = [1268023523408.0 / 10340822734521.0, 0.0, 1029933939417.0 / 13636558850479.0]
-    matrix[4, :4] = [
-        14463281900351.0 / 6315353703477.0,
-        0.0,
-        66114435211212.0 / 5879490589093.0,
-        -54053170152839.0 / 4284798021562.0,
-    ]
-    matrix[5, :5] = [
-        14090043504691.0 / 34967701212078.0,
-        0.0,
-        15191511035443.0 / 11219624916014.0,
-        -18461159152457.0 / 12425892160975.0,
-        -281667163811.0 / 9011619295870.0,
-    ]
-    matrix[6, :6] = [
-        19230459214898.0 / 13134317526959.0,
-        0.0,
-        21275331358303.0 / 2942455364971.0,
-        -38145345988419.0 / 4862620318723.0,
-        -1.0 / 8.0,
-        -1.0 / 8.0,
-    ]
-    matrix[7, :7] = [
-        -19977161125411.0 / 11928030595625.0,
-        0.0,
-        -40795976796054.0 / 6384907823539.0,
-        177454434618887.0 / 12078138498510.0,
-        782672205425.0 / 8267701900261.0,
-        -69563011059811.0 / 9646580694205.0,
-        7356628210526.0 / 4942186776405.0,
-    ]
 
     @classmethod
     def get_update_order(cls):
@@ -841,44 +618,8 @@ class ARK548L2SAESDIRK(ARK548L2SAERK):
     Implicit part of the ARK54 scheme. Be careful with the embedded scheme. It seems that both schemes are order 5 as opposed to 5 and 4 as claimed. This may cause issues when doing adaptive time-stepping.
     """
 
-    matrix = np.zeros((8, 8))
-    matrix[1, :2] = [41.0 / 200.0, 41.0 / 200.0]
-    matrix[2, :3] = [41.0 / 400.0, -567603406766.0 / 11931857230679.0, 41.0 / 200.0]
-    matrix[3, :4] = [683785636431.0 / 9252920307686.0, 0.0, -110385047103.0 / 1367015193373.0, 41.0 / 200.0]
-    matrix[4, :5] = [
-        3016520224154.0 / 10081342136671.0,
-        0.0,
-        30586259806659.0 / 12414158314087.0,
-        -22760509404356.0 / 11113319521817.0,
-        41.0 / 200.0,
-    ]
-    matrix[5, :6] = [
-        218866479029.0 / 1489978393911.0,
-        0.0,
-        638256894668.0 / 5436446318841.0,
-        -1179710474555.0 / 5321154724896.0,
-        -60928119172.0 / 8023461067671.0,
-        41.0 / 200.0,
-    ]
-    matrix[6, :7] = [
-        1020004230633.0 / 5715676835656.0,
-        0.0,
-        25762820946817.0 / 25263940353407.0,
-        -2161375909145.0 / 9755907335909.0,
-        -211217309593.0 / 5846859502534.0,
-        -4269925059573.0 / 7827059040749.0,
-        41.0 / 200.0,
-    ]
-    matrix[7, :] = [
-        -872700587467.0 / 9133579230613.0,
-        0.0,
-        0.0,
-        22348218063261.0 / 9555858737531.0,
-        -1143369518992.0 / 8141816002931.0,
-        -39379526789629.0 / 19018526304540.0,
-        32727382324388.0 / 42900044865799.0,
-        41.0 / 200.0,
-    ]
+    generator_IMP = RK_SCHEMES["ARK548L2SAESDIRK"]()
+    matrix = generator_IMP.Q
 
 
 class ARK54(RungeKuttaIMEX):
@@ -906,67 +647,9 @@ class ARK548L2SAESDIRK2(RungeKutta):
     This method is part of the IMEX method ARK548L2SA.
     """
 
+    generator = RK_SCHEMES["ARK548L2SAESDIRK2"]()
+    nodes, weights, matrix = generator.genCoeffs(embedded=True)
     ButcherTableauClass = ButcherTableauEmbedded
-    gamma = 2.0 / 9.0
-    nodes = np.array(
-        [
-            0.0,
-            4.0 / 9.0,
-            6456083330201.0 / 8509243623797.0,
-            1632083962415.0 / 14158861528103.0,
-            6365430648612.0 / 17842476412687.0,
-            18.0 / 25.0,
-            191.0 / 200.0,
-            1.0,
-        ]
-    )
-
-    weights = np.array(
-        [
-            [
-                0.0,
-                0.0,
-                3517720773327.0 / 20256071687669.0,
-                4569610470461.0 / 17934693873752.0,
-                2819471173109.0 / 11655438449929.0,
-                3296210113763.0 / 10722700128969.0,
-                -1142099968913.0 / 5710983926999.0,
-                gamma,
-            ],
-            [
-                0.0,
-                0.0,
-                520639020421.0 / 8300446712847.0,
-                4550235134915.0 / 17827758688493.0,
-                1482366381361.0 / 6201654941325.0,
-                5551607622171.0 / 13911031047899.0,
-                -5266607656330.0 / 36788968843917.0,
-                1074053359553.0 / 5740751784926.0,
-            ],
-        ]
-    )
-
-    matrix = np.zeros((8, 8))
-    matrix[2, 1] = 2366667076620.0 / 8822750406821.0
-    matrix[3, 1] = -257962897183.0 / 4451812247028.0
-    matrix[3, 2] = 128530224461.0 / 14379561246022.0
-    matrix[4, 1] = -486229321650.0 / 11227943450093.0
-    matrix[4, 2] = -225633144460.0 / 6633558740617.0
-    matrix[4, 3] = 1741320951451.0 / 6824444397158.0
-    matrix[5, 1] = 621307788657.0 / 4714163060173.0
-    matrix[5, 2] = -125196015625.0 / 3866852212004.0
-    matrix[5, 3] = 940440206406.0 / 7593089888465.0
-    matrix[5, 4] = 961109811699.0 / 6734810228204.0
-    matrix[6, 1] = 2036305566805.0 / 6583108094622.0
-    matrix[6, 2] = -3039402635899.0 / 4450598839912.0
-    matrix[6, 3] = -1829510709469.0 / 31102090912115.0
-    matrix[6, 4] = -286320471013.0 / 6931253422520.0
-    matrix[6, 5] = 8651533662697.0 / 9642993110008.0
-
-    for i in range(matrix.shape[0]):
-        matrix[i, i] = gamma
-        matrix[i, 0] = matrix[i, 1]
-        matrix[7, i] = weights[0][i]
 
     @classmethod
     def get_update_order(cls):
@@ -979,36 +662,8 @@ class ARK548L2SAERK2(ARK548L2SAESDIRK2):
     This method is part of the IMEX method ARK548L2SA.
     """
 
-    matrix = np.zeros((8, 8))
-    matrix[2, 0] = 1.0 / 9.0
-    matrix[2, 1] = 1183333538310.0 / 1827251437969.0
-    matrix[3, 0] = 895379019517.0 / 9750411845327.0
-    matrix[3, 1] = 477606656805.0 / 13473228687314.0
-    matrix[3, 2] = -112564739183.0 / 9373365219272.0
-    matrix[4, 0] = -4458043123994.0 / 13015289567637.0
-    matrix[4, 1] = -2500665203865.0 / 9342069639922.0
-    matrix[4, 2] = 983347055801.0 / 8893519644487.0
-    matrix[4, 3] = 2185051477207.0 / 2551468980502.0
-    matrix[5, 0] = -167316361917.0 / 17121522574472.0
-    matrix[5, 1] = 1605541814917.0 / 7619724128744.0
-    matrix[5, 2] = 991021770328.0 / 13052792161721.0
-    matrix[5, 3] = 2342280609577.0 / 11279663441611.0
-    matrix[5, 4] = 3012424348531.0 / 12792462456678.0
-    matrix[6, 0] = 6680998715867.0 / 14310383562358.0
-    matrix[6, 1] = 5029118570809.0 / 3897454228471.0
-    matrix[6, 2] = 2415062538259.0 / 6382199904604.0
-    matrix[6, 3] = -3924368632305.0 / 6964820224454.0
-    matrix[6, 4] = -4331110370267.0 / 15021686902756.0
-    matrix[6, 5] = -3944303808049.0 / 11994238218192.0
-    matrix[7, 0] = 2193717860234.0 / 3570523412979.0
-    matrix[7, 1] = 2193717860234.0 / 3570523412979.0
-    matrix[7, 2] = 5952760925747.0 / 18750164281544.0
-    matrix[7, 3] = -4412967128996.0 / 6196664114337.0
-    matrix[7, 4] = 4151782504231.0 / 36106512998704.0
-    matrix[7, 5] = 572599549169.0 / 6265429158920.0
-    matrix[7, 6] = -457874356192.0 / 11306498036315.0
-
-    matrix[1, 0] = ARK548L2SAESDIRK2.nodes[1]
+    generator_EXP = RK_SCHEMES["ARK548L2SAERK2"]()
+    matrix = generator_EXP.Q
 
 
 class ARK548L2SA(RungeKuttaIMEX):

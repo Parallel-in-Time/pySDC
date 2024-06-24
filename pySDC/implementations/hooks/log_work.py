@@ -1,7 +1,7 @@
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class LogWork(hooks):
+class LogWork(Hooks):
     """
     Log the increment of all work counters in the problem between steps
     """
@@ -55,7 +55,7 @@ class LogWork(hooks):
             )
 
 
-class LogSDCIterations(hooks):
+class LogSDCIterations(Hooks):
     """
     Log the number of SDC iterations between steps.
     You can control the name in the stats via the class attribute ``name``.

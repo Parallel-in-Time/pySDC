@@ -2,8 +2,8 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import cg
 
-from pySDC.core.Errors import ParameterError, ProblemError
-from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.core.errors import ParameterError, ProblemError
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_mesh
 
@@ -12,7 +12,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_m
 
 
 # noinspection PyUnusedLocal
-class allencahn_fullyimplicit(ptype):
+class allencahn_fullyimplicit(Problem):
     r"""
     Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
 

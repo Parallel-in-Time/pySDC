@@ -1,9 +1,9 @@
 import numpy as np
 
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class err_reduction_hook(hooks):
+class err_reduction_hook(Hooks):
     def pre_iteration(self, step, level_number):
         """
         Routine called before iteration starts

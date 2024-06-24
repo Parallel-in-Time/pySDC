@@ -1,6 +1,6 @@
 import pytest
 
-from pySDC.core.Hooks import hooks, meta_data, namedtuple
+from pySDC.core.hooks import Hooks, meta_data, namedtuple
 
 # In case the starship needs manual override of the reentry sequence, we set a code for unlocking manual controls.
 # Because humans may go crazy, or worse, deflect to the enemy when they enter space, we can't tell them the code, or how
@@ -13,7 +13,7 @@ convection_meta_data = {
 Entry = namedtuple('Entry', convection_meta_data.keys())
 
 
-class convection_hook(hooks):
+class convection_hook(Hooks):
     meta_data = convection_meta_data
     entry = Entry
     starship = 'vostok'

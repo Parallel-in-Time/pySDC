@@ -2,11 +2,11 @@ import numpy as np
 import scipy.sparse as sp
 
 import pySDC.helpers.transfer_helper as th
-from pySDC.core.Errors import TransferError
-from pySDC.core.SpaceTransfer import space_transfer
+from pySDC.core.errors import TransferError
+from pySDC.core.space_transfer import SpaceTransfer
 
 
-class mesh_to_mesh(space_transfer):
+class mesh_to_mesh(SpaceTransfer):
     """
     Custom base_transfer class, implements Transfer.py
 

@@ -16,9 +16,9 @@ class _Pars(FrozenClass):
         self._freeze()
 
 
-class space_transfer(object):
+class SpaceTransfer(object):
     """
-    Abstract space_transfer class
+    Abstract SpaceTransfer class
 
     Attributes:
         params (__Pars): parameters given by the user

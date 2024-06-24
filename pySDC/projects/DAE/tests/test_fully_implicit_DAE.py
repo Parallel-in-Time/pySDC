@@ -6,7 +6,7 @@ import numpy as np
 def test_predict_main():
     from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-    from pySDC.core.Step import step
+    from pySDC.core.step import Step
 
     # initialize level parameters
     level_params = dict()
@@ -30,7 +30,7 @@ def test_predict_main():
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
 
-    S = step(description=description)
+    S = Step(description=description)
     L = S.levels[0]
     P = L.prob
     # set initial time in the status of the level
@@ -49,7 +49,7 @@ def test_predict_main():
     # expecting that random initialisation does not initialise to zero
     sweeper_params['initial_guess'] = 'random'
     description['sweeper_params'] = sweeper_params
-    S = step(description=description)
+    S = Step(description=description)
     L = S.levels[0]
     P = L.prob
     # set initial time in the status of the level
@@ -67,7 +67,7 @@ def test_predict_main():
 def test_residual_main():
     from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-    from pySDC.core.Step import step
+    from pySDC.core.step import Step
 
     # initialize level parameters
     level_params = dict()
@@ -93,7 +93,7 @@ def test_residual_main():
     # description['step_params'] = step_params
 
     # last_abs residual test
-    S = step(description=description)
+    S = Step(description=description)
     L = S.levels[0]
     P = L.prob
     # set reference values
@@ -120,7 +120,7 @@ def test_residual_main():
     level_params['residual_type'] = 'full_rel'
     description['level_params'] = level_params
 
-    S = step(description=description)
+    S = Step(description=description)
     L = S.levels[0]
     P = L.prob
     # set initial time in the status of the level
@@ -136,7 +136,7 @@ def test_residual_main():
     level_params['residual_type'] = 'last_rel'
     description['level_params'] = level_params
 
-    S = step(description=description)
+    S = Step(description=description)
     L = S.levels[0]
     P = L.prob
     # set initial time in the status of the level
@@ -153,7 +153,7 @@ def test_residual_main():
 def test_compute_end_point_main():
     from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-    from pySDC.core.Step import step
+    from pySDC.core.step import Step
 
     # initialize level parameters
     level_params = dict()
@@ -178,7 +178,7 @@ def test_compute_end_point_main():
     description['level_params'] = level_params
 
     # last_abs residual test
-    S = step(description=description)
+    S = Step(description=description)
     L = S.levels[0]
     P = L.prob
     # set initial time in the status of the level

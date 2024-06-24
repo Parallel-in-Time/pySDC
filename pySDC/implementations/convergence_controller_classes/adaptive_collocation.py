@@ -1,8 +1,8 @@
 import numpy as np
 
-from pySDC.core.Lagrange import LagrangeApproximation
-from pySDC.core.ConvergenceController import ConvergenceController, Status
-from pySDC.core.Collocation import CollBase
+from qmat.lagrange import LagrangeApproximation
+from pySDC.core.convergence_controller import ConvergenceController, Status
+from pySDC.core.collocation import CollBase
 
 
 class AdaptiveCollocation(ConvergenceController):

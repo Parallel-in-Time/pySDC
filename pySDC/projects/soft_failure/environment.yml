@@ -9,3 +9,6 @@ dependencies:
   - numpy
   - scipy>=0.17.1
   - matplotlib>=3.0
+  - pip
+  - pip:
+    - qmat>=0.1.8

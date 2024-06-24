@@ -1,4 +1,4 @@
-from pySDC.core.Sweeper import sweeper, _Pars
+from pySDC.core.sweeper import Sweeper, _Pars
 
 
 class Cache(object):
@@ -51,7 +51,7 @@ class Cache(object):
         return string
 
 
-class MultiStep(sweeper):
+class MultiStep(Sweeper):
     alpha = None
     beta = None
 
@@ -73,7 +73,7 @@ class MultiStep(sweeper):
             params (dict): parameter object
         """
         import logging
-        from pySDC.core.Collocation import CollBase
+        from pySDC.core.collocation import CollBase
 
         # set up logger
         self.logger = logging.getLogger('sweeper')

@@ -2,14 +2,14 @@
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit, allencahn_semiimplicit
 from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 from pySDC.projects.Resilience.hook import hook_collection, LogData
 from pySDC.projects.Resilience.strategies import merge_descriptions
 from pySDC.projects.Resilience.sweepers import imex_1st_order_efficient, generic_implicit_efficient
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pySDC.core.Errors import ConvergenceError
+from pySDC.core.errors import ConvergenceError
 
 
 def run_AC(
@@ -160,7 +160,7 @@ def plot_solution(stats):  # pragma: no cover
     plt.show()
 
 
-class LivePlot(hooks):  # pragma: no cover
+class LivePlot(Hooks):  # pragma: no cover
     def __init__(self):
         super().__init__()
         self.fig, self.axs = plt.subplots(1, 3, figsize=(12, 4))
@@ -217,7 +217,7 @@ class LivePlot(hooks):  # pragma: no cover
         plt.pause(1e-9)
 
 
-class LogRadius(hooks):
+class LogRadius(Hooks):
     @staticmethod
     def compute_radius(L):
         c = np.count_nonzero(L.u[0] > 0.0)

@@ -1,9 +1,9 @@
 import numpy as np
 
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class monitor(hooks):
+class monitor(Hooks):
     def __init__(self):
         """
         Initialization of Allen-Cahn monitoring

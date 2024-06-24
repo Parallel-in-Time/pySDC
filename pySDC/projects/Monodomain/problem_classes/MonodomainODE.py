@@ -1,14 +1,14 @@
 from pathlib import Path
 import logging
 import numpy as np
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.projects.Monodomain.datatype_classes.my_mesh import imexexp_mesh
 from pySDC.projects.Monodomain.problem_classes.space_discretizazions.Parabolic_DCT import Parabolic_DCT
 import pySDC.projects.Monodomain.problem_classes.ionicmodels.cpp as ionicmodels
 
 
-class MonodomainODE(ptype):
+class MonodomainODE(Problem):
     """
     A class for the discretization of the Monodomain equation. The Monodomain equation is a parabolic PDE composed of
     a reaction-diffusion equation coupled with an ODE system. The unknowns are the potential V and the ionic model variables (g_1,...,g_N).

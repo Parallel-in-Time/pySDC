@@ -7,13 +7,13 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import gmres, spsolve, cg
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.core.errors import ProblemError
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
-class GenericNDimFinDiff(ptype):
+class GenericNDimFinDiff(Problem):
     r"""
     Base class for finite difference spatial discretisation in :math:`N` dimensions
 

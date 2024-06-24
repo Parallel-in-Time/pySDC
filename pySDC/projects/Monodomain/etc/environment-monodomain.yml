@@ -24,3 +24,6 @@ dependencies:
   - mpich
   - tqdm
   - pymp-pypi
+  - pip
+  - pip:
+    - qmat>=0.1.8

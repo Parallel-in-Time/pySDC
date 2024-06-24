@@ -1,10 +1,10 @@
 import numpy as np
 
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
-class buck_converter(ptype):
+class buck_converter(Problem):
     r"""
     Example implementing the model of a buck converter, which is also called a step-down converter. The converter has two different
     states and each of this state can be expressed as a nonhomogeneous linear system of ordinary differential equations (ODEs)

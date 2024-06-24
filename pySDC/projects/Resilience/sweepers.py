@@ -1,7 +1,7 @@
 import numpy as np
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.core.Errors import ParameterError
+from pySDC.core.errors import ParameterError
 
 
 class efficient_sweeper:

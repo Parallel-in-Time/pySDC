@@ -13,11 +13,11 @@ def get_problem(nvars, xp, L, mpifft=False, spectral=False, x0=0, useGPU=False):
     Returns:
         Instance of pySDC problem class
     """
-    from pySDC.core.Problem import ptype
+    from pySDC.core.problem import Problem
     from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
     from pySDC.helpers.problem_helper import get_1d_grid
 
-    class DummyProblem(ptype):
+    class DummyProblem(Problem):
         dtype_u = mesh
         dtype_f = imex_mesh
 

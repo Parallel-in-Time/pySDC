@@ -1,7 +1,7 @@
 import numpy as np
 
-from pySDC.core.Lagrange import LagrangeApproximation
-from pySDC.core.ConvergenceController import ConvergenceController
+from qmat.lagrange import LagrangeApproximation
+from pySDC.core.convergence_controller import ConvergenceController
 
 
 class EstimatePolynomialError(ConvergenceController):
@@ -51,7 +51,7 @@ class EstimatePolynomialError(ConvergenceController):
         self.check_convergence = CheckConvergence.check_convergence
 
         if quad_type != 'GAUSS' and defaults['estimate_on_node'] > num_nodes:
-            from pySDC.core.Errors import ParameterError
+            from pySDC.core.errors import ParameterError
 
             raise ParameterError(
                 'You cannot interpolate with lower accuracy to the end point if the end point is a node!'

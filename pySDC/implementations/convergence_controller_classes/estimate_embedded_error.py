@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.core.ConvergenceController import ConvergenceController, Pars, Status
+from pySDC.core.convergence_controller import ConvergenceController, Pars, Status
 from pySDC.implementations.convergence_controller_classes.store_uold import StoreUOld
 
 from pySDC.implementations.sweeper_classes.Runge_Kutta import RungeKutta

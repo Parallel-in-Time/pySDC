@@ -7,7 +7,7 @@ Description
 Module containing utility classe(s) from which inherit some of the pySDC base
 classes.
 """
-from pySDC.core.Errors import ReadOnlyError
+from pySDC.core.errors import ReadOnlyError
 
 
 class _MetaRegisterParams(type):

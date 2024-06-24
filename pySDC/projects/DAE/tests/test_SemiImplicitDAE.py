@@ -56,7 +56,7 @@ def testPredict(initial_guess):
     from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE
     from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
     from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
-    from pySDC.core.Step import step
+    from pySDC.core.step import Step
 
     description, _ = getTestSetup(DiscontinuousTestDAE, SemiImplicitDAE, [])
 
@@ -72,7 +72,7 @@ def testPredict(initial_guess):
     level_params.update({'dt': 0.1})
     description.update({'level_params': level_params})
 
-    S = step(description=description)
+    S = Step(description=description)
     L = S.levels[0]
     P = L.prob
 
@@ -113,8 +113,8 @@ def testComputeResidual(residual_type):
 
     from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE
     from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
-    from pySDC.core.Step import step
-    from pySDC.core.Errors import ParameterError
+    from pySDC.core.step import Step
+    from pySDC.core.errors import ParameterError
 
     description, _ = getTestSetup(DiscontinuousTestDAE, SemiImplicitDAE, [])
 
@@ -131,7 +131,7 @@ def testComputeResidual(residual_type):
     level_params.update({'residual_type': residual_type})
     description.update({'level_params': level_params})
 
-    S = step(description=description)
+    S = Step(description=description)
     L = S.levels[0]
     P = L.prob
 
@@ -171,8 +171,8 @@ def testComputeEndpoint(quad_type):
 
     from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE
     from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
-    from pySDC.core.Step import step
-    from pySDC.core.Errors import ParameterError
+    from pySDC.core.step import Step
+    from pySDC.core.errors import ParameterError
 
     description, _ = getTestSetup(DiscontinuousTestDAE, SemiImplicitDAE, [])
 
@@ -190,11 +190,11 @@ def testComputeEndpoint(quad_type):
 
     if quad_type == 'RADAU-LEFT':
         with pytest.raises(ParameterError):
-            S = step(description=description)
+            S = Step(description=description)
             with pytest.raises(NotImplementedError):
                 S.levels[0].sweep.compute_end_point()
     else:
-        S = step(description=description)
+        S = Step(description=description)
 
         L = S.levels[0]
         P = L.prob
@@ -207,7 +207,7 @@ def testComputeEndpoint(quad_type):
 
         L.sweep.compute_end_point()
 
-        assert np.isclose(L.u[-1], L.uend), "Endpoint is not computed correctly!"
+        assert np.allclose(L.u[-1], L.uend), "Endpoint is not computed correctly!"
 
 
 @pytest.mark.base
@@ -261,9 +261,9 @@ def testCompareResults(M):
 
 
 @pytest.mark.base
-@pytest.mark.parametrize('case', [0, 1])
-@pytest.mark.parametrize('M', [2, 3])
 @pytest.mark.parametrize('QI', ['IE', 'LU'])
+@pytest.mark.parametrize('M', [2, 3])
+@pytest.mark.parametrize('case', [0, 1])
 def testOrderAccuracy(case, M, QI):
     r"""
     In this test, the order of accuracy of the ``SemiImplicitDAE`` sweeper is tested for an index-1 DAE

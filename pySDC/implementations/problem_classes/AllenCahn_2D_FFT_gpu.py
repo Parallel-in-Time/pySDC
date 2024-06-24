@@ -1,12 +1,12 @@
 import cupy as cp
 import numpy as np
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.errors import ProblemError
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh
 
 
-class allencahn2d_imex(ptype):  # pragma: no cover
+class allencahn2d_imex(Problem):  # pragma: no cover
     r"""
     Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
 

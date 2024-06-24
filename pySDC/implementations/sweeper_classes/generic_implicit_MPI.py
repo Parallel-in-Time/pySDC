@@ -1,11 +1,11 @@
 from mpi4py import MPI
 
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.core.Sweeper import sweeper, ParameterError
+from pySDC.core.sweeper import Sweeper, ParameterError
 import logging
 
 
-class SweeperMPI(sweeper):
+class SweeperMPI(Sweeper):
     """
     MPI based sweeper where each rank administers one collocation node. Adapt sweepers to MPI by use of multiple inheritance.
     See for example the `generic_implicit_MPI` sweeper, which has a class definition:

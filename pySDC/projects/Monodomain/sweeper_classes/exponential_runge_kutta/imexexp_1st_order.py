@@ -1,13 +1,13 @@
 import numpy as np
 
-from pySDC.core.Sweeper import sweeper
-from pySDC.core.Errors import CollocationError, ParameterError
-from pySDC.core.Collocation import CollBase
+from pySDC.core.sweeper import Sweeper
+from pySDC.core.errors import CollocationError, ParameterError
+from pySDC.core.collocation import CollBase
 import numdifftools.fornberg as fornberg
 import scipy
 
 
-class imexexp_1st_order(sweeper):
+class imexexp_1st_order(Sweeper):
     """
     Custom sweeper class, implements Sweeper.py
 
@@ -32,7 +32,7 @@ class imexexp_1st_order(sweeper):
         super(imexexp_1st_order, self).__init__(params)
 
         # IMEX integration matrices
-        self.QI = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.QI)
+        self.QI = self.get_Qdelta_implicit(qd_type=self.params.QI)
         self.delta = np.diagonal(self.QI)[1:]
 
         # Compute weights w such that PiQ^(k)(0) = sum_{j=0}^{M-1} w[k,j]*Q[j], k=0,...,M-1

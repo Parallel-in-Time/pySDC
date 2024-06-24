@@ -1,8 +1,8 @@
 import numpy as np
 import logging
 
-from pySDC.core.Sweeper import sweeper, _Pars
-from pySDC.core.Errors import ParameterError
+from pySDC.core.sweeper import Sweeper, _Pars
+from pySDC.core.errors import ParameterError
 from pySDC.implementations.datatype_classes.particles import particles, fields, acceleration
 from pySDC.implementations.sweeper_classes.Runge_Kutta import ButcherTableau
 from copy import deepcopy

@@ -17,7 +17,7 @@ Entry = namedtuple('Entry', meta_data.keys())
 
 
 # noinspection PyUnusedLocal,PyShadowingBuiltins,PyShadowingNames
-class hooks(object):
+class Hooks(object):
     """
     Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)
 

@@ -1,8 +1,8 @@
 import pySDC.helpers.plot_helper as plt_helper
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class output(hooks):
+class output(Hooks):
     def __init__(self):
         """
         Initialization of Allen-Cahn monitoring

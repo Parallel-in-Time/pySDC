@@ -1,11 +1,11 @@
 import numpy as np
 
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.particles import particles, acceleration
 
 
 # noinspection PyUnusedLocal
-class outer_solar_system(ptype):
+class outer_solar_system(Problem):
     r"""
     The :math:`N`-body problem describes the mutual influence of the motion of :math:`N` bodies. Formulation of the problem is
     based on Newton's second law. Therefore, the :math:`N`-body problem is formulated as

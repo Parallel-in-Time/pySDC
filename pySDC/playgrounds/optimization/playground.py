@@ -1,4 +1,4 @@
-from pySDC.core.Sweeper import sweeper
+from pySDC.core.sweeper import Sweeper
 from matplotlib import pyplot as plt
 import scipy.optimize as opt
 import numpy as np
@@ -17,11 +17,11 @@ ldt_list = np.arange(-2, 0.1, 0.1)
 results = {}
 
 for prec in prec_list:
-    sw = sweeper({'collocation_class': CollGaussRadau_Right, 'num_nodes': M})
+    sw = Sweeper({'collocation_class': CollGaussRadau_Right, 'num_nodes': M})
     if prec != 'EE':
-        QDelta = sw.get_Qdelta_implicit(sw.coll, prec)[1:, 1:]
+        QDelta = sw.get_Qdelta_implicit(prec)[1:, 1:]
     else:
-        QDelta = sw.get_Qdelta_explicit(sw.coll, prec)[1:, 1:]
+        QDelta = sw.get_Qdelta_explicit(prec)[1:, 1:]
     QDL = np.tril(QDelta, -1)
     QDD = np.diag(np.diag(QDelta))
     Q = sw.coll.Qmat[1:, 1:]
@@ -49,7 +49,7 @@ for prec in prec_list:
     for i, ldt in enumerate(ldt_list):
 
         R = np.linalg.matrix_power(ldt * np.linalg.inv(np.eye(M) - ldt * QDelta).dot(Q - QDelta), 1)
-        result_Rnorm[i] = np.linalg.norm(R, np.infty)
+        result_Rnorm[i] = np.linalg.norm(R, np.inf)
         result_Rrho[i] = np.amax(abs(np.linalg.eigvals(R)))
         # result_est[i] = abs(ldt) * np.linalg.norm(np.linalg.inv(np.eye(M) - ldt * QDelta), np.inf) * np.linalg.norm(Q - QDelta, np.inf)
         # result_est[i] = abs(ldt) * np.linalg.norm(np.linalg.inv(np.eye(M) - ldt * QDD), np.inf) * np.linalg.norm(np.linalg.inv(np.eye(M) - ldt * np.linalg.inv(np.eye(M) - ldt * QDD).dot(QDL)), np.inf) * np.linalg.norm(Q - QDelta, np.inf)

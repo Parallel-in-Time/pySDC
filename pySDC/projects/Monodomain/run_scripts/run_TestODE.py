@@ -5,7 +5,7 @@ import os
 
 from tqdm import tqdm
 
-from pySDC.core.Errors import ParameterError
+from pySDC.core.errors import ParameterError
 
 from pySDC.projects.Monodomain.problem_classes.TestODE import MultiscaleTestODE
 from pySDC.projects.Monodomain.transfer_classes.TransferVectorOfDCTVectors import TransferVectorOfDCTVectors

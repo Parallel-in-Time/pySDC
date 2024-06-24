@@ -1,12 +1,12 @@
 import numpy as np
 from scipy.integrate import solve_ivp
 
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 # noinspection PyUnusedLocal
-class piline(ptype):
+class piline(Problem):
     r"""
     Example implementing the model of the piline. It serves as a transmission line in an energy grid. The problem of simulating the
     piline consists of three ordinary differential equations (ODEs) with nonhomogeneous part:

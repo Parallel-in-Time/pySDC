@@ -4,7 +4,7 @@ from mpi4py import MPI
 import logging
 import os
 
-from pySDC.core.Errors import ParameterError
+from pySDC.core.errors import ParameterError
 
 from pySDC.projects.Monodomain.problem_classes.MonodomainODE import MultiscaleMonodomainODE
 from pySDC.projects.Monodomain.hooks.HookClass_pde import pde_hook

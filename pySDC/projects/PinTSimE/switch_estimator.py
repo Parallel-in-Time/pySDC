@@ -1,11 +1,11 @@
 import numpy as np
 import scipy as sp
 
-from pySDC.core.Errors import ParameterError
-from pySDC.core.Collocation import CollBase
-from pySDC.core.ConvergenceController import ConvergenceController, Status
+from pySDC.core.errors import ParameterError
+from pySDC.core.collocation import CollBase
+from pySDC.core.convergence_controller import ConvergenceController, Status
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
-from pySDC.core.Lagrange import LagrangeApproximation
+from qmat.lagrange import LagrangeApproximation
 
 
 class SwitchEstimator(ConvergenceController):

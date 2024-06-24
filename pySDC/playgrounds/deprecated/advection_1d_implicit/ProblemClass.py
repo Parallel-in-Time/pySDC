@@ -2,12 +2,12 @@ import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg as LA
 
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes import mesh
 from pySDC.playgrounds.deprecated.advection_1d_implicit.getFDMatrix import getFDMatrix
 
 
-class advection(ptype):
+class advection(Problem):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 

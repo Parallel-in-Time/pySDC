@@ -2,13 +2,13 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import spsolve
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.core.errors import ProblemError
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_mesh
 
 
-class allencahn_front_fullyimplicit(ptype):
+class allencahn_front_fullyimplicit(Problem):
     r"""
     Example implementing the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet
     boundary conditions
@@ -475,7 +475,7 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
         return f
 
 
-class allencahn_periodic_fullyimplicit(ptype):
+class allencahn_periodic_fullyimplicit(Problem):
     r"""
     Example implementing the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions
 

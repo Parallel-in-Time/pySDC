@@ -1,10 +1,10 @@
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 import pickle
 import os
 import numpy as np
 
 
-class LogSolution(hooks):
+class LogSolution(Hooks):
     """
     Store the solution at the end of each step as "u".
     """
@@ -36,7 +36,7 @@ class LogSolution(hooks):
         )
 
 
-class LogSolutionAfterIteration(hooks):
+class LogSolutionAfterIteration(Hooks):
     """
     Store the solution at the end of each iteration as "u".
     """
@@ -68,7 +68,7 @@ class LogSolutionAfterIteration(hooks):
         )
 
 
-class LogToFile(hooks):
+class LogToFile(Hooks):
     r"""
     Hook for logging the solution to file after the step using pickle.
 

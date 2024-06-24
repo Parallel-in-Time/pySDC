@@ -3,14 +3,14 @@ import cupy as cp
 import cupyx.scipy.sparse as csp
 from cupyx.scipy.sparse.linalg import cg  # , spsolve, gmres, minres
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.errors import ProblemError
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh, comp2_cupy_mesh
 
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
 
 
-class allencahn_fullyimplicit(ptype):  # pragma: no cover
+class allencahn_fullyimplicit(Problem):  # pragma: no cover
     r"""
     Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
 

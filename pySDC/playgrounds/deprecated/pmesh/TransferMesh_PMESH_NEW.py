@@ -1,10 +1,10 @@
-from pySDC.core.Errors import TransferError
-from pySDC.core.SpaceTransfer import space_transfer
+from pySDC.core.errors import TransferError
+from pySDC.core.space_transfer import SpaceTransfer
 from pySDC.playgrounds.pmesh.PMESH_datatype_NEW import pmesh_datatype, rhs_imex_pmesh
 import time
 
 
-class pmesh_to_pmesh(space_transfer):
+class pmesh_to_pmesh(SpaceTransfer):
     """
     Custon base_transfer class, implements Transfer.py
 

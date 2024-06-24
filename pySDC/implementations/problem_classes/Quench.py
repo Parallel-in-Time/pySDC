@@ -3,14 +3,14 @@ import scipy.sparse as sp
 from scipy.sparse.linalg import spsolve, gmres
 from scipy.linalg import inv
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.core.errors import ProblemError
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 # noinspection PyUnusedLocal
-class Quench(ptype):
+class Quench(Problem):
     """
     This is a toy problem [1]_ to emulate a magnet that has been cooled to temperatures where superconductivity is possible.
     However, there is a leak! Some point in the domain is constantly heated and when this has heated up its environment

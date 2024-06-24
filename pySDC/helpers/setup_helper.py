@@ -9,8 +9,8 @@ def generate_description(problem_class, **kwargs):
     Returns:
         dict: A description object for running pySDC
     """
-    from pySDC.core.Level import _Pars as level_params
-    from pySDC.core.Step import _Pars as step_params
+    from pySDC.core.level import _Pars as level_params
+    from pySDC.core.step import _Pars as step_params
 
     description = {
         'level_params': {},

@@ -146,7 +146,7 @@ def test_capture_errors_and_warnings(caplog, stop_at_nan):
     Test if errors and warnings are raised correctly.
     """
     import numpy as np
-    from pySDC.core.Errors import ProblemError
+    from pySDC.core.errors import ProblemError
     from pySDC.implementations.problem_classes.AllenCahn_1D_FD import (
         allencahn_front_fullyimplicit,
         allencahn_front_semiimplicit,

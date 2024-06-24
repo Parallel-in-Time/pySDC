@@ -1,10 +1,10 @@
 import scipy.fft as fft
 
-from pySDC.core.SpaceTransfer import space_transfer
+from pySDC.core.space_transfer import SpaceTransfer
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
-class DCT_to_DCT(space_transfer):
+class DCT_to_DCT(SpaceTransfer):
     """
     Class to transfer data between two meshes using DCT.
     Restriction is performed by zeroing out high frequency modes, while prolongation is done by zero-padding.

@@ -1,8 +1,8 @@
-from pySDC.core.BaseTransfer import base_transfer
-from pySDC.core.Errors import UnlockError
+from pySDC.core.base_transfer import BaseTransfer
+from pySDC.core.errors import UnlockError
 
 
-class base_transfer_mass(base_transfer):
+class base_transfer_mass(BaseTransfer):
     """
     Standard base_transfer class
 

@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.core.Problem import WorkCounter
+from pySDC.core.problem import WorkCounter
 from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
 
 
