@@ -64,7 +64,7 @@ Features
   `petsc4py <https://bitbucket.org/petsc/petsc4py>`_\ )
 * Continuous integration via `GitHub
   Actions <https://github.com/Parallel-in-Time/pySDC/actions>`_ and
-  `Gitlab CI <https://gitlab.hzdr.de/r.speck/pysdc/-/pipelines>`_
+  `Gitlab CI <https://gitlab.hzdr.de/r.speck/pysdc/-/pipelines>`_ (through the `GitHub2Gitlab Action <https://github.com/jakob-fritz/github2lab_action>`_\ )
 * Fully compatible with Python 3.8 - 3.10 (and mostly up to 3.12), runs at least on Ubuntu
 
 Getting started
