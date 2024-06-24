@@ -65,7 +65,7 @@ class CollBase(object):
                 nNodes=num_nodes, nodeType=node_type, quadType=quad_type, tLeft=tleft, tRight=tright
             )
         except Exception as e:
-            raise CollocationError(f"could not instantiate qmat generator, got error : {e}")
+            raise CollocationError(f"could not instantiate qmat generator, got error: {e}")
 
         # Set base attributes
         self.num_nodes = num_nodes
@@ -89,7 +89,7 @@ class CollBase(object):
 
         S = np.zeros([num_nodes + 1, num_nodes + 1], dtype=float)
         S[1:, 1:] = super(self.generator.__class__, self.generator).S
-        # Note : qmat redefines the S matrix for collocation with integrals,
+        # Note: qmat redefines the S matrix for collocation with integrals,
         # instead of differences of the Q matrix coefficients.
         # This does not passes the pySDC tests ... however the default S computation
         # in qmat uses Q matrix coefficients differences, and that's what we
