@@ -24,7 +24,7 @@ class _Pars(FrozenClass):
 
 class Sweeper(object):
     """
-    Base abstract sweeper class, provides two base methods to generate QDelta matrices :
+    Base abstract sweeper class, provides two base methods to generate QDelta matrices:
 
     - get_Qdelta_implicit(qd_type):
         Returns a (pySDC-type) QDelta matrix of **implicit type**,
