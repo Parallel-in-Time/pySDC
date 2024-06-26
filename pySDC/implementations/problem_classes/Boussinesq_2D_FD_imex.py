@@ -181,7 +181,7 @@ class boussinesq_2d_imex(Problem):
             self.Id - factor * self.M,
             b,
             x0=u0.flatten(),
-            tol=self.gmres_tol_limit,
+            rtol=self.gmres_tol_limit,
             restart=self.gmres_restart,
             maxiter=self.gmres_maxiter,
             atol=0,
