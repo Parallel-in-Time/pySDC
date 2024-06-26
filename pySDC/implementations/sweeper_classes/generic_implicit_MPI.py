@@ -220,7 +220,7 @@ class generic_implicit_MPI(SweeperMPI, generic_implicit):
         # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
 
         # implicit solve with prefactor stemming from the diagonal of Qd
-        L.u[self.rank + 1] = P.solve_system(
+        L.u[self.rank + 1][:] = P.solve_system(
             rhs,
             L.dt * self.QI[self.rank + 1, self.rank + 1],
             L.u[self.rank + 1],
