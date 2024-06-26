@@ -219,7 +219,7 @@
 
             <span class="c1"># newton update: u1 = u0 - g/dg</span>
             <span class="n">u</span> <span class="o">-=</span> <span class="n">spsolve</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
-            <span class="c1"># u -= gmres(dg, g, x0=z, tol=self.lin_tol)[0]</span>
+            <span class="c1"># u -= gmres(dg, g, x0=z, rtol=self.lin_tol)[0]</span>
             <span class="c1"># increase iteration count</span>
             <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]()</span>
@@ -490,7 +490,7 @@
             <span class="c1"># newton update: u1 = u0 - g/dg</span>
             <span class="n">u</span> <span class="o">-=</span> <span class="n">spsolve</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
             <span class="c1"># For some reason, doing cg or gmres does not work so well here...</span>
-            <span class="c1"># u -= cg(dg, g, x0=z, tol=self.lin_tol)[0]</span>
+            <span class="c1"># u -= cg(dg, g, x0=z, rtol=self.lin_tol)[0]</span>
             <span class="c1"># increase iteration count</span>
             <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]()</span>
@@ -702,7 +702,7 @@
 
             <span class="c1"># newton update: u1 = u0 - g/dg</span>
             <span class="n">u</span> <span class="o">-=</span> <span class="n">spsolve</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
-            <span class="c1"># u -= gmres(dg, g, x0=z, tol=self.lin_tol)[0]</span>
+            <span class="c1"># u -= gmres(dg, g, x0=z, rtol=self.lin_tol)[0]</span>
             <span class="c1"># increase iteration count</span>
             <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]()</span>
@@ -1010,7 +1010,7 @@
 
             <span class="c1"># newton update: u1 = u0 - g/dg</span>
             <span class="n">u</span> <span class="o">-=</span> <span class="n">spsolve</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
-            <span class="c1"># u -= gmres(dg, g, x0=z, tol=self.lin_tol)[0]</span>
+            <span class="c1"># u -= gmres(dg, g, x0=z, rtol=self.lin_tol)[0]</span>
             <span class="c1"># increase iteration count</span>
             <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]()</span>
