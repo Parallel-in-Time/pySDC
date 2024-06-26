@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.optimize import newton_krylov
-from scipy.optimize.nonlin import NoConvergence
+from scipy.optimize import NoConvergence
 
 from pySDC.core.errors import ProblemError
 from pySDC.core.problem import WorkCounter
