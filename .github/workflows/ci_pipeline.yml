@@ -39,7 +39,7 @@ jobs:
       fail-fast: false
       matrix:
         env: ['base', 'fenics', 'mpi4py', 'petsc', 'pytorch']
-        python: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python: ['3.9', '3.10', '3.11', '3.12']
     defaults:
       run:
         shell: bash -l {0}
@@ -96,7 +96,7 @@ jobs:
           - Second_orderSDC
           - soft_failure
           - TOMS
-        python: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python: ['3.9', '3.10', '3.11', '3.12']
         exclude:
           - env: parallelSDC
             python: '3.11'

@@ -176,7 +176,7 @@ class allencahn_front_fullyimplicit(Problem):
 
             # newton update: u1 = u0 - g/dg
             u -= spsolve(dg, g)
-            # u -= gmres(dg, g, x0=z, tol=self.lin_tol)[0]
+            # u -= gmres(dg, g, x0=z, rtol=self.lin_tol)[0]
             # increase iteration count
             n += 1
             self.work_counters['newton']()
@@ -426,7 +426,7 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
             # newton update: u1 = u0 - g/dg
             u -= spsolve(dg, g)
             # For some reason, doing cg or gmres does not work so well here...
-            # u -= cg(dg, g, x0=z, tol=self.lin_tol)[0]
+            # u -= cg(dg, g, x0=z, rtol=self.lin_tol)[0]
             # increase iteration count
             n += 1
             self.work_counters['newton']()
@@ -629,7 +629,7 @@ class allencahn_periodic_fullyimplicit(Problem):
 
             # newton update: u1 = u0 - g/dg
             u -= spsolve(dg, g)
-            # u -= gmres(dg, g, x0=z, tol=self.lin_tol)[0]
+            # u -= gmres(dg, g, x0=z, rtol=self.lin_tol)[0]
             # increase iteration count
             n += 1
             self.work_counters['newton']()
@@ -910,7 +910,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
 
             # newton update: u1 = u0 - g/dg
             u -= spsolve(dg, g)
-            # u -= gmres(dg, g, x0=z, tol=self.lin_tol)[0]
+            # u -= gmres(dg, g, x0=z, rtol=self.lin_tol)[0]
             # increase iteration count
             n += 1
             self.work_counters['newton']()

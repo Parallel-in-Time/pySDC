@@ -186,7 +186,7 @@ class allencahn_fullyimplicit(Problem):
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
             u -= cg(
-                dg, g, x0=z, tol=self.lin_tol, maxiter=self.lin_maxiter, atol=0, callback=self.work_counters['linear']
+                dg, g, x0=z, rtol=self.lin_tol, maxiter=self.lin_maxiter, atol=0, callback=self.work_counters['linear']
             )[0]
             # increase iteration count
             n += 1
@@ -339,7 +339,7 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
             Id - factor * self.A,
             rhs.flatten(),
             x0=u0.flatten(),
-            tol=self.lin_tol,
+            rtol=self.lin_tol,
             maxiter=self.lin_maxiter,
             atol=0,
             callback=callback,
@@ -468,7 +468,7 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
-            u -= cg(dg, g, x0=z, tol=self.lin_tol, atol=0)[0]
+            u -= cg(dg, g, x0=z, rtol=self.lin_tol, atol=0)[0]
             # increase iteration count
             n += 1
             # print(n, res)
@@ -564,7 +564,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
             Id - factor * self.A,
             rhs.flatten(),
             x0=u0.flatten(),
-            tol=self.lin_tol,
+            rtol=self.lin_tol,
             maxiter=self.lin_maxiter,
             atol=0,
             callback=callback,
@@ -621,7 +621,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
-            u -= cg(dg, g, x0=z, tol=self.lin_tol, atol=0)[0]
+            u -= cg(dg, g, x0=z, rtol=self.lin_tol, atol=0)[0]
             # increase iteration count
             n += 1
             # print(n, res)
@@ -732,7 +732,7 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
                 dg,
                 g,
                 x0=z,
-                tol=self.lin_tol,
+                rtol=self.lin_tol,
                 atol=0,
             )[0]
             # increase iteration count

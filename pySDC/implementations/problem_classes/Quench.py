@@ -345,7 +345,7 @@ class Quench(Problem):
                     G,
                     x0=zero,
                     M=M,
-                    tol=self.lintol,
+                    rtol=self.lintol,
                     maxiter=self.liniter,
                     atol=0,
                     callback=self.work_counters['linear'],

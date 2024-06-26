@@ -34,7 +34,11 @@ class StoreUOld(ConvergenceController):
             None
         """
         for L in S.levels:
-            L.uold[:] = L.u[:]
+            for i in range(len(L.u)):
+                if L.u[i] is not None:
+                    L.uold[i] = L.prob.dtype_u(L.u[i])
+                else:
+                    L.uold[i] = None
 
         return None
 
