@@ -23,6 +23,14 @@ def test_frozen_class():
     me.add_attr('foo')
     assert len(Dummy.attrs) == 1, 'Attribute was added too many times'
 
+    class Dummy2(FrozenClass):
+        pass
+
+    Dummy2.add_attr('bar')
+    you = Dummy2()
+    you.bar = 5
+    assert me.bar is None, 'Attribute was set across classes'
+
 
 if __name__ == '__main__':
     test_frozen_class()
