@@ -21,7 +21,7 @@ def test_frozen_class():
     assert me.foo is None, 'Attribute persists after reinstantiation'
 
     me.add_attr('foo')
-    assert len(Dummy.attrs) == 1, 'Attribute was added too many times'
+    assert Dummy.attrs.count('foo') == 1, 'Attribute was added too many times'
 
     class Dummy2(FrozenClass):
         pass
