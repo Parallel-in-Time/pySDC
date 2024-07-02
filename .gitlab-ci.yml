@@ -73,6 +73,7 @@ test_JUWELS:
       - sbatch.err
       - sbatch.out
   before_script:
+    - bash etc/check_node_avail.sh
     - mkdir -p benchmarks
     - module --force purge
     - module load Stages/2024
