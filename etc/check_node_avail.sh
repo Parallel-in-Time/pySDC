@@ -18,6 +18,6 @@ if [ "$part_up" = "up" ] && [ "$nodes_avail" != "0/0" ] ; then {
     exit 0
 } else {
     echo "Partition down or no nodes available"
-    exit 100
+    exit 404
 }
 fi

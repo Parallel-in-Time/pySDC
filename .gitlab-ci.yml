@@ -65,18 +65,19 @@ test_JUWELS:
     - shell
   allow_failure:
     exit_codes:
-      - 100 # When partition is down or nodes of paration are not available
+      - 404
   parallel:
     matrix:
       - SHELL_SCRIPT: ['benchmark', 'cupy']
   artifacts:
-    when: always
+    # when: always
     paths:
       - coverage_*.dat
       - sbatch.err
       - sbatch.out
   before_script:
     - bash etc/check_node_avail.sh
+    - echo $?
     - mkdir -p benchmarks
     - module --force purge
     - module load Stages/2024
