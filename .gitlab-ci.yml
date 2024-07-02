@@ -63,6 +63,9 @@ test_JUWELS:
     - juwels
     - login
     - shell
+  allow_failure:
+    exit_codes:
+      - 100 # When partition is down or nodes of paration are not available
   parallel:
     matrix:
       - SHELL_SCRIPT: ['benchmark', 'cupy']
