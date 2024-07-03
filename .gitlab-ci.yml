@@ -76,8 +76,6 @@ test_JUWELS:
       - sbatch.err
       - sbatch.out
   before_script:
-    - bash etc/check_node_avail.sh || PARTITION_AVAIL=$?
-    - if [ -n "$PARTITION_AVAIL" ] ; then exit $PARTITION_AVAIL ; fi
     - mkdir -p benchmarks
     - module --force purge
     - module load Stages/2024
@@ -90,6 +88,8 @@ test_JUWELS:
     - jutil env activate -p ${JUWELS_PROJECT}
     - source $SCRATCH/.venv/pySDC/bin/activate
   script:
+    - bash etc/check_node_avail.sh || PARTITION_AVAIL=$?
+    - if [ -n "$PARTITION_AVAIL" ] ; then exit $PARTITION_AVAIL ; fi
     # - touch benchmarks/output.json
     - echo $SYSTEMNAME
     - sbatch --wait etc/juwels_${SHELL_SCRIPT}.sh
