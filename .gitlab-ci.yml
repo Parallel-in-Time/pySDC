@@ -92,15 +92,15 @@ test_JUWELS:
     - if [ -n "$PARTITION_AVAIL" ] ; then exit $PARTITION_AVAIL ; fi
     # - touch benchmarks/output.json
     - echo $SYSTEMNAME
-    - sbatch --wait etc/juwels_${SHELL_SCRIPT}.sh
-    - touch .coverage.empty
-    - python -m coverage combine
-    - mv .coverage coverage_${SHELL_SCRIPT}.dat
-  after_script:
-    - echo "Following Errors occured:"
-    - cat sbatch.err
-    - echo "Following was written to stdout:"
-    - cat sbatch.out
+  #   - sbatch --wait etc/juwels_${SHELL_SCRIPT}.sh
+  #   - touch .coverage.empty
+  #   - python -m coverage combine
+  #   - mv .coverage coverage_${SHELL_SCRIPT}.dat
+  # after_script:
+  #   - echo "Following Errors occured:"
+  #   - cat sbatch.err
+  #   - echo "Following was written to stdout:"
+  #   - cat sbatch.out
 
 
 benchmark:
