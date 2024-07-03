@@ -68,7 +68,7 @@ def run(dt, restol, maxiter, M, QI, problem, sweeper, t0, Tend, hook_class):
 
     # initialize step parameters
     step_params = {
-        'maxiter': 60,
+        'maxiter': maxiter,
     }
 
     # initialize controller parameters
