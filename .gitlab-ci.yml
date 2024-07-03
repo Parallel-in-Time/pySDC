@@ -65,7 +65,7 @@ test_JUWELS:
     - shell
   allow_failure:
     exit_codes:
-      - 404
+      - 100
   parallel:
     matrix:
       - SHELL_SCRIPT: ['benchmark', 'cupy']
@@ -76,8 +76,8 @@ test_JUWELS:
       - sbatch.err
       - sbatch.out
   before_script:
-    - bash etc/check_node_avail.sh
-    - echo $?
+    - bash etc/check_node_avail.sh || PARTITION_AVAIL=$?
+    - if [ "$PARTITION_AVAIL" != 0 ] ; then exit $PARTITION_AVAIL ; fi
     - mkdir -p benchmarks
     - module --force purge
     - module load Stages/2024
