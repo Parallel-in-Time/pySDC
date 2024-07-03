@@ -77,7 +77,7 @@ test_JUWELS:
       - sbatch.out
   before_script:
     - bash etc/check_node_avail.sh || PARTITION_AVAIL=$?
-    - if [ "$PARTITION_AVAIL" != 0 ] ; then exit $PARTITION_AVAIL ; fi
+    - if [ -n "$PARTITION_AVAIL" ] ; then exit $PARTITION_AVAIL ; fi
     - mkdir -p benchmarks
     - module --force purge
     - module load Stages/2024
