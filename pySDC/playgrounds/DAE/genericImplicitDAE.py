@@ -2,6 +2,82 @@ from pySDC.implementations.sweeper_classes.generic_implicit import generic_impli
 from pySDC.core.errors import ParameterError
 
 
+class genericImplicitOriginal(generic_implicit):
+    r"""
+    This class is only intended for the use inside the DAE playground. Since no additional attribute should be stored in the
+    parent class, inheritance is used to overload.
+    """
+
+    def __init__(self, params):
+        """Initialization routine"""
+
+        if 'QI' not in params:
+            params['QI'] = 'IE'
+
+        # call parent's initialization routine
+        super().__init__(params)
+
+        # get QI matrix
+        self.QI = self.get_Qdelta_implicit(qd_type=self.params.QI)
+
+        self.residual_components = []
+
+    def compute_residual(self, stage=''):
+        """
+        Computation of the residual using the collocation matrix Q
+
+        Args:
+            stage (str): The current stage of the step the level belongs to
+        """
+
+        # get current level and problem description
+        L = self.level
+
+        # Check if we want to skip the residual computation to gain performance
+        # Keep in mind that skipping any residual computation is likely to give incorrect outputs of the residual!
+        if stage in self.params.skip_residual_computation:
+            L.status.residual = 0.0 if L.status.residual is None else L.status.residual
+            return None
+
+        # check if there are new values (e.g. from a sweep)
+        # assert L.status.updated
+
+        # compute the residual for each node
+
+        # build QF(u)
+        res_norm = []
+        res = self.integrate()
+        for m in range(self.coll.num_nodes):
+            res[m] += L.u[0] - L.u[m + 1]
+            # add tau if associated
+            if L.tau[m] is not None:
+                res[m] += L.tau[m]
+            # use abs function from data type here
+            res_norm.append(abs(res[m]))
+
+        self.residual_components = res[-1]
+
+        # find maximal residual over the nodes
+        if L.params.residual_type == 'full_abs':
+            L.status.residual = max(res_norm)
+        elif L.params.residual_type == 'last_abs':
+            L.status.residual = res_norm[-1]
+        elif L.params.residual_type == 'full_rel':
+            L.status.residual = max(res_norm) / abs(L.u[0])
+        elif L.params.residual_type == 'last_rel':
+            L.status.residual = res_norm[-1] / abs(L.u[0])
+        else:
+            raise ParameterError(
+                f'residual_type = {L.params.residual_type} not implemented, choose '
+                f'full_abs, last_abs, full_rel or last_rel instead'
+            )
+
+        # indicate that the residual has seen the new values
+        L.status.updated = False
+
+        return None
+
+
 class genericImplicitConstrained(generic_implicit):
     r"""
     Base sweeper class for solving differential-algebraic equations of the form
@@ -25,6 +101,8 @@ class genericImplicitConstrained(generic_implicit):
     ----------
     params : dict
         Parameters passed to the sweeper.
+    residual_components : list
+        Stores the residual from last node.
     """
 
     def __init__(self, params):
@@ -38,6 +116,8 @@ class genericImplicitConstrained(generic_implicit):
 
         # get QI matrix
         self.QI = self.get_Qdelta_implicit(qd_type=self.params.QI)
+
+        self.residual_components = []
 
     def integrate(self):
         """
@@ -160,18 +240,7 @@ class genericImplicitConstrained(generic_implicit):
             # use abs function from data type here
             res_norm.append(abs(res[m]))
 
-        # TODO: can this be combined with ``integrate()`` with a separate function ?!
-        res_initial = []
-        for m in range(1, self.coll.num_nodes + 1):
-            # new instance of dtype_u, initialize values with 0
-            res_initial.append(P.dtype_u(P.init, val=0.0))
-            for j in range(1, self.coll.num_nodes + 1):
-                res_initial[-1].diff[:] += L.dt * self.coll.Qmat[m, j] * P.eval_f(L.u[0], L.time + L.dt * self.coll.nodes[j - 1]).diff[:]
-
-        res_initial_norm = []
-        for m in range(self.coll.num_nodes):
-            res_initial[m].diff[:] += L.u[0].diff[:] - L.u[0].diff[:] 
-            res_initial_norm.append(abs(res_initial[m]))
+        self.residual_components = res[-1]
 
         # find maximal residual over the nodes
         if L.params.residual_type == 'full_abs':
@@ -182,8 +251,6 @@ class genericImplicitConstrained(generic_implicit):
             L.status.residual = max(res_norm) / abs(L.u[0])
         elif L.params.residual_type == 'last_rel':
             L.status.residual = res_norm[-1] / abs(L.u[0])
-        elif L.params.residual_type == 'initial_rel':
-            L.status.residual = max(res_norm) / max(res_initial_norm)
         else:
             raise ParameterError(
                 f'residual_type = {L.params.residual_type} not implemented, choose '
@@ -221,6 +288,8 @@ class genericImplicitEmbedded(generic_implicit):
     ----------
     params : dict
         Parameters passed to the sweeper.
+    residual_components : list
+        Stores the residual from last node.
 
     Note
     ----
@@ -239,6 +308,8 @@ class genericImplicitEmbedded(generic_implicit):
 
         # get QI matrix
         self.QI = self.get_Qdelta_implicit(qd_type=self.params.QI)
+
+        self.residual_components = []
 
     def update_nodes(self):
         """
@@ -337,18 +408,7 @@ class genericImplicitEmbedded(generic_implicit):
             # use abs function from data type here
             res_norm.append(abs(res[m]))
 
-        # TODO: can this be combined with ``integrate()`` with a separate function ?!
-        res_initial = []
-        for m in range(1, self.coll.num_nodes + 1):
-            # new instance of dtype_u, initialize values with 0
-            res_initial.append(P.dtype_u(P.init, val=0.0))
-            for j in range(1, self.coll.num_nodes + 1):
-                res_initial[-1] += L.dt * self.coll.Qmat[m, j] * P.eval_f(L.u[0], L.time + L.dt * self.coll.nodes[j - 1])
-
-        res_initial_norm = []
-        for m in range(self.coll.num_nodes):
-            res_initial[m].diff[:] += L.u[0].diff[:] - L.u[0].diff[:] 
-            res_initial_norm.append(abs(res_initial[m]))
+        self.residual_components = res[-1]
 
         # find maximal residual over the nodes
         if L.params.residual_type == 'full_abs':
@@ -359,8 +419,6 @@ class genericImplicitEmbedded(generic_implicit):
             L.status.residual = max(res_norm) / abs(L.u[0])
         elif L.params.residual_type == 'last_rel':
             L.status.residual = res_norm[-1] / abs(L.u[0])
-        elif L.params.residual_type == 'initial_rel':
-            L.status.residual = max(res_norm) / max(res_initial_norm)
         else:
             raise ParameterError(
                 f'residual_type = {L.params.residual_type} not implemented, choose '
