@@ -115,3 +115,82 @@ jobs:
           GITLAB_PROJECT_ID: "6029"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MIRROR_BRANCH: ${{ env.MIRROR_BRANCH }}
+
+  get_artifacts_from_other_workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts from this workflow
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - name: Set env-var
+        id: get_id
+        uses: actions/github-script@v7
+        env:
+          workflow_filename: 'ci_pipeline.yml'
+        with:
+          script: |
+            if (context.eventName == "pull_request_target") {
+              var used_sha = context.payload.pull_request.head.sha;
+              var used_event = "pull_request";
+            } else {
+              var used_sha = context.sha;
+              var used_event = context.eventName;
+            }
+            const result = await github.request('GET /repos/{owner}/{repo}/actions/workflows/{workflow_id}/runs', {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: process.env.workflow_filename,
+              headers: {
+                'X-GitHub-Api-Version': '2022-11-28',
+                'accept': 'application/vnd.github+json'
+              },
+              head_sha: used_sha,
+              event: used_event
+            })
+            console.log("SHA of commit " + used_sha);
+            console.log("Found runs of workflow: " + result.data.total_count);
+            if (result.data.total_count == 1) {
+              console.log("Found workflow has id: " + result.data.workflow_runs[0].id);
+              return result.data.workflow_runs[0].id
+            } else {
+              console.log("Logging all found workflow ids:");
+              for (var i = 0; i < result.data.workflow_runs.length; i++) {
+                console.log(result.data.workflow_runs[i].id);
+              }
+              console.log("Returned workflow id is: " + result.data.workflow_runs[0].id);
+              return result.data.workflow_runs[0].id
+            }
+      - name: Wait for other workflow to finish
+        env:
+          RUN_ID: ${{ steps.get_id.outputs.result }}
+          POLL_TIMEOUT: 10
+        run: |
+          ci_conclusion="pending"
+          echo "Querying status of workflow $RUN_ID for repo $GITHUB_REPOSITORY"
+          until [ "$ci_conclusion" != "pending" ] && [ "$ci_conclusion" != "in_progress" ] && [ "$ci_conclusion" != "null" ]
+          do
+            # Wait some seconds
+            sleep "$POLL_TIMEOUT"
+            # Get the current state of the pipeline and the url of the website
+            run_reply=$(curl --header "'X-GitHub-Api-Version': '2022-11-28', 'accept': 'application/vnd.github+json'" --silent "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID")
+            ci_conclusion=$(jq -n "$run_reply" | jq -r .conclusion)
+            echo "Current pipeline status: ${ci_conclusion}"
+            http_status=$(jq -n "$run_reply" | jq -r .status)
+            if [ "$http_status" != 200 ] && [[ "$http_status" =~ ^[0-9]+$ ]]; then
+              echo "Request returned status: ${http_status}"
+              exit 1
+            fi
+          done
+          # Set exit code for success or failure  (everything non-success)
+          if [ "$ci_conclusion" = "success" ]; then
+            exit 0
+          else
+            exit 1
+          fi
+      - name: Download artifacts from other workflow
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          run-id: ${{ steps.get_id.outputs.result }}
+          github-token: ${{ secrets.ACTION_READ_TOKEN }}
