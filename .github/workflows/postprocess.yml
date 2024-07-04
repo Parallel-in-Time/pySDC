@@ -6,19 +6,13 @@ on:
   workflow_run:
     workflows: ["Mirror to Gitlab to trigger CI"]
     types: ["completed"]
-    branches: ["master"]
   
 jobs:
   post-processing:
     runs-on: ubuntu-latest
-    if: ${{ github.repository_owner == 'Parallel-in-Time'}}
-    needs:
-      - lint
-      - user_cpu_tests_linux
-      - project_cpu_tests_linux
-      - user_libpressio_tests
-      - user_monodomain_tests_linux
-#       - wait_for_gitlab
+    if: >-
+      ${{ github.repository_owner == 'Parallel-in-Time'
+      && github.event.workflow_run.conclusion == 'success' }}
     defaults:
       run:
         shell: bash -l {0}
@@ -34,6 +28,8 @@ jobs:
         with:
           path: .
           merge-multiple: true
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.ACTION_READ_TOKEN }}
       - name: Prepare artifacts
         run: |
           cp data_3.10/* data/.
@@ -86,9 +82,9 @@ jobs:
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         if: >-
-          ${{ github.event_name == 'push'
+          ${{ github.event.workflow_run.event == 'push'
           && github.repository_owner == 'Parallel-in-Time'
-          && github.ref == 'refs/heads/master' }}
+          && github.event.workflow_run.head_branch == 'refs/heads/master' }}
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: docs/build/html # The folder the action should deploy.
