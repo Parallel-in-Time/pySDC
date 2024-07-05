@@ -99,11 +99,11 @@ jobs:
           - TOMS
         python: ['3.9', '3.10', '3.11', '3.12']
         # python: ['3.10']
-        exclude:
-          - env: parallelSDC
-            python: '3.11'
-          - env: parallelSDC
-            python: '3.12'
+        # exclude:
+        #   - env: parallelSDC
+        #     python: '3.11'
+        #   - env: parallelSDC
+        #     python: '3.12'
     defaults:
       run:
         shell: bash -l {0}
