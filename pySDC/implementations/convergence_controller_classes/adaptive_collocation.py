@@ -20,7 +20,7 @@ class AdaptiveCollocation(ConvergenceController):
         params = {
             'num_nodes': [2, 3],
         }
-    
+
     will use collocation methods like you passed to the `sweeper_params` in the `description` object, but will change
     the number of nodes to 2 before the first iteration and to 3 as soon as the 2-node collocation problem is converged.
     This will override whatever you set for the number of nodes in the `sweeper_params`, but you still need to set
