@@ -1,5 +1,6 @@
 import os
 import pickle
+import dill
 from collections import namedtuple
 
 import numpy as np
@@ -156,8 +157,8 @@ def main(comm=None):
 
     if comm.Get_rank() == 0:
         # write out for later visualization
-        file = open('data/parallelSDC_iterations_precond_MPI.pkl', 'wb')
-        pickle.dump(results, file)
+        with open('data/parallelSDC_iterations_precond_MPI.pkl', 'wb') as file:
+            pickle.dump(results, file)
 
         assert os.path.isfile('data/parallelSDC_iterations_precond_MPI.pkl'), 'ERROR: pickle did not create file'
 
@@ -168,8 +169,10 @@ def plot_iterations():
     Helper routine to plot iteration counts
     """
 
-    file = open('data/parallelSDC_iterations_precond_MPI.pkl', 'rb')
-    results = pickle.load(file)
+    with open('data/parallelSDC_iterations_precond_MPI.pkl', 'rb') as file:
+        results = pickle.load(file)
+
+    # return 1
 
     # find the lists/header required for plotting
     qd_type_list = []
@@ -183,8 +186,10 @@ def plot_iterations():
     print('Found these type of preconditioners:', qd_type_list)
     print('Found these setups:', setup_list)
 
-    assert len(qd_type_list) == 5, 'ERROR did not find four preconditioners, got %s' % qd_type_list
+    assert len(qd_type_list) == 5, 'ERROR did not find five preconditioners, got %s' % qd_type_list
     assert len(setup_list) == 4, 'ERROR: did not find four setup, got %s' % setup_list
+
+    # return 1
 
     qd_type_list = ['IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
     marker_list = ['s', 'o', '^', 'v', 'x']
@@ -192,6 +197,9 @@ def plot_iterations():
 
     plt_helper.setup_mpl()
     print('post setup')
+    
+    # return 1
+
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
     for setup in setup_list:
         print('setup')
@@ -217,6 +225,8 @@ def plot_iterations():
                 markeredgecolor='k',
             )
 
+        # return 1
+
         if setup == 'heat':
             xlabel = r'$\nu$'
         elif setup == 'advection':
@@ -235,17 +245,25 @@ def plot_iterations():
         plt_helper.plt.xlabel(xlabel)
         plt_helper.plt.grid()
 
+        # return 1
+
         # save plot as PDF and PGF
         fname = 'data/parallelSDC_preconditioner_MPI_' + setup
         plt_helper.savefig(fname)
+        
+        # return 1
 
         assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'
         # assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
         assert os.path.isfile(fname + '.png'), 'ERROR: plotting did not create PNG file'
 
+        return 0
+
 
 if __name__ == "__main__":
     comm = MPI.COMM_WORLD
     main(comm=comm)
+    print(f"Own rank is {comm.Get_rank()}")
     if comm.Get_rank() == 0:
+        print("I am rank number 0")
         plot_iterations()
