@@ -197,7 +197,7 @@ def plot_iterations():
 
     plt_helper.setup_mpl()
     print('post setup')
-    
+
     # return 1
 
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
@@ -250,7 +250,7 @@ def plot_iterations():
         # save plot as PDF and PGF
         fname = 'data/parallelSDC_preconditioner_MPI_' + setup
         plt_helper.savefig(fname)
-        
+
         # return 1
 
         assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'

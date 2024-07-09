@@ -9,7 +9,6 @@ import pytest
 # @pytest.mark.parametrize('num_procs', [3, 5])
 @pytest.mark.parametrize('num_procs', [3])
 def test_preconditioner_playground_MPI(num_procs):
-    from pySDC.projects.parallelSDC import preconditioner_playground_MPI 
 
     # Set python path once
     my_env = os.environ.copy()
