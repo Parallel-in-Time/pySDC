@@ -256,7 +256,9 @@ def plot_iterations():
         # assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
         assert os.path.isfile(fname + '.png'), 'ERROR: plotting did not create PNG file'
 
-        return 0
+        print(f"Successfully stored image {fname}.png")
+
+    return 0
 
 
 if __name__ == "__main__":
