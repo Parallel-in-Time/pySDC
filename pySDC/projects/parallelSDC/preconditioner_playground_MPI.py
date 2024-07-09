@@ -1,6 +1,5 @@
 import os
 import pickle
-import dill
 from collections import namedtuple
 
 import numpy as np
@@ -263,7 +262,7 @@ def plot_iterations():
 if __name__ == "__main__":
     comm = MPI.COMM_WORLD
     main(comm=comm)
-    print(f"Own rank is {comm.Get_rank()}")
+    # print(f"Own rank is {comm.Get_rank()}")
     if comm.Get_rank() == 0:
-        print("I am rank number 0")
+        # print("I am rank number 0")
         plot_iterations()

@@ -27,4 +27,3 @@ def test_preconditioner_playground_MPI(num_procs):
     for line in p.stderr:
         print(line)
     assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (p.returncode, num_procs)
-    # preconditioner_playground_MPI.plot_iterations()
