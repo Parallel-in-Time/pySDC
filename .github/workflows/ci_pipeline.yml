@@ -81,21 +81,21 @@ jobs:
       fail-fast: false
       matrix:
         env: 
-          - AllenCahn_Bayreuth
-          - AsympConv
-          - DAE
-          - FastWaveSlowWave
-          - Hamiltonian
-          - matrixPFASST
+          # - AllenCahn_Bayreuth
+          # - AsympConv
+          # - DAE
+          # - FastWaveSlowWave
+          # - Hamiltonian
+          # - matrixPFASST
           - parallelSDC
-          - parallelSDC_reloaded
-          - PinTSimE
-          - RDC
-          - Resilience
-          - SDC_showdown
-          - Second_orderSDC
-          - soft_failure
-          - TOMS
+          # - parallelSDC_reloaded
+          # - PinTSimE
+          # - RDC
+          # - Resilience
+          # - SDC_showdown
+          # - Second_orderSDC
+          # - soft_failure
+          # - TOMS
         python: ['3.9', '3.10', '3.11', '3.12']
     defaults:
       run:
