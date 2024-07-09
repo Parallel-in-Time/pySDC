@@ -171,8 +171,6 @@ def plot_iterations():
     with open('data/parallelSDC_iterations_precond_MPI.pkl', 'rb') as file:
         results = pickle.load(file)
 
-    # return 1
-
     # find the lists/header required for plotting
     qd_type_list = []
     setup_list = []
@@ -188,8 +186,6 @@ def plot_iterations():
     assert len(qd_type_list) == 5, 'ERROR did not find five preconditioners, got %s' % qd_type_list
     assert len(setup_list) == 4, 'ERROR: did not find four setup, got %s' % setup_list
 
-    # return 1
-
     qd_type_list = ['IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
     marker_list = ['s', 'o', '^', 'v', 'x']
     color_list = ['r', 'g', 'b', 'c', 'm']
@@ -197,12 +193,14 @@ def plot_iterations():
     plt_helper.setup_mpl()
     print('post setup')
 
-    # return 1
-
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
-    for setup in setup_list:
-        print('setup')
-        plt_helper.newfig(textwidth=238.96, scale=0.89)
+    for setup in setup_list[2:]:
+        if setup in setup_list[3:]:
+            continue
+        print(f'setup of {setup}')
+        fig, ax= plt_helper.newfig(textwidth=238.96, scale=0.89)
+        # mpl.pyplot.clf()
+        # fig, ax = mpl.pyplot.subplots(figsize=plt_helper.figsize(textwidth=238.96, scale=0.89, ratio=0.6180339887))
 
         for qd_type, marker, color in zip(qd_type_list, marker_list, color_list):
             niter = np.zeros(len(results[setup][1]))
@@ -224,8 +222,6 @@ def plot_iterations():
                 markeredgecolor='k',
             )
 
-        # return 1
-
         if setup == 'heat':
             xlabel = r'$\nu$'
         elif setup == 'advection':
@@ -244,13 +240,10 @@ def plot_iterations():
         plt_helper.plt.xlabel(xlabel)
         plt_helper.plt.grid()
 
-        # return 1
-
         # save plot as PDF and PGF
         fname = 'data/parallelSDC_preconditioner_MPI_' + setup
         plt_helper.savefig(fname)
-
-        # return 1
+        mpl.pyplot.close(fig=fig)
 
         assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'
         # assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
@@ -258,8 +251,9 @@ def plot_iterations():
 
         print(f"Successfully stored image {fname}.png")
 
+        continue
+    
     return 0
-
 
 if __name__ == "__main__":
     comm = MPI.COMM_WORLD
