@@ -186,16 +186,12 @@ def plot_iterations():
     assert len(qd_type_list) == 5, 'ERROR did not find five preconditioners, got %s' % qd_type_list
     assert len(setup_list) == 4, 'ERROR: did not find four setup, got %s' % setup_list
 
-    qd_type_list = ['IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
-    marker_list = ['s', 'o', '^', 'v', 'x']
-    color_list = ['r', 'g', 'b', 'c', 'm']
-
     plt_helper.setup_mpl()
     print('post setup')
 
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
     for setup in setup_list[1:]:
-        if setup in setup_list[3:]:
+        if setup in setup_list[2:]:
             continue
         print_figure(results, setup)
     return 0
