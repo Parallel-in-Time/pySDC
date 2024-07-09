@@ -204,9 +204,9 @@ def print_figure(results, setup):
     marker_list = ['s', 'o', '^', 'v', 'x']
     color_list = ['r', 'g', 'b', 'c', 'm']
 
-    fig, ax = plt_helper.newfig(textwidth=238.96, scale=0.89)
-    # mpl.pyplot.clf()
-    # fig, ax = mpl.pyplot.subplots(figsize=plt_helper.figsize(textwidth=238.96, scale=0.89, ratio=0.6180339887))
+    # fig, ax = plt_helper.newfig(textwidth=238.96, scale=0.89)
+    mpl.pyplot.clf()
+    fig, ax = mpl.pyplot.subplots(figsize=plt_helper.figsize(textwidth=238.96, scale=0.89, ratio=0.6180339887))
 
     for qd_type, marker, color in zip(qd_type_list, marker_list, color_list):
         niter = np.zeros(len(results[setup][1]))
