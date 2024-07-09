@@ -190,7 +190,7 @@ def plot_iterations():
     print('post setup')
 
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
-    for setup in setup_list[1:]:
+    for setup in setup_list:
         if setup in setup_list[2:]:
             continue
         print_figure(results, setup)
@@ -255,6 +255,7 @@ def print_figure(results, setup):
     # assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
     assert os.path.isfile(fname + '.png'), 'ERROR: plotting did not create PNG file'
     print(f"Successfully stored image {fname}.png")
+    return
 
 
 if __name__ == "__main__":
