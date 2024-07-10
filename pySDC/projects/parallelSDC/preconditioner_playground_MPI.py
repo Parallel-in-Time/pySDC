@@ -223,7 +223,7 @@ def plot_setup(results, setup):
                     niter[xvalue] = results[key]
         ls = '-'
         lw = 1
-        plt_helper.plt.semilogx(
+        ax.semilogx(
             results[setup][1],
             niter,
             label=qd_type,
@@ -246,11 +246,11 @@ def plot_setup(results, setup):
         print('Setup not implemented..', setup)
         exit()
 
-    plt_helper.plt.ylim([0, 60])
-    plt_helper.plt.legend(loc=2, ncol=1)
-    plt_helper.plt.ylabel('number of iterations')
-    plt_helper.plt.xlabel(xlabel)
-    plt_helper.plt.grid()
+    ax.ylim([0, 60])
+    fig.legend(loc=2, ncol=1)
+    ax.ylabel('number of iterations')
+    ax.xlabel(xlabel)
+    ax.grid()
 
     # save plot as PDF and PGF
     fname = 'data/parallelSDC_preconditioner_MPI_' + setup
