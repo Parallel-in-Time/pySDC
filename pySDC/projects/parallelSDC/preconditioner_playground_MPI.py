@@ -196,7 +196,6 @@ def plot_iterations():
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
     for setup in setup_list[:]:
         plot_setup(setup)
-        del results
 
     return 0
 
