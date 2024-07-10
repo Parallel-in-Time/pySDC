@@ -186,75 +186,85 @@ def plot_iterations():
     assert len(qd_type_list) == 5, 'ERROR did not find five preconditioners, got %s' % qd_type_list
     assert len(setup_list) == 4, 'ERROR: did not find four setup, got %s' % setup_list
 
-    qd_type_list = ['IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
-    marker_list = ['s', 'o', '^', 'v', 'x']
-    color_list = ['r', 'g', 'b', 'c', 'm']
+    # qd_type_list = ['IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
+    # marker_list = ['s', 'o', '^', 'v', 'x']
+    # color_list = ['r', 'g', 'b', 'c', 'm']
 
     plt_helper.setup_mpl()
     print('post setup')
 
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
-    for setup in setup_list:
-        if setup in setup_list[1:]:
-            continue
-        print(f'setup of {setup}')
-
-        # fig, ax = plt_helper.newfig(textwidth=238.96, scale=0.89)
-        mpl.pyplot.clf()
-        fig, ax = mpl.pyplot.subplots(figsize=plt_helper.figsize(textwidth=238.96, scale=0.89, ratio=0.6180339887))
-
-        for qd_type, marker, color in zip(qd_type_list, marker_list, color_list):
-            niter = np.zeros(len(results[setup][1]))
-            for key in results.keys():
-                if isinstance(key, ID):
-                    if key.setup == setup and key.qd_type == qd_type:
-                        xvalue = results[setup][1].index(key.param)
-                        niter[xvalue] = results[key]
-            ls = '-'
-            lw = 1
-            plt_helper.plt.semilogx(
-                results[setup][1],
-                niter,
-                label=qd_type,
-                lw=lw,
-                linestyle=ls,
-                color=color,
-                marker=marker,
-                markeredgecolor='k',
-            )
-
-        if setup == 'heat':
-            xlabel = r'$\nu$'
-        elif setup == 'advection':
-            xlabel = r'$c$'
-        elif setup == 'fisher':
-            xlabel = r'$\lambda_0$'
-        elif setup == 'vanderpol':
-            xlabel = r'$\mu$'
-        else:
-            print('Setup not implemented..', setup)
-            exit()
-
-        plt_helper.plt.ylim([0, 60])
-        plt_helper.plt.legend(loc=2, ncol=1)
-        plt_helper.plt.ylabel('number of iterations')
-        plt_helper.plt.xlabel(xlabel)
-        plt_helper.plt.grid()
-
-        # save plot as PDF and PGF
-        fname = 'data/parallelSDC_preconditioner_MPI_' + setup
-        # plt_helper.savefig(fname)
-        fig.savefig('{}.pdf'.format(fname), bbox_inches='tight')
-        fig.savefig('{}.png'.format(fname), bbox_inches='tight')
-        mpl.pyplot.close(fig=fig)
-        del fig, ax
-
-        assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'
-        # assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
-        assert os.path.isfile(fname + '.png'), 'ERROR: plotting did not create PNG file'
-        print(f"Successfully stored image {fname}.png")
+    for setup in setup_list[2:]:
+        with open('data/parallelSDC_iterations_precond_MPI.pkl', 'rb') as file:
+            results = pickle.load(file)
+        plot_setup(results, setup)
+        del results
 
     return 0
+
+
+def plot_setup(result, setup):
+    print(f'setup of {setup}')
+
+    qd_type_list = ['IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
+    marker_list = ['s', 'o', '^', 'v', 'x']
+    color_list = ['r', 'g', 'b', 'c', 'm']
+
+    # fig, ax = plt_helper.newfig(textwidth=238.96, scale=0.89)
+    # mpl.pyplot.clf()
+    fig, ax = mpl.pyplot.subplots(figsize=plt_helper.figsize(textwidth=238.96, scale=0.89, ratio=0.6180339887))
+
+    for qd_type, marker, color in zip(qd_type_list, marker_list, color_list):
+        niter = np.zeros(len(results[setup][1]))
+        for key in results.keys():
+            if isinstance(key, ID):
+                if key.setup == setup and key.qd_type == qd_type:
+                    xvalue = results[setup][1].index(key.param)
+                    niter[xvalue] = results[key]
+        ls = '-'
+        lw = 1
+        plt_helper.plt.semilogx(
+            results[setup][1],
+            niter,
+            label=qd_type,
+            lw=lw,
+            linestyle=ls,
+            color=color,
+            marker=marker,
+            markeredgecolor='k',
+        )
+
+    if setup == 'heat':
+        xlabel = r'$\nu$'
+    elif setup == 'advection':
+        xlabel = r'$c$'
+    elif setup == 'fisher':
+        xlabel = r'$\lambda_0$'
+    elif setup == 'vanderpol':
+        xlabel = r'$\mu$'
+    else:
+        print('Setup not implemented..', setup)
+        exit()
+
+    plt_helper.plt.ylim([0, 60])
+    plt_helper.plt.legend(loc=2, ncol=1)
+    plt_helper.plt.ylabel('number of iterations')
+    plt_helper.plt.xlabel(xlabel)
+    plt_helper.plt.grid()
+
+    # save plot as PDF and PGF
+    fname = 'data/parallelSDC_preconditioner_MPI_' + setup
+    # plt_helper.savefig(fname)
+    fig.savefig('{}.pdf'.format(fname), bbox_inches='tight')
+    fig.savefig('{}.png'.format(fname), bbox_inches='tight')
+    mpl.pyplot.close(fig=fig)
+    del fig, ax
+
+    assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'
+    # assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
+    assert os.path.isfile(fname + '.png'), 'ERROR: plotting did not create PNG file'
+    print(f"Successfully stored image {fname}.png")
+
 
 
 if __name__ == "__main__":
