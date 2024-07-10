@@ -246,10 +246,10 @@ def plot_setup(results, setup):
         print('Setup not implemented..', setup)
         exit()
 
-    ax.ylim([0, 60])
+    ax.set_ylim(0, 60)
     fig.legend(loc=2, ncol=1)
-    ax.ylabel('number of iterations')
-    ax.xlabel(xlabel)
+    ax.set_ylabel('number of iterations')
+    ax.set_xlabel(xlabel)
     ax.grid()
 
     # save plot as PDF and PGF
