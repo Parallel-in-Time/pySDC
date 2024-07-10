@@ -203,7 +203,7 @@ def plot_iterations():
     return 0
 
 
-def plot_setup(result, setup):
+def plot_setup(results, setup):
     print(f'setup of {setup}')
 
     qd_type_list = ['IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
@@ -264,7 +264,6 @@ def plot_setup(result, setup):
     # assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
     assert os.path.isfile(fname + '.png'), 'ERROR: plotting did not create PNG file'
     print(f"Successfully stored image {fname}.png")
-
 
 
 if __name__ == "__main__":
