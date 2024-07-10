@@ -195,6 +195,8 @@ def plot_iterations():
 
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
     for setup in setup_list:
+        if setup in setup_list[1:]:
+            continue
         print(f'setup of {setup}')
 
         # fig, ax = plt_helper.newfig(textwidth=238.96, scale=0.89)
