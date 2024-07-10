@@ -195,16 +195,16 @@ def plot_iterations():
 
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
     for setup in setup_list[:]:
-        with open('data/parallelSDC_iterations_precond_MPI.pkl', 'rb') as file:
-            results = pickle.load(file)
-        plot_setup(results, setup)
+        plot_setup(setup)
         del results
 
     return 0
 
 
-def plot_setup(results, setup):
+def plot_setup(setup):
     print(f'setup of {setup}')
+    with open('data/parallelSDC_iterations_precond_MPI.pkl', 'rb') as file:
+        results = pickle.load(file)
 
     qd_type_list = ['IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
     marker_list = ['s', 'o', '^', 'v', 'x']
