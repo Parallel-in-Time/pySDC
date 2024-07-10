@@ -242,9 +242,10 @@ def plot_iterations():
         # save plot as PDF and PGF
         fname = 'data/parallelSDC_preconditioner_MPI_' + setup
         # plt_helper.savefig(fname)
-        mpl.pyplot.savefig('{}.pdf'.format(fname), bbox_inches='tight')
-        mpl.pyplot.savefig('{}.png'.format(fname), bbox_inches='tight')
+        fig.savefig('{}.pdf'.format(fname), bbox_inches='tight')
+        fig.savefig('{}.png'.format(fname), bbox_inches='tight')
         mpl.pyplot.close(fig=fig)
+        del fig, ax
 
         assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'
         # assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
