@@ -118,7 +118,6 @@ jobs:
           import coverage
           coverage.process_startup() " > sitecustomize.py
           coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/${{ matrix.env }}/tests
-          ls -l data/*.png
       - name: Make coverage report
         run: |
           mv data data_${{ matrix.python }}
