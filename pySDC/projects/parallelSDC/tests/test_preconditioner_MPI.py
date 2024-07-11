@@ -24,11 +24,9 @@ def test_preconditioner_playground_MPI(num_procs):
     ).split()
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
     p.wait()
-    cmd = ('python -u pySDC/projects/parallelSDC/preconditioner_playground_MPI.py plot').split()
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
-    p.wait()
     for line in p.stdout:
         print(line)
     for line in p.stderr:
         print(line)
+    subprocess.run('python -u pySDC/projects/parallelSDC/preconditioner_playground_MPI.py plot')
     assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (p.returncode, num_procs)
