@@ -71,7 +71,9 @@ jobs:
         run: |
           chmod u+x ./docs/update_apidocs.sh
           ./docs/update_apidocs.sh
-          sphinx-build -b html docs/source docs/build/html
+          sphinx-build -b html docs/source docs/build/html 2>&1 | tee sphinx_build.log
+          images_not_found=$(grep "WARNING: image file not readable:" < sphinx_build.log | wc -l)
+          if [ $images_not_found != "0" ] ; then echo "Some linked images were not found"; exit 1 ;fi
           mkdir -p docs/build/html/coverage
           mv htmlcov/* docs/build/html/coverage/.
       - name: Store docs

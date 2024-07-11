@@ -4,6 +4,7 @@ from collections import namedtuple
 
 import numpy as np
 from mpi4py import MPI
+import argparse
 
 import matplotlib as mpl
 
@@ -156,8 +157,8 @@ def main(comm=None):
 
     if comm.Get_rank() == 0:
         # write out for later visualization
-        file = open('data/parallelSDC_iterations_precond_MPI.pkl', 'wb')
-        pickle.dump(results, file)
+        with open('data/parallelSDC_iterations_precond_MPI.pkl', 'wb') as file:
+            pickle.dump(results, file)
 
         assert os.path.isfile('data/parallelSDC_iterations_precond_MPI.pkl'), 'ERROR: pickle did not create file'
 
@@ -168,8 +169,8 @@ def plot_iterations():
     Helper routine to plot iteration counts
     """
 
-    file = open('data/parallelSDC_iterations_precond_MPI.pkl', 'rb')
-    results = pickle.load(file)
+    with open('data/parallelSDC_iterations_precond_MPI.pkl', 'rb') as file:
+        results = pickle.load(file)
 
     # find the lists/header required for plotting
     qd_type_list = []
@@ -183,69 +184,92 @@ def plot_iterations():
     print('Found these type of preconditioners:', qd_type_list)
     print('Found these setups:', setup_list)
 
-    assert len(qd_type_list) == 5, 'ERROR did not find four preconditioners, got %s' % qd_type_list
+    assert len(qd_type_list) == 5, 'ERROR did not find five preconditioners, got %s' % qd_type_list
     assert len(setup_list) == 4, 'ERROR: did not find four setup, got %s' % setup_list
+
+    plt_helper.setup_mpl()
+    print('post setup')
+
+    # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
+    for setup in list(setup_list[:]):
+        plot_setup(results, setup)
+        mpl.pyplot.close("all")
+    return 0
+
+
+def plot_setup(results, setup):
+    print(f'setup of {setup}')
 
     qd_type_list = ['IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
     marker_list = ['s', 'o', '^', 'v', 'x']
     color_list = ['r', 'g', 'b', 'c', 'm']
 
-    plt_helper.setup_mpl()
-    print('post setup')
-    # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
-    for setup in setup_list:
-        print('setup')
-        plt_helper.newfig(textwidth=238.96, scale=0.89)
+    fig, ax = plt_helper.newfig(textwidth=238.96, scale=0.89)
 
-        for qd_type, marker, color in zip(qd_type_list, marker_list, color_list):
-            niter = np.zeros(len(results[setup][1]))
-            for key in results.keys():
-                if isinstance(key, ID):
-                    if key.setup == setup and key.qd_type == qd_type:
-                        xvalue = results[setup][1].index(key.param)
-                        niter[xvalue] = results[key]
-            ls = '-'
-            lw = 1
-            plt_helper.plt.semilogx(
-                results[setup][1],
-                niter,
-                label=qd_type,
-                lw=lw,
-                linestyle=ls,
-                color=color,
-                marker=marker,
-                markeredgecolor='k',
-            )
+    for qd_type, marker, color in zip(qd_type_list, marker_list, color_list):
+        niter = np.zeros(len(results[setup][1]))
+        for key in results.keys():
+            if isinstance(key, ID):
+                if key.setup == setup and key.qd_type == qd_type:
+                    xvalue = results[setup][1].index(key.param)
+                    niter[xvalue] = results[key]
+        ls = '-'
+        lw = 1
+        ax.semilogx(
+            results[setup][1],
+            niter,
+            label=qd_type,
+            lw=lw,
+            linestyle=ls,
+            color=color,
+            marker=marker,
+            markeredgecolor='k',
+        )
 
-        if setup == 'heat':
-            xlabel = r'$\nu$'
-        elif setup == 'advection':
-            xlabel = r'$c$'
-        elif setup == 'fisher':
-            xlabel = r'$\lambda_0$'
-        elif setup == 'vanderpol':
-            xlabel = r'$\mu$'
-        else:
-            print('Setup not implemented..', setup)
-            exit()
+    if setup == 'heat':
+        xlabel = r'$\nu$'
+    elif setup == 'advection':
+        xlabel = r'$c$'
+    elif setup == 'fisher':
+        xlabel = r'$\lambda_0$'
+    elif setup == 'vanderpol':
+        xlabel = r'$\mu$'
+    else:
+        print('Setup not implemented..', setup)
+        exit()
 
-        plt_helper.plt.ylim([0, 60])
-        plt_helper.plt.legend(loc=2, ncol=1)
-        plt_helper.plt.ylabel('number of iterations')
-        plt_helper.plt.xlabel(xlabel)
-        plt_helper.plt.grid()
+    ax.set_ylim(0, 60)
+    fig.legend(loc=2, ncol=1)
+    ax.set_ylabel('number of iterations')
+    ax.set_xlabel(xlabel)
+    ax.grid()
 
-        # save plot as PDF and PGF
-        fname = 'data/parallelSDC_preconditioner_MPI_' + setup
-        plt_helper.savefig(fname)
+    # save plot as PDF and PGF
+    fname = 'data/parallelSDC_preconditioner_MPI_' + setup
+    plt_helper.savefig(fname)
+    del fig, ax
 
-        assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'
-        # assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
-        assert os.path.isfile(fname + '.png'), 'ERROR: plotting did not create PNG file'
+    assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'
+    # assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
+    assert os.path.isfile(fname + '.png'), 'ERROR: plotting did not create PNG file'
+    print(f"Successfully stored image {fname}.png")
+
+    return
 
 
 if __name__ == "__main__":
-    comm = MPI.COMM_WORLD
-    main(comm=comm)
-    # if comm.Get_rank() == 0:
-    #     plot_iterations()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("action", type=str, default="", const="", nargs='?')
+    args = parser.parse_args()
+    if args.action == "":
+        comm = MPI.COMM_WORLD
+        main(comm=comm)
+        if comm.Get_rank() == 0:
+            plot_iterations()
+    elif args.action == "simulate":
+        comm = MPI.COMM_WORLD
+        main(comm=comm)
+    elif args.action == "plot":
+        plot_iterations()
+    else:
+        raise KeyError(f"Unknown action '{args.action}'. Known actions are 'simulate', 'plot', or none for both")
