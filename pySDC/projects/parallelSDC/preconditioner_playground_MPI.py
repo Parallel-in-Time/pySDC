@@ -249,9 +249,6 @@ def plot_setup(results, setup):
     # save plot as PDF and PGF
     fname = 'data/parallelSDC_preconditioner_MPI_' + setup
     plt_helper.savefig(fname)
-    # fig.savefig('{}.pdf'.format(fname), bbox_inches='tight')
-    # fig.savefig('{}.png'.format(fname), bbox_inches='tight')
-    # mpl.pyplot.close(fig=fig)
     del fig, ax
 
     assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'
