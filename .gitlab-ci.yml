@@ -63,6 +63,9 @@ test_JUWELS:
     - juwels
     - login
     - shell
+  allow_failure:
+    exit_codes:
+      - 100
   parallel:
     matrix:
       - SHELL_SCRIPT: ['benchmark', 'cupy']
@@ -85,13 +88,14 @@ test_JUWELS:
     - jutil env activate -p ${JUWELS_PROJECT}
     - source $SCRATCH/.venv/pySDC/bin/activate
   script:
+    - bash etc/check_node_avail.sh || PARTITION_AVAIL=$?
+    - if [ -n "$PARTITION_AVAIL" ] ; then exit $PARTITION_AVAIL ; fi
     # - touch benchmarks/output.json
     - echo $SYSTEMNAME
     - sbatch --wait etc/juwels_${SHELL_SCRIPT}.sh
     - touch .coverage.empty
     - python -m coverage combine
     - mv .coverage coverage_${SHELL_SCRIPT}.dat
-  after_script:
     - echo "Following Errors occured:"
     - cat sbatch.err
     - echo "Following was written to stdout:"
