@@ -199,16 +199,14 @@ def plot_iterations():
 
 def plot_setup(results, setup):
     print(f'setup of {setup}')
-    # with open('data/parallelSDC_iterations_precond_MPI.pkl', 'rb') as file:
-    #     results = pickle.load(file)
 
     qd_type_list = ['IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
     marker_list = ['s', 'o', '^', 'v', 'x']
     color_list = ['r', 'g', 'b', 'c', 'm']
 
-    # fig, ax = plt_helper.newfig(textwidth=238.96, scale=0.89)
+    fig, ax = plt_helper.newfig(textwidth=238.96, scale=0.89)
     # mpl.pyplot.clf()
-    fig, ax = mpl.pyplot.subplots(figsize=plt_helper.figsize(textwidth=238.96, scale=0.89, ratio=0.6180339887))
+    # fig, ax = mpl.pyplot.subplots(figsize=plt_helper.figsize(textwidth=238.96, scale=0.89, ratio=0.6180339887))
 
     for qd_type, marker, color in zip(qd_type_list, marker_list, color_list):
         niter = np.zeros(len(results[setup][1]))
@@ -250,10 +248,10 @@ def plot_setup(results, setup):
 
     # save plot as PDF and PGF
     fname = 'data/parallelSDC_preconditioner_MPI_' + setup
-    # plt_helper.savefig(fname)
-    fig.savefig('{}.pdf'.format(fname), bbox_inches='tight')
-    fig.savefig('{}.png'.format(fname), bbox_inches='tight')
-    mpl.pyplot.close(fig=fig)
+    plt_helper.savefig(fname)
+    # fig.savefig('{}.pdf'.format(fname), bbox_inches='tight')
+    # fig.savefig('{}.png'.format(fname), bbox_inches='tight')
+    # mpl.pyplot.close(fig=fig)
     del fig, ax
 
     assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'
