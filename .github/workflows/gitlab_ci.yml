@@ -117,7 +117,9 @@ jobs:
           MIRROR_BRANCH: ${{ env.MIRROR_BRANCH }}
 
   get_artifacts_from_other_workflow:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest#
+    needs:
+      - mirror_to_gitlab
     steps:
       - name: Download artifacts from this workflow
         uses: actions/download-artifact@v4
