@@ -16,9 +16,9 @@ class AdaptiveCollocation(ConvergenceController):
 
     Use this convergence controller by supplying parameters that the sweeper accepts as a list to the `params`.
     For instance, supplying
-    
+
     .. code-block:: python
-    
+
         params = {
             'num_nodes': [2, 3],
         }
