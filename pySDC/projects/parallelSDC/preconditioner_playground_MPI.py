@@ -205,8 +205,6 @@ def plot_setup(results, setup):
     color_list = ['r', 'g', 'b', 'c', 'm']
 
     fig, ax = plt_helper.newfig(textwidth=238.96, scale=0.89)
-    # mpl.pyplot.clf()
-    # fig, ax = mpl.pyplot.subplots(figsize=plt_helper.figsize(textwidth=238.96, scale=0.89, ratio=0.6180339887))
 
     for qd_type, marker, color in zip(qd_type_list, marker_list, color_list):
         niter = np.zeros(len(results[setup][1]))
@@ -266,9 +264,7 @@ if __name__ == "__main__":
     if args.action == "":
         comm = MPI.COMM_WORLD
         main(comm=comm)
-        # print(f"Own rank is {comm.Get_rank()}")
         if comm.Get_rank() == 0:
-            # print("I am rank number 0")
             plot_iterations()
     elif args.action == "simulate":
         comm = MPI.COMM_WORLD
