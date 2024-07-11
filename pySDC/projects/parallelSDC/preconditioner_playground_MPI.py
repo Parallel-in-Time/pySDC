@@ -187,29 +187,20 @@ def plot_iterations():
     assert len(qd_type_list) == 5, 'ERROR did not find five preconditioners, got %s' % qd_type_list
     assert len(setup_list) == 4, 'ERROR: did not find four setup, got %s' % setup_list
 
-    # qd_type_list = ['IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
-    # marker_list = ['s', 'o', '^', 'v', 'x']
-    # color_list = ['r', 'g', 'b', 'c', 'm']
-
     plt_helper.setup_mpl()
     print('post setup')
 
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
     for setup in list(setup_list[:]):
-        plot_setup(setup)
+        plot_setup(results, setup)
         mpl.pyplot.close("all")
-    # plot_setup(setup_list[0])
-    # plot_setup(setup_list[1])
-    # mpl.pyplot.close("all")
-    # plot_setup(setup_list[2])
-    # plot_setup(setup_list[3])
     return 0
 
 
-def plot_setup(setup):
+def plot_setup(results, setup):
     print(f'setup of {setup}')
-    with open('data/parallelSDC_iterations_precond_MPI.pkl', 'rb') as file:
-        results = pickle.load(file)
+    # with open('data/parallelSDC_iterations_precond_MPI.pkl', 'rb') as file:
+    #     results = pickle.load(file)
 
     qd_type_list = ['IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
     marker_list = ['s', 'o', '^', 'v', 'x']
