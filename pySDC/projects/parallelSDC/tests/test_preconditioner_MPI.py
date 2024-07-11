@@ -18,7 +18,12 @@ def test_preconditioner_playground_MPI(num_procs):
     my_env['MKL_NUM_THREADS'] = '1'
     cwd = '.'
     cmd = (
-        'mpirun -np ' + str(num_procs) + ' python -u pySDC/projects/parallelSDC/preconditioner_playground_MPI.py'
+        'mpirun -np ' + str(num_procs) + ' python -u pySDC/projects/parallelSDC/preconditioner_playground_MPI.py simulate'
+    ).split()
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
+    p.wait()
+    cmd = (
+        'python -u pySDC/projects/parallelSDC/preconditioner_playground_MPI.py plot'
     ).split()
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
     p.wait()

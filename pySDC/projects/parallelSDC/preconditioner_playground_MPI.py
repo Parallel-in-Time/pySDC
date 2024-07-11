@@ -4,6 +4,7 @@ from collections import namedtuple
 
 import numpy as np
 from mpi4py import MPI
+import argparse
 
 import matplotlib as mpl
 
@@ -194,13 +195,13 @@ def plot_iterations():
     print('post setup')
 
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
-    # for setup in list(setup_list[:]):
-    #     plot_setup(setup)
-    plot_setup(setup_list[0])
-    plot_setup(setup_list[1])
-    mpl.pyplot.close("all")
-    plot_setup(setup_list[2])
-    plot_setup(setup_list[3])
+    for setup in list(setup_list[:]):
+        plot_setup(setup)
+    # plot_setup(setup_list[0])
+    # plot_setup(setup_list[1])
+    # mpl.pyplot.close("all")
+    # plot_setup(setup_list[2])
+    # plot_setup(setup_list[3])
     return 0
 
 
@@ -272,9 +273,20 @@ def plot_setup(setup):
 
 
 if __name__ == "__main__":
-    comm = MPI.COMM_WORLD
-    main(comm=comm)
-    # print(f"Own rank is {comm.Get_rank()}")
-    if comm.Get_rank() == 0:
-        # print("I am rank number 0")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("action", type=str, default="", const="", nargs='?')
+    args = parser.parse_args()
+    if args.action == "":
+        comm = MPI.COMM_WORLD
+        main(comm=comm)
+        # print(f"Own rank is {comm.Get_rank()}")
+        if comm.Get_rank() == 0:
+            # print("I am rank number 0")
+            plot_iterations()
+    elif args.action == "simulate":
+        comm = MPI.COMM_WORLD
+        main(comm=comm)
+    elif args.action == "plot":
         plot_iterations()
+    else:
+        raise KeyError(f"Unknown action '{args.action}'. Known actions are 'simulate', 'plot', or none for both")
