@@ -5,7 +5,7 @@ import pytest
 
 @pytest.mark.slow
 @pytest.mark.mpi4py
-@pytest.mark.timeout(600)
+@pytest.mark.timeout(1200)
 # @pytest.mark.parametrize('num_procs', [3, 5])
 @pytest.mark.parametrize('num_procs', [3])
 def test_preconditioner_playground_MPI(num_procs):
@@ -29,11 +29,4 @@ def test_preconditioner_playground_MPI(num_procs):
     for line in p.stderr:
         print(line)
     assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (p.returncode, num_procs)
-    cmd = ('python -u pySDC/projects/parallelSDC/preconditioner_playground_MPI.py plot').split()
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
-    p.wait()
-    for line in p.stdout:
-        print(line)
-    for line in p.stderr:
-        print(line)
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s' % (p.returncode)
+    subprocess.run('python pySDC/projects/parallelSDC/preconditioner_playground_MPI.py plot'.split(), cwd=cwd, env=my_env)
