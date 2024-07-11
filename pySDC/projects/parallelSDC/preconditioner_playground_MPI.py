@@ -198,6 +198,9 @@ def plot_iterations():
     #     plot_setup(setup)
     plot_setup(setup_list[0])
     plot_setup(setup_list[1])
+    mpl.pyplot.close("all")
+    plot_setup(setup_list[2])
+    plot_setup(setup_list[3])
     return 0
 
 
