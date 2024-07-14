@@ -53,8 +53,8 @@ class DedalusSweeperIMEX(sweeper):
             np.copyto(Fk[m].data, Fk[0].data)
 
         # additional stuff for pySDC, which stores solution at each nodes
-        # for m in range(1, self.coll.num_nodes + 1):
-        #     L.u[m] = P.stateCopy()
+        for m in range(1, self.coll.num_nodes + 1):
+            L.u[m] = P.stateCopy()
 
         # indicate that this level is now ready for sweeps
         L.status.unlocked = True
@@ -116,7 +116,7 @@ class DedalusSweeperIMEX(sweeper):
             P.evalF(t0+dt*tau[m], Fk1[m])
 
             # Update u for pySDC
-            # L.u[m+1] = P.stateCopy()
+            L.u[m+1] = P.stateCopy()
 
         # Inverse position for iterate k and k+1 in storage
         # ie making the new evaluation the old for next iteration
@@ -145,7 +145,7 @@ class DedalusSweeperIMEX(sweeper):
         # check if Mth node is equal to right point and do_coll_update is false, perform a simple copy
         if self.coll.right_is_node and not self.params.do_coll_update:
             # a copy is sufficient
-            L.uend = P.state
+            L.uend = L.u[-1]
         else:
             raise NotImplementedError()
             # start with u0 and add integral over the full interval (using coll.weights)

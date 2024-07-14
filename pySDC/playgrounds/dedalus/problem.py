@@ -18,7 +18,7 @@ from dedalus.core.field import Field
 
 
 def State(cls, fields):
-    return fields
+    return [f.copy() for f in fields]
 
 
 class DedalusProblem(ptype):
