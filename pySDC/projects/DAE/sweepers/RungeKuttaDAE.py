@@ -102,6 +102,31 @@ class RungeKuttaDAE(RungeKutta):
         lvl.status.unlocked = True
         lvl.status.updated = True
 
+    def integrate(self):
+        r"""
+        Returns the solution by integrating its gradient (fundamental theorem of calculus) at each collocation node.
+        ``level.f`` stores the gradient of solution ``level.u``.
+
+        Returns
+        -------
+        me : list of lists
+            Integral of the gradient at each collocation node.
+        """
+
+        # get current level and problem
+        lvl = self.level
+        prob = lvl.prob
+
+        # integrate RHS over all collocation nodes
+        me = []
+        for m in range(1, self.coll.num_nodes + 1):
+            # new instance of dtype_u, initialize values with 0
+            me.append(prob.dtype_u(prob.init, val=0.0))
+            for j in range(1, self.coll.num_nodes + 1):
+                me[-1] += lvl.dt * self.coll.Qmat[m, j] * lvl.f[j]
+
+        return me
+
     def update_nodes(self):
         r"""
         Updates the values of solution ``u`` and their gradient stored in ``f``.
@@ -130,10 +155,10 @@ class RungeKuttaDAE(RungeKutta):
                 lvl.time + lvl.dt * self.coll.nodes[m + 1],
             )
 
-        # Update numerical solution - update value only at last node
-        lvl.u[-1][:] = lvl.u[0]
-        for j in range(1, M + 1):
-            lvl.u[-1][:] += lvl.dt * self.coll.Qmat[-1, j] * lvl.f[j][:]
+        # Update numerical solution
+        integral = self.integrate()
+        for m in range(M):
+            lvl.u[m + 1][:] = lvl.u[0][:] + integral[m][:]
 
         self.du_init = prob.dtype_f(lvl.f[-1])
 
