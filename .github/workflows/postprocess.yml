@@ -1,6 +1,6 @@
 ---
 
-name: CI pipeline for pySDC
+name: Create Website for pySDC
 
 on:
   workflow_run:
@@ -8,7 +8,7 @@ on:
     types: ["completed"]
   
 jobs:
-  post-processing:
+  build_website:
     runs-on: ubuntu-latest
     if: >-
       ${{ github.repository_owner == 'Parallel-in-Time'
