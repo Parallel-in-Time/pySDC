@@ -86,7 +86,7 @@ jobs:
         if: >-
           ${{ github.event.workflow_run.event == 'push'
           && github.repository_owner == 'Parallel-in-Time'
-          && github.event.workflow_run.head_branch == 'refs/heads/master' }}
+          && github.event.workflow_run.head_branch == 'master' }}
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: docs/build/html # The folder the action should deploy.
