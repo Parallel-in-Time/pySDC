@@ -117,7 +117,7 @@ jobs:
           MIRROR_BRANCH: ${{ env.MIRROR_BRANCH }}
 
   get_artifacts_from_other_workflow:
-    runs-on: ubuntu-latest#
+    runs-on: ubuntu-latest
     needs:
       - mirror_to_gitlab
     steps:
@@ -196,3 +196,10 @@ jobs:
           merge-multiple: true
           run-id: ${{ steps.get_id.outputs.result }}
           github-token: ${{ secrets.ACTION_READ_TOKEN }}
+          path: ./github_ci_artifacts
+      - name: Uploading artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Github_CI_artifacts
+          path: |
+            ./github_ci_artifacts/*
