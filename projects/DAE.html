@@ -20,7 +20,7 @@
     <link rel="next" title="Compression in pySDC" href="compression.html" />
     <link rel="prev" title="Resilience in SDC" href="Resilience.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -273,6 +273,115 @@ y (t) + \eta t z (t) &amp;= \sin (t)\end{split}\]</div>
 \[\begin{eqnarray}
    F\left(u (t), u' (t), t\right) = 0
 \end{eqnarray}\]</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.projects.DAE.misc.ProblemDAE</span> <span class="kn">import</span> <span class="n">ptype_dae</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
+
+
+<span class="k">class</span> <span class="nc">problematic_f</span><span class="p">(</span><span class="n">ptype_dae</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Standard example of a very simple fully implicit index-2 differential algebraic equation (DAE) that is not</span>
+<span class="sd">    numerically solvable for certain choices of the parameter :math:`\eta`. The DAE system is given by</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d y(t)}{dt} + \eta t \frac{d z(t)}{dt} + (1 + \eta) z (t) = g (t).</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        y (t) + \eta t z (t) = f(t),</span>
+
+<span class="sd">    See, for example, page 264 of [1]_.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nvars : int</span>
+<span class="sd">        Number of unknowns of the system of DAEs.</span>
+<span class="sd">    newton_tol : float</span>
+<span class="sd">        Tolerance for Newton solver.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    eta : float</span>
+<span class="sd">        Specific parameter of the problem.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] U. Ascher, L. R. Petzold. Computer method for ordinary differential equations and differential-algebraic</span>
+<span class="sd">        equations. Society for Industrial and Applied Mathematics (1998).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newton_tol</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nvars</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="n">newton_tol</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;eta&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">du</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate the implicit representation of the problem, i.e., :math:`F(u, u&#39;, t)`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution at time t.</span>
+<span class="sd">        du : dtype_u</span>
+<span class="sd">            Current values of the derivative of the numerical solution at time t.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time of the numerical solution.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            Current value of the right-hand side of f (which includes two components).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span> <span class="o">*</span> <span class="n">t</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">),</span>
+            <span class="n">du</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span> <span class="o">*</span> <span class="n">t</span> <span class="o">*</span> <span class="n">du</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
+        <span class="k">return</span> <span class="n">f</span>
+
+    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine for the exact solution.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            The time of the reference solution.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The reference solution as mesh object containing two components.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">me</span>
+
+    <span class="k">def</span> <span class="nf">du_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine for the derivative of the exact solution.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            The time of the reference solution.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The reference solution as mesh object containing two components.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">me</span>
+</pre></div>
+</div>
 <p>The imports for the classes <code class="docutils literal notranslate"><span class="pre">ptype_dae</span></code> and <code class="docutils literal notranslate"><span class="pre">mesh</span></code> are necessary for implementing this problem.</p>
 <p>The problem class inherits from the parent <code class="docutils literal notranslate"><span class="pre">ptype_dae</span></code> that
 has the <code class="docutils literal notranslate"><span class="pre">solve_system</span></code> method solving the (non)-linear system to find the root, i.e., updating the values of the unknown derivative. All DAE problem classes should therefore inherit from this class.
@@ -296,6 +405,123 @@ u_2' (t) &amp;= \frac{1 - \alpha}{t - 2} u_1 (t) - u_2 (t) + (\alpha - 1) z (t) 
 0 &amp;= (t + 2) u_1 (t) + (t^2 - 4) u_2 (t) - (t^2 + t - 2) e^t.\end{split}\]</div>
 <p>This example has two differential variables <span class="math notranslate nohighlight">\(u_1\)</span>, <span class="math notranslate nohighlight">\(u_2\)</span> (two differential equations) and one algebraic variable <span class="math notranslate nohighlight">\(z\)</span> (thus one algebraic equation).
 In <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> defining a problem class for semi-explicit DAEs is slightly different to those of fully-implicit form. Additionally to <code class="docutils literal notranslate"><span class="pre">numpy</span></code> for the example the imports for the classes <code class="docutils literal notranslate"><span class="pre">ptype_dae</span></code> and <code class="docutils literal notranslate"><span class="pre">DAEMesh</span></code> are needed.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.projects.DAE.misc.ProblemDAE</span> <span class="kn">import</span> <span class="n">ptype_dae</span>
+
+
+<span class="k">class</span> <span class="nc">simple_dae_1</span><span class="p">(</span><span class="n">ptype_dae</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example implementing a smooth linear index-2 differential-algebraic equation (DAE) with known analytical solution.</span>
+<span class="sd">    The DAE system is given by</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d u_1 (t)}{dt} = (\alpha - \frac{1}{2 - t}) u_1 (t) + (2-t) \alpha z (t) + \frac{3 - t}{2 - t},</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d u_2 (t)}{dt} = \frac{1 - \alpha}{t - 2} u_1 (t) - u_2 (t) + (\alpha - 1) z (t) + 2 e^{t},</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        0 = (t + 2) u_1 (t) + (t^{2} - 4) u_2 (t) - (t^{2} + t - 2) e^{t}.</span>
+
+<span class="sd">    The exact solution of this system is</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u_1 (t) = u_2 (t) = e^{t},</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        z (t) = -\frac{e^{t}}{2 - t}.</span>
+
+<span class="sd">    This example is commonly used to test that numerical implementations are functioning correctly. See, for example,</span>
+<span class="sd">    page 267 of [1]_.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nvars : int</span>
+<span class="sd">        Number of unknowns of the system of DAEs.</span>
+<span class="sd">    newton_tol : float</span>
+<span class="sd">        Tolerance for Newton solver.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] U. Ascher, L. R. Petzold. Computer method for ordinary differential equations and differential-algebraic</span>
+<span class="sd">        equations. Society for Industrial and Applied Mathematics (1998).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nvars</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="n">newton_tol</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">du</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate the implicit representation of the problem, i.e., :math:`F(u, u&#39;, t)`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution at time t.</span>
+<span class="sd">        du : dtype_u</span>
+<span class="sd">            Current values of the derivative of the numerical solution at time t.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time of the numerical solution.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            Current value of the right-hand side of f (which includes three components).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Smooth index-2 DAE pg. 267 Ascher and Petzold (also the first example in KDC Minion paper)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="mf">10.0</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+
+        <span class="n">f</span><span class="o">.</span><span class="n">diff</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="o">-</span><span class="n">du</span><span class="o">.</span><span class="n">diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">-</span> <span class="n">t</span><span class="p">))</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">alg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">3</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">t</span><span class="p">),</span>
+            <span class="o">-</span><span class="n">du</span><span class="o">.</span><span class="n">diff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">u</span><span class="o">.</span><span class="n">diff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">alg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">t</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">alg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">t</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">diff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">t</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">t</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
+        <span class="k">return</span> <span class="n">f</span>
+
+    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine for the exact solution.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            The time of the reference solution.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The reference solution as mesh object containing three components.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">me</span><span class="o">.</span><span class="n">diff</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+        <span class="n">me</span><span class="o">.</span><span class="n">alg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">me</span>
+
+    <span class="k">def</span> <span class="nf">du_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine for the derivative of the exact solution.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            The time of the reference solution.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The reference solution as mesh object containing three components.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">me</span><span class="o">.</span><span class="n">diff</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+        <span class="n">me</span><span class="o">.</span><span class="n">alg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="mi">3</span><span class="p">))</span> <span class="o">/</span> <span class="p">((</span><span class="mi">2</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">me</span>
+</pre></div>
+</div>
 <p>This problem class inherits again from <code class="docutils literal notranslate"><span class="pre">ptype_dae</span></code>. In contrast, for the solution <code class="docutils literal notranslate"><span class="pre">u</span></code> and the right-hand side of the <code class="docutils literal notranslate"><span class="pre">f</span></code>
 a different datatype <code class="docutils literal notranslate"><span class="pre">DAEMesh</span></code> is used that allows to separate between the differential variables and the algebraic variables as well
 as for the equations. The tolerance for the root solver is passed with a default value of <code class="docutils literal notranslate"><span class="pre">1e-10</span></code> and the number of unknowns is <span class="math notranslate nohighlight">\(3\)</span>, i.e., <code class="docutils literal notranslate"><span class="pre">nvars=3</span></code>.
@@ -317,7 +543,7 @@ It is also possible to separate the differential and algebraic equations by assi
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
   <div>
     <h3><a href="../index.html">Table of Contents</a></h3>
@@ -362,7 +588,7 @@ It is also possible to separate the differential and algebraic equations by assi
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -383,7 +609,7 @@ It is also possible to separate the differential and algebraic equations by assi
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

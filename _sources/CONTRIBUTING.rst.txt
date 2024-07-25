@@ -1,5 +1,8 @@
 
 :orphan:
+.. role:: raw-html-m2r(raw)
+   :format: html
+
 
 .. _CONTRIBUTING/how-to-contribute-to-pysdc:
 
@@ -7,17 +10,30 @@ How to contribute to pySDC
 ==========================
 
 Developments on the ``pySDC`` code use the classical approach of forks and pull requests.
-You can look at `extended GitHub documentation <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/getting-started/about-collaborative-development-models>`_ for more details (skip this if you are already used to it). Furthermore, branches on ``pySDC`` follow a pre-defined structure. To contribute to any of them, please look at the :doc:`pull request recommendations <./docs/contrib/01_pull_requests>`.
+You can look at `extended GitHub documentation <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/getting-started/about-collaborative-development-models>`_
+for more details (skip this if you are already used to it).
+Furthermore, branches on ``pySDC`` follow a pre-defined structure.
+To contribute to any of them, please look at the :doc:`pull request recommendations <./docs/contrib/01_pull_requests>`.
 
-Additionally, a *few* rules are set to enforce code readability, consistency and reliability. Some of them are automatically tested with each commit, and summarized in the page on :doc:`continuous integration (CI) <./docs/contrib/02_continuous_integration>`.
-Others are specific conventions chosen for the pySDC library, that may follow Python standards (or not ...), detailed in the :doc:`naming conventions <./docs/contrib/03_naming_conventions>` page.
+Additionally, a *few* rules are set to enforce code readability,
+consistency and reliability.
+Some of them are automatically tested with each commit,
+and summarized in the page on :doc:`continuous integration (CI) <./docs/contrib/02_continuous_integration>`.
+Others are specific conventions chosen for the pySDC library,
+that may follow Python standards (or not ...), detailed in the
+:doc:`naming conventions <./docs/contrib/03_naming_conventions>` page.
 
-Finally, while ``pySDC`` provides many base functionalities that implement classical flavors of SDC, it also allows problem-specific applications through Object-Oriented Programming (OOP) and the implementation of custom inherited classes.
-This follows a specific OOP framework, you can look at the page on :doc:`custom implementations <./docs/contrib/04_custom_implementations>` for more details. Additional guideline are also given on how to :doc:`document the code <./docs/contrib/05_documenting_code>` in ``pySDC``.
+Finally, while ``pySDC`` provides many base functionalities that implement
+classical flavors of SDC, it also allows problem-specific applications through
+Object-Oriented Programming (OOP) and the implementation of custom inherited classes.
+This follows a specific OOP framework, you can look at the page on
+:doc:`custom implementations <./docs/contrib/04_custom_implementations>`
+for more details. Additional guideline are also given on how to
+:doc:`document the code <./docs/contrib/05_documenting_code>` in ``pySDC``.
 
 ..
 
-   📣 Some core components (collocation matrix, $Q-\Delta$ coefficients, Lagrange barycentric interpolation) 
+   📣 Some core components (collocation matrix, $Q-\Delta$ coefficients, Lagrange barycentric interpolation)\ :raw-html-m2r:`<br>`
    are implemented and developed in the `\ ``qmat`` companion package <https://github.com/Parallel-in-Time/qmat>`_.
    Checkout its own `contributing guide <https://qmat.readthedocs.io/en/latest/contributing.html>`_
    to add any new coefficient / feature on this part.

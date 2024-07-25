@@ -19,7 +19,7 @@
     <link rel="next" title="implementations.convergence_controller_classes.adaptivity module" href="implementations.convergence_controller_classes.adaptivity.html" />
     <link rel="prev" title="implementations.convergence_controller_classes package" href="implementations.convergence_controller_classes.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -58,14 +58,12 @@ converged until all methods given are converged, at which point the step is ende
 Whenever the quadrature is changed, the solution is interpolated from the old nodes to the new nodes to ensure
 accelerated convergence compared to starting from the initial conditions.</p>
 <p>Use this convergence controller by supplying parameters that the sweeper accepts as a list to the <cite>params</cite>.
-For instance, supplying
-<a href="#id1"><span class="problematic" id="id2">``</span></a>`
-params = {</p>
-<blockquote>
-<div><p>‘num_nodes’: [2, 3],</p>
-</div></blockquote>
-<section id="id3">
-<h2>}<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+For instance, supplying</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;num_nodes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 <p>will use collocation methods like you passed to the <cite>sweeper_params</cite> in the <cite>description</cite> object, but will change
 the number of nodes to 2 before the first iteration and to 3 as soon as the 2-node collocation problem is converged.
 This will override whatever you set for the number of nodes in the <cite>sweeper_params</cite>, but you still need to set
@@ -227,7 +225,6 @@ on any specific rank.</p>
 </dl>
 </dd></dl>
 
-</section>
 </dd></dl>
 
 </section>
@@ -237,7 +234,7 @@ on any specific rank.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
   <div>
     <h3><a href="../index.html">Table of Contents</a></h3>
@@ -290,7 +287,7 @@ on any specific rank.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -313,7 +310,7 @@ on any specific rank.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>
