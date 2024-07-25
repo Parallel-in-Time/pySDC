@@ -196,10 +196,10 @@ jobs:
           merge-multiple: true
           run-id: ${{ steps.get_id.outputs.result }}
           github-token: ${{ secrets.ACTION_READ_TOKEN }}
+          path: ./github_ci_artifacts
       - name: Uploading artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Github_CI_artifacts
           path: |
-            data_3.10
-            coverage_*_3.10.dat
+            ./github_ci_artifacts/*
