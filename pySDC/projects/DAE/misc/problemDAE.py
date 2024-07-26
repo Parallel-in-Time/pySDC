@@ -5,7 +5,7 @@ from pySDC.core.problem import Problem, WorkCounter
 from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
 
 
-class ptype_dae(Problem):
+class ProblemDAE(Problem):
     r"""
     This class implements a generic DAE class and illustrates the interface class for DAE problems.
     It ensures that all parameters are passed that are needed by DAE sweepers.

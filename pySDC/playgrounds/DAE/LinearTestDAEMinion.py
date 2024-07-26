@@ -1,11 +1,11 @@
 import numpy as np
 
 from pySDC.core.problem import WorkCounter
-from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
+from pySDC.projects.DAE.misc.problemDAE import ProblemDAE
 from pySDC.core.errors import ProblemError
 
 
-class LinearTestDAEMinion(ptype_dae):
+class LinearTestDAEMinion(ProblemDAE):
     r"""
     This class implements a linear stiff DAE problem from [1]_ that is given by
 
