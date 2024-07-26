@@ -88,7 +88,7 @@ def testOrderAccuracySemiExplicitIndexOne(sweeper_name):
 
     from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.projects.DAE.misc.HookClass_DAE import (
+    from pySDC.projects.DAE.misc.hooksDAE import (
         LogGlobalErrorPostStepDifferentialVariable,
         LogGlobalErrorPostStepAlgebraicVariable,
     )
@@ -171,9 +171,9 @@ def testOrderAccuracySemiExplicitIndexTwo(sweeper_name):
     Note that order reduction in the algebraic variable is expected.
     """
 
-    from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
+    from pySDC.projects.DAE.problems.simpleDAE import SimpleDAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.projects.DAE.misc.HookClass_DAE import (
+    from pySDC.projects.DAE.misc.hooksDAE import (
         LogGlobalErrorPostStepDifferentialVariable,
         LogGlobalErrorPostStepAlgebraicVariable,
     )
@@ -194,7 +194,7 @@ def testOrderAccuracySemiExplicitIndexTwo(sweeper_name):
     }
 
     hook_class = [LogGlobalErrorPostStepDifferentialVariable, LogGlobalErrorPostStepAlgebraicVariable]
-    description, controller_params = getTestSetup(simple_dae_1, get_sweeper(sweeper_name), hook_class)
+    description, controller_params = getTestSetup(SimpleDAE, get_sweeper(sweeper_name), hook_class)
 
     sweeper_params = {
         'quad_type': 'RADAU-RIGHT',
@@ -255,7 +255,7 @@ def testOrderAccuracyFullyImplicitIndexTwo(sweeper_name):
     Note that for index two problems order reduction is expected.
     """
 
-    from pySDC.projects.DAE.problems.problematicF import problematic_f
+    from pySDC.projects.DAE.problems.problematicF import ProblematicF
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostStep
 
@@ -269,7 +269,7 @@ def testOrderAccuracyFullyImplicitIndexTwo(sweeper_name):
     }
 
     hook_class = [LogGlobalErrorPostStep]
-    description, controller_params = getTestSetup(problematic_f, get_sweeper(sweeper_name), hook_class)
+    description, controller_params = getTestSetup(ProblematicF, get_sweeper(sweeper_name), hook_class)
 
     sweeper_params = {
         'quad_type': 'RADAU-RIGHT',

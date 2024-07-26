@@ -4,7 +4,7 @@ from pySDC.projects.DAE.misc.problemDAE import ProblemDAE
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
-class problematic_f(ProblemDAE):
+class ProblematicF(ProblemDAE):
     r"""
     Standard example of a very simple fully implicit index-2 differential algebraic equation (DAE) that is not
     numerically solvable for certain choices of the parameter :math:`\eta`. The DAE system is given by

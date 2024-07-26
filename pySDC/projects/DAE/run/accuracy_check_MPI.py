@@ -2,7 +2,7 @@ import numpy as np
 from mpi4py import MPI
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.DAE.misc.HookClass_DAE import (
+from pySDC.projects.DAE.misc.hooksDAE import (
     LogGlobalErrorPostStepDifferentialVariable,
     LogGlobalErrorPostStepAlgebraicVariable,
 )
@@ -36,10 +36,10 @@ def run(dt, num_nodes, use_MPI, semi_implicit, residual_type, index_case, initia
 
     if not semi_implicit:
         if use_MPI:
-            from pySDC.projects.DAE.sweepers.fully_implicit_DAE_MPI import fully_implicit_DAE_MPI as sweeper
+            from pySDC.projects.DAE.sweepers.fullyImplicitDAEMPI import FullyImplicitDAEMPI as sweeper
 
         else:
-            from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE as sweeper
+            from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE as sweeper
 
     else:
         if use_MPI:
@@ -55,7 +55,7 @@ def run(dt, num_nodes, use_MPI, semi_implicit, residual_type, index_case, initia
         Tend = 1.5
 
     elif index_case == 2:
-        from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1 as problem
+        from pySDC.projects.DAE.problems.simpleDAE import SimpleDAE as problem
 
         t0 = 0.0
         Tend = 0.4

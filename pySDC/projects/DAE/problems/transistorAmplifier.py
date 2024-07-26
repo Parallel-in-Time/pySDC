@@ -11,7 +11,7 @@ def _transistor(u_in):
     return 1e-6 * (np.exp(u_in / 0.026) - 1)
 
 
-class one_transistor_amplifier(ProblemDAE):
+class OneTransistorAmplifier(ProblemDAE):
     r"""
     The one transistor amplifier example from pg. 377 in [1]_. The problem is an index-1 differential-algebraic equation
     (DAE) having the equations
@@ -138,7 +138,7 @@ class one_transistor_amplifier(ProblemDAE):
         return me
 
 
-class two_transistor_amplifier(ProblemDAE):
+class TwoTransistorAmplifier(ProblemDAE):
     r"""
     The two transistor amplifier example from page 108 in [1]_. The problem is an index-1 differential-algebraic equation
     (DAE) having the equations

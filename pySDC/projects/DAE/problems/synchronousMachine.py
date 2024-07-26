@@ -5,7 +5,7 @@ from scipy.interpolate import interp1d
 from pySDC.projects.DAE.misc.problemDAE import ProblemDAE
 
 
-class synchronous_machine_infinite_bus(ProblemDAE):
+class SynchronousMachineInfiniteBus(ProblemDAE):
     r"""
     Synchronous machine model from Kundur (equiv. circuits fig. 3.18 in [1]_) attached to infinite bus. The machine can be
     represented as two different circuits at the direct-axis and the quadrature-axis. Detailed information can be found in

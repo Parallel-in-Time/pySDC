@@ -10,9 +10,9 @@ Project overview
 - misc
     - | ``DAEMesh.py``
       | Datatype for semi-explicit DAE problem classes differential and algebraic parts to have a clean treatment.
-    - | ``HookClass_DAE.py``
+    - | ``hooksDAE.py``
       | Simple hook classes to read out the approximate solution and error after each time step.
-    - | ``ProblemDAE.py``
+    - | ``problemDAE.py``
       | Parent class for DAE problems containing the method to solve the (non)-linear system at each node/stage.
 
 - plotting
@@ -30,11 +30,11 @@ Project overview
       | Example of the pendulum described by a semi-implicit DAE of index 3.
     - | ``problematicF.py``
       | Fully-implicit DAE of index 2 which is not solvable for numerically solvable for certain choices of parameter :math:`\eta`.
-    - | ``simple_DAE.py`` 
+    - | ``simpleDAE.py`` 
       | Linear semi-explicit index-2 system of Hessenberg form with known analytical solution.
-    - | ``synchronous_machine.py`` 
+    - | ``synchronousMachine.py`` 
       | Synchronous machine model attached to an infinite bus undergoing torque disturbance test. Results in an index-1 system. 
-    - | ``transistor_amplifier.py``
+    - | ``transistorAmplifier.py``
       | A two transistor amplifier model that results in an index-1 differential algebraic system. A nice example of a system resulting from a common real world situation.
     - | ``WSCC9BusSystem.py``
       | Large power system test case with three reduced model synchronous machines and nine buses. It is also part of the `PinTSimE project <https://github.com/Parallel-in-Time/pySDC/tree/master/pySDC/projects/PinTSimE>`_.
@@ -52,11 +52,11 @@ Project overview
       | Script checking the order of accuracy of MPI sweepers for DAEs of different indices.
 
 - sweepers
-    - | ``fully_implicit_DAE.py`` 
+    - | ``fullyImplicitDAE.py`` 
       | Sweeper that accepts a fully implicit formulation of a system of differential equations and applies to it a modified version of spectral deferred correction
     - | ``SemiImplicitDAE.py``
       | SDC sweeper especially for semi-explicit DAEs. This sweeper is based on ideas mentioned in `Huang et al. (2007) <https://www.sciencedirect.com/science/article/abs/pii/S0021999106003147>`_.
-    - | ``fully_implicit_DAE_MPI.py``
+    - | ``fullyImplicitDAEMPI.py``
       | MPI version of fully-implicit SDC-DAE sweeper.
     - | ``SemiImplicitDAEMPI.py``
       | MPI version of semi-implicit SDC-DAE sweeper.
@@ -210,7 +210,7 @@ We want to implement such an equation and consider the example
 This example has two differential variables :math:`u_1`, :math:`u_2` (two differential equations) and one algebraic variable :math:`z` (thus one algebraic equation).
 In ``pySDC`` defining a problem class for semi-explicit DAEs is slightly different to those of fully-implicit form. Additionally to ``numpy`` for the example the imports for the classes ``ptype_dae`` and ``DAEMesh`` are needed.
 
-.. literalinclude:: ../../../pySDC/projects/DAE/problems/simple_DAE.py
+.. literalinclude:: ../../../pySDC/projects/DAE/problems/simpleDAE.py
 
 This problem class inherits again from ``ptype_dae``. In contrast, for the solution ``u`` and the right-hand side of the ``f``
 a different datatype ``DAEMesh`` is used that allows to separate between the differential variables and the algebraic variables as well

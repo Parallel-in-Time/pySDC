@@ -4,7 +4,7 @@ import dill
 
 from pySDC.core.errors import ParameterError
 
-from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
 from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
 from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem
 
@@ -43,7 +43,7 @@ def make_plots_for_test_DAE():  # pragma: no cover
     problem_class = DiscontinuousTestDAE
     prob_class_name = DiscontinuousTestDAE.__name__
 
-    sweeper = fully_implicit_DAE
+    sweeper = FullyImplicitDAE
     nnodes = [2, 3, 4, 5]
     quad_type = 'RADAU-RIGHT'
     QI = 'LU'
@@ -172,7 +172,7 @@ def make_plots_for_WSCC9_test_case(cwd='./'):  # pragma: no cover
     problem_class = WSCC9BusSystem
     prob_class_name = WSCC9BusSystem.__name__
 
-    sweeper = fully_implicit_DAE
+    sweeper = FullyImplicitDAE
     nnodes = [2, 3, 4, 5]
     quad_type = 'RADAU-RIGHT'
     QI = 'LU'

@@ -214,17 +214,17 @@ def testComputeEndpoint(quad_type):
 @pytest.mark.parametrize('M', [2, 3])
 def testCompareResults(M):
     r"""
-    Test checks whether the results of the ``fully_implicit_DAE`` sweeper matches
+    Test checks whether the results of the ``FullyImplicitDAE`` sweeper matches
     with the ``SemiImplicitDAE`` version.
     """
 
     from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE
-    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
     from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
     descrSI, controller_params = getTestSetup(DiscontinuousTestDAE, SemiImplicitDAE, [])
-    descrFI, _ = getTestSetup(DiscontinuousTestDAE, fully_implicit_DAE, [])
+    descrFI, _ = getTestSetup(DiscontinuousTestDAE, FullyImplicitDAE, [])
 
     sweeper_params = {
         'quad_type': 'RADAU-RIGHT',
@@ -272,9 +272,9 @@ def testOrderAccuracy(case, M, QI):
 
     from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE
     from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
-    from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
+    from pySDC.projects.DAE.problems.simpleDAE import SimpleDAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.projects.DAE.misc.HookClass_DAE import (
+    from pySDC.projects.DAE.misc.hooksDAE import (
         LogGlobalErrorPostStepDifferentialVariable,
         LogGlobalErrorPostStepAlgebraicVariable,
     )
@@ -282,23 +282,23 @@ def testOrderAccuracy(case, M, QI):
 
     problem = {
         0: DiscontinuousTestDAE,
-        1: simple_dae_1,
+        1: SimpleDAE,
     }
 
     interval = {
         'DiscontinuousTestDAE': (1.0, 1.5),
-        'simple_dae_1': (0.0, 0.4),
+        'SimpleDAE': (0.0, 0.4),
     }
 
     refOrderDiff = {
         'DiscontinuousTestDAE': 2 * M - 1,
-        'simple_dae_1': 2 * M - 1,
+        'SimpleDAE': 2 * M - 1,
     }
 
     # note that for index-2 DAEs there is order reduction in alg. variable
     refOrderAlg = {
         'DiscontinuousTestDAE': 2 * M - 1,
-        'simple_dae_1': M,
+        'SimpleDAE': M,
     }
 
     hook_class = [LogGlobalErrorPostStepDifferentialVariable, LogGlobalErrorPostStepAlgebraicVariable]

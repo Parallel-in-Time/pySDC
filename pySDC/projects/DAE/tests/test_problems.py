@@ -4,45 +4,45 @@ import numpy as np
 
 
 @pytest.mark.base
-def test_pendulum_u_exact_main():
-    from pySDC.projects.DAE.problems.pendulum2D import pendulum_2d
+def test_Pendulum2D_u_exact_main():
+    from pySDC.projects.DAE.problems.pendulum2D import Pendulum2D
 
     # initialize problem parameters
     problem_params = dict()
     problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
 
     # instantiate problem
-    prob = pendulum_2d(**problem_params)
+    prob = Pendulum2D(**problem_params)
 
     u_test = prob.u_exact(5.0)
     assert np.isclose(abs(u_test), 0.0)
 
 
 @pytest.mark.base
-def test_one_transistor_amplifier_u_exact_main():
-    from pySDC.projects.DAE.problems.transistor_amplifier import one_transistor_amplifier
+def test_OneTransistorAmplifier_u_exact_main():
+    from pySDC.projects.DAE.problems.transistorAmplifier import OneTransistorAmplifier
 
     # initialize problem parameters
     problem_params = dict()
     problem_params['newton_tol'] = 1e-12  # tollerance for implicit solver
 
     # instantiate problem
-    prob = one_transistor_amplifier(**problem_params)
+    prob = OneTransistorAmplifier(**problem_params)
 
     u_test = prob.u_exact(5.0)
     assert np.array_equal(abs(u_test), 0.0)
 
 
 @pytest.mark.base
-def test_two_transistor_amplifier_u_exact_main():
-    from pySDC.projects.DAE.problems.transistor_amplifier import two_transistor_amplifier
+def test_TwoTransistorAmplifier_u_exact_main():
+    from pySDC.projects.DAE.problems.transistorAmplifier import TwoTransistorAmplifier
 
     # initialize problem parameters
     problem_params = dict()
     problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
 
     # instantiate problem
-    prob = two_transistor_amplifier(**problem_params)
+    prob = TwoTransistorAmplifier(**problem_params)
 
     u_test = prob.u_exact(5.0)
     assert np.isclose(abs(u_test), 0.0)
@@ -52,10 +52,10 @@ def test_two_transistor_amplifier_u_exact_main():
 #   Explicit test for the pendulum example
 #
 @pytest.mark.base
-def test_pendulum_main():
-    from pySDC.projects.DAE.problems.pendulum2D import pendulum_2d
+def test_Pendulum2D_main():
+    from pySDC.projects.DAE.problems.pendulum2D import Pendulum2D
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
 
     # initialize level parameters
     level_params = dict()
@@ -81,9 +81,9 @@ def test_pendulum_main():
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = pendulum_2d
+    description['problem_class'] = Pendulum2D
     description['problem_params'] = problem_params
-    description['sweeper_class'] = fully_implicit_DAE
+    description['sweeper_class'] = FullyImplicitDAE
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
@@ -110,10 +110,10 @@ def test_pendulum_main():
 
 
 @pytest.mark.base
-def test_one_transistor_amplifier_main():
-    from pySDC.projects.DAE.problems.transistor_amplifier import one_transistor_amplifier
+def test_OneTransistorAmplifier_main():
+    from pySDC.projects.DAE.problems.transistorAmplifier import OneTransistorAmplifier
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
 
     # initialize level parameters
     level_params = dict()
@@ -139,9 +139,9 @@ def test_one_transistor_amplifier_main():
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = one_transistor_amplifier
+    description['problem_class'] = OneTransistorAmplifier
     description['problem_params'] = problem_params
-    description['sweeper_class'] = fully_implicit_DAE
+    description['sweeper_class'] = FullyImplicitDAE
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
@@ -169,10 +169,10 @@ def test_one_transistor_amplifier_main():
 
 
 @pytest.mark.base
-def test_two_transistor_amplifier_main():
-    from pySDC.projects.DAE.problems.transistor_amplifier import two_transistor_amplifier
+def test_TwoTransistorAmplifier_main():
+    from pySDC.projects.DAE.problems.transistorAmplifier import TwoTransistorAmplifier
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
 
     # initialize level parameters
     level_params = dict()
@@ -198,9 +198,9 @@ def test_two_transistor_amplifier_main():
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = two_transistor_amplifier
+    description['problem_class'] = TwoTransistorAmplifier
     description['problem_params'] = problem_params
-    description['sweeper_class'] = fully_implicit_DAE
+    description['sweeper_class'] = FullyImplicitDAE
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
@@ -237,10 +237,10 @@ def test_two_transistor_amplifier_main():
 
 
 @pytest.mark.base
-def test_synchgen_infinite_bus_main():
-    from pySDC.projects.DAE.problems.synchronous_machine import synchronous_machine_infinite_bus
+def test_SynchronousMachineInfiniteBus_main():
+    from pySDC.projects.DAE.problems.synchronousMachine import SynchronousMachineInfiniteBus
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
 
     # initialize level parameters
     level_params = dict()
@@ -266,9 +266,9 @@ def test_synchgen_infinite_bus_main():
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = synchronous_machine_infinite_bus
+    description['problem_class'] = SynchronousMachineInfiniteBus
     description['problem_params'] = problem_params
-    description['sweeper_class'] = fully_implicit_DAE
+    description['sweeper_class'] = FullyImplicitDAE
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
@@ -369,7 +369,7 @@ def test_DiscontinuousTestDAE_SDC(M):
     """
 
     from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
-    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
     # large errors are expected since the simulation domain contains the event
@@ -406,7 +406,7 @@ def test_DiscontinuousTestDAE_SDC(M):
     description = {
         'problem_class': DiscontinuousTestDAE,
         'problem_params': problem_params,
-        'sweeper_class': fully_implicit_DAE,
+        'sweeper_class': FullyImplicitDAE,
         'sweeper_params': sweeper_params,
         'level_params': level_params,
         'step_params': step_params,
@@ -437,7 +437,7 @@ def test_DiscontinuousTestDAE_SDC_detection(M):
 
     from pySDC.helpers.stats_helper import get_sorted
     from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
-    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
     from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
@@ -489,7 +489,7 @@ def test_DiscontinuousTestDAE_SDC_detection(M):
     description = {
         'problem_class': DiscontinuousTestDAE,
         'problem_params': problem_params,
-        'sweeper_class': fully_implicit_DAE,
+        'sweeper_class': FullyImplicitDAE,
         'sweeper_params': sweeper_params,
         'level_params': level_params,
         'step_params': step_params,
@@ -554,7 +554,7 @@ def test_WSCC9_update_YBus():
     """
 
     from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem, get_initial_Ybus, get_event_Ybus
-    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
     dt = 0.05
@@ -584,7 +584,7 @@ def test_WSCC9_update_YBus():
     description = {
         'problem_class': WSCC9BusSystem,
         'problem_params': problem_params,
-        'sweeper_class': fully_implicit_DAE,
+        'sweeper_class': FullyImplicitDAE,
         'sweeper_params': sweeper_params,
         'level_params': level_params,
         'step_params': step_params,
@@ -621,7 +621,7 @@ def test_WSCC9_get_switching_info():
 
     from pySDC.helpers.stats_helper import get_sorted
     from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem
-    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
     dt = 0.75
@@ -651,7 +651,7 @@ def test_WSCC9_get_switching_info():
     description = {
         'problem_class': WSCC9BusSystem,
         'problem_params': problem_params,
-        'sweeper_class': fully_implicit_DAE,
+        'sweeper_class': FullyImplicitDAE,
         'sweeper_params': sweeper_params,
         'level_params': level_params,
         'step_params': step_params,

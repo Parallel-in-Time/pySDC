@@ -3,7 +3,7 @@ import numpy as np
 from pySDC.projects.DAE.misc.problemDAE import ProblemDAE
 
 
-class simple_dae_1(ProblemDAE):
+class SimpleDAE(ProblemDAE):
     r"""
     Example implementing a smooth linear index-2 differential-algebraic equation (DAE) with known analytical solution.
     The DAE system is given by

@@ -4,8 +4,8 @@ import numpy as np
 
 @pytest.mark.base
 def test_predict_main():
-    from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
-    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.projects.DAE.problems.simpleDAE import SimpleDAE
+    from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
     from pySDC.core.step import Step
 
     # initialize level parameters
@@ -24,9 +24,9 @@ def test_predict_main():
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = simple_dae_1
+    description['problem_class'] = SimpleDAE
     description['problem_params'] = problem_params
-    description['sweeper_class'] = fully_implicit_DAE
+    description['sweeper_class'] = FullyImplicitDAE
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
 
@@ -65,8 +65,8 @@ def test_predict_main():
 
 @pytest.mark.base
 def test_residual_main():
-    from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
-    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.projects.DAE.problems.simpleDAE import SimpleDAE
+    from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
     from pySDC.core.step import Step
 
     # initialize level parameters
@@ -85,9 +85,9 @@ def test_residual_main():
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = simple_dae_1
+    description['problem_class'] = SimpleDAE
     description['problem_params'] = problem_params
-    description['sweeper_class'] = fully_implicit_DAE
+    description['sweeper_class'] = FullyImplicitDAE
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     # description['step_params'] = step_params
@@ -151,8 +151,8 @@ def test_residual_main():
 
 @pytest.mark.base
 def test_compute_end_point_main():
-    from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
-    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.projects.DAE.problems.simpleDAE import SimpleDAE
+    from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
     from pySDC.core.step import Step
 
     # initialize level parameters
@@ -171,9 +171,9 @@ def test_compute_end_point_main():
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = simple_dae_1
+    description['problem_class'] = SimpleDAE
     description['problem_params'] = problem_params
-    description['sweeper_class'] = fully_implicit_DAE
+    description['sweeper_class'] = FullyImplicitDAE
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
 

@@ -46,7 +46,7 @@ class LogGlobalErrorPostStepDifferentialVariable(Hooks):
 
 class LogGlobalErrorPostStepAlgebraicVariable(Hooks):
     """
-    Logs the global error in the algebraic variable
+    Logs the global error in the algebraic variable after each step.
     """
 
     def post_step(self, step, level_number):

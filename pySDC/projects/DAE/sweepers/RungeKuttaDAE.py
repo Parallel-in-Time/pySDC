@@ -1,4 +1,4 @@
-from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
 from pySDC.implementations.sweeper_classes.Runge_Kutta import (
     RungeKutta,
     BackwardEuler,
@@ -148,7 +148,7 @@ class RungeKuttaDAE(RungeKutta):
 
             finit = lvl.f[m].flatten()
             lvl.f[m + 1][:] = prob.solve_system(
-                fully_implicit_DAE.F,
+                FullyImplicitDAE.F,
                 u_approx,
                 lvl.dt * self.QI[m + 1, m + 1],
                 finit,
