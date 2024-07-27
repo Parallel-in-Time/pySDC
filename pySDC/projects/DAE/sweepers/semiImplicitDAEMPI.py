@@ -1,7 +1,7 @@
 from mpi4py import MPI
 
 from pySDC.projects.DAE.sweepers.fullyImplicitDAEMPI import SweeperDAEMPI
-from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE
+from pySDC.projects.DAE.sweepers.semiImplicitDAE import SemiImplicitDAE
 
 
 class SemiImplicitDAEMPI(SweeperDAEMPI, SemiImplicitDAE):
@@ -14,7 +14,7 @@ class SemiImplicitDAEMPI(SweeperDAEMPI, SemiImplicitDAE):
     .. math::
         0 = g(u, z, t)
 
-    More detailed description can be found in ``SemiImplicitDAE.py``. To parallelize SDC across the method the idea is to use a diagonal :math:`\mathbf{Q}_\Delta` to have solves of the implicit system on each node that can be done in parallel since they are fully decoupled from values of previous nodes. First such diagonal :math:`\mathbf{Q}_\Delta` were developed in [1]_. Years later intensive theory about the topic was developed in [2]_. For the DAE case these ideas were basically transferred.
+    More detailed description can be found in ``semiImplicitDAE.py``. To parallelize SDC across the method the idea is to use a diagonal :math:`\mathbf{Q}_\Delta` to have solves of the implicit system on each node that can be done in parallel since they are fully decoupled from values of previous nodes. First such diagonal :math:`\mathbf{Q}_\Delta` were developed in [1]_. Years later intensive theory about the topic was developed in [2]_. For the DAE case these ideas were basically transferred.
 
     Note
     ----

@@ -53,9 +53,9 @@ def testPredict(initial_guess):
     In this test the predict function of the sweeper is tested.
     """
 
-    from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE
-    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
-    from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
+    from pySDC.projects.DAE.sweepers.semiImplicitDAE import SemiImplicitDAE
+    from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.misc.meshDAE import MeshDAE
     from pySDC.core.step import Step
 
     description, _ = getTestSetup(DiscontinuousTestDAE, SemiImplicitDAE, [])
@@ -83,8 +83,8 @@ def testPredict(initial_guess):
 
     L.sweep.predict()
 
-    assert isinstance(L.u[0], DAEMesh), "Initial condition u0 is not of type DAEMesh!"
-    assert isinstance(L.f[0], DAEMesh), "Initial condition f0 is not of type DAEMesh!"
+    assert isinstance(L.u[0], MeshDAE), "Initial condition u0 is not of type MeshDAE!"
+    assert isinstance(L.f[0], MeshDAE), "Initial condition f0 is not of type MeshDAE!"
 
     assert np.allclose(L.f[0], 0.0), "Gradient at starting time needs to be initialised as zero!"
     if initial_guess == 'spread':
@@ -111,8 +111,8 @@ def testComputeResidual(residual_type):
     In this test the predict function of the sweeper is tested.
     """
 
-    from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE
-    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.sweepers.semiImplicitDAE import SemiImplicitDAE
+    from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE
     from pySDC.core.step import Step
     from pySDC.core.errors import ParameterError
 
@@ -169,8 +169,8 @@ def testComputeEndpoint(quad_type):
     In this test the predict function of the sweeper is tested.
     """
 
-    from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE
-    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.sweepers.semiImplicitDAE import SemiImplicitDAE
+    from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE
     from pySDC.core.step import Step
     from pySDC.core.errors import ParameterError
 
@@ -218,9 +218,9 @@ def testCompareResults(M):
     with the ``SemiImplicitDAE`` version.
     """
 
-    from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE
+    from pySDC.projects.DAE.sweepers.semiImplicitDAE import SemiImplicitDAE
     from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
-    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
     descrSI, controller_params = getTestSetup(DiscontinuousTestDAE, SemiImplicitDAE, [])
@@ -270,8 +270,8 @@ def testOrderAccuracy(case, M, QI):
     and an index-2 DAE of semi-explicit form.
     """
 
-    from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE
-    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.sweepers.semiImplicitDAE import SemiImplicitDAE
+    from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE
     from pySDC.projects.DAE.problems.simpleDAE import SimpleDAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.projects.DAE.misc.hooksDAE import (

@@ -20,10 +20,10 @@ def get_sweeper(sweeper_name):
 
     Returns
     -------
-    pySDC.Sweeper.RungeKutta
+    pySDC.projects.DAE.sweepers.rungeKuttaDAE.RungeKuttaDAE
         The sweeper.
     """
-    import pySDC.projects.DAE.sweepers.RungeKuttaDAE as RK
+    import pySDC.projects.DAE.sweepers.rungeKuttaDAE as RK
 
     return eval(f'RK.{sweeper_name}')
 
@@ -34,9 +34,9 @@ def getTestSetup(problem, sweeper, hook_class):
 
     Parameters
     ----------
-    problem : pySDC.projects.DAE.misc.ptype_dae
+    problem : pySDC.projects.DAE.misc.problemDAE.ProblemDAE
         Problem class.
-    sweeper : pySDC.projects.DAE.sweepers.RungeKuttaDAE
+    sweeper : pySDC.projects.DAE.sweepers.rungeKuttaDAE.RungeKuttaDAE
         Sweeper passed to the controller.
     hook_class : list
         Hook classes to log statistics such as errors.
@@ -86,7 +86,7 @@ def testOrderAccuracySemiExplicitIndexOne(sweeper_name):
     part.
     """
 
-    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.projects.DAE.misc.hooksDAE import (
         LogGlobalErrorPostStepDifferentialVariable,

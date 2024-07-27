@@ -114,7 +114,7 @@ class FullyImplicitDAEMPI(SweeperDAEMPI, generic_implicit_MPI, FullyImplicitDAE)
     .. math::
         F(t, u, u') = 0.
 
-    More detailed description can be found in ``FullyImplicitDAE.py``.
+    More detailed description can be found in ``fullyImplicitDAE.py``.
 
     This sweeper uses diagonal matrices :math:`\mathbf{Q}_\Delta` to
     solve the implicit system on each node in parallel. First diagonal matrices were first developed and applied in [1]_. Years later intensive theory in [2]_ is developed to that topic. Ideas of parallelizing SDC across the method are basically applied for the DAE case here.

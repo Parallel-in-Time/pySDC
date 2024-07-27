@@ -333,7 +333,7 @@ def testDetectionDAE(num_nodes):
     """
 
     from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
-    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE
     from pySDC.helpers.stats_helper import get_sorted
     from pySDC.projects.PinTSimE.battery_model import generateDescription, controllerRun
     from pySDC.implementations.hooks.log_solution import LogSolution

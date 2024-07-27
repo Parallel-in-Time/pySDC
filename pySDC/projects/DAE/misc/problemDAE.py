@@ -2,7 +2,7 @@ import numpy as np
 from scipy.optimize import root
 
 from pySDC.core.problem import Problem, WorkCounter
-from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
+from pySDC.projects.DAE.misc.meshDAE import MeshDAE
 
 
 class ProblemDAE(Problem):
@@ -25,8 +25,8 @@ class ProblemDAE(Problem):
         in work_counters['rhs']
     """
 
-    dtype_u = DAEMesh
-    dtype_f = DAEMesh
+    dtype_u = MeshDAE
+    dtype_f = MeshDAE
 
     def __init__(self, nvars, newton_tol):
         """Initialization routine"""

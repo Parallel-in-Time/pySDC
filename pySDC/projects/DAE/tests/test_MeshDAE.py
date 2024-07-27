@@ -9,10 +9,10 @@ def testInitialization(shape):
     """
 
     import numpy as np
-    from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
+    from pySDC.projects.DAE.misc.meshDAE import MeshDAE
 
     init = (shape, None, np.dtype('float64'))
-    mesh = DAEMesh(init)
+    mesh = MeshDAE(init)
 
     assert np.shape(mesh.diff) == shape, f'ERROR: Component diff does not have the desired length!'
     assert np.shape(mesh.alg) == shape, f'ERROR: Component alg does not have the desired length!'
@@ -27,15 +27,15 @@ def testInitializationGivenMesh():
     """
 
     import numpy as np
-    from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
+    from pySDC.projects.DAE.misc.meshDAE import MeshDAE
 
     nvars_1d = 6
     init = (nvars_1d, None, np.dtype('float64'))
-    mesh1 = DAEMesh(init)
+    mesh1 = MeshDAE(init)
     mesh1.diff[:] = np.arange(6)
     mesh1.alg[:] = np.arange(6, 12)
 
-    mesh2 = DAEMesh(mesh1)
+    mesh2 = MeshDAE(mesh1)
 
     assert np.allclose(mesh1.diff, mesh2.diff) and np.allclose(
         mesh1.alg, mesh2.alg
@@ -50,27 +50,27 @@ def testArrayUFuncOperator(shape):
     """
 
     import numpy as np
-    from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
+    from pySDC.projects.DAE.misc.meshDAE import MeshDAE
 
     init = (shape, None, np.dtype('float64'))
-    mesh = DAEMesh(init)
-    mesh2 = DAEMesh(mesh)
+    mesh = MeshDAE(init)
+    mesh2 = MeshDAE(mesh)
 
     randomArr = np.random.random(shape)
     mesh.diff[:] = randomArr
     mesh2.diff[:] = 2 * randomArr
 
     subMesh = mesh - mesh2
-    assert type(subMesh) == DAEMesh
+    assert type(subMesh) == MeshDAE
     assert np.allclose(subMesh.diff, randomArr - 2 * randomArr)
     assert np.allclose(subMesh.alg, 0)
 
     addMesh = mesh + mesh2
-    assert type(addMesh) == DAEMesh
+    assert type(addMesh) == MeshDAE
     assert np.allclose(addMesh.diff, randomArr + 2 * randomArr)
     assert np.allclose(addMesh.alg, 0)
 
     sinMesh = np.sin(mesh)
-    assert type(sinMesh) == DAEMesh
+    assert type(sinMesh) == MeshDAE
     assert np.allclose(sinMesh.diff, np.sin(randomArr))
     assert np.allclose(sinMesh.alg, 0)

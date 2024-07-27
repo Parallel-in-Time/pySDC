@@ -8,7 +8,7 @@ To run the scripts contained in this project a standard installation of pySDC sh
 Project overview 
 ----------------
 - misc
-    - | ``DAEMesh.py``
+    - | ``meshDAE.py``
       | Datatype for semi-explicit DAE problem classes differential and algebraic parts to have a clean treatment.
     - | ``hooksDAE.py``
       | Simple hook classes to read out the approximate solution and error after each time step.
@@ -24,7 +24,7 @@ Project overview
       | Reads a previously generated data file in `.npy` format and generates a plot on logarithmic y-axis and linear x-axis. 
 
 - problems
-    - | ``DiscontinousTestDAE``
+    - | ``discontinousTestDAE.py``
       | Simple nonlinear semi-explicit index-1 DAE with discrete state event whose event time is known.
     - | ``pendulum2D.py``
       | Example of the pendulum described by a semi-implicit DAE of index 3.
@@ -36,7 +36,7 @@ Project overview
       | Synchronous machine model attached to an infinite bus undergoing torque disturbance test. Results in an index-1 system. 
     - | ``transistorAmplifier.py``
       | A two transistor amplifier model that results in an index-1 differential algebraic system. A nice example of a system resulting from a common real world situation.
-    - | ``WSCC9BusSystem.py``
+    - | ``wscc9BusSystem.py``
       | Large power system test case with three reduced model synchronous machines and nine buses. It is also part of the `PinTSimE project <https://github.com/Parallel-in-Time/pySDC/tree/master/pySDC/projects/PinTSimE>`_.
 
 - run
@@ -54,13 +54,13 @@ Project overview
 - sweepers
     - | ``fullyImplicitDAE.py`` 
       | Sweeper that accepts a fully implicit formulation of a system of differential equations and applies to it a modified version of spectral deferred correction
-    - | ``SemiImplicitDAE.py``
+    - | ``semiImplicitDAE.py``
       | SDC sweeper especially for semi-explicit DAEs. This sweeper is based on ideas mentioned in `Huang et al. (2007) <https://www.sciencedirect.com/science/article/abs/pii/S0021999106003147>`_.
     - | ``fullyImplicitDAEMPI.py``
       | MPI version of fully-implicit SDC-DAE sweeper.
-    - | ``SemiImplicitDAEMPI.py``
+    - | ``semiImplicitDAEMPI.py``
       | MPI version of semi-implicit SDC-DAE sweeper.
-    - | ``RungeKuttaDAE.py``
+    - | ``rungeKuttaDAE.py``
       | Runge-Kutta methods that can be used to solve DAEs in pySDC in a fully-implicit description.
 
 - tests
@@ -173,9 +173,9 @@ which is of the general form
 
 .. literalinclude:: ../../../pySDC/projects/DAE/problems/problematicF.py
 
-The imports for the classes ``ptype_dae`` and ``mesh`` are necessary for implementing this problem.
+The imports for the classes ``ProblemDAE`` and ``mesh`` are necessary for implementing this problem.
 
-The problem class inherits from the parent ``ptype_dae`` that
+The problem class inherits from the parent ``ProblemDAE`` that
 has the ``solve_system`` method solving the (non)-linear system to find the root, i.e., updating the values of the unknown derivative. All DAE problem classes should therefore inherit from this class.
 For this general type of DAEs the datatype ``mesh`` is used here for both, ``u`` and ``f``.
 Further, the constructor requires at least the parameter ``newton_tol``, the tolerance passed to the root solver. It is possible to set a default value (which is set to ``1e-8`` in the example above).
@@ -208,16 +208,16 @@ We want to implement such an equation and consider the example
   0 &= (t + 2) u_1 (t) + (t^2 - 4) u_2 (t) - (t^2 + t - 2) e^t.
 
 This example has two differential variables :math:`u_1`, :math:`u_2` (two differential equations) and one algebraic variable :math:`z` (thus one algebraic equation).
-In ``pySDC`` defining a problem class for semi-explicit DAEs is slightly different to those of fully-implicit form. Additionally to ``numpy`` for the example the imports for the classes ``ptype_dae`` and ``DAEMesh`` are needed.
+In ``pySDC`` defining a problem class for semi-explicit DAEs is slightly different to those of fully-implicit form. Additionally to ``numpy`` for the example the imports for the classes ``ProblemDAE`` and ``MeshDAE`` are needed.
 
 .. literalinclude:: ../../../pySDC/projects/DAE/problems/simpleDAE.py
 
-This problem class inherits again from ``ptype_dae``. In contrast, for the solution ``u`` and the right-hand side of the ``f``
-a different datatype ``DAEMesh`` is used that allows to separate between the differential variables and the algebraic variables as well
+This problem class inherits again from ``ProblemDAE``. In contrast, for the solution ``u`` and the right-hand side of the ``f``
+a different datatype ``MeshDAE`` is used that allows to separate between the differential variables and the algebraic variables as well
 as for the equations. The tolerance for the root solver is passed with a default value of ``1e-10`` and the number of unknowns is :math:`3`, i.e., ``nvars=3``.
 The problem-specific parameter ``a`` has a default value of ``10.0``.
 
-In the ``eval_f`` method the equations and the variables are now separated using the components of the ``DAEMesh``. Recall that ``eval_f`` returns the right-hand side function so that we have a root problem. However, for this semi-explicit DAE this is not the case, but we can change that by rewriting the system to
+In the ``eval_f`` method the equations and the variables are now separated using the components of the ``MeshDAE``. Recall that ``eval_f`` returns the right-hand side function so that we have a root problem. However, for this semi-explicit DAE this is not the case, but we can change that by rewriting the system to
 
 .. math::
 

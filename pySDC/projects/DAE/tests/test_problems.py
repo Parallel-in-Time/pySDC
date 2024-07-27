@@ -319,7 +319,7 @@ def test_DiscontinuousTestDAE_singularity():
     Test if the event occurs at the correct time and proves if the right-hand side has with the correct values at the event.
     """
     import numpy as np
-    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE
 
     t_event = np.arccosh(50.0)
     disc_test_DAE = DiscontinuousTestDAE()
@@ -368,7 +368,7 @@ def test_DiscontinuousTestDAE_SDC(M):
     Simulates one SDC run for different number of coll.nodes and compares if the error satisfies an approppriate value.
     """
 
-    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE
     from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
@@ -436,7 +436,7 @@ def test_DiscontinuousTestDAE_SDC_detection(M):
     """
 
     from pySDC.helpers.stats_helper import get_sorted
-    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE
     from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
@@ -527,7 +527,7 @@ def test_WSCC9_evaluation():
     Test for WSCC9 bus test case. The class is written for components :math:`m = 3`, :math:`n = 9`.
     """
 
-    from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem
+    from pySDC.projects.DAE.problems.wscc9BusSystem import WSCC9BusSystem
 
     problem_params = {
         'newton_tol': 1e-10,
@@ -553,7 +553,7 @@ def test_WSCC9_update_YBus():
     Test if YBus is updated at time 0.05. For this SDC performs one time step.
     """
 
-    from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem, get_initial_Ybus, get_event_Ybus
+    from pySDC.projects.DAE.problems.wscc9BusSystem import WSCC9BusSystem, get_initial_Ybus, get_event_Ybus
     from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
@@ -620,7 +620,7 @@ def test_WSCC9_get_switching_info():
     """
 
     from pySDC.helpers.stats_helper import get_sorted
-    from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem
+    from pySDC.projects.DAE.problems.wscc9BusSystem import WSCC9BusSystem
     from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 

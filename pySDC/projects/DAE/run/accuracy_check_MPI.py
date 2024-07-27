@@ -43,13 +43,13 @@ def run(dt, num_nodes, use_MPI, semi_implicit, residual_type, index_case, initia
 
     else:
         if use_MPI:
-            from pySDC.projects.DAE.sweepers.SemiImplicitDAEMPI import SemiImplicitDAEMPI as sweeper
+            from pySDC.projects.DAE.sweepers.semiImplicitDAEMPI import SemiImplicitDAEMPI as sweeper
 
         else:
-            from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE as sweeper
+            from pySDC.projects.DAE.sweepers.semiImplicitDAE import SemiImplicitDAE as sweeper
 
     if index_case == 1:
-        from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE as problem
+        from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE as problem
 
         t0 = 1.0
         Tend = 1.5

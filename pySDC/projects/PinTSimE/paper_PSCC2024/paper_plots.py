@@ -5,8 +5,8 @@ import dill
 from pySDC.core.errors import ParameterError
 
 from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
-from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
-from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem
+from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE
+from pySDC.projects.DAE.problems.wscc9BusSystem import WSCC9BusSystem
 
 from pySDC.projects.PinTSimE.battery_model import generateDescription
 from pySDC.projects.PinTSimE.battery_model import controllerRun

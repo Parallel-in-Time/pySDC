@@ -192,7 +192,7 @@ class SemiImplicitDAE(FullyImplicitDAE):
         ----------
         du : dtype_u
             Unknowns of the system (derivative of solution u).
-        P : pySDC.projects.DAE.misc.ProblemDAE
+        P : pySDC.projects.DAE.misc.problemDAE.ProblemDAE
             Problem class.
         factor : float
             Abbrev. for the node-to-node stepsize.

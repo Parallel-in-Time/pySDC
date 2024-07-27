@@ -13,9 +13,9 @@ class LogGlobalErrorPostStepDifferentialVariable(Hooks):
 
         Parameters
         ----------
-        step : pySDC.core.Step
+        step : pySDC.core.step.Step
             Current step.
-        level_number : pySDC.core.level
+        level_number : pySDC.core.level.Level
             Current level number.
         """
 
@@ -55,9 +55,9 @@ class LogGlobalErrorPostStepAlgebraicVariable(Hooks):
 
         Parameters
         ----------
-        step : pySDC.core.Step
+        step : pySDC.core.step.Step
             Current step.
-        level_number : pySDC.core.level
+        level_number : pySDC.core.level.Level
             Current level number.
         """
 
