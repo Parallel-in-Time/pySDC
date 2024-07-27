@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/projects/DAE/problems/transistor_amplifier.py: 97%</title>
+    <title>Coverage for pySDC/projects/DAE/problems/transistorAmplifier.py: 97%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_58284776.png">
     <link rel="stylesheet" href="style_cb_8e611ae1.css" type="text/css">
     <script src="coverage_html_cb_6fb7b396.js" defer></script>
@@ -11,7 +11,7 @@
 <header>
     <div class="content">
         <h1>
-            <span class="text">Coverage for </span><b>pySDC/projects/DAE/problems/transistor_amplifier.py</b>:
+            <span class="text">Coverage for </span><b>pySDC/projects/DAE/problems/transistorAmplifier.py</b>:
             <span class="pc_cov">97%</span>
         </h1>
         <aside id="help_panel_wrapper">
@@ -60,12 +60,12 @@
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
-            <a id="prevFileLink" class="nav" href="z_0eb34c630be51b75_synchronous_machine_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="z_0eb34c630be51b75_synchronousMachine_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a id="nextFileLink" class="nav" href="z_4ef83d310f553371_accuracy_check_MPI_py.html">&#xbb; next</a>
+            <a id="nextFileLink" class="nav" href="z_0eb34c630be51b75_wscc9BusSystem_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.0">coverage.py v7.6.0</a>,
-            created at 2024-07-25 12:46 +0000
+            created at 2024-07-27 09:26 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -84,7 +84,7 @@
     <p class="run"><span class="n"><a id="t2" href="#t2">2</a></span><span class="t"><span class="key">import</span> <span class="nam">numpy</span> <span class="key">as</span> <span class="nam">np</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t3" href="#t3">3</a></span><span class="t"><span class="key">from</span> <span class="nam">scipy</span><span class="op">.</span><span class="nam">interpolate</span> <span class="key">import</span> <span class="nam">interp1d</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t4" href="#t4">4</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t5" href="#t5">5</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">DAE</span><span class="op">.</span><span class="nam">misc</span><span class="op">.</span><span class="nam">ProblemDAE</span> <span class="key">import</span> <span class="nam">ptype_dae</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t5" href="#t5">5</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">DAE</span><span class="op">.</span><span class="nam">misc</span><span class="op">.</span><span class="nam">problemDAE</span> <span class="key">import</span> <span class="nam">ProblemDAE</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t6" href="#t6">6</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">datatype_classes</span><span class="op">.</span><span class="nam">mesh</span> <span class="key">import</span> <span class="nam">mesh</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -93,7 +93,7 @@
     <p class="run"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">    <span class="key">return</span> <span class="num">1e-6</span> <span class="op">*</span> <span class="op">(</span><span class="nam">np</span><span class="op">.</span><span class="nam">exp</span><span class="op">(</span><span class="nam">u_in</span> <span class="op">/</span> <span class="num">0.026</span><span class="op">)</span> <span class="op">-</span> <span class="num">1</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="key">class</span> <span class="nam">one_transistor_amplifier</span><span class="op">(</span><span class="nam">ptype_dae</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="key">class</span> <span class="nam">OneTransistorAmplifier</span><span class="op">(</span><span class="nam">ProblemDAE</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t">    <span class="str">r"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="str">    The one transistor amplifier example from pg. 377 in [1]_. The problem is an index-1 differential-algebraic equation</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t"><span class="str">    (DAE) having the equations</span>&nbsp;</span><span class="r"></span></p>
@@ -220,7 +220,7 @@
     <p class="run"><span class="n"><a id="t138" href="#t138">138</a></span><span class="t">        <span class="key">return</span> <span class="nam">me</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t139" href="#t139">139</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t140" href="#t140">140</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t141" href="#t141">141</a></span><span class="t"><span class="key">class</span> <span class="nam">two_transistor_amplifier</span><span class="op">(</span><span class="nam">ptype_dae</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t141" href="#t141">141</a></span><span class="t"><span class="key">class</span> <span class="nam">TwoTransistorAmplifier</span><span class="op">(</span><span class="nam">ProblemDAE</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t142" href="#t142">142</a></span><span class="t">    <span class="str">r"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t143" href="#t143">143</a></span><span class="t"><span class="str">    The two transistor amplifier example from page 108 in [1]_. The problem is an index-1 differential-algebraic equation</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t144" href="#t144">144</a></span><span class="t"><span class="str">    (DAE) having the equations</span>&nbsp;</span><span class="r"></span></p>
@@ -363,12 +363,12 @@
 <footer>
     <div class="content">
         <p>
-            <a class="nav" href="z_0eb34c630be51b75_synchronous_machine_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a class="nav" href="z_0eb34c630be51b75_synchronousMachine_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a class="nav" href="z_4ef83d310f553371_accuracy_check_MPI_py.html">&#xbb; next</a>
+            <a class="nav" href="z_0eb34c630be51b75_wscc9BusSystem_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.0">coverage.py v7.6.0</a>,
-            created at 2024-07-25 12:46 +0000
+            created at 2024-07-27 09:26 +0000
         </p>
     </div>
 </footer>

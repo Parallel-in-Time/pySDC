@@ -55,17 +55,17 @@
 <li><dl>
 <dt>misc</dt><dd><ul>
 <li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">DAEMesh.py</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">meshDAE.py</span></code></div>
 <div class="line">Datatype for semi-explicit DAE problem classes differential and algebraic parts to have a clean treatment.</div>
 </div>
 </li>
 <li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">HookClass_DAE.py</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">hooksDAE.py</span></code></div>
 <div class="line">Simple hook classes to read out the approximate solution and error after each time step.</div>
 </div>
 </li>
 <li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">ProblemDAE.py</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">problemDAE.py</span></code></div>
 <div class="line">Parent class for DAE problems containing the method to solve the (non)-linear system at each node/stage.</div>
 </div>
 </li>
@@ -97,7 +97,7 @@
 <li><dl>
 <dt>problems</dt><dd><ul>
 <li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">DiscontinousTestDAE</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">discontinousTestDAE.py</span></code></div>
 <div class="line">Simple nonlinear semi-explicit index-1 DAE with discrete state event whose event time is known.</div>
 </div>
 </li>
@@ -112,22 +112,22 @@
 </div>
 </li>
 <li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">simple_DAE.py</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">simpleDAE.py</span></code></div>
 <div class="line">Linear semi-explicit index-2 system of Hessenberg form with known analytical solution.</div>
 </div>
 </li>
 <li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">synchronous_machine.py</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">synchronousMachine.py</span></code></div>
 <div class="line">Synchronous machine model attached to an infinite bus undergoing torque disturbance test. Results in an index-1 system.</div>
 </div>
 </li>
 <li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">transistor_amplifier.py</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">transistorAmplifier.py</span></code></div>
 <div class="line">A two transistor amplifier model that results in an index-1 differential algebraic system. A nice example of a system resulting from a common real world situation.</div>
 </div>
 </li>
 <li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">WSCC9BusSystem.py</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">wscc9BusSystem.py</span></code></div>
 <div class="line">Large power system test case with three reduced model synchronous machines and nine buses. It is also part of the <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/tree/master/pySDC/projects/PinTSimE">PinTSimE project</a>.</div>
 </div>
 </li>
@@ -169,27 +169,27 @@
 <li><dl>
 <dt>sweepers</dt><dd><ul>
 <li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">fully_implicit_DAE.py</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">fullyImplicitDAE.py</span></code></div>
 <div class="line">Sweeper that accepts a fully implicit formulation of a system of differential equations and applies to it a modified version of spectral deferred correction</div>
 </div>
 </li>
 <li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">SemiImplicitDAE.py</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">semiImplicitDAE.py</span></code></div>
 <div class="line">SDC sweeper especially for semi-explicit DAEs. This sweeper is based on ideas mentioned in <a class="reference external" href="https://www.sciencedirect.com/science/article/abs/pii/S0021999106003147">Huang et al. (2007)</a>.</div>
 </div>
 </li>
 <li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">fully_implicit_DAE_MPI.py</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">fullyImplicitDAEMPI.py</span></code></div>
 <div class="line">MPI version of fully-implicit SDC-DAE sweeper.</div>
 </div>
 </li>
 <li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">SemiImplicitDAEMPI.py</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">semiImplicitDAEMPI.py</span></code></div>
 <div class="line">MPI version of semi-implicit SDC-DAE sweeper.</div>
 </div>
 </li>
 <li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">RungeKuttaDAE.py</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">rungeKuttaDAE.py</span></code></div>
 <div class="line">Runge-Kutta methods that can be used to solve DAEs in pySDC in a fully-implicit description.</div>
 </div>
 </li>
@@ -275,11 +275,11 @@ y (t) + \eta t z (t) &amp;= \sin (t)\end{split}\]</div>
 \end{eqnarray}\]</div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.projects.DAE.misc.ProblemDAE</span> <span class="kn">import</span> <span class="n">ptype_dae</span>
+<span class="kn">from</span> <span class="nn">pySDC.projects.DAE.misc.problemDAE</span> <span class="kn">import</span> <span class="n">ProblemDAE</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
 
 
-<span class="k">class</span> <span class="nc">problematic_f</span><span class="p">(</span><span class="n">ptype_dae</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">ProblematicF</span><span class="p">(</span><span class="n">ProblemDAE</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Standard example of a very simple fully implicit index-2 differential algebraic equation (DAE) that is not</span>
 <span class="sd">    numerically solvable for certain choices of the parameter :math:`\eta`. The DAE system is given by</span>
@@ -382,8 +382,8 @@ y (t) + \eta t z (t) &amp;= \sin (t)\end{split}\]</div>
         <span class="k">return</span> <span class="n">me</span>
 </pre></div>
 </div>
-<p>The imports for the classes <code class="docutils literal notranslate"><span class="pre">ptype_dae</span></code> and <code class="docutils literal notranslate"><span class="pre">mesh</span></code> are necessary for implementing this problem.</p>
-<p>The problem class inherits from the parent <code class="docutils literal notranslate"><span class="pre">ptype_dae</span></code> that
+<p>The imports for the classes <code class="docutils literal notranslate"><span class="pre">ProblemDAE</span></code> and <code class="docutils literal notranslate"><span class="pre">mesh</span></code> are necessary for implementing this problem.</p>
+<p>The problem class inherits from the parent <code class="docutils literal notranslate"><span class="pre">ProblemDAE</span></code> that
 has the <code class="docutils literal notranslate"><span class="pre">solve_system</span></code> method solving the (non)-linear system to find the root, i.e., updating the values of the unknown derivative. All DAE problem classes should therefore inherit from this class.
 For this general type of DAEs the datatype <code class="docutils literal notranslate"><span class="pre">mesh</span></code> is used here for both, <code class="docutils literal notranslate"><span class="pre">u</span></code> and <code class="docutils literal notranslate"><span class="pre">f</span></code>.
 Further, the constructor requires at least the parameter <code class="docutils literal notranslate"><span class="pre">newton_tol</span></code>, the tolerance passed to the root solver. It is possible to set a default value (which is set to <code class="docutils literal notranslate"><span class="pre">1e-8</span></code> in the example above).</p>
@@ -404,13 +404,13 @@ We want to implement such an equation and consider the example</p>
 u_2' (t) &amp;= \frac{1 - \alpha}{t - 2} u_1 (t) - u_2 (t) + (\alpha - 1) z (t) + 2 e^t, \\
 0 &amp;= (t + 2) u_1 (t) + (t^2 - 4) u_2 (t) - (t^2 + t - 2) e^t.\end{split}\]</div>
 <p>This example has two differential variables <span class="math notranslate nohighlight">\(u_1\)</span>, <span class="math notranslate nohighlight">\(u_2\)</span> (two differential equations) and one algebraic variable <span class="math notranslate nohighlight">\(z\)</span> (thus one algebraic equation).
-In <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> defining a problem class for semi-explicit DAEs is slightly different to those of fully-implicit form. Additionally to <code class="docutils literal notranslate"><span class="pre">numpy</span></code> for the example the imports for the classes <code class="docutils literal notranslate"><span class="pre">ptype_dae</span></code> and <code class="docutils literal notranslate"><span class="pre">DAEMesh</span></code> are needed.</p>
+In <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> defining a problem class for semi-explicit DAEs is slightly different to those of fully-implicit form. Additionally to <code class="docutils literal notranslate"><span class="pre">numpy</span></code> for the example the imports for the classes <code class="docutils literal notranslate"><span class="pre">ProblemDAE</span></code> and <code class="docutils literal notranslate"><span class="pre">MeshDAE</span></code> are needed.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.projects.DAE.misc.ProblemDAE</span> <span class="kn">import</span> <span class="n">ptype_dae</span>
+<span class="kn">from</span> <span class="nn">pySDC.projects.DAE.misc.problemDAE</span> <span class="kn">import</span> <span class="n">ProblemDAE</span>
 
 
-<span class="k">class</span> <span class="nc">simple_dae_1</span><span class="p">(</span><span class="n">ptype_dae</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">SimpleDAE</span><span class="p">(</span><span class="n">ProblemDAE</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing a smooth linear index-2 differential-algebraic equation (DAE) with known analytical solution.</span>
 <span class="sd">    The DAE system is given by</span>
@@ -522,11 +522,11 @@ In <code class="docutils literal notranslate"><span class="pre">pySDC</span></co
         <span class="k">return</span> <span class="n">me</span>
 </pre></div>
 </div>
-<p>This problem class inherits again from <code class="docutils literal notranslate"><span class="pre">ptype_dae</span></code>. In contrast, for the solution <code class="docutils literal notranslate"><span class="pre">u</span></code> and the right-hand side of the <code class="docutils literal notranslate"><span class="pre">f</span></code>
-a different datatype <code class="docutils literal notranslate"><span class="pre">DAEMesh</span></code> is used that allows to separate between the differential variables and the algebraic variables as well
+<p>This problem class inherits again from <code class="docutils literal notranslate"><span class="pre">ProblemDAE</span></code>. In contrast, for the solution <code class="docutils literal notranslate"><span class="pre">u</span></code> and the right-hand side of the <code class="docutils literal notranslate"><span class="pre">f</span></code>
+a different datatype <code class="docutils literal notranslate"><span class="pre">MeshDAE</span></code> is used that allows to separate between the differential variables and the algebraic variables as well
 as for the equations. The tolerance for the root solver is passed with a default value of <code class="docutils literal notranslate"><span class="pre">1e-10</span></code> and the number of unknowns is <span class="math notranslate nohighlight">\(3\)</span>, i.e., <code class="docutils literal notranslate"><span class="pre">nvars=3</span></code>.
 The problem-specific parameter <code class="docutils literal notranslate"><span class="pre">a</span></code> has a default value of <code class="docutils literal notranslate"><span class="pre">10.0</span></code>.</p>
-<p>In the <code class="docutils literal notranslate"><span class="pre">eval_f</span></code> method the equations and the variables are now separated using the components of the <code class="docutils literal notranslate"><span class="pre">DAEMesh</span></code>. Recall that <code class="docutils literal notranslate"><span class="pre">eval_f</span></code> returns the right-hand side function so that we have a root problem. However, for this semi-explicit DAE this is not the case, but we can change that by rewriting the system to</p>
+<p>In the <code class="docutils literal notranslate"><span class="pre">eval_f</span></code> method the equations and the variables are now separated using the components of the <code class="docutils literal notranslate"><span class="pre">MeshDAE</span></code>. Recall that <code class="docutils literal notranslate"><span class="pre">eval_f</span></code> returns the right-hand side function so that we have a root problem. However, for this semi-explicit DAE this is not the case, but we can change that by rewriting the system to</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}0 &amp;= f \left(y (t), z (t), t\right) - y' (t) \\
 0 &amp;= g \left(y (t), z (t), t\right).\end{split}\]</div>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/projects/DAE/sweepers/SemiImplicitDAEMPI.py: 100%</title>
+    <title>Coverage for pySDC/projects/DAE/sweepers/semiImplicitDAEMPI.py: 100%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_58284776.png">
     <link rel="stylesheet" href="style_cb_8e611ae1.css" type="text/css">
     <script src="coverage_html_cb_6fb7b396.js" defer></script>
@@ -11,7 +11,7 @@
 <header>
     <div class="content">
         <h1>
-            <span class="text">Coverage for </span><b>pySDC/projects/DAE/sweepers/SemiImplicitDAEMPI.py</b>:
+            <span class="text">Coverage for </span><b>pySDC/projects/DAE/sweepers/semiImplicitDAEMPI.py</b>:
             <span class="pc_cov">100%</span>
         </h1>
         <aside id="help_panel_wrapper">
@@ -60,12 +60,12 @@
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
-            <a id="prevFileLink" class="nav" href="z_15820e38ae7f8080_SemiImplicitDAE_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="z_15820e38ae7f8080_semiImplicitDAE_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a id="nextFileLink" class="nav" href="z_15820e38ae7f8080_fully_implicit_DAE_py.html">&#xbb; next</a>
+            <a id="nextFileLink" class="nav" href="z_60ee0c9d7735ef11_AcousticAdvection_1D_FD_imex_multiscale_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.0">coverage.py v7.6.0</a>,
-            created at 2024-07-25 12:46 +0000
+            created at 2024-07-27 09:26 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -82,8 +82,8 @@
 <main id="source">
     <p class="run"><span class="n"><a id="t1" href="#t1">1</a></span><span class="t"><span class="key">from</span> <span class="nam">mpi4py</span> <span class="key">import</span> <span class="nam">MPI</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t2" href="#t2">2</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t3" href="#t3">3</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">DAE</span><span class="op">.</span><span class="nam">sweepers</span><span class="op">.</span><span class="nam">fully_implicit_DAE_MPI</span> <span class="key">import</span> <span class="nam">SweeperDAEMPI</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t4" href="#t4">4</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">DAE</span><span class="op">.</span><span class="nam">sweepers</span><span class="op">.</span><span class="nam">SemiImplicitDAE</span> <span class="key">import</span> <span class="nam">SemiImplicitDAE</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t3" href="#t3">3</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">DAE</span><span class="op">.</span><span class="nam">sweepers</span><span class="op">.</span><span class="nam">fullyImplicitDAEMPI</span> <span class="key">import</span> <span class="nam">SweeperDAEMPI</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t4" href="#t4">4</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">DAE</span><span class="op">.</span><span class="nam">sweepers</span><span class="op">.</span><span class="nam">semiImplicitDAE</span> <span class="key">import</span> <span class="nam">SemiImplicitDAE</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t5" href="#t5">5</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t6" href="#t6">6</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="key">class</span> <span class="nam">SemiImplicitDAEMPI</span><span class="op">(</span><span class="nam">SweeperDAEMPI</span><span class="op">,</span> <span class="nam">SemiImplicitDAE</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -96,11 +96,11 @@
     <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="str">    .. math::</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="str">        0 = g(u, z, t)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t"><span class="str">    More detailed description can be found in ``SemiImplicitDAE.py``. To parallelize SDC across the method the idea is to use a diagonal :math:`\mathbf{Q}_\Delta` to have solves of the implicit system on each node that can be done in parallel since they are fully decoupled from values of previous nodes. First such diagonal :math:`\mathbf{Q}_\Delta` were developed in [1]_. Years later intensive theory about the topic was developed in [2]_. For the DAE case these ideas were basically transferred.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t"><span class="str">    More detailed description can be found in ``semiImplicitDAE.py``. To parallelize SDC across the method the idea is to use a diagonal :math:`\mathbf{Q}_\Delta` to have solves of the implicit system on each node that can be done in parallel since they are fully decoupled from values of previous nodes. First such diagonal :math:`\mathbf{Q}_\Delta` were developed in [1]_. Years later intensive theory about the topic was developed in [2]_. For the DAE case these ideas were basically transferred.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t"><span class="str">    Note</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t"><span class="str">    ----</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t"><span class="str">    For more details of implementing a sweeper enabling parallelization across the method we refer to documentation in [generic_implicit_MPI.py](https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/sweeper_classes/generic_implicit_MPI.py) and [fully_implicit_DAE_MPI.py](https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/DAE/sweepers/fully_implicit_DAE_MPI.py).</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t"><span class="str">    For more details of implementing a sweeper enabling parallelization across the method we refer to documentation in [generic_implicit_MPI.py](https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/sweeper_classes/generic_implicit_MPI.py) and [fullyImplicitDAEMPI.py](https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/DAE/sweepers/fullyImplicitDAEMPI.py).</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t23" href="#t23">23</a></span><span class="t"><span class="str">    For parallelization across the method for semi-explicit DAEs, differential and algebraic parts have to be treated separately. In ``integrate()`` these parts needs to be collected separately, otherwise information would get lost.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -182,12 +182,12 @@
 <footer>
     <div class="content">
         <p>
-            <a class="nav" href="z_15820e38ae7f8080_SemiImplicitDAE_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a class="nav" href="z_15820e38ae7f8080_semiImplicitDAE_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a class="nav" href="z_15820e38ae7f8080_fully_implicit_DAE_py.html">&#xbb; next</a>
+            <a class="nav" href="z_60ee0c9d7735ef11_AcousticAdvection_1D_FD_imex_multiscale_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.0">coverage.py v7.6.0</a>,
-            created at 2024-07-25 12:46 +0000
+            created at 2024-07-27 09:26 +0000
         </p>
     </div>
 </footer>
