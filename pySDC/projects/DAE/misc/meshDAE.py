@@ -1,7 +1,7 @@
 from pySDC.implementations.datatype_classes.mesh import MultiComponentMesh
 
 
-class DAEMesh(MultiComponentMesh):
+class MeshDAE(MultiComponentMesh):
     r"""
     Datatype for DAE problems. The solution of the problem can be splitted in the differential part
     and in an algebraic part.

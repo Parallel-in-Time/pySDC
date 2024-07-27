@@ -1,7 +1,7 @@
 from mpi4py import MPI
 
-from pySDC.projects.DAE.sweepers.fully_implicit_DAE_MPI import SweeperDAEMPI
-from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE
+from pySDC.projects.DAE.sweepers.fullyImplicitDAEMPI import SweeperDAEMPI
+from pySDC.projects.DAE.sweepers.semiImplicitDAE import SemiImplicitDAE
 
 
 class SemiImplicitDAEMPI(SweeperDAEMPI, SemiImplicitDAE):
@@ -14,11 +14,11 @@ class SemiImplicitDAEMPI(SweeperDAEMPI, SemiImplicitDAE):
     .. math::
         0 = g(u, z, t)
 
-    More detailed description can be found in ``SemiImplicitDAE.py``. To parallelize SDC across the method the idea is to use a diagonal :math:`\mathbf{Q}_\Delta` to have solves of the implicit system on each node that can be done in parallel since they are fully decoupled from values of previous nodes. First such diagonal :math:`\mathbf{Q}_\Delta` were developed in [1]_. Years later intensive theory about the topic was developed in [2]_. For the DAE case these ideas were basically transferred.
+    More detailed description can be found in ``semiImplicitDAE.py``. To parallelize SDC across the method the idea is to use a diagonal :math:`\mathbf{Q}_\Delta` to have solves of the implicit system on each node that can be done in parallel since they are fully decoupled from values of previous nodes. First such diagonal :math:`\mathbf{Q}_\Delta` were developed in [1]_. Years later intensive theory about the topic was developed in [2]_. For the DAE case these ideas were basically transferred.
 
     Note
     ----
-    For more details of implementing a sweeper enabling parallelization across the method we refer to documentation in [generic_implicit_MPI.py](https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/sweeper_classes/generic_implicit_MPI.py) and [fully_implicit_DAE_MPI.py](https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/DAE/sweepers/fully_implicit_DAE_MPI.py).
+    For more details of implementing a sweeper enabling parallelization across the method we refer to documentation in [generic_implicit_MPI.py](https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/sweeper_classes/generic_implicit_MPI.py) and [fullyImplicitDAEMPI.py](https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/DAE/sweepers/fullyImplicitDAEMPI.py).
 
     For parallelization across the method for semi-explicit DAEs, differential and algebraic parts have to be treated separately. In ``integrate()`` these parts needs to be collected separately, otherwise information would get lost.
 

@@ -2,7 +2,7 @@ from mpi4py import MPI
 
 from pySDC.core.errors import ParameterError
 from pySDC.implementations.sweeper_classes.generic_implicit_MPI import SweeperMPI, generic_implicit_MPI
-from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
 
 
 class SweeperDAEMPI(SweeperMPI):
@@ -11,7 +11,7 @@ class SweeperDAEMPI(SweeperMPI):
 
     This class provides all the stuff to be done in parallel during the simulation. When implementing a new MPI-DAE sweeper multiple inheritance is used here
 
-    >>> class fully_implicit_DAE_MPI(SweeperDAEMPI, generic_implicit_MPI, fully_implicit_DAE):
+    >>> class FullyImplicitDAEMPI(SweeperDAEMPI, generic_implicit_MPI, FullyImplicitDAE):
 
     Be careful with ordering of classes where the child class should inherit from! Due to multiple inheritance several methods are overwritten here. In the example above (which is the class below) the class first inherits the methods
 
@@ -107,14 +107,14 @@ class SweeperDAEMPI(SweeperMPI):
         L.status.updated = True
 
 
-class fully_implicit_DAE_MPI(SweeperDAEMPI, generic_implicit_MPI, fully_implicit_DAE):
+class FullyImplicitDAEMPI(SweeperDAEMPI, generic_implicit_MPI, FullyImplicitDAE):
     r"""
     Custom sweeper class to implement the fully-implicit SDC parallelized across the nodes for solving fully-implicit DAE problems of the form
 
     .. math::
         F(t, u, u') = 0.
 
-    More detailed description can be found in ``fully_implicit_DAE.py``.
+    More detailed description can be found in ``fullyImplicitDAE.py``.
 
     This sweeper uses diagonal matrices :math:`\mathbf{Q}_\Delta` to
     solve the implicit system on each node in parallel. First diagonal matrices were first developed and applied in [1]_. Years later intensive theory in [2]_ is developed to that topic. Ideas of parallelizing SDC across the method are basically applied for the DAE case here.
@@ -181,7 +181,7 @@ class fully_implicit_DAE_MPI(SweeperDAEMPI, generic_implicit_MPI, fully_implicit
         u_approx = P.dtype_u(integral)
 
         L.f[self.rank + 1][:] = P.solve_system(
-            fully_implicit_DAE.F,
+            FullyImplicitDAE.F,
             u_approx,
             L.dt * self.QI[self.rank + 1, self.rank + 1],
             L.f[self.rank + 1],

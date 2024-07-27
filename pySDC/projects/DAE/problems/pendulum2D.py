@@ -1,7 +1,7 @@
-from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
+from pySDC.projects.DAE.misc.problemDAE import ProblemDAE
 
 
-class pendulum_2d(ptype_dae):
+class Pendulum2D(ProblemDAE):
     r"""
     Example implementing the well known 2D pendulum as a first order differential-algebraic equation (DAE) of index 3.
     The DAE system is given by the equations

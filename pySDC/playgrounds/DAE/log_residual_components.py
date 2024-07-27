@@ -7,19 +7,19 @@ class LogResidualComponentsPostIter(Hooks):
 
     Parameters
     ----------
-    Hooks : _type_
-        _description_
+    Hooks : pySDC.core.hooks.Hooks
+        Hook base class.
     """
 
     def post_iteration(self, step, level_number):
         r"""
-        Default routine called after each step.
+        Default routine called after each iteration.
 
         Parameters
         ----------
-        step : pySDC.core.Step
+        step : pySDC.core.step.Step
             Current step.
-        level_number : pySDC.core.level
+        level_number : pySDC.core.level.Level
             Current level number.
         """
 

@@ -10,10 +10,10 @@ def testHookClassDiffAlgComps(M):
     """
 
     from pySDC.helpers.stats_helper import get_sorted
-    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
-    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.projects.DAE.misc.HookClass_DAE import (
+    from pySDC.projects.DAE.misc.hooksDAE import (
         LogGlobalErrorPostStepDifferentialVariable,
         LogGlobalErrorPostStepAlgebraicVariable,
     )
@@ -46,7 +46,7 @@ def testHookClassDiffAlgComps(M):
     description = {
         'problem_class': DiscontinuousTestDAE,
         'problem_params': problem_params,
-        'sweeper_class': fully_implicit_DAE,
+        'sweeper_class': FullyImplicitDAE,
         'sweeper_params': sweeper_params,
         'level_params': level_params,
         'step_params': step_params,

@@ -3,9 +3,9 @@ import statistics
 import pickle
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
-from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-from pySDC.projects.DAE.misc.HookClass_DAE import LogGlobalErrorPostStepDifferentialVariable
+from pySDC.projects.DAE.problems.simpleDAE import SimpleDAE
+from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
+from pySDC.projects.DAE.misc.hooksDAE import LogGlobalErrorPostStepDifferentialVariable
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.helpers.stats_helper import filter_stats
 
@@ -37,9 +37,9 @@ def setup():
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = simple_dae_1
+    description['problem_class'] = SimpleDAE
     description['problem_params'] = problem_params
-    description['sweeper_class'] = fully_implicit_DAE
+    description['sweeper_class'] = FullyImplicitDAE
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params

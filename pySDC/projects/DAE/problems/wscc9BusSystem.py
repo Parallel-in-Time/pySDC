@@ -1,5 +1,5 @@
 import numpy as np
-from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
+from pySDC.projects.DAE.misc.problemDAE import ProblemDAE
 from pySDC.core.errors import ParameterError
 
 
@@ -573,7 +573,7 @@ def get_event_Ybus():
 #     return ppc['Ybus']()
 
 
-class WSCC9BusSystem(ptype_dae):
+class WSCC9BusSystem(ProblemDAE):
     r"""
     Example implementing the WSCC 9 Bus system [1]_. For this complex model, the equations can be found in [2]_, and
     sub-transient and turbine parameters are taken from [3]_. The network data of the system are taken from MATPOWER [4]_.

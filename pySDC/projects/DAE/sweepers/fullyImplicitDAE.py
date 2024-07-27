@@ -3,10 +3,9 @@ from scipy import optimize
 
 from pySDC.core.errors import ParameterError
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
 
 
-class fully_implicit_DAE(generic_implicit):
+class FullyImplicitDAE(generic_implicit):
     r"""
     Custom sweeper class to implement the fully-implicit SDC for solving DAEs. It solves fully-implicit DAE problems
     of the form
@@ -233,7 +232,7 @@ class fully_implicit_DAE(generic_implicit):
         ----------
         du : dtype_u
             Unknowns of the system (derivative of solution u).
-        P : pySDC.projects.DAE.misc.ProblemDAE
+        P : pySDC.projects.DAE.misc.problemDAE.ProblemDAE
             Problem class.
         factor : float
             Abbrev. for the node-to-node stepsize.

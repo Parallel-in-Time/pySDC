@@ -1,8 +1,8 @@
 from pySDC.core.errors import ParameterError
-from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
 
 
-class SemiImplicitDAE(fully_implicit_DAE):
+class SemiImplicitDAE(FullyImplicitDAE):
     r"""
     Custom sweeper class to implement SDC for solving semi-explicit DAEs of the form
 
@@ -192,7 +192,7 @@ class SemiImplicitDAE(fully_implicit_DAE):
         ----------
         du : dtype_u
             Unknowns of the system (derivative of solution u).
-        P : pySDC.projects.DAE.misc.ProblemDAE
+        P : pySDC.projects.DAE.misc.problemDAE.ProblemDAE
             Problem class.
         factor : float
             Abbrev. for the node-to-node stepsize.

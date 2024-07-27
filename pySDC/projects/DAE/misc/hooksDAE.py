@@ -13,9 +13,9 @@ class LogGlobalErrorPostStepDifferentialVariable(Hooks):
 
         Parameters
         ----------
-        step : pySDC.core.Step
+        step : pySDC.core.step.Step
             Current step.
-        level_number : pySDC.core.level
+        level_number : pySDC.core.level.Level
             Current level number.
         """
 
@@ -46,7 +46,7 @@ class LogGlobalErrorPostStepDifferentialVariable(Hooks):
 
 class LogGlobalErrorPostStepAlgebraicVariable(Hooks):
     """
-    Logs the global error in the algebraic variable
+    Logs the global error in the algebraic variable after each step.
     """
 
     def post_step(self, step, level_number):
@@ -55,9 +55,9 @@ class LogGlobalErrorPostStepAlgebraicVariable(Hooks):
 
         Parameters
         ----------
-        step : pySDC.core.Step
+        step : pySDC.core.step.Step
             Current step.
-        level_number : pySDC.core.level
+        level_number : pySDC.core.level.Level
             Current level number.
         """
 

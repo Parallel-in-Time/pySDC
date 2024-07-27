@@ -1,10 +1,10 @@
 import numpy as np
 
 from pySDC.core.problem import WorkCounter
-from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
+from pySDC.projects.DAE.misc.problemDAE import ProblemDAE
 
 
-class DiscontinuousTestDAE(ptype_dae):
+class DiscontinuousTestDAE(ProblemDAE):
     r"""
     This class implements a scalar test discontinuous differential-algebraic equation (DAE) similar to [1]_. The event function
     is defined as :math:`h(y):= 2y - 100`. Then, the discontinuous DAE model reads:

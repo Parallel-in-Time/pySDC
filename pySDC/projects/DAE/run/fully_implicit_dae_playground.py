@@ -3,8 +3,8 @@ import numpy as np
 import pickle
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.DAE.problems.problematicF import problematic_f
-from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+from pySDC.projects.DAE.problems.problematicF import ProblematicF
+from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
 from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostStep
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.hooks.log_solution import LogSolution
@@ -39,9 +39,9 @@ def main():
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = problematic_f
+    description['problem_class'] = ProblematicF
     description['problem_params'] = problem_params
-    description['sweeper_class'] = fully_implicit_DAE
+    description['sweeper_class'] = FullyImplicitDAE
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
