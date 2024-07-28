@@ -224,7 +224,7 @@ class LogToFile(Hooks):
 
         Returns
         -------
-        str : 
+        str :
             Path of file.
         """
         return f'{cls.path}/{cls.file_name}_{cls.format_index(index)}.pickle'
