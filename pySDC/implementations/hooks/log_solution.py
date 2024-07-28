@@ -6,19 +6,25 @@ import numpy as np
 
 class LogSolution(Hooks):
     """
-    Store the solution at the end of each step as "u".
+    Store the solution at the end of each step as "u". It is also possible to get the solution
+    on each node as "u_dense" and corresponding collocation nodes as "nodes" at the end
+    of the step.
     """
 
     def post_step(self, step, level_number):
         """
         Record solution at the end of the step
 
-        Args:
-            step (pySDC.Step.step): the current step
-            level_number (int): the current level number
+        Parameters
+        ----------
+        step : pySDC.core.step.Step
+            Current step.
+        level_number : int
+            Current level number.
 
-        Returns:
-            None
+        Returns
+        -------
+        None
         """
         super().post_step(step, level_number)
 
@@ -35,6 +41,59 @@ class LogSolution(Hooks):
             value=L.uend,
         )
 
+        if hasattr(L.sweep, 'comm'):
+            comm = L.sweep.comm
+            size = comm.Get_size()
+
+            uTmp = L.u if not L.sweep.coll.left_is_node else L.u[1:]
+
+            # Determine the shape of arrays to handle None values
+            shape = max((me.shape for me in uTmp if me is not None), default=(0,))
+            placeholder = np.zeros(shape)
+
+            # Replace None values with placeholder
+            u = [me if me is not None else placeholder for me in uTmp]
+
+            # Flatten the list to a single array for Allgather
+            uFlat = np.concatenate(u)
+
+            # Prepare the buffer to receive data from all processes
+            recvBuf = np.empty(size * len(uFlat), dtype='d')
+
+            # Use Allgather to collect data from all processes
+            comm.Allgather(uFlat, recvBuf)
+
+            # Reshape and combine data from all processes
+            recvBuf = recvBuf.reshape(size, -1, shape[0])
+
+            # Sum the collected arrays along the first axis
+            uDense = np.sum(recvBuf, axis=0)
+            uDense = [me.view(type(L.u[0])) for me in uDense]
+
+        else:
+            uDense = L.u if not L.sweep.coll.left_is_node else L.u[1:]
+
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='u_dense',
+            value=uDense,
+        )
+
+        nodes = [L.time + L.dt * L.sweep.coll.nodes[m] for m in range(len(L.sweep.coll.nodes))]
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='nodes',
+            value=np.append([L.time], nodes) if not L.sweep.coll.left_is_node else nodes,
+        )
+
 
 class LogSolutionAfterIteration(Hooks):
     """
@@ -45,12 +104,16 @@ class LogSolutionAfterIteration(Hooks):
         """
         Record solution at the end of the iteration
 
-        Args:
-            step (pySDC.Step.step): the current step
-            level_number (int): the current level number
+        Parameters
+        ----------
+        step : pySDC.core.step.Step
+            Current step
+        level_number : int
+            Current level number.
 
-        Returns:
-            None
+        Returns
+        -------
+        None
         """
         super().post_iteration(step, level_number)
 
@@ -104,6 +167,7 @@ class LogToFile(Hooks):
     format_index = lambda index: f'{index:06d}'
 
     def __init__(self):
+        """Initialization routine"""
         super().__init__()
         self.counter = 0
 
@@ -119,6 +183,21 @@ class LogToFile(Hooks):
             os.mkdir(self.path)
 
     def post_step(self, step, level_number):
+        """
+        Log solution at the end of the step in a file.
+
+        Parameters
+        ----------
+        step : pySDC.core.step.Step
+            Current step.
+        level_number : int
+            Current level number.
+
+        Returns
+        -------
+        None
+        """
+
         if level_number > 0:
             return None
 
@@ -135,10 +214,36 @@ class LogToFile(Hooks):
 
     @classmethod
     def get_path(cls, index):
+        """
+        Get path of the file where the solution is stored.
+
+        Parameters
+        ----------
+        index : int
+            Index of a file.
+
+        Returns
+        -------
+        str : 
+            Path of file.
+        """
         return f'{cls.path}/{cls.file_name}_{cls.format_index(index)}.pickle'
 
     @classmethod
     def load(cls, index):
+        """
+        Load data from file.
+
+        Parameters
+        ----------
+        index : int
+            Index of a file.
+
+        Returns
+        -------
+        file object :
+            File where the solution is stored.
+        """
         path = cls.get_path(index)
         with open(path, 'rb') as file:
             return pickle.load(file)
