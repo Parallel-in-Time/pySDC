@@ -39,7 +39,7 @@ class controller_nonMPI(Controller):
             for _ in range(num_procs - 1):
                 self.MS.append(dill.copy(self.MS[0]))
         # if this fails (e.g. due to un-picklable data in the steps), initialize separately
-        except (dill.PicklingError, TypeError) as error:
+        except (dill.PicklingError, TypeError, ValueError) as error:
             self.logger.warning(f'Need to initialize steps separately due to pickling error: {error}')
             for _ in range(num_procs - 1):
                 self.MS.append(stepclass.Step(description))
