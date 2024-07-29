@@ -20,7 +20,7 @@ class allencahn_imex(IMEX_Laplacian_MPIFFT):
         u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),
 
     for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated
-    *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Tranform (FFT) and the nonlinear part in the right-hand
+    *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Transform (FFT) and the nonlinear part in the right-hand
     side will be treated explicitly using ``mpi4py-fft`` [1]_ to solve them.
 
     Parameters
@@ -183,7 +183,7 @@ class allencahn_imex_timeforcing(allencahn_imex):
         u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),
 
     for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated
-    *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Tranform (FFT) and the nonlinear part in the right-hand
+    *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Transform (FFT) and the nonlinear part in the right-hand
     side will be treated explicitly using ``mpi4py-fft`` [1]_ to solve them.
     """
 
@@ -230,7 +230,7 @@ class allencahn_imex_timeforcing(allencahn_imex):
             if self.comm is not None:
                 Ht_global = self.comm.allreduce(sendobj=Ht_local, op=MPI.SUM)
             else:
-                Ht_global = Rt_local
+                Ht_global = Ht_local
 
             # add/substract time-dependent driving force
             if Ht_global != 0.0:
@@ -258,7 +258,7 @@ class allencahn_imex_timeforcing(allencahn_imex):
             if self.comm is not None:
                 Ht_global = self.comm.allreduce(sendobj=Ht_local, op=MPI.SUM)
             else:
-                Ht_global = Rt_local
+                Ht_global = Ht_local
 
             # add/substract time-dependent driving force
             if Ht_global != 0.0:
