@@ -61,7 +61,7 @@
 <span class="sd">        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),</span>
 
 <span class="sd">    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated</span>
-<span class="sd">    *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Tranform (FFT) and the nonlinear part in the right-hand</span>
+<span class="sd">    *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Transform (FFT) and the nonlinear part in the right-hand</span>
 <span class="sd">    side will be treated explicitly using ``mpi4py-fft`` [1]_ to solve them.</span>
 
 <span class="sd">    Parameters</span>
@@ -233,7 +233,7 @@
 <span class="sd">        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),</span>
 
 <span class="sd">    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated</span>
-<span class="sd">    *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Tranform (FFT) and the nonlinear part in the right-hand</span>
+<span class="sd">    *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Transform (FFT) and the nonlinear part in the right-hand</span>
 <span class="sd">    side will be treated explicitly using ``mpi4py-fft`` [1]_ to solve them.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -282,7 +282,7 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">Ht_global</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">sendobj</span><span class="o">=</span><span class="n">Ht_local</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">Ht_global</span> <span class="o">=</span> <span class="n">Rt_local</span>
+                <span class="n">Ht_global</span> <span class="o">=</span> <span class="n">Ht_local</span>
 
             <span class="c1"># add/substract time-dependent driving force</span>
             <span class="k">if</span> <span class="n">Ht_global</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
@@ -310,7 +310,7 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">Ht_global</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">sendobj</span><span class="o">=</span><span class="n">Ht_local</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">Ht_global</span> <span class="o">=</span> <span class="n">Rt_local</span>
+                <span class="n">Ht_global</span> <span class="o">=</span> <span class="n">Ht_local</span>
 
             <span class="c1"># add/substract time-dependent driving force</span>
             <span class="k">if</span> <span class="n">Ht_global</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>

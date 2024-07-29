@@ -67,7 +67,7 @@
 
 <span class="sd">    or uniform distributed random numbers in :math:`[-1, 1]` for :math:`i, j=0,..,N-1`, where :math:`N` is the number of</span>
 <span class="sd">    spatial grid points. For time-stepping, the problem is treated *semi-implicitly*, i.e., the diffusion part is solved by</span>
-<span class="sd">    Fast-Fourier Tranform (FFT) and the nonlinear term is treated explicitly.</span>
+<span class="sd">    Fast-Fourier Transform (FFT) and the nonlinear term is treated explicitly.</span>
 
 <span class="sd">    An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed</span>
 <span class="sd">    by a ``SciPy`` routine.</span>
@@ -163,11 +163,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lap</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft2</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft2</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">v</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
 
@@ -253,7 +252,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab">[docs]</a>
 <span class="k">class</span> <span class="nc">allencahn2d_imex_stab</span><span class="p">(</span><span class="n">allencahn2d_imex</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`</span>
+<span class="sd">    This implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-0.5, 0.5]^2`</span>
 <span class="sd">    with stabilized splitting</span>
 
 <span class="sd">    .. math::</span>
@@ -272,7 +271,7 @@
 
 <span class="sd">    or uniform distributed random numbers in :math:`[-1, 1]` for :math:`i, j=0,..,N-1`, where :math:`N` is the number of</span>
 <span class="sd">    spatial grid points. For time-stepping, the problem is treated *semi-implicitly*, i.e., the diffusion part is solved with</span>
-<span class="sd">    Fast-Fourier Tranform (FFT) and the nonlinear term is treated explicitly.</span>
+<span class="sd">    Fast-Fourier Transform (FFT) and the nonlinear term is treated explicitly.</span>
 
 <span class="sd">    An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed</span>
 <span class="sd">    by a ``SciPy`` routine.</span>
@@ -331,11 +330,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lap</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft2</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft2</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">v</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">)</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">)</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
 

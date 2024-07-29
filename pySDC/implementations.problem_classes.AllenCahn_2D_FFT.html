@@ -65,7 +65,7 @@ can be used, for example, circles of the form</p>
 \[u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),\]</div>
 <p>or uniform distributed random numbers in <span class="math notranslate nohighlight">\([-1, 1]\)</span> for <span class="math notranslate nohighlight">\(i, j=0,..,N-1\)</span>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of
 spatial grid points. For time-stepping, the problem is treated <em>semi-implicitly</em>, i.e., the diffusion part is solved by
-Fast-Fourier Tranform (FFT) and the nonlinear term is treated explicitly.</p>
+Fast-Fourier Transform (FFT) and the nonlinear term is treated explicitly.</p>
 <p>An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed
 by a <code class="docutils literal notranslate"><span class="pre">SciPy</span></code> routine.</p>
 <dl class="field-list simple">
@@ -194,7 +194,7 @@ by a <code class="docutils literal notranslate"><span class="pre">SciPy</span></
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn2d_imex_stab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'circle'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT.html#allencahn2d_imex_stab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex" title="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn2d_imex</span></code></a></p>
-<p>This implements the two-dimensional Allen-Cahn equation with periodic boundary conditions <span class="math notranslate nohighlight">\(u \in [-1, 1]^2\)</span>
+<p>This implements the two-dimensional Allen-Cahn equation with periodic boundary conditions <span class="math notranslate nohighlight">\(u \in [-0.5, 0.5]^2\)</span>
 with stabilized splitting</p>
 <div class="math notranslate nohighlight">
 \[\frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu) + \frac{2}{\varepsilon^2}u\]</div>
@@ -207,7 +207,7 @@ can be used here, for example, circles of the form</p>
 \[u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),\]</div>
 <p>or uniform distributed random numbers in <span class="math notranslate nohighlight">\([-1, 1]\)</span> for <span class="math notranslate nohighlight">\(i, j=0,..,N-1\)</span>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of
 spatial grid points. For time-stepping, the problem is treated <em>semi-implicitly</em>, i.e., the diffusion part is solved with
-Fast-Fourier Tranform (FFT) and the nonlinear term is treated explicitly.</p>
+Fast-Fourier Transform (FFT) and the nonlinear term is treated explicitly.</p>
 <p>An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed
 by a <code class="docutils literal notranslate"><span class="pre">SciPy</span></code> routine.</p>
 <dl class="field-list simple">
