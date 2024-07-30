@@ -7,7 +7,7 @@ on:
   pull_request_target:
     types: [opened, synchronize, reopened, labeled]
   schedule:
-    - cron: '1 5 * * 1'
+    - cron: '2 5 * * 1'
 
 jobs:
   check_permission:
@@ -106,7 +106,7 @@ jobs:
           echo "Merge the two parts of the Merge-Request to test the resulting version"
           git merge "${{ github.event.pull_request.head.sha }}"
       - name: Mirror and wait for Gitlab-CI
-        uses: jakob-fritz/github2lab_action@v0.7
+        uses: jakob-fritz/github2lab_action@v0.8
         env:
           MODE: 'all'  # Either 'mirror', 'get_status', 'get_artifact', or 'all'
           GITLAB_TOKEN: ${{ secrets.GITLAB_SECRET }}
