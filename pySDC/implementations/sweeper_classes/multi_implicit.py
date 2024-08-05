@@ -1,7 +1,7 @@
-from pySDC.core.Sweeper import sweeper
+from pySDC.core.sweeper import Sweeper
 
 
-class multi_implicit(sweeper):
+class multi_implicit(Sweeper):
     """
     Custom sweeper class, implements Sweeper.py
 
@@ -30,8 +30,8 @@ class multi_implicit(sweeper):
         super(multi_implicit, self).__init__(params)
 
         # Integration matrices
-        self.Q1 = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.Q1)
-        self.Q2 = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.Q2)
+        self.Q1 = self.get_Qdelta_implicit(qd_type=self.params.Q1)
+        self.Q2 = self.get_Qdelta_implicit(qd_type=self.params.Q2)
 
     def integrate(self):
         """

@@ -6,12 +6,12 @@ import dolfinx as dfx
 import ufl
 import numpy as np
 
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 # noinspection PyUnusedLocal
-class fenicsx_heat_mass(ptype):
+class fenicsx_heat_mass(Problem):
     r"""
     Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions
 

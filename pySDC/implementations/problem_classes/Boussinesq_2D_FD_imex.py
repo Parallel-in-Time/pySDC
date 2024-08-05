@@ -1,8 +1,7 @@
 import numpy as np
 from scipy.sparse.linalg import gmres
 
-from pySDC.core.Errors import ParameterError
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 from pySDC.implementations.problem_classes.boussinesq_helpers.build2DFDMatrix import get2DMesh
 from pySDC.implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix import getBoussinesq2DMatrix
@@ -12,7 +11,7 @@ from pySDC.implementations.problem_classes.boussinesq_helpers.unflatten import u
 
 
 # noinspection PyUnusedLocal
-class boussinesq_2d_imex(ptype):
+class boussinesq_2d_imex(Problem):
     r"""
     This class implements the two-dimensional Boussinesq equations for different boundary conditions with
 
@@ -182,7 +181,7 @@ class boussinesq_2d_imex(ptype):
             self.Id - factor * self.M,
             b,
             x0=u0.flatten(),
-            tol=self.gmres_tol_limit,
+            rtol=self.gmres_tol_limit,
             restart=self.gmres_restart,
             maxiter=self.gmres_maxiter,
             atol=0,
@@ -263,8 +262,8 @@ class boussinesq_2d_imex(ptype):
         """
 
         f = self.dtype_f(self.init)
-        f.impl = self.__eval_fimpl(u, t)
-        f.expl = self.__eval_fexpl(u, t)
+        f.impl[:] = self.__eval_fimpl(u, t)
+        f.expl[:] = self.__eval_fexpl(u, t)
         return f
 
     def u_exact(self, t):

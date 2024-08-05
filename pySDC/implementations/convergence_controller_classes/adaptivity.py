@@ -1,5 +1,5 @@
 import numpy as np
-from pySDC.core.ConvergenceController import ConvergenceController, Status
+from pySDC.core.convergence_controller import ConvergenceController, Status
 from pySDC.implementations.convergence_controller_classes.step_size_limiter import (
     StepSizeLimiter,
 )

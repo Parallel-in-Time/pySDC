@@ -26,6 +26,4 @@ ${SPHINX_APIDOC} -o docs/source/pySDC pySDC/implementations --force -T -d 2 -e
 ${SPHINX_APIDOC} -o docs/source/pySDC pySDC/helpers --force -T -d 2 -e
 #rm docs/source/pySDC/pySDC.rst
 
-echo "Running : pip install sphinxemoji m2r2"
-pip install sphinxemoji m2r2 --quiet
 ./docs/convert_markdown.py

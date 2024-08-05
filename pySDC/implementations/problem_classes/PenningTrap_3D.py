@@ -1,13 +1,13 @@
 import numpy as np
 from numba import jit
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.core.errors import ProblemError
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.implementations.datatype_classes.particles import particles, fields, acceleration
 
 
 # noinspection PyUnusedLocal
-class penningtrap(ptype):
+class penningtrap(Problem):
     r"""
     This class implements a standard Penning trap problem on the time interval :math:`[0, t_{end}]`
     fully investigated in [1]_. The equations are given by the following equation of motion

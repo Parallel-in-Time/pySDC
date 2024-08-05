@@ -150,7 +150,7 @@ This stage allows to checks how much of the `pySDC` code is tested by the previo
 - `pySDC/tutorial`
 
 This analysis is done in parallel to the test each time a pull is done on any branch (main repository or fork).
-You can look at the current coverage report for the master branch [here](https://parallel-in-time.org/pySDC/coverage/index.html) or compare the results with previous builds [here](https://app.codecov.io/gh/Parallel-in-Time/pySDC). Codecov will also comment on any pull request, indicating the change of coverage.
+You can look at the current [coverage report for the master branch](https://parallel-in-time.org/pySDC/coverage/index.html) or [compare the results with previous builds](https://app.codecov.io/gh/Parallel-in-Time/pySDC). Codecov will also comment on any pull request, indicating the change of coverage.
 
 During developments, you can also run the coverage tests locally, using :
 

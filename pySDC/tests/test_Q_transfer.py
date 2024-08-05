@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from numpy.polynomial.polynomial import polyval
 
-from pySDC.core.Collocation import CollBase
+from pySDC.core.collocation import CollBase
 import pySDC.helpers.transfer_helper as th
 
 t_start = np.random.rand(1) * 0.2

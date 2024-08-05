@@ -2,8 +2,8 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import cg
 
-from pySDC.core.Errors import ParameterError, ProblemError
-from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.core.errors import ParameterError, ProblemError
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_mesh
 
@@ -12,7 +12,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_m
 
 
 # noinspection PyUnusedLocal
-class allencahn_fullyimplicit(ptype):
+class allencahn_fullyimplicit(Problem):
     r"""
     Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
 
@@ -134,41 +134,6 @@ class allencahn_fullyimplicit(ptype):
         self.work_counters['rhs'] = WorkCounter()
         self.work_counters['linear'] = WorkCounter()
 
-    @staticmethod
-    def __get_A(N, dx):
-        """
-        Helper function to assemble FD matrix A in sparse format.
-
-        Parameters
-        ----------
-        N : list
-            Number of degrees of freedom.
-        dx : float
-            Distance between two spatial nodes.
-
-        Returns
-        -------
-        A : scipy.sparse.csc_matrix
-            Matrix in CSC format.
-        """
-
-        stencil = [1, -2, 1]
-        zero_pos = 2
-
-        dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
-        offsets = np.concatenate(
-            (
-                [N[0] - i - 1 for i in reversed(range(zero_pos - 1))],
-                [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))],
-            )
-        )
-        doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N[0]))
-
-        A = sp.diags(dstencil, doffsets, shape=(N[0], N[0]), format='csc')
-        A = sp.kron(A, sp.eye(N[0])) + sp.kron(sp.eye(N[1]), A)
-        A *= 1.0 / (dx**2)
-        return A
-
     # noinspection PyTypeChecker
     def solve_system(self, rhs, factor, u0, t):
         """
@@ -221,7 +186,7 @@ class allencahn_fullyimplicit(ptype):
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
             u -= cg(
-                dg, g, x0=z, tol=self.lin_tol, maxiter=self.lin_maxiter, atol=0, callback=self.work_counters['linear']
+                dg, g, x0=z, rtol=self.lin_tol, maxiter=self.lin_maxiter, atol=0, callback=self.work_counters['linear']
             )[0]
             # increase iteration count
             n += 1
@@ -286,10 +251,9 @@ class allencahn_fullyimplicit(ptype):
             me[:] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init)
 
         else:
-            for i in range(self.nvars[0]):
-                for j in range(self.nvars[1]):
-                    r2 = self.xvalues[i] ** 2 + self.xvalues[j] ** 2
-                    me[i, j] = np.tanh((self.radius - np.sqrt(r2)) / (np.sqrt(2) * self.eps))
+            X, Y = np.meshgrid(self.xvalues, self.xvalues)
+            r2 = X**2 + Y**2
+            me[:] = np.tanh((self.radius - np.sqrt(r2)) / (np.sqrt(2) * self.eps))
 
         return me
 
@@ -375,7 +339,7 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
             Id - factor * self.A,
             rhs.flatten(),
             x0=u0.flatten(),
-            tol=self.lin_tol,
+            rtol=self.lin_tol,
             maxiter=self.lin_maxiter,
             atol=0,
             callback=callback,
@@ -504,7 +468,7 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
-            u -= cg(dg, g, x0=z, tol=self.lin_tol, atol=0)[0]
+            u -= cg(dg, g, x0=z, rtol=self.lin_tol, atol=0)[0]
             # increase iteration count
             n += 1
             # print(n, res)
@@ -600,7 +564,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
             Id - factor * self.A,
             rhs.flatten(),
             x0=u0.flatten(),
-            tol=self.lin_tol,
+            rtol=self.lin_tol,
             maxiter=self.lin_maxiter,
             atol=0,
             callback=callback,
@@ -657,7 +621,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
-            u -= cg(dg, g, x0=z, tol=self.lin_tol, atol=0)[0]
+            u -= cg(dg, g, x0=z, rtol=self.lin_tol, atol=0)[0]
             # increase iteration count
             n += 1
             # print(n, res)
@@ -768,7 +732,7 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
                 dg,
                 g,
                 x0=z,
-                tol=self.lin_tol,
+                rtol=self.lin_tol,
                 atol=0,
             )[0]
             # increase iteration count

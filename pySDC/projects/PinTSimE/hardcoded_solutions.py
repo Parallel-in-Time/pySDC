@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.core.Errors import ParameterError
+from pySDC.core.errors import ParameterError
 
 
 def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):

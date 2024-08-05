@@ -1,12 +1,12 @@
 import numpy as np
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.errors import ProblemError
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 # noinspection PyUnusedLocal
-class logistics_equation(ptype):
+class logistics_equation(Problem):
     r"""
     Problem implementing a specific form of the Logistic Differential Equation
 

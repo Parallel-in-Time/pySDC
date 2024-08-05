@@ -1,4 +1,4 @@
-from pySDC.core.ConvergenceController import ConvergenceController
+from pySDC.core.convergence_controller import ConvergenceController
 import numpy as np
 
 np.bool = np.bool_

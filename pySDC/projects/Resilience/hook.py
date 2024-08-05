@@ -1,4 +1,4 @@
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 from pySDC.implementations.hooks.log_solution import LogSolution
 from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
 from pySDC.implementations.hooks.log_extrapolated_error_estimate import LogExtrapolationErrorEstimate
@@ -8,7 +8,7 @@ from pySDC.implementations.hooks.log_step_size import LogStepSize
 hook_collection = [LogSolution, LogEmbeddedErrorEstimate, LogExtrapolationErrorEstimate, LogStepSize]
 
 
-class LogData(hooks):
+class LogData(Hooks):
     """
     Record data required for analysis of problems in the resilience project
     """
@@ -51,7 +51,7 @@ class LogData(hooks):
         )
 
 
-class LogUold(hooks):
+class LogUold(Hooks):
     """
     Log last iterate at the end of the step. Since the hook comes after override of uold, we need to do this in each
     iteration. But we don't know which will be the last, so we just do `iter=-1` to override the previous value.
@@ -71,7 +71,7 @@ class LogUold(hooks):
         )
 
 
-class LogUAllIter(hooks):
+class LogUAllIter(Hooks):
     """
     Log solution and errors after each iteration
     """

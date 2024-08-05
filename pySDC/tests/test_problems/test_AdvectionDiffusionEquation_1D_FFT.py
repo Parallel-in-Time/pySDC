@@ -47,7 +47,7 @@ def get_error_thresholds(freq, nu):
 @pytest.mark.parametrize('nu', [0.02, -0.02])
 def test_imex_vs_implicit(freq, nu):
     import numpy as np
-    from pySDC.core.Errors import ParameterError, ProblemError
+    from pySDC.core.errors import ParameterError, ProblemError
     from pySDC.implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT import (
         advectiondiffusion1d_imex,
         advectiondiffusion1d_implicit,

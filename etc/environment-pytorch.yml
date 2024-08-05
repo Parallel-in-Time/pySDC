@@ -1,3 +1,5 @@
+---
+
 name: pySDC
 channels:
   - conda-forge
@@ -9,3 +11,8 @@ dependencies:
   - pytorch
   - matplotlib>=3.0
   - dill
+  - mpich
+  - mpi4py>=3.0.0
+  - pip
+  - pip:
+    - qmat>=0.1.8

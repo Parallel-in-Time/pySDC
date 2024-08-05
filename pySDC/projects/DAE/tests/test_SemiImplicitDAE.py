@@ -53,10 +53,10 @@ def testPredict(initial_guess):
     In this test the predict function of the sweeper is tested.
     """
 
-    from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE
-    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
-    from pySDC.projects.DAE.misc.DAEMesh import DAEMesh
-    from pySDC.core.Step import step
+    from pySDC.projects.DAE.sweepers.semiImplicitDAE import SemiImplicitDAE
+    from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.misc.meshDAE import MeshDAE
+    from pySDC.core.step import Step
 
     description, _ = getTestSetup(DiscontinuousTestDAE, SemiImplicitDAE, [])
 
@@ -72,7 +72,7 @@ def testPredict(initial_guess):
     level_params.update({'dt': 0.1})
     description.update({'level_params': level_params})
 
-    S = step(description=description)
+    S = Step(description=description)
     L = S.levels[0]
     P = L.prob
 
@@ -83,8 +83,8 @@ def testPredict(initial_guess):
 
     L.sweep.predict()
 
-    assert isinstance(L.u[0], DAEMesh), "Initial condition u0 is not of type DAEMesh!"
-    assert isinstance(L.f[0], DAEMesh), "Initial condition f0 is not of type DAEMesh!"
+    assert isinstance(L.u[0], MeshDAE), "Initial condition u0 is not of type MeshDAE!"
+    assert isinstance(L.f[0], MeshDAE), "Initial condition f0 is not of type MeshDAE!"
 
     assert np.allclose(L.f[0], 0.0), "Gradient at starting time needs to be initialised as zero!"
     if initial_guess == 'spread':
@@ -111,10 +111,10 @@ def testComputeResidual(residual_type):
     In this test the predict function of the sweeper is tested.
     """
 
-    from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE
-    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
-    from pySDC.core.Step import step
-    from pySDC.core.Errors import ParameterError
+    from pySDC.projects.DAE.sweepers.semiImplicitDAE import SemiImplicitDAE
+    from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.core.step import Step
+    from pySDC.core.errors import ParameterError
 
     description, _ = getTestSetup(DiscontinuousTestDAE, SemiImplicitDAE, [])
 
@@ -131,7 +131,7 @@ def testComputeResidual(residual_type):
     level_params.update({'residual_type': residual_type})
     description.update({'level_params': level_params})
 
-    S = step(description=description)
+    S = Step(description=description)
     L = S.levels[0]
     P = L.prob
 
@@ -169,10 +169,10 @@ def testComputeEndpoint(quad_type):
     In this test the predict function of the sweeper is tested.
     """
 
-    from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE
-    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
-    from pySDC.core.Step import step
-    from pySDC.core.Errors import ParameterError
+    from pySDC.projects.DAE.sweepers.semiImplicitDAE import SemiImplicitDAE
+    from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.core.step import Step
+    from pySDC.core.errors import ParameterError
 
     description, _ = getTestSetup(DiscontinuousTestDAE, SemiImplicitDAE, [])
 
@@ -190,11 +190,11 @@ def testComputeEndpoint(quad_type):
 
     if quad_type == 'RADAU-LEFT':
         with pytest.raises(ParameterError):
-            S = step(description=description)
+            S = Step(description=description)
             with pytest.raises(NotImplementedError):
                 S.levels[0].sweep.compute_end_point()
     else:
-        S = step(description=description)
+        S = Step(description=description)
 
         L = S.levels[0]
         P = L.prob
@@ -207,24 +207,24 @@ def testComputeEndpoint(quad_type):
 
         L.sweep.compute_end_point()
 
-        assert np.isclose(L.u[-1], L.uend), "Endpoint is not computed correctly!"
+        assert np.allclose(L.u[-1], L.uend), "Endpoint is not computed correctly!"
 
 
 @pytest.mark.base
 @pytest.mark.parametrize('M', [2, 3])
 def testCompareResults(M):
     r"""
-    Test checks whether the results of the ``fully_implicit_DAE`` sweeper matches
+    Test checks whether the results of the ``FullyImplicitDAE`` sweeper matches
     with the ``SemiImplicitDAE`` version.
     """
 
-    from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE
-    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.sweepers.semiImplicitDAE import SemiImplicitDAE
+    from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
+    from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
     descrSI, controller_params = getTestSetup(DiscontinuousTestDAE, SemiImplicitDAE, [])
-    descrFI, _ = getTestSetup(DiscontinuousTestDAE, fully_implicit_DAE, [])
+    descrFI, _ = getTestSetup(DiscontinuousTestDAE, FullyImplicitDAE, [])
 
     sweeper_params = {
         'quad_type': 'RADAU-RIGHT',
@@ -261,20 +261,20 @@ def testCompareResults(M):
 
 
 @pytest.mark.base
-@pytest.mark.parametrize('case', [0, 1])
-@pytest.mark.parametrize('M', [2, 3])
 @pytest.mark.parametrize('QI', ['IE', 'LU'])
+@pytest.mark.parametrize('M', [2, 3])
+@pytest.mark.parametrize('case', [0, 1])
 def testOrderAccuracy(case, M, QI):
     r"""
     In this test, the order of accuracy of the ``SemiImplicitDAE`` sweeper is tested for an index-1 DAE
     and an index-2 DAE of semi-explicit form.
     """
 
-    from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE
-    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
-    from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
+    from pySDC.projects.DAE.sweepers.semiImplicitDAE import SemiImplicitDAE
+    from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.problems.simpleDAE import SimpleDAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.projects.DAE.misc.HookClass_DAE import (
+    from pySDC.projects.DAE.misc.hooksDAE import (
         LogGlobalErrorPostStepDifferentialVariable,
         LogGlobalErrorPostStepAlgebraicVariable,
     )
@@ -282,23 +282,23 @@ def testOrderAccuracy(case, M, QI):
 
     problem = {
         0: DiscontinuousTestDAE,
-        1: simple_dae_1,
+        1: SimpleDAE,
     }
 
     interval = {
         'DiscontinuousTestDAE': (1.0, 1.5),
-        'simple_dae_1': (0.0, 0.4),
+        'SimpleDAE': (0.0, 0.4),
     }
 
     refOrderDiff = {
         'DiscontinuousTestDAE': 2 * M - 1,
-        'simple_dae_1': 2 * M - 1,
+        'SimpleDAE': 2 * M - 1,
     }
 
     # note that for index-2 DAEs there is order reduction in alg. variable
     refOrderAlg = {
         'DiscontinuousTestDAE': 2 * M - 1,
-        'simple_dae_1': M,
+        'SimpleDAE': M,
     }
 
     hook_class = [LogGlobalErrorPostStepDifferentialVariable, LogGlobalErrorPostStepAlgebraicVariable]

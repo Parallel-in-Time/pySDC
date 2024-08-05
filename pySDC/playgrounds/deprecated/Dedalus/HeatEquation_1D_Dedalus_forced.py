@@ -2,13 +2,13 @@ import numpy as np
 
 from dedalus import public as de
 
-from pySDC.core.Problem import ptype
-from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.problem import Problem
+from pySDC.core.errors import ParameterError, ProblemError
 
 from pySDC.playgrounds.Dedalus.dedalus_field import dedalus_field, rhs_imex_dedalus_field
 
 
-class heat1d_dedalus_forced(ptype):
+class heat1d_dedalus_forced(Problem):
     """
     Example implementing the forced 1D heat equation with periodic BC in [0,1], discretized using Dedalus
     """

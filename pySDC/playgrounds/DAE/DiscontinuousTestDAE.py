@@ -3,8 +3,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.projects.DAE.sweepers.SemiImplicitDAE import SemiImplicitDAE
-from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
+from pySDC.projects.DAE.sweepers.semiImplicitDAE import SemiImplicitDAE
+from pySDC.projects.DAE.problems.discontinuousTestDAE import DiscontinuousTestDAE
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 from pySDC.implementations.hooks.log_solution import LogSolution
@@ -74,7 +74,7 @@ def simulateDAE():
     plotSolution(stats)
 
 
-def plotSolution(stats):
+def plotSolution(stats, file_name='data/solution.png'):
     r"""
     Here, the solution of the DAE is plotted.
 
@@ -96,7 +96,7 @@ def plotSolution(stats):
     plt.xlabel(r"Time $t$")
     plt.ylabel(r"Solution $y(t)$, $z(t)$")
 
-    plt.savefig('data/solution.png', dpi=300, bbox_inches='tight')
+    plt.savefig(file_name, dpi=300, bbox_inches='tight')
     plt.close()
 
 

@@ -1,9 +1,9 @@
 import numpy as np
 
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class monitor(hooks):
+class monitor(Hooks):
     def pre_run(self, step, level_number):
         """
         Overwrite standard post step hook

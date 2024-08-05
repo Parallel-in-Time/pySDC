@@ -1,8 +1,7 @@
 import numpy as np
 
-from pySDC.core.Lagrange import LagrangeApproximation
-from pySDC.core.ConvergenceController import ConvergenceController, Status
-from pySDC.core.Collocation import CollBase
+from qmat.lagrange import LagrangeApproximation
+from pySDC.core.convergence_controller import ConvergenceController
 
 
 class EstimatePolynomialError(ConvergenceController):
@@ -52,7 +51,7 @@ class EstimatePolynomialError(ConvergenceController):
         self.check_convergence = CheckConvergence.check_convergence
 
         if quad_type != 'GAUSS' and defaults['estimate_on_node'] > num_nodes:
-            from pySDC.core.Errors import ParameterError
+            from pySDC.core.errors import ParameterError
 
             raise ParameterError(
                 'You cannot interpolate with lower accuracy to the end point if the end point is a node!'
@@ -62,28 +61,15 @@ class EstimatePolynomialError(ConvergenceController):
 
         return defaults
 
-    def reset_status_variables(self, controller, **kwargs):
+    def reset_status_variables(self, *args, **kwargs):
         """
         Add variable for embedded error
-
-        Args:
-            controller (pySDC.Controller): The controller
 
         Returns:
             None
         """
-        if 'comm' in kwargs.keys():
-            steps = [controller.S]
-        else:
-            if 'active_slots' in kwargs.keys():
-                steps = [controller.MS[i] for i in kwargs['active_slots']]
-            else:
-                steps = controller.MS
-
-        where = ["levels", "status"]
-        for S in steps:
-            self.add_variable(S, name='error_embedded_estimate', where=where, init=None)
-            self.add_variable(S, name='order_embedded_estimate', where=where, init=None)
+        self.add_status_variable_to_level('error_embedded_estimate')
+        self.add_status_variable_to_level('order_embedded_estimate')
 
     def matmul(self, A, b):
         """

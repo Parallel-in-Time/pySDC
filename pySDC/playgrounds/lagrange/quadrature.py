@@ -9,10 +9,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from time import time
 
-from pySDC.core import NodesGenerator, LagrangeApproximation
+from qmat.nodes import NodesGenerator
+from qmat.lagrange import LagrangeApproximation
 from pySDC.implementations.collocations import Collocation
 
-from pySDC.core.Errors import CollocationError
+from pySDC.core.errors import CollocationError
 
 from scipy.integrate import quad
 from scipy.interpolate import BarycentricInterpolator

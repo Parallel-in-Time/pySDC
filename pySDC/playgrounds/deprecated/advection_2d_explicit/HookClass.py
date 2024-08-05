@@ -1,10 +1,10 @@
 from matplotlib import cm
 from matplotlib import pyplot as plt
 
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class plot_solution(hooks):
+class plot_solution(Hooks):
     def __init__(self):
         """
         Initialization of output

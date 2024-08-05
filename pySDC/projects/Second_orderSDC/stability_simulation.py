@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Step import step
+from pySDC.core.errors import ProblemError
+from pySDC.core.step import Step
 
 from pySDC.projects.Second_orderSDC.plot_helper import set_fixed_plot_params
 
@@ -45,7 +45,7 @@ class StabilityImplementation:
             numpy.ndarray: domain_picard
             numpy.ndarray: domain_Kpicard
         """
-        S = step(description=self.description)
+        S = Step(description=self.description)
         # Define L to get access level params and functions
         L = S.levels[0]
         # Number of nodes

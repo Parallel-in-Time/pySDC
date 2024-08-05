@@ -11,9 +11,9 @@ def test_errors():
 
 @pytest.mark.base
 def check_error(subclass):
-    import pySDC.core.Errors
+    import pySDC.core.errors
 
-    err = getattr(pySDC.core.Errors, subclass)
+    err = getattr(pySDC.core.errors, subclass)
 
     try:
         raise err('bla')

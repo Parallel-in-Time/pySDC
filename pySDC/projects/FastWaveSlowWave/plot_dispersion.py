@@ -12,7 +12,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 from pySDC.implementations.problem_classes.acoustic_helpers.standard_integrators import dirk, rk_imex
 
-from pySDC.core.Step import step
+from pySDC.core.step import Step
 
 
 def findomega(stab_fh):
@@ -75,7 +75,7 @@ def compute_and_plot_dispersion(Nsamples=15, K=3):
     U_speed = 0.05
 
     # now the description contains more or less everything we need to create a step
-    S = step(description=description)
+    S = Step(description=description)
 
     L = S.levels[0]
 

@@ -1,0 +1,6 @@
+# Add here the pip packages you would like to install on this virtual environment / kernel
+numpy
+matplotlib>=3.0
+dill>=0.2.6
+scipy>=1.14
+qmat>=0.1.8

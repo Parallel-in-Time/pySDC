@@ -2,7 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 from pathlib import Path
 
-from pySDC.core.Collocation import CollBase
+from pySDC.core.collocation import CollBase
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 
 

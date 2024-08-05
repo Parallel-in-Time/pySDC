@@ -1,10 +1,10 @@
 import numpy as np
-from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.core.Errors import ConvergenceError
+from pySDC.core.errors import ConvergenceError
 
 
-class LorenzAttractor(ptype):
+class LorenzAttractor(Problem):
     r"""
     Simple script to run a Lorenz attractor problem.
 

@@ -9,7 +9,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 
 import pySDC.helpers.plot_helper as plt_helper
 
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 from pySDC.implementations.hooks.log_solution import LogSolution
 from pySDC.implementations.hooks.log_step_size import LogStepSize
 from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
@@ -21,7 +21,7 @@ from pySDC.implementations.convergence_controller_classes.basic_restarting impor
 from pySDC.projects.PinTSimE.hardcoded_solutions import testSolution
 
 
-class LogEventBattery(hooks):
+class LogEventBattery(Hooks):
     """
     Logs the problem dependent state function of the battery drain model.
     """

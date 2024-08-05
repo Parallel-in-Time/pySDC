@@ -7,7 +7,7 @@ from pySDC.implementations.convergence_controller_classes.estimate_embedded_erro
 from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import (
     EstimateExtrapolationErrorNonMPI,
 )
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 from pySDC.implementations.hooks.log_errors import LogLocalErrorPostStep
 from pySDC.projects.Resilience.strategies import merge_descriptions
 
@@ -15,7 +15,7 @@ import pySDC.helpers.plot_helper as plt_helper
 from pySDC.projects.Resilience.piline import run_piline
 
 
-class DoNothing(hooks):
+class DoNothing(Hooks):
     pass
 
 

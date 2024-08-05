@@ -1,10 +1,10 @@
 import pytest
 import numpy as np
 
-from pySDC.core.Collocation import CollBase
+from pySDC.core.collocation import CollBase
 
-t_start = np.random.rand(1) * 0.2
-t_end = 0.8 + np.random.rand(1) * 0.2
+t_start = float(np.random.rand(1) * 0.2)
+t_end = float(0.8 + np.random.rand(1) * 0.2)
 
 tolQuad = 1e-13
 

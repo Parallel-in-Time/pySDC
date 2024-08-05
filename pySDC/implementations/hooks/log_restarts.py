@@ -1,7 +1,7 @@
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class LogRestarts(hooks):
+class LogRestarts(Hooks):
     """
     Record restarts as `restart` at the beginning of the step.
     """

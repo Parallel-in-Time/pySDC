@@ -1,10 +1,10 @@
-from pySDC.core.SpaceTransfer import space_transfer
+from pySDC.core.space_transfer import SpaceTransfer
 from pySDC.projects.Monodomain.transfer_classes.Transfer_DCT_Vector import DCT_to_DCT
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.projects.Monodomain.datatype_classes.my_mesh import imexexp_mesh
 
 
-class TransferVectorOfDCTVectors(space_transfer):
+class TransferVectorOfDCTVectors(SpaceTransfer):
     """
     This implementation can restrict and prolong VectorOfVectors
     """

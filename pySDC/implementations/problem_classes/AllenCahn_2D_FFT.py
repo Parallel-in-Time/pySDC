@@ -1,12 +1,12 @@
 import numpy as np
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.errors import ProblemError
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 # noinspection PyUnusedLocal
-class allencahn2d_imex(ptype):
+class allencahn2d_imex(Problem):
     r"""
     Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
 
@@ -26,7 +26,7 @@ class allencahn2d_imex(ptype):
 
     or uniform distributed random numbers in :math:`[-1, 1]` for :math:`i, j=0,..,N-1`, where :math:`N` is the number of
     spatial grid points. For time-stepping, the problem is treated *semi-implicitly*, i.e., the diffusion part is solved by
-    Fast-Fourier Tranform (FFT) and the nonlinear term is treated explicitly.
+    Fast-Fourier Transform (FFT) and the nonlinear term is treated explicitly.
 
     An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed
     by a ``SciPy`` routine.
@@ -120,11 +120,10 @@ class allencahn2d_imex(ptype):
         """
 
         f = self.dtype_f(self.init)
-        v = u.flatten()
         tmp = self.lap * np.fft.rfft2(u)
         f.impl[:] = np.fft.irfft2(tmp)
         if self.eps > 0:
-            f.expl[:] = (1.0 / self.eps**2 * v * (1.0 - v**self.nu)).reshape(self.nvars)
+            f.expl[:] = 1.0 / self.eps**2 * u * (1.0 - u**self.nu)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -200,7 +199,7 @@ class allencahn2d_imex(ptype):
 
 class allencahn2d_imex_stab(allencahn2d_imex):
     r"""
-    This implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+    This implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-0.5, 0.5]^2`
     with stabilized splitting
 
     .. math::
@@ -219,7 +218,7 @@ class allencahn2d_imex_stab(allencahn2d_imex):
 
     or uniform distributed random numbers in :math:`[-1, 1]` for :math:`i, j=0,..,N-1`, where :math:`N` is the number of
     spatial grid points. For time-stepping, the problem is treated *semi-implicitly*, i.e., the diffusion part is solved with
-    Fast-Fourier Tranform (FFT) and the nonlinear term is treated explicitly.
+    Fast-Fourier Transform (FFT) and the nonlinear term is treated explicitly.
 
     An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed
     by a ``SciPy`` routine.
@@ -276,11 +275,10 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         """
 
         f = self.dtype_f(self.init)
-        v = u.flatten()
         tmp = self.lap * np.fft.rfft2(u)
         f.impl[:] = np.fft.irfft2(tmp)
         if self.eps > 0:
-            f.expl[:] = (1.0 / self.eps**2 * v * (1.0 - v**self.nu) + 2.0 / self.eps**2 * v).reshape(self.nvars)
+            f.expl[:] = 1.0 / self.eps**2 * u * (1.0 - u**self.nu) + 2.0 / self.eps**2 * u
         return f
 
     def solve_system(self, rhs, factor, u0, t):

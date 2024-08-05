@@ -1,7 +1,7 @@
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class LogEventDiscontinuousTestDAE(hooks):
+class LogEventDiscontinuousTestDAE(Hooks):
     """
     Logs the data for the discontinuous test DAE problem containing one discrete event.
     Note that this logging data is dependent from the problem itself.
@@ -25,7 +25,7 @@ class LogEventDiscontinuousTestDAE(hooks):
         )
 
 
-class LogEventWSCC9(hooks):
+class LogEventWSCC9(Hooks):
     """
     Logs the data for the discontinuous test DAE problem containing one discrete event.
     Note that this logging data is dependent from the problem itself.

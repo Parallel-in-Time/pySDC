@@ -1,6 +1,6 @@
 from petsc4py import PETSc
 
-from pySDC.core.Errors import DataError
+from pySDC.core.errors import DataError
 
 
 class petsc_vec(PETSc.Vec):

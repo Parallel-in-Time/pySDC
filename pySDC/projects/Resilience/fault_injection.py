@@ -1,7 +1,7 @@
 import struct
 import numpy as np
 
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.helpers.pysdc_helper import FrozenClass
 
@@ -129,7 +129,7 @@ class Fault(FrozenClass):
         return cls({**combination, **args})
 
 
-class FaultInjector(hooks):
+class FaultInjector(Hooks):
     '''
     Class to use as base for hooks class instead of abstract hooks class to insert faults using hooks
     '''

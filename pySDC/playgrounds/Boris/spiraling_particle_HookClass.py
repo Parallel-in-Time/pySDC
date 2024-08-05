@@ -2,10 +2,10 @@ import numpy as np
 
 # import progressbar
 
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class particles_output(hooks):
+class particles_output(Hooks):
     def __init__(self):
         """
         Initialization of particles output

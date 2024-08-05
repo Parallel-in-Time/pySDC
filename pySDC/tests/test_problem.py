@@ -18,10 +18,10 @@ def test_scipy_reference(init):
     Returns:
         None
     """
-    from pySDC.core.Problem import ptype
+    from pySDC.core.problem import Problem
 
     # instantiate a dummy problem
-    problem = ptype(init)
+    problem = Problem(init)
 
     # setup random initial conditions
     u0 = np.random.rand(*init[0])

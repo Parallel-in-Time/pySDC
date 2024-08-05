@@ -1,11 +1,11 @@
 import dolfin as df
 
-from pySDC.core.Errors import TransferError
-from pySDC.core.SpaceTransfer import space_transfer
+from pySDC.core.errors import TransferError
+from pySDC.core.space_transfer import SpaceTransfer
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_fenics_mesh
 
 
-class mesh_to_mesh_fenics(space_transfer):
+class mesh_to_mesh_fenics(SpaceTransfer):
     """
     This implementation can restrict and prolong between fenics meshes
     """

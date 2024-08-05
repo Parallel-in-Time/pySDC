@@ -6,7 +6,7 @@ matplotlib.use('Agg')
 import matplotlib.pylab as plt
 from matplotlib import rc
 
-from pySDC.core.Collocation import CollBase
+from pySDC.core.collocation import CollBase
 
 
 def compute_and_plot_specrad(Nnodes, lam):

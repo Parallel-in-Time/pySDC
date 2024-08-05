@@ -1,9 +1,9 @@
 import numpy as np
 
-from pySDC.core.Sweeper import sweeper
+from pySDC.core.sweeper import Sweeper
 
 
-class boris_2nd_order(sweeper):
+class boris_2nd_order(Sweeper):
     """
     Custom sweeper class, implements Sweeper.py
 
@@ -60,8 +60,8 @@ class boris_2nd_order(sweeper):
         """
 
         # set implicit and explicit Euler matrices (default, but can be changed)
-        QI = self.get_Qdelta_implicit(self.coll, qd_type=self.params.QI)
-        QE = self.get_Qdelta_explicit(self.coll, qd_type=self.params.QE)
+        QI = self.get_Qdelta_implicit(qd_type=self.params.QI)
+        QE = self.get_Qdelta_explicit(qd_type=self.params.QE)
 
         # trapezoidal rule
         QT = 1 / 2 * (QI + QE)

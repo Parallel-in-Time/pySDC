@@ -9,9 +9,9 @@ def test_Newton_inexactness(ratio=1e-2, min_tol=1e-11, max_tol=1e-6):
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.helpers.stats_helper import get_sorted, filter_stats
-    from pySDC.core.Hooks import hooks
+    from pySDC.core.hooks import Hooks
 
-    class log_newton_tol(hooks):
+    class log_newton_tol(Hooks):
         def pre_iteration(self, step, level_number):
             lvl = step.levels[level_number]
             self.add_to_stats(

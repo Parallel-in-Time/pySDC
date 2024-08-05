@@ -1,10 +1,10 @@
 import numpy as np
 
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
-class polynomial_testequation(ptype):
+class polynomial_testequation(Problem):
     """
     Dummy problem for tests only! In particular, the `solve_system` function just returns the exact solution instead of
     solving an appropriate system. This class is indented to be used for tests of operations that are exact on polynomials.

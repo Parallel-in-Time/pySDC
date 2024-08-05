@@ -1,15 +1,15 @@
 import numpy as np
 from mpi4py import MPI
 
-from pySDC.core.Controller import controller
-from pySDC.core.Errors import ControllerError
-from pySDC.core.Step import step
+from pySDC.core.controller import Controller
+from pySDC.core.errors import ControllerError
+from pySDC.core.step import Step
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
 
 import scorep.user as spu
 
 
-class controller_MPI(controller):
+class controller_MPI(Controller):
     """
 
     PFASST controller, running parallel version of PFASST in blocks (MG-style)
@@ -30,7 +30,7 @@ class controller_MPI(controller):
         super(controller_MPI, self).__init__(controller_params)
 
         # create single step per processor
-        self.S = step(description)
+        self.S = Step(description)
 
         # pass communicator for future use
         self.comm = comm

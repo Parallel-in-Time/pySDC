@@ -1,9 +1,9 @@
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Auzinger_implicit import auzinger
 
 
-class error_output(hooks):
+class error_output(Hooks):
     """
     Hook class to add output of error
     """

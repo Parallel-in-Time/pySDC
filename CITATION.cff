@@ -20,10 +20,19 @@ authors:
     given-names: Ikrom
     orcid: https://orcid.org/0000-0002-8869-0784
     affiliation: "Hamburg University of Technology, Institute of Mathematics, 21073 Hamburg, Germany"
+  - family-names: Rosilho de Souza
+    given-names: Giacomo
+    orcid: https://orcid.org/0000-0002-0176-8455
+    affiliation: "Università della Svizzera italiana, Via la Santa 1, 6962 Lugano-Viganello, Switzerland"
+  - family-names: Fritz
+    given-names: Jakob
+    orcid: https://orcid.org/0000-0001-6280-8396
+    affiliation: "Jülich Supercomputing Centre, Forschungszentrum Jülich GmbH, 52425 Jülich, Germany"
 
-version: 5.4.3
+
+version: 5.5.0
 doi: 10.5281/zenodo.594191
-date-released: 2024-03-27
+date-released: 2024-06-24
 keywords: 
   - "parallel-in-time"
   - "spectral deferred corrections"

@@ -1,8 +1,8 @@
 import numpy as np
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class LogError(hooks):
+class LogError(Hooks):
     """
     Base class with functions to add the local and global error to the stats, which can be inherited by hooks logging
     these at specific places.
@@ -118,7 +118,7 @@ class LogGlobalErrorPostIter(LogError):
         self.log_global_error(step, level_number, suffix='_post_iteration')
 
 
-class LogGlobalErrorPostRun(hooks):
+class LogGlobalErrorPostRun(Hooks):
     """
     Compute the global error once after the run is finished.
     Because of some timing issues, we cannot inherit from the `LogError` class here.
@@ -167,7 +167,7 @@ class LogGlobalErrorPostRun(hooks):
             None
         """
         super().post_run(step, level_number)
-        self._hooks__num_restarts = self.num_restarts
+        self._Hooks__num_restarts = self.num_restarts
 
         if level_number == 0 and step.status.last:
             L = step.levels[level_number]

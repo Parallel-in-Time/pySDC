@@ -1,7 +1,7 @@
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class libpfasst_output(hooks):
+class libpfasst_output(Hooks):
     def __init__(self):
         """
         Initialization of Allen-Cahn monitoring

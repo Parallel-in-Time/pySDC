@@ -2,12 +2,12 @@ import numpy as np
 from mpi4py import MPI
 from pmesh.pm import ParticleMesh
 
-from pySDC.core.Errors import ParameterError, ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.errors import ParameterError, ProblemError
+from pySDC.core.problem import Problem
 from pySDC.playgrounds.pmesh.PMESH_datatype import pmesh_datatype, rhs_imex_pmesh
 
 
-class allencahn_imex(ptype):
+class allencahn_imex(Problem):
     """
     Example implementing Allen-Cahn equation in 2-3D using PMESH for solving linear parts, IMEX time-stepping
 

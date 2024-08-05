@@ -1,12 +1,11 @@
 import pytest
 
-from pySDC.core.Hooks import hooks
-from pySDC.core.Lagrange import LagrangeApproximation
-from pySDC.core.Collocation import CollBase
+from pySDC.core.hooks import Hooks
+from qmat.lagrange import LagrangeApproximation
 import numpy as np
 
 
-class LogInterpolation(hooks):
+class LogInterpolation(Hooks):
     """
     Log the solution when a step is supposed to be restarted as well as the interpolated solution to the new nodes and
     the solution that ends up at the nodes after the restart.
@@ -81,7 +80,7 @@ class LogInterpolation(hooks):
             )
 
 
-class CheckInterpolationOrder(hooks):
+class CheckInterpolationOrder(Hooks):
     def __init__(self):
         self.mess_with_solution = True
         self.messed_with_solution = False

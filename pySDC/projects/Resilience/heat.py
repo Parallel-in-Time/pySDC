@@ -3,7 +3,7 @@
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.projects.Resilience.hook import hook_collection, LogData
 import numpy as np

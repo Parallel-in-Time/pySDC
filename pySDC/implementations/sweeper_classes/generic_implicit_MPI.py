@@ -1,11 +1,11 @@
 from mpi4py import MPI
 
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.core.Sweeper import sweeper, ParameterError
+from pySDC.core.sweeper import Sweeper, ParameterError
 import logging
 
 
-class SweeperMPI(sweeper):
+class SweeperMPI(Sweeper):
     """
     MPI based sweeper where each rank administers one collocation node. Adapt sweepers to MPI by use of multiple inheritance.
     See for example the `generic_implicit_MPI` sweeper, which has a class definition:
@@ -148,6 +148,13 @@ class SweeperMPI(sweeper):
         L.status.unlocked = True
         L.status.updated = True
 
+    def communicate_tau_correction_for_full_interval(self):
+        L = self.level
+        P = L.prob
+        if self.rank < self.comm.size - 1:
+            L.tau[-1] = P.u_init
+        self.comm.Bcast(L.tau[-1], root=self.comm.size - 1)
+
 
 class generic_implicit_MPI(SweeperMPI, generic_implicit):
     """
@@ -213,7 +220,7 @@ class generic_implicit_MPI(SweeperMPI, generic_implicit):
         # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
 
         # implicit solve with prefactor stemming from the diagonal of Qd
-        L.u[self.rank + 1] = P.solve_system(
+        L.u[self.rank + 1][:] = P.solve_system(
             rhs,
             L.dt * self.QI[self.rank + 1, self.rank + 1],
             L.u[self.rank + 1],
@@ -250,6 +257,7 @@ class generic_implicit_MPI(SweeperMPI, generic_implicit):
             L.uend += L.u[0]
 
             # add up tau correction of the full interval (last entry)
-            if L.tau[-1] is not None:
+            if L.tau[self.rank] is not None:
+                self.communicate_tau_correction_for_full_interval()
                 L.uend += L.tau[-1]
         return None

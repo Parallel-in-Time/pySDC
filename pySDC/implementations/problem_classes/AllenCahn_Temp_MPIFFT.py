@@ -1,14 +1,14 @@
 import numpy as np
 from mpi4py_fft import PFFT
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.errors import ProblemError
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 from mpi4py_fft import newDistArray
 
 
-class allencahn_temp_imex(ptype):
+class allencahn_temp_imex(Problem):
     r"""
     This class implements the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [0, 1]^2`
 
@@ -123,7 +123,7 @@ class allencahn_temp_imex(ptype):
         L = np.array([self.L] * ndim, dtype=float)
 
         # get local mesh
-        X = np.ogrid[self.fft.local_slice(False)]
+        X = list(np.ogrid[self.fft.local_slice(False)])
         N = self.fft.global_shape()
         for i in range(len(N)):
             X[i] = X[i] * L[i] / N[i]
@@ -135,7 +135,7 @@ class allencahn_temp_imex(ptype):
         k = [np.fft.fftfreq(n, 1.0 / n).astype(int) for n in N[:-1]]
         k.append(np.fft.rfftfreq(N[-1], 1.0 / N[-1]).astype(int))
         K = [ki[si] for ki, si in zip(k, s)]
-        Ks = np.meshgrid(*K, indexing='ij', sparse=True)
+        Ks = list(np.meshgrid(*K, indexing='ij', sparse=True))
         Lp = 2 * np.pi / L
         for i in range(ndim):
             Ks[i] = (Ks[i] * Lp[i]).astype(float)

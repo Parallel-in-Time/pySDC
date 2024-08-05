@@ -1,11 +1,11 @@
 import numpy as np
 
-from pySDC.core.Errors import ParameterError, ProblemError
-from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.core.errors import ParameterError, ProblemError
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
-class DiscontinuousTestODE(ptype):
+class DiscontinuousTestODE(Problem):
     r"""
     This class implements a very simple test case of a ordinary differential equation consisting of one discrete event. The dynamics of
     the solution changes when the state function :math:`h(u) := u - 5` changes the sign. The problem is defined by:

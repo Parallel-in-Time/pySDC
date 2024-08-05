@@ -1,7 +1,7 @@
 # script to run a quench problem
 from pySDC.implementations.problem_classes.Quench import Quench, QuenchIMEX
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.projects.Resilience.hook import hook_collection, LogData
 from pySDC.projects.Resilience.strategies import merge_descriptions
@@ -9,10 +9,10 @@ from pySDC.projects.Resilience.sweepers import imex_1st_order_efficient, generic
 import numpy as np
 
 import matplotlib.pyplot as plt
-from pySDC.core.Errors import ConvergenceError
+from pySDC.core.errors import ConvergenceError
 
 
-class live_plot(hooks):  # pragma: no cover
+class live_plot(Hooks):  # pragma: no cover
     """
     This hook plots the solution and the non-linear part of the right hand side after every step. Keep in mind that using adaptivity will result in restarts, which is not marked in these plots. Prepare to see the temperature profile jumping back again after a restart.
     """
@@ -248,8 +248,8 @@ def get_crossing_time(stats, controller, num_points=5, inter_points=50, temperat
     Returns:
         float: The time when the temperature threshold is crossed
     """
-    from pySDC.core.Lagrange import LagrangeApproximation
-    from pySDC.core.Collocation import CollBase
+    from qmat.lagrange import LagrangeApproximation
+    from pySDC.core.collocation import CollBase
 
     P = controller.MS[0].levels[0].prob
     u_thresh = P.u_thresh

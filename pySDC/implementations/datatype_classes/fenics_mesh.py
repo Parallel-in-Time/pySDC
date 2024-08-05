@@ -1,6 +1,6 @@
 import dolfin as df
 
-from pySDC.core.Errors import DataError
+from pySDC.core.errors import DataError
 
 
 class fenics_mesh(object):

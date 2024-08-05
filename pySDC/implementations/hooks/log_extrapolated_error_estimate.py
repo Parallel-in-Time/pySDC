@@ -1,7 +1,7 @@
-from pySDC.core.Hooks import hooks
+from pySDC.core.hooks import Hooks
 
 
-class LogExtrapolationErrorEstimate(hooks):
+class LogExtrapolationErrorEstimate(Hooks):
     """
     Store the extrapolated error estimate at the end of each step as "error_extrapolation_estimate".
     """

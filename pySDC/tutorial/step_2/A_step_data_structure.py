@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pySDC.core.Step import step
+from pySDC.core.step import Step
 
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
@@ -44,7 +44,7 @@ def main():
     description['step_params'] = step_params
 
     # now the description contains more or less everything we need to create a step
-    S = step(description=description)
+    S = Step(description=description)
 
     # we only have a single level, make a shortcut
     L = S.levels[0]

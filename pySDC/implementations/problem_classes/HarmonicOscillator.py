@@ -1,12 +1,12 @@
 import numpy as np
 
-from pySDC.core.Errors import ParameterError
-from pySDC.core.Problem import ptype
+from pySDC.core.errors import ParameterError
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.particles import particles, acceleration
 
 
 # noinspection PyUnusedLocal
-class harmonic_oscillator(ptype):
+class harmonic_oscillator(Problem):
     r"""
     Example implementing the harmonic oscillator with mass :math:`1`
 

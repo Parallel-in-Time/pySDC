@@ -4,11 +4,11 @@ import scipy.sparse.linalg as LA
 from clawpack import pyclaw
 from clawpack import riemann
 
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes import mesh, rhs_imex_mesh
 
 
-class sharpclaw(ptype):
+class sharpclaw(Problem):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 

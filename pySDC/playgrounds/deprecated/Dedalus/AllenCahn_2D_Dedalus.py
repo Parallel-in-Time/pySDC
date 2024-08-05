@@ -2,13 +2,13 @@ import numpy as np
 
 from dedalus import public as de
 
-from pySDC.core.Problem import ptype
-from pySDC.core.Errors import ParameterError
+from pySDC.core.problem import Problem
+from pySDC.core.errors import ParameterError
 
 from pySDC.playgrounds.Dedalus.dedalus_field import dedalus_field, rhs_imex_dedalus_field
 
 
-class allencahn2d_dedalus(ptype):
+class allencahn2d_dedalus(Problem):
     """
     Example implementing the 2D Allen-Cahn equation with periodic BC in [-L/2,L/2]^2, discretized using Dedalus
     """

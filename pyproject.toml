@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = 'pySDC'
-version = '5.4.3'
+version = '5.5.0'
 description = 'A Python implementation of spectral deferred correction methods and the likes'
 license = {text = "BSD-2-Clause"}
 readme = 'README.md'
@@ -14,10 +14,10 @@ authors=[
     {name='Thomas Baumann', email='t.baumann@fz-juelich.de'},
     {name='Lisa Wimmer', email='wimmer@uni-wuppertal.de'},
     {name='Ikrom Akramov', email='ikrom.akramov@tuhh.de'},
+    {name='Giacomo Rosilho De Souza', email='giacomo.rosilhodesouza@usi.ch'},
+    {name='Jakob Fritz', email='j.fritz@fz-juelich.de'},
     ]
-homepage = "http://www.parallel-in-time.org/pySDC/"
-repository = "https://github.com/Parallel-in-Time/pySDC/"
-documentation = "http://www.parallel-in-time.org/pySDC/"
+
 
 classifiers = [
     "Topic :: Scientific/Engineering :: Mathematics",
@@ -30,7 +30,14 @@ dependencies = [
     'sympy>=1.0',
     'numba>=0.35',
     'dill>=0.2.6',
+    'qmat>=0.1.8',
     ]
+
+[project.urls]
+Homepage = "http://www.parallel-in-time.org/pySDC/"
+Repository = "https://github.com/Parallel-in-Time/pySDC/"
+Documentation = "http://www.parallel-in-time.org/pySDC/"
+Tracker = "https://github.com/Parallel-in-Time/pySDC/issues"
 
 [project.optional-dependencies]
 apps = [

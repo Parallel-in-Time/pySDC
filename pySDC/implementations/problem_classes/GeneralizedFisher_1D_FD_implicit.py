@@ -2,14 +2,14 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import spsolve
 
-from pySDC.core.Errors import ParameterError, ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.errors import ParameterError, ProblemError
+from pySDC.core.problem import Problem
 from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 # noinspection PyUnusedLocal
-class generalized_fisher(ptype):
+class generalized_fisher(Problem):
     r"""
     The following one-dimensional problem is an example of a reaction-diffusion equation with traveling waves, and can
     be seen as a generalized Fisher equation. This class implements a special case of the Kolmogorov-Petrovskii-Piskunov
