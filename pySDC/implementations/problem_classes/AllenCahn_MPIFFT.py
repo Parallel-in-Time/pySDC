@@ -113,7 +113,7 @@ class allencahn_imex(IMEX_Laplacian_MPIFFT):
         self.work_counters['rhs']()
         return f
 
-    def u_exact(self, t):
+    def u_exact(self, t, **kwargs):
         r"""
         Routine to compute the exact solution at time :math:`t`.
 

@@ -1,15 +1,148 @@
 # script to run an Allen-Cahn problem
-from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit, allencahn_semiimplicit
 from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.core.hooks import Hooks
 from pySDC.projects.Resilience.hook import hook_collection, LogData
 from pySDC.projects.Resilience.strategies import merge_descriptions
-from pySDC.projects.Resilience.sweepers import imex_1st_order_efficient, generic_implicit_efficient
 import matplotlib.pyplot as plt
 import numpy as np
 
 from pySDC.core.errors import ConvergenceError
+
+
+class allencahn_imex_timeforcing_adaptivity(allencahn2d_imex):
+    r"""
+    Add more source terms to `allencahn_imex_timeforcing` such that the time-scale changes and we can benefit from adaptivity.
+    """
+
+    def __init__(self, time_freq=2.0, time_dep_strength=1e-2, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._makeAttributeAndRegister('time_freq', 'time_dep_strength', localVars=locals(), readOnly=True)
+
+    def eval_f(self, u, t):
+        f = super().eval_f(u, t)
+        time_mod = self.get_time_dep_fac(self.time_freq, self.time_dep_strength, t)
+
+        if self.eps > 0:
+            f.expl = -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u)
+
+        # build sum over RHS without driving force
+        Rt = float(np.sum(f.impl + f.expl))
+
+        # build sum over driving force term
+        Ht = float(np.sum(6.0 * u * (1.0 - u)))
+
+        # add/subtract time-dependent driving force
+        if Ht != 0.0:
+            dw = Rt / Ht * time_mod
+        else:
+            dw = 0.0
+
+        f.expl -= 6.0 * dw * u * (1.0 - u)
+
+        return f
+
+    @staticmethod
+    def get_time_dep_fac(time_freq, time_dep_strength, t):
+        return 1 - time_dep_strength * np.sin(time_freq * 2 * np.pi / 0.032 * t)
+
+
+class monitor(Hooks):
+    phase_thresh = 0.0  # count everything above this threshold to the high phase.
+
+    def __init__(self):
+        """
+        Initialization of Allen-Cahn monitoring
+        """
+        super().__init__()
+
+        self.init_radius = None
+
+    def get_exact_radius(self, t):
+        return np.sqrt(max(self.init_radius**2 - 2.0 * t, 0))
+
+    @classmethod
+    def get_radius(cls, u, dx):
+        c = np.count_nonzero(u > cls.phase_thresh)
+        return np.sqrt(c / np.pi) * dx
+
+    @staticmethod
+    def get_interface_width(u, L):
+        # TODO: How does this generalize to different phase transitions?
+        rows1 = np.where(u[L.prob.init[0][0] // 2, : L.prob.init[0][0] // 2] > -0.99)
+        rows2 = np.where(u[L.prob.init[0][0] // 2, : L.prob.init[0][0] // 2] < 0.99)
+
+        return (rows2[0][-1] - rows1[0][0]) * L.prob.dx / L.prob.eps
+
+    def pre_run(self, step, level_number):
+        """
+        Record radius of the blob, exact radius and interface width.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+        """
+        super().pre_run(step, level_number)
+        L = step.levels[0]
+
+        radius = self.get_radius(L.u[0], L.prob.dx)
+        self.init_radius = L.prob.radius
+
+        if L.time == 0.0:
+            self.add_to_stats(
+                process=step.status.slot,
+                time=L.time,
+                level=-1,
+                iter=step.status.iter,
+                sweep=L.status.sweep,
+                type='computed_radius',
+                value=radius,
+            )
+            self.add_to_stats(
+                process=step.status.slot,
+                time=L.time,
+                level=-1,
+                iter=step.status.iter,
+                sweep=L.status.sweep,
+                type='exact_radius',
+                value=self.init_radius,
+            )
+
+    def post_step(self, step, level_number):
+        """
+        Record radius of the blob, exact radius and interface width.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+        """
+        super().post_step(step, level_number)
+
+        # some abbreviations
+        L = step.levels[0]
+
+        radius = self.get_radius(L.uend, L.prob.dx)
+
+        exact_radius = self.get_exact_radius(L.time + L.dt)
+
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='computed_radius',
+            value=radius,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='exact_radius',
+            value=exact_radius,
+        )
 
 
 def run_AC(
@@ -25,6 +158,7 @@ def run_AC(
     use_MPI=False,
     live_plot=False,
     FFT=True,
+    time_forcing=True,
     **kwargs,
 ):
     """
@@ -55,7 +189,10 @@ def run_AC(
             problem_params.pop('FFT', None)
 
     # import problem and sweeper class
-    if FFT:
+    if time_forcing:
+        problem_class = allencahn_imex_timeforcing_adaptivity
+        from pySDC.projects.Resilience.sweepers import imex_1st_order_efficient as sweeper_class
+    elif FFT:
         from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex as problem_class
         from pySDC.projects.Resilience.sweepers import imex_1st_order_efficient as sweeper_class
     elif imex:
@@ -340,7 +477,6 @@ class LogRadius(Hooks):
 
 
 if __name__ == '__main__':
-    from pySDC.implementations.hooks.log_errors import LogLocalErrorPostStep
 
-    stats, _, _ = run_AC(imex=True, hook_class=LogLocalErrorPostStep)
+    stats, _, _ = run_AC()
     plot_solution(stats)

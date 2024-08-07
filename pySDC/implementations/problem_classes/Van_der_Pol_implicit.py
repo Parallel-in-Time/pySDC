@@ -28,6 +28,8 @@ class vanderpol(Problem):
     crash_at_maxiter : bool, optional
         Indicates whether Newton's method should stop if maximum number of iterations
         ``newton_maxiter`` is reached.
+    relative_tolerance : bool, optional
+        Use a relative or absolute tolerance for the Newton solver
 
     Attributes
     ----------
@@ -39,7 +41,16 @@ class vanderpol(Problem):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, u0=None, mu=5.0, newton_maxiter=100, newton_tol=1e-9, stop_at_nan=True, crash_at_maxiter=True):
+    def __init__(
+        self,
+        u0=None,
+        mu=5.0,
+        newton_maxiter=100,
+        newton_tol=1e-9,
+        stop_at_nan=True,
+        crash_at_maxiter=True,
+        relative_tolerance=False,
+    ):
         """Initialization routine"""
         nvars = 2
 
@@ -49,7 +60,13 @@ class vanderpol(Problem):
         super().__init__((nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister('nvars', 'u0', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister(
-            'mu', 'newton_maxiter', 'newton_tol', 'stop_at_nan', 'crash_at_maxiter', localVars=locals()
+            'mu',
+            'newton_maxiter',
+            'newton_tol',
+            'stop_at_nan',
+            'crash_at_maxiter',
+            'relative_tolerance',
+            localVars=locals(),
         )
         self.work_counters['newton'] = WorkCounter()
         self.work_counters['rhs'] = WorkCounter()
@@ -146,7 +163,7 @@ class vanderpol(Problem):
             g = np.array([x1 - dt * x2 - rhs[0], x2 - dt * (mu * (1 - x1**2) * x2 - x1) - rhs[1]])
 
             # if g is close to 0, then we are done
-            res = np.linalg.norm(g, np.inf)
+            res = np.linalg.norm(g, np.inf) / (abs(u) if self.relative_tolerance else 1.0)
             if res < self.newton_tol or np.isnan(res):
                 break
 

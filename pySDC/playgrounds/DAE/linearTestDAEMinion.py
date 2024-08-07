@@ -13,7 +13,7 @@ class LinearTestDAEMinion(ProblemDAE):
         \frac{d}{dt} u_1 = u_1 - u_3 + u_4,
 
     .. math::
-        \frac{d}{dt} u_2 = -10^4 u_2 + (1 + 10^4) e^t, 
+        \frac{d}{dt} u_2 = -10^4 u_2 + (1 + 10^4) e^t,
 
     .. math::
         \frac{d}{dt} u_3 = u_1,
@@ -128,7 +128,9 @@ class LinearTestDAEMinionConstrained(LinearTestDAEMinion):
     def __init__(self, nvars=(3, 1), newton_tol=1e-12, newton_maxiter=100, stop_at_maxiter=False, stop_at_nan=True):
         """Initialization routine"""
         super().__init__()
-        self._makeAttributeAndRegister('newton_tol', 'newton_maxiter', 'stop_at_maxiter', 'stop_at_nan', localVars=locals())
+        self._makeAttributeAndRegister(
+            'newton_tol', 'newton_maxiter', 'stop_at_maxiter', 'stop_at_nan', localVars=locals()
+        )
         self.work_counters['newton'] = WorkCounter()
         self.work_counters['rhs'] = WorkCounter()
 

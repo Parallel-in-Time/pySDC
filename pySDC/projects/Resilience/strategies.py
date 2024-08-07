@@ -195,7 +195,7 @@ class Strategy:
             float: Tend to put into the run
         '''
         if problem.__name__ == "run_vdp":
-            return 11.5
+            return 20  # 11.5
         elif problem.__name__ == "run_piline":
             return 20.0
         elif problem.__name__ == "run_Lorenz":
@@ -230,12 +230,13 @@ class Strategy:
         if problem.__name__ == "run_vdp":
             custom_description['step_params'] = {'maxiter': 3}
             custom_description['problem_params'] = {
-                'u0': np.array([2, 0], dtype=np.float64),
+                'u0': np.array([1.1, 0], dtype=np.float64),
+                'mu': 1000,
                 'crash_at_maxiter': False,
                 'newton_tol': 1e-11,
                 'stop_at_nan': False,
             }
-            custom_description['level_params'] = {'dt': 1e-2}
+            custom_description['level_params'] = {'dt': 1e-4}
 
         elif problem.__name__ == "run_Lorenz":
             custom_description['step_params'] = {'maxiter': 5}
@@ -267,7 +268,7 @@ class Strategy:
                 'radius': 0.25,
                 'nu': 2,
             }
-            custom_description['level_params'] = {'restol': -1, 'dt': 0.5 * eps**2}
+            custom_description['level_params'] = {'restol': -1, 'dt': 0.1 * eps**2}
 
         custom_description['convergence_controllers'] = {
             # StepSizeLimiter: {'dt_min': self.get_Tend(problem=problem, num_procs=num_procs) / self.max_steps}
@@ -281,7 +282,7 @@ class Strategy:
         from pySDC.implementations.convergence_controller_classes.crash import StopAtMaxRuntime
 
         max_runtime = {
-            'run_vdp': 60,
+            'run_vdp': 1000,
             'run_Lorenz': 60,
             'run_Schroedinger': 150,
             'run_quench': 150,
@@ -329,7 +330,9 @@ class Strategy:
         Returns:
             The reference value
         """
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        raise NotImplementedError(
+            f'The reference value you are looking for is not implemented for {type(self).__name__} strategy!'
+        )
 
 
 class InexactBaseStrategy(Strategy):
@@ -353,7 +356,7 @@ class InexactBaseStrategy(Strategy):
     def get_custom_description(self, problem, num_procs=1):
         from pySDC.implementations.convergence_controller_classes.inexactness import NewtonInexactness
 
-        preconditioner = 'MIN-SR-NS' if problem.__name__ in ['run_vdp', 'run_Lorenz'] else 'MIN-SR-S'
+        preconditioner = 'MIN-SR-NS' if problem.__name__ in ['run_Lorenz'] else 'MIN-SR-S'
 
         desc = {}
         desc['sweeper_params'] = {'QI': preconditioner}
@@ -375,6 +378,10 @@ class InexactBaseStrategy(Strategy):
                 inexactness_params['ratio'] = 1e-1
                 inexactness_params['min_tol'] = 1e-11
                 inexactness_params['maxiter'] = 5
+            elif problem.__name__ == "run_vdp":
+                inexactness_params['ratio'] = 1e-5
+                inexactness_params['min_tol'] = 1e-15
+                inexactness_params['maxiter'] = 9
             desc['convergence_controllers'][NewtonInexactness] = inexactness_params
 
         if problem.__name__ in ['run_vdp']:
@@ -420,7 +427,7 @@ class BaseStrategy(Strategy):
     def get_custom_description(self, problem, num_procs):
         desc = super().get_custom_description(problem, num_procs)
         if problem.__name__ == "run_AC":
-            desc['level_params']['dt'] = 0.8 * desc['problem_params']['eps'] ** 2 / 8.0
+            desc['level_params']['dt'] = 1e-2 * desc['problem_params']['eps'] ** 2
         return desc
 
     def get_custom_description_for_faults(self, problem, *args, **kwargs):
@@ -442,13 +449,13 @@ class BaseStrategy(Strategy):
         Returns:
             The reference value
         """
-        if problem.__name__ == "run_vdp":
+        if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 12453
+                return 2136
             elif key == 'e_global_post_run' and op == max:
-                return 4.3956128381594795e-06
+                return 9.256926357892326e-06
 
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        super().get_reference_value(problem, key, op, num_procs)
 
 
 class AdaptivityStrategy(Strategy):
@@ -536,8 +543,8 @@ class AdaptivityStrategy(Strategy):
                 'max_restarts': 99,
             }
         elif problem.__name__ == "run_AC":
-            e_tol = 1e-6
-            dt_max = 0.8 * base_params['problem_params']['eps'] ** 2
+            e_tol = 1e-7
+            # dt_max = 0.1 * base_params['problem_params']['eps'] ** 2
 
         else:
             raise NotImplementedError(
@@ -567,13 +574,13 @@ class AdaptivityStrategy(Strategy):
         Returns:
             The reference value
         """
-        if problem.__name__ == "run_vdp":
+        if problem.__name__ == 'run_Lorenz':
             if key == 'work_newton' and op == sum:
-                return 3825
+                return 1369
             elif key == 'e_global_post_run' and op == max:
-                return 1.3370376368393444e-05
+                return 9.364841517367495e-06
 
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        super().get_reference_value(problem, key, op, num_procs)
 
     def get_custom_description_for_faults(self, problem, num_procs, *args, **kwargs):
         from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeLimiter
@@ -656,6 +663,11 @@ class AdaptiveHotRodStrategy(Strategy):
             dt_min = 1e-3
             maxiter = 4
             HotRod_tol = 2e-6
+        elif problem.__name__ == "run_Lorenz":
+            e_tol = 3e-7
+            dt_min = 1e-3
+            maxiter = 4
+            HotRod_tol = 2e-6
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for adaptive Hot Rod for your problem. Please add one \
@@ -687,13 +699,13 @@ to the strategy'
         Returns:
             The reference value
         """
-        if problem.__name__ == "run_vdp":
+        if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 4466
+                return 4758
             elif key == 'e_global_post_run' and op == max:
-                return 2.1455229857747504e-06
+                return 4.107116318152748e-06
 
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        super().get_reference_value(problem, key, op, num_procs)
 
 
 class IterateStrategy(Strategy):
@@ -790,13 +802,13 @@ strategy'
         Returns:
             The reference value
         """
-        if problem.__name__ == "run_vdp":
+        if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 8534
+                return 1872
             elif key == 'e_global_post_run' and op == max:
-                return 0.0005961192269257065
+                return 2.2362043480939064e-05
 
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        super().get_reference_value(problem, key, op, num_procs)
 
 
 class kAdaptivityStrategy(IterateStrategy):
@@ -814,7 +826,7 @@ class kAdaptivityStrategy(IterateStrategy):
             desc['level_params']['dt'] = 2.5
         elif problem.__name__ == "run_AC":
             desc['level_params']['restol'] = 1e-11
-            desc['level_params']['dt'] = 0.8 * desc['problem_params']['eps'] ** 2 / 8.0
+            desc['level_params']['dt'] = 0.4 * desc['problem_params']['eps'] ** 2 / 8.0
         return desc
 
     def get_custom_description_for_faults(self, problem, *args, **kwargs):
@@ -838,13 +850,13 @@ class kAdaptivityStrategy(IterateStrategy):
         Returns:
             The reference value
         """
-        if problem.__name__ == "run_vdp":
+        if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 13241
+                return 2392
             elif key == 'e_global_post_run' and op == max:
-                return 1.0505165626284452e-08
+                return 4.808610118089973e-06
 
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        super().get_reference_value(problem, key, op, num_procs)
 
 
 class HotRodStrategy(Strategy):
@@ -959,13 +971,13 @@ class HotRodStrategy(Strategy):
         Returns:
             The reference value
         """
-        if problem.__name__ == "run_vdp":
+        if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 15230
+                return 2329
             elif key == 'e_global_post_run' and op == max:
-                return 4.3956128381594795e-06
+                return 9.256926357892326e-06
 
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        super().get_reference_value(problem, key, op, num_procs)
 
 
 class AdaptivityCollocationStrategy(InexactBaseStrategy):
@@ -1075,13 +1087,13 @@ class AdaptivityCollocationTypeStrategy(AdaptivityCollocationStrategy):
         Returns:
             The reference value
         """
-        if problem.__name__ == "run_vdp":
+        if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 1954
+                return 983
             elif key == 'e_global_post_run' and op == max:
-                return 1.1341277847964903e-06
+                return 3.944880392126038e-06
 
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        super().get_reference_value(problem, key, op, num_procs)
 
 
 class AdaptivityCollocationRefinementStrategy(AdaptivityCollocationStrategy):
@@ -1112,13 +1124,13 @@ class AdaptivityCollocationRefinementStrategy(AdaptivityCollocationStrategy):
         Returns:
             The reference value
         """
-        if problem.__name__ == "run_vdp":
+        if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 1785
+                return 917
             elif key == 'e_global_post_run' and op == max:
-                return 1.2448609458259874e-06
+                return 1.0587702028885815e-05
 
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        super().get_reference_value(problem, key, op, num_procs)
 
 
 class AdaptivityCollocationDerefinementStrategy(AdaptivityCollocationStrategy):
@@ -1145,13 +1157,13 @@ class AdaptivityCollocationDerefinementStrategy(AdaptivityCollocationStrategy):
         Returns:
             The reference value
         """
-        if problem.__name__ == "run_vdp":
+        if problem.__name__ == 'run_Lorenz':
             if key == 'work_newton' and op == sum:
-                return 2508
+                return 1358
             elif key == 'e_global_post_run' and op == max:
-                return 3.452255036812124e-05
+                return 0.00010316526647002888
 
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        super().get_reference_value(problem, key, op, num_procs)
 
 
 class DIRKStrategy(AdaptivityStrategy):
@@ -1228,13 +1240,13 @@ class DIRKStrategy(AdaptivityStrategy):
         Returns:
             The reference value
         """
-        if problem.__name__ == "run_vdp":
+        if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 2168
+                return 1820
             elif key == 'e_global_post_run' and op == max:
-                return 0.00024166437265116247
+                return 0.00013730538358736055
 
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        super().get_reference_value(problem, key, op, num_procs)
 
     def get_random_params(self, problem, num_procs):
         '''
@@ -1334,7 +1346,7 @@ class ARKStrategy(AdaptivityStrategy):
             elif key == 'e_global_post_run' and op == max:
                 return 3.1786601531890356e-08
 
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        super().get_reference_value(problem, key, op, num_procs)
 
 
 class ESDIRKStrategy(AdaptivityStrategy):
@@ -1419,13 +1431,13 @@ class ESDIRKStrategy(AdaptivityStrategy):
         Returns:
             The reference value
         """
-        if problem.__name__ == "run_vdp":
+        if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 1562
+                return 984
             elif key == 'e_global_post_run' and op == max:
-                return 3.6982949243591356e-06
+                return 3.148061889390874e-06
 
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        super().get_reference_value(problem, key, op, num_procs)
 
     def get_random_params(self, problem, num_procs):
         '''
@@ -1510,13 +1522,13 @@ class ERKStrategy(DIRKStrategy):
         Returns:
             The reference value
         """
-        if problem.__name__ == "run_vdp":
+        if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
                 return 0
             elif key == 'e_global_post_run' and op == max:
-                return 2.0606132165701396e-05
+                return 3.5085474063834e-05
 
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        super().get_reference_value(problem, key, op, num_procs)
 
 
 class DoubleAdaptivityStrategy(AdaptivityStrategy):
@@ -1589,13 +1601,13 @@ class DoubleAdaptivityStrategy(AdaptivityStrategy):
         Returns:
             The reference value
         """
-        if problem.__name__ == "run_vdp":
+        if problem.__name__ == 'run_Lorenz':
             if key == 'work_newton' and op == sum:
-                return 3825
+                return 1369
             elif key == 'e_global_post_run' and op == max:
-                return 1.3370376368393444e-05
+                return 9.364841517367495e-06
 
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        super().get_reference_value(problem, key, op, num_procs)
 
 
 class AdaptivityAvoidRestartsStrategy(AdaptivityStrategy):
@@ -1644,13 +1656,13 @@ class AdaptivityAvoidRestartsStrategy(AdaptivityStrategy):
         Returns:
             The reference value
         """
-        if problem.__name__ == "run_vdp":
+        if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 2955
+                return 1369
             elif key == 'e_global_post_run' and op == max:
-                return 5.274015506540053e-07
+                return 9.364841517367495e-06
 
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        super().get_reference_value(problem, key, op, num_procs)
 
 
 class AdaptivityInterpolationStrategy(AdaptivityStrategy):
@@ -1703,13 +1715,13 @@ class AdaptivityInterpolationStrategy(AdaptivityStrategy):
         Returns:
             The reference value
         """
-        if problem.__name__ == "run_vdp":
+        if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
                 return 6659
             elif key == 'e_global_post_run' and op == max:
                 return 2.9780002756552015e-06
 
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        super().get_reference_value(problem, key, op, num_procs)
 
 
 class AdaptivityExtrapolationWithinQStrategy(InexactBaseStrategy):
@@ -1799,13 +1811,13 @@ class AdaptivityExtrapolationWithinQStrategy(InexactBaseStrategy):
         Returns:
             The reference value
         """
-        if problem.__name__ == "run_vdp":
+        if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 2426
+                return 2198
             elif key == 'e_global_post_run' and op == max:
-                return 1.7293825160247245e-06
+                return 5.412657451131508e-07
 
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        super().get_reference_value(problem, key, op, num_procs)
 
 
 class AdaptivityPolynomialError(InexactBaseStrategy):
@@ -1813,7 +1825,7 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
     Adaptivity based on extrapolation between collocation nodes as a resilience strategy
     '''
 
-    def __init__(self, interpolate_between_restarts=False, use_restol_rel=True, **kwargs):
+    def __init__(self, interpolate_between_restarts=False, use_restol_rel=True, max_slope=4, **kwargs):
         '''
         Initialization routine
         '''
@@ -1830,6 +1842,7 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         self.precision_parameter_loc = ['convergence_controllers', AdaptivityPolynomialError, 'e_tol']
         self.interpolate_between_restarts = interpolate_between_restarts
         self.use_restol_rel = use_restol_rel
+        self.max_slope = max_slope
 
     def get_custom_description(self, problem, num_procs):
         '''
@@ -1849,14 +1862,19 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         custom_description = {}
 
         dt_max = np.inf
-        max_slope = 4.0
         restol_rel = 1e-4
         restol_min = 1e-12
+        dt_min = 0
         level_params = {}
+        problem_params = {}
 
         if problem.__name__ == "run_vdp":
             e_tol = 6e-4
             level_params['dt'] = 0.1
+            restol_rel = 1e-5
+            restol_min = 1e-12
+            dt_min = 1e-7
+            problem_params['newton_tol'] = 1e-14
         elif problem.__name__ == "run_piline":
             e_tol = 1e-7
         elif problem.__name__ == "run_Lorenz":
@@ -1869,8 +1887,9 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
             restol_min = 1e-11
             restol_rel = 1e-1
         elif problem.__name__ == "run_AC":
-            e_tol = 1e-4
-            dt_max = 0.8 * base_params['problem_params']['eps'] ** 2
+            e_tol = 1.0e-4
+            restol_rel = 1e-3
+            # dt_max = 0.1 * base_params['problem_params']['eps'] ** 2
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
@@ -1883,15 +1902,17 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
                 'restol_rel': restol_rel if self.use_restol_rel else 1e-11,
                 'restol_min': restol_min if self.use_restol_rel else 1e-12,
                 'restart_at_maxiter': True,
-                'factor_if_not_converged': max_slope,
+                'factor_if_not_converged': self.max_slope,
                 'interpolate_between_restarts': self.interpolate_between_restarts,
             },
             StepSizeLimiter: {
                 'dt_max': dt_max,
-                'dt_slope_max': max_slope,
+                'dt_slope_max': self.max_slope,
+                'dt_min': dt_min,
             },
         }
         custom_description['level_params'] = level_params
+        custom_description['problem_params'] = problem_params
         return merge_descriptions(base_params, custom_description)
 
     def get_custom_description_for_faults(self, problem, *args, **kwargs):
@@ -1939,13 +1960,13 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         Returns:
             The reference value
         """
-        if problem.__name__ == "run_vdp":
+        if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 2819
+                return 2124
             elif key == 'e_global_post_run' and op == max:
-                return 1.8147451097405565e-07
+                return 8.484321512014503e-08
 
-        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+        super().get_reference_value(problem, key, op, num_procs)
 
     @property
     def label(self):

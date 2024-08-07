@@ -239,8 +239,7 @@ def plot_adaptivity_stuff():  # pragma: no cover
     from pySDC.implementations.hooks.log_errors import LogLocalErrorPostStep
     from pySDC.implementations.hooks.log_work import LogWork
     from pySDC.projects.Resilience.hook import LogData
-
-    stats_analyser = get_stats(run_vdp, 'data/stats')
+    import pickle
 
     my_setup_mpl()
     scale = 0.5 if JOURNAL == 'JSC_beamer' else 1.0
@@ -259,10 +258,10 @@ def plot_adaptivity_stuff():  # pragma: no cover
         Returns:
             None
         """
-        markevery = 40
-        e = get_sorted(stats, type='e_local_post_step', recomputed=False)
+        markevery = 1 if type(strategy) in [AdaptivityStrategy, AdaptivityPolynomialError] else 10000
+        e = stats['e_local_post_step']
         ax.plot([me[0] for me in e], [me[1] for me in e], markevery=markevery, **strategy.style, **kwargs)
-        k = get_sorted(stats, type='work_newton')
+        k = stats['work_newton']
         iter_ax.plot(
             [me[0] for me in k], np.cumsum([me[1] for me in k]), **strategy.style, markevery=markevery, **kwargs
         )
@@ -270,40 +269,52 @@ def plot_adaptivity_stuff():  # pragma: no cover
         ax.set_ylabel('local error')
         iter_ax.set_ylabel(r'Newton iterations')
 
-    force_params = {}
-    for strategy in [BaseStrategy, AdaptivityStrategy, IterateStrategy, AdaptivityPolynomialError]:
-        if strategy == AdaptivityPolynomialError:
-            from pySDC.implementations.convergence_controller_classes.adaptivity import (
-                AdaptivityPolynomialError as adaptivity,
+    run = False
+    for strategy in [BaseStrategy, IterateStrategy, AdaptivityStrategy, AdaptivityPolynomialError]:
+        S = strategy(newton_inexactness=False)
+        desc = S.get_custom_description(problem=run_vdp, num_procs=1)
+        desc['problem_params']['mu'] = 1000
+        desc['problem_params']['u0'] = (1.1, 0)
+        if strategy in [AdaptivityStrategy, BaseStrategy]:
+            desc['step_params']['maxiter'] = 5
+        if strategy in [BaseStrategy, IterateStrategy]:
+            desc['level_params']['dt'] = 1e-4
+            desc['sweeper_params']['QI'] = 'LU'
+        if strategy in [IterateStrategy]:
+            desc['step_params']['maxiter'] = 99
+            desc['level_params']['restol'] = 1e-10
+
+        path = f'./data/adaptivity_paper_plot_data_{strategy.__name__}.pickle'
+        if run:
+            stats, _, _ = run_vdp(
+                custom_description=desc,
+                Tend=20,
+                hook_class=[LogLocalErrorPostStep, LogWork, LogData],
+                custom_controller_params={'logger_level': 15},
             )
 
-            force_params = {'sweeper_params': {'num_nodes': 2}}
-            force_params['convergence_controllers'] = {
-                adaptivity: {
-                    'e_tol': 7e-5,
-                    'restol_rel': 1e-4,
-                    'restol_min': 1e-10,
-                    'restart_at_maxiter': True,
-                    'factor_if_not_converged': 4.0,
-                },
+            data = {
+                'u': get_sorted(stats, type='u', recomputed=False),
+                'e_local_post_step': get_sorted(stats, type='e_local_post_step', recomputed=False),
+                'work_newton': get_sorted(stats, type='work_newton', recomputed=None),
             }
+            with open(path, 'wb') as file:
+                pickle.dump(data, file)
         else:
-            force_params = {}
-        stats, _, _ = stats_analyser.single_run(
-            strategy=strategy(useMPI=False),
-            force_params=force_params,
-            hook_class=[LogLocalErrorPostStep, LogData, LogWork],
-        )
-        plot_error(stats, axs[1], axs[2], strategy())
+            with open(path, 'rb') as file:
+                data = pickle.load(file)
 
-        if strategy == BaseStrategy:
-            u = get_sorted(stats, type='u', recomputed=False)
+        plot_error(data, axs[1], axs[2], strategy())
+
+        if strategy == BaseStrategy or True:
+            u = data['u']
             axs[0].plot([me[0] for me in u], [me[1][0] for me in u], color='black', label=r'$u$')
 
     axs[2].set_xlabel(r'$t$')
     axs[0].set_ylabel('solution')
     axs[2].legend(frameon=JOURNAL == 'JSC_beamer')
     axs[1].legend(frameon=True)
+    axs[2].set_yscale('log')
     savefig(fig, 'adaptivity')
 
 
@@ -409,8 +420,51 @@ def plot_quench_solution():  # pragma: no cover
     savefig(fig, 'quench_sol')
 
 
+def plot_Schroedinger_solution():  # pragma: no cover
+    from pySDC.implementations.problem_classes.NonlinearSchroedinger_MPIFFT import nonlinearschroedinger_imex
+
+    my_setup_mpl()
+    if JOURNAL == 'JSC_beamer':
+        raise NotImplementedError
+        fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.5, 0.9))
+    else:
+        fig, axs = plt.subplots(1, 2, figsize=figsize_by_journal(JOURNAL, 1.0, 0.45), sharex=True, sharey=True)
+
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+    plt.rcParams['figure.constrained_layout.use'] = True
+    cax = []
+    divider = make_axes_locatable(axs[0])
+    cax += [divider.append_axes('right', size='5%', pad=0.05)]
+    divider2 = make_axes_locatable(axs[1])
+    cax += [divider2.append_axes('right', size='5%', pad=0.05)]
+
+    problem_params = dict()
+    problem_params['nvars'] = (256, 256)
+    problem_params['spectral'] = False
+    problem_params['c'] = 1.0
+    description = {'problem_params': problem_params}
+    stats, _, _ = run_Schroedinger(Tend=1.0e0, custom_description=description)
+
+    P = nonlinearschroedinger_imex(**problem_params)
+    u = get_sorted(stats, type='u')
+
+    im = axs[0].pcolormesh(*P.X, np.abs(u[0][1]), rasterized=True)
+    im1 = axs[1].pcolormesh(*P.X, np.abs(u[-1][1]), rasterized=True)
+
+    fig.colorbar(im, cax=cax[0])
+    fig.colorbar(im1, cax=cax[1])
+    axs[0].set_title(r'$\|u(t=0)\|$')
+    axs[1].set_title(r'$\|u(t=1)\|$')
+    for ax in axs:
+        ax.set_aspect(1)
+        ax.set_xlabel('$x$')
+        ax.set_ylabel('$y$')
+    savefig(fig, 'Schroedinger_sol')
+
+
 def plot_AC_solution():  # pragma: no cover
-    from pySDC.projects.TOMS.AllenCahn_monitor import monitor
+    from pySDC.projects.Resilience.AC import monitor
 
     my_setup_mpl()
     if JOURNAL == 'JSC_beamer':
@@ -419,14 +473,13 @@ def plot_AC_solution():  # pragma: no cover
     else:
         fig, axs = plt.subplots(1, 2, figsize=figsize_by_journal(JOURNAL, 1.0, 0.45))
 
-    stats, _, _ = run_AC(Tend=0.032, hook_class=monitor)
+    description = {'problem_params': {'nvars': (256, 256)}}
+    stats, _, _ = run_AC(Tend=0.032, hook_class=monitor, custom_description=description)
 
     u = get_sorted(stats, type='u')
 
     computed_radius = get_sorted(stats, type='computed_radius')
-    exact_radius = get_sorted(stats, type='exact_radius')
-    axs[1].plot([me[0] for me in computed_radius], [me[1] for me in computed_radius], ls='-', label='numerical')
-    axs[1].plot([me[0] for me in exact_radius], [me[1] for me in exact_radius], ls='--', color='black', label='exact')
+    axs[1].plot([me[0] for me in computed_radius], [me[1] for me in computed_radius], ls='-')
     axs[1].axvline(0.025, ls=':', label=r'$t=0.025$', color='grey')
     axs[1].set_title('Radius over time')
     axs[1].set_xlabel('$t$')
@@ -455,12 +508,21 @@ def plot_vdp_solution():  # pragma: no cover
     else:
         fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 1.0, 0.33))
 
-    custom_description = {'convergence_controllers': {Adaptivity: {'e_tol': 1e-7}}}
+    custom_description = {
+        'convergence_controllers': {Adaptivity: {'e_tol': 1e-7, 'dt_max': 1e0}},
+        'problem_params': {'mu': 1000, 'crash_at_maxiter': False},
+        'level_params': {'dt': 1e-3},
+    }
 
-    stats, _, _ = run_vdp(custom_description=custom_description, Tend=28.6)
+    stats, _, _ = run_vdp(custom_description=custom_description, Tend=2000)
 
-    u = get_sorted(stats, type='u')
-    ax.plot([me[0] for me in u], [me[1][0] for me in u], color='black')
+    u = get_sorted(stats, type='u', recomputed=False)
+    _u = np.array([me[1][0] for me in u])
+    _x = np.array([me[0] for me in u])
+
+    x1 = _x[abs(_u - 1.1) < 1e-2][0]
+    ax.plot(_x, _u, color='black')
+    ax.axvspan(x1, x1 + 20, alpha=0.4)
     ax.set_ylabel(r'$u$')
     ax.set_xlabel(r'$t$')
     savefig(fig, 'vdp_sol')
@@ -481,6 +543,7 @@ def work_precision():  # pragma: no cover
 
     for mode in ['compare_strategies', 'parallel_efficiency', 'RK_comp']:
         all_problems(**all_params, mode=mode)
+    all_problems(**{**all_params, 'work_key': 'param'}, mode='compare_strategies')
 
 
 def make_plots_for_TIME_X_website():  # pragma: no cover
@@ -514,7 +577,7 @@ def make_plots_for_SIAM_CSE23():  # pragma: no cover
     plot_vdp_solution()
 
 
-def make_plots_for_paper():  # pragma: no cover
+def make_plots_for_adaptivity_paper():  # pragma: no cover
     """
     Make plots that are supposed to go in the paper.
     """
@@ -528,8 +591,11 @@ def make_plots_for_paper():  # pragma: no cover
 
     plot_vdp_solution()
     plot_AC_solution()
+    plot_Schroedinger_solution()
     plot_quench_solution()
 
+
+def make_plots_for_resilience_paper():  # pragma: no cover
     plot_recovery_rate(get_stats(run_vdp))
     plot_fault_vdp(0)
     plot_fault_vdp(13)
@@ -552,4 +618,4 @@ if __name__ == "__main__":
     # make_plots_for_notes()
     # make_plots_for_SIAM_CSE23()
     # make_plots_for_TIME_X_website()
-    make_plots_for_paper()
+    make_plots_for_adaptivity_paper()
