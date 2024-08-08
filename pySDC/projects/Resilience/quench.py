@@ -105,11 +105,9 @@ def run_quench(
             imex = problem_params['imex']
             problem_params.pop('imex', None)
 
-    # initialize level parameters
     level_params = {}
     level_params['dt'] = 10.0
 
-    # initialize sweeper parameters
     sweeper_params = {}
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
@@ -123,11 +121,9 @@ def run_quench(
         'nvars': 2**7,
     }
 
-    # initialize step parameters
     step_params = {}
     step_params['maxiter'] = 5
 
-    # initialize controller parameters
     controller_params = {}
     controller_params['logger_level'] = 30
     controller_params['hook_class'] = hook_collection + (hook_class if type(hook_class) == list else [hook_class])
@@ -136,7 +132,6 @@ def run_quench(
     if custom_controller_params is not None:
         controller_params = {**controller_params, **custom_controller_params}
 
-    # fill description dictionary for easy step instantiation
     description = {}
     description['problem_class'] = QuenchIMEX if imex else Quench
     description['problem_params'] = problem_params
@@ -148,10 +143,8 @@ def run_quench(
     if custom_description is not None:
         description = merge_descriptions(description, custom_description)
 
-    # set time parameters
     t0 = 0.0 if t0 is None else t0
 
-    # instantiate controller
     controller_args = {
         'controller_params': controller_params,
         'description': description,
@@ -170,13 +163,11 @@ def run_quench(
 
     uinit = P.u_exact(t0) if u0 is None else u0
 
-    # insert faults
     if fault_stuff is not None:
         from pySDC.projects.Resilience.fault_injection import prepare_controller_for_faults
 
         prepare_controller_for_faults(controller, fault_stuff)
 
-    # call main function to get things done...
     crash = False
     try:
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
@@ -249,7 +240,6 @@ def get_crossing_time(stats, controller, num_points=5, inter_points=50, temperat
         float: The time when the temperature threshold is crossed
     """
     from qmat.lagrange import LagrangeApproximation
-    from pySDC.core.collocation import CollBase
 
     P = controller.MS[0].levels[0].prob
     u_thresh = P.u_thresh

@@ -28,12 +28,12 @@ base_params = {
         'QI': 'LU',
         'num_nodes': 4,
     },
-    'level_params': {'restol': 1e-9, 'dt': Tend},
+    'level_params': {'restol': 1e-8, 'dt': Tend},
 }
 
 coll_params_inexact = {
     'num_nodes': [2, 3, 4],
-    'restol': [1e-4, 1e-7, 1e-9],
+    'restol': [1e-4, 1e-7, 1e-8],
 }
 coll_params_refinement = {
     'num_nodes': [1, 2, 3, 4],
@@ -145,11 +145,11 @@ def plot_residual(stats, ax, node_ax, **kwargs):
     # test if the expected outcome was achieved
     label = kwargs['label']
     expect = {
-        'inexact': [2, 2, 3, 3, 4, 4],
-        'refinement': [1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 4, 4],
-        'reduce': [4, 4, 4, 4, 4, 4, 3, 3, 2, 2, 2, 1],
-        'standard': [4, 4, 4, 4, 4, 4],
-        'type': [4, 4, 4, 4, 4, 4, 4],
+        'inexact': [2, 2, 3, 3, 4],
+        'refinement': [1, 2, 2, 2, 2, 3, 3, 3, 4],
+        'reduce': [4, 4, 4, 4, 4, 3, 2, 2, 1],
+        'standard': [4, 4, 4, 4, 4],
+        'type': [4, 4, 4, 4, 4, 4],
     }
     assert np.allclose(
         nodes, expect[label]

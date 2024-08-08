@@ -61,7 +61,7 @@ class nonlinearschroedinger_imex(IMEX_Laplacian_MPIFFT):
 
     def u_exact(self, t, **kwargs):
         r"""
-        Routine to compute the exact solution at time :math:`t`, see (1.3) https://arxiv.org/pdf/nlin/0702010.pdf for details
+        Routine to compute the exact solution at time :math:`t`, see (39) from https://doi.org/10.1007/BF01017105 for details
 
         Parameters
         ----------

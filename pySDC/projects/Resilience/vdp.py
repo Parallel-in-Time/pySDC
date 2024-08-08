@@ -125,6 +125,7 @@ def run_vdp(
         'newton_tol': 1e-9,
         'newton_maxiter': 99,
         'u0': np.array([2.0, 0.0]),
+        'relative_tolerance': True,
     }
 
     # initialize step parameters
