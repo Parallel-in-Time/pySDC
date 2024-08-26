@@ -6,9 +6,10 @@ Sweeper class for dedalus
 import numpy as np
 
 from problem import DedalusProblem
-from pySDC.core.Sweeper import sweeper
+from pySDC.core.sweeper import Sweeper
 
-class DedalusSweeperIMEX(sweeper):
+
+class DedalusSweeperIMEX(Sweeper):
 
     def __init__(self, params):
         if 'QI' not in params: params['QI'] = 'IE'
@@ -16,8 +17,8 @@ class DedalusSweeperIMEX(sweeper):
         # call parent's initialization routine
         super().__init__(params)
         # IMEX integration matrices
-        self.QI = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.QI)
-        self.QE = self.get_Qdelta_explicit(coll=self.coll, qd_type=self.params.QE)
+        self.QI = self.get_Qdelta_implicit(qd_type=self.params.QI)
+        self.QE = self.get_Qdelta_explicit(qd_type=self.params.QE)
 
     def predict(self):
         """Copy for now ..."""

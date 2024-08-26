@@ -3,7 +3,7 @@
 """
 Problem class for dedalus
 """
-from pySDC.core.Problem import ptype
+from pySDC.core.problem import Problem
 
 import numpy as np
 from scipy.linalg import blas
@@ -21,7 +21,7 @@ def State(cls, fields):
     return [f.copy() for f in fields]
 
 
-class DedalusProblem(ptype):
+class DedalusProblem(Problem):
 
     dtype_u = State
     dtype_f = State
