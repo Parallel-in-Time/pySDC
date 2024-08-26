@@ -19,6 +19,7 @@ class mesh(np.ndarray):
     """
 
     comm = None
+    xp = np
 
     def __new__(cls, init, val=0.0, **kwargs):
         """

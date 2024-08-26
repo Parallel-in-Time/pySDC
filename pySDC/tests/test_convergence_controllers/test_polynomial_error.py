@@ -1,7 +1,7 @@
 import pytest
 
 
-def get_controller(dt, num_nodes, quad_type, useMPI):
+def get_controller(dt, num_nodes, quad_type, useMPI, useGPU):
     """
     Get a controller prepared for polynomial test equation
 
@@ -42,7 +42,10 @@ def get_controller(dt, num_nodes, quad_type, useMPI):
     sweeper_params['num_nodes'] = num_nodes
     sweeper_params['comm'] = comm
 
-    problem_params = {'degree': 12}
+    problem_params = {
+        'degree': 12,
+        'useGPU': useGPU,
+    }
 
     # initialize step parameters
     step_params = {}
@@ -82,6 +85,7 @@ def single_test(**kwargs):
         'quad_type': 'RADAU-RIGHT',
         'useMPI': False,
         'dt': 1.0,
+        'useGPU': False,
         **kwargs,
     }
 
@@ -131,8 +135,6 @@ def multiple_runs(dts, **kwargs):
         dict: Errors for multiple runs
         int: Order of the collocation problem
     """
-    from pySDC.helpers.stats_helper import get_sorted
-
     res = {}
 
     for dt in dts:
@@ -182,6 +184,22 @@ def test_interpolation_error(num_nodes, quad_type):
         'num_nodes': num_nodes,
         'quad_type': quad_type,
         'useMPI': False,
+    }
+    steps = np.logspace(-1, -4, 20)
+    check_order(steps, **kwargs)
+
+
+@pytest.mark.cupy
+@pytest.mark.parametrize('num_nodes', [2, 3, 4, 5])
+@pytest.mark.parametrize('quad_type', ['RADAU-RIGHT', 'GAUSS'])
+def test_interpolation_error_GPU(num_nodes, quad_type):
+    import numpy as np
+
+    kwargs = {
+        'num_nodes': num_nodes,
+        'quad_type': quad_type,
+        'useMPI': False,
+        'useGPU': True,
     }
     steps = np.logspace(-1, -4, 20)
     check_order(steps, **kwargs)
