@@ -29,6 +29,7 @@ class NCCLComm(object):
         """
         if name not in ['size', 'rank', 'Get_rank', 'Get_size', 'Split']:
             cp.cuda.get_current_stream().synchronize()
+
         return getattr(self.commMPI, name)
 
     @staticmethod
@@ -71,6 +72,9 @@ class NCCLComm(object):
             raise NotImplementedError('Don\'t know what NCCL operation to use to replace this MPI operation!')
 
     def Reduce(self, sendbuf, recvbuf, op=MPI.SUM, root=0):
+        if not hasattr(sendbuf.data, 'ptr'):
+            return self.commMPI.Reduce(sendbuf=sendbuf, recvbuf=recvbuf, op=op, root=root)
+
         dtype = self.get_dtype(sendbuf)
         count = self.get_count(sendbuf)
         op = self.get_op(op)
@@ -88,6 +92,9 @@ class NCCLComm(object):
         )
 
     def Allreduce(self, sendbuf, recvbuf, op=MPI.SUM):
+        if not hasattr(sendbuf.data, 'ptr'):
+            return self.commMPI.Allreduce(sendbuf=sendbuf, recvbuf=recvbuf, op=op)
+
         dtype = self.get_dtype(sendbuf)
         count = self.get_count(sendbuf)
         op = self.get_op(op)
@@ -96,3 +103,13 @@ class NCCLComm(object):
         self.commNCCL.allReduce(
             sendbuf=sendbuf.data.ptr, recvbuf=recvbuf.data.ptr, count=count, datatype=dtype, op=op, stream=stream.ptr
         )
+
+    def Bcast(self, buf, root=0):
+        if not hasattr(buf.data, 'ptr'):
+            return self.commMPI.Bcast(buf=buf, root=root)
+
+        dtype = self.get_dtype(buf)
+        count = self.get_count(buf)
+        stream = cp.cuda.get_current_stream()
+
+        self.commNCCL.bcast(buff=buf.data.ptr, count=count, datatype=dtype, root=root, stream=stream.ptr)
