@@ -12,15 +12,24 @@ class polynomial_testequation(Problem):
 
     dtype_u = mesh
     dtype_f = mesh
+    xp = np
 
-    def __init__(self, degree=1, seed=26266):
+    def __init__(self, degree=1, seed=26266, useGPU=False):
         """Initialization routine"""
+
+        if useGPU:
+            import cupy as cp
+            from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
+
+            type(self).xp = cp
+            type(self).dtype_u = cupy_mesh
+            type(self).dtype_f = cupy_mesh
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(1, None, np.dtype('float64')))
 
-        self.rng = np.random.RandomState(seed=seed)
-        self.poly = np.polynomial.Polynomial(self.rng.rand(degree))
+        self.rng = self.xp.random.RandomState(seed=seed)
+        self.poly = self.xp.polynomial.Polynomial(self.rng.rand(degree))
         self._makeAttributeAndRegister('degree', 'seed', localVars=locals(), readOnly=True)
 
     def eval_f(self, u, t):
