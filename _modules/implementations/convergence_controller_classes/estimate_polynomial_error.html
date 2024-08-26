@@ -120,7 +120,7 @@
 
 <div class="viewcode-block" id="EstimatePolynomialError.matmul">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.html#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.matmul">[docs]</a>
-    <span class="k">def</span> <span class="nf">matmul</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">matmul</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">np</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Matrix vector multiplication, possibly MPI parallel.</span>
 <span class="sd">        The parallel implementation performs a reduce operation in every row of the matrix. While communicating the</span>
@@ -130,10 +130,12 @@
 <span class="sd">        Args:</span>
 <span class="sd">            A (2d np.ndarray): Matrix</span>
 <span class="sd">            b (list): Vector</span>
+<span class="sd">            xp: Either numpy or cupy</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            List: Axb</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">:</span>
             <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
             <span class="n">buf</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.0</span>
@@ -142,13 +144,13 @@
                 <span class="n">send_buf</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">index</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">rank</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">estimate_on_node</span> <span class="o">-</span> <span class="mi">1</span>
-                    <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="k">else</span> <span class="n">xp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                 <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Allreduce</span><span class="p">(</span><span class="n">send_buf</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MPI_SUM</span><span class="p">)</span>
                 <span class="n">res</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">buf</span>
             <span class="k">return</span> <span class="n">res</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">A</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">b</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="n">A</span> <span class="o">@</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">b</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="EstimatePolynomialError.post_iteration_processing">
@@ -170,19 +172,20 @@
             <span class="n">coll</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span>
             <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
             <span class="n">estimate_on_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">estimate_on_node</span>
+            <span class="n">xp</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xp</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolation_matrix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">interpolator</span> <span class="o">=</span> <span class="n">LagrangeApproximation</span><span class="p">(</span>
                     <span class="n">points</span><span class="o">=</span><span class="p">[</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">estimate_on_node</span><span class="p">]</span>
                 <span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">interpolation_matrix</span> <span class="o">=</span> <span class="n">interpolator</span><span class="o">.</span><span class="n">getInterpolationMatrix</span><span class="p">([</span><span class="n">nodes</span><span class="p">[</span><span class="n">estimate_on_node</span><span class="p">]])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">interpolation_matrix</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">interpolator</span><span class="o">.</span><span class="n">getInterpolationMatrix</span><span class="p">([</span><span class="n">nodes</span><span class="p">[</span><span class="n">estimate_on_node</span><span class="p">]]))</span>
 
             <span class="n">u</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">estimate_on_node</span>
             <span class="p">]</span>
-            <span class="n">u_inter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interpolation_matrix</span><span class="p">,</span> <span class="n">u</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">u_inter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interpolation_matrix</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
             <span class="c1"># compute end point if needed</span>
             <span class="k">if</span> <span class="n">estimate_on_node</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
