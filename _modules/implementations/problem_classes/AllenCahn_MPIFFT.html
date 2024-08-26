@@ -48,7 +48,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_MPIFFT.html#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex">[docs]</a>
 <span class="k">class</span> <span class="nc">allencahn_imex</span><span class="p">(</span><span class="n">IMEX_Laplacian_MPIFFT</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [0, 1]^2`</span>
+<span class="sd">    Example implementing the :math:`2`-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [0, 1]^2`</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)</span>
@@ -159,7 +159,7 @@
 
 <div class="viewcode-block" id="allencahn_imex.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_MPIFFT.html#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.u_exact">[docs]</a>
-    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
@@ -199,7 +199,9 @@
                         <span class="c1"># build radius</span>
                         <span class="n">r2</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">i</span> <span class="o">-</span> <span class="n">L</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">j</span> <span class="o">-</span> <span class="n">L</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
                         <span class="c1"># add this blob, shifted by 1 to avoid issues with adding up negative contributions</span>
-                        <span class="n">tmp</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="n">rand_radii</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">r2</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+                        <span class="n">tmp</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="n">rand_radii</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">r2</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span>
             <span class="c1"># normalize to [0,1]</span>
             <span class="n">tmp</span> <span class="o">*=</span> <span class="mf">0.5</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">tmp</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">)</span>
@@ -233,8 +235,8 @@
 <span class="sd">        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),</span>
 
 <span class="sd">    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated</span>
-<span class="sd">    *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Transform (FFT) and the nonlinear part in the right-hand</span>
-<span class="sd">    side will be treated explicitly using ``mpi4py-fft`` [1]_ to solve them.</span>
+<span class="sd">    *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Transform (FFT) using ``mpi4py-fft`` [1]_ and the nonlinear part in the right-hand</span>
+<span class="sd">    side will be treated explicitly.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="allencahn_imex_timeforcing.eval_f">
@@ -362,7 +364,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
     </div>
   </body>
 </html>

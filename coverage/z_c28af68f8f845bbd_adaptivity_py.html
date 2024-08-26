@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/implementations/convergence_controller_classes/adaptivity.py: 95%</title>
+    <title>Coverage for pySDC/implementations/convergence_controller_classes/adaptivity.py: 92%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_58284776.png">
     <link rel="stylesheet" href="style_cb_8e611ae1.css" type="text/css">
     <script src="coverage_html_cb_6fb7b396.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC/implementations/convergence_controller_classes/adaptivity.py</b>:
-            <span class="pc_cov">95%</span>
+            <span class="pc_cov">92%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">257 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">243<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">14<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">237<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">20<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">12<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_c28af68f8f845bbd_basic_restarting_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.6.0">coverage.py v7.6.0</a>,
-            created at 2024-07-30 09:07 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.6.1">coverage.py v7.6.1</a>,
+            created at 2024-08-26 11:21 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -222,8 +222,8 @@
     <p class="pln"><span class="n"><a id="t140" href="#t140">140</a></span><span class="t">                            <span class="fst">f"</span><span class="op">{</span><span class="nam">more_iter_needed</span><span class="op">}</span><span class="fst"> more iterations needed for convergence -> restart is more efficient</span><span class="fst">"</span><span class="op">,</span> <span class="nam">S</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t141" href="#t141">141</a></span><span class="t">                        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t142" href="#t142">142</a></span><span class="t">                    <span class="key">elif</span> <span class="nam">k_final</span> <span class="op">></span> <span class="nam">coll_order</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t143" href="#t143">143</a></span><span class="t">                        <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">restart</span> <span class="op">=</span> <span class="key">True</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t144" href="#t144">144</a></span><span class="t">                        <span class="nam">self</span><span class="op">.</span><span class="nam">log</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t143" href="#t143">143</a></span><span class="t">                        <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">restart</span> <span class="op">=</span> <span class="key">True</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t144" href="#t144">144</a></span><span class="t">                        <span class="nam">self</span><span class="op">.</span><span class="nam">log</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t145" href="#t145">145</a></span><span class="t">                            <span class="fst">f"</span><span class="op">{</span><span class="nam">more_iter_needed</span><span class="op">}</span><span class="fst"> more iterations needed for convergence -> restart because collocation problem would be over resolved</span><span class="fst">"</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t146" href="#t146">146</a></span><span class="t">                            <span class="nam">S</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t147" href="#t147">147</a></span><span class="t">                        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -321,7 +321,7 @@
     <p class="pln"><span class="n"><a id="t239" href="#t239">239</a></span><span class="t">            <span class="key">and</span> <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">iter</span> <span class="op">></span> <span class="num">0</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t240" href="#t240">240</a></span><span class="t">            <span class="key">and</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">abort_at_growing_residual</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t241" href="#t241">241</a></span><span class="t">        <span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t242" href="#t242">242</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">trigger_restart_upon_nonconvergence</span><span class="op">(</span><span class="nam">S</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t242" href="#t242">242</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">trigger_restart_upon_nonconvergence</span><span class="op">(</span><span class="nam">S</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t243" href="#t243">243</a></span><span class="t">        <span class="key">elif</span> <span class="nam">S</span><span class="op">.</span><span class="nam">levels</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">residual</span> <span class="op">></span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">residual_max_tol</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t244" href="#t244">244</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">trigger_restart_upon_nonconvergence</span><span class="op">(</span><span class="nam">S</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t245" href="#t245">245</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -331,16 +331,16 @@
     <p class="run"><span class="n"><a id="t249" href="#t249">249</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">res_last_iter</span> <span class="op">=</span> <span class="nam">S</span><span class="op">.</span><span class="nam">levels</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">residual</span> <span class="op">*</span> <span class="num">1.0</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t250" href="#t250">250</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t251" href="#t251">251</a></span><span class="t">    <span class="key">def</span> <span class="nam">trigger_restart_upon_nonconvergence</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">S</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t252" href="#t252">252</a></span><span class="t">        <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">restart</span> <span class="op">=</span> <span class="key">True</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t253" href="#t253">253</a></span><span class="t">        <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">force_done</span> <span class="op">=</span> <span class="key">True</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t254" href="#t254">254</a></span><span class="t">        <span class="key">for</span> <span class="nam">L</span> <span class="key">in</span> <span class="nam">S</span><span class="op">.</span><span class="nam">levels</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t255" href="#t255">255</a></span><span class="t">            <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">dt_new</span> <span class="op">=</span> <span class="nam">L</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">dt</span> <span class="op">/</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">factor_if_not_converged</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t256" href="#t256">256</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">log</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t252" href="#t252">252</a></span><span class="t">        <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">restart</span> <span class="op">=</span> <span class="key">True</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t253" href="#t253">253</a></span><span class="t">        <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">force_done</span> <span class="op">=</span> <span class="key">True</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t254" href="#t254">254</a></span><span class="t">        <span class="key">for</span> <span class="nam">L</span> <span class="key">in</span> <span class="nam">S</span><span class="op">.</span><span class="nam">levels</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t255" href="#t255">255</a></span><span class="t">            <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">dt_new</span> <span class="op">=</span> <span class="nam">L</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">dt</span> <span class="op">/</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">factor_if_not_converged</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t256" href="#t256">256</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">log</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t257" href="#t257">257</a></span><span class="t">                <span class="fst">f'</span><span class="fst">Collocation problem not converged. Reducing step size to </span><span class="op">{</span><span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">dt_new</span><span class="op">:</span><span class="fst">.2e</span><span class="op">}</span><span class="fst">'</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t258" href="#t258">258</a></span><span class="t">                <span class="nam">S</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t259" href="#t259">259</a></span><span class="t">            <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t260" href="#t260">260</a></span><span class="t">        <span class="key">if</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">interpolate_between_restarts</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t261" href="#t261">261</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">interpolator</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">skip_interpolation</span> <span class="op">=</span> <span class="key">True</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t260" href="#t260">260</a></span><span class="t">        <span class="key">if</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">interpolate_between_restarts</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t261" href="#t261">261</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">interpolator</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">skip_interpolation</span> <span class="op">=</span> <span class="key">True</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t262" href="#t262">262</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t263" href="#t263">263</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t264" href="#t264">264</a></span><span class="t"><span class="key">class</span> <span class="nam">Adaptivity</span><span class="op">(</span><span class="nam">AdaptivityBase</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -995,8 +995,8 @@
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_c28af68f8f845bbd_basic_restarting_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.6.0">coverage.py v7.6.0</a>,
-            created at 2024-07-30 09:07 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.6.1">coverage.py v7.6.1</a>,
+            created at 2024-08-26 11:21 +0000
         </p>
     </div>
 </footer>

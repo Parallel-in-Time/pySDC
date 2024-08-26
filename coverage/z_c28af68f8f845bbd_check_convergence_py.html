@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/implementations/convergence_controller_classes/check_convergence.py: 86%</title>
+    <title>Coverage for pySDC/implementations/convergence_controller_classes/check_convergence.py: 84%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_58284776.png">
     <link rel="stylesheet" href="style_cb_8e611ae1.css" type="text/css">
     <script src="coverage_html_cb_6fb7b396.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC/implementations/convergence_controller_classes/check_convergence.py</b>:
-            <span class="pc_cov">86%</span>
+            <span class="pc_cov">84%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">57 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">49<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">8<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">48<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">9<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">1<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_c28af68f8f845bbd_check_iteration_estimator_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.6.0">coverage.py v7.6.0</a>,
-            created at 2024-07-30 09:07 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.6.1">coverage.py v7.6.1</a>,
+            created at 2024-08-26 11:21 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -225,7 +225,7 @@
     <p class="pln"><span class="n"><a id="t143" href="#t143">143</a></span><span class="t">            <span class="com"># check if an open request of the status send is pending</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t144" href="#t144">144</a></span><span class="t">            <span class="nam">controller</span><span class="op">.</span><span class="nam">wait_with_interrupt</span><span class="op">(</span><span class="nam">request</span><span class="op">=</span><span class="nam">controller</span><span class="op">.</span><span class="nam">req_status</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t145" href="#t145">145</a></span><span class="t">            <span class="key">if</span> <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">force_done</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t146" href="#t146">146</a></span><span class="t">                <span class="key">return</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t146" href="#t146">146</a></span><span class="t">                <span class="key">return</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t147" href="#t147">147</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t148" href="#t148">148</a></span><span class="t">            <span class="com"># recv status</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t149" href="#t149">149</a></span><span class="t">            <span class="key">if</span> <span class="key">not</span> <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">first</span> <span class="key">and</span> <span class="key">not</span> <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">prev_done</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -250,8 +250,8 @@
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_c28af68f8f845bbd_check_iteration_estimator_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.6.0">coverage.py v7.6.0</a>,
-            created at 2024-07-30 09:07 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.6.1">coverage.py v7.6.1</a>,
+            created at 2024-08-26 11:21 +0000
         </p>
     </div>
 </footer>

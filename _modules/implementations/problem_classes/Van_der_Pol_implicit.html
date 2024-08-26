@@ -69,6 +69,8 @@
 <span class="sd">    crash_at_maxiter : bool, optional</span>
 <span class="sd">        Indicates whether Newton&#39;s method should stop if maximum number of iterations</span>
 <span class="sd">        ``newton_maxiter`` is reached.</span>
+<span class="sd">    relative_tolerance : bool, optional</span>
+<span class="sd">        Use a relative or absolute tolerance for the Newton solver</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -80,7 +82,16 @@
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-9</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">crash_at_maxiter</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">u0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">mu</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
+        <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-9</span><span class="p">,</span>
+        <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">crash_at_maxiter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">relative_tolerance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
         <span class="n">nvars</span> <span class="o">=</span> <span class="mi">2</span>
 
@@ -90,7 +101,13 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;nvars&#39;</span><span class="p">,</span> <span class="s1">&#39;u0&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
-            <span class="s1">&#39;mu&#39;</span><span class="p">,</span> <span class="s1">&#39;newton_maxiter&#39;</span><span class="p">,</span> <span class="s1">&#39;newton_tol&#39;</span><span class="p">,</span> <span class="s1">&#39;stop_at_nan&#39;</span><span class="p">,</span> <span class="s1">&#39;crash_at_maxiter&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">()</span>
+            <span class="s1">&#39;mu&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;newton_maxiter&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;newton_tol&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;stop_at_nan&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;crash_at_maxiter&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;relative_tolerance&#39;</span><span class="p">,</span>
+            <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
@@ -195,7 +212,7 @@
             <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x1</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">rhs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="p">(</span><span class="n">mu</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span><span class="p">)</span> <span class="o">-</span> <span class="n">rhs</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
 
             <span class="c1"># if g is close to 0, then we are done</span>
-            <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative_tolerance</span> <span class="k">else</span> <span class="mf">1.0</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">res</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_tol</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
                 <span class="k">break</span>
 
@@ -263,7 +280,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
     </div>
   </body>
 </html>
