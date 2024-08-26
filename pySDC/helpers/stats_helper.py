@@ -27,12 +27,13 @@ def filter_stats(stats, comm=None, recomputed=None, **kwargs):
         times_restarted = np.unique([me.time for me in result.keys() if me.num_restarts > 0])
         for t in times_restarted:
             restarts = {}
-            for me in filter_stats(result, time=t).keys():
+            stats_now = filter_stats(result, time=t)
+            for me in stats_now.keys():
                 restarts[me.type] = max([restarts.get(me.type, 0), me.num_restarts])
 
             [
                 [
-                    [result.pop(you, None) for you in filter_stats(result, time=t, type=type_, num_restarts=i).keys()]
+                    [result.pop(you, None) for you in filter_stats(stats_now, type=type_, num_restarts=i).keys()]
                     for i in range(num_restarts_)
                 ]
                 for type_, num_restarts_ in restarts.items()
