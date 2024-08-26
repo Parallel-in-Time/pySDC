@@ -42,10 +42,12 @@ def figsize_by_journal(journal, scale, ratio):  # pragma: no cover
     textwidths = {
         'JSC_beamer': 426.79135,
         'Springer_Numerical_Algorithms': 338.58778,
+        'JSC_thesis': 434.26027,
     }
     # store text height in points here, get this from LaTeX using \the\textheight
     textheights = {
         'JSC_beamer': 214.43411,
+        'JSC_thesis': 635.5,
     }
     assert (
         journal in textwidths.keys()

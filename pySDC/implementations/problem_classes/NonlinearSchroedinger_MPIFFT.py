@@ -118,6 +118,8 @@ class nonlinearschroedinger_fully_implicit(nonlinearschroedinger_imex):
     dtype_f = mesh
 
     def __init__(self, lintol=1e-9, liniter=99, **kwargs):
+        assert kwargs.get('useGPU', False) is False
+
         super().__init__(**kwargs)
         self._makeAttributeAndRegister('liniter', 'lintol', localVars=locals(), readOnly=False)
 
