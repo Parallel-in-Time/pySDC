@@ -30,114 +30,21 @@ class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
         # Store solver as attribute
         self.solver = solver
         self.subproblems = [sp for sp in solver.subproblems if sp.size]
+        self.stages = self.M    # need this for solver.log_stats()
 
-        # need this for solver.log_stats()
-        self.stages = self.M
         # Create coefficient systems for steps history
         c = lambda: CoeffSystem(solver.subproblems, dtype=solver.dtype)
         self.MX0, self.RHS = c(), c()
         self.LX = deque([[c() for _ in range(self.M)] for _ in range(2)])
         self.F = deque([[c() for _ in range(self.M)] for _ in range(2)])
 
-
-        if not self.leftIsNode:
+        if not self.leftIsNode and self.initSweep == "QDelta":
             self.F0, self.LX0 = c(), c()
-
-        # Instantiate M solver, needed only when prolongation is used
-        if self.doProlongation:
-            for sp in solver.subproblems:
-                if solver.store_expanded_matrices:
-                    np.copyto(sp.LHS.data, sp.M_exp.data)
-                else:
-                    sp.LHS = sp.M_min @ sp.pre_right
-                sp.M_solver = solver.matsolver(sp.LHS, solver)
-            self.Fr = [c() for _ in range(self.M)]
-            self.LXr = [c() for _ in range(self.M)]
-            # permanently store node information for calculating the residual
-
-            # function that creates fields
-            f = self.solver.problem.dist.Field
-            vf = self.solver.problem.dist.VectorField
-
-            # state contains the problems fields
-            state = self.solver.state
-
-            # identify vector fields/there is probably some better way
-            # that I haven't figured out yet
-            id_vector = [len(x) for x in [_.data.shape for _ in state]]
-            id_vector = np.asarray(id_vector)
-            id_vector -= min(id_vector)
-            self.id_vector = id_vector
-            # get basis of every field in the problem
-            # this may restrict redidual to 1d problems (only 0 index)...
-            basis = [_.get_basis(_.dist.get_coordsystem(0)) for _ in state]
-
-            #initialise fields for every node to calculate residual
-            self.U = [[None for x in range(len(state))] for _ in range(self.M)]
-            self.residualState = [None for _ in state]
-            if self.modeControl:
-                self.setTol = True
-                self.tol = 1e-6
-                # this stores maximum residual for each individual component. this then gets multiplied with
-                # self.tol to set an individual residual tolerance
-                self.tols = [None for _ in state]
-                self.tolState = [float(-1) for x in range(len(state))]
-                self.modeState = [[None for x in range(len(state))] for _ in range(self.M)]
-                self.modeDiff = deque([[[None for x in range(len(state))] for _ in range(self.M)] for b in range(self.nSweep)])
-                self.mask = [[None for _ in range(len(self.residualState))] for _ in range(self.M)]
-                self.maskCheck = [None for _ in range(self.M)]
-                self.maskInv = [[None for _ in range(len(self.residualState))] for _ in range(self.M)]
-                self.finalMask = [None for _ in range(self.M)]
-                self.finalMaskInv = [None for _ in range(self.M)]
-
-            if self.logResIter:
-                self.residualStateIter = [[None for x in range(len(state))]
-                                          for _ in range(self.nSweep)]
-            for k in range(self.nSweep):
-                for j in range(len(state)):
-                    coords = state[j].dist.get_coordsystem(0)
-                    basis = state[j].get_basis(coords)
-                    if id_vector[j]:
-                        self.residualState[j] = vf(coords, bases=basis)
-                    else:
-                        self.residualState[j] = f(basis)
-                        if self.modeControl:
-                            self.shape = self.residualState[j]['c'][:].shape
-                            self.nModes = np.prod(self.shape)
-
-                    for i in range(self.M):
-                        if id_vector[j]:
-                            if self.modeControl:
-                                self.modeState[i][j] = vf(coords, bases=basis)
-                                self.modeDiff[k][i][j] = vf(coords, bases=basis)
-                            self.U[i][j] = vf(coords, bases=basis)
-                        else:
-                            if self.modeControl:
-                                self.modeState[i][j] = f(basis)
-                                self.modeDiff[k][i][j] = f(basis)
-                            self.U[i][j] = f(basis)
-                    if self.logResIter:
-                        for i in range(self.nSweep):
-                            if id_vector[j]:
-                                self.residualStateIter[i][j] =vf(coords, bases=basis)
-                            else:
-                                self.residualStateIter[i][j] =f(basis)
-
-
-            #self.U = [[f(b) for b in basis] for _ in range(self.M)]
-            #self.residualState = [f(b) for b in basis]
-            self.MXi = c()
-
-            if self.logResidual:
-                self.residualLog = np.zeros([self.nSweep, self.M])
-                if self.modeControl:
-                    self.nModesShut = np.zeros([self.nSweep, self.M])
 
         # Attributes
         self.axpy = blas.get_blas_funcs('axpy', dtype=solver.dtype)
         self.dt = None
         self.firstEval = True
-        self.isInit = False
 
     @property
     def M(self):
@@ -188,15 +95,19 @@ class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
         # Update LHS and LHS solvers for each subproblems
         for sp in solver.subproblems:
             if init:
-                # Eventually instanciate list of solver (ony first time step)
-                sp.LHS_solvers = [None] * self.M
-            for i in range(self.M):
-                if solver.store_expanded_matrices:
-                    np.copyto(sp.LHS.data, sp.M_exp.data)
-                    self.axpy(a=dt*qI[i, i], x=sp.L_exp.data, y=sp.LHS.data)
-                else:
-                    sp.LHS = (sp.M_min + dt*qI[i, i]*sp.L_min)
-                sp.LHS_solvers[i] = solver.matsolver(sp.LHS, solver)
+                # Eventually instantiate list of solver (ony first time step)
+                sp.LHS_solvers = [[None for _ in range(self.M)] for _ in range(self.nSweeps)]
+            for k in range(self.nSweeps):
+                for m in range(self.M):
+                    if solver.store_expanded_matrices:
+                        raise NotImplementedError("code correction required")
+                        np.copyto(sp.LHS.data, sp.M_exp.data)
+                        self.axpy(a=dt*qI[k, m, m], x=sp.L_exp.data, y=sp.LHS.data)
+                    else:
+                        sp.LHS = (sp.M_min + dt*qI[k, m, m]*sp.L_min)
+                    sp.LHS_solvers[k][m] = solver.matsolver(sp.LHS, solver)
+            if self.initSweep == "QDELTA":
+                raise NotImplementedError()
 
     def _evalLX(self, LX):
         """
@@ -247,8 +158,8 @@ class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
         solver.sim_time = time
         if self.firstEval:
             solver.evaluator.evaluate_scheduled(
-                wall_time=0, timestep=0, sim_time=time,
-                iteration=0)
+                wall_time=wall_time, timestep=dt, sim_time=time,
+                iteration=solver.iteration)
             self.firstEval = False
         else:
             solver.evaluator.evaluate_group('F')
@@ -258,7 +169,7 @@ class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
         # Put back initial solver simulation time
         solver.sim_time = t0
 
-    def _solveAndStoreState(self, m):
+    def _solveAndStoreState(self, k, m):
         """
         Solve LHS * X = RHS using the LHS associated to a given node,
         and store X into the solver state.
@@ -266,6 +177,8 @@ class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
 
         Parameters
         ----------
+        k : int
+            Sweep index (0 for the first sweep).
         m : int
             Index of the nodes.
         """
@@ -279,7 +192,7 @@ class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
         for sp in solver.subproblems:
             # Slice out valid subdata, skipping invalid components
             spRHS = RHS.get_subdata(sp)
-            spX = sp.LHS_solvers[m].solve(spRHS)  # CREATES TEMPORARY
+            spX = sp.LHS_solvers[k][m].solve(spRHS)  # CREATES TEMPORARY
             sp.scatter_inputs(spX, solver.state)
 
     def _requireStateCoeffSpace(self, state):
@@ -294,7 +207,7 @@ class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
         for field in state:
             field.preset_layout('c')
 
-    def _initSweep(self, iType='QDELTA'):
+    def _initSweep(self):
         """
         Initialize node terms for one given time-step
 
@@ -304,63 +217,67 @@ class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
             Type of initialization, can be :
             - iType="QDELTA" : use QDelta[I,E] for coarse time integration.
             - iType="COPY" : just copy the values from the initial solution.
+            - iType="FNO" : use an FNO-ML model to predict values (incoming ...)
         """
         # Attribute references
         tau, qI, qE = self.nodes, self.QDeltaI, self.QDeltaE
         solver = self.solver
         t0, dt, wall_time = solver.sim_time, self.dt, self.wall_time
         RHS, MX0, Fk, LXk = self.RHS, self.MX0, self.F[0], self.LX[0]
-        if not self.leftIsNode:
+        if not self.leftIsNode and self.initSweep == "QDELTA":
             F0, LX0 = self.F0, self.LX0
         axpy = self.axpy
-        self.isInit = False
 
-        if iType == 'QDELTA':
-            #print('DO INITIAL SWEEP')
-            # Prepare initial field evaluation
+        if self.initSweep == 'QDELTA':
+
+            # Eventual initial field evaluation
             if not self.leftIsNode:
-                self._evalF(F0, t0, dt, wall_time)
-                F0.data *= dt*self.dtauE
-                if self.dtauI != 0.0:
+                if np.any(self.dtauE):
+                    self._evalF(F0, t0, dt, wall_time)
+                if np.any(self.dtauI):
                     self._evalLX(LX0)
-                    axpy(a=-dt*self.dtauI, x=LX0.data, y=F0.data)
 
             # Loop on all quadrature nodes
-            for i in range(self.M):
+            for m in range(self.M):
+
                 # Build RHS
                 if RHS.data.size:
+
                     # Initialize with MX0 term
                     np.copyto(RHS.data, MX0.data)
-                    # Add initial field evaluation
+
+                    # Add eventual initial field evaluation
                     if not self.leftIsNode:
-                        RHS.data += F0.data
+                        if self.dtauE[m]:
+                            axpy(a=dt*self.dtauE[m], x=F0.data, y=RHS.data)
+                        if self.dtauI[m]:
+                            axpy(a=-dt*self.dtauI[m], x=LX0.data, y=RHS.data)
+
                     # Add F and LX terms (already computed)
-                    for j in range(i):
-                        axpy(a=dt*qE[i, j], x=Fk[j].data, y=RHS.data)
-                        axpy(a=-dt*qI[i, j], x=LXk[j].data, y=RHS.data)
+                    for i in range(m):
+                        axpy(a=dt*qE[m, i], x=Fk[i].data, y=RHS.data)
+                        axpy(a=-dt*qI[m, i], x=LXk[i].data, y=RHS.data)
+
                 # Solve system and store node solution in solver state
-                self._solveAndStoreState(i)
+                self._solveAndStoreState(m)
+
                 # Evaluate and store LX with current state
-                self._evalLX(LXk[i])
+                self._evalLX(LXk[m])
+
                 # Evaluate and store F(X, t) with current state
-                self._evalF(Fk[i], t0+dt*tau[i], dt, wall_time)
+                self._evalF(Fk[m], t0+dt*tau[m], dt, wall_time)
 
-                if self.modeControl:
-                    self._setModeStates(i)
-
-        elif iType == 'COPY':
+        elif self.initSweep == 'COPY':
             self._evalLX(LXk[0])
             self._evalF(Fk[0], t0, dt, wall_time)
-            for i in range(1, self.M):
-                np.copyto(LXk[i].data, LXk[0].data)
-                np.copyto(Fk[i].data, Fk[0].data)
+            for m in range(1, self.M):
+                np.copyto(LXk[m].data, LXk[0].data)
+                np.copyto(Fk[m].data, Fk[0].data)
 
         else:
-            raise NotImplementedError(f'iType={iType}')
+            raise NotImplementedError(f'initSweep={self.initSweep}')
 
-        self.isInit = False
-
-    def _sweep(self):
+    def _sweep(self, k):
         """Perform a sweep for the current time-step"""
         # Attribute references
         tau, qI, qE, q = self.nodes, self.QDeltaI, self.QDeltaE, self.Q
@@ -371,31 +288,46 @@ class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
         axpy = self.axpy
 
         # Loop on all quadrature nodes
-        for i in range(self.M):
+        for m in range(self.M):
+
             # Build RHS
             if RHS.data.size:
+
                 # Initialize with MX0 term
                 np.copyto(RHS.data, MX0.data)
+
                 # Add quadrature terms
-                for j in range(self.M):
-                    axpy(a=dt*q[i, j], x=Fk[j].data, y=RHS.data)
-                    axpy(a=-dt*q[i, j], x=LXk[j].data, y=RHS.data)
-                # Add F and LX terms from iteration k+1
-                for j in range(i):
-                    axpy(a=dt*qE[i, j], x=Fk1[j].data, y=RHS.data)
-                    axpy(a=-dt*qI[i, j], x=LXk1[j].data, y=RHS.data)
-                # Add F and LX terms from iteration k
-                for j in range(i):
-                    axpy(a=-dt*qE[i, j], x=Fk[j].data, y=RHS.data)
-                    axpy(a=dt*qI[i, j], x=LXk[j].data, y=RHS.data)
-                axpy(a=dt*qI[i, i], x=LXk[i].data, y=RHS.data)
+                for i in range(self.M):
+                    axpy(a=dt*q[m, i], x=Fk[i].data, y=RHS.data)
+                    axpy(a=-dt*q[m, i], x=LXk[i].data, y=RHS.data)
+
+                if not self.diagonal:
+                    # Add F and LX terms from iteration k+1 and previous nodes
+                    for i in range(m):
+                        axpy(a=dt*qE[k, m, i], x=Fk1[i].data, y=RHS.data)
+                        axpy(a=-dt*qI[k, m, i], x=LXk1[i].data, y=RHS.data)
+                    # Add F and LX terms from iteration k and previous nodes
+                    for i in range(m):
+                        axpy(a=-dt*qE[k, m, i], x=Fk[i].data, y=RHS.data)
+                        axpy(a=dt*qI[k, m, i], x=LXk[i].data, y=RHS.data)
+
+                # Add LX terms from iteration k+1 and current nodes
+                axpy(a=dt*qI[k, m, m], x=LXk[m].data, y=RHS.data)
 
             # Solve system and store node solution in solver state
-            self._solveAndStoreState(i)
+            self._solveAndStoreState(k, m)
+
+            # Avoid non necessary RHS evaluations work
+            if not self.forceProl and k == self.nSweeps-1:
+                if self.diagonal:
+                    continue
+                elif m == self.M-1:
+                    continue
+
             # Evaluate and store LX with current state
-            self._evalLX(LXk1[i])
+            self._evalLX(LXk1[m])
             # Evaluate and store F(X, t) with current state
-            self._evalF(Fk1[i], t0+dt*tau[i], dt, wall_time)
+            self._evalF(Fk1[m], t0+dt*tau[m], dt, wall_time)
 
         # Inverse position for iterate k and k+1 in storage
         # ie making the new evaluation the old for next iteration
@@ -460,14 +392,13 @@ class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
 
         # Compute MX0 for the whole time step
         self._computeMX0(self.MX0)
+
         # Initialize node values
-        self._initSweep(iType=self.initSweep)
+        self._initSweep()
+
         # Performs sweeps
-        for k in range(self.nSweep):
-            self.k = k
-            if self._setSweep(k):
-                self._updateLHS(dt)
-            self._sweep()
+        for k in range(self.nSweeps):
+            self._sweep(k)
 
         # Compute prolongation if needed
         if self.doProlongation:

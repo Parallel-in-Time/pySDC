@@ -1,25 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Core class for IMEX SDC (independant of any application code).
+Core class for IMEX SDC (independent of any application code).
 Set the main parameters, compute coefficients, ...
 """
 import numpy as np
 
-from qmat import genQCoeffs, genQDeltaCoeffs
-
+from qmat.qcoeff.collocation import Collocation
+from qmat import genQDeltaCoeffs
 
 # -----------------------------------------------------------------------------
 # Main SDC parameters
 # -----------------------------------------------------------------------------
 DEFAULT = {
     'nNodes': 4,
-    'nSweep': 3,
+    'nSweeps': 3,
     'nodeDistr': 'LEGENDRE',
     'quadType': 'RADAU-RIGHT',
     'implSweep': 'BE',
     'explSweep': 'FE',
     'initSweep': 'COPY',
+    'initSweepQDelta': 'BE',
     'forceProl': False,
     }
 
@@ -33,12 +34,15 @@ PARAMS = {
     ('nodeDistr', '-snd', '--sdcNodeDistr'):
         dict(help='node distribution for SDC',
              default=DEFAULT['nodeDistr']),
-    ('nSweep', '-sK', '--sdcNSweep'):
+    ('nSweeps', '-sK', '--sdcNSweeps'):
         dict(help='number of sweeps for SDC', type=int,
-             default=DEFAULT['nSweep']),
+             default=DEFAULT['nSweeps']),
     ('initSweep', '-si', '--sdcInitSweep'):
         dict(help='initial sweep to get initialized nodes values',
              default=DEFAULT['initSweep']),
+    ('initSweepQDelta', '-siq', '--sdcInitSweepQDelta'):
+        dict(help='QDelta matrix used with initSweep=QDELTA',
+             default=DEFAULT['initSweepQDelta']),
     ('implSweep', '-sis', '--sdcImplSweep'):
         dict(help='type of QDelta matrix for implicit sweep',
              default=DEFAULT['implSweep']),
@@ -52,14 +56,14 @@ PARAMS = {
     }
 
 # Printing function
-def sdcInfos(nNodes, quadType, nodeDistr, nSweep,
+def sdcInfos(nNodes, quadType, nodeDistr, nSweeps,
              implSweep, explSweep, initSweep, forceProl,
              **kwargs):
     return f"""
 -- nNodes : {nNodes}
 -- quadType : {quadType}
 -- nodeDistr : {nodeDistr}
--- nSweep : {nSweep}
+-- nSweeps : {nSweeps}
 -- implSweep : {implSweep}
 -- explSweep : {explSweep}
 -- initSweep : {initSweep}
@@ -72,26 +76,37 @@ def sdcInfos(nNodes, quadType, nodeDistr, nSweep,
 class IMEXSDCCore(object):
 
     # Initialize parameters with default values
-    nSweep = DEFAULT['nSweep']
-    nodeDistr = DEFAULT['nodeDistr']
-    quadType = DEFAULT['quadType']
+    nSweeps:int = DEFAULT['nSweeps']
+    nodeType:str = DEFAULT['nodeDistr']
+    quadType:str = DEFAULT['quadType']
     implSweep = DEFAULT['implSweep']
     explSweep = DEFAULT['explSweep']
     initSweep = DEFAULT['initSweep']
+    initSweepQDelta = DEFAULT['initSweepQDelta']
     forceProl = DEFAULT['forceProl']
 
     # Collocation method attributes
-    nodes, weights, Q = genQCoeffs(
-        "coll", nNodes=DEFAULT['nNodes'], nodeType=nodeDistr, quadType=quadType)
-    # IMEX SDC attributes
+    coll = Collocation(
+        nNodes=DEFAULT['nNodes'], nodeType=nodeType, quadType=quadType)
+    nodes, weights, Q = coll.genCoeffs()
+    # IMEX SDC attributes, QDelta matrices are 3D with shape (K, M, M)
     QDeltaI, dtauI = genQDeltaCoeffs(
-        implSweep, dTau=True,
+        implSweep, dTau=True, nSweeps=nSweeps,
         Q=Q, nodes=nodes, nNodes=DEFAULT['nNodes'],
-        nodeType=nodeDistr, quadType=quadType)
+        nodeType=nodeType, quadType=quadType)
     QDeltaE, dtauE = genQDeltaCoeffs(
-        explSweep, dTau=True,
+        explSweep, dTau=True, nSweeps=nSweeps,
         Q=Q, nodes=nodes, nNodes=DEFAULT['nNodes'],
-        nodeType=nodeDistr, quadType=quadType)
+        nodeType=nodeType, quadType=quadType)
+    QDelta0 = genQDeltaCoeffs(
+        initSweepQDelta,
+        Q=Q, nodes=nodes, nNodes=DEFAULT['nNodes'],
+        nodeType=nodeType, quadType=quadType)
+
+    diagonal = np.all(np.diag(np.diag(qD)) == qD for qD in QDeltaI)
+    diagonal *= np.all(np.diag(np.diag(qD)) == 0 for qD in QDeltaE)
+    if initSweep == "QDelta":
+        diagonal *=  np.all(np.diag(np.diag(QDelta0)) == QDelta0)
 
     # Default attributes, used later as instance attributes
     # => should be defined in inherited class
@@ -99,58 +114,69 @@ class IMEXSDCCore(object):
     axpy = None
 
     @classmethod
-    def setParameters(cls, M=None, nodeDistr=None, quadType=None,
+    def setParameters(cls, nNodes=None, nodeType=None, quadType=None,
                       implSweep=None, explSweep=None, initSweep=None,
-                      nSweep=None, forceProl=None):
+                      initSweepQDelta=None, nSweeps=None, forceProl=None):
 
         # Get non-changing parameters
-        keepM = M is None
-        keepNodeDistr = nodeDistr is None
+        keepNNodes = nNodes is None
+        keepNodeDistr = nodeType is None
         keepQuadType = quadType is None
         keepImplSweep = implSweep is None
         keepExplSweep = explSweep is None
+        keepNSweeps = nSweeps is None
+        keepInitSweepQDelta = initSweepQDelta is None
 
         # Set parameter values
-        M = len(cls.nodes) if keepM else M
-        nodeDistr = cls.nodeDistr if keepNodeDistr else nodeDistr
+        nNodes = len(cls.nodes) if keepNNodes else nNodes
+        nodeType = cls.nodeType if keepNodeDistr else nodeType
         quadType = cls.quadType if keepQuadType else quadType
         implSweep = cls.implSweep if keepImplSweep else implSweep
         explSweep = cls.explSweep if keepExplSweep else explSweep
+        nSweeps = cls.nSweeps if keepNSweeps else nSweeps
+        initSweepQDelta = cls.initSweepQDelta if keepInitSweepQDelta else initSweepQDelta
 
         # Determine updated parts
-        updateNode = (not keepM) or (not keepNodeDistr) or (not keepQuadType)
-        updateQDeltaI = (not keepImplSweep) or updateNode
-        updateQDeltaE = (not keepExplSweep) or updateNode
+        updateNode = (not keepNNodes) or (not keepNodeDistr) or (not keepQuadType)
+        updateQDeltaI = (not keepImplSweep) or updateNode or (not keepNSweeps)
+        updateQDeltaE = (not keepExplSweep) or updateNode or (not keepNSweeps)
+        updateQDelta0 = (not keepInitSweepQDelta) or updateNode
 
         # Update parameters
         if updateNode:
-            cls.nodes, cls.weights, cls.Q = genQCoeffs("coll",
-                nNodes=M, nodeType=nodeDistr, quadType=quadType)
-            cls.nodeDistr, cls.quadType = nodeDistr, quadType
+            cls.coll = Collocation(
+                nNodes=DEFAULT['nNodes'], nodeType=nodeType, quadType=quadType)
+            cls.nodes, cls.weights, cls.Q = cls.coll.genCoeffs()
+            cls.nodeType, cls.quadType = nodeType, quadType
         if updateQDeltaI:
-            iSweepName = implSweep
-            if not isinstance(implSweep, str):
-                iSweepName = implSweep[0]
             cls.QDeltaI, cls.dtauI = genQDeltaCoeffs(
-                iSweepName, dTau=True,
-                Q=cls.Q, nodes=cls.nodes, nNodes=M,
-                nodeType=nodeDistr, quadType=quadType)
+                implSweep, dTau=True, nSweeps=nSweeps,
+                Q=cls.Q, nodes=cls.nodes, nNodes=nNodes,
+                nodeType=nodeType, quadType=quadType)
             cls.implSweep = implSweep
         if updateQDeltaE:
-            eSweepName = explSweep
-            if not isinstance(explSweep, str):
-                eSweepName = explSweep[0]
             cls.QDeltaE, cls.dtauE = genQDeltaCoeffs(
-                eSweepName, dTau=True,
-                Q=cls.Q, nodes=cls.nodes, nNodes=M,
-                nodeType=nodeDistr, quadType=quadType)
+                explSweep, dTau=True, nSweeps=nSweeps,
+                Q=cls.Q, nodes=cls.nodes, nNodes=nNodes,
+                nodeType=nodeType, quadType=quadType)
             cls.explSweep = explSweep
+        if updateQDelta0:
+            cls.QDelta0 = genQDeltaCoeffs(
+                initSweepQDelta,
+                Q=cls.Q, nodes=cls.nodes, nNodes=nNodes,
+                nodeType=nodeType, quadType=quadType)
 
         # Eventually update additional parameters
-        for par in ['initSweep', 'nSweep', 'forceProl']:
-            val = eval(par)
-            if val is not None:
-                setattr(cls, par, val)
+        if forceProl is not None: cls.forceProl = forceProl
+        if initSweep is not None: cls.initSweep = initSweep
+        if not keepNSweeps:
+            cls.nSweeps = nSweeps
+
+        diagonal = np.all([np.diag(np.diag(qD)) == qD for qD in cls.QDeltaI])
+        diagonal *= np.all([np.diag(np.diag(qD)) == 0 for qD in cls.QDeltaE])
+        if cls.initSweep == "QDELTA":
+            diagonal *=  np.all(np.diag(np.diag(cls.QDelta0)) == cls.QDelta0)
+        cls.diagonal = diagonal
 
     # -------------------------------------------------------------------------
     # Class properties
@@ -166,7 +192,7 @@ class IMEXSDCCore(object):
     @classmethod
     def getInfos(cls):
         return sdcInfos(
-            len(cls.nodes), cls.quadType, cls.nodeDistr, cls.nSweep,
+            len(cls.nodes), cls.quadType, cls.nodeType, cls.nSweeps,
             cls.implSweep, cls.explSweep, cls.initSweep, cls.forceProl)
 
     @classmethod
@@ -184,35 +210,6 @@ class IMEXSDCCore(object):
     @classmethod
     def doProlongation(cls):
         return not cls.rightIsNode or cls.forceProl
-
-    @classmethod
-    def _setSweep(cls, k):
-        updateQDeltaI = False
-        if cls.initSweep == 'QDelta':
-            k += 1
-        # Eventually change implicit QDelta during sweeps
-        if not isinstance(cls.implSweep, str):
-            try:
-                iSweepName = cls.implSweep[k]
-                updateQDeltaI = True
-            except IndexError:
-                iSweepName = cls.implSweep[-1]
-            cls.QDeltaI = genQDeltaCoeffs(
-                iSweepName,
-                Q=cls.Q, nodes=cls.nodes, nNodes=len(cls.nodes),
-                nodeType=cls.nodeDistr, quadType=cls.quadType)
-        # Eventually change explicit QDelta during sweeps
-        if not isinstance(cls.explSweep, str):
-            try:
-                eSweepName = cls.explSweep[k]
-            except IndexError:
-                eSweepName = cls.explSweep[-1]
-            cls.QDeltaE = genQDeltaCoeffs(
-                eSweepName,
-                Q=cls.Q, nodes=cls.nodes, nNodes=len(cls.nodes),
-                nodeType=cls.nodeDistr, quadType=cls.quadType)
-        return updateQDeltaI
-
 
 
 if __name__ == '__main__':

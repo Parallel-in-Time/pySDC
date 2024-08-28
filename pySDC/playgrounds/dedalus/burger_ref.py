@@ -22,7 +22,10 @@ logger = logging.getLogger(__name__)
 from sdc import SpectralDeferredCorrectionIMEX
 
 SpectralDeferredCorrectionIMEX.setParameters(
-    nSweep=1, M=4)
+    nSweeps=4,
+    nNodes=4,
+    implSweep="MIN-SR-S",
+    explSweep="PIC")
 
 useSDC = True
 
@@ -34,7 +37,7 @@ b = 2e-4
 dealias = 3/2
 stop_sim_time = 10
 timestepper = SpectralDeferredCorrectionIMEX if useSDC else d3.SBDF2
-timestep = 1e-3
+timestep = 2e-3
 dtype = np.float64
 
 # Bases
@@ -69,6 +72,7 @@ i = 0
 while solver.proceed:
     solver.step(timestep)
     if solver.iteration % 100 == 0:
+        print(f"step {solver.iteration}/...")
         logger.info('Iteration=%i, Time=%e, dt=%e' %(solver.iteration, solver.sim_time, timestep))
     if solver.iteration % 25 == 0:
         u.change_scales(1)

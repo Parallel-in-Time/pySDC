@@ -63,7 +63,8 @@ description = {
         "do_coll_update": False,
         "QI": "IE",
         "QE": "EE",
-        'skip_residual_computation': ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE'),
+        'skip_residual_computation':
+            ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE'),
     },
     # Step parameters
     "step_params": {
@@ -111,7 +112,9 @@ for i in range(nSteps):
 
 # Plot
 plt.figure(figsize=(6, 4))
-plt.pcolormesh(x.ravel(), np.array(t_list), np.array(u_list), cmap='RdBu_r', shading='gouraud', rasterized=True, clim=(-0.8, 0.8))
+plt.pcolormesh(
+    x.ravel(), np.array(t_list), np.array(u_list), cmap='RdBu_r',
+    shading='gouraud', rasterized=True, clim=(-0.8, 0.8))
 plt.xlim(0, Lx)
 plt.ylim(0, tEnd)
 plt.xlabel('x')
