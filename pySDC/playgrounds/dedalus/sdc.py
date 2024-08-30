@@ -219,6 +219,9 @@ class IMEXSDCCore(object):
         return not cls.rightIsNode or cls.forceProl
 
 
+# -----------------------------------------------------------------------------
+# Dedalus based IMEX timeintegrator class
+# -----------------------------------------------------------------------------
 class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
 
     steps = 1
