@@ -152,7 +152,7 @@ class IMEXSDCCore(object):
         # Update parameters
         if updateNode:
             cls.coll = Collocation(
-                nNodes=DEFAULT['nNodes'], nodeType=nodeType, quadType=quadType)
+                nNodes=nNodes, nodeType=nodeType, quadType=quadType)
             cls.nodes, cls.weights, cls.Q = cls.coll.genCoeffs()
             cls.nodeType, cls.quadType = nodeType, quadType
         if updateQDeltaI:
