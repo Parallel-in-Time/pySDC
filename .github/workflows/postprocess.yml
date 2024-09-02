@@ -32,8 +32,7 @@ jobs:
           github-token: ${{ secrets.ACTION_READ_TOKEN }}
       - name: Prepare artifacts
         run: |
-          cp data_3.10/* data/.
-          python -m coverage combine coverage_*_3.10.dat
+          python -m coverage combine coverage_*.dat
           python -m coverage xml
           python -m coverage html
       - name: Generate Coverage badge

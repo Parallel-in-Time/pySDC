@@ -63,17 +63,16 @@ jobs:
           coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
       - name: Make coverage report
         run: |
-          mv data data_${{ matrix.python }}
           coverage combine
-          mv .coverage coverage_${{ matrix.env }}_${{ matrix.python }}.dat
+          mv .coverage coverage_${{ matrix.env }}.dat
       - name: Uploading artifacts
         uses: actions/upload-artifact@v4
-        if: matrix.python == '3.10'
+        if: matrix.python == '3.12'
         with:
           name: test-artifacts-cpu-${{ matrix.env }}
           path: |
-            data_3.10
-            coverage_${{ matrix.env }}_3.10.dat
+            data
+            coverage_${{ matrix.env }}.dat
 
   project_cpu_tests_linux:
     runs-on: ubuntu-latest
@@ -120,17 +119,16 @@ jobs:
           coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/${{ matrix.env }}/tests
       - name: Make coverage report
         run: |
-          mv data data_${{ matrix.python }}
           coverage combine
-          mv .coverage coverage_${{ matrix.env }}_${{ matrix.python }}.dat
+          mv .coverage coverage_${{ matrix.env }}.dat
       - name: Uploading artifacts
         uses: actions/upload-artifact@v4
-        if: matrix.python == '3.10'
+        if: matrix.python == '3.12'
         with:
           name: test-artifacts-project-${{ matrix.env }}
           path: |
-            data_3.10
-            coverage_${{ matrix.env }}_3.10.dat
+            data
+            coverage_${{ matrix.env }}.dat
 
   user_libpressio_tests:
     runs-on: ubuntu-latest
@@ -160,14 +158,14 @@ jobs:
 
           mv data data_libpressio
           coverage combine
-          mv .coverage coverage_libpressio_3.10.dat
+          mv .coverage coverage_libpressio.dat
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: test-artifacts-libpressio
           path: |
             data_libpressio
-            coverage_libpressio_3.10.dat
+            coverage_libpressio.dat
          
   user_monodomain_tests_linux:
     runs-on: ubuntu-latest
@@ -182,7 +180,7 @@ jobs:
         with:
           environment-file: "pySDC/projects/Monodomain/etc/environment-monodomain.yml"
           create-args: >-
-              python=3.10
+              python=3.12
       - name: Compile C++ ionic models
         env:
           IONIC_MODELS_PATH: "pySDC/projects/Monodomain/problem_classes/ionicmodels/cpp"
@@ -201,11 +199,11 @@ jobs:
         run: |
           mv data data_monodomain
           coverage combine
-          mv .coverage coverage_monodomain_3.10.dat
+          mv .coverage coverage_monodomain.dat
       - name: Uploading artifacts
         uses: actions/upload-artifact@v4
         with:
           name: test-artifacts-monodomain
           path: |
             data_monodomain
-            coverage_monodomain_3.10.dat
+            coverage_monodomain.dat
