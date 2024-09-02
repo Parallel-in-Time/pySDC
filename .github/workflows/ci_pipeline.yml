@@ -25,7 +25,7 @@ jobs:
         with:
           environment-file: ${{ env.YML }}
           create-args: >-
-              python=3.12
+              python=3.10
       - name: Code reformatting with black
         run: |
           black pySDC  --check --diff --color
