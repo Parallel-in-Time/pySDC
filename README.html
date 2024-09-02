@@ -94,6 +94,14 @@ which can be found in the folder <code class="docutils literal notranslate"><spa
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>etc/environment-base.yml
 </pre></div>
 </div>
+<p>If you want to install the developer version using <code class="docutils literal notranslate"><span class="pre">pip</span></code> directly from the GitHub repository, use this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># optionally use venv</span>
+<span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">venv</span> <span class="n">name_of_pySDC_env</span>
+<span class="o">.</span> <span class="o">./</span><span class="n">name_of_pySDC_env</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">activate</span>
+<span class="c1"># drop @5.5.0 if you want to install the develop version</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">Parallel</span><span class="o">-</span><span class="ow">in</span><span class="o">-</span><span class="n">Time</span><span class="o">/</span><span class="n">pySDC</span><span class="o">@</span><span class="mf">5.5.0</span>
+</pre></div>
+</div>
 <p>To check your installation, run</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>pySDC/tests<span class="w"> </span>-m<span class="w"> </span>NAME
 </pre></div>
