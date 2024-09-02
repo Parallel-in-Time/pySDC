@@ -95,7 +95,7 @@ test_JUWELS:
     - sbatch --wait etc/juwels_${SHELL_SCRIPT}.sh
     - touch .coverage.empty
     - python -m coverage combine
-    - mv .coverage coverage_${SHELL_SCRIPT}_3.10.dat
+    - mv .coverage coverage_${SHELL_SCRIPT}.dat
     - echo "Following Errors occured:"
     - cat sbatch.err
     - echo "Following was written to stdout:"
@@ -129,22 +129,3 @@ benchmark:
     - >-
       pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark"
       --benchmark-json=benchmarks/output.json
-
-# bundle:
-#  image: mambaorg/micromamba
-#  stage: upload
-#  artifacts:
-#    paths:
-#      - data
-#      - coverage.xml
-#      - benchmarks
-#      - htmlcov
-#  before_script:
-#    - micromamba create --yes -f etc/environment-base.yml
-#    - eval "$(micromamba shell hook --shell=bash)"
-#    - micromamba activate pySDC
-#  script:
-#    - cp data_3.10/* data/.
-#    - python -m coverage combine coverage_*_3.10.dat
-#    - python -m coverage xml
-#    - python -m coverage html
