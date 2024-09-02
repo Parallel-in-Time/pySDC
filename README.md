@@ -51,7 +51,7 @@ which can be found in the folder `etc/`. Use these as e.g.
 conda env create -f etc/environment-base.yml
 ```
 
-Alternatively, you can also use `pip` to install pySDC using the code from the GitHub repository:
+If you want to install the developer version using `pip` directly from the GitHub repository, use this:
 
 ```
 # optionally use venv
