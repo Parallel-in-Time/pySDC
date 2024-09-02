@@ -95,7 +95,7 @@ test_JUWELS:
     - sbatch --wait etc/juwels_${SHELL_SCRIPT}.sh
     - touch .coverage.empty
     - python -m coverage combine
-    - mv .coverage coverage_${SHELL_SCRIPT}.dat
+    - mv .coverage coverage_${SHELL_SCRIPT}_3.10.dat
     - echo "Following Errors occured:"
     - cat sbatch.err
     - echo "Following was written to stdout:"
