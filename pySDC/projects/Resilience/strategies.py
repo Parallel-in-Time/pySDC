@@ -127,7 +127,7 @@ class Strategy:
         elif problem.__name__ == "run_quench":
             args['time'] = 41.0
         elif problem.__name__ == "run_Lorenz":
-            args['time'] = 0.3
+            args['time'] = 10
         elif problem.__name__ == "run_AC":
             args['time'] = 1e-2
 
@@ -199,7 +199,7 @@ class Strategy:
         elif problem.__name__ == "run_piline":
             return 20.0
         elif problem.__name__ == "run_Lorenz":
-            return 1.5
+            return 20
         elif problem.__name__ == "run_Schroedinger":
             return 1.0
         elif problem.__name__ == "run_quench":

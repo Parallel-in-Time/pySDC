@@ -19,6 +19,7 @@ from pySDC.projects.Resilience.strategies import (
     DIRKStrategy,
     ERKStrategy,
     AdaptivityPolynomialError,
+    cmap,
 )
 from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
 from pySDC.helpers.stats_helper import get_sorted
@@ -388,6 +389,105 @@ def plot_fault_vdp(bit=0):  # pragma: no cover
     savefig(fig, f'fault_bit_{bit}')
 
 
+def plot_fault_Lorenz(bit=0):  # pragma: no cover
+    """
+    Make a plot showing the impact of a fault on the Lorenz attractor without any resilience.
+    The faults are inserted in the last iteration in the last node in x such that you can best see the impact.
+
+    Args:
+        bit (int): The bit that you want to flip
+
+    Returns:
+        None
+    """
+    from pySDC.projects.Resilience.fault_stats import (
+        FaultStats,
+        BaseStrategy,
+    )
+    from pySDC.projects.Resilience.hook import LogData
+
+    stats_analyser = FaultStats(
+        prob=run_Lorenz,
+        strategies=[BaseStrategy()],
+        faults=[False, True],
+        reload=True,
+        recovery_thresh=1.1,
+        num_procs=1,
+        mode='combination',
+    )
+
+    strategy = BaseStrategy()
+
+    my_setup_mpl()
+    fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.8, 0.5))
+    colors = ['grey', strategy.color, 'magenta']
+    ls = ['--', '-']
+    markers = [None, strategy.marker]
+    do_faults = [False, True]
+    superscripts = ['*', '']
+    labels = ['x', 'x']
+
+    run = 19 + 20 * bit
+
+    for i in range(len(do_faults)):
+        stats, controller, Tend = stats_analyser.single_run(
+            strategy=BaseStrategy(),
+            run=run,
+            faults=do_faults[i],
+            hook_class=[LogData],
+        )
+        u = get_sorted(stats, type='u')
+        faults = get_sorted(stats, type='bitflip')
+        ax.plot(
+            [me[0] for me in u],
+            [me[1][0] for me in u],
+            ls=ls[i],
+            color=colors[i],
+            label=rf'${{{labels[i]}}}^{{{superscripts[i]}}}$',
+            marker=markers[i],
+            markevery=120,
+        )
+        for idx in range(len(faults)):
+            ax.axvline(faults[idx][0], color='black', label='Fault', ls=':')
+            print(
+                f'Fault at t={faults[idx][0]:.2e}, iter={faults[idx][1][1]}, node={faults[idx][1][2]}, space={faults[idx][1][3]}, bit={faults[idx][1][4]}'
+            )
+            ax.set_title(f'Fault in bit {faults[idx][1][4]}')
+
+    ax.legend(frameon=True, loc='lower left')
+    ax.set_xlabel(r'$t$')
+    # plt.show()
+    savefig(fig, f'fault_bit_{bit}')
+
+
+def plot_Lorenz_solution():  # pragma: no cover
+    my_setup_mpl()
+
+    fig, axs = plt.subplots(1, 2, figsize=figsize_by_journal(JOURNAL, 1, 0.4), sharex=True)
+
+    strategy = BaseStrategy()
+    desc = strategy.get_custom_description(run_Lorenz, num_procs=1)
+    stats, controller, _ = run_Lorenz(custom_description=desc, Tend=strategy.get_Tend(run_Lorenz))
+
+    u = get_sorted(stats, recomputed=False, type='u')
+
+    axs[0].plot([me[1][0] for me in u], [me[1][2] for me in u])
+    axs[0].set_ylabel('$z$')
+    axs[0].set_xlabel('$x$')
+
+    axs[1].plot([me[1][0] for me in u], [me[1][1] for me in u])
+    axs[1].set_ylabel('$y$')
+    axs[1].set_xlabel('$x$')
+
+    for ax in axs:
+        ax.set_box_aspect(1.0)
+
+    path = 'data/paper/Lorenz_sol.pdf'
+    fig.savefig(path, bbox_inches='tight', transparent=True, dpi=200)
+
+    plt.show()
+
+
 def plot_quench_solution():  # pragma: no cover
     """
     Plot the solution of Quench problem over time
@@ -596,10 +696,9 @@ def make_plots_for_adaptivity_paper():  # pragma: no cover
 
 
 def make_plots_for_resilience_paper():  # pragma: no cover
-    plot_recovery_rate(get_stats(run_vdp))
-    plot_fault_vdp(0)
-    plot_fault_vdp(13)
-    compare_recovery_rate_problems(num_procs=1, strategy_type='SDC')
+    # plot_Lorenz_solution()
+    # plot_fault_Lorenz(0)
+    plot_fault_Lorenz(20)
 
 
 def make_plots_for_notes():  # pragma: no cover
@@ -618,4 +717,5 @@ if __name__ == "__main__":
     # make_plots_for_notes()
     # make_plots_for_SIAM_CSE23()
     # make_plots_for_TIME_X_website()
-    make_plots_for_adaptivity_paper()
+    # make_plots_for_adaptivity_paper()
+    make_plots_for_resilience_paper()

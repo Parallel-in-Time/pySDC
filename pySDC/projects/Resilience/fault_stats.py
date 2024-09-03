@@ -1654,11 +1654,11 @@ def compare_adaptivity_modes():
 
 def main():
     kwargs = {
-        'prob': run_AC,
+        'prob': run_Lorenz,
         'num_procs': 1,
         'mode': 'default',
-        'runs': 2000,
-        'reload': True,
+        'runs': 6000,
+        'reload': False,
         **parse_args(),
     }
 
