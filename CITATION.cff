@@ -30,9 +30,9 @@ authors:
     affiliation: "Jülich Supercomputing Centre, Forschungszentrum Jülich GmbH, 52425 Jülich, Germany"
 
 
-version: 5.5.0
+version: 5.5.1
 doi: 10.5281/zenodo.594191
-date-released: 2024-06-24
+date-released: 2024-09-03
 keywords: 
   - "parallel-in-time"
   - "spectral deferred corrections"
