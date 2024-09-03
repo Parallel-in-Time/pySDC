@@ -35,7 +35,6 @@ jobs:
 
   user_cpu_tests_linux:
     runs-on: ubuntu-latest
-    if: false
     strategy:
       fail-fast: false
       matrix:
@@ -77,7 +76,6 @@ jobs:
 
   project_cpu_tests_linux:
     runs-on: ubuntu-latest
-    if: false
     strategy:
       fail-fast: false
       matrix:
@@ -134,7 +132,6 @@ jobs:
 
   user_libpressio_tests:
     runs-on: ubuntu-latest
-    if: false
     container:
       image: brownbaerchen/libpressio:amd64_2
       volumes:
@@ -172,7 +169,6 @@ jobs:
          
   user_monodomain_tests_linux:
     runs-on: ubuntu-latest
-    if: false
     defaults:
       run:
         shell: bash -l {0}
