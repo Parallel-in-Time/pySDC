@@ -475,9 +475,9 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
         if key == 't_switches' or key == 'e_event':
             err_msg = f'{msg} Expected {key}={expected[key]}, got {key}={got[key]}'
             if len(expected[key]) == got[key]:
-                assert np.allclose(expected[key], got[key], atol=1e-4) == True, err_msg
+                assert np.allclose(expected[key], got[key], atol=1e-4), err_msg
             else:
-                assert np.isclose(expected[key][-1], got[key][-1], atol=1e-4) == True, err_msg
+                assert np.isclose(expected[key][-1], got[key][-1], atol=1e-4), err_msg
         else:
             err_msg = f'{msg} Expected {key}={expected[key]:.4e}, got {key}={got[key]:.4e}'
             assert np.isclose(expected[key], got[key], atol=1e-4), err_msg

@@ -25,13 +25,13 @@ jobs:
         with:
           environment-file: ${{ env.YML }}
           create-args: >-
-              python=3.10
+              python=3.12
       - name: Code reformatting with black
         run: |
           black pySDC  --check --diff --color
-      - name: Linting with flakeheaven
+      - name: Linting with ruff
         run: |
-          flakeheaven lint --benchmark pySDC
+          ruff check pySDC
 
   user_cpu_tests_linux:
     runs-on: ubuntu-latest

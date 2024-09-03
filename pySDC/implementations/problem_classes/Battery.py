@@ -163,7 +163,7 @@ class battery_n_capacitors(Problem):
         else:
             # proof all switching conditions and find largest index where it drops below V_ref
             switch = [True if u[k] <= self.V_ref[k - 1] else False for k in range(1, len(u))]
-            max_index = max([k if switch[k] == True else -1 for k in range(len(switch))])
+            max_index = max([k if switch[k] else -1 for k in range(len(switch))])
 
             if max_index == -1:
                 f.expl[:] = self.switch_f[0]
@@ -200,7 +200,7 @@ class battery_n_capacitors(Problem):
         else:
             # proof all switching conditions and find largest index where it drops below V_ref
             switch = [True if rhs[k] <= self.V_ref[k - 1] else False for k in range(1, len(rhs))]
-            max_index = max([k if switch[k] == True else -1 for k in range(len(switch))])
+            max_index = max([k if switch[k] else -1 for k in range(len(switch))])
             if max_index == -1:
                 self.A = self.switch_A[0]
 

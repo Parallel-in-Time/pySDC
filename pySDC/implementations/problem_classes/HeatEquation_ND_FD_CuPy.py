@@ -86,9 +86,9 @@ class heatNd_forced(Problem):  # pragma: no cover
         """Initialization routine"""
 
         # make sure parameters have the correct types
-        if not type(nvars) in [int, tuple]:
+        if type(nvars) not in [int, tuple]:
             raise ProblemError('nvars should be either tuple or int')
-        if not type(freq) in [int, tuple]:
+        if type(freq) not in [int, tuple]:
             raise ProblemError('freq should be either tuple or int')
 
         # transforms nvars into a tuple

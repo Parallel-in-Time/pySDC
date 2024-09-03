@@ -172,7 +172,7 @@ class penningtrap(Problem):
 
         self.work_counters['rhs']()
         try:
-            penningtrap.Harmonic_oscillator
+            _unused = penningtrap.Harmonic_oscillator
             Emat = np.diag([0, 0, -1])
         except AttributeError:
             Emat = np.diag([1, 1, -2])

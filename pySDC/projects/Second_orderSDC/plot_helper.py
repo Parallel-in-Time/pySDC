@@ -314,7 +314,7 @@ class PlotManager(object):  # pragma: no cover
             filename (string): data to find approximate order
             time_iter : in case it you used different time iterations
         """
-        if time_iter == None:
+        if time_iter is None:
             time_iter = self.time_iter
 
         items = np.genfromtxt(filename, delimiter=',', skip_header=1)

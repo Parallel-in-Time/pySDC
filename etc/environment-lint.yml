@@ -6,6 +6,4 @@ channels:
   - defaults
 dependencies:
   - black
-  - flakeheaven
-  - flake8-comprehensions
-  - flake8-bugbear
+  - ruff
