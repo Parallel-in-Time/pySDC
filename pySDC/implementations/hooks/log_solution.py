@@ -99,10 +99,13 @@ class LogToFile(Hooks):
 
     path = None
     file_name = 'solution'
+
     def logging_condition(L):
         return True
+
     def process_solution(L):
         return {'t': L.time + L.dt, 'u': L.uend.view(np.ndarray)}
+
     def format_index(index):
         return f'{index:06d}'
 
