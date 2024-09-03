@@ -19,7 +19,7 @@ import dedalus.public as d3
 import logging
 logger = logging.getLogger(__name__)
 
-from sdc import SpectralDeferredCorrectionIMEX
+from pySDC.playgrounds.dedalus.sdc import SpectralDeferredCorrectionIMEX
 
 SpectralDeferredCorrectionIMEX.setParameters(
     nSweeps=4,

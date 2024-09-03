@@ -1,4 +1,4 @@
-# Playground to use Dedalus V3 within pySDC
+# Playground to use Dedalus with pySDC
 
 :scroll: Interface for [Dedalus code](https://dedalus-project.readthedocs.io/en/latest/) so it can be used within the pySDC framework.
 
@@ -100,3 +100,33 @@ Then `uSol` contains a list of `Fields` that represent the final solution of the
   <img src="./demo_advection.png" width="500"/>
 </p>
 
+See an other example with the [Burger equation](./burger.py)
+
+
+## Use a pySDC based time-integrator within Dedalus
+
+This playground also provide a standalone SDC solver that can be used directly,
+see the [demo file for the Burger equation](./burger_ref.py).
+
+To use this standalone time-integrator, simply do :
+
+```python
+# Base import
+from pySDC.playgrounds.dedalus.sdc import SpectralDeferredCorrectionIMEX
+
+# Setup SDC parameters (non set parameters use default values ...)
+SpectralDeferredCorrectionIMEX.setParameters(
+    nSweeps=4,
+    nNodes=4,
+    implSweep="MIN-SR-S",
+    explSweep="PIC")
+```
+
+then you can use this class when instantiating and using a Dedalus solver simply like this :
+
+```python
+solver = problem.build_solver(SpectralDeferredCorrectionIMEX)
+timestep = 2e-3  # dummy value for example ...
+while solver.proceed:
+    solver.step(timestep)
+```
