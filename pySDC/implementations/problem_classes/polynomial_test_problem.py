@@ -12,9 +12,18 @@ class polynomial_testequation(Problem):
 
     dtype_u = mesh
     dtype_f = mesh
+    xp = np
 
-    def __init__(self, degree=1, seed=26266):
+    def __init__(self, degree=1, seed=26266, useGPU=False):
         """Initialization routine"""
+
+        if useGPU:
+            import cupy as cp
+            from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
+
+            type(self).xp = cp
+            type(self).dtype_u = cupy_mesh
+            type(self).dtype_f = cupy_mesh
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(1, None, np.dtype('float64')))
@@ -41,7 +50,7 @@ class polynomial_testequation(Problem):
         """
 
         f = self.dtype_f(self.init)
-        f[:] = self.poly.deriv(m=1)(t)
+        f[:] = self.xp.array(self.poly.deriv(m=1)(t))
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -86,7 +95,7 @@ class polynomial_testequation(Problem):
             The exact solution.
         """
         me = self.dtype_u(self.init)
-        me[:] = self.poly(t)
+        me[:] = self.xp.array(self.poly(t))
         return me
 
 
@@ -116,7 +125,7 @@ class polynomial_testequation_IMEX(polynomial_testequation):
         """
 
         f = self.dtype_f(self.init)
-        derivative = self.poly.deriv(m=1)(t)
+        derivative = self.xp.array(self.poly.deriv(m=1)(t))
         f.impl[:] = derivative / 2
         f.expl[:] = derivative / 2
         return f

@@ -71,7 +71,7 @@ class EstimatePolynomialError(ConvergenceController):
         self.add_status_variable_to_level('error_embedded_estimate')
         self.add_status_variable_to_level('order_embedded_estimate')
 
-    def matmul(self, A, b):
+    def matmul(self, A, b, xp=np):
         """
         Matrix vector multiplication, possibly MPI parallel.
         The parallel implementation performs a reduce operation in every row of the matrix. While communicating the
@@ -81,10 +81,12 @@ class EstimatePolynomialError(ConvergenceController):
         Args:
             A (2d np.ndarray): Matrix
             b (list): Vector
+            xp: Either numpy or cupy
 
         Returns:
             List: Axb
         """
+
         if self.comm:
             res = [A[i, 0] * b[0] if b[i] is not None else None for i in range(A.shape[0])]
             buf = b[0] * 0.0
@@ -93,13 +95,13 @@ class EstimatePolynomialError(ConvergenceController):
                 send_buf = (
                     (A[i, index] * b[index])
                     if self.comm.rank != self.params.estimate_on_node - 1
-                    else np.zeros_like(res[0])
+                    else xp.zeros_like(res[0])
                 )
                 self.comm.Allreduce(send_buf, buf, op=self.MPI_SUM)
                 res[i] += buf
             return res
         else:
-            return A @ np.asarray(b)
+            return A @ xp.asarray(b)
 
     def post_iteration_processing(self, controller, S, **kwargs):
         """
@@ -118,19 +120,20 @@ class EstimatePolynomialError(ConvergenceController):
             coll = L.sweep.coll
             nodes = np.append(np.append(0, coll.nodes), 1.0)
             estimate_on_node = self.params.estimate_on_node
+            xp = L.u[0].xp
 
             if self.interpolation_matrix is None:
                 interpolator = LagrangeApproximation(
                     points=[nodes[i] for i in range(coll.num_nodes + 1) if i != estimate_on_node]
                 )
-                self.interpolation_matrix = interpolator.getInterpolationMatrix([nodes[estimate_on_node]])
+                self.interpolation_matrix = xp.array(interpolator.getInterpolationMatrix([nodes[estimate_on_node]]))
 
             u = [
                 L.u[i].flatten() if L.u[i] is not None else L.u[i]
                 for i in range(coll.num_nodes + 1)
                 if i != estimate_on_node
             ]
-            u_inter = self.matmul(self.interpolation_matrix, u)[0].reshape(L.prob.init[0])
+            u_inter = self.matmul(self.interpolation_matrix, u, xp=xp)[0].reshape(L.prob.init[0])
 
             # compute end point if needed
             if estimate_on_node == len(nodes) - 1:

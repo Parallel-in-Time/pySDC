@@ -51,6 +51,16 @@ which can be found in the folder `etc/`. Use these as e.g.
 conda env create -f etc/environment-base.yml
 ```
 
+If you want to install the developer version using `pip` directly from the GitHub repository, use this:
+
+```
+# optionally use venv
+python3 -m venv name_of_pySDC_env
+. ./name_of_pySDC_env/bin/activate
+# drop @5.5.0 if you want to install the develop version
+pip install git+https://github.com/Parallel-in-Time/pySDC@5.5.0
+```
+
 To check your installation, run
 
 ``` bash
