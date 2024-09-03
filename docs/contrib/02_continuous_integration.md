@@ -6,17 +6,17 @@ Finally, the CI also build artifacts that are used to generate the documentation
 
 ## Code linting
 
-Code style linting is performed using [black](https://black.readthedocs.io/en/stable/) and [flakeheaven](https://flakeheaven.readthedocs.io/en/latest/) for code syntax checking. In particular, `black` is used to check compliance with (most of) [PEP-8 guidelines](https://peps.python.org/pep-0008/).
+Code style linting is performed using [black](https://black.readthedocs.io/en/stable/) and [ruff](https://docs.astral.sh/ruff/) for code syntax checking. In particular, `black` is used to check compliance with (most of) [PEP-8 guidelines](https://peps.python.org/pep-0008/).
 
 Those tests are conducted for each commit (even for forks), but you can also run it locally in the root folder of `pySDC` before pushing any commit :
 
 ```bash
 # Install required packages (works also with conda/mamba)
-pip install black flakeheaven flake8-comprehensions flake8-bugbear
+pip install black ruff
 # First : test code style linting with black
 black pySDC --check --diff --color
-# Second : test code syntax with flakeheaven
-flakeheaven lint --benchmark pySDC
+# Second : test code syntax with ruff
+ruff check pySDC
 ```
 
 > :bell: To avoid any error about formatting (`black`), you can simply use this program to reformat your code directly using the command :
@@ -59,7 +59,7 @@ fi
 You may need to run `chmod +x` on the file to allow it to be executed.
 Be aware that the hook will alter files you may have opened in an editor whenever you make a commit, which may confuse you(r editor).
 
-To automate flakeheaven, we want to write a hook that alters the commit message in case any errors are detected. This gives us the choice of aborting the commit and fixing the issues, or we can go ahead and commit them and worry about flakeheaven only when the time comes to do a pull request.
+To automate ruff, we want to write a hook that alters the commit message in case any errors are detected. This gives us the choice of aborting the commit and fixing the issues, or we can go ahead and commit them and worry about ruff only when the time comes to do a pull request.
 To obtain this functionality, add the following to `<pySDC-root-directory>/.git/hooks/prepare-commit-msg`:
 
 ```bash
@@ -71,11 +71,11 @@ export files=$(git diff --staged --name-only HEAD | grep .py | sed -e "s,^,$(git
 
 if [[ $files != "" ]]
 then
-        export flakeheaven_output=$(flakeheaven lint --format default $files)
-        if [[ "$flakeheaven_output" != 0 ]]
+        export ruff_output=$(ruff check --quiet $files)
+        if [[ "$ruff_output" != 0 ]]
         then
-                git interpret-trailers --in-place --trailer "$(echo "$flakeheaven_output" | sed -e 's/^/#/')" "$COMMIT_MSG_FILE"
-                git interpret-trailers --in-place --trailer "#!!!!!!!!!! WARNING: FLAKEHEAVEN FAILED !!!!!!!!!!" "$COMMIT_MSG_FILE"
+                git interpret-trailers --in-place --trailer "$(echo "$ruff_output" | sed -e 's/^/#/')" "$COMMIT_MSG_FILE"
+                git interpret-trailers --in-place --trailer "#!!!!!!!!!! WARNING: RUFF FAILED !!!!!!!!!!" "$COMMIT_MSG_FILE"
         fi
 fi
 
