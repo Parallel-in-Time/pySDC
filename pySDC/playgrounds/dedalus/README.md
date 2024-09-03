@@ -130,3 +130,5 @@ timestep = 2e-3  # dummy value for example ...
 while solver.proceed:
     solver.step(timestep)
 ```
+
+A full example script for the 2D Rayleigh-Benard Convection problem can be found [here](./rayleighBenardSDC.py).
