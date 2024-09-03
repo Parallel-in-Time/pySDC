@@ -110,8 +110,8 @@ class IMEXSDCCore(object):
         Q=Q, nodes=nodes, nNodes=DEFAULT['nNodes'],
         nodeType=nodeType, quadType=quadType)
 
-    diagonal = np.all(np.diag(np.diag(qD)) == qD for qD in QDeltaI)
-    diagonal *= np.all(np.diag(np.diag(qD)) == 0 for qD in QDeltaE)
+    diagonal = np.all([np.diag(np.diag(qD)) == qD for qD in QDeltaI])
+    diagonal *= np.all([np.diag(np.diag(qD)) == 0 for qD in QDeltaE])
     if initSweep == "QDelta":
         diagonal *=  np.all(np.diag(np.diag(QDelta0)) == QDelta0)
 
