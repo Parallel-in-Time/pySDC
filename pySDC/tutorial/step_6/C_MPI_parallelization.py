@@ -14,8 +14,8 @@ def main(cwd):
         import mpi4py
 
         del mpi4py
-    except ImportError:
-        raise ImportError('petsc tests need mpi4py')
+    except ImportError as e:
+        raise ImportError('petsc tests need mpi4py') from e
 
     # Set python path once
     my_env = os.environ.copy()
