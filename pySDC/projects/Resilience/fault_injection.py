@@ -55,7 +55,7 @@ class Fault(FrozenClass):
         for k, v in params.items():
             setattr(self, k, v)
 
-        self._freeze
+        self._freeze()
 
     @classmethod
     def random(cls, args, rnd_params, random_generator=None):

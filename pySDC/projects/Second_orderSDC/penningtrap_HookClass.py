@@ -41,7 +41,7 @@ class particles_output(Hooks):
         #
 
         try:  # pragma: no cover
-            L.prob.Harmonic_oscillator
+            _unused = L.prob.Harmonic_oscillator
 
             # add up kinetic and potntial contributions to total energy
             epot = 0
