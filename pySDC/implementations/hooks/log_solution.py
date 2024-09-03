@@ -84,7 +84,7 @@ class LogToFile(Hooks):
     index associated with individual files by giving a different lambda function ``format_index`` class attribute. This
     lambda should accept one index and return one string.
 
-    You can also give a custom ``logging_condition`` lambda, accepting the current level if you want to log selectively.
+    You can also give a custom ``logging_condition`` function, accepting the current level if you want to log selectively.
 
     Importantly, you may need to change ``process_solution``. By default, this will return a numpy view of the solution.
     Of course, if you are not using numpy, you need to change this. Again, this is a lambda accepting the level.
@@ -99,9 +99,12 @@ class LogToFile(Hooks):
 
     path = None
     file_name = 'solution'
-    logging_condition = lambda L: True
-    process_solution = lambda L: {'t': L.time + L.dt, 'u': L.uend.view(np.ndarray)}
-    format_index = lambda index: f'{index:06d}'
+    def logging_condition(L):
+        return True
+    def process_solution(L):
+        return {'t': L.time + L.dt, 'u': L.uend.view(np.ndarray)}
+    def format_index(index):
+        return f'{index:06d}'
 
     def __init__(self):
         super().__init__()
