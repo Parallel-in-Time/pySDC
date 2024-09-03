@@ -270,8 +270,10 @@ class FaultStats:
                 dat['bit'][i] = faults_run[0][1][4]
                 dat['target'][i] = faults_run[0][1][5]
                 dat['rank'][i] = faults_run[0][1][6]
+
             if crash:
                 print('Code crashed!')
+                dat['error'][i] = np.inf
                 continue
 
             # record the rest of the data
@@ -873,7 +875,7 @@ class FaultStats:
         args=None,
         strategies=None,
         name=None,
-        store=True,
+        store=False,
         ax=None,
         fig=None,
         plotting_args=None,

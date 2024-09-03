@@ -456,7 +456,6 @@ def plot_fault_Lorenz(bit=0):  # pragma: no cover
 
     ax.legend(frameon=True, loc='lower left')
     ax.set_xlabel(r'$t$')
-    # plt.show()
     savefig(fig, f'fault_bit_{bit}')
 
 
@@ -484,8 +483,6 @@ def plot_Lorenz_solution():  # pragma: no cover
 
     path = 'data/paper/Lorenz_sol.pdf'
     fig.savefig(path, bbox_inches='tight', transparent=True, dpi=200)
-
-    plt.show()
 
 
 def plot_quench_solution():  # pragma: no cover
@@ -698,7 +695,12 @@ def make_plots_for_adaptivity_paper():  # pragma: no cover
 def make_plots_for_resilience_paper():  # pragma: no cover
     # plot_Lorenz_solution()
     # plot_fault_Lorenz(0)
-    plot_fault_Lorenz(20)
+    # plot_fault_Lorenz(20)
+    # compare_recovery_rate_problems()
+    # fig, axs = plt.subplots(1, 2, figsize=figsize_by_journal(JOURNAL, 1, 0.8))
+    # plot_recovery_rate_recoverable_only(get_stats(run_Lorenz), fig, axs[1])
+    plot_recovery_rate(get_stats(run_Lorenz))
+    # savefig(fig, 'recovery_rate')
 
 
 def make_plots_for_notes():  # pragma: no cover
