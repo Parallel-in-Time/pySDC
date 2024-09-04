@@ -1660,7 +1660,7 @@ def compare_adaptivity_modes():
 
 def main():
     kwargs = {
-        'prob': run_AC,
+        'prob': run_Lorenz,
         'num_procs': 1,
         'mode': 'default',
         'runs': 5000,

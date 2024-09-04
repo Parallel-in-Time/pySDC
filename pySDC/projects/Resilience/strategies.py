@@ -240,7 +240,7 @@ class Strategy:
 
         elif problem.__name__ == "run_Lorenz":
             custom_description['step_params'] = {'maxiter': 5}
-            custom_description['level_params'] = {'dt': 1e-2}
+            custom_description['level_params'] = {'dt': 1e-3}
             custom_description['problem_params'] = {'stop_at_nan': False}
         elif problem.__name__ == "run_Schroedinger":
             custom_description['step_params'] = {'maxiter': 5}
@@ -453,9 +453,9 @@ class BaseStrategy(Strategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 2136
+                return 243380
             elif key == 'e_global_post_run' and op == max:
-                return 9.256926357892326e-06
+                return 4.68e-04
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -529,7 +529,7 @@ class AdaptivityStrategy(Strategy):
         elif problem.__name__ == "run_vdp":
             e_tol = 2e-5
         elif problem.__name__ == "run_Lorenz":
-            e_tol = 2e-5
+            e_tol = 1e-7
         elif problem.__name__ == "run_Schroedinger":
             e_tol = 4e-7
         elif problem.__name__ == "run_quench":
@@ -578,9 +578,9 @@ class AdaptivityStrategy(Strategy):
         """
         if problem.__name__ == 'run_Lorenz':
             if key == 'work_newton' and op == sum:
-                return 1369
+                return 44635
             elif key == 'e_global_post_run' and op == max:
-                return 9.364841517367495e-06
+                return 2.82e-04
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -856,9 +856,9 @@ class kAdaptivityStrategy(IterateStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 2392
+                return 243380
             elif key == 'e_global_post_run' and op == max:
-                return 4.808610118089973e-06
+                return 4.68e-04
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -977,9 +977,9 @@ class HotRodStrategy(Strategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 2329
+                return 243380
             elif key == 'e_global_post_run' and op == max:
-                return 9.256926357892326e-06
+                return 4.68e-04
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1882,7 +1882,7 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         elif problem.__name__ == "run_piline":
             e_tol = 1e-7
         elif problem.__name__ == "run_Lorenz":
-            e_tol = 7e-4
+            e_tol = 2e-4
         elif problem.__name__ == "run_Schroedinger":
             e_tol = 3e-5
         elif problem.__name__ == "run_quench":
@@ -1966,9 +1966,9 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 2124
+                return 25404
             elif key == 'e_global_post_run' and op == max:
-                return 8.484321512014503e-08
+                return 4.34e-04
 
         super().get_reference_value(problem, key, op, num_procs)
 
