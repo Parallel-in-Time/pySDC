@@ -434,6 +434,8 @@ class BaseStrategy(Strategy):
         desc = self.get_custom_description(problem, *args, **kwargs)
         if problem.__name__ == "run_quench":
             desc['level_params']['dt'] = 5.0
+        elif problem.__name__ == "run_AC":
+            desc['level_params']['dt'] = 8e-5
         return desc
 
     def get_reference_value(self, problem, key, op, num_procs=1):
@@ -590,6 +592,8 @@ class AdaptivityStrategy(Strategy):
         if problem.__name__ == "run_quench":
             desc['level_params']['dt'] = 1.1e1
             desc['convergence_controllers'][Adaptivity]['e_tol'] = 1e-6
+        elif problem.__name__ == "run_AC":
+            desc['convergence_controllers'][Adaptivity]['e_tol'] = 1e-5
         return desc
 
 
@@ -834,7 +838,7 @@ class kAdaptivityStrategy(IterateStrategy):
         if problem.__name__ == 'run_quench':
             desc['level_params']['dt'] = 5.0
         elif problem.__name__ == 'run_AC':
-            desc['level_params']['dt'] = 0.6 * desc['problem_params']['eps'] ** 2
+            desc['level_params']['dt'] = 5e-4
         return desc
 
     def get_reference_value(self, problem, key, op, num_procs=1):
@@ -949,7 +953,7 @@ class HotRodStrategy(Strategy):
             'level_params': {},
         }
         if problem.__name__ == "run_AC":
-            custom_description['level_params']['dt'] = 0.8 * base_params['problem_params']['eps'] ** 2 / 8.0
+            custom_description['level_params']['dt'] = 8e-5
         return merge_descriptions(base_params, custom_description)
 
     def get_custom_description_for_faults(self, problem, *args, **kwargs):

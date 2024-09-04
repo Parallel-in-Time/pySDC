@@ -932,7 +932,7 @@ class FaultStats:
         return None
 
     def plot_recovery_thresholds(
-        self, strategies=None, thresh_range=None, ax=None, mask=None, **kwargs
+        self, strategies=None, thresh_range=None, ax=None, recoverable_only=False, **kwargs
     ):  # pragma: no cover
         '''
         Plot the recovery rate for a range of thresholds
@@ -941,7 +941,6 @@ class FaultStats:
             strategies (list): List of the strategies you want to plot, if None, all will be plotted
             thresh_range (list): thresholds for deciding whether to accept as recovered
             ax (Matplotlib.axes): Somewhere to plot
-            mask (Numpy.ndarray of shape (n)): The mask you want to know about
 
         Returns:
             None
@@ -960,16 +959,21 @@ class FaultStats:
             fault_free = self.load(strategy=strategy, faults=False)
             with_faults = self.load(strategy=strategy, faults=True)
 
+            if recoverable_only:
+                recoverable_mask = self.get_fixable_faults_only(strategy)
+            else:
+                recoverable_mask = self.get_mask()
+
             for thresh_idx in range(len(thresh_range)):
                 rec_mask = self.get_mask(
                     strategy=strategy,
                     key='error',
                     val=(thresh_range[thresh_idx] * fault_free['error'].mean()),
                     op='gt',
-                    old_mask=mask,
+                    old_mask=recoverable_mask,
                 )
                 rec_rates[strategy_idx][thresh_idx] = 1.0 - len(with_faults['error'][rec_mask]) / len(
-                    with_faults['error']
+                    with_faults['error'][recoverable_mask]
                 )
 
             ax.plot(
@@ -1656,10 +1660,10 @@ def compare_adaptivity_modes():
 
 def main():
     kwargs = {
-        'prob': run_Lorenz,
+        'prob': run_AC,
         'num_procs': 1,
         'mode': 'default',
-        'runs': 6000,
+        'runs': 5000,
         'reload': False,
         **parse_args(),
     }
@@ -1684,13 +1688,17 @@ def main():
         stats_path='data/stats-jusuf',
         **kwargs,
     )
-    stats_analyser.run_stats_generation(runs=kwargs['runs'], step=12)
+    stats_analyser.run_stats_generation(runs=kwargs['runs'], step=25)
 
     if MPI.COMM_WORLD.rank > 0:  # make sure only one rank accesses the data
         return None
 
     stats_analyser.get_recovered()
     mask = None
+
+    # mask =
+    stats_analyser.scrutinize(HotRodStrategy(), run=1, faults=False)
+    return None
 
     # stats_analyser.compare_strategies()
     stats_analyser.plot_things_per_things(

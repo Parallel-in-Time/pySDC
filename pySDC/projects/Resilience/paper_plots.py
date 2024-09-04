@@ -643,6 +643,12 @@ def work_precision():  # pragma: no cover
     all_problems(**{**all_params, 'work_key': 'param'}, mode='compare_strategies')
 
 
+def plot_recovery_rate_per_acceptance_threshold(problem):  # pragma no cover
+    stats_analyser = get_stats(problem)
+
+    stats_analyser.plot_recovery_thresholds(thresh_range=np.linspace(0.5, 1.5, 1000), recoverable_only=True)
+
+
 def make_plots_for_TIME_X_website():  # pragma: no cover
     global JOURNAL, BASE_PATH
     JOURNAL = 'JSC_beamer'
@@ -697,10 +703,9 @@ def make_plots_for_resilience_paper():  # pragma: no cover
     # plot_fault_Lorenz(0)
     # plot_fault_Lorenz(20)
     # compare_recovery_rate_problems()
-    # fig, axs = plt.subplots(1, 2, figsize=figsize_by_journal(JOURNAL, 1, 0.8))
-    # plot_recovery_rate_recoverable_only(get_stats(run_Lorenz), fig, axs[1])
     plot_recovery_rate(get_stats(run_Lorenz))
-    # savefig(fig, 'recovery_rate')
+    plot_recovery_rate_per_acceptance_threshold(run_Lorenz)
+    plt.show()
 
 
 def make_plots_for_notes():  # pragma: no cover

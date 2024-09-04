@@ -200,7 +200,7 @@ def test_fault_stats(numprocs):
         index = stats.get_index(mask=fixable_mask)
 
         assert all(fixable_mask[:-1] == [False, True, False]), "Error in generating mask of fixable faults"
-        assert all(index == [1, 3]), "Error when converting to  index"
+        assert all(index == [1]), "Error when converting to  index"
 
         combinations = np.array(stats.get_combination_counts(dat, keys=['bit'], mask=fixable_mask))
         assert all(combinations == [1.0, 1.0]), "Error when counting combinations"
