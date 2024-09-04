@@ -283,7 +283,7 @@ class Strategy:
 
         max_runtime = {
             'run_vdp': 1000,
-            'run_Lorenz': 60,
+            'run_Lorenz': 500,
             'run_Schroedinger': 150,
             'run_quench': 150,
             'run_AC': 150,
@@ -453,9 +453,9 @@ class BaseStrategy(Strategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 243380
+                return 12350
             elif key == 'e_global_post_run' and op == max:
-                return 4.68e-04
+                return 1.3527453646133836e-07
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -578,9 +578,9 @@ class AdaptivityStrategy(Strategy):
         """
         if problem.__name__ == 'run_Lorenz':
             if key == 'work_newton' and op == sum:
-                return 44635
+                return 2989
             elif key == 'e_global_post_run' and op == max:
-                return 2.82e-04
+                return 5.636767497207984e-08
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -705,7 +705,7 @@ to the strategy'
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 4758
+                return 5092
             elif key == 'e_global_post_run' and op == max:
                 return 4.107116318152748e-06
 
@@ -808,9 +808,9 @@ strategy'
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 1872
+                return 9200
             elif key == 'e_global_post_run' and op == max:
-                return 2.2362043480939064e-05
+                return 2.139863344829962e-05
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -856,9 +856,9 @@ class kAdaptivityStrategy(IterateStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 243380
+                return 12350
             elif key == 'e_global_post_run' and op == max:
-                return 4.68e-04
+                return 1.3527453646133836e-07
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -977,9 +977,9 @@ class HotRodStrategy(Strategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 243380
+                return 12350
             elif key == 'e_global_post_run' and op == max:
-                return 4.68e-04
+                return 1.3527453646133836e-07
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1093,9 +1093,9 @@ class AdaptivityCollocationTypeStrategy(AdaptivityCollocationStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 983
+                return 1025
             elif key == 'e_global_post_run' and op == max:
-                return 3.944880392126038e-06
+                return 4.266975256683736e-06
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1132,7 +1132,7 @@ class AdaptivityCollocationRefinementStrategy(AdaptivityCollocationStrategy):
             if key == 'work_newton' and op == sum:
                 return 917
             elif key == 'e_global_post_run' and op == max:
-                return 1.0587702028885815e-05
+                return 1.0874929465387595e-05
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1163,9 +1163,9 @@ class AdaptivityCollocationDerefinementStrategy(AdaptivityCollocationStrategy):
         """
         if problem.__name__ == 'run_Lorenz':
             if key == 'work_newton' and op == sum:
-                return 1358
+                return 1338
             elif key == 'e_global_post_run' and op == max:
-                return 0.00010316526647002888
+                return 0.0001013999955041811
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1246,9 +1246,9 @@ class DIRKStrategy(AdaptivityStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 1820
+                return 6835
             elif key == 'e_global_post_run' and op == max:
-                return 0.00013730538358736055
+                return 7.049480537091313e-07
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1437,9 +1437,9 @@ class ESDIRKStrategy(AdaptivityStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 984
+                return 3572
             elif key == 'e_global_post_run' and op == max:
-                return 3.148061889390874e-06
+                return 4.126039954144289e-09
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1530,7 +1530,7 @@ class ERKStrategy(DIRKStrategy):
             if key == 'work_newton' and op == sum:
                 return 0
             elif key == 'e_global_post_run' and op == max:
-                return 3.5085474063834e-05
+                return 1.509206128957885e-07
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1607,9 +1607,9 @@ class DoubleAdaptivityStrategy(AdaptivityStrategy):
         """
         if problem.__name__ == 'run_Lorenz':
             if key == 'work_newton' and op == sum:
-                return 1369
+                return 2989
             elif key == 'e_global_post_run' and op == max:
-                return 9.364841517367495e-06
+                return 5.636763944494305e-08
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1662,9 +1662,9 @@ class AdaptivityAvoidRestartsStrategy(AdaptivityStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 1369
+                return 2989
             elif key == 'e_global_post_run' and op == max:
-                return 9.364841517367495e-06
+                return 5.636763944494305e-08
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1966,9 +1966,9 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 25404
+                return 2123
             elif key == 'e_global_post_run' and op == max:
-                return 4.34e-04
+                return 7.931560830343187e-08
 
         super().get_reference_value(problem, key, op, num_procs)
 

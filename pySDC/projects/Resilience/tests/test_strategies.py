@@ -81,6 +81,7 @@ def single_test(strategy_name, useMPI, num_procs):
         use_MPI=useMPI,
         custom_controller_params=controller_params,
         comm=comm,
+        Tend=1.0,
     )
 
     # things we want to test

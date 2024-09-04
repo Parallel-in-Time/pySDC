@@ -445,7 +445,7 @@ def plot_fault_Lorenz(bit=0):  # pragma: no cover
             color=colors[i],
             label=rf'${{{labels[i]}}}^{{{superscripts[i]}}}$',
             marker=markers[i],
-            markevery=120,
+            markevery=500,
         )
         for idx in range(len(faults)):
             ax.axvline(faults[idx][0], color='black', label='Fault', ls=':')
@@ -699,12 +699,12 @@ def make_plots_for_adaptivity_paper():  # pragma: no cover
 
 
 def make_plots_for_resilience_paper():  # pragma: no cover
-    # plot_Lorenz_solution()
-    # plot_fault_Lorenz(0)
-    # plot_fault_Lorenz(20)
+    plot_Lorenz_solution()
+    plot_fault_Lorenz(0)
+    plot_fault_Lorenz(20)
     # compare_recovery_rate_problems()
-    plot_recovery_rate(get_stats(run_Lorenz))
-    plot_recovery_rate_per_acceptance_threshold(run_Lorenz)
+    # plot_recovery_rate(get_stats(run_Lorenz))
+    # plot_recovery_rate_per_acceptance_threshold(run_Lorenz)
     plt.show()
 
 
