@@ -75,10 +75,6 @@ class GenericSpectralLinear(Problem):
 
         self.setup_preconditioner(Dirichlet_recombination, left_preconditioner)
 
-        self.base_change = self._setup_operator(
-            {comp: {comp: self.spectral.get_basis_change_matrix()} for comp in self.spectral.components}
-        )
-
     def __getattr__(self, name):
         return getattr(self.spectral, name)
 
@@ -194,7 +190,6 @@ class GenericSpectralLinear(Problem):
         #     # M = self.spectral.put_BCs_in_matrix(self.L.copy())
         #     M = A  # self.L
         #     im = plt.imshow((M / abs(M)).real)
-        #     # im = plt.imshow(self.base_change.toarray().real)
         #     # im = plt.imshow(np.log10(abs(A.toarray())).real)
         #     # im = plt.imshow(((A.toarray())).real)
         #     plt.colorbar(im)
@@ -228,24 +223,6 @@ class GenericSpectralLinear(Problem):
             self.spectral.check_BCs(sol)
 
         return sol
-
-    def eval_L(self, u):
-        f = self.u_init
-
-        u_hat = self.transform(u)
-        f_hat = (self.base_change @ self.L @ u_hat.flatten()).reshape(u_hat.shape)
-        f[:] = self.itransform(f_hat)
-        return f
-
-    def eval_f(self, u, *args):
-        f = self.f_init
-
-        if 'imex' in self.dtype_f.__name__.lower():
-            f.impl[:] = -self.eval_L(u)
-        else:
-            f[:] = -self.eval_L(u)
-
-        return f
 
 
 def compute_residual_DAE(self, stage=''):
