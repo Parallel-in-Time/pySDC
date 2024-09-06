@@ -115,6 +115,14 @@ jobs:
           GITLAB_PROJECT_ID: "6029"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MIRROR_BRANCH: ${{ env.MIRROR_BRANCH }}
+      - name: Unzip downloaded artifacts
+        run: |
+          ls -lah
+          cd ./artifacts
+          unzip -f '*.zip'
+          rm '*.zip'
+          ls -lah
+          cd ..
 
   get_artifacts_from_other_workflow:
     runs-on: ubuntu-latest
