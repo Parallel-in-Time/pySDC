@@ -71,6 +71,8 @@ errors = []
 costs = []
 
 root = COMM_WORLD.Get_rank() == 0
+if root:
+    print(f"Running simulation with {qDelta}")
 
 for nSteps in nStepsList:
     if root:
