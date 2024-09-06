@@ -59,7 +59,7 @@ for qDeltaList in config:
     for figName in [figNameConv, figNameCost]:
         plt.figure(figName)
         plt.gca().set(
-            xlabel="Cost" if "cost" in figName else r"$\Delta {t}$",
+            xlabel="Computation Time" if "cost" in figName else r"$\Delta {t}$",
             ylabel=r"$L_2$ error at $T$",
         )
         plt.legend()
@@ -73,14 +73,17 @@ for qDeltaList in config:
 header = f"{'dt size':12} |"
 header += '|'.join(f"  {dt:1.1e}  " for dt in dtVals)
 print(header)
-print("-"*len(header))
+print("-" * len(header))
+meanEff = 0
 for qDelta in ["MIN-SR-S", "MIN-SR-FLEX", "VDHS"]:
     seq = timings[f"{qDelta}"]
     par = timings[f"{qDelta}_MPI"]
-    assert np.allclose(seq["errors"], par["errors"], atol=1e-6), f"parallel and sequential errors are not close for {qDelta}"
+    assert np.allclose(
+        seq["errors"], par["errors"], atol=1e-6
+    ), f"parallel and sequential errors are not close for {qDelta}"
     tComp = seq["costs"]
     tCompMPI = par["costs"]
-    print(
-        f"{qDelta:12} |"+
-        '|'.join(f" {tS/tP:1.1f} ({tS/tP/4*100:1.0f}%) " for tP, tS in zip(tCompMPI, tComp))
-        )
+    meanEff += np.mean([tS / tP for tP, tS in zip(tCompMPI, tComp)])
+    print(f"{qDelta:12} |" + '|'.join(f" {tS/tP:1.1f} ({tS/tP/4*100:1.0f}%) " for tP, tS in zip(tCompMPI, tComp)))
+meanEff /= 3
+print("Mean parallel efficiency :", meanEff / 4)
