@@ -40,7 +40,7 @@ for qDeltaList in config:
         if qDelta == "MIN-SR-NS":
             res = timings["MIN-SR-S_MPI"].copy()
             res["errors"] = [np.nan for _ in res["errors"]]
-        elif qDelta in ["MIN-SR-S", "MIN-SR-FLEX"]:
+        elif qDelta in ["MIN-SR-S", "MIN-SR-FLEX", "VDHS"]:
             res = timings[f"{qDelta}_MPI"]
         else:
             res = timings[qDelta]
@@ -66,3 +66,21 @@ for qDeltaList in config:
         plt.grid(True)
         plt.tight_layout()
         plt.savefig(f"{PATH}/{figName}.pdf")
+
+# -----------------------------------------------------------------------------
+# %% Speedup tables
+# -----------------------------------------------------------------------------
+header = f"{'dt size':12} |"
+header += '|'.join(f"  {dt:1.1e}  " for dt in dtVals)
+print(header)
+print("-"*len(header))
+for qDelta in ["MIN-SR-S", "MIN-SR-FLEX", "VDHS"]:
+    seq = timings[f"{qDelta}"]
+    par = timings[f"{qDelta}_MPI"]
+    assert np.allclose(seq["errors"], par["errors"], atol=1e-6), f"parallel and sequential errors are not close for {qDelta}"
+    tComp = seq["costs"]
+    tCompMPI = par["costs"]
+    print(
+        f"{qDelta:12} |"+
+        '|'.join(f" {tS/tP:1.1f} ({tS/tP/4*100:1.0f}%) " for tP, tS in zip(tCompMPI, tComp))
+        )
