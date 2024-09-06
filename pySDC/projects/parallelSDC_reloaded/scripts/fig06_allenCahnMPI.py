@@ -38,7 +38,7 @@ pParams = {
 # -----------------------------------------------------------------------------
 # %% Convergence and error VS cost plots
 # -----------------------------------------------------------------------------
-nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500])
+nStepsList = np.array([5, 10, 20, 50, 100, 200, 500])
 dtVals = tEnd / nStepsList
 
 
@@ -64,7 +64,7 @@ except KeyError:
     params = getParamsSDC(quadType=quadType, numNodes=nNodes, nodeType=nodeType, qDeltaI=qDelta, nSweeps=nSweeps)
 
 useMPI = False
-if COMM_WORLD.Get_size() == 4 and qDelta in ["MIN-SR-NS", "MIN-SR-S", "MIN-SR-FLEX"]:
+if COMM_WORLD.Get_size() == 4 and qDelta in ["MIN-SR-NS", "MIN-SR-S", "MIN-SR-FLEX", "VDHS"]:
     params['sweeper_class'] = generic_implicit_MPI
     useMPI = True
 
@@ -93,7 +93,7 @@ if COMM_WORLD.Get_rank() == 0:
 
     print("errors : ", errors)
     print("tComps : ", costs)
-    fileName = f"{PATH}/{SCRIPT}_compTime.json"
+    fileName = f"{PATH}/fig06_compTime.json"
     timings = {}
     if os.path.isfile(fileName):
         with open(fileName, "r") as f:
