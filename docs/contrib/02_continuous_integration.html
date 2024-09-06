@@ -5,12 +5,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Continuous Integration in pySDC &#8212; pySDC 5.5.0 documentation</title>
+    <title>Continuous Integration in pySDC &#8212; pySDC 5.5.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=def86cc0" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
     
-    <script src="../../_static/documentation_options.js?v=a385a3de"></script>
+    <script src="../../_static/documentation_options.js?v=07fd27c7"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
@@ -26,7 +26,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.5.1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Continuous Integration in pySDC</a></li> 
       </ul>
     </div>  
@@ -43,14 +43,14 @@ Those tests are currently divided in three main categories : <a class="reference
 Finally, the CI also build artifacts that are used to generate the documentation website (see <a class="reference external" href="http://parallel-in-time.org/pySDC/">http://parallel-in-time.org/pySDC/</a>), more details given in the <a class="reference internal" href="#docs-contrib-02-continuous-integration-documentation-generation"><span class="std std-ref">documentation generation</span></a> section.</p>
 <section id="code-linting">
 <span id="docs-contrib-02-continuous-integration-code-linting"></span><h2>Code linting<a class="headerlink" href="#code-linting" title="Link to this heading">¶</a></h2>
-<p>Code style linting is performed using <a class="reference external" href="https://black.readthedocs.io/en/stable/">black</a> and <a class="reference external" href="https://flakeheaven.readthedocs.io/en/latest/">flakeheaven</a> for code syntax checking. In particular, <code class="docutils literal notranslate"><span class="pre">black</span></code> is used to check compliance with (most of) <a class="reference external" href="https://peps.python.org/pep-0008/">PEP-8 guidelines</a>.</p>
+<p>Code style linting is performed using <a class="reference external" href="https://black.readthedocs.io/en/stable/">black</a> and <a class="reference external" href="https://docs.astral.sh/ruff/">ruff</a> for code syntax checking. In particular, <code class="docutils literal notranslate"><span class="pre">black</span></code> is used to check compliance with (most of) <a class="reference external" href="https://peps.python.org/pep-0008/">PEP-8 guidelines</a>.</p>
 <p>Those tests are conducted for each commit (even for forks), but you can also run it locally in the root folder of <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> before pushing any commit :</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install required packages (works also with conda/mamba)</span>
-pip<span class="w"> </span>install<span class="w"> </span>black<span class="w"> </span>flakeheaven<span class="w"> </span>flake8-comprehensions<span class="w"> </span>flake8-bugbear
+pip<span class="w"> </span>install<span class="w"> </span>black<span class="w"> </span>ruff
 <span class="c1"># First : test code style linting with black</span>
 black<span class="w"> </span>pySDC<span class="w"> </span>--check<span class="w"> </span>--diff<span class="w"> </span>--color
-<span class="c1"># Second : test code syntax with flakeheaven</span>
-flakeheaven<span class="w"> </span>lint<span class="w"> </span>--benchmark<span class="w"> </span>pySDC
+<span class="c1"># Second : test code syntax with ruff</span>
+ruff<span class="w"> </span>check<span class="w"> </span>pySDC
 </pre></div>
 </div>
 <blockquote>
@@ -90,7 +90,7 @@ To this end, just add the following to a possibly new file in the path <code cla
 </div>
 <p>You may need to run <code class="docutils literal notranslate"><span class="pre">chmod</span> <span class="pre">+x</span></code> on the file to allow it to be executed.
 Be aware that the hook will alter files you may have opened in an editor whenever you make a commit, which may confuse you(r editor).</p>
-<p>To automate flakeheaven, we want to write a hook that alters the commit message in case any errors are detected. This gives us the choice of aborting the commit and fixing the issues, or we can go ahead and commit them and worry about flakeheaven only when the time comes to do a pull request.
+<p>To automate ruff, we want to write a hook that alters the commit message in case any errors are detected. This gives us the choice of aborting the commit and fixing the issues, or we can go ahead and commit them and worry about ruff only when the time comes to do a pull request.
 To obtain this functionality, add the following to <code class="docutils literal notranslate"><span class="pre">&lt;pySDC-root-directory&gt;/.git/hooks/prepare-commit-msg</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
 
@@ -100,11 +100,11 @@ To obtain this functionality, add the following to <code class="docutils literal
 
 <span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$files</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="o">]]</span>
 <span class="k">then</span>
-<span class="w">        </span><span class="nb">export</span><span class="w"> </span><span class="nv">flakeheaven_output</span><span class="o">=</span><span class="k">$(</span>flakeheaven<span class="w"> </span>lint<span class="w"> </span>--format<span class="w"> </span>default<span class="w"> </span><span class="nv">$files</span><span class="k">)</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$flakeheaven_output</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span>
+<span class="w">        </span><span class="nb">export</span><span class="w"> </span><span class="nv">ruff_output</span><span class="o">=</span><span class="k">$(</span>ruff<span class="w"> </span>check<span class="w"> </span>--quiet<span class="w"> </span><span class="nv">$files</span><span class="k">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ruff_output</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span>
 <span class="w">        </span><span class="k">then</span>
-<span class="w">                </span>git<span class="w"> </span>interpret-trailers<span class="w"> </span>--in-place<span class="w"> </span>--trailer<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$flakeheaven_output</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;s/^/#/&#39;</span><span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$COMMIT_MSG_FILE</span><span class="s2">&quot;</span>
-<span class="w">                </span>git<span class="w"> </span>interpret-trailers<span class="w"> </span>--in-place<span class="w"> </span>--trailer<span class="w"> </span><span class="s2">&quot;#!!!!!!!!!! WARNING: FLAKEHEAVEN FAILED !!!!!!!!!!&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$COMMIT_MSG_FILE</span><span class="s2">&quot;</span>
+<span class="w">                </span>git<span class="w"> </span>interpret-trailers<span class="w"> </span>--in-place<span class="w"> </span>--trailer<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ruff_output</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;s/^/#/&#39;</span><span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$COMMIT_MSG_FILE</span><span class="s2">&quot;</span>
+<span class="w">                </span>git<span class="w"> </span>interpret-trailers<span class="w"> </span>--in-place<span class="w"> </span>--trailer<span class="w"> </span><span class="s2">&quot;#!!!!!!!!!! WARNING: RUFF FAILED !!!!!!!!!!&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$COMMIT_MSG_FILE</span><span class="s2">&quot;</span>
 <span class="w">        </span><span class="k">fi</span>
 <span class="k">fi</span>
 </pre></div>
@@ -301,7 +301,7 @@ This approach can be considered for local testing of your contribution when it d
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.5.1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Continuous Integration in pySDC</a></li> 
       </ul>
     </div>
