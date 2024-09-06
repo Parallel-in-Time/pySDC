@@ -41,14 +41,17 @@ pParams = {
 nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500])
 dtVals = tEnd / nStepsList
 
+
 def getError(uNum, uRef):
     if uNum is None:
         return np.inf
     return np.linalg.norm(uRef[-1, :] - uNum[-1, :], ord=2)
 
+
 def getCost(counters):
     _, _, tComp = counters
     return tComp
+
 
 try:
     qDelta = sys.argv[1]
@@ -58,9 +61,7 @@ except:
 try:
     params = getParamsRK(qDelta)
 except KeyError:
-    params = getParamsSDC(
-        quadType=quadType, numNodes=nNodes, nodeType=nodeType, qDeltaI=qDelta, nSweeps=nSweeps
-    )
+    params = getParamsSDC(quadType=quadType, numNodes=nNodes, nodeType=nodeType, qDeltaI=qDelta, nSweeps=nSweeps)
 
 useMPI = False
 if COMM_WORLD.Get_size() == 4 and qDelta in ["MIN-SR-NS", "MIN-SR-S", "MIN-SR-FLEX"]:
@@ -78,8 +79,7 @@ for nSteps in nStepsList:
     if root:
         uRef = solutionExact(tEnd, nSteps, pName, **pParams)
 
-    uSDC, counters, parallel = solutionSDC(
-        tEnd, nSteps, params, pName, verbose=root, noExcept=True, **pParams)
+    uSDC, counters, parallel = solutionSDC(tEnd, nSteps, params, pName, verbose=root, noExcept=True, **pParams)
 
     if root:
         err = getError(uSDC, uRef)
@@ -96,13 +96,10 @@ if COMM_WORLD.Get_rank() == 0:
     fileName = f"{PATH}/{SCRIPT}_compTime.json"
     timings = {}
     if os.path.isfile(fileName):
-        with open(timings, "r") as f:
+        with open(fileName, "r") as f:
             timings = json.load(f)
 
-        timings[qDelta+"_MPI"*useMPI] = {
-            "errors": errors,
-            "costs": costs
-            }
+    timings[qDelta + "_MPI" * useMPI] = {"errors": errors, "costs": costs}
 
-        with open(timings, 'w') as f:
-            json.dump(timings, f, indent=4)
+    with open(fileName, 'w') as f:
+        json.dump(timings, f, indent=4)
