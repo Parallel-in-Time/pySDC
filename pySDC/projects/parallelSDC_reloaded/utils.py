@@ -210,7 +210,7 @@ def setupProblem(name, description, dt, **kwargs):
         raise NotImplementedError(f"problem {name} not implemented")
 
 
-def solutionSDC(tEnd, nSteps, params, probName, **kwargs):
+def solutionSDC(tEnd, nSteps, params, probName, verbose=True, **kwargs):
     dt = tEnd / nSteps
     setupProblem(probName, params, dt, **kwargs)
 
@@ -225,7 +225,8 @@ def solutionSDC(tEnd, nSteps, params, probName, **kwargs):
     uSDC[0] = uInit
     tVals = np.linspace(0, tEnd, nSteps + 1)
     tBeg = time()
-    print(" -- computing numerical solution with pySDC ...")
+    if verbose:
+        print(" -- computing numerical solution with pySDC ...")
     warnings.filterwarnings("ignore")
     for i in range(nSteps):
         uTmp[:] = uSDC[i]
@@ -243,7 +244,8 @@ def solutionSDC(tEnd, nSteps, params, probName, **kwargs):
     except KeyError:
         nNewton = 0
     nRHS = prob.work_counters["rhs"].niter
-    print(f"    done, newton:{nNewton}, rhs:{nRHS}, tComp:{tComp}")
+    if verbose:
+        print(f"    done, newton:{nNewton}, rhs:{nRHS}, tComp:{tComp}")
     try:
         parallel = controller.MS[0].levels[0].sweep.parallelizable
     except AttributeError:  # pragma: no cover
