@@ -38,7 +38,7 @@ pParams = {
 # -----------------------------------------------------------------------------
 # %% Convergence and error VS cost plots
 # -----------------------------------------------------------------------------
-nStepsList = np.array([5, 10, 20, 50, 100, 200, 500])
+nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500])
 dtVals = tEnd / nStepsList
 
 def getError(uNum, uRef):
@@ -62,8 +62,10 @@ except KeyError:
         quadType=quadType, numNodes=nNodes, nodeType=nodeType, qDeltaI=qDelta, nSweeps=nSweeps
     )
 
+useMPI = False
 if COMM_WORLD.Get_size() == 4 and qDelta in ["MIN-SR-NS", "MIN-SR-S", "MIN-SR-FLEX"]:
     params['sweeper_class'] = generic_implicit_MPI
+    useMPI = True
 
 errors = []
 costs = []
@@ -75,7 +77,7 @@ for nSteps in nStepsList:
         uRef = solutionExact(tEnd, nSteps, pName, **pParams)
 
     uSDC, counters, parallel = solutionSDC(
-        tEnd, nSteps, params, pName, verbose=root, **pParams)
+        tEnd, nSteps, params, pName, verbose=root, noExcept=True, **pParams)
 
     if root:
         err = getError(uSDC, uRef)
@@ -95,7 +97,7 @@ if COMM_WORLD.Get_rank() == 0:
         with open(timings, "r") as f:
             timings = json.load(f)
 
-        timings[qDelta] = {
+        timings[qDelta+"_MPI"*useMPI] = {
             "errors": errors,
             "costs": costs
             }

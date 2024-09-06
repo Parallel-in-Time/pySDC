@@ -210,9 +210,12 @@ def setupProblem(name, description, dt, **kwargs):
         raise NotImplementedError(f"problem {name} not implemented")
 
 
-def solutionSDC(tEnd, nSteps, params, probName, verbose=True, **kwargs):
+def solutionSDC(tEnd, nSteps, params, probName, verbose=True, noExcept=False, **kwargs):
     dt = tEnd / nSteps
     setupProblem(probName, params, dt, **kwargs)
+    if noExcept:
+        params["problem_params"]["stop_at_nan"] = False
+        params["problem_params"]["stop_at_maxiter"] = False
 
     controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=params)
 
