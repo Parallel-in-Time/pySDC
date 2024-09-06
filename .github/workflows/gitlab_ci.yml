@@ -120,8 +120,8 @@ jobs:
           ls -lah
           cd ./artifacts
           unzip -f '*.zip'
-          rm '*.zip'
           ls -lah
+          rm *.zip
           cd ..
 
   get_artifacts_from_other_workflow:
