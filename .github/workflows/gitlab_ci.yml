@@ -117,11 +117,13 @@ jobs:
           MIRROR_BRANCH: ${{ env.MIRROR_BRANCH }}
       - name: Unzip downloaded artifacts
         run: |
+          pwd
           ls -lah
           cd ./artifacts
-          unzip -f '*.zip'
+          unzip -f '*.zip' .
           ls -lah
           rm *.zip
+          ls -lah
           cd ..
 
   get_artifacts_from_other_workflow:
