@@ -5,9 +5,9 @@ import pytest
 @pytest.mark.parametrize('N', [4, 32])
 def test_D2T_conversion_matrices(N):
     import numpy as np
-    from pySDC.helpers.spectral_helper import ChebychovHelper
+    from pySDC.helpers.spectral_helper import ChebychevHelper
 
-    cheby = ChebychovHelper(N)
+    cheby = ChebychevHelper(N)
 
     x = np.linspace(-1, 1, N)
     D2T = cheby.get_conv('D2T')
@@ -31,9 +31,9 @@ def test_D2T_conversion_matrices(N):
 def test_T_U_conversion(N):
     import numpy as np
     from scipy.special import chebyt, chebyu
-    from pySDC.helpers.spectral_helper import ChebychovHelper
+    from pySDC.helpers.spectral_helper import ChebychevHelper
 
-    cheby = ChebychovHelper(N)
+    cheby = ChebychevHelper(N)
 
     T2U = cheby.get_conv('T2U')
     U2T = cheby.get_conv('U2T')
@@ -61,11 +61,11 @@ def test_T_U_conversion(N):
 @pytest.mark.base
 @pytest.mark.parametrize('name', ['T2U', 'T2D', 'T2T'])
 def test_conversion_inverses(name):
-    from pySDC.helpers.spectral_helper import ChebychovHelper
+    from pySDC.helpers.spectral_helper import ChebychevHelper
     import numpy as np
 
     N = 8
-    cheby = ChebychovHelper(N)
+    cheby = ChebychevHelper(N)
     P = cheby.get_conv(name)
     Pinv = cheby.get_conv(name[::-1])
     assert np.allclose((P @ Pinv).toarray(), np.diag(np.ones(N)))
@@ -76,9 +76,9 @@ def test_conversion_inverses(name):
 def test_differentiation_matrix(N):
     import numpy as np
     import scipy
-    from pySDC.helpers.spectral_helper import ChebychovHelper
+    from pySDC.helpers.spectral_helper import ChebychevHelper
 
-    cheby = ChebychovHelper(N)
+    cheby = ChebychevHelper(N)
     x = np.cos(np.pi / N * (np.arange(N) + 0.5))
     coeffs = np.random.random(N)
     norm = cheby.get_norm()
@@ -95,9 +95,9 @@ def test_differentiation_matrix(N):
 @pytest.mark.parametrize('N', [4, 32])
 def test_integration_matrix(N):
     import numpy as np
-    from pySDC.helpers.spectral_helper import ChebychovHelper
+    from pySDC.helpers.spectral_helper import ChebychevHelper
 
-    cheby = ChebychovHelper(N)
+    cheby = ChebychevHelper(N)
     coeffs = np.random.random(N)
     coeffs[-1] = 0
 
@@ -116,9 +116,9 @@ def test_integration_matrix(N):
 def test_transform(N, d, transform_type):
     import scipy
     import numpy as np
-    from pySDC.helpers.spectral_helper import ChebychovHelper
+    from pySDC.helpers.spectral_helper import ChebychevHelper
 
-    cheby = ChebychovHelper(N, transform_type=transform_type)
+    cheby = ChebychevHelper(N, transform_type=transform_type)
     u = np.random.random((d, N))
     norm = cheby.get_norm()
     x = cheby.get_1dgrid()
@@ -137,10 +137,10 @@ def test_transform(N, d, transform_type):
 @pytest.mark.base
 @pytest.mark.parametrize('N', [8, 32])
 def test_integration_BC(N):
-    from pySDC.helpers.spectral_helper import ChebychovHelper
+    from pySDC.helpers.spectral_helper import ChebychevHelper
     import numpy as np
 
-    cheby = ChebychovHelper(N)
+    cheby = ChebychevHelper(N)
     coef = np.random.random(N)
 
     BC = cheby.get_integ_BC_row()
@@ -155,11 +155,11 @@ def test_integration_BC(N):
 @pytest.mark.base
 @pytest.mark.parametrize('N', [4, 32])
 def test_norm(N):
-    from pySDC.helpers.spectral_helper import ChebychovHelper
+    from pySDC.helpers.spectral_helper import ChebychevHelper
     import numpy as np
     import scipy
 
-    cheby = ChebychovHelper(N)
+    cheby = ChebychevHelper(N)
     coeffs = np.random.random(N)
     x = cheby.get_1dgrid()
     norm = cheby.get_norm()
@@ -185,10 +185,10 @@ def test_tau_method(bc, N, bc_val):
 
     The test verifies that the solution satisfies the perturbed equation and the boundary condition.
     '''
-    from pySDC.helpers.spectral_helper import ChebychovHelper
+    from pySDC.helpers.spectral_helper import ChebychevHelper
     import numpy as np
 
-    cheby = ChebychovHelper(N)
+    cheby = ChebychevHelper(N)
     x = cheby.get_1dgrid()
 
     coef = np.append(np.zeros(N - 1), [1])
@@ -221,13 +221,13 @@ def test_tau_method(bc, N, bc_val):
 def test_tau_method2D(bc, nz, nx, bc_val, plotting=False):
     '''
     solve u_z - 0.1u_xx -u_x + tau P = 0, u(bc) = sin(bc_val*x) -> space-time discretization of advection-diffusion
-    problem. We do FFT in x-direction and Chebychov in z-direction.
+    problem. We do FFT in x-direction and Chebychev in z-direction.
     '''
-    from pySDC.helpers.spectral_helper import ChebychovHelper, FFTHelper
+    from pySDC.helpers.spectral_helper import ChebychevHelper, FFTHelper
     import numpy as np
     import scipy.sparse as sp
 
-    cheby = ChebychovHelper(nz)
+    cheby = ChebychevHelper(nz)
     fft = FFTHelper(nx)
 
     # generate grid
@@ -239,7 +239,7 @@ def test_tau_method2D(bc, nz, nx, bc_val, plotting=False):
     bcs = np.sin(bc_val * x)
     rhs = np.zeros_like(X)
     rhs[:, -1] = bcs
-    rhs_hat = fft.transform(rhs, axis=-2)  # the rhs is already in Chebychov spectral space
+    rhs_hat = fft.transform(rhs, axis=-2)  # the rhs is already in Chebychev spectral space
 
     # generate matrices
     Dx = fft.get_differentiation_matrix(p=2) * 1e-1 + fft.get_differentiation_matrix()
@@ -299,11 +299,11 @@ def test_tau_method2D_diffusion(nz, nx, bc_val, plotting=False):
     '''
     Solve a Poisson problem with funny Dirichlet BCs in z-direction and periodic in x-direction.
     '''
-    from pySDC.helpers.spectral_helper import ChebychovHelper, FFTHelper
+    from pySDC.helpers.spectral_helper import ChebychevHelper, FFTHelper
     import numpy as np
     import scipy.sparse as sp
 
-    cheby = ChebychovHelper(nz)
+    cheby = ChebychevHelper(nz)
     fft = FFTHelper(nx)
 
     # generate grid
@@ -315,7 +315,7 @@ def test_tau_method2D_diffusion(nz, nx, bc_val, plotting=False):
     rhs = np.zeros((2, nx, nz))  # components u and u_x
     rhs[0, :, -1] = np.sin(bc_val * x) + 1
     rhs[1, :, -1] = 3 * np.exp(-((x - 3.6) ** 2)) + np.cos(x)
-    rhs_hat = fft.transform(rhs, axis=-2)  # the rhs is already in Chebychov spectral space
+    rhs_hat = fft.transform(rhs, axis=-2)  # the rhs is already in Chebychev spectral space
 
     # generate 1D matrices
     Dx = fft.get_differentiation_matrix()

@@ -9,6 +9,19 @@ from pySDC.implementations.convergence_controller_classes.check_convergence impo
 
 
 class RayleighBenard(GenericSpectralLinear):
+    """
+    Rayleigh-Benard Convection is a variation of incompressible Navier-Stokes. See, for instance https://doi.org/10.1007/s00791-020-00332-3.
+
+    Parameters:
+        Prandl (float): Prandl number
+        Rayleigh (float): Rayleigh number
+        nx (int): Horizontal resolution
+        nz (int): Vertical resolution
+        BCs (dict): Can specify boundary conditions here
+        dealiasing (float): Dealiasing factor for evaluating the non-linear part
+        comm (mpi4py.Intracomm): Space communicator
+    """
+
     dtype_u = mesh
     dtype_f = imex_mesh
 
@@ -21,7 +34,6 @@ class RayleighBenard(GenericSpectralLinear):
         BCs=None,
         dealiasing=3 / 2,
         comm=None,
-        debug=False,
         **kwargs,
     ):
         BCs = {} if BCs is None else BCs
@@ -50,7 +62,6 @@ class RayleighBenard(GenericSpectralLinear):
             'BCs',
             'dealiasing',
             'comm',
-            'debug',
             localVars=locals(),
             readOnly=True,
         )

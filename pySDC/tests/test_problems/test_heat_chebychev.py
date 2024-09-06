@@ -7,13 +7,13 @@ import pytest
 @pytest.mark.parametrize('f', [0, 1])
 @pytest.mark.parametrize('noise', [0, 1e-3])
 @pytest.mark.parametrize('use_ultraspherical', [True, False])
-def test_heat1d_chebychov(a, b, f, noise, use_ultraspherical, nvars=2**4):
+def test_heat1d_chebychev(a, b, f, noise, use_ultraspherical, nvars=2**4):
     import numpy as np
 
     if use_ultraspherical:
-        from pySDC.implementations.problem_classes.HeatEquation_Chebychov import Heat1DUltraspherical as problem_class
+        from pySDC.implementations.problem_classes.HeatEquation_Chebychev import Heat1DUltraspherical as problem_class
     else:
-        from pySDC.implementations.problem_classes.HeatEquation_Chebychov import Heat1DChebychov as problem_class
+        from pySDC.implementations.problem_classes.HeatEquation_Chebychev import Heat1DChebychev as problem_class
 
     P = problem_class(
         nvars=nvars, a=a, b=b, f=f, nu=1e-2, left_preconditioner=False, right_preconditioning='T2T', debug=True
@@ -42,17 +42,17 @@ def test_heat1d_chebychov(a, b, f, noise, use_ultraspherical, nvars=2**4):
 @pytest.mark.parametrize('c', [0, 3.1415])
 @pytest.mark.parametrize('fx', [2, 1])
 @pytest.mark.parametrize('fy', [2, 1])
-@pytest.mark.parametrize('base_x', ['fft', 'chebychov', 'ultraspherical'])
-@pytest.mark.parametrize('base_y', ['fft', 'chebychov', 'ultraspherical'])
-def test_heat2d_chebychov(a, b, c, fx, fy, base_x, base_y, nx=2**5 + 1, ny=2**5 + 1):
+@pytest.mark.parametrize('base_x', ['fft', 'chebychev', 'ultraspherical'])
+@pytest.mark.parametrize('base_y', ['fft', 'chebychev', 'ultraspherical'])
+def test_heat2d_chebychev(a, b, c, fx, fy, base_x, base_y, nx=2**5 + 1, ny=2**5 + 1):
     import numpy as np
 
     if base_x == 'ultraspherical' or base_y == 'ultraspherical':
-        from pySDC.implementations.problem_classes.HeatEquation_Chebychov import Heat2DUltraspherical as problem_class
+        from pySDC.implementations.problem_classes.HeatEquation_Chebychev import Heat2DUltraspherical as problem_class
     else:
-        from pySDC.implementations.problem_classes.HeatEquation_Chebychov import Heat2DChebychov as problem_class
+        from pySDC.implementations.problem_classes.HeatEquation_Chebychev import Heat2DChebychev as problem_class
 
-    if base_x == 'chebychov' and base_y == 'ultraspherical' or base_y == 'chebychov' and base_x == 'ultraspherical':
+    if base_x == 'chebychev' and base_y == 'ultraspherical' or base_y == 'chebychev' and base_x == 'ultraspherical':
         return None
 
     if base_y == 'fft' and (b != c):
@@ -87,7 +87,7 @@ def test_heat2d_chebychov(a, b, c, fx, fy, base_x, base_y, nx=2**5 + 1, ny=2**5 
 def test_SDC():
     import numpy as np
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-    from pySDC.implementations.problem_classes.HeatEquation_Chebychov import Heat1DChebychov
+    from pySDC.implementations.problem_classes.HeatEquation_Chebychev import Heat1DChebychev
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.implementations.problem_classes.generic_spectral import compute_residual_DAE
     from pySDC.helpers.stats_helper import get_sorted
@@ -117,7 +117,7 @@ def test_SDC():
     controller_params['hook_class'] = [LogSDCIterations]
 
     description = {}
-    description['problem_class'] = Heat1DChebychov
+    description['problem_class'] = Heat1DChebychev
     description['problem_params'] = problem_params
     description['sweeper_class'] = generic_implicit
     description['sweeper_params'] = sweeper_params
@@ -139,5 +139,5 @@ def test_SDC():
 
 if __name__ == '__main__':
     # test_SDC()
-    # test_heat1d_chebychov(1, 0, 1, 1e-3, True, 2**6)
-    test_heat2d_chebychov(0, 0, 0, 2, 2, 'ultraspherical', 'fft', 2**6, 2**6)
+    # test_heat1d_chebychev(1, 0, 1, 1e-3, True, 2**6)
+    test_heat2d_chebychev(0, 0, 0, 2, 2, 'ultraspherical', 'fft', 2**6, 2**6)

@@ -150,7 +150,7 @@ class GenericSpectralLinear(Problem):
 
             self.Pl = self.spectral.sparse_lib.csc_matrix(R)
 
-        if Dirichlet_recombination and type(self.axes[-1]).__name__ in ['ChebychovHelper, Ultraspherical']:
+        if Dirichlet_recombination and type(self.axes[-1]).__name__ in ['ChebychevHelper, Ultraspherical']:
             _Pr = self.spectral.get_Dirichlet_recombination_matrix(axis=-1)
         else:
             _Pr = Id

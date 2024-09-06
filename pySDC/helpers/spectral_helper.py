@@ -117,12 +117,12 @@ class SpectralHelper1D:
         raise NotImplementedError
 
 
-class ChebychovHelper(SpectralHelper1D):
+class ChebychevHelper(SpectralHelper1D):
     """
-    The Chebychov base consists of special kinds of polynomials, with the main advantage that you can easily transform
+    The Chebychev base consists of special kinds of polynomials, with the main advantage that you can easily transform
     between physical and spectral space by discrete cosine transform.
-    The differentiation in the Chebychov T base is dense, but can be preconditioned to yield a differentiation operator
-    that moves to Chebychov U basis during differentiation, which is sparse. When using this technique, problems need to
+    The differentiation in the Chebychev T base is dense, but can be preconditioned to yield a differentiation operator
+    that moves to Chebychev U basis during differentiation, which is sparse. When using this technique, problems need to
     be formulated in first order formulation.
 
     This implementation is largely based on the Dedalus paper (arXiv:1905.10388).
@@ -142,9 +142,9 @@ class ChebychovHelper(SpectralHelper1D):
 
     def get_1dgrid(self):
         '''
-        Generates a 1D grid with Chebychov points. These are clustered at the boundary. You need this kind of grid to
-        use discrete cosine transformation (DCT) to get the Chebychov representation. If you want a different grid, you
-        need to do an affine transformation before any Chebychov business.
+        Generates a 1D grid with Chebychev points. These are clustered at the boundary. You need this kind of grid to
+        use discrete cosine transformation (DCT) to get the Chebychev representation. If you want a different grid, you
+        need to do an affine transformation before any Chebychev business.
 
         Returns:
             numpy.ndarray: 1D grid
@@ -157,8 +157,8 @@ class ChebychovHelper(SpectralHelper1D):
     def get_conv(self, name, N=None):
         '''
         Get conversion matrix between different kinds of polynomials. The supported kinds are
-         - T: Chebychov polynomials of first kind
-         - U: Chebychov polynomials of second kind
+         - T: Chebychev polynomials of first kind
+         - U: Chebychev polynomials of second kind
          - D: Dirichlet recombination.
 
         You get the desired matrix by choosing a name as ``A2B``. I.e. ``T2U`` for the conversion matrix from T to U.
@@ -420,11 +420,11 @@ class ChebychovHelper(SpectralHelper1D):
         return sp.eye(N) - sp.diags(xp.ones(N - 2), offsets=+2)
 
 
-class Ultraspherical(ChebychovHelper):
+class Ultraspherical(ChebychevHelper):
     """
     This implementation follows https://doi.org/10.1137/120865458.
-    The ultraspherical method works in Chebychov polynomials as well, but also uses various Gegenbauer polynomials.
-    The idea is that for every derivative of Chebychov T polynomials, there is a basis of Gegenbauer polynomials where the differentiation matrix is a single off-diagonal.
+    The ultraspherical method works in Chebychev polynomials as well, but also uses various Gegenbauer polynomials.
+    The idea is that for every derivative of Chebychev T polynomials, there is a basis of Gegenbauer polynomials where the differentiation matrix is a single off-diagonal.
     There are also conversion operators from one derivative basis to the next that are sparse.
 
     This basis is used like this: For every equation that you have, look for the highest derivative and bump all matrices to the correct basis. If your highest derivative is 2 and you have an identity, it needs to get bumped from 0 to 1 and from 1 to 2. If you have a first derivative as well, it needs to be bumped from 1 to 2.
@@ -672,7 +672,7 @@ class SpectralHelper:
 
         if base.lower() in ['chebychov', 'chebychev', 'cheby', 'chebychovhelper']:
             kwargs['transform_type'] = kwargs.get('transform_type', 'fft')
-            self.axes.append(ChebychovHelper(*args, **kwargs))
+            self.axes.append(ChebychevHelper(*args, **kwargs))
         elif base.lower() in ['fft', 'fourier', 'ffthelper']:
             self.axes.append(FFTHelper(*args, **kwargs))
         elif base.lower() in ['ultraspherical', 'gegenbauer']:
@@ -1146,7 +1146,7 @@ class SpectralHelper:
         Transform a single component of the solution
         """
         trfs = {
-            ChebychovHelper: self._transform_dct,
+            ChebychevHelper: self._transform_dct,
             Ultraspherical: self._transform_dct,
             FFTHelper: self._transform_fft,
         }
@@ -1283,7 +1283,7 @@ class SpectralHelper:
     def itransform_single_component(self, u, axes=None, padding=None):
         trfs = {
             FFTHelper: self._transform_ifft,
-            ChebychovHelper: self._transform_idct,
+            ChebychevHelper: self._transform_idct,
             Ultraspherical: self._transform_idct,
         }
 
@@ -1504,10 +1504,10 @@ class SpectralHelper:
 
     def get_Dirichlet_recombination_matrix(self, axis=-1, **kwargs):
         """
-        Get Dirichlet recombination matrix along axis. Not that it only makes sense in directions discretized with variations of Chebychov bases.
+        Get Dirichlet recombination matrix along axis. Not that it only makes sense in directions discretized with variations of Chebychev bases.
 
         Args:
-            axis (int): Axis you discretized with Chebychov
+            axis (int): Axis you discretized with Chebychev
 
         Returns:
             sparse matrix

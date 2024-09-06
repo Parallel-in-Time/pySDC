@@ -6,14 +6,14 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.generic_spectral import GenericSpectralLinear
 
 
-class Heat1DChebychov(GenericSpectralLinear):
+class Heat1DChebychev(GenericSpectralLinear):
     dtype_u = mesh
     dtype_f = mesh
 
     def __init__(self, nvars=128, a=0, b=0, f=1, nu=1.0, mode='T2U', **kwargs):
         self._makeAttributeAndRegister(*locals().keys(), localVars=locals(), readOnly=True)
 
-        bases = [{'base': 'chebychov', 'N': nvars}]
+        bases = [{'base': 'chebychev', 'N': nvars}]
         components = ['u', 'ux']
 
         super().__init__(bases, components, **kwargs)
@@ -153,11 +153,11 @@ class Heat1DUltraspherical(GenericSpectralLinear):
         return u
 
 
-class Heat2DChebychov(GenericSpectralLinear):
+class Heat2DChebychev(GenericSpectralLinear):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, nx=128, ny=128, base_x='fft', base_y='chebychov', a=0, b=0, c=0, fx=1, fy=1, nu=1.0, **kwargs):
+    def __init__(self, nx=128, ny=128, base_x='fft', base_y='chebychev', a=0, b=0, c=0, fx=1, fy=1, nu=1.0, **kwargs):
         assert nx % 2 == 1 or base_x == 'fft'
         assert ny % 2 == 1 or base_y == 'fft'
         self._makeAttributeAndRegister(*locals().keys(), localVars=locals(), readOnly=True)
@@ -184,20 +184,20 @@ class Heat2DChebychov(GenericSpectralLinear):
         self.setup_M(M_lhs)
 
         for base in [base_x, base_y]:
-            assert base in ['chebychov', 'fft']
+            assert base in ['chebychev', 'fft']
 
         alpha = (self.b - self.a) / 2.0
         beta = (self.c - self.b) / 2.0
         gamma = (self.c + self.a) / 2.0
 
-        if base_x == 'chebychov':
+        if base_x == 'chebychev':
             y = self.Y[0, :]
             if self.base_y == 'fft':
                 self.add_BC(component='u', equation='u', axis=0, x=-1, v=beta * y - alpha + gamma, kind='Dirichlet')
             self.add_BC(component='ux', equation='ux', axis=0, v=2 * alpha, kind='integral')
         else:
             assert a == b, f'Need periodic boundary conditions in x for {base_x} method!'
-        if base_y == 'chebychov':
+        if base_y == 'chebychev':
             x = self.X[:, 0]
             self.add_BC(component='u', equation='u', axis=1, x=-1, v=alpha * x - beta + gamma, kind='Dirichlet')
             self.add_BC(component='uy', equation='uy', axis=1, v=2 * beta, kind='integral')
