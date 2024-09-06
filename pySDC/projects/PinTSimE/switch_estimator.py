@@ -297,7 +297,9 @@ class SwitchEstimator(ConvergenceController):
         """
 
         LagrangeInterpolation = LagrangeApproximation(points=t_interp, fValues=state_function)
-        p = lambda t: LagrangeInterpolation.__call__(t)
+
+        def p(t):
+            return LagrangeInterpolation.__call__(t)
 
         def fprime(t):
             r"""

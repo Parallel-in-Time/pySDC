@@ -56,8 +56,8 @@ class RegisterParams(metaclass=_MetaRegisterParams):
         for name in names:
             try:
                 super().__setattr__(name, localVars[name])
-            except KeyError:  # pragma: no cover
-                raise ValueError(f'value for {name} not given in localVars')
+            except KeyError as e:  # pragma: no cover
+                raise ValueError(f'value for {name} not given in localVars') from e
         # Register as class parameter
         if readOnly:
             self._parNamesReadOnly = self._parNamesReadOnly.union(names)

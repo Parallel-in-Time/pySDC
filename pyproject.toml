@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = 'pySDC'
-version = '5.5.0'
+version = '5.5.1'
 description = 'A Python implementation of spectral deferred correction methods and the likes'
 license = {text = "BSD-2-Clause"}
 readme = 'README.md'
@@ -47,9 +47,7 @@ apps = [
     'mpi4py-fft>=2.0.2'
     ]
 dev = [
-    'flakeheaven',
-    'flake8-comprehensions',
-    'flake8-bugbear',
+    'ruff',
     'pytest',
     'pytest-cov',
     'sphinx'
@@ -70,31 +68,35 @@ markers = [
     ]
 timeout = 300
 
-[tool.flakeheaven]
-max-line-length = 120
-per-file-ignores = [
-    'pySDC/tutorial/step_6/C_MPI_parallelization.py:F401',
-    'pySDC/projects/Hamiltonian/solar_system.py:F401'
-    ]
-exclude = [
+[tool.ruff]
+line-length = 120
+extend-exclude = [
     'playgrounds',
     'tests',
     '*/data/*'
     ]
-count = true
-show-source = true
-statistics = true
 
-# list of plugins and rules for them
-[tool.flakeheaven.plugins]
-# include everything in pyflakes except F401
-pyflakes = [
-    '+C*', '+E*', '+F*', '+W*', '+B*', '+B9*',
-    '-E203', '-E741', '-E402', '-W504', '-W605', '-F401'
-    ]
-#flake8-black = ["+*"]
-flake8-bugbear = ["+*", '-B023', '-B028']
-flake8-comprehensions = ["+*", '-C408', '-C417']
+[tool.ruff.lint]
+select = ["C", "E", "F", "W", "B"]
+ignore = ["E203", # Whitespace before punctuation
+          "E741", # Ambiguous variable name
+          "E402", # Module level import not at top of cell
+          "W605", # Invalid escape sequence
+          "F401", # unused import
+          "B023", # function uses loop variable
+          "B028", # No excplicit stackvariable
+          "C408", # Unnecessary collection call
+          "C417", # Unnecessary map usage
+          # Newly added
+          "C901", # Complex name
+          "E501", # Line length, as enforced by black, but black ignores comments
+          "E721" # Type comparison
+          ]
+# W504 is not supported by ruff and does not need to be excluded
+
+[tool.ruff.lint.per-file-ignores]
+"pySDC/tutorial/step_6/C_MPI_parallelization.py" = ["F401"]
+"pySDC/projects/Hamiltonian/solar_system.py" = ["F401"]
 
 [tool.black]
 line-length = 120

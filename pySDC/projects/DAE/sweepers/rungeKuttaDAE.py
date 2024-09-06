@@ -15,7 +15,7 @@ class RungeKuttaDAE(RungeKutta):
 
     .. math::
         0 = F(u, u', t).
-    
+
     RK methods for general DAEs have the form
 
     .. math::

@@ -104,7 +104,7 @@ class Sweeper(object):
                 tLeft=coll.tleft,
             )
         except Exception as e:
-            raise ValueError(f"could not generate {qd_type=!r} with qmat, got error : {e}")
+            raise ValueError(f"could not generate {qd_type=!r} with qmat, got error : {e}") from e
 
     def get_Qdelta_implicit(self, qd_type, k=None):
         QDmat = np.zeros_like(self.coll.Qmat)
