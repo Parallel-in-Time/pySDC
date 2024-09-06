@@ -5,6 +5,11 @@ from pySDC.implementations.problem_classes.generic_spectral import GenericSpectr
 
 
 class Burgers1D(GenericSpectralLinear):
+    """
+    See https://en.wikipedia.org/wiki/Burgers'_equation
+    Discretization is done with a Chebychov method, which requires a first order derivative formulation.
+    Feel free to do a more efficient implementation using an ultraspherical method to avoid the first order business.
+    """
 
     dtype_u = mesh
     dtype_f = imex_mesh
@@ -125,9 +130,12 @@ class Burgers1D(GenericSpectralLinear):
 
 
 class Burgers2D(GenericSpectralLinear):
+    """
+    See documentation of `Burgers1D`.
+    """
+
     dtype_u = mesh
     dtype_f = imex_mesh
-    xp = np
 
     def __init__(self, nx=64, nz=64, epsilon=0.1, fux=2, fuz=1, mode='T2U', **kwargs):
         self._makeAttributeAndRegister(*locals().keys(), localVars=locals(), readOnly=True)
@@ -187,9 +195,6 @@ class Burgers2D(GenericSpectralLinear):
             me[iu] = self.xp.cos(self.X * self.fux) * self.xp.sin(self.Z * np.pi * self.fuz) + self.BCtopu
             me[iux] = -self.xp.sin(self.X * self.fux) * self.fux * self.xp.sin(self.Z * np.pi * self.fuz)
             me[iuz] = self.xp.cos(self.X * self.fux) * self.xp.cos(self.Z * np.pi * self.fuz) * np.pi * self.fuz
-            # me[iu] = self.xp.cos(self.X * self.fux) * (self.Z+1)*(self.Z-1) + self.BCtopu
-            # me[iux] = -self.xp.sin(self.X * self.fux) * self.fux * (self.Z+1)*(self.Z-1)
-            # me[iuz] = self.xp.cos(self.X * self.fux) * 2 * self.Z
 
             me[iv] = (self.BCtop + self.BCbottom) / 2 + (self.BCtop - self.BCbottom) / 2 * self.Z
             me[ivz][:] = (self.BCtop - self.BCbottom) / 2
