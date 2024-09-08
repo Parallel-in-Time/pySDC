@@ -36,9 +36,10 @@ class GenericSpectralLinear(Problem):
         comm=None,
         Dirichlet_recombination=True,
         left_preconditioner=True,
-        solver_type='direct',
+        solver_type='cached_direct',
         solver_args=None,
         useGPU=False,
+        max_cached_factorizations=12,
         *args,
         **kwargs,
     ):
@@ -54,7 +55,19 @@ class GenericSpectralLinear(Problem):
             solver_type (str): Solver for linear systems
             solver_args (dict): Arguments for linear solver
             useGPU (bool): Run on GPU or CPU
+            max_cached_factorizations (int): Number of matrix decompositions to cache before starting eviction
         """
+        solver_args = {} if solver_args is None else solver_args
+        self._makeAttributeAndRegister(
+            'max_cached_factorizations',
+            'useGPU',
+            'solver_type',
+            'solver_args',
+            'left_preconditioner',
+            'Dirichlet_recombination',
+            'comm',
+            localVars=locals(),
+        )
         self.spectral = SpectralHelper(comm=comm, useGPU=useGPU)
 
         if useGPU:
@@ -68,12 +81,12 @@ class GenericSpectralLinear(Problem):
 
         super().__init__(init=self.spectral.init)
 
-        self.solver_type = solver_type
-        self.solver_args = {} if solver_args is None else solver_args
-
         self.work_counters[solver_type] = WorkCounter()
+        self.work_counters['factorizations'] = WorkCounter()
 
         self.setup_preconditioner(Dirichlet_recombination, left_preconditioner)
+
+        self.cached_factorizations = {}
 
     def __getattr__(self, name):
         return getattr(self.spectral, name)
@@ -126,7 +139,7 @@ class GenericSpectralLinear(Problem):
         Get left and right precondioners. A right preconditioner of D2T will result in Dirichlet recombination. 10/10 would recommend!
 
         Args:
-            right_preconditioning (str): Basis conversion for right precondioner
+            Dirichlet_recombination (bool): Basis conversion for right precondioner
             left_preconditioner (bool): If True, it will interleave the variables and reverse the Kronecker product
         """
         sp = self.spectral.sparse_lib
@@ -180,8 +193,9 @@ class GenericSpectralLinear(Problem):
         rhs = self.spectral.put_BCs_in_rhs(rhs)
         rhs_hat = self.Pl @ self.spectral.transform(rhs).flatten()
 
-        A = self.M + dt * self.L
-        A = self.Pl @ self.spectral.put_BCs_in_matrix(A) @ self.Pr
+        if dt not in self.cached_factorizations.keys():
+            A = self.M + dt * self.L
+            A = self.Pl @ self.spectral.put_BCs_in_matrix(A) @ self.Pr
 
         # import numpy as np
         # if A.shape[0] < 200:
@@ -195,7 +209,19 @@ class GenericSpectralLinear(Problem):
         #     plt.colorbar(im)
         #     plt.show()
 
-        if self.solver_type.lower() == 'direct':
+        if self.solver_type.lower() == 'cached_direct':
+            if dt not in self.cached_factorizations.keys():
+                if len(self.cached_factorizations) >= self.max_cached_factorizations:
+                    self.cached_factorizations.pop(list(self.cached_factorizations.keys())[0])
+                    self.logger.debug(f'Evicted matrix factorization for {dt=:.6f} from cache')
+                self.cached_factorizations[dt] = self.spectral.linalg.factorized(A)
+                self.logger.debug(f'Cached matrix factorization for {dt=:.6f}')
+                self.work_counters['factorizations']()
+
+            sol_hat = self.cached_factorizations[dt](rhs_hat)
+            self.logger.debug(f'Used cached matrix factorization for {dt=:.6f}')
+
+        elif self.solver_type.lower() == 'direct':
             sol_hat = sp.linalg.spsolve(A, rhs_hat)
         elif self.solver_type.lower() == 'gmres':
             sol_hat, _ = sp.linalg.gmres(

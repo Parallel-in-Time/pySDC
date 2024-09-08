@@ -97,13 +97,18 @@ class SpectralHelper1D:
         Returns:
             sparse matrix
         """
+
         k = abs(self.get_wavenumbers())
 
         kmax = max(k) if kmax is None else kmax
 
         mask = self.xp.logical_or(k >= kmax, k < kmin)
 
-        F = self.get_Id().tolil()
+        if self.useGPU:
+            Id = self.get_Id().get()
+        else:
+            Id = self.get_Id()
+        F = Id.tolil()
         F[:, mask] = 0
         return F.tocsc()
 
@@ -742,14 +747,19 @@ class SpectralHelper:
         Returns:
             sparse matrix containing the BC
         """
+        sp = scipy.sparse
+
         base = self.axes[axis]
 
-        BC = base.get_Id().tolil() * 0
-        BC[line, :] = base.get_BC(kind=kind, **kwargs)
+        BC = sp.eye(base.N).tolil() * 0
+        if self.useGPU:
+            BC[line, :] = base.get_BC(kind=kind, **kwargs).get()
+        else:
+            BC[line, :] = base.get_BC(kind=kind, **kwargs)
 
         ndim = len(self.axes)
         if ndim == 1:
-            return BC
+            return self.sparse_lib.csc_matrix(BC)
         elif ndim == 2:
             axis2 = (axis + 1) % ndim
 
@@ -759,12 +769,16 @@ class SpectralHelper:
                 _Id = self.axes[axis2].get_Id()
 
             Id = self.get_local_slice_of_1D_matrix(self.axes[axis2].get_Id() @ _Id, axis=axis2)
+
+            if self.useGPU:
+                Id = Id.get()
+
             mats = [
                 None,
             ] * ndim
             mats[axis] = self.get_local_slice_of_1D_matrix(BC, axis=axis)
             mats[axis2] = Id
-            return self.sparse_lib.kron(*mats)
+            return self.sparse_lib.csc_matrix(sp.kron(*mats))
 
     def remove_BC(self, component, equation, axis, kind, line=-1, scalar=False, **kwargs):
         """
