@@ -205,7 +205,7 @@ class ChebychevHelper(SpectralHelper1D):
                 if self.sparse_lib == sp:
                     mat = self.sparse_lib.linalg.inv(fwd.tocsc())
                 else:
-                    mat = self.sparse_lib.csr_matrix(sp.linalg.inv(fwd.tocsc().get()))
+                    mat = self.sparse_lib.csc_matrix(sp.linalg.inv(fwd.tocsc().get()))
             except NotImplementedError:
                 raise NotImplementedError from E
 
@@ -245,7 +245,7 @@ class ChebychevHelper(SpectralHelper1D):
                 D[k, j] = 2 * j * ((j - k) % 2)
 
         D[0, :] /= 2
-        return self.sparse_lib.csr_matrix(self.xp.linalg.matrix_power(D, p))
+        return self.sparse_lib.csc_matrix(self.xp.linalg.matrix_power(D, p))
 
     def get_norm(self, N=None):
         '''get normalization for converting Chebychev coefficients and DCT'''
@@ -477,7 +477,7 @@ class Ultraspherical(ChebychevHelper):
                 lmbda / (lmbda + 2 + xp.arange(N - 2)), offsets=+2
             )
 
-        return self.sparse_lib.csr_matrix(mat)
+        return self.sparse_lib.csc_matrix(mat)
 
     def get_conv(self, p_out, p_in=0):
         """
@@ -502,7 +502,7 @@ class Ultraspherical(ChebychevHelper):
 
             mat_bck = sp.linalg.inv(mat_fwd.tocsc())
 
-            return self.sparse_lib.csr_matrix(mat_bck)
+            return self.sparse_lib.csc_matrix(mat_bck)
 
     def get_basis_change_matrix(self, p_in=0, p_out=0, **kwargs):
         return self.get_conv(p_in=p_in, p_out=p_out)
@@ -550,7 +550,7 @@ class FFTHelper(SpectralHelper1D):
 
         if self.useGPU:
             D = self.sparse_lib.diags(1j * k).get()
-            return self.sparse_lib.csr_matrix(sp.linalg.matrix_power(D, p))
+            return self.sparse_lib.csc_matrix(sp.linalg.matrix_power(D, p))
         elif self.sparse_lib == sp:
             return self.linalg.matrix_power(self.sparse_lib.diags(1j * k), p)
 
@@ -1070,10 +1070,13 @@ class SpectralHelper:
 
         return self.fft_cache[key]
 
-    def setup_fft(self):
+    def setup_fft(self, real_spectral_coefficients=False):
         """
         This function must be called after all axes have been setup in order to prepare the local shapes of the data.
         This must also be called before setting up any BCs.
+
+        Args:
+            real_spectral_coefficients (bool): Allow only real coefficients in spectral space
         """
         if len(self.components) == 0:
             self.add_component('u')
@@ -1104,7 +1107,7 @@ class SpectralHelper:
                 )
             ].shape,
             self.comm,
-            np.dtype('complex128'),
+            np.dtype('float') if real_spectral_coefficients else np.dtype('complex128'),
         )
 
         self.BC_mat = self.get_empty_operator_matrix()

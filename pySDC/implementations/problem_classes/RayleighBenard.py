@@ -138,7 +138,11 @@ class RayleighBenard(GenericSpectralLinear):
     def eval_f(self, u, *args, **kwargs):
         f = self.f_init
 
-        u_hat = self.transform(u)
+        if self.spectral_space:
+            u_hat = u.copy()
+        else:
+            u_hat = self.transform(u)
+
         f_impl_hat = self.u_init_forward
 
         Dz = self.Dz
@@ -148,7 +152,11 @@ class RayleighBenard(GenericSpectralLinear):
 
         # evaluate implicit terms
         f_impl_hat = -(self.base_change @ self.L @ u_hat.flatten()).reshape(u_hat.shape)
-        f.impl[:] = self.itransform(f_impl_hat).real
+
+        if self.spectral_space:
+            f.impl[:] = f_impl_hat
+        else:
+            f.impl[:] = self.itransform(f_impl_hat).real
 
         # treat convection explicitly with dealiasing
         Dx_u_hat = self.u_init_forward
@@ -168,7 +176,10 @@ class RayleighBenard(GenericSpectralLinear):
         fexpl_pad[iv][:] = -(u_pad[iu] * Dx_u_pad[iv] + u_pad[iv] * Dz_u_pad[iv])
         fexpl_pad[iT][:] = -(u_pad[iu] * Dx_u_pad[iT] + u_pad[iv] * Dz_u_pad[iT])
 
-        f.expl[:] = self.itransform(self.transform(fexpl_pad, padding=padding)).real
+        if self.spectral_space:
+            f.expl[:] = self.transform(fexpl_pad, padding=padding)
+        else:
+            f.expl[:] = self.itransform(self.transform(fexpl_pad, padding=padding)).real
 
         return f
 
@@ -178,7 +189,7 @@ class RayleighBenard(GenericSpectralLinear):
             self.BCs['v_top'] == self.BCs['v_bottom']
         ), 'Initial conditions are only implemented for zero velocity gradient'
 
-        me = self.u_init
+        me = self.spectral.u_init
         iu, iv, iT, ip = self.index(['u', 'v', 'T', 'p'])
 
         # linear temperature gradient
@@ -190,12 +201,17 @@ class RayleighBenard(GenericSpectralLinear):
         # perturb slightly
         rng = self.xp.random.default_rng(seed=seed)
 
-        noise = self.u_init
+        noise = self.spectral.u_init
         noise[iT] = rng.random(size=me[iT].shape)
 
         me[iT] += noise[iT].real * noise_level * (self.Z - 1) * (self.Z + 1)
 
-        return me
+        if self.spectral_space:
+            me_hat = self.spectral.u_init_forward
+            me_hat[:] = self.transform(me)
+            return me_hat
+        else:
+            return me
 
     def get_fig(self):  # pragma: no cover
         """
@@ -237,8 +253,12 @@ class RayleighBenard(GenericSpectralLinear):
         fig = self.get_fig() if fig is None else fig
         axs = fig.axes
 
-        imT = axs[0].pcolormesh(self.X, self.Z, u[self.index(quantity)].real)
         imV = axs[1].pcolormesh(self.X, self.Z, self.compute_vorticity(u).real)
+
+        if self.spectral_space:
+            u = self.itransform(u)
+
+        imT = axs[0].pcolormesh(self.X, self.Z, u[self.index(quantity)].real)
 
         for i, label in zip([0, 1], [rf'${quantity}$', 'vorticity']):
             axs[i].set_aspect(1)
@@ -252,12 +272,15 @@ class RayleighBenard(GenericSpectralLinear):
         fig.colorbar(imV, self.cax[1])
 
     def compute_vorticity(self, u):
-        u_hat = self.transform(u)
+        if self.spectral_space:
+            u_hat = u.copy()
+        else:
+            u_hat = self.transform(u)
         Dz = self.Dz
         Dx = self.Dx
         iu, iv = self.index(['u', 'v'])
 
-        vorticity_hat = self.u_init_forward
+        vorticity_hat = self.spectral.u_init_forward
         vorticity_hat[0] = (Dx * u_hat[iv].flatten() + Dz @ u_hat[iu].flatten()).reshape(u[iu].shape)
         return self.itransform(vorticity_hat)[0].real
 
@@ -276,9 +299,13 @@ class RayleighBenard(GenericSpectralLinear):
         """
         iv, iT = self.index(['v', 'T'])
 
-        DzT_hat = self.u_init_forward
+        DzT_hat = self.spectral.u_init_forward
 
-        u_hat = self.transform(u)
+        if self.spectral_space:
+            u_hat = u.copy()
+        else:
+            u_hat = self.transform(u)
+
         DzT_hat[iT] = (self.Dz @ u_hat[iT].flatten()).reshape(DzT_hat[iT].shape)
 
         # compute vT with dealiasing
@@ -322,9 +349,12 @@ class RayleighBenard(GenericSpectralLinear):
     def compute_viscous_dissipation(self, u):
         iu, iv = self.index(['u', 'v'])
 
-        Lap_u_hat = self.u_init_forward
+        Lap_u_hat = self.spectral.u_init_forward
 
-        u_hat = self.transform(u)
+        if self.spectral_space:
+            u_hat = u.copy()
+        else:
+            u_hat = self.transform(u)
         Lap_u_hat[iu] = ((self.Dzz + self.Dxx) @ u_hat[iu].flatten()).reshape(u_hat[iu].shape)
         Lap_u_hat[iv] = ((self.Dzz + self.Dxx) @ u_hat[iv].flatten()).reshape(u_hat[iu].shape)
         Lap_u = self.itransform(Lap_u_hat)
@@ -332,6 +362,8 @@ class RayleighBenard(GenericSpectralLinear):
         return abs(u[iu] * Lap_u[iu] + u[iv] * Lap_u[iv])
 
     def compute_buoyancy_generation(self, u):
+        if self.spectral_space:
+            u = self.itransform(u)
         iv, iT = self.index(['v', 'T'])
         return abs(u[iv] * self.Rayleigh * u[iT])
 
@@ -389,6 +421,9 @@ class CFLLimit(ConvergenceController):
         grid_spacing_z = cell_wallz[:-1] - cell_wallz[1:]
 
         iu, iv = P.index(['u', 'v'])
+
+        if P.spectral_space:
+            u = P.itransform(u)
 
         max_step_size_x = P.xp.min(grid_spacing_x / P.xp.abs(u[iu]))
         max_step_size_z = P.xp.min(grid_spacing_z / P.xp.abs(u[iv]))

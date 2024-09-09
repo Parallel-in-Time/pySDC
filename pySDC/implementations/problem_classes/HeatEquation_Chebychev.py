@@ -16,7 +16,7 @@ class Heat1DChebychev(GenericSpectralLinear):
         bases = [{'base': 'chebychev', 'N': nvars}]
         components = ['u', 'ux']
 
-        super().__init__(bases, components, **kwargs)
+        super().__init__(bases, components, real_spectral_coefficients=True, **kwargs)
 
         self.x = self.get_grid()[0]
 
@@ -43,10 +43,17 @@ class Heat1DChebychev(GenericSpectralLinear):
         f = self.f_init
         iu, iux = self.index(self.components)
 
-        me_hat = self.u_init_forward
-        me_hat[:] = self.transform(u)
-        me_hat[iu] = (self.nu * self.Dx @ me_hat[iux].flatten()).reshape(me_hat[iu].shape)
-        me = self.itransform(me_hat).real
+        if self.spectral_space:
+            u_hat = u.copy()
+        else:
+            u_hat = self.transform(u)
+
+        u_hat[iu] = (self.nu * self.Dx @ u_hat[iux].flatten()).reshape(u_hat[iu].shape)
+
+        if self.spectral_space:
+            me = u_hat
+        else:
+            me = self.itransform(u_hat).real
 
         f[iu] = me[iu]
         return f
@@ -54,7 +61,7 @@ class Heat1DChebychev(GenericSpectralLinear):
     def u_exact(self, t, noise=0):
         xp = self.xp
         iu, iux = self.index(self.components)
-        u = self.u_init
+        u = self.spectral.u_init
 
         u[iu] = (
             xp.sin(self.f * np.pi * self.x) * xp.exp(-self.nu * (self.f * np.pi) ** 2 * t)
@@ -78,7 +85,13 @@ class Heat1DChebychev(GenericSpectralLinear):
             u += _noise * noise * (self.x - 1) * (self.x + 1)
 
         self.check_BCs(u)
-        return u
+
+        if self.spectral_space:
+            u_hat = self.u_init
+            u_hat[...] = self.transform(u)
+            return u_hat
+        else:
+            return u
 
 
 class Heat1DUltraspherical(GenericSpectralLinear):
@@ -91,7 +104,7 @@ class Heat1DUltraspherical(GenericSpectralLinear):
         bases = [{'base': 'ultraspherical', 'N': nvars}]
         components = ['u']
 
-        GenericSpectralLinear.__init__(self, bases, components, **kwargs)
+        GenericSpectralLinear.__init__(self, bases, components, real_spectral_coefficients=True, **kwargs)
 
         self.x = self.get_grid()[0]
 
@@ -119,10 +132,17 @@ class Heat1DUltraspherical(GenericSpectralLinear):
         f = self.f_init
         iu = self.index('u')
 
-        me_hat = self.u_init_forward
-        me_hat[:] = self.transform(u)
-        me_hat[iu] = (self.nu * (self.Dxx @ me_hat[iu].flatten())).reshape(me_hat[iu].shape)
-        me = self.itransform(me_hat).real
+        if self.spectral_space:
+            u_hat = u.copy()
+        else:
+            u_hat = self.transform(u)
+
+        u_hat[iu] = (self.nu * (self.Dxx @ u_hat[iu].flatten())).reshape(u_hat[iu].shape)
+
+        if self.spectral_space:
+            me = u_hat
+        else:
+            me = self.itransform(u_hat).real
 
         f[iu][...] = me[iu]
         return f
@@ -130,7 +150,7 @@ class Heat1DUltraspherical(GenericSpectralLinear):
     def u_exact(self, t, noise=0):
         xp = self.xp
         iu = self.index('u')
-        u = self.u_init
+        u = self.spectral.u_init
 
         u[iu] = (
             xp.sin(self.f * np.pi * self.x) * xp.exp(-self.nu * (self.f * np.pi) ** 2 * t)
@@ -150,7 +170,11 @@ class Heat1DUltraspherical(GenericSpectralLinear):
             u += _noise * noise * (self.x - 1) * (self.x + 1)
 
         self.check_BCs(u)
-        return u
+
+        if self.spectral_space:
+            return self.transform(u)
+        else:
+            return u
 
 
 class Heat2DChebychev(GenericSpectralLinear):
@@ -165,7 +189,7 @@ class Heat2DChebychev(GenericSpectralLinear):
         bases = [{'base': base_x, 'N': nx}, {'base': base_y, 'N': ny}]
         components = ['u', 'ux', 'uy']
 
-        super().__init__(bases, components, Dirichlet_recombination=False, **kwargs)
+        super().__init__(bases, components, Dirichlet_recombination=False, spectral_space=False, **kwargs)
 
         self.Y, self.X = self.get_grid()
 
@@ -252,7 +276,7 @@ class Heat2DUltraspherical(GenericSpectralLinear):
         bases = [{'base': base_x, 'N': nx}, {'base': base_y, 'N': ny}]
         components = ['u']
 
-        super().__init__(bases, components, Dirichlet_recombination=False, **kwargs)
+        super().__init__(bases, components, Dirichlet_recombination=False, spectral_space=False, **kwargs)
 
         self.Y, self.X = self.get_grid()
 

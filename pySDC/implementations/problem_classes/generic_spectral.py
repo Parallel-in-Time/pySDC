@@ -40,6 +40,8 @@ class GenericSpectralLinear(Problem):
         solver_args=None,
         useGPU=False,
         max_cached_factorizations=12,
+        spectral_space=True,
+        real_spectral_coefficients=False,
         *args,
         **kwargs,
     ):
@@ -56,6 +58,8 @@ class GenericSpectralLinear(Problem):
             solver_args (dict): Arguments for linear solver
             useGPU (bool): Run on GPU or CPU
             max_cached_factorizations (int): Number of matrix decompositions to cache before starting eviction
+            spectral_space (bool): If yes, the solution will not be transformed back after solving and evaluating the RHS, and is expected as input in spectral space to these functions
+            real_spectral_coefficients (bool): If yes, allow only real values in spectral space, otherwise, allow complex.
         """
         solver_args = {} if solver_args is None else solver_args
         self._makeAttributeAndRegister(
@@ -66,6 +70,8 @@ class GenericSpectralLinear(Problem):
             'left_preconditioner',
             'Dirichlet_recombination',
             'comm',
+            'spectral_space',
+            'real_spectral_coefficients',
             localVars=locals(),
         )
         self.spectral = SpectralHelper(comm=comm, useGPU=useGPU)
@@ -77,9 +83,9 @@ class GenericSpectralLinear(Problem):
             self.spectral.add_axis(**base)
         self.spectral.add_component(components)
 
-        self.spectral.setup_fft()
+        self.spectral.setup_fft(real_spectral_coefficients)
 
-        super().__init__(init=self.spectral.init)
+        super().__init__(init=self.spectral.init_forward if spectral_space else self.spectral.init)
 
         self.work_counters[solver_type] = WorkCounter()
         self.work_counters['factorizations'] = WorkCounter()
@@ -182,9 +188,11 @@ class GenericSpectralLinear(Problem):
 
         sp = self.spectral.sparse_lib
 
-        sol = self.u_init
+        if self.spectral_space:
+            rhs_hat = rhs.copy()
+        else:
+            rhs_hat = self.spectral.transform(rhs)
 
-        rhs_hat = self.spectral.transform(rhs)
         rhs_hat = (self.M @ rhs_hat.flatten()).reshape(rhs_hat.shape)
         rhs_hat = self.spectral.put_BCs_in_rhs_hat(rhs_hat)
         rhs_hat = self.Pl @ rhs_hat.flatten()
@@ -214,13 +222,13 @@ class GenericSpectralLinear(Problem):
                 self.logger.debug(f'Cached matrix factorization for {dt=:.6f}')
                 self.work_counters['factorizations']()
 
-            sol_hat = self.cached_factorizations[dt](rhs_hat)
+            _sol_hat = self.cached_factorizations[dt](rhs_hat)
             self.logger.debug(f'Used cached matrix factorization for {dt=:.6f}')
 
         elif self.solver_type.lower() == 'direct':
-            sol_hat = sp.linalg.spsolve(A, rhs_hat)
+            _sol_hat = sp.linalg.spsolve(A, rhs_hat)
         elif self.solver_type.lower() == 'gmres':
-            sol_hat, _ = sp.linalg.gmres(
+            _sol_hat, _ = sp.linalg.gmres(
                 A,
                 rhs_hat,
                 x0=u0.flatten(),
@@ -229,22 +237,26 @@ class GenericSpectralLinear(Problem):
                 callback_type='legacy',
             )
         elif self.solver_type.lower() == 'cg':
-            sol_hat, _ = sp.linalg.cg(
+            _sol_hat, _ = sp.linalg.cg(
                 A, rhs_hat, x0=u0.flatten(), **self.solver_args, callback=self.work_counters[self.solver_type]
             )
         else:
             raise NotImplementedError(f'Solver {self.solver_type:!} not implemented in {type(self).__name__}!')
 
-        sol_hat = (self.Pr @ sol_hat).reshape(sol.shape)
-        if skip_itransform:
+        sol_hat = self.spectral.u_init_forward
+        sol_hat[...] = (self.Pr @ _sol_hat).reshape(sol_hat.shape)
+
+        if self.spectral_space:
             return sol_hat
+        else:
 
-        sol[:] = self.spectral.itransform(sol_hat).real
+            sol = self.spectral.u_init
+            sol[:] = self.spectral.itransform(sol_hat).real
 
-        if self.spectral.debug:
-            self.spectral.check_BCs(sol)
+            if self.spectral.debug:
+                self.spectral.check_BCs(sol)
 
-        return sol
+            return sol
 
 
 def compute_residual_DAE(self, stage=''):

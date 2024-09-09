@@ -7,7 +7,8 @@ import pytest
 @pytest.mark.parametrize('f', [0, 1])
 @pytest.mark.parametrize('noise', [0, 1e-3])
 @pytest.mark.parametrize('use_ultraspherical', [True, False])
-def test_heat1d_chebychev(a, b, f, noise, use_ultraspherical, nvars=2**4):
+@pytest.mark.parametrize('spectral_space', [True, False])
+def test_heat1d_chebychev(a, b, f, noise, use_ultraspherical, spectral_space, nvars=2**4):
     import numpy as np
 
     if use_ultraspherical:
@@ -16,7 +17,15 @@ def test_heat1d_chebychev(a, b, f, noise, use_ultraspherical, nvars=2**4):
         from pySDC.implementations.problem_classes.HeatEquation_Chebychev import Heat1DChebychev as problem_class
 
     P = problem_class(
-        nvars=nvars, a=a, b=b, f=f, nu=1e-2, left_preconditioner=False, right_preconditioning='T2T', debug=True
+        nvars=nvars,
+        a=a,
+        b=b,
+        f=f,
+        nu=1e-2,
+        left_preconditioner=False,
+        right_preconditioning='T2T',
+        debug=True,
+        spectral_space=spectral_space,
     )
 
     u0 = P.u_exact(0, noise=noise)
@@ -135,9 +144,10 @@ def test_SDC():
 
     k = get_sorted(stats, type='k')
     assert all(me[1] < step_params['maxiter'] for me in k)
+    assert all(me[1] > 0 for me in k)
 
 
 if __name__ == '__main__':
     test_SDC()
-    # test_heat1d_chebychev(1, 0, 1, 1e-3, True, 2**6)
+    # test_heat1d_chebychev(1, 0, 1, 0e-3, True, True, 2**4)
     # test_heat2d_chebychev(0, 0, 0, 2, 2, 'ultraspherical', 'fft', 2**6, 2**6)

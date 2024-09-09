@@ -28,7 +28,7 @@ class Burgers1D(GenericSpectralLinear):
         bases = [{'base': 'cheby', 'N': N}]
         components = ['u', 'ux']
 
-        super().__init__(bases=bases, components=components, **kwargs)
+        super().__init__(bases=bases, components=components, spectral_space=False, **kwargs)
 
         self.x = self.get_grid()[0]
 
@@ -164,7 +164,7 @@ class Burgers2D(GenericSpectralLinear):
             {'base': 'cheby', 'N': nz},
         ]
         components = ['u', 'v', 'ux', 'uz', 'vx', 'vz']
-        super().__init__(bases=bases, components=components, **kwargs)
+        super().__init__(bases=bases, components=components, spectral_space=False, **kwargs)
 
         self.Z, self.X = self.get_grid()
 

@@ -5,11 +5,12 @@ import pytest
 @pytest.mark.parametrize('direction', ['x', 'z', 'mixed'])
 @pytest.mark.parametrize('nx', [16])
 @pytest.mark.parametrize('nz', [8])
-def test_eval_f(nx, nz, direction):
+@pytest.mark.parametrize('spectral_space', [True, False])
+def test_eval_f(nx, nz, direction, spectral_space):
     import numpy as np
     from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
 
-    P = RayleighBenard(nx=nx, nz=nz, Rayleigh=1)
+    P = RayleighBenard(nx=nx, nz=nz, Rayleigh=1, spectral_space=spectral_space)
     iu, iv, ip, iT = P.index(['u', 'v', 'p', 'T'])
     X, Z = P.X, P.Z
     cos, sin = np.cos, np.sin
@@ -44,6 +45,9 @@ def test_eval_f(nx, nz, direction):
     for i in [iu, iv, iT, ip]:
         u[i][:] = y
 
+    if spectral_space:
+        u = P.transform(u)
+
     f = P.eval_f(u)
 
     f_expect = P.f_init
@@ -54,6 +58,10 @@ def test_eval_f(nx, nz, direction):
     f_expect.expl[iv] = -y * (y_z + y_x)
     f_expect.impl[iv] = -y_z + nu * (y_xx + y_zz) + y
     f_expect.impl[ip] = -(y_x + y_z)
+
+    if spectral_space:
+        f.impl = P.itransform(f.impl).real
+        f.expl = P.itransform(f.expl).real
 
     for comp in ['u', 'v', 'T', 'p']:
         i = P.spectral.index(comp)
@@ -72,7 +80,7 @@ def test_vorticity(nx, nz, direction):
     assert nz > 3
     assert nx > 8
 
-    P = RayleighBenard(nx=nx, nz=nz)
+    P = RayleighBenard(nx=nx, nz=nz, spectral_space=False)
     iu, iv = P.index(['u', 'v'])
 
     u = P.u_init
@@ -120,7 +128,7 @@ def test_viscous_dissipation(nx=2**5 + 1, nz=2**3 + 1):
     import numpy as np
     from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
 
-    P = RayleighBenard(nx=nx, nz=nz)
+    P = RayleighBenard(nx=nx, nz=nz, spectral_space=False)
     iu, iv = P.index(['u', 'v'])
     X, Z = P.X, P.Z
 
@@ -140,7 +148,7 @@ def test_buoyancy_computation(nx=9, nz=6):
     import numpy as np
     from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
 
-    P = RayleighBenard(nx=nx, nz=nz)
+    P = RayleighBenard(nx=nx, nz=nz, spectral_space=False)
     iT, iv = P.index(['T', 'v'])
     Z = P.Z
 
@@ -245,7 +253,7 @@ def test_CFL():
     from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard, CFLLimit
     import numpy as np
 
-    P = RayleighBenard(nx=5, nz=2)
+    P = RayleighBenard(nx=5, nz=2, spectral_space=False)
     iu, iv = P.index(['u', 'v'])
 
     u = P.u_init
@@ -264,10 +272,10 @@ def test_CFL():
 
 
 if __name__ == '__main__':
-    # test_eval_f(2**7, 2**5, 'mixed')
+    test_eval_f(2**0, 2**2, 'z', True)
     # test_Poisson_problem(1, 'T')
     # test_Poisson_problem_v()
     # test_Nusselt_numbers(1)
     # test_buoyancy_computation()
     # test_viscous_dissipation()
-    test_CFL()
+    # test_CFL()
