@@ -563,8 +563,9 @@ def test_tau_method2D(variant, nz, nx, bc_val, bc=-1, useMPI=False, plotting=Fal
 
     # prepare system to solve
     A = helper.put_BCs_in_matrix(A)
-    rhs = helper.put_BCs_in_rhs(helper.u_init)
-    rhs_hat = helper.transform(rhs, axes=(-1, -2))
+    # rhs = helper.put_BCs_in_rhs(helper.u_init)
+    # rhs_hat = helper.transform(rhs, axes=(-1, -2))
+    rhs_hat = helper.put_BCs_in_rhs_hat(helper.u_init_forward)
 
     # solve the system
     sol_hat = helper.u_init_forward
@@ -653,9 +654,9 @@ if __name__ == '__main__':
         # test_differentiation_matrix2D(2**5, 2**5, 'T2U', bx='fft', bz='fft', axes=(-2, -1))
         # test_matrix1D(4, 'cheby', 'int')
         # test_tau_method(-1, 8, 99, kind='Dirichlet')
-        # test_tau_method2D('T2U', 2**2, 2**2, -2, plotting=True)
+        test_tau_method2D('T2U', 2**8, 2**8, -2, plotting=True)
         # test_filter(6, 6, (0,))
-        _test_transform_dealias('fft', 'cheby', (-1, -2))
+        # _test_transform_dealias('fft', 'cheby', (-1, -2))
     else:
         raise NotImplementedError
     print('done')

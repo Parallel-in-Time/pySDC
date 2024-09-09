@@ -877,6 +877,10 @@ class SpectralHelper:
         diags[self.BC_zero_index] = 0
         self.BC_line_zero_matrix = sp.diags(diags)
 
+        # prepare BCs in spectral space to easily add to the RHS
+        rhs_BCs = self.put_BCs_in_rhs(self.u_init)
+        self.rhs_BCs_hat = self.transform(rhs_BCs)
+
     def check_BCs(self, u):
         """
         Check that the solution satisfies the boundary conditions
@@ -906,9 +910,37 @@ class SpectralHelper:
         """
         return self.BC_line_zero_matrix @ A + self.BCs
 
+    def put_BCs_in_rhs_hat(self, rhs_hat):
+        """
+        Put the BCs in the right hand side in spectral space for solving.
+        This function needs no transforms.
+
+        Args:
+            rhs_hat: Right hand side in spectral space
+
+        Returns:
+            rhs in spectral space with BCs
+        """
+        ndim = self.ndim
+
+        for axis in range(ndim):
+            for bc in self.full_BCs:
+                slices = (
+                    [slice(0, self.init[0][i + 1]) for i in range(axis)]
+                    + [bc['line']]
+                    + [slice(0, self.init[0][i + 1]) for i in range(axis + 1, len(self.axes))]
+                )
+                if axis == bc['axis']:
+                    _slice = [self.index(bc['equation'])] + slices
+                    rhs_hat[(*_slice,)] = 0
+
+        return rhs_hat + self.rhs_BCs_hat
+
     def put_BCs_in_rhs(self, rhs):
         """
         Put the BCs in the right hand side for solving.
+        This function will transform along each axis individually and add all BCs in that axis.
+        Consider `put_BCs_in_rhs_hat` to add BCs with no extra transforms needed.
 
         Args:
             rhs: Right hand side in physical space
@@ -918,7 +950,7 @@ class SpectralHelper:
         """
         assert rhs.ndim > 1, 'rhs must not be flattened here!'
 
-        ndim = len(self.axes)
+        ndim = self.ndim
 
         for axis in range(ndim):
             _rhs_hat = self.transform(rhs, axes=(axis - ndim,))

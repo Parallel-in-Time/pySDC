@@ -138,6 +138,6 @@ def test_SDC():
 
 
 if __name__ == '__main__':
-    # test_SDC()
+    test_SDC()
     # test_heat1d_chebychev(1, 0, 1, 1e-3, True, 2**6)
-    test_heat2d_chebychev(0, 0, 0, 2, 2, 'ultraspherical', 'fft', 2**6, 2**6)
+    # test_heat2d_chebychev(0, 0, 0, 2, 2, 'ultraspherical', 'fft', 2**6, 2**6)
