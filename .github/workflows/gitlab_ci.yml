@@ -120,7 +120,7 @@ jobs:
           pwd
           ls -lah
           cd artifacts
-          find . -type f -name "*.zip" -exec {} unzip ;
+          find . -name "*.zip" -type f -exec unzip -o {} ;
           ls -lah
           rm *.zip
           cd ..
