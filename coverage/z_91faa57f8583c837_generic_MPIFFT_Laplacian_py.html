@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/implementations/problem_classes/generic_MPIFFT_Laplacian.py: 90%</title>
+    <title>Coverage for pySDC/implementations/problem_classes/generic_MPIFFT_Laplacian.py: 99%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_58284776.png">
     <link rel="stylesheet" href="style_cb_8e611ae1.css" type="text/css">
     <script src="coverage_html_cb_6fb7b396.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC/implementations/problem_classes/generic_MPIFFT_Laplacian.py</b>:
-            <span class="pc_cov">90%</span>
+            <span class="pc_cov">99%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">86 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">77<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">9<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">85<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">1<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">2<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_91faa57f8583c837_generic_ND_FD_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.1">coverage.py v7.6.1</a>,
-            created at 2024-09-06 15:28 +0000
+            created at 2024-09-09 14:59 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -134,16 +134,16 @@
     <p class="run"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t">    <span class="op">@</span><span class="nam">classmethod</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">    <span class="key">def</span> <span class="nam">setup_GPU</span><span class="op">(</span><span class="nam">cls</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t">        <span class="str">"""switch to GPU modules"""</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t">        <span class="key">import</span> <span class="nam">cupy</span> <span class="key">as</span> <span class="nam">cp</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t56" href="#t56">56</a></span><span class="t">        <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">datatype_classes</span><span class="op">.</span><span class="nam">cupy_mesh</span> <span class="key">import</span> <span class="nam">cupy_mesh</span><span class="op">,</span> <span class="nam">imex_cupy_mesh</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t">        <span class="key">import</span> <span class="nam">cupy</span> <span class="key">as</span> <span class="nam">cp</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t56" href="#t56">56</a></span><span class="t">        <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">datatype_classes</span><span class="op">.</span><span class="nam">cupy_mesh</span> <span class="key">import</span> <span class="nam">cupy_mesh</span><span class="op">,</span> <span class="nam">imex_cupy_mesh</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t">        <span class="nam">cls</span><span class="op">.</span><span class="nam">xp</span> <span class="op">=</span> <span class="nam">cp</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t">        <span class="nam">cls</span><span class="op">.</span><span class="nam">xp</span> <span class="op">=</span> <span class="nam">cp</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">        <span class="nam">cls</span><span class="op">.</span><span class="nam">dtype_u</span> <span class="op">=</span> <span class="nam">cupy_mesh</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t61" href="#t61">61</a></span><span class="t">        <span class="nam">cls</span><span class="op">.</span><span class="nam">dtype_f</span> <span class="op">=</span> <span class="nam">imex_cupy_mesh</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">        <span class="nam">cls</span><span class="op">.</span><span class="nam">dtype_u</span> <span class="op">=</span> <span class="nam">cupy_mesh</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t61" href="#t61">61</a></span><span class="t">        <span class="nam">cls</span><span class="op">.</span><span class="nam">dtype_f</span> <span class="op">=</span> <span class="nam">imex_cupy_mesh</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t">        <span class="nam">cls</span><span class="op">.</span><span class="nam">fft_backend</span> <span class="op">=</span> <span class="str">'cupy'</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t64" href="#t64">64</a></span><span class="t">        <span class="nam">cls</span><span class="op">.</span><span class="nam">fft_comm_backend</span> <span class="op">=</span> <span class="str">'NCCL'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t">        <span class="nam">cls</span><span class="op">.</span><span class="nam">fft_backend</span> <span class="op">=</span> <span class="str">'cupy'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t64" href="#t64">64</a></span><span class="t">        <span class="nam">cls</span><span class="op">.</span><span class="nam">fft_comm_backend</span> <span class="op">=</span> <span class="str">'NCCL'</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t65" href="#t65">65</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t66" href="#t66">66</a></span><span class="t">    <span class="key">def</span> <span class="nam">__init__</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t67" href="#t67">67</a></span><span class="t">        <span class="nam">self</span><span class="op">,</span> <span class="nam">nvars</span><span class="op">=</span><span class="key">None</span><span class="op">,</span> <span class="nam">spectral</span><span class="op">=</span><span class="key">False</span><span class="op">,</span> <span class="nam">L</span><span class="op">=</span><span class="num">2</span> <span class="op">*</span> <span class="nam">np</span><span class="op">.</span><span class="nam">pi</span><span class="op">,</span> <span class="nam">alpha</span><span class="op">=</span><span class="num">1.0</span><span class="op">,</span> <span class="nam">comm</span><span class="op">=</span><span class="nam">MPI</span><span class="op">.</span><span class="nam">COMM_WORLD</span><span class="op">,</span> <span class="nam">dtype</span><span class="op">=</span><span class="str">'d'</span><span class="op">,</span> <span class="nam">useGPU</span><span class="op">=</span><span class="key">False</span><span class="op">,</span> <span class="nam">x0</span><span class="op">=</span><span class="num">0.0</span>&nbsp;</span><span class="r"></span></p>
@@ -151,7 +151,7 @@
     <p class="pln"><span class="n"><a id="t69" href="#t69">69</a></span><span class="t">        <span class="str">"""Initialization routine"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t70" href="#t70">70</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t71" href="#t71">71</a></span><span class="t">        <span class="key">if</span> <span class="nam">useGPU</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t72" href="#t72">72</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">setup_GPU</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t72" href="#t72">72</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">setup_GPU</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t73" href="#t73">73</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t74" href="#t74">74</a></span><span class="t">        <span class="key">if</span> <span class="nam">nvars</span> <span class="key">is</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t75" href="#t75">75</a></span><span class="t">            <span class="nam">nvars</span> <span class="op">=</span> <span class="op">(</span><span class="num">128</span><span class="op">,</span> <span class="num">128</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -299,7 +299,7 @@
             <a class="nav" href="z_91faa57f8583c837_generic_ND_FD_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.1">coverage.py v7.6.1</a>,
-            created at 2024-09-06 15:28 +0000
+            created at 2024-09-09 14:59 +0000
         </p>
     </div>
 </footer>
