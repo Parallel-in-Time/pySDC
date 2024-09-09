@@ -125,6 +125,12 @@ jobs:
           rm *.zip
           cd ..
           ls -lah
+      - name: Uploading artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gitlab-Action_artifacts
+          path: |
+            ./artifacts/*
 
   get_artifacts_from_other_workflow:
     runs-on: ubuntu-latest
