@@ -122,6 +122,7 @@ jobs:
           cd artifacts
           unzip -f '*.zip' -d .
           ls -lah
+          find -type d .. test_JUWELS
           rm *.zip
           ls -lah
           cd ..
