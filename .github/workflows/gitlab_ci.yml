@@ -125,7 +125,7 @@ jobs:
           rm *.zip
           cd ..
           ls -lah
-          find . -type d "test_JUWELS"
+          find . -type d -name "test_JUWELS"
 
   get_artifacts_from_other_workflow:
     runs-on: ubuntu-latest
