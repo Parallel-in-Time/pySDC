@@ -104,7 +104,7 @@ jobs:
           git config user.email "unused@example.com"
           git config user.name "Sync bot"
           echo "Merge the two parts of the Merge-Request to test the resulting version"
-          git merge "${{ github.event.pul­­l_request.head.sha }}"
+          git merge "${{ github.event.pull_request.head.sha }}"
       - name: Mirror and wait for Gitlab-CI
         uses: jakob-fritz/github2lab_action@v0.8
         env:
