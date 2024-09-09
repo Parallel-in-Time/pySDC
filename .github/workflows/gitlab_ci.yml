@@ -120,12 +120,11 @@ jobs:
           pwd
           ls -lah
           cd artifacts
-          unzip -f '*.zip' -d .
+          find . -type f -name "*.zip" -exec {} unzip ;
           ls -lah
           rm *.zip
           cd ..
           ls -lah
-          find . -type d -name "test_JUWELS"
 
   get_artifacts_from_other_workflow:
     runs-on: ubuntu-latest
