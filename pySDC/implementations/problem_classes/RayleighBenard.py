@@ -128,12 +128,15 @@ class RayleighBenard(GenericSpectralLinear):
             kind='Dirichlet',
             line=-1,
         )
-        self.setup_BCs()
 
+        # eliminate Nyquist mode if needed
         if nx % 2 == 0:
-            self.logger.warning(
-                f'The resolution is x-direction is even at {nx}. Keep in mind that the Nyquist mode is only partially resolved in this case. Consider changing the solution by one.'
-            )
+            Nyquist_mode_index = self.axes[0].get_Nyquist_mode_index()
+            for component in self.components:
+                self.add_BC(
+                    component=component, equation=component, axis=0, kind='Nyquist', line=Nyquist_mode_index, v=0
+                )
+        self.setup_BCs()
 
     def eval_f(self, u, *args, **kwargs):
         f = self.f_init

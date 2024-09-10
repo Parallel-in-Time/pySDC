@@ -249,6 +249,7 @@ def test_Poisson_problem_v():
     assert np.allclose(u_exact, u)
 
 
+@pytest.mark.mpi4py
 def test_CFL():
     from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard, CFLLimit
     import numpy as np
@@ -271,11 +272,26 @@ def test_CFL():
     assert np.allclose(dt2, 1 / u2[iv])
 
 
+@pytest.mark.mpi4py
+def test_Nyquist_mode_elimination():
+    from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
+    import numpy as np
+
+    P = RayleighBenard(nx=32, nz=8)
+    u0 = P.u_exact(noise_level=1e-3)
+
+    u = P.solve_system(u0, dt=1e-3)
+
+    Nyquist_mode_index = P.axes[0].get_Nyquist_mode_index()
+    assert np.allclose(u[:, Nyquist_mode_index, :], 0)
+
+
 if __name__ == '__main__':
-    test_eval_f(2**0, 2**2, 'z', True)
+    # test_eval_f(2**0, 2**2, 'z', True)
     # test_Poisson_problem(1, 'T')
     # test_Poisson_problem_v()
     # test_Nusselt_numbers(1)
     # test_buoyancy_computation()
     # test_viscous_dissipation()
     # test_CFL()
+    test_Nyquist_mode_elimination()

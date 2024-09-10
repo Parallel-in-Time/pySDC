@@ -568,8 +568,20 @@ class FFTHelper(SpectralHelper1D):
     def get_BC(self, kind, **kwargs):
         if kind.lower() == 'integral':
             return self.get_integ_BC_row(**kwargs)
+        elif kind.lower() == 'nyquist':
+            assert (
+                self.N % 2 == 0
+            ), f'Do not eliminate the Nyquist mode with odd resolution as it is fully resolved. You chose {self.N} in this axis'
+            BC = self.xp.zeros(self.N)
+            BC[self.get_Nyquist_mode_index()] = 1
+            return BC
         else:
             return super().get_BC(kind, **kwargs)
+
+    def get_Nyquist_mode_index(self):
+        k = self.get_wavenumbers()
+        Nyquist_mode = min(k)
+        return self.xp.where(k == Nyquist_mode)[0][0]
 
     def get_integ_BC_row(self, **kwargs):
         """
@@ -861,6 +873,7 @@ class SpectralHelper:
             )
             N = self.axes[axis].N
             if (N + line) % N in self.xp.arange(N)[self.local_slice[axis]]:
+                slices[axis + 1] -= self.local_slice[axis].start
                 self.BC_rhs_mask[(*slices,)] = True
 
     def setup_BCs(self):
@@ -932,7 +945,10 @@ class SpectralHelper:
                 )
                 if axis == bc['axis']:
                     _slice = [self.index(bc['equation'])] + slices
-                    rhs_hat[(*_slice,)] = 0
+                    N = self.axes[axis].N
+                    if (N + bc['line']) % N in self.xp.arange(N)[self.local_slice[axis]]:
+                        _slice[axis + 1] -= self.local_slice[axis].start
+                        rhs_hat[(*_slice,)] = 0
 
         return rhs_hat + self.rhs_BCs_hat
 
@@ -963,7 +979,12 @@ class SpectralHelper:
                 )
                 if axis == bc['axis']:
                     _slice = [self.index(bc['equation'])] + slices
-                    _rhs_hat[(*_slice,)] = bc['v']
+
+                    N = self.axes[axis].N
+                    if (N + bc['line']) % N in self.xp.arange(N)[self.local_slice[axis]]:
+                        _slice[axis + 1] -= self.local_slice[axis].start
+
+                        _rhs_hat[(*_slice,)] = bc['v']
 
             rhs = self.itransform(_rhs_hat, axes=(axis - ndim,))
 
