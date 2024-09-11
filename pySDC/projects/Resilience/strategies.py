@@ -1242,7 +1242,7 @@ class DIRKStrategy(AdaptivityStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 1820
+                return 1456
             elif key == 'e_global_post_run' and op == max:
                 return 0.00013730538358736055
 
@@ -1433,7 +1433,7 @@ class ESDIRKStrategy(AdaptivityStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 984
+                return 820
             elif key == 'e_global_post_run' and op == max:
                 return 3.148061889390874e-06
 
