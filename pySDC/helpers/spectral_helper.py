@@ -1468,8 +1468,7 @@ class SpectralHelper:
             from mpi4py_fft import newDistArray
 
             _in = newDistArray(fft, forward).redistribute(axis_in)
-            if fill:
-                _in[...] = u
+            _in[...] = u
 
             return _in.redistribute(axis_out)
 
