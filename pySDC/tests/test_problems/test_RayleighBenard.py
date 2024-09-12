@@ -289,9 +289,9 @@ def test_Nyquist_mode_elimination():
 if __name__ == '__main__':
     # test_eval_f(2**0, 2**2, 'z', True)
     # test_Poisson_problem(1, 'T')
-    # test_Poisson_problem_v()
+    test_Poisson_problem_v()
     # test_Nusselt_numbers(1)
     # test_buoyancy_computation()
     # test_viscous_dissipation()
     # test_CFL()
-    test_Nyquist_mode_elimination()
+    # test_Nyquist_mode_elimination()
