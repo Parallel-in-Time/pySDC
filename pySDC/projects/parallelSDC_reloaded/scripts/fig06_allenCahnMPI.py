@@ -55,7 +55,7 @@ def getCost(counters):
 
 try:
     qDelta = sys.argv[1]
-except:
+except IndexError:
     qDelta = "MIN-SR-FLEX"
 
 try:
