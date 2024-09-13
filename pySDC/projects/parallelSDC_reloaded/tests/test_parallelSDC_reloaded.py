@@ -113,3 +113,15 @@ def test_script_fig05_allenCahn():
     assert fig05_allenCahn.config == [
         (*minPrec, "VDHS", "ESDIRK43", "LU"),
     ]
+
+
+@pytest.mark.base
+def test_script_fig06_allenCahn():
+    # Test fails for python < 3.8, so avoid it
+    if sys.version_info.minor < 8:
+        return
+
+    from pySDC.projects.parallelSDC_reloaded.scripts import fig06_allenCahnMPI, fig06_allenCahnMPI_plot
+
+    assert fig06_allenCahnMPI.nSweeps == 4
+    assert fig06_allenCahnMPI_plot.minPrec == ["MIN-SR-NS", "MIN-SR-S", "MIN-SR-FLEX"]

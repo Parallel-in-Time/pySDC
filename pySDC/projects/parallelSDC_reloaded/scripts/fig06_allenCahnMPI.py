@@ -64,7 +64,7 @@ except KeyError:
     params = getParamsSDC(quadType=quadType, numNodes=nNodes, nodeType=nodeType, qDeltaI=qDelta, nSweeps=nSweeps)
 
 useMPI = False
-if COMM_WORLD.Get_size() == 4 and qDelta in ["MIN-SR-NS", "MIN-SR-S", "MIN-SR-FLEX", "VDHS"]:
+if COMM_WORLD.Get_size() == 4 and qDelta in ["MIN-SR-NS", "MIN-SR-S", "MIN-SR-FLEX", "VDHS"]:  # pragma: no cover
     params['sweeper_class'] = generic_implicit_MPI
     useMPI = True
 
