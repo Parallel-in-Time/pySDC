@@ -29,11 +29,13 @@ class SpectralHelper1D:
         import cupy as cp
         import cupyx.scipy.sparse as sparse_lib
         import cupyx.scipy.sparse.linalg as linalg
+        import cupyx.scipy.fft as fft_lib
         from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
 
         cls.xp = cp
         cls.sparse_lib = sparse_lib
         cls.linalg = linalg
+        cls.fft_lib = fft_lib
 
     def get_Id(self):
         return self.sparse_lib.eye(self.N)
@@ -1429,6 +1431,8 @@ class SpectralHelper:
         """
         if self.comm is None or axis_in == axis_out:
             return u.copy()
+        if self.comm.size == 1:
+            return u.copy()
 
         fft = self.get_fft(**kwargs) if fft is None else fft
 
@@ -1450,6 +1454,7 @@ class SpectralHelper:
 
                 current_axis = transfer.axisB
                 u = arrayB
+
             return u
         elif axis_in in axisB and axis_out in axisA:
             while current_axis != axis_out:
@@ -1463,6 +1468,7 @@ class SpectralHelper:
 
                 current_axis = transfer.axisA
                 u = arrayA
+
             return u
         else:  # go the potentially slower route of not reusing transfer classes
             from mpi4py_fft import newDistArray

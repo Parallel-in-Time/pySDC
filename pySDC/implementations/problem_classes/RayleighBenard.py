@@ -134,7 +134,7 @@ class RayleighBenard(GenericSpectralLinear):
             Nyquist_mode_index = self.axes[0].get_Nyquist_mode_index()
             for component in self.components:
                 self.add_BC(
-                    component=component, equation=component, axis=0, kind='Nyquist', line=Nyquist_mode_index, v=0
+                    component=component, equation=component, axis=0, kind='Nyquist', line=int(Nyquist_mode_index), v=0
                 )
         self.setup_BCs()
 
@@ -434,7 +434,7 @@ class CFLLimit(ConvergenceController):
 
         if hasattr(P, 'comm'):
             max_step_size = P.comm.allreduce(max_step_size, op=MPI.MIN)
-        return max_step_size
+        return float(max_step_size)
 
     def get_new_step_size(self, controller, step, **kwargs):
         if not CheckConvergence.check_convergence(step):

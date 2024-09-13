@@ -18,8 +18,6 @@ class GenericSpectralLinear(Problem):
         from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh
         from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
-        cls.xp = cp
-
         cls.dtype_u = cupy_mesh
 
         GPU_versions = {
@@ -183,8 +181,6 @@ class GenericSpectralLinear(Problem):
 
         Note that in implicit Euler, the right hand side will be composed of the initial conditions. We don't want that in lines that don't depend on time. Therefore, we multiply the right hand side by the mass matrix. This means you can only do algebraic conditions that add up to zero. But you can easily overload this function with something more generic if needed.
         """
-        if dt == 0:
-            return rhs
 
         sp = self.spectral.sparse_lib
 
@@ -249,7 +245,6 @@ class GenericSpectralLinear(Problem):
         if self.spectral_space:
             return sol_hat
         else:
-
             sol = self.spectral.u_init
             sol[:] = self.spectral.itransform(sol_hat).real
 
@@ -308,6 +303,53 @@ def compute_residual_DAE(self, stage=''):
             f'residual_type = {L.params.residual_type} not implemented, choose '
             f'full_abs, last_abs, full_rel or last_rel instead'
         )
+
+    # indicate that the residual has seen the new values
+    L.status.updated = False
+
+    return None
+
+
+def compute_residual_DAE_MPI(self, stage=None):
+    """
+    Computation of the residual using the collocation matrix Q
+
+    Args:
+        stage (str): The current stage of the step the level belongs to
+    """
+    from mpi4py import MPI
+
+    L = self.level
+
+    # Check if we want to skip the residual computation to gain performance
+    # Keep in mind that skipping any residual computation is likely to give incorrect outputs of the residual!
+    if stage in self.params.skip_residual_computation:
+        L.status.residual = 0.0 if L.status.residual is None else L.status.residual
+        return None
+
+    # compute the residual for each node
+
+    # build QF(u)
+    res = self.integrate(last_only=L.params.residual_type[:4] == 'last')
+    mask = L.prob.diff_mask
+    res[mask] += L.u[0][mask] - L.u[self.rank + 1][mask]
+    # add tau if associated
+    if L.tau[self.rank] is not None:
+        res += L.tau[self.rank]
+    # use abs function from data type here
+    res_norm = abs(res)
+
+    # find maximal residual over the nodes
+    if L.params.residual_type == 'full_abs':
+        L.status.residual = self.comm.allreduce(res_norm, op=MPI.MAX)
+    elif L.params.residual_type == 'last_abs':
+        L.status.residual = self.comm.bcast(res_norm, root=self.comm.size - 1)
+    elif L.params.residual_type == 'full_rel':
+        L.status.residual = self.comm.allreduce(res_norm / abs(L.u[0]), op=MPI.MAX)
+    elif L.params.residual_type == 'last_rel':
+        L.status.residual = self.comm.bcast(res_norm / abs(L.u[0]), root=self.comm.size - 1)
+    else:
+        raise NotImplementedError(f'residual type \"{L.params.residual_type}\" not implemented!')
 
     # indicate that the residual has seen the new values
     L.status.updated = False
