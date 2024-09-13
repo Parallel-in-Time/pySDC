@@ -357,5 +357,5 @@ def test_RK_sweepers_with_GPU(test_name, sweeper_name):
 
 if __name__ == '__main__':
     # test_rhs_evals('ARK54')
-    test_order('ARK548L2SAERK2')
+    test_order('CrankNicholson')
     # test_order('ARK54')
