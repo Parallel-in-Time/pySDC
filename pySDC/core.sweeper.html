@@ -163,6 +163,17 @@ and evaluates the RHS of the ODE there</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="core.sweeper.Sweeper.updateVariableCoeffs">
+<span class="sig-name descname"><span class="pre">updateVariableCoeffs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.updateVariableCoeffs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.updateVariableCoeffs" title="Link to this definition">¶</a></dt>
+<dd><p>Potentially update QDelta implicit coefficients if variable …</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<em>int</em>) – Index of the sweep (0 for initial sweep, 1 for the first one, …).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.update_nodes">
 <span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.update_nodes" title="Link to this definition">¶</a></dt>
 <dd><p>Abstract interface to node update</p>
@@ -196,6 +207,7 @@ and evaluates the RHS of the ODE there</p>
 <li><a class="reference internal" href="#core.sweeper.Sweeper.predict"><code class="docutils literal notranslate"><span class="pre">predict()</span></code></a></li>
 <li><a class="reference internal" href="#core.sweeper.Sweeper.rank"><code class="docutils literal notranslate"><span class="pre">rank</span></code></a></li>
 <li><a class="reference internal" href="#core.sweeper.Sweeper.setupGenerator"><code class="docutils literal notranslate"><span class="pre">setupGenerator()</span></code></a></li>
+<li><a class="reference internal" href="#core.sweeper.Sweeper.updateVariableCoeffs"><code class="docutils literal notranslate"><span class="pre">updateVariableCoeffs()</span></code></a></li>
 <li><a class="reference internal" href="#core.sweeper.Sweeper.update_nodes"><code class="docutils literal notranslate"><span class="pre">update_nodes()</span></code></a></li>
 </ul>
 </li>

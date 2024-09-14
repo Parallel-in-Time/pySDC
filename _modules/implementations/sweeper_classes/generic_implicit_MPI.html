@@ -262,7 +262,8 @@
         <span class="c1"># only if the level has been touched before</span>
         <span class="k">assert</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">unlocked</span>
 
-        <span class="c1"># get number of collocation nodes for easier access</span>
+        <span class="c1"># update the MIN-SR-FLEX preconditioner</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateVariableCoeffs</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">)</span>
 
         <span class="c1"># gather all terms which are known already (e.g. from the previous iteration)</span>
         <span class="c1"># this corresponds to u0 + QF(u^k) - QdF(u^k) + tau</span>
