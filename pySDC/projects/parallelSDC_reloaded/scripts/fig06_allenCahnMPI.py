@@ -55,6 +55,8 @@ def getCost(counters):
 
 try:
     qDelta = sys.argv[1]
+    if qDelta.startswith("--"):
+        qDelta = "MIN-SR-FLEX"
 except IndexError:
     qDelta = "MIN-SR-FLEX"
 
