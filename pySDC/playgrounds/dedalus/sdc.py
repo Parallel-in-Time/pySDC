@@ -173,7 +173,7 @@ class IMEXSDCCore(object):
                 Q=cls.Q, nodes=cls.nodes, nNodes=nNodes,
                 nodeType=nodeType, quadType=quadType)
 
-        # Eventually update additional parameters
+        # Potentially update additional parameters
         if forceProl is not None: cls.forceProl = forceProl
         if initSweep is not None: cls.initSweep = initSweep
         if not keepNSweeps:
@@ -302,7 +302,7 @@ class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
         # Update LHS and LHS solvers for each subproblems
         for sp in solver.subproblems:
             if init:
-                # Eventually instantiate list of solver (ony first time step)
+                # Potentially instantiate list of solver (ony first time step)
                 sp.LHS_solvers = [[None for _ in range(self.M)] for _ in range(self.nSweeps)]
             for k in range(self.nSweeps):
                 for m in range(self.M):

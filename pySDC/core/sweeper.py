@@ -266,7 +266,7 @@ class Sweeper(object):
 
     def updateVariableCoeffs(self, k):
         """
-        Eventually update QDelta implicit coefficients if variable ...
+        Potentially update QDelta implicit coefficients if variable ...
 
         Parameters
         ----------

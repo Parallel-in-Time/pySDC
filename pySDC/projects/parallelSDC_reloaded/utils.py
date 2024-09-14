@@ -275,7 +275,7 @@ def solutionExact(tEnd, nSteps, probName, **kwargs):
         key = f"{tEnd}_{nSteps}"
         cacheFile = '_solJacobiEllipticExact.json'
 
-    # Eventually load already computed solution from local cache
+    # Potentially load already computed solution from local cache
     try:
         with open(f"{PATH}/{cacheFile}", "r") as f:
             cache = json.load(f)
