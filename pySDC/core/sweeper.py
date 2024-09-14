@@ -104,7 +104,7 @@ class Sweeper(object):
                 tLeft=coll.tleft,
             )
         except Exception as e:
-            raise ValueError(f"could not generate {qd_type=!r} with qmat, got error : {e}")
+            raise ValueError(f"could not generate {qd_type=!r} with qmat, got error : {e}") from e
 
     def get_Qdelta_implicit(self, qd_type, k=None):
         QDmat = np.zeros_like(self.coll.Qmat)
@@ -263,3 +263,15 @@ class Sweeper(object):
     @property
     def rank(self):
         return 0
+
+    def updateVariableCoeffs(self, k):
+        """
+        Potentially update QDelta implicit coefficients if variable ...
+
+        Parameters
+        ----------
+        k : int
+            Index of the sweep (0 for initial sweep, 1 for the first one, ...).
+        """
+        if self.params.QI == 'MIN-SR-FLEX':
+            self.QI = self.get_Qdelta_implicit(qd_type="MIN-SR-FLEX", k=k)

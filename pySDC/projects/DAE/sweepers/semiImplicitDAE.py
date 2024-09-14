@@ -26,7 +26,7 @@ class SemiImplicitDAE(FullyImplicitDAE):
         0 = g(\vec{U}_0 + \Delta t (\mathbf{Q} \otimes \mathbf{I}_{n_d}) \vec{U}, \vec{z}, \tau),
 
     where
-    
+
     - :math:`\tau=(\tau_1,..,\tau_M) in \mathbb{R}^M` the vector of collocation nodes,
     - :math:`\vec{U}_0 = (u_0,..,u_0) \in \mathbb{R}^{MN_d}` the vector of initial condition spread to each node,
     - spectral integration matrix :math:`\mathbf{Q} \in \mathbb{R}^{M \times M}`,

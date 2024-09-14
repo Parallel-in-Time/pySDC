@@ -19,7 +19,7 @@ from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1
 )
 from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.imexexp_1st_order import imexexp_1st_order
 
-""" 
+"""
 Run the multirate Dahlquist test equation and plot the stability domain of the method.
 We vary only the exponential term and the stiff term, while the non stiff term is kept constant (to allow 2D plots).
 """

@@ -65,7 +65,7 @@ class CollBase(object):
                 nNodes=num_nodes, nodeType=node_type, quadType=quad_type, tLeft=tleft, tRight=tright
             )
         except Exception as e:
-            raise CollocationError(f"could not instantiate qmat generator, got error: {e}")
+            raise CollocationError(f"could not instantiate qmat generator, got error: {e}") from e
 
         # Set base attributes
         self.num_nodes = num_nodes

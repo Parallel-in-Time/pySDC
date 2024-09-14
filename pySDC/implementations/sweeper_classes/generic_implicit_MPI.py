@@ -201,7 +201,8 @@ class generic_implicit_MPI(SweeperMPI, generic_implicit):
         # only if the level has been touched before
         assert L.status.unlocked
 
-        # get number of collocation nodes for easier access
+        # update the MIN-SR-FLEX preconditioner
+        self.updateVariableCoeffs(L.status.sweep)
 
         # gather all terms which are known already (e.g. from the previous iteration)
         # this corresponds to u0 + QF(u^k) - QdF(u^k) + tau

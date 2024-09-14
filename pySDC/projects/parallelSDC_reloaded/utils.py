@@ -210,9 +210,12 @@ def setupProblem(name, description, dt, **kwargs):
         raise NotImplementedError(f"problem {name} not implemented")
 
 
-def solutionSDC(tEnd, nSteps, params, probName, **kwargs):
+def solutionSDC(tEnd, nSteps, params, probName, verbose=True, noExcept=False, **kwargs):
     dt = tEnd / nSteps
     setupProblem(probName, params, dt, **kwargs)
+    if noExcept:
+        params["problem_params"]["stop_at_nan"] = False
+        params["problem_params"]["stop_at_maxiter"] = False
 
     controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=params)
 
@@ -225,7 +228,8 @@ def solutionSDC(tEnd, nSteps, params, probName, **kwargs):
     uSDC[0] = uInit
     tVals = np.linspace(0, tEnd, nSteps + 1)
     tBeg = time()
-    print(" -- computing numerical solution with pySDC ...")
+    if verbose:
+        print(" -- computing numerical solution with pySDC ...")
     warnings.filterwarnings("ignore")
     for i in range(nSteps):
         uTmp[:] = uSDC[i]
@@ -243,7 +247,8 @@ def solutionSDC(tEnd, nSteps, params, probName, **kwargs):
     except KeyError:
         nNewton = 0
     nRHS = prob.work_counters["rhs"].niter
-    print(f"    done, newton:{nNewton}, rhs:{nRHS}, tComp:{tComp}")
+    if verbose:
+        print(f"    done, newton:{nNewton}, rhs:{nRHS}, tComp:{tComp}")
     try:
         parallel = controller.MS[0].levels[0].sweep.parallelizable
     except AttributeError:  # pragma: no cover
@@ -270,7 +275,7 @@ def solutionExact(tEnd, nSteps, probName, **kwargs):
         key = f"{tEnd}_{nSteps}"
         cacheFile = '_solJacobiEllipticExact.json'
 
-    # Eventually load already computed solution from local cache
+    # Potentially load already computed solution from local cache
     try:
         with open(f"{PATH}/{cacheFile}", "r") as f:
             cache = json.load(f)

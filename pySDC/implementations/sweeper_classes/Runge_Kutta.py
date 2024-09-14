@@ -37,17 +37,24 @@ class ButcherTableau(object):
         elif len(nodes) != matrix.shape[0]:
             raise ParameterError(f'Incompatible number of nodes! Need {matrix.shape[0]}, got {len(nodes)}')
 
-        # Set number of nodes, left and right interval boundaries
-        self.num_solution_stages = 1
-        self.num_nodes = matrix.shape[0] + self.num_solution_stages
+        self.globally_stiffly_accurate = np.allclose(matrix[-1], weights)
+
         self.tleft = 0.0
         self.tright = 1.0
-
-        self.nodes = np.append(np.append([0], nodes), [1])
+        self.num_solution_stages = 0 if self.globally_stiffly_accurate else 1
+        self.num_nodes = matrix.shape[0] + self.num_solution_stages
         self.weights = weights
-        self.Qmat = np.zeros([self.num_nodes + 1, self.num_nodes + 1])
-        self.Qmat[1:-1, 1:-1] = matrix
-        self.Qmat[-1, 1:-1] = weights  # this is for computing the solution to the step from the previous stages
+
+        if self.globally_stiffly_accurate:
+            # For globally stiffly accurate methods, the last row of the Butcher tableau is the same as the weights.
+            self.nodes = np.append([0], nodes)
+            self.Qmat = np.zeros([self.num_nodes + 1, self.num_nodes + 1])
+            self.Qmat[1:, 1:] = matrix
+        else:
+            self.nodes = np.append(np.append([0], nodes), [1])
+            self.Qmat = np.zeros([self.num_nodes + 1, self.num_nodes + 1])
+            self.Qmat[1:-1, 1:-1] = matrix
+            self.Qmat[-1, 1:-1] = weights  # this is for computing the solution to the step from the previous stages
 
         self.left_is_node = True
         self.right_is_node = self.nodes[-1] == self.tright
@@ -277,7 +284,7 @@ class RungeKutta(Sweeper):
                 rhs += lvl.dt * self.QI[m + 1, j] * self.get_full_f(lvl.f[j])
 
             # implicit solve with prefactor stemming from the diagonal of Qd, use previous stage as initial guess
-            if self.coll.implicit:
+            if self.QI[m + 1, m + 1] != 0:
                 lvl.u[m + 1][:] = prob.solve_system(
                     rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m], lvl.time + lvl.dt * self.coll.nodes[m + 1]
                 )
