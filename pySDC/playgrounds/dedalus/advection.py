@@ -81,7 +81,7 @@ for timeStepper in [d3.RK111, ERK4, 1, 2]:
     sym = '^-' if useSDC else 'o-'
     plt.loglog(dt, err, sym, label=lbl)
 
-    # Eventually plot order curve
+    # Potentially plot order curve
     if name in orderPlot:
         order = orderPlot[name]
         c = err[-1]/dt[-1]**order * 2

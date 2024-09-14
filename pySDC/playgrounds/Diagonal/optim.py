@@ -50,7 +50,7 @@ def findLocalMinima(func, dim, bounds=(0, 15),
 
         funcEval = func(x0)
 
-        # Eventually add local minimum to results
+        # Potentially add local minimum to results
         xOrig = findRes(x0)
         if xOrig:
             if funcEval < res[xOrig]:

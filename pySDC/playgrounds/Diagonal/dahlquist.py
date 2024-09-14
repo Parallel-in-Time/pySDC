@@ -71,7 +71,7 @@ class IMEXSDC(object):
             cls.QDeltaE, cls.dtauE = genQDelta(cls.nodes, explSweep, cls.Q)
             cls.explSweep = explSweep
 
-        # Eventually update nSweep, initSweep and forceProlongation
+        # Potentially update nSweep, initSweep and forceProlongation
         cls.initSweep = cls.initSweep if initSweep is None else initSweep
         cls.nSweep = cls.nSweep if nSweep is None else nSweep
         cls.forceProl = cls.forceProl if forceProl is None else forceProl
