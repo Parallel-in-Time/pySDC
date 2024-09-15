@@ -6,9 +6,9 @@ import pytest
 @pytest.mark.parametrize('p', [1, 2, 3, 4])
 def test_differentiation_matrix(N, p):
     import numpy as np
-    from pySDC.helpers.spectral_helper import Ultraspherical
+    from pySDC.helpers.spectral_helper import UltrasphericalHelper
 
-    helper = Ultraspherical(N)
+    helper = UltrasphericalHelper(N)
     x = helper.get_1dgrid()
     coeffs = np.random.random(N)
 
@@ -25,9 +25,9 @@ def test_differentiation_matrix(N, p):
 @pytest.mark.parametrize('N', [4, 7, 32])
 def test_integration(N):
     import numpy as np
-    from pySDC.helpers.spectral_helper import Ultraspherical
+    from pySDC.helpers.spectral_helper import UltrasphericalHelper
 
-    helper = Ultraspherical(N)
+    helper = UltrasphericalHelper(N)
     coeffs = np.random.random(N)
     coeffs[-1] = 0
 
@@ -47,12 +47,12 @@ def test_integration(N):
 def test_poisson_problem(N, deg, Dirichlet_recombination):
     import numpy as np
     import scipy.sparse as sp
-    from pySDC.helpers.spectral_helper import Ultraspherical
+    from pySDC.helpers.spectral_helper import UltrasphericalHelper
 
     a = 0
     b = 4
 
-    helper = Ultraspherical(N)
+    helper = UltrasphericalHelper(N)
     x = helper.get_1dgrid()
 
     f = x**deg * (deg + 1) * (deg + 2) * (a - b) / 2

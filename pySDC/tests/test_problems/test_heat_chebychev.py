@@ -23,7 +23,6 @@ def test_heat1d_chebychev(a, b, f, noise, use_ultraspherical, spectral_space, nv
         f=f,
         nu=1e-2,
         left_preconditioner=False,
-        right_preconditioning='T2T',
         debug=True,
         spectral_space=spectral_space,
     )

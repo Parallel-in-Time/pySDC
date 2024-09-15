@@ -19,7 +19,7 @@ def test_integration_matrix2D(nx, nz, variant, axes, useMPI=False, **kwargs):
 
     helper = SpectralHelper(comm=comm, debug=True)
     helper.add_axis(base='fft', N=nx)
-    helper.add_axis(base='cheby', N=nz, mode=variant)
+    helper.add_axis(base='cheby', N=nz)
     helper.setup_fft()
 
     Z, X = helper.get_grid()
@@ -65,7 +65,7 @@ def test_differentiation_matrix2D(nx, nz, variant, axes, bx, bz, useMPI=False, *
 
     helper = SpectralHelper(comm=comm, debug=True)
     helper.add_axis(base=bx, N=nx)
-    helper.add_axis(base=bz, N=nz, mode=variant)
+    helper.add_axis(base=bz, N=nz)
     helper.setup_fft()
 
     Z, X = helper.get_grid()
@@ -120,7 +120,7 @@ def test_identity_matrix2D(nx, nz, variant, bx, useMPI=False, **kwargs):
 
     helper = SpectralHelper(comm=comm, debug=True)
     helper.add_axis(base=bx, N=nx)
-    helper.add_axis(base='cheby', N=nz, mode=variant)
+    helper.add_axis(base='cheby', N=nz)
     helper.setup_fft()
 
     Z, X = helper.get_grid()
@@ -226,8 +226,6 @@ def _test_transform_dealias(
         u2_hat_expect[0][xp.logical_and(xp.abs(Kx) == 0, Kz == 0)] += 2 / nx
         u_expect[0] += np.cos(f * X) * 2 / nx
         u_expect_pad[0] += np.cos(f * X_pad) * 2 / nx
-        # u2_expect = u_expect**2
-        # u2_expect_pad = u_expect_pad**2
     elif axis == -1:
         f = nz // 2 + 1
         u_hat[0][xp.logical_and(xp.abs(Kz) == f, Kx == 0)] += 1
@@ -238,8 +236,6 @@ def _test_transform_dealias(
         coef[f] = 1 / nx
         u_expect[0] = np.polynomial.Chebyshev(coef)(Z)
         u_expect_pad[0] = np.polynomial.Chebyshev(coef)(Z_pad)
-        # u2_expect = u_expect**2
-        # u2_expect_pad = u_expect_pad**2
     elif axis in [(-1, -2), (-2, -1)]:
         fx = nx // 3
         fz = nz // 2 + 1
@@ -257,9 +253,7 @@ def _test_transform_dealias(
         coef[fz] = 1 / nx
 
         u_expect[0] = np.cos(fx * X) * 2 / nx + np.polynomial.Chebyshev(coef)(Z)
-        # u2_expect = u_expect**2
         u_expect_pad[0] = np.cos(fx * X_pad) * 2 / nx + np.polynomial.Chebyshev(coef)(Z_pad)
-        # u2_expect_pad = u_expect_pad**2
     else:
         raise NotImplementedError
 
@@ -278,60 +272,6 @@ def _test_transform_dealias(
 
     assert np.allclose(u2_hat_expect, helper.transform(u2_pad, padding=_padding))
     assert not np.allclose(u2_hat_expect, helper.transform(u2)), 'Test is too boring, no dealiasing needed'
-
-
-# @pytest.mark.base
-# @pytest.mark.parametrize('bx', ['fft', 'cheby'])
-# @pytest.mark.parametrize('bz', ['fft', 'cheby'])
-# @pytest.mark.parametrize('axis', [0, 1])
-# def test_transform_dealias_back_and_forth(
-#     bx,
-#     bz,
-#     axis,
-#     nx=2**1 + 1,
-#     nz=2**1 + 1,
-#     padding=3 / 2,
-#     axes=(
-#         -2,
-#         -1,
-#     ),
-#     useMPI=False,
-#     **kwargs,
-# ):
-#     import numpy as np
-#     from pySDC.helpers.spectral_helper import SpectralHelper
-#
-#     if useMPI:
-#         from mpi4py import MPI
-#
-#         comm = MPI.COMM_WORLD
-#         rank = comm.rank
-#     else:
-#         comm = None
-#
-#     helper = SpectralHelper(comm=comm, debug=True)
-#     helper.add_axis(base=bx, N=nx)
-#     helper.add_axis(base=bz, N=nz)
-#     helper.setup_fft()
-#     xp = helper.xp
-#
-#     shape = helper.shape
-#     helper_padded = helper.get_zero_padded_version(axis=axis, padding=padding)
-#
-#     u = helper.u_init
-#     u[:] = xp.random.rand(*shape)
-#
-#     u_hat = helper.transform(u)
-#     u_hat_padded = helper_padded.get_padded(u_hat)
-#
-#     u_padded = helper_padded.itransform(u_hat_padded)
-#
-#     u_2_padded_hat = helper_padded.transform(u_padded)
-#     u_2_hat = helper_padded.get_unpadded(u_2_padded_hat)
-#
-#     assert xp.allclose(u_2_padded_hat.real, u_hat_padded.real)
-#     assert xp.allclose(u_2_padded_hat.imag, u_hat_padded.imag)
-#     assert xp.allclose(u_2_hat, u_hat)
 
 
 @pytest.mark.base
@@ -493,12 +433,6 @@ def test_tau_method(bc, N, bc_val, kind='Dirichlet'):
     rhs_hat = helper.transform(rhs, axes=(-1,))
 
     sol_hat = sp.linalg.spsolve(A, rhs_hat.flatten())
-    # print(_sol_hat)
-    # sol_hat = helper.remove_tau_terms(_sol_hat)
-    # print(A.toarray())
-    # import matplotlib.pyplot as plt
-    # plt.imshow(A.real/np.abs(A))
-    # plt.show()
 
     sol_poly = np.polynomial.Chebyshev(sol_hat)
     d_sol_poly = sol_poly.deriv(1)
@@ -538,7 +472,7 @@ def test_tau_method2D(variant, nz, nx, bc_val, bc=-1, useMPI=False, plotting=Fal
 
     helper = SpectralHelper(comm=comm, debug=True)
     helper.add_axis('fft', N=nx)
-    helper.add_axis('cheby', N=nz, mode=variant)
+    helper.add_axis('cheby', N=nz)
     helper.add_component(['u'])
     helper.setup_fft()
 
@@ -563,8 +497,6 @@ def test_tau_method2D(variant, nz, nx, bc_val, bc=-1, useMPI=False, plotting=Fal
 
     # prepare system to solve
     A = helper.put_BCs_in_matrix(A)
-    # rhs = helper.put_BCs_in_rhs(helper.u_init)
-    # rhs_hat = helper.transform(rhs, axes=(-1, -2))
     rhs_hat = helper.put_BCs_in_rhs_hat(helper.u_init_forward)
 
     # solve the system
@@ -584,7 +516,6 @@ def test_tau_method2D(variant, nz, nx, bc_val, bc=-1, useMPI=False, plotting=Fal
         import matplotlib.pyplot as plt
 
         im = plt.pcolormesh(X, Z, sol[0])
-        # im = plt.pcolormesh(X, Z, error)
         plt.colorbar(im)
         plt.xlabel('x')
         plt.ylabel('t')

@@ -6,9 +6,26 @@ from pySDC.core.errors import ParameterError
 
 class GenericSpectralLinear(Problem):
     """
-    Generic class to solve problems of the form M u_t + L u = y, with mass matrix M, linear operator L and some right hand side y using spectral methods.
+    Generic class to solve problems of the form M u_t + L u = y, with mass matrix M, linear operator L and some right
+    hand side y using spectral methods.
     L may contain algebraic conditions, as long as (M + dt L) is invertible.
 
+    Note that the `__getattr__` method is overloaded to pass requests on to the spectral helper if they are not
+    attributes of this class itself. For instance, you can add a BC by calling `self.spectral.add_BC` or equivalently
+    `self.add_BC`.
+
+    You can port problems derived from this more or less seamlessly to GPU by using the numerical libraries that are
+    class attributes of the spectral helper. This class will automatically switch the datatype using the `setup_GPU` class method.
+
+    Attributes:
+        spectral (pySDC.helpers.spectral_helper.SpectralHelper): Spectral helper
+        work_counters (dict): Dictionary for counting work
+        cached_factorizations (dict): Dictionary of cached matrix factorizations for solving
+        L (sparse matrix): Linear operator
+        M (sparse matrix): Mass matrix
+        diff_mask (list): Mask for separating differential and algebraic terms
+        Pl (sparse matrix): Left preconditioner
+        Pr (sparse matrix): Right preconditioner
     """
 
     @classmethod
@@ -40,8 +57,7 @@ class GenericSpectralLinear(Problem):
         max_cached_factorizations=12,
         spectral_space=True,
         real_spectral_coefficients=False,
-        *args,
-        **kwargs,
+        debug=False,
     ):
         """
         Base class for problems discretized with spectral methods.
@@ -58,6 +74,7 @@ class GenericSpectralLinear(Problem):
             max_cached_factorizations (int): Number of matrix decompositions to cache before starting eviction
             spectral_space (bool): If yes, the solution will not be transformed back after solving and evaluating the RHS, and is expected as input in spectral space to these functions
             real_spectral_coefficients (bool): If yes, allow only real values in spectral space, otherwise, allow complex.
+            debug (bool): Make additional tests at extra computational cost
         """
         solver_args = {} if solver_args is None else solver_args
         self._makeAttributeAndRegister(
@@ -70,9 +87,10 @@ class GenericSpectralLinear(Problem):
             'comm',
             'spectral_space',
             'real_spectral_coefficients',
+            'debug',
             localVars=locals(),
         )
-        self.spectral = SpectralHelper(comm=comm, useGPU=useGPU)
+        self.spectral = SpectralHelper(comm=comm, useGPU=useGPU, debug=debug)
 
         if useGPU:
             self.setup_GPU()
@@ -93,6 +111,15 @@ class GenericSpectralLinear(Problem):
         self.cached_factorizations = {}
 
     def __getattr__(self, name):
+        """
+        Pass requests on to the helper if they are not directly attributes of this class for convenience.
+
+        Args:
+            name (str): Name of the attribute you want
+
+        Returns:
+            request
+        """
         return getattr(self.spectral, name)
 
     def _setup_operator(self, LHS):
@@ -117,7 +144,7 @@ class GenericSpectralLinear(Problem):
         The argument is meant to be a dictionary with the line you want to write the equation in as the key and the relationship between components as another dictionary. For instance, you can add an algebraic condition capturing a first derivative relationship between u and ux as follows:
 
         ```
-        Dx = self.get_self.get_differentiation_matrix(axes=(0,))
+        Dx = self.get_differentiation_matrix(axes=(0,))
         I = self.get_Id()
         LHS = {'ux': {'u': Dx, 'ux': -I}}
         self.setup_L(LHS)
@@ -134,16 +161,16 @@ class GenericSpectralLinear(Problem):
         '''
         Setup mass matrix, see documentation of ``GenericSpectralLinear.setup_L``.
         '''
-        self.diff_index = list(LHS.keys())
-        self.diff_mask = [me in self.diff_index for me in self.components]
+        diff_index = list(LHS.keys())
+        self.diff_mask = [me in diff_index for me in self.components]
         self.M = self._setup_operator(LHS)
 
     def setup_preconditioner(self, Dirichlet_recombination=True, left_preconditioner=True):
         """
-        Get left and right precondioners. A right preconditioner of D2T will result in Dirichlet recombination. 10/10 would recommend!
+        Get left and right preconditioners.
 
         Args:
-            Dirichlet_recombination (bool): Basis conversion for right precondioner
+            Dirichlet_recombination (bool): Basis conversion for right preconditioner. Useful for Chebychev and Ultraspherical methods. 10/10 would recommend.
             left_preconditioner (bool): If True, it will interleave the variables and reverse the Kronecker product
         """
         sp = self.spectral.sparse_lib
@@ -177,9 +204,14 @@ class GenericSpectralLinear(Problem):
 
     def solve_system(self, rhs, dt, u0=None, *args, skip_itransform=False, **kwargs):
         """
-        Solve (M + dt*L)u=rhs. This requires that you setup the operators before using the functions ``GenericSpectralLinear.setup_L`` and ``GenericSpectralLinear.setup_M``. Note that the mass matrix need not be invertible, as long as (M + dt*L) is. This allows to solve some differential algebraic equations.
+        Do an implicit Euler step to solve M u_t + Lu = rhs, with M the mass matrix and L the linear operator as setup by
+        ``GenericSpectralLinear.setup_L`` and ``GenericSpectralLinear.setup_M``.
 
-        Note that in implicit Euler, the right hand side will be composed of the initial conditions. We don't want that in lines that don't depend on time. Therefore, we multiply the right hand side by the mass matrix. This means you can only do algebraic conditions that add up to zero. But you can easily overload this function with something more generic if needed.
+        The implicit Euler step is (M - dt L) u = M rhs. Note that M need not be invertible as long as (M + dt*L) is.
+        This means solving with dt=0 to mimic explicit methods does not work for all problems, in particular simple DAEs.
+
+        Note that by putting M rhs on the right hand side, this function can only solve algebraic conditions equal to
+        zero. If you want something else, it should be easy to overload this function.
         """
 
         sp = self.spectral.sparse_lib

@@ -144,7 +144,6 @@ def test_Burgers2D_solver(mode, nx=2**6, nz=2**6, plotting=False):
         mode=mode,
         comm=comm,
         left_preconditioner=True,
-        right_preconditioning='D2T',
     )
 
     iu, iv, iux, iuz, ivx, ivz = P.index(P.components)

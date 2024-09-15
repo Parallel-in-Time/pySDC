@@ -7,11 +7,27 @@ from pySDC.implementations.problem_classes.generic_spectral import GenericSpectr
 
 
 class Heat1DChebychev(GenericSpectralLinear):
+    """
+    1D Heat equation with Dirichlet Boundary conditions discretized on (-1, 1) using a Chebychev spectral method.
+    """
+
     dtype_u = mesh
     dtype_f = mesh
 
     def __init__(self, nvars=128, a=0, b=0, f=1, nu=1.0, mode='T2U', **kwargs):
-        self._makeAttributeAndRegister(*locals().keys(), localVars=locals(), readOnly=True)
+        """
+        Constructor. `kwargs` are forwarded to parent class constructor.
+
+        Args:
+            nvars (int): Resolution
+            a (float): Left BC value
+            b (float): Right BC value
+            f (int): Frequency of the solution
+            nu (float): Diffusion parameter
+            mode ('T2T' or 'T2U'): Mode for Chebychev method.
+
+        """
+        self._makeAttributeAndRegister('nvars', 'a', 'b', 'f', 'nu', 'mode', localVars=locals(), readOnly=True)
 
         bases = [{'base': 'chebychev', 'N': nvars}]
         components = ['u', 'ux']
@@ -58,7 +74,18 @@ class Heat1DChebychev(GenericSpectralLinear):
         f[iu] = me[iu]
         return f
 
-    def u_exact(self, t, noise=0):
+    def u_exact(self, t, noise=0, seed=666):
+        """
+        Get exact solution at time `t`
+
+        Args:
+            t (float): When you want the exact solution
+            noise (float): Add noise of this level
+            seed (int): Random seed for the noise
+
+        Returns:
+            Heat1DChebychev.dtype_u: Exact solution
+        """
         xp = self.xp
         iu, iux = self.index(self.components)
         u = self.spectral.u_init
@@ -76,7 +103,7 @@ class Heat1DChebychev(GenericSpectralLinear):
         if noise > 0:
             assert t == 0
             _noise = self.u_init
-            rng = self.xp.random.default_rng(seed=666)
+            rng = self.xp.random.default_rng(seed=seed)
             _noise[iu] = rng.normal(size=u[iu].shape)
             noise_hat = self.transform(_noise)
             low_pass = self.get_filter_matrix(axis=0, kmax=self.nvars - 2)
@@ -95,11 +122,25 @@ class Heat1DChebychev(GenericSpectralLinear):
 
 
 class Heat1DUltraspherical(GenericSpectralLinear):
+    """
+    1D Heat equation with Dirichlet Boundary conditions discretized on (-1, 1) using an ultraspherical spectral method.
+    """
+
     dtype_u = mesh
     dtype_f = mesh
 
     def __init__(self, nvars=128, a=0, b=0, f=1, nu=1.0, **kwargs):
-        self._makeAttributeAndRegister(*locals().keys(), localVars=locals(), readOnly=True)
+        """
+        Constructor. `kwargs` are forwarded to parent class constructor.
+
+        Args:
+            nvars (int): Resolution
+            a (float): Left BC value
+            b (float): Right BC value
+            f (int): Frequency of the solution
+            nu (float): Diffusion parameter
+        """
+        self._makeAttributeAndRegister('nvars', 'a', 'b', 'f', 'nu', localVars=locals(), readOnly=True)
 
         bases = [{'base': 'ultraspherical', 'N': nvars}]
         components = ['u']
@@ -147,7 +188,18 @@ class Heat1DUltraspherical(GenericSpectralLinear):
         f[iu][...] = me[iu]
         return f
 
-    def u_exact(self, t, noise=0):
+    def u_exact(self, t, noise=0, seed=666):
+        """
+        Get exact solution at time `t`
+
+        Args:
+            t (float): When you want the exact solution
+            noise (float): Add noise of this level
+            seed (int): Random seed for the noise
+
+        Returns:
+            Heat1DUltraspherical.dtype_u: Exact solution
+        """
         xp = self.xp
         iu = self.index('u')
         u = self.spectral.u_init
@@ -161,7 +213,7 @@ class Heat1DUltraspherical(GenericSpectralLinear):
         if noise > 0:
             assert t == 0
             _noise = self.u_init
-            rng = self.xp.random.default_rng(seed=666)
+            rng = self.xp.random.default_rng(seed=seed)
             _noise[iu] = rng.normal(size=u[iu].shape)
             noise_hat = self.transform(_noise)
             low_pass = self.get_filter_matrix(axis=0, kmax=self.nvars - 2)
@@ -178,13 +230,34 @@ class Heat1DUltraspherical(GenericSpectralLinear):
 
 
 class Heat2DChebychev(GenericSpectralLinear):
+    """
+    2D Heat equation with Dirichlet Boundary conditions discretized on (-1, 1)x(-1,1) using spectral methods based on FFT and Chebychev.
+    """
+
     dtype_u = mesh
     dtype_f = mesh
 
     def __init__(self, nx=128, ny=128, base_x='fft', base_y='chebychev', a=0, b=0, c=0, fx=1, fy=1, nu=1.0, **kwargs):
+        """
+        Constructor. `kwargs` are forwarded to parent class constructor.
+
+        Args:
+            nx (int): Resolution in x-direction
+            ny (int): Resolution in y-direction
+            base_x (str): Spectral base in x-direction
+            base_y (str): Spectral base in y-direction
+            a (float): BC at y=0 and x=-1
+            b (float): BC at y=0 and x=+1
+            c (float): BC at y=1 and x = -1
+            fx (int): Horizontal frequency of initial conditions
+            fy (int): Vertical frequency of initial conditions
+            nu (float): Diffusion parameter
+        """
         assert nx % 2 == 1 or base_x == 'fft'
         assert ny % 2 == 1 or base_y == 'fft'
-        self._makeAttributeAndRegister(*locals().keys(), localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister(
+            'nx', 'ny', 'base_x', 'base_y', 'a', 'b', 'c', 'fx', 'fy', 'nu', localVars=locals(), readOnly=True
+        )
 
         bases = [{'base': base_x, 'N': nx}, {'base': base_y, 'N': ny}]
         components = ['u', 'ux', 'uy']
@@ -265,13 +338,34 @@ class Heat2DChebychev(GenericSpectralLinear):
 
 
 class Heat2DUltraspherical(GenericSpectralLinear):
+    """
+    2D Heat equation with Dirichlet Boundary conditions discretized on (-1, 1)x(-1,1) using spectral methods based on FFT and Gegenbauer.
+    """
+
     dtype_u = mesh
     dtype_f = mesh
 
     def __init__(
         self, nx=128, ny=128, base_x='fft', base_y='ultraspherical', a=0, b=0, c=0, fx=1, fy=1, nu=1.0, **kwargs
     ):
-        self._makeAttributeAndRegister(*locals().keys(), localVars=locals(), readOnly=True)
+        """
+        Constructor. `kwargs` are forwarded to parent class constructor.
+
+        Args:
+            nx (int): Resolution in x-direction
+            ny (int): Resolution in y-direction
+            base_x (str): Spectral base in x-direction
+            base_y (str): Spectral base in y-direction
+            a (float): BC at y=0 and x=-1
+            b (float): BC at y=0 and x=+1
+            c (float): BC at y=1 and x = -1
+            fx (int): Horizontal frequency of initial conditions
+            fy (int): Vertical frequency of initial conditions
+            nu (float): Diffusion parameter
+        """
+        self._makeAttributeAndRegister(
+            'nx', 'ny', 'base_x', 'base_y', 'a', 'b', 'c', 'fx', 'fy', 'nu', localVars=locals(), readOnly=True
+        )
 
         bases = [{'base': base_x, 'N': nx}, {'base': base_y, 'N': ny}]
         components = ['u']
