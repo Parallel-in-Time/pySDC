@@ -39,7 +39,7 @@ class StepSizeLimiter(ConvergenceController):
         Returns:
             None
         """
-        slope_limiter_keys = ['dt_slope_min', 'dt_slope_max']
+        slope_limiter_keys = ['dt_slope_min', 'dt_slope_max', 'dt_rel_min_slope']
         available_keys = [me for me in slope_limiter_keys if me in self.params.__dict__.keys()]
 
         if len(available_keys) > 0:
@@ -90,7 +90,9 @@ class StepSizeSlopeLimiter(ConvergenceController):
     """
     Class to set limits to adaptive step size computation during run time
 
-    Please supply dt_min or dt_max in the params to limit in either direction
+    Please supply `dt_slope_min` or `dt_slope_max` in the params to limit in either direction.
+    You can also supply `dt_rel_min_slope` in order to keep the old step size in case the relative change is smaller
+    than this minimum.
     """
 
     def setup(self, controller, params, description, **kwargs):
@@ -109,6 +111,7 @@ class StepSizeSlopeLimiter(ConvergenceController):
             "control_order": 91,
             "dt_slope_min": 0,
             "dt_slope_max": np.inf,
+            "dt_rel_min_slope": 0,
         }
         return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
@@ -143,5 +146,11 @@ class StepSizeSlopeLimiter(ConvergenceController):
                         S,
                     )
                     L.status.dt_new = dt_new
+                elif abs(L.status.dt_new / L.params.dt - 1) < self.params.dt_rel_min_slope:
+                    L.status.dt_new = L.params.dt
+                    self.log(
+                        f"Step size did not change sufficiently to warrant step size change, keeping {L.status.dt_new:.2e}",
+                        S,
+                    )
 
         return None
