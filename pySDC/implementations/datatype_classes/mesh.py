@@ -70,12 +70,11 @@ class mesh(np.ndarray):
             float: absolute maximum of all mesh values
         """
         # take absolute values of the mesh values
-        local_absval = float(np.amax(np.ndarray.__abs__(self)))
+        local_absval = float(np.max(np.ndarray.__abs__(self)))
 
         if self.comm is not None:
-            if self.comm.Get_size() > 1:
-                global_absval = 0.0
-                global_absval = max(self.comm.allreduce(sendobj=local_absval, op=MPI.MAX), global_absval)
+            if self.comm.size > 1:
+                global_absval = self.comm.allreduce(sendobj=local_absval, op=MPI.MAX)
             else:
                 global_absval = local_absval
         else:
