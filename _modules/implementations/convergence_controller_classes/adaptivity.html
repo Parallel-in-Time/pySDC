@@ -98,7 +98,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">step_limiter_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dt_min&#39;</span><span class="p">,</span> <span class="s1">&#39;dt_max&#39;</span><span class="p">,</span> <span class="s1">&#39;dt_slope_min&#39;</span><span class="p">,</span> <span class="s1">&#39;dt_slope_max&#39;</span><span class="p">]</span>
+        <span class="n">step_limiter_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dt_min&#39;</span><span class="p">,</span> <span class="s1">&#39;dt_max&#39;</span><span class="p">,</span> <span class="s1">&#39;dt_slope_min&#39;</span><span class="p">,</span> <span class="s1">&#39;dt_slope_max&#39;</span><span class="p">,</span> <span class="s1">&#39;dt_rel_min_slope&#39;</span><span class="p">]</span>
         <span class="n">available_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">step_limiter_keys</span> <span class="k">if</span> <span class="n">me</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">available_keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
