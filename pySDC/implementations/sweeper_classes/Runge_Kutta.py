@@ -477,7 +477,7 @@ class BackwardEuler(RungeKutta):
     nodes, weights, matrix = generator.genCoeffs()
 
 
-class CrankNicholson(RungeKutta):
+class CrankNicolson(RungeKutta):
     """
     Implicit Runge-Kutta method of second order, A-stable.
     """
