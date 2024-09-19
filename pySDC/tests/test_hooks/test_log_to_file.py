@@ -32,7 +32,7 @@ def run(hook, Tend=0):
         u0 = prob.u_exact(0)
 
         _, stats = controller.run(u0, 0, Tend)
-        return stats
+        return u0, stats
 
 
 @pytest.mark.base
@@ -68,8 +68,8 @@ def test_logging():
     LogToFile.path = path
     Tend = 2
 
-    stats = run([LogToFile, LogSolution], Tend=Tend)
-    u = get_sorted(stats, type='u')
+    u0, stats = run([LogToFile, LogSolution], Tend=Tend)
+    u = [(0.0, u0)] + get_sorted(stats, type='u')
 
     u_file = []
     for i in range(len(u)):
