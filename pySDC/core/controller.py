@@ -47,7 +47,7 @@ class Controller(object):
         user_hooks = controller_params.get('hook_class', [])
         hook_classes += user_hooks if type(user_hooks) == list else [user_hooks]
         [self.add_hook(hook) for hook in hook_classes]
-        controller_params['hook_class'] = controller_params.get('hook_class', hook_classes)
+        controller_params['hook_class'] = hook_classes
 
         for hook in self.hooks:
             hook.pre_setup(step=None, level_number=None)
