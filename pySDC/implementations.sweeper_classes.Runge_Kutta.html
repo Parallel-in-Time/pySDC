@@ -335,28 +335,28 @@ This method is part of the IMEX method ARK548L2SA.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.CrankNicholson">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CrankNicholson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#CrankNicholson"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.CrankNicolson">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CrankNicolson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#CrankNicolson"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicolson" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
 <p>Implicit Runge-Kutta method of second order, A-stable.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.CrankNicholson.generator">
-<span class="sig-name descname"><span class="pre">generator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.TRAP</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.generator" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.CrankNicolson.generator">
+<span class="sig-name descname"><span class="pre">generator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.TRAP</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicolson.generator" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.CrankNicholson.matrix">
-<span class="sig-name descname"><span class="pre">matrix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.5,</span> <span class="pre">0.5]])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.matrix" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.CrankNicolson.matrix">
+<span class="sig-name descname"><span class="pre">matrix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.5,</span> <span class="pre">0.5]])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicolson.matrix" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.CrankNicholson.nodes">
-<span class="sig-name descname"><span class="pre">nodes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.,</span> <span class="pre">1.])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.nodes" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.CrankNicolson.nodes">
+<span class="sig-name descname"><span class="pre">nodes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.,</span> <span class="pre">1.])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicolson.nodes" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.CrankNicholson.weights">
-<span class="sig-name descname"><span class="pre">weights</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.5,</span> <span class="pre">0.5])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.weights" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.CrankNicolson.weights">
+<span class="sig-name descname"><span class="pre">weights</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.5,</span> <span class="pre">0.5])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicolson.weights" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -944,11 +944,11 @@ method, which does not require us to solve a system of equations to compute the 
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.weights"><code class="docutils literal notranslate"><span class="pre">weights</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson"><code class="docutils literal notranslate"><span class="pre">CrankNicholson</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.generator"><code class="docutils literal notranslate"><span class="pre">generator</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.weights"><code class="docutils literal notranslate"><span class="pre">weights</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicolson"><code class="docutils literal notranslate"><span class="pre">CrankNicolson</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicolson.generator"><code class="docutils literal notranslate"><span class="pre">generator</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicolson.matrix"><code class="docutils literal notranslate"><span class="pre">matrix</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicolson.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicolson.weights"><code class="docutils literal notranslate"><span class="pre">weights</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43"><code class="docutils literal notranslate"><span class="pre">DIRK43</span></code></a><ul>
