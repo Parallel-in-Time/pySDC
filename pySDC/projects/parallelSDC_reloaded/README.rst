@@ -19,6 +19,12 @@ See the `scripts` folder, all python scripts have the `fig0[...]` prefix, and ea
 from the manuscript.
 One can run everything with the `run.sh` script, and crop the pdf figures to the format used in the manuscript with the `crop.sh` script.
 
+Note that most scripts generate error vs cost figure using a cost modeling of the simulation that counts the
+number of Newton iterations and RHS evaluation.
+This can be switched to a estimation of the cost using runtime measurements by :
+
+- modifying the return statement in the `getCost` function by `return tComp`
+
 Experimental scripts
 --------------------
 
