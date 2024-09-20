@@ -24,6 +24,8 @@ number of Newton iterations and RHS evaluation.
 This can be switched to a estimation of the cost using runtime measurements by :
 
 - modifying the return statement in the `getCost` function by `return tComp`
+- changing the `xlabel="Cost"` in the `plt.gca().set` call into `xlabel="Computation time [s]"`
+- commenting the `xlim` argument in the `plt.gca().set` call
 
 Experimental scripts
 --------------------
