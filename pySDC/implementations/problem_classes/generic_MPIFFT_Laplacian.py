@@ -66,8 +66,6 @@ class IMEX_Laplacian_MPIFFT(Problem):
     def __init__(
         self, nvars=None, spectral=False, L=2 * np.pi, alpha=1.0, comm=MPI.COMM_WORLD, dtype='d', useGPU=False, x0=0.0
     ):
-        """Initialization routine"""
-
         if useGPU:
             self.setup_GPU()
 
@@ -98,7 +96,7 @@ class IMEX_Laplacian_MPIFFT(Problem):
         # invoke super init, passing the communicator and the local dimensions as init
         super().__init__(init=(tmp_u.shape, comm, tmp_u.dtype))
         self._makeAttributeAndRegister(
-            'nvars', 'spectral', 'L', 'alpha', 'comm', 'x0', localVars=locals(), readOnly=True
+            'nvars', 'spectral', 'L', 'alpha', 'comm', 'x0', 'useGPU', localVars=locals(), readOnly=True
         )
 
         # get local mesh

@@ -1,10 +1,9 @@
+import numpy as np
 import scipy.sparse as sp
-from mpi4py import MPI
-from mpi4py_fft import PFFT
 
 from pySDC.core.errors import ProblemError
-from pySDC.core.problem import Problem, WorkCounter
-from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_mesh
+from pySDC.core.problem import WorkCounter
+from pySDC.implementations.datatype_classes.mesh import comp2_mesh
 from pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian import IMEX_Laplacian_MPIFFT
 
 from mpi4py_fft import newDistArray
@@ -71,9 +70,17 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
     .. [3] https://www.chebfun.org/examples/pde/GrayScott.html
     """
 
-    def __init__(self, Du=1.0, Dv=0.01, A=0.09, B=0.086, **kwargs):
-        kwargs['L'] = 2.0
-        super().__init__(dtype='d', alpha=1.0, x0=-kwargs['L'] / 2.0, **kwargs)
+    def __init__(
+        self,
+        Du=1.0,
+        Dv=0.01,
+        A=0.09,
+        B=0.086,
+        L=2.0,
+        num_blobs=1,
+        **kwargs,
+    ):
+        super().__init__(dtype='d', alpha=1.0, x0=-L / 2.0, L=L, **kwargs)
 
         # prepare the array with two components
         shape = (2,) + (self.init[0])
@@ -82,7 +89,15 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
         self.ncomp = 2  # needed for transfer class
         self.init = (shape, self.comm, self.xp.dtype('float'))
 
-        self._makeAttributeAndRegister('Du', 'Dv', 'A', 'B', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister(
+            'Du',
+            'Dv',
+            'A',
+            'B',
+            'num_blobs',
+            localVars=locals(),
+            readOnly=True,
+        )
 
         # prepare "Laplacians"
         self.Ku = -self.Du * self.K2
@@ -187,17 +202,94 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
 
         me = self.dtype_u(self.init, val=0.0)
 
-        # This assumes that the box is [-L/2, L/2]^2
-        if self.spectral:
-            tmp = 1.0 - self.xp.exp(-80.0 * ((self.X[0] + 0.05) ** 2 + (self.X[1] + 0.02) ** 2))
-            me[0, ...] = self.fft.forward(tmp)
-            tmp = self.xp.exp(-80.0 * ((self.X[0] - 0.05) ** 2 + (self.X[1] - 0.02) ** 2))
-            me[1, ...] = self.fft.forward(tmp)
-        else:
-            me[0, ...] = 1.0 - self.xp.exp(-80.0 * ((self.X[0] + 0.05) ** 2 + (self.X[1] + 0.02) ** 2))
-            me[1, ...] = self.xp.exp(-80.0 * ((self.X[0] - 0.05) ** 2 + (self.X[1] - 0.02) ** 2))
+        inc = self.L[0] / (self.num_blobs + 1)
+
+        for i in range(1, self.num_blobs + 1):
+            for j in range(1, self.num_blobs + 1):
+
+                # This assumes that the box is [-L/2, L/2]^2
+                if self.spectral:
+                    tmp = -self.xp.exp(
+                        -80.0
+                        * ((self.X[0] + self.x0 + inc * i + 0.05) ** 2 + (self.X[1] + self.x0 + inc * j + 0.02) ** 2)
+                    )
+                    me[0, ...] += self.fft.forward(tmp)
+                    tmp = self.xp.exp(
+                        -80.0
+                        * ((self.X[0] + self.x0 + inc * i - 0.05) ** 2 + (self.X[1] + self.x0 + inc * j - 0.02) ** 2)
+                    )
+                    me[1, ...] += self.fft.forward(tmp)
+                else:
+                    me[0, ...] += -self.xp.exp(
+                        -80.0
+                        * ((self.X[0] + self.x0 + inc * i + 0.05) ** 2 + (self.X[1] + self.x0 + inc * j + 0.02) ** 2)
+                    )
+                    me[1, ...] += self.xp.exp(
+                        -80.0
+                        * ((self.X[0] + self.x0 + inc * i - 0.05) ** 2 + (self.X[1] + self.x0 + inc * j - 0.02) ** 2)
+                    )
+        me[0] += 1
 
         return me
+
+    def get_fig(self, n_comps=2):  # pragma: no cover
+        """
+        Get a figure suitable to plot the solution of this problem
+
+        Args:
+        n_comps (int): Number of components that fit in the solution
+
+        Returns
+        -------
+        self.fig : matplotlib.pyplot.figure.Figure
+        """
+        import matplotlib.pyplot as plt
+        from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+        plt.rcParams['figure.constrained_layout.use'] = True
+
+        if n_comps == 2:
+            self.fig, axs = plt.subplots(1, 2, sharex=True, sharey=True, figsize=((6, 3)))
+            divider = make_axes_locatable(axs[1])
+            self.cax = divider.append_axes('right', size='3%', pad=0.03)
+        else:
+            self.fig, ax = plt.subplots(1, 1, figsize=((4, 3)))
+            divider = make_axes_locatable(ax)
+            self.cax = divider.append_axes('right', size='3%', pad=0.03)
+        return self.fig
+
+    def plot(self, u, t=None, fig=None):  # pragma: no cover
+        r"""
+        Plot the solution. Please supply a figure with the same structure as returned by ``self.get_fig``.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Solution to be plotted
+        t : float
+            Time to display at the top of the figure
+        fig : matplotlib.pyplot.figure.Figure
+            Figure with the correct structure
+
+        Returns
+        -------
+        None
+        """
+        fig = self.get_fig(n_comps=2) if fig is None else fig
+        axs = fig.axes
+
+        vmin = u.min()
+        vmax = u.max()
+        for i, label in zip([self.iU, self.iV], [r'$u$', r'$v$']):
+            im = axs[i].pcolormesh(self.X[0], self.X[1], u[i], vmin=vmin, vmax=vmax)
+            axs[i].set_aspect(1)
+            axs[i].set_title(label)
+
+        if t is not None:
+            fig.suptitle(f't = {t:.2e}')
+        axs[0].set_xlabel(r'$x$')
+        axs[0].set_ylabel(r'$y$')
+        fig.colorbar(im, self.cax)
 
 
 class grayscott_imex_linear(grayscott_imex_diffusion):
