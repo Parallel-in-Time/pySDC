@@ -1,0 +1,7 @@
+implementations.problem\_classes.Burgers module
+===============================================
+
+.. automodule:: implementations.problem_classes.Burgers
+   :members:
+   :undoc-members:
+   :show-inheritance:

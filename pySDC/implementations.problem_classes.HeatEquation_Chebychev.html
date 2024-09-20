@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.problem_classes.HeatEquation_Chebychev module &#8212; pySDC 5.5.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=07fd27c7"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.problem_classes.HeatEquation_ND_FD module" href="implementations.problem_classes.HeatEquation_ND_FD.html" />
+    <link rel="prev" title="implementations.problem_classes.HeatEquation_2D_PETSc_forced module" href="implementations.problem_classes.HeatEquation_2D_PETSc_forced.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.HeatEquation_ND_FD.html" title="implementations.problem_classes.HeatEquation_ND_FD module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.HeatEquation_2D_PETSc_forced.html" title="implementations.problem_classes.HeatEquation_2D_PETSc_forced module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.5.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.HeatEquation_Chebychev module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.problem_classes.HeatEquation_Chebychev">
+<span id="implementations-problem-classes-heatequation-chebychev-module"></span><h1>implementations.problem_classes.HeatEquation_Chebychev module<a class="headerlink" href="#module-implementations.problem_classes.HeatEquation_Chebychev" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Heat1DChebychev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T2U'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_Chebychev.html#Heat1DChebychev"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericSpectralLinear</span></code></p>
+<p>1D Heat equation with Dirichlet Boundary conditions discretized on (-1, 1) using a Chebychev spectral method.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.dtype_f" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.dtype_u" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_Chebychev.html#Heat1DChebychev.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.eval_f" title="Link to this definition">¶</a></dt>
+<dd><p>Abstract interface to RHS computation of the ODE</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – The RHS values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.u_exact">
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">666</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_Chebychev.html#Heat1DChebychev.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.u_exact" title="Link to this definition">¶</a></dt>
+<dd><p>Get exact solution at time <cite>t</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>float</em>) – When you want the exact solution</p></li>
+<li><p><strong>noise</strong> (<em>float</em>) – Add noise of this level</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – Random seed for the noise</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Exact solution</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Heat1DChebychev.dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Heat1DUltraspherical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_Chebychev.html#Heat1DUltraspherical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericSpectralLinear</span></code></p>
+<p>1D Heat equation with Dirichlet Boundary conditions discretized on (-1, 1) using an ultraspherical spectral method.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.dtype_f" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.dtype_u" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_Chebychev.html#Heat1DUltraspherical.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.eval_f" title="Link to this definition">¶</a></dt>
+<dd><p>Abstract interface to RHS computation of the ODE</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – The RHS values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.u_exact">
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">666</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_Chebychev.html#Heat1DUltraspherical.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.u_exact" title="Link to this definition">¶</a></dt>
+<dd><p>Get exact solution at time <cite>t</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>float</em>) – When you want the exact solution</p></li>
+<li><p><strong>noise</strong> (<em>float</em>) – Add noise of this level</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – Random seed for the noise</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Exact solution</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Heat1DUltraspherical.dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Heat2DChebychev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ny</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fft'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'chebychev'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_Chebychev.html#Heat2DChebychev"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericSpectralLinear</span></code></p>
+<p>2D Heat equation with Dirichlet Boundary conditions discretized on (-1, 1)x(-1,1) using spectral methods based on FFT and Chebychev.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.dtype_f" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.dtype_u" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_Chebychev.html#Heat2DChebychev.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.eval_f" title="Link to this definition">¶</a></dt>
+<dd><p>Abstract interface to RHS computation of the ODE</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – The RHS values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.u_exact">
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_Chebychev.html#Heat2DChebychev.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.u_exact" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Heat2DUltraspherical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ny</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fft'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ultraspherical'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_Chebychev.html#Heat2DUltraspherical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericSpectralLinear</span></code></p>
+<p>2D Heat equation with Dirichlet Boundary conditions discretized on (-1, 1)x(-1,1) using spectral methods based on FFT and Gegenbauer.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.dtype_f" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.dtype_u" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_Chebychev.html#Heat2DUltraspherical.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.eval_f" title="Link to this definition">¶</a></dt>
+<dd><p>Abstract interface to RHS computation of the ODE</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – The RHS values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.u_exact">
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_Chebychev.html#Heat2DUltraspherical.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.u_exact" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.problem_classes.HeatEquation_Chebychev module</a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev"><code class="docutils literal notranslate"><span class="pre">Heat1DChebychev</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical"><code class="docutils literal notranslate"><span class="pre">Heat1DUltraspherical</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev"><code class="docutils literal notranslate"><span class="pre">Heat2DChebychev</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical"><code class="docutils literal notranslate"><span class="pre">Heat2DUltraspherical</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.HeatEquation_2D_PETSc_forced.html"
+                          title="previous chapter">implementations.problem_classes.HeatEquation_2D_PETSc_forced module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.HeatEquation_ND_FD.html"
+                          title="next chapter">implementations.problem_classes.HeatEquation_ND_FD module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.problem_classes.HeatEquation_Chebychev.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.HeatEquation_ND_FD.html" title="implementations.problem_classes.HeatEquation_ND_FD module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.HeatEquation_2D_PETSc_forced.html" title="implementations.problem_classes.HeatEquation_2D_PETSc_forced module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.5.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.HeatEquation_Chebychev module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    </div>
+  </body>
+</html>

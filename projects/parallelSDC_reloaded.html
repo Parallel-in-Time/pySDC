@@ -52,6 +52,14 @@
 <p>See the <cite>scripts</cite> folder, all python scripts have the <cite>fig0[…]</cite> prefix, and each script generate several figures
 from the manuscript.
 One can run everything with the <cite>run.sh</cite> script, and crop the pdf figures to the format used in the manuscript with the <cite>crop.sh</cite> script.</p>
+<p>Note that most scripts generate error vs cost figure using a cost modeling of the simulation that counts the
+number of Newton iterations and RHS evaluation.
+This can be switched to a estimation of the cost using runtime measurements by :</p>
+<ul class="simple">
+<li><p>modifying the return statement in the <cite>getCost</cite> function by <cite>return tComp</cite></p></li>
+<li><p>changing the <cite>xlabel=”Cost”</cite> in the <cite>plt.gca().set</cite> call into <cite>xlabel=”Computation time [s]”</cite></p></li>
+<li><p>commenting the <cite>xlim</cite> argument in the <cite>plt.gca().set</cite> call</p></li>
+</ul>
 </section>
 <section id="experimental-scripts">
 <h2>Experimental scripts<a class="headerlink" href="#experimental-scripts" title="Link to this heading">¶</a></h2>

@@ -1,0 +1,7 @@
+implementations.problem\_classes.HeatEquation\_Chebychev module
+===============================================================
+
+.. automodule:: implementations.problem_classes.HeatEquation_Chebychev
+   :members:
+   :undoc-members:
+   :show-inheritance:

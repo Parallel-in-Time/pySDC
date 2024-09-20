@@ -31,6 +31,7 @@ Submodules
    implementations.problem_classes.Boussinesq_2D_FD_imex
    implementations.problem_classes.Brusselator
    implementations.problem_classes.BuckConverter
+   implementations.problem_classes.Burgers
    implementations.problem_classes.DiscontinuousTestODE
    implementations.problem_classes.FastWaveSlowWave_0D
    implementations.problem_classes.FermiPastaUlamTsingou
@@ -43,6 +44,7 @@ Submodules
    implementations.problem_classes.HarmonicOscillator
    implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced
    implementations.problem_classes.HeatEquation_2D_PETSc_forced
+   implementations.problem_classes.HeatEquation_Chebychev
    implementations.problem_classes.HeatEquation_ND_FD
    implementations.problem_classes.HeatEquation_ND_FD_CuPy
    implementations.problem_classes.HenonHeiles
@@ -53,11 +55,13 @@ Submodules
    implementations.problem_classes.PenningTrap_3D
    implementations.problem_classes.Piline
    implementations.problem_classes.Quench
+   implementations.problem_classes.RayleighBenard
    implementations.problem_classes.TestEquation_0D
    implementations.problem_classes.Van_der_Pol_implicit
    implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic
    implementations.problem_classes.generic_MPIFFT_Laplacian
    implementations.problem_classes.generic_ND_FD
+   implementations.problem_classes.generic_spectral
    implementations.problem_classes.nonlinear_ODE_1
    implementations.problem_classes.odeScalar
    implementations.problem_classes.odeSystem

@@ -1,0 +1,1693 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>helpers.spectral_helper module &#8212; pySDC 5.5.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=07fd27c7"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="helpers.stats_helper module" href="helpers.stats_helper.html" />
+    <link rel="prev" title="helpers.setup_helper module" href="helpers.setup_helper.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="helpers.stats_helper.html" title="helpers.stats_helper module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="helpers.setup_helper.html" title="helpers.setup_helper module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.5.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="helpers.html" accesskey="U">helpers package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">helpers.spectral_helper module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-helpers.spectral_helper">
+<span id="helpers-spectral-helper-module"></span><h1>helpers.spectral_helper module<a class="headerlink" href="#module-helpers.spectral_helper" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ChebychevHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fft'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D" title="helpers.spectral_helper.SpectralHelper1D"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpectralHelper1D</span></code></a></p>
+<p>The Chebychev base consists of special kinds of polynomials, with the main advantage that you can easily transform
+between physical and spectral space by discrete cosine transform.
+The differentiation in the Chebychev T base is dense, but can be preconditioned to yield a differentiation operator
+that moves to Chebychev U basis during differentiation, which is sparse. When using this technique, problems need to
+be formulated in first order formulation.</p>
+<p>This implementation is largely based on the Dedalus paper (arXiv:1905.10388).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_1dgrid">
+<span class="sig-name descname"><span class="pre">get_1dgrid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_1dgrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_1dgrid" title="Link to this definition">¶</a></dt>
+<dd><p>Generates a 1D grid with Chebychev points. These are clustered at the boundary. You need this kind of grid to
+use discrete cosine transformation (DCT) to get the Chebychev representation. If you want a different grid, you
+need to do an affine transformation before any Chebychev business.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>1D grid</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_BC">
+<span class="sig-name descname"><span class="pre">get_BC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_BC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_BC" title="Link to this definition">¶</a></dt>
+<dd><p>Get boundary condition row for boundary bordering. <cite>kwargs</cite> will be passed on to implementations of the BC of
+the kind you choose. Specifically, <cite>x</cite> for <cite>‘dirichlet’</cite> boundary condition, which is the coordinate at which to
+set the BC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kind</strong> (<em>'integral'</em><em> or </em><em>'dirichlet'</em>) – Kind of boundary condition you want</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_Dirichlet_BC_row">
+<span class="sig-name descname"><span class="pre">get_Dirichlet_BC_row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_Dirichlet_BC_row"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_Dirichlet_BC_row" title="Link to this definition">¶</a></dt>
+<dd><p>Get a row for generating Dirichlet BCs at x with T polynomials.
+It returns the values of the T polynomials at x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>float</em>) – Position of the boundary condition</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Row to put into a matrix</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>self.xp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_Dirichlet_recombination_matrix">
+<span class="sig-name descname"><span class="pre">get_Dirichlet_recombination_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_Dirichlet_recombination_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_Dirichlet_recombination_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Get matrix for Dirichlet recombination, which changes the basis to have sparse boundary conditions.
+This makes for a good right preconditioner.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Sparse conversion matrix</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>scipy.sparse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_basis_change_matrix">
+<span class="sig-name descname"><span class="pre">get_basis_change_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T2T'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_basis_change_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_basis_change_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>As the differentiation matrix in Chebychev-T base is dense but is sparse when simultaneously changing base to
+Chebychev-U, you may need a basis change matrix to transfer the other matrices as well. This function returns a
+conversion matrix from <cite>ChebychevHelper.get_conv</cite>. Not that <cite>**kwargs</cite> are used to absorb arguments for other
+bases, see documentation of <cite>SpectralHelper1D.get_basis_change_matrix</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>conv</strong> (<em>str</em>) – Conversion code, i.e. T2U</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sparse conversion matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_conv">
+<span class="sig-name descname"><span class="pre">get_conv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_conv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_conv" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get conversion matrix between different kinds of polynomials. The supported kinds are</dt><dd><ul class="simple">
+<li><p>T: Chebychev polynomials of first kind</p></li>
+<li><p>U: Chebychev polynomials of second kind</p></li>
+<li><p>D: Dirichlet recombination.</p></li>
+</ul>
+</dd>
+</dl>
+<p>You get the desired matrix by choosing a name as <code class="docutils literal notranslate"><span class="pre">A2B</span></code>. I.e. <code class="docutils literal notranslate"><span class="pre">T2U</span></code> for the conversion matrix from T to U.
+Once generates matrices are cached. So feel free to call the method as often as you like.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – Conversion code, e.g. ‘T2U’</p></li>
+<li><p><strong>N</strong> (<em>int</em>) – Size of the matrix (optional)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sparse conversion matrix</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>scipy.sparse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_differentiation_matrix">
+<span class="sig-name descname"><span class="pre">get_differentiation_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_differentiation_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_differentiation_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Keep in mind that the T2T differentiation matrix is dense.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>p</strong> (<em>int</em>) – Derivative you want to compute</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Differentiation matrix</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_fft_shift">
+<span class="sig-name descname"><span class="pre">get_fft_shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_fft_shift"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_fft_shift" title="Link to this definition">¶</a></dt>
+<dd><p>As described in the docstring for <cite>get_fft_shuffle</cite>, we need to rotate in the complex plane in order to use FFT for DCT.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>forward</strong> (<em>bool</em>) – Whether you want the rotation for forward transform or backward transform</p></li>
+<li><p><strong>N</strong> (<em>int</em>) – size of the grid</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Rotation</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>self.xp.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_fft_shuffle">
+<span class="sig-name descname"><span class="pre">get_fft_shuffle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_fft_shuffle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_fft_shuffle" title="Link to this definition">¶</a></dt>
+<dd><p>In order to more easily parallelize using distributed FFT libraries, we express the DCT via an FFT following
+doi.org/10.1109/TASSP.1980.1163351. The idea is based on reshuffling the data to be periodic and rotating it
+in the complex plane. This function returns a mask to do the shuffling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>forward</strong> (<em>bool</em>) – Whether you want the shuffle for forward transform or backward transform</p></li>
+<li><p><strong>N</strong> (<em>int</em>) – size of the grid</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Use as mask</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>self.xp.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_fft_utils">
+<span class="sig-name descname"><span class="pre">get_fft_utils</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_fft_utils"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_fft_utils" title="Link to this definition">¶</a></dt>
+<dd><p>Get the required utilities for using FFT to do DCT as described in the docstring for <cite>get_fft_shuffle</cite> and keep
+them cached.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_integ_BC_row">
+<span class="sig-name descname"><span class="pre">get_integ_BC_row</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_integ_BC_row"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_integ_BC_row" title="Link to this definition">¶</a></dt>
+<dd><p>Get a row for generating integral BCs with T polynomials.
+It returns the values of the integrals of T polynomials over the entire interval.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Row to put into a matrix</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>self.xp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_integration_matrix">
+<span class="sig-name descname"><span class="pre">get_integration_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lbnd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_integration_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_integration_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Get matrix for integration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>lbnd</strong> (<em>float</em>) – Lower bound for integration, only 0 is currently implemented</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sparse integration matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_norm">
+<span class="sig-name descname"><span class="pre">get_norm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_norm" title="Link to this definition">¶</a></dt>
+<dd><p>Get normalization for converting Chebychev coefficients and DCT</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N</strong> (<em>int</em><em>, </em><em>optional</em>) – Resolution</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Normalization</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>self.xp.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_wavenumbers">
+<span class="sig-name descname"><span class="pre">get_wavenumbers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_wavenumbers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_wavenumbers" title="Link to this definition">¶</a></dt>
+<dd><p>Get the domain in spectral space</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.itransform">
+<span class="sig-name descname"><span class="pre">itransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.itransform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.itransform" title="Link to this definition">¶</a></dt>
+<dd><p>1D inverse DCT along axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – Data you want to transform</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – Axis you want to transform along</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Data in physical space</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.transform" title="Link to this definition">¶</a></dt>
+<dd><p>1D DCT along axis. <cite>kwargs</cite> will be passed on to the FFT library.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – Data you want to transform</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – Axis you want to transform along</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Data in spectral space</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FFTHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.283185307179586</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D" title="helpers.spectral_helper.SpectralHelper1D"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpectralHelper1D</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.get_1dgrid">
+<span class="sig-name descname"><span class="pre">get_1dgrid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.get_1dgrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.get_1dgrid" title="Link to this definition">¶</a></dt>
+<dd><p>We use equally spaced points including the left boundary and not including the right one, which is the left boundary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.get_BC">
+<span class="sig-name descname"><span class="pre">get_BC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.get_BC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.get_BC" title="Link to this definition">¶</a></dt>
+<dd><p>Get a sort of boundary condition. You can use <cite>kind=integral</cite>, to fix the integral, or you can use <cite>kind=Nyquist</cite>.
+The latter is not really a boundary condition, but is used to set the Nyquist mode to some value, preferably zero.
+You should set the Nyquist mode zero when the solution in physical space is real and the resolution is even.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kind</strong> (<em>'integral'</em><em> or </em><em>'nyquist'</em>) – Kind of BC</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boundary condition row</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>self.xp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.get_Nyquist_mode_index">
+<span class="sig-name descname"><span class="pre">get_Nyquist_mode_index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.get_Nyquist_mode_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.get_Nyquist_mode_index" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the index of the Nyquist mode, i.e. the mode with the lowest wavenumber, which doesn’t have a positive
+counterpart for even resolution. This means real waves of this wave number cannot be properly resolved and you
+are best advised to set this mode zero if representing real functions on even-resolution grids is what you’re
+after.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Index of the Nyquist mode</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.get_differentiation_matrix">
+<span class="sig-name descname"><span class="pre">get_differentiation_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.get_differentiation_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.get_differentiation_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>This matrix is diagonal, allowing to invert concurrently.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>p</strong> (<em>int</em>) – Order of the derivative</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sparse differentiation matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.get_integ_BC_row">
+<span class="sig-name descname"><span class="pre">get_integ_BC_row</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.get_integ_BC_row"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.get_integ_BC_row" title="Link to this definition">¶</a></dt>
+<dd><p>Only the 0-mode has non-zero integral with FFT basis in periodic BCs</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.get_integration_matrix">
+<span class="sig-name descname"><span class="pre">get_integration_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.get_integration_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.get_integration_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Get integration matrix to compute <cite>p</cite>-th integral over the entire domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>p</strong> (<em>int</em>) – Order of integral you want to compute</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sparse integration matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.get_wavenumbers">
+<span class="sig-name descname"><span class="pre">get_wavenumbers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.get_wavenumbers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.get_wavenumbers" title="Link to this definition">¶</a></dt>
+<dd><p>Be careful that this ordering is very unintuitive.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.itransform">
+<span class="sig-name descname"><span class="pre">itransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.itransform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.itransform" title="Link to this definition">¶</a></dt>
+<dd><p>Inverse 1D FFT.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – Data you want to transform</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – Axis you want to transform along</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>transformed data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.transform" title="Link to this definition">¶</a></dt>
+<dd><p>1D FFT along axis. <cite>kwargs</cite> are passed on to the FFT library.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – Data you want to transform</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – Axis you want to transform along</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>transformed data</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SpectralHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useGPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="simple">
+<dt>This class has three functions:</dt><dd><ul class="simple">
+<li><p>Easily assemble matrices containing multiple equations</p></li>
+<li><p>Direct product of 1D bases to solve problems in more dimensions</p></li>
+<li><p>Distribute the FFTs to facilitate concurrency.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.comm">
+<span class="sig-name descname"><span class="pre">comm</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.comm" title="Link to this definition">¶</a></dt>
+<dd><p>MPI communicator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>mpi4py.Intracomm</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.debug">
+<span class="sig-name descname"><span class="pre">debug</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.debug" title="Link to this definition">¶</a></dt>
+<dd><p>Perform additional checks at extra computational cost</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.useGPU">
+<span class="sig-name descname"><span class="pre">useGPU</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.useGPU" title="Link to this definition">¶</a></dt>
+<dd><p>Whether to use GPUs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.axes">
+<span class="sig-name descname"><span class="pre">axes</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.axes" title="Link to this definition">¶</a></dt>
+<dd><p>List of 1D bases</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.components">
+<span class="sig-name descname"><span class="pre">components</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.components" title="Link to this definition">¶</a></dt>
+<dd><p>List of strings of the names of components in the equations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.full_BCs">
+<span class="sig-name descname"><span class="pre">full_BCs</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.full_BCs" title="Link to this definition">¶</a></dt>
+<dd><p>List of Dictionaries containing all information about the boundary conditions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.BC_mat">
+<span class="sig-name descname"><span class="pre">BC_mat</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.BC_mat" title="Link to this definition">¶</a></dt>
+<dd><p>List of lists of sparse matrices to put BCs into and eventually assemble the BC matrix from</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.BCs">
+<span class="sig-name descname"><span class="pre">BCs</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.BCs" title="Link to this definition">¶</a></dt>
+<dd><p>Matrix containing only the BCs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.fft_cache">
+<span class="sig-name descname"><span class="pre">fft_cache</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.fft_cache" title="Link to this definition">¶</a></dt>
+<dd><p>Cache FFTs of various shapes here to facilitate padding and so on</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.BC_rhs_mask">
+<span class="sig-name descname"><span class="pre">BC_rhs_mask</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.BC_rhs_mask" title="Link to this definition">¶</a></dt>
+<dd><p>Mask values that contain boundary conditions in the right hand side</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>self.xp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.BC_zero_index">
+<span class="sig-name descname"><span class="pre">BC_zero_index</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.BC_zero_index" title="Link to this definition">¶</a></dt>
+<dd><p>Indeces of rows in the matrix that are replaced by BCs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>self.xp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.BC_line_zero_matrix">
+<span class="sig-name descname"><span class="pre">BC_line_zero_matrix</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.BC_line_zero_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Matrix that zeros rows where we can then add the BCs in using <cite>BCs</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.rhs_BCs_hat">
+<span class="sig-name descname"><span class="pre">rhs_BCs_hat</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.rhs_BCs_hat" title="Link to this definition">¶</a></dt>
+<dd><p>Boundary conditions in spectral space</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>self.xp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.global_shape">
+<span class="sig-name descname"><span class="pre">global_shape</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.global_shape" title="Link to this definition">¶</a></dt>
+<dd><p>Global shape of the solution as in <cite>mpi4py-fft</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.local_slice">
+<span class="sig-name descname"><span class="pre">local_slice</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.local_slice" title="Link to this definition">¶</a></dt>
+<dd><p>Local slice of the solution as in <cite>mpi4py-fft</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>slice</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.fft_obj">
+<span class="sig-name descname"><span class="pre">fft_obj</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.fft_obj" title="Link to this definition">¶</a></dt>
+<dd><p>When using distributed FFTs, this will be a parallel transform object from <cite>mpi4py-fft</cite></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.init">
+<span class="sig-name descname"><span class="pre">init</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.init" title="Link to this definition">¶</a></dt>
+<dd><p>This is the same <cite>init</cite> that is used throughout the problem classes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.init_forward">
+<span class="sig-name descname"><span class="pre">init_forward</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.init_forward" title="Link to this definition">¶</a></dt>
+<dd><p>This is the equivalent of <cite>init</cite> in spectral space</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.V">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">V</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.V" title="Link to this definition">¶</a></dt>
+<dd><p>Get domain volume</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.add_BC">
+<span class="sig-name descname"><span class="pre">add_BC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">component</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.add_BC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.add_BC" title="Link to this definition">¶</a></dt>
+<dd><p>Add a BC to the matrix. Note that you need to convert the list of lists of BCs that this method generates to a
+single sparse matrix by calling <cite>setup_BCs</cite> after adding/removing all BCs.
+Forward arguments for the boundary conditions using <cite>kwargs</cite>. Refer to documentation of 1D bases for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>component</strong> (<em>str</em>) – Name of the component the BC should act on</p></li>
+<li><p><strong>equation</strong> (<em>str</em>) – Name of the equation for the component you want to put the BC in</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – Axis you want to add the BC to</p></li>
+<li><p><strong>kind</strong> (<em>str</em>) – kind of BC, e.g. Dirichlet</p></li>
+<li><p><strong>v</strong> – Value of the BC</p></li>
+<li><p><strong>line</strong> (<em>int</em>) – Line you want the BC to go in</p></li>
+<li><p><strong>scalar</strong> (<em>bool</em>) – Put the BC in all space positions in the other direction</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.add_axis">
+<span class="sig-name descname"><span class="pre">add_axis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.add_axis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.add_axis" title="Link to this definition">¶</a></dt>
+<dd><p>Add an axis to the domain by deciding on suitable 1D base.
+Arguments to the bases are forwarded using <cite>*args</cite> and <cite>**kwargs</cite>. Please refer to the documentation of the 1D
+bases for possible arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base</strong> (<em>str</em>) – 1D spectral method</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.add_component">
+<span class="sig-name descname"><span class="pre">add_component</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.add_component"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.add_component" title="Link to this definition">¶</a></dt>
+<dd><p>Add solution component(s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em><em> or </em><em>list</em><em> of </em><em>strings</em>) – Name(s) of component(s)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.add_equation_lhs">
+<span class="sig-name descname"><span class="pre">add_equation_lhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relations</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.add_equation_lhs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.add_equation_lhs" title="Link to this definition">¶</a></dt>
+<dd><p>Add the left hand part (that you want to solve implicitly) of an equation to a list of lists of sparse matrices
+that you will convert to an operator later.</p>
+<p>Example:
+Setup linear operator <cite>L</cite> for 1D heat equation using Chebychev method in first order form and T-to-U
+preconditioning:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<em>list</em><em> of </em><em>lists</em><em> of </em><em>sparse matrices</em>) – The operator to be</p></li>
+<li><p><strong>equation</strong> (<em>str</em>) – The equation of the component you want this in</p></li>
+<li><p><strong>relations</strong> – (dict): Relations between quantities</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.check_BCs">
+<span class="sig-name descname"><span class="pre">check_BCs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.check_BCs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.check_BCs" title="Link to this definition">¶</a></dt>
+<dd><p>Check that the solution satisfies the boundary conditions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>u</strong> – The solution you want to check</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.convert_operator_matrix_to_operator">
+<span class="sig-name descname"><span class="pre">convert_operator_matrix_to_operator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.convert_operator_matrix_to_operator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.convert_operator_matrix_to_operator" title="Link to this definition">¶</a></dt>
+<dd><p>Promote the list of lists of sparse matrices to a single sparse matrix that can be used as linear operator.
+See documentation of <cite>SpectralHelper.add_equation_lhs</cite> for an example.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>M</strong> (<em>list</em><em> of </em><em>lists</em><em> of </em><em>sparse matrices</em>) – The operator to be</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sparse linear operator</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.dtype">
+<span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.dtype" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.fft_backend">
+<span class="sig-name descname"><span class="pre">fft_backend</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'fftw'</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.fft_backend" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.fft_comm_backend">
+<span class="sig-name descname"><span class="pre">fft_comm_backend</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'MPI'</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.fft_comm_backend" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.fft_lib">
+<span class="sig-name descname"><span class="pre">fft_lib</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.fft'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.12/site-packages/scipy/fft/__init__.py'&gt;</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.fft_lib" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_BC">
+<span class="sig-name descname"><span class="pre">get_BC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_BC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_BC" title="Link to this definition">¶</a></dt>
+<dd><p>Use this method for boundary bordering. It gets the respective matrix row and embeds it into a matrix.
+Pay attention that if you have multiple BCs in a single equation, you need to put them in different lines.
+Typically, the last line that does not contain a BC is the best choice.
+Forward arguments for the boundary conditions using <cite>kwargs</cite>. Refer to documentation of 1D bases for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> (<em>int</em>) – Axis you want to add the BC to</p></li>
+<li><p><strong>kind</strong> (<em>str</em>) – kind of BC, e.g. Dirichlet</p></li>
+<li><p><strong>line</strong> (<em>int</em>) – Line you want the BC to go in</p></li>
+<li><p><strong>scalar</strong> (<em>bool</em>) – Put the BC in all space positions in the other direction</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sparse matrix containing the BC</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_Dirichlet_recombination_matrix">
+<span class="sig-name descname"><span class="pre">get_Dirichlet_recombination_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_Dirichlet_recombination_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_Dirichlet_recombination_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Get Dirichlet recombination matrix along axis. Not that it only makes sense in directions discretized with variations of Chebychev bases.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>axis</strong> (<em>int</em>) – Axis you discretized with Chebychev</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sparse matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_Id">
+<span class="sig-name descname"><span class="pre">get_Id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_Id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_Id" title="Link to this definition">¶</a></dt>
+<dd><p>Get identity matrix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse identity matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_aligned">
+<span class="sig-name descname"><span class="pre">get_aligned</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fft</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_aligned"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_aligned" title="Link to this definition">¶</a></dt>
+<dd><p>Realign the data along the axis when using distributed FFTs. <cite>kwargs</cite> will be used to get the correct PFFT
+object from <cite>mpi4py-fft</cite>, which has suitable transfer classes for the shape of data. Hence, they should include
+shape especially, if applicable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – The solution</p></li>
+<li><p><strong>axis_in</strong> (<em>int</em>) – Current alignment</p></li>
+<li><p><strong>axis_out</strong> (<em>int</em>) – New alignment</p></li>
+<li><p><strong>fft</strong> (<em>mpi4py_fft.PFFT</em>) – parallel FFT object</p></li>
+<li><p><strong>forward</strong> (<em>bool</em>) – Whether the input is in spectral space or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>solution aligned on <cite>axis_in</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_basis_change_matrix">
+<span class="sig-name descname"><span class="pre">get_basis_change_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_basis_change_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_basis_change_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Some spectral bases do a change between bases while differentiating. This method returns matrices that changes the basis to whatever you want.
+Refer to the methods of the same name of the 1D bases to learn what parameters you need to pass here as <cite>kwargs</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>axes</strong> (<em>tuple</em>) – Axes along which to change basis.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sparse basis change matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_differentiation_matrix">
+<span class="sig-name descname"><span class="pre">get_differentiation_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axes</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_differentiation_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_differentiation_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Get differentiation matrix along specified axis. <cite>kwargs</cite> are forwarded to the 1D base implementation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>axes</strong> (<em>tuple</em>) – Axes along which to differentiate.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sparse differentiation matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_empty_operator_matrix">
+<span class="sig-name descname"><span class="pre">get_empty_operator_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_empty_operator_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_empty_operator_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Return a matrix of operators to be filled with the connections between the solution components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list containing sparse zeros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_fft">
+<span class="sig-name descname"><span class="pre">get_fft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'object'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_fft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_fft" title="Link to this definition">¶</a></dt>
+<dd><p>When using MPI, we use <cite>PFFT</cite> objects generated by mpi4py-fft</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axes</strong> (<em>tuple</em>) – Axes you want to transform over</p></li>
+<li><p><strong>direction</strong> (<em>str</em>) – use “forward” or “backward” to get functions for performing the transforms or “object” to get the PFFT object</p></li>
+<li><p><strong>padding</strong> (<em>tuple</em>) – Padding for dealiasing</p></li>
+<li><p><strong>shape</strong> (<em>tuple</em>) – Shape of the transform</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>transform</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_filter_matrix">
+<span class="sig-name descname"><span class="pre">get_filter_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_filter_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_filter_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Get bandpass filter along <cite>axis</cite>. See the documentation <cite>get_filter_matrix</cite> in the 1D bases for what kwargs are
+admissible.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse bandpass matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_grid">
+<span class="sig-name descname"><span class="pre">get_grid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_grid" title="Link to this definition">¶</a></dt>
+<dd><p>Get grid in physical space</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_integration_matrix">
+<span class="sig-name descname"><span class="pre">get_integration_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_integration_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_integration_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Get integration matrix to integrate along specified axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>axes</strong> (<em>tuple</em>) – Axes along which to integrate over.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sparse integration matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_local_slice_of_1D_matrix">
+<span class="sig-name descname"><span class="pre">get_local_slice_of_1D_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_local_slice_of_1D_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_local_slice_of_1D_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Get the local version of a 1D matrix. When using distributed FFTs, each rank will carry only a subset of modes,
+which you can sort out via the <cite>SpectralHelper.local_slice</cite> attribute. When constructing a 1D matrix, you can
+use this method to get the part corresponding to the modes carried by this rank.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>M</strong> (<em>sparse matrix</em>) – Global 1D matrix you want to get the local version of</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – Direction in which you want the local version. You will get the global matrix in other directions. This means slab decomposition only.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sparse local matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_wavenumbers">
+<span class="sig-name descname"><span class="pre">get_wavenumbers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_wavenumbers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_wavenumbers" title="Link to this definition">¶</a></dt>
+<dd><p>Get grid in spectral space</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.index">
+<span class="sig-name descname"><span class="pre">index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.index" title="Link to this definition">¶</a></dt>
+<dd><p>Get the index of component <cite>name</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em><em> or </em><em>list</em><em> of </em><em>strings</em>) – Name(s) of component(s)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Index of the component</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.itransform">
+<span class="sig-name descname"><span class="pre">itransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.itransform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.itransform" title="Link to this definition">¶</a></dt>
+<dd><p>Inverse transform over all components of the solution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transform</strong> (<em>u data to</em>)</p></li>
+<li><p><strong>axes</strong> (<em>tuple</em>) – Axes over which to transform</p></li>
+<li><p><strong>padding</strong> (<em>list</em>) – Padding factor for transform. E.g. a padding factor of 2 will add as many zeros as there were modes before before transforming</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Transformed data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.itransform_single_component">
+<span class="sig-name descname"><span class="pre">itransform_single_component</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.itransform_single_component"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.itransform_single_component" title="Link to this definition">¶</a></dt>
+<dd><p>Inverse transform over single component of the solution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transform</strong> (<em>u data to</em>)</p></li>
+<li><p><strong>axes</strong> (<em>tuple</em>) – Axes over which to transform</p></li>
+<li><p><strong>padding</strong> (<em>list</em>) – Padding factor for transform. E.g. a padding factor of 2 will add as many zeros as there were modes before before transforming</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Transformed data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.linalg">
+<span class="sig-name descname"><span class="pre">linalg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.sparse.linalg'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.12/site-packages/scipy/sparse/linalg/__init__.py'&gt;</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.linalg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.ncomponents">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ncomponents</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.ncomponents" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.ndim">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.ndim" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.put_BCs_in_matrix">
+<span class="sig-name descname"><span class="pre">put_BCs_in_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.put_BCs_in_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.put_BCs_in_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Put the boundary conditions in a matrix by replacing rows with BCs.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.put_BCs_in_rhs">
+<span class="sig-name descname"><span class="pre">put_BCs_in_rhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.put_BCs_in_rhs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.put_BCs_in_rhs" title="Link to this definition">¶</a></dt>
+<dd><p>Put the BCs in the right hand side for solving.
+This function will transform along each axis individually and add all BCs in that axis.
+Consider <cite>put_BCs_in_rhs_hat</cite> to add BCs with no extra transforms needed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rhs</strong> – Right hand side in physical space</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>rhs in physical space with BCs</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.put_BCs_in_rhs_hat">
+<span class="sig-name descname"><span class="pre">put_BCs_in_rhs_hat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs_hat</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.put_BCs_in_rhs_hat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.put_BCs_in_rhs_hat" title="Link to this definition">¶</a></dt>
+<dd><p>Put the BCs in the right hand side in spectral space for solving.
+This function needs no transforms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rhs_hat</strong> – Right hand side in spectral space</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>rhs in spectral space with BCs</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.remove_BC">
+<span class="sig-name descname"><span class="pre">remove_BC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">component</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.remove_BC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.remove_BC" title="Link to this definition">¶</a></dt>
+<dd><p>Remove a BC from the matrix. This is useful e.g. when you add a non-scalar BC and then need to selectively
+remove single BCs again, as in incompressible Navier-Stokes, for instance.
+Forward arguments for the boundary conditions using <cite>kwargs</cite>. Refer to documentation of 1D bases for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>component</strong> (<em>str</em>) – Name of the component the BC should act on</p></li>
+<li><p><strong>equation</strong> (<em>str</em>) – Name of the equation for the component you want to put the BC in</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – Axis you want to add the BC to</p></li>
+<li><p><strong>kind</strong> (<em>str</em>) – kind of BC, e.g. Dirichlet</p></li>
+<li><p><strong>v</strong> – Value of the BC</p></li>
+<li><p><strong>line</strong> (<em>int</em>) – Line you want the BC to go in</p></li>
+<li><p><strong>scalar</strong> (<em>bool</em>) – Put the BC in all space positions in the other direction</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.setup_BCs">
+<span class="sig-name descname"><span class="pre">setup_BCs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.setup_BCs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.setup_BCs" title="Link to this definition">¶</a></dt>
+<dd><p>Convert the list of lists of BCs to the boundary condition operator.
+Also, boundary bordering requires to zero out all other entries in the matrix in rows containing a boundary
+condition. This method sets up a suitable sparse matrix to do this.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.setup_GPU">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setup_GPU</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.setup_GPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.setup_GPU" title="Link to this definition">¶</a></dt>
+<dd><p>switch to GPU modules</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.setup_fft">
+<span class="sig-name descname"><span class="pre">setup_fft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">real_spectral_coefficients</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.setup_fft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.setup_fft" title="Link to this definition">¶</a></dt>
+<dd><p>This function must be called after all axes have been setup in order to prepare the local shapes of the data.
+This must also be called before setting up any BCs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>real_spectral_coefficients</strong> (<em>bool</em>) – Allow only real coefficients in spectral space</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.shape">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.shape" title="Link to this definition">¶</a></dt>
+<dd><p>Get shape of individual solution component</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.sparse_lib">
+<span class="sig-name descname"><span class="pre">sparse_lib</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.sparse'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.12/site-packages/scipy/sparse/__init__.py'&gt;</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.sparse_lib" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.transform" title="Link to this definition">¶</a></dt>
+<dd><p>Transform all components from physical space to spectral space</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transform</strong> (<em>u data to</em>)</p></li>
+<li><p><strong>axes</strong> (<em>tuple</em>) – Axes over which to transform</p></li>
+<li><p><strong>padding</strong> (<em>list</em>) – Padding factor for transform. E.g. a padding factor of 2 will discard the upper half of modes after transforming</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Transformed data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.transform_single_component">
+<span class="sig-name descname"><span class="pre">transform_single_component</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.transform_single_component"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.transform_single_component" title="Link to this definition">¶</a></dt>
+<dd><p>Transform a single component of the solution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transform</strong> (<em>u data to</em>)</p></li>
+<li><p><strong>axes</strong> (<em>tuple</em>) – Axes over which to transform</p></li>
+<li><p><strong>padding</strong> (<em>list</em>) – Padding factor for transform. E.g. a padding factor of 2 will discard the upper half of modes after transforming</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Transformed data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.u_init">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">u_init</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.u_init" title="Link to this definition">¶</a></dt>
+<dd><p>Get empty data container in physical space</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.u_init_forward">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">u_init_forward</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.u_init_forward" title="Link to this definition">¶</a></dt>
+<dd><p>Get empty data container in spectral space</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.xp">
+<span class="sig-name descname"><span class="pre">xp</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'numpy'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.12/site-packages/numpy/__init__.py'&gt;</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.xp" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SpectralHelper1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useGPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstract base class for 1D spectral discretizations. Defines a common interface with parameters and functions that
+all bases need to have.</p>
+<p>When implementing new bases, please take care to use the modules that are supplied as class attributes to enable
+the code for GPUs.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.N">
+<span class="sig-name descname"><span class="pre">N</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.N" title="Link to this definition">¶</a></dt>
+<dd><p>Resolution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.x0">
+<span class="sig-name descname"><span class="pre">x0</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.x0" title="Link to this definition">¶</a></dt>
+<dd><p>Coordinate of left boundary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.x1">
+<span class="sig-name descname"><span class="pre">x1</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.x1" title="Link to this definition">¶</a></dt>
+<dd><p>Coordinate of right boundary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.L">
+<span class="sig-name descname"><span class="pre">L</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.L" title="Link to this definition">¶</a></dt>
+<dd><p>Length of the domain</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.useGPU">
+<span class="sig-name descname"><span class="pre">useGPU</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.useGPU" title="Link to this definition">¶</a></dt>
+<dd><p>Whether to use GPUs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.fft_lib">
+<span class="sig-name descname"><span class="pre">fft_lib</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.fft'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.12/site-packages/scipy/fft/__init__.py'&gt;</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.fft_lib" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.get_1dgrid">
+<span class="sig-name descname"><span class="pre">get_1dgrid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.get_1dgrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.get_1dgrid" title="Link to this definition">¶</a></dt>
+<dd><p>Get the grid in physical space</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Grid</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>self.xp.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.get_BC">
+<span class="sig-name descname"><span class="pre">get_BC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.get_BC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.get_BC" title="Link to this definition">¶</a></dt>
+<dd><p>To facilitate boundary conditions (BCs) we use either a basis where all functions satisfy the BCs automatically,
+as is the case in FFT basis for periodic BCs, or boundary bordering. In boundary bordering, specific lines in
+the matrix are replaced by the boundary conditions as obtained by this method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kind</strong> (<em>str</em>) – The type of BC you want to implement please refer to the implementations of this method in the</p></li>
+<li><p><strong>implemented</strong> (<em>individual 1D bases for what is</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boundary condition</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>self.xp.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.get_Id">
+<span class="sig-name descname"><span class="pre">get_Id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.get_Id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.get_Id" title="Link to this definition">¶</a></dt>
+<dd><p>Get identity matrix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse diagonal identity matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.get_basis_change_matrix">
+<span class="sig-name descname"><span class="pre">get_basis_change_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.get_basis_change_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.get_basis_change_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Some spectral discretization change the basis during differentiation. This method can be used to transfer
+between the various bases.</p>
+<p>This method accepts arbitrary arguments that may not be used in order to provide an easy interface for multi-
+dimensional bases. For instance, you may combine an FFT discretization with an ultraspherical discretization.
+The FFT discretization will always be in the same base, but the ultraspherical discretization uses a different
+base for every derivative. You can then ask all bases for transfer matrices from one ultraspherical derivative
+base to the next. The FFT discretization will ignore this and return an identity while the ultraspherical
+discretization will return the desired matrix. After a Kronecker product, you get the 2D version of the matrix
+you want. This is what the <cite>SpectralHelper</cite> does when you call the method of the same name on it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse bases change matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.get_differentiation_matrix">
+<span class="sig-name descname"><span class="pre">get_differentiation_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.get_differentiation_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.get_differentiation_matrix" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.get_empty_operator_matrix">
+<span class="sig-name descname"><span class="pre">get_empty_operator_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.get_empty_operator_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.get_empty_operator_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Return a matrix of operators to be filled with the connections between the solution components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>S</strong> (<em>int</em>) – Number of components in the solution</p></li>
+<li><p><strong>O</strong> (<em>sparse matrix</em>) – Zero matrix used for initialization</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of lists containing sparse zeros</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.get_filter_matrix">
+<span class="sig-name descname"><span class="pre">get_filter_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.get_filter_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.get_filter_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Get a bandpass filter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kmin</strong> (<em>int</em>) – Lower limit of the bandpass filter</p></li>
+<li><p><strong>kmax</strong> (<em>int</em>) – Upper limit of the bandpass filter</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sparse matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.get_integration_matrix">
+<span class="sig-name descname"><span class="pre">get_integration_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.get_integration_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.get_integration_matrix" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.get_wavenumbers">
+<span class="sig-name descname"><span class="pre">get_wavenumbers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.get_wavenumbers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.get_wavenumbers" title="Link to this definition">¶</a></dt>
+<dd><p>Get the grid in spectral space</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.get_zero">
+<span class="sig-name descname"><span class="pre">get_zero</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.get_zero"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.get_zero" title="Link to this definition">¶</a></dt>
+<dd><p>Get a matrix with all zeros of the correct size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse matrix with zeros everywhere</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.linalg">
+<span class="sig-name descname"><span class="pre">linalg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.sparse.linalg'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.12/site-packages/scipy/sparse/linalg/__init__.py'&gt;</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.linalg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.setup_GPU">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setup_GPU</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.setup_GPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.setup_GPU" title="Link to this definition">¶</a></dt>
+<dd><p>switch to GPU modules</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.sparse_lib">
+<span class="sig-name descname"><span class="pre">sparse_lib</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.sparse'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.12/site-packages/scipy/sparse/__init__.py'&gt;</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.sparse_lib" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.xp">
+<span class="sig-name descname"><span class="pre">xp</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'numpy'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.12/site-packages/numpy/__init__.py'&gt;</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.xp" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="helpers.spectral_helper.UltrasphericalHelper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UltrasphericalHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fft'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#UltrasphericalHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.UltrasphericalHelper" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper" title="helpers.spectral_helper.ChebychevHelper"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChebychevHelper</span></code></a></p>
+<p>This implementation follows <a class="reference external" href="https://doi.org/10.1137/120865458">https://doi.org/10.1137/120865458</a>.
+The ultraspherical method works in Chebychev polynomials as well, but also uses various Gegenbauer polynomials.
+The idea is that for every derivative of Chebychev T polynomials, there is a basis of Gegenbauer polynomials where the differentiation matrix is a single off-diagonal.
+There are also conversion operators from one derivative basis to the next that are sparse.</p>
+<p>This basis is used like this: For every equation that you have, look for the highest derivative and bump all matrices to the correct basis. If your highest derivative is 2 and you have an identity, it needs to get bumped from 0 to 1 and from 1 to 2. If you have a first derivative as well, it needs to be bumped from 1 to 2.
+You don’t need the same resulting basis in all equations. You just need to take care that you translate the right hand side to the correct basis as well.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.UltrasphericalHelper.get_S">
+<span class="sig-name descname"><span class="pre">get_S</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lmbda</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#UltrasphericalHelper.get_S"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.UltrasphericalHelper.get_S" title="Link to this definition">¶</a></dt>
+<dd><p>Get matrix for bumping the derivative base by one from lmbda to lmbda + 1. This is the same language as in
+<a class="reference external" href="https://doi.org/10.1137/120865458">https://doi.org/10.1137/120865458</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>lmbda</strong> (<em>int</em>) – Ingoing derivative base</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Conversion from derivative base lmbda to lmbda + 1</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.UltrasphericalHelper.get_basis_change_matrix">
+<span class="sig-name descname"><span class="pre">get_basis_change_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#UltrasphericalHelper.get_basis_change_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.UltrasphericalHelper.get_basis_change_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Get a conversion matrix from derivative base <cite>p_in</cite> to <cite>p_out</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p_out</strong> (<em>int</em>) – Resulting derivative base</p></li>
+<li><p><strong>p_in</strong> (<em>int</em>) – Ingoing derivative base</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.UltrasphericalHelper.get_differentiation_matrix">
+<span class="sig-name descname"><span class="pre">get_differentiation_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#UltrasphericalHelper.get_differentiation_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.UltrasphericalHelper.get_differentiation_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Notice that while sparse, this matrix is not diagonal, which means the inversion cannot be parallelized easily.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>p</strong> (<em>int</em>) – Order of the derivative</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sparse differentiation matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.UltrasphericalHelper.get_integration_constant">
+<span class="sig-name descname"><span class="pre">get_integration_constant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#UltrasphericalHelper.get_integration_constant"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.UltrasphericalHelper.get_integration_constant" title="Link to this definition">¶</a></dt>
+<dd><p>Get integration constant for lower bound of -1. See documentation of <cite>UltrasphericalHelper.get_integration_matrix</cite> for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u_hat</strong> – Solution in spectral space</p></li>
+<li><p><strong>axis</strong> – Axis you want to integrate over</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Integration constant, has one less dimension than <cite>u_hat</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.UltrasphericalHelper.get_integration_matrix">
+<span class="sig-name descname"><span class="pre">get_integration_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#UltrasphericalHelper.get_integration_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.UltrasphericalHelper.get_integration_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Get an integration matrix. Please use <cite>UltrasphericalHelper.get_integration_constant</cite> afterwards to compute the
+integration constant such that integration starts from x=-1.</p>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.spectral_helper</span> <span class="kn">import</span> <span class="n">UltrasphericalHelper</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">helper</span> <span class="o">=</span> <span class="n">UltrasphericalHelper</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+<span class="n">coeffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+<span class="n">coeffs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">poly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polynomial</span><span class="o">.</span><span class="n">Chebyshev</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span>
+
+<span class="n">S</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">get_integration_matrix</span><span class="p">()</span>
+<span class="n">U_hat</span> <span class="o">=</span> <span class="n">S</span> <span class="o">@</span> <span class="n">coeffs</span>
+<span class="n">U_hat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">get_integration_constant</span><span class="p">(</span><span class="n">U_hat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">poly</span><span class="o">.</span><span class="n">integ</span><span class="p">(</span><span class="n">lbnd</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">coef</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">U_hat</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse integration matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">helpers.spectral_helper module</a><ul>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper"><code class="docutils literal notranslate"><span class="pre">ChebychevHelper</span></code></a><ul>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_1dgrid"><code class="docutils literal notranslate"><span class="pre">get_1dgrid()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_BC"><code class="docutils literal notranslate"><span class="pre">get_BC()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_Dirichlet_BC_row"><code class="docutils literal notranslate"><span class="pre">get_Dirichlet_BC_row()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_Dirichlet_recombination_matrix"><code class="docutils literal notranslate"><span class="pre">get_Dirichlet_recombination_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_basis_change_matrix"><code class="docutils literal notranslate"><span class="pre">get_basis_change_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_conv"><code class="docutils literal notranslate"><span class="pre">get_conv()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_differentiation_matrix"><code class="docutils literal notranslate"><span class="pre">get_differentiation_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_fft_shift"><code class="docutils literal notranslate"><span class="pre">get_fft_shift()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_fft_shuffle"><code class="docutils literal notranslate"><span class="pre">get_fft_shuffle()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_fft_utils"><code class="docutils literal notranslate"><span class="pre">get_fft_utils()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_integ_BC_row"><code class="docutils literal notranslate"><span class="pre">get_integ_BC_row()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_integration_matrix"><code class="docutils literal notranslate"><span class="pre">get_integration_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_norm"><code class="docutils literal notranslate"><span class="pre">get_norm()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_wavenumbers"><code class="docutils literal notranslate"><span class="pre">get_wavenumbers()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.itransform"><code class="docutils literal notranslate"><span class="pre">itransform()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.transform"><code class="docutils literal notranslate"><span class="pre">transform()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper"><code class="docutils literal notranslate"><span class="pre">FFTHelper</span></code></a><ul>
+<li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_1dgrid"><code class="docutils literal notranslate"><span class="pre">get_1dgrid()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_BC"><code class="docutils literal notranslate"><span class="pre">get_BC()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_Nyquist_mode_index"><code class="docutils literal notranslate"><span class="pre">get_Nyquist_mode_index()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_differentiation_matrix"><code class="docutils literal notranslate"><span class="pre">get_differentiation_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_integ_BC_row"><code class="docutils literal notranslate"><span class="pre">get_integ_BC_row()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_integration_matrix"><code class="docutils literal notranslate"><span class="pre">get_integration_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_wavenumbers"><code class="docutils literal notranslate"><span class="pre">get_wavenumbers()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.itransform"><code class="docutils literal notranslate"><span class="pre">itransform()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.transform"><code class="docutils literal notranslate"><span class="pre">transform()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper"><code class="docutils literal notranslate"><span class="pre">SpectralHelper</span></code></a><ul>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.comm"><code class="docutils literal notranslate"><span class="pre">comm</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.debug"><code class="docutils literal notranslate"><span class="pre">debug</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.useGPU"><code class="docutils literal notranslate"><span class="pre">useGPU</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.axes"><code class="docutils literal notranslate"><span class="pre">axes</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.components"><code class="docutils literal notranslate"><span class="pre">components</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.full_BCs"><code class="docutils literal notranslate"><span class="pre">full_BCs</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.BC_mat"><code class="docutils literal notranslate"><span class="pre">BC_mat</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.BCs"><code class="docutils literal notranslate"><span class="pre">BCs</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.fft_cache"><code class="docutils literal notranslate"><span class="pre">fft_cache</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.BC_rhs_mask"><code class="docutils literal notranslate"><span class="pre">BC_rhs_mask</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.BC_zero_index"><code class="docutils literal notranslate"><span class="pre">BC_zero_index</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.BC_line_zero_matrix"><code class="docutils literal notranslate"><span class="pre">BC_line_zero_matrix</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.rhs_BCs_hat"><code class="docutils literal notranslate"><span class="pre">rhs_BCs_hat</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.global_shape"><code class="docutils literal notranslate"><span class="pre">global_shape</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.local_slice"><code class="docutils literal notranslate"><span class="pre">local_slice</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.fft_obj"><code class="docutils literal notranslate"><span class="pre">fft_obj</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.init"><code class="docutils literal notranslate"><span class="pre">init</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.init_forward"><code class="docutils literal notranslate"><span class="pre">init_forward</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.V"><code class="docutils literal notranslate"><span class="pre">V</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.add_BC"><code class="docutils literal notranslate"><span class="pre">add_BC()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.add_axis"><code class="docutils literal notranslate"><span class="pre">add_axis()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.add_component"><code class="docutils literal notranslate"><span class="pre">add_component()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.add_equation_lhs"><code class="docutils literal notranslate"><span class="pre">add_equation_lhs()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.check_BCs"><code class="docutils literal notranslate"><span class="pre">check_BCs()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.convert_operator_matrix_to_operator"><code class="docutils literal notranslate"><span class="pre">convert_operator_matrix_to_operator()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.dtype"><code class="docutils literal notranslate"><span class="pre">dtype</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.fft_backend"><code class="docutils literal notranslate"><span class="pre">fft_backend</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.fft_comm_backend"><code class="docutils literal notranslate"><span class="pre">fft_comm_backend</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.fft_lib"><code class="docutils literal notranslate"><span class="pre">fft_lib</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_BC"><code class="docutils literal notranslate"><span class="pre">get_BC()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_Dirichlet_recombination_matrix"><code class="docutils literal notranslate"><span class="pre">get_Dirichlet_recombination_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_Id"><code class="docutils literal notranslate"><span class="pre">get_Id()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_aligned"><code class="docutils literal notranslate"><span class="pre">get_aligned()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_basis_change_matrix"><code class="docutils literal notranslate"><span class="pre">get_basis_change_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_differentiation_matrix"><code class="docutils literal notranslate"><span class="pre">get_differentiation_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_empty_operator_matrix"><code class="docutils literal notranslate"><span class="pre">get_empty_operator_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_fft"><code class="docutils literal notranslate"><span class="pre">get_fft()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_filter_matrix"><code class="docutils literal notranslate"><span class="pre">get_filter_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_grid"><code class="docutils literal notranslate"><span class="pre">get_grid()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_integration_matrix"><code class="docutils literal notranslate"><span class="pre">get_integration_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_local_slice_of_1D_matrix"><code class="docutils literal notranslate"><span class="pre">get_local_slice_of_1D_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_wavenumbers"><code class="docutils literal notranslate"><span class="pre">get_wavenumbers()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.index"><code class="docutils literal notranslate"><span class="pre">index()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.itransform"><code class="docutils literal notranslate"><span class="pre">itransform()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.itransform_single_component"><code class="docutils literal notranslate"><span class="pre">itransform_single_component()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.linalg"><code class="docutils literal notranslate"><span class="pre">linalg</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.ncomponents"><code class="docutils literal notranslate"><span class="pre">ncomponents</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.ndim"><code class="docutils literal notranslate"><span class="pre">ndim</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.put_BCs_in_matrix"><code class="docutils literal notranslate"><span class="pre">put_BCs_in_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.put_BCs_in_rhs"><code class="docutils literal notranslate"><span class="pre">put_BCs_in_rhs()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.put_BCs_in_rhs_hat"><code class="docutils literal notranslate"><span class="pre">put_BCs_in_rhs_hat()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.remove_BC"><code class="docutils literal notranslate"><span class="pre">remove_BC()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.setup_BCs"><code class="docutils literal notranslate"><span class="pre">setup_BCs()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.setup_GPU"><code class="docutils literal notranslate"><span class="pre">setup_GPU()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.setup_fft"><code class="docutils literal notranslate"><span class="pre">setup_fft()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.shape"><code class="docutils literal notranslate"><span class="pre">shape</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.sparse_lib"><code class="docutils literal notranslate"><span class="pre">sparse_lib</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.transform"><code class="docutils literal notranslate"><span class="pre">transform()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.transform_single_component"><code class="docutils literal notranslate"><span class="pre">transform_single_component()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.u_init"><code class="docutils literal notranslate"><span class="pre">u_init</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.u_init_forward"><code class="docutils literal notranslate"><span class="pre">u_init_forward</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.xp"><code class="docutils literal notranslate"><span class="pre">xp</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D"><code class="docutils literal notranslate"><span class="pre">SpectralHelper1D</span></code></a><ul>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.N"><code class="docutils literal notranslate"><span class="pre">N</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.x0"><code class="docutils literal notranslate"><span class="pre">x0</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.x1"><code class="docutils literal notranslate"><span class="pre">x1</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.L"><code class="docutils literal notranslate"><span class="pre">L</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.useGPU"><code class="docutils literal notranslate"><span class="pre">useGPU</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.fft_lib"><code class="docutils literal notranslate"><span class="pre">fft_lib</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_1dgrid"><code class="docutils literal notranslate"><span class="pre">get_1dgrid()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_BC"><code class="docutils literal notranslate"><span class="pre">get_BC()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_Id"><code class="docutils literal notranslate"><span class="pre">get_Id()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_basis_change_matrix"><code class="docutils literal notranslate"><span class="pre">get_basis_change_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_differentiation_matrix"><code class="docutils literal notranslate"><span class="pre">get_differentiation_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_empty_operator_matrix"><code class="docutils literal notranslate"><span class="pre">get_empty_operator_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_filter_matrix"><code class="docutils literal notranslate"><span class="pre">get_filter_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_integration_matrix"><code class="docutils literal notranslate"><span class="pre">get_integration_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_wavenumbers"><code class="docutils literal notranslate"><span class="pre">get_wavenumbers()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_zero"><code class="docutils literal notranslate"><span class="pre">get_zero()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.linalg"><code class="docutils literal notranslate"><span class="pre">linalg</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.setup_GPU"><code class="docutils literal notranslate"><span class="pre">setup_GPU()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.sparse_lib"><code class="docutils literal notranslate"><span class="pre">sparse_lib</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.xp"><code class="docutils literal notranslate"><span class="pre">xp</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#helpers.spectral_helper.UltrasphericalHelper"><code class="docutils literal notranslate"><span class="pre">UltrasphericalHelper</span></code></a><ul>
+<li><a class="reference internal" href="#helpers.spectral_helper.UltrasphericalHelper.get_S"><code class="docutils literal notranslate"><span class="pre">get_S()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.UltrasphericalHelper.get_basis_change_matrix"><code class="docutils literal notranslate"><span class="pre">get_basis_change_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.UltrasphericalHelper.get_differentiation_matrix"><code class="docutils literal notranslate"><span class="pre">get_differentiation_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.UltrasphericalHelper.get_integration_constant"><code class="docutils literal notranslate"><span class="pre">get_integration_constant()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.UltrasphericalHelper.get_integration_matrix"><code class="docutils literal notranslate"><span class="pre">get_integration_matrix()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="helpers.setup_helper.html"
+                          title="previous chapter">helpers.setup_helper module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="helpers.stats_helper.html"
+                          title="next chapter">helpers.stats_helper module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/helpers.spectral_helper.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="helpers.stats_helper.html" title="helpers.stats_helper module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="helpers.setup_helper.html" title="helpers.setup_helper module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.5.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="helpers.html" >helpers package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">helpers.spectral_helper module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    </div>
+  </body>
+</html>

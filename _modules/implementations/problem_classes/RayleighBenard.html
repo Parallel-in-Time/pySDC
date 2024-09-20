@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>implementations.problem_classes.RayleighBenard &#8212; pySDC 5.5.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=def86cc0" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../../_static/documentation_options.js?v=07fd27c7"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.5.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.RayleighBenard</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.problem_classes.RayleighBenard</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.generic_spectral</span> <span class="kn">import</span> <span class="n">GenericSpectralLinear</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.convergence_controller</span> <span class="kn">import</span> <span class="n">ConvergenceController</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.hooks</span> <span class="kn">import</span> <span class="n">Hooks</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.check_convergence</span> <span class="kn">import</span> <span class="n">CheckConvergence</span>
+
+
+<div class="viewcode-block" id="RayleighBenard">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard">[docs]</a>
+<span class="k">class</span> <span class="nc">RayleighBenard</span><span class="p">(</span><span class="n">GenericSpectralLinear</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rayleigh-Benard Convection is a variation of incompressible Navier-Stokes.</span>
+
+<span class="sd">    The equations we solve are</span>
+
+<span class="sd">        u_x + v_z = 0</span>
+<span class="sd">        T_t - kappa (T_xx + T_zz) = -uT_x - vT_z</span>
+<span class="sd">        u_t - nu (u_xx + u_zz) + p_x = -uu_x - vu_z</span>
+<span class="sd">        v_t - nu (v_xx + v_zz) + p_z - T = -uv_x - vv_z</span>
+
+<span class="sd">    with u the horizontal velocity, v the vertical velocity (in z-direction), T the temperature, p the pressure, indices</span>
+<span class="sd">    denoting derivatives, kappa=(Rayleigh * Prandl)**(-1/2) and nu = (Rayleigh / Prandl)**(-1/2). Everything on the left</span>
+<span class="sd">    hand side, that is the viscous part, the pressure gradient and the buoyancy due to temperature are treated</span>
+<span class="sd">    implicitly, while the non-linear convection part on the right hand side is integrated explicitly.</span>
+
+<span class="sd">    The domain, vertical boundary conditions and pressure gauge are</span>
+
+<span class="sd">        Omega = [0, 8) x (-1, 1)</span>
+<span class="sd">        T(z=+1) = 0</span>
+<span class="sd">        T(z=-1) = 2</span>
+<span class="sd">        u(z=+-1) = v(z=+-1) = 0</span>
+<span class="sd">        integral over p = 0</span>
+
+<span class="sd">    The spectral discretization uses FFT horizontally, implying periodic BCs, and an ultraspherical method vertically to</span>
+<span class="sd">    facilitate the Dirichlet BCs.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        Prandl (float): Prandl number</span>
+<span class="sd">        Rayleigh (float): Rayleigh number</span>
+<span class="sd">        nx (int): Horizontal resolution</span>
+<span class="sd">        nz (int): Vertical resolution</span>
+<span class="sd">        BCs (dict): Can specify boundary conditions here</span>
+<span class="sd">        dealiasing (float): Dealiasing factor for evaluating the non-linear part</span>
+<span class="sd">        comm (mpi4py.Intracomm): Space communicator</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">Prandl</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">Rayleigh</span><span class="o">=</span><span class="mf">2e6</span><span class="p">,</span>
+        <span class="n">nx</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+        <span class="n">nz</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">BCs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dealiasing</span><span class="o">=</span><span class="mi">3</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor. `kwargs` are forwarded to parent class constructor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            Prandl (float): Prandtl number</span>
+<span class="sd">            Rayleigh (float): Rayleigh number</span>
+<span class="sd">            nx (int): Resolution in x-direction</span>
+<span class="sd">            nz (int): Resolution in z direction</span>
+<span class="sd">            BCs (dict): Vertical boundary conditions</span>
+<span class="sd">            dealiasing (float): Dealiasing for evaluating the non-linear part in real space</span>
+<span class="sd">            comm (mpi4py.Intracomm): Space communicator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">BCs</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">BCs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">BCs</span>
+        <span class="n">BCs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;T_top&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;T_bottom&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s1">&#39;v_top&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;v_bottom&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;u_top&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;u_bottom&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;p_integral&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">BCs</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
+
+                <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+            <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
+            <span class="s1">&#39;Prandl&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Rayleigh&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;nx&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;nz&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;BCs&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dealiasing&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;comm&#39;</span><span class="p">,</span>
+            <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span>
+            <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">bases</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="s1">&#39;fft&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="p">,</span> <span class="s1">&#39;x0&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;x1&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="s1">&#39;ultraspherical&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">nz</span><span class="p">}]</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">bases</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Kz</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_wavenumbers</span><span class="p">()</span>
+
+        <span class="c1"># construct 2D matrices</span>
+        <span class="n">Dzz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_differentiation_matrix</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">Dz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_differentiation_matrix</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))</span>
+        <span class="n">Dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_differentiation_matrix</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,))</span>
+        <span class="n">Dxx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_differentiation_matrix</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,),</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">Id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Id</span><span class="p">()</span>
+
+        <span class="n">S1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basis_change_matrix</span><span class="p">(</span><span class="n">p_out</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">p_in</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">S2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basis_change_matrix</span><span class="p">(</span><span class="n">p_out</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">p_in</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">U01</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basis_change_matrix</span><span class="p">(</span><span class="n">p_in</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">p_out</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">U12</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basis_change_matrix</span><span class="p">(</span><span class="n">p_in</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">p_out</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">U02</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basis_change_matrix</span><span class="p">(</span><span class="n">p_in</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">p_out</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Dx</span> <span class="o">=</span> <span class="n">Dx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Dxx</span> <span class="o">=</span> <span class="n">Dxx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Dz</span> <span class="o">=</span> <span class="n">S1</span> <span class="o">@</span> <span class="n">Dz</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Dzz</span> <span class="o">=</span> <span class="n">S2</span> <span class="o">@</span> <span class="n">Dzz</span>
+
+        <span class="n">kappa</span> <span class="o">=</span> <span class="p">(</span><span class="n">Rayleigh</span> <span class="o">*</span> <span class="n">Prandl</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">nu</span> <span class="o">=</span> <span class="p">(</span><span class="n">Rayleigh</span> <span class="o">/</span> <span class="n">Prandl</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+
+        <span class="c1"># construct operators</span>
+        <span class="n">L_lhs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="n">U01</span> <span class="o">@</span> <span class="n">Dx</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="n">Dz</span><span class="p">},</span>  <span class="c1"># divergence free constraint</span>
+            <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">U02</span> <span class="o">@</span> <span class="n">Dx</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">nu</span> <span class="o">*</span> <span class="p">(</span><span class="n">U02</span> <span class="o">@</span> <span class="n">Dxx</span> <span class="o">+</span> <span class="n">Dzz</span><span class="p">)},</span>
+            <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">U12</span> <span class="o">@</span> <span class="n">Dz</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">nu</span> <span class="o">*</span> <span class="p">(</span><span class="n">U02</span> <span class="o">@</span> <span class="n">Dxx</span> <span class="o">+</span> <span class="n">Dzz</span><span class="p">),</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">U02</span> <span class="o">@</span> <span class="n">Id</span><span class="p">},</span>
+            <span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">kappa</span> <span class="o">*</span> <span class="p">(</span><span class="n">U02</span> <span class="o">@</span> <span class="n">Dxx</span> <span class="o">+</span> <span class="n">Dzz</span><span class="p">)},</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_L</span><span class="p">(</span><span class="n">L_lhs</span><span class="p">)</span>
+
+        <span class="c1"># mass matrix</span>
+        <span class="n">M_lhs</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">U02</span> <span class="o">@</span> <span class="n">Id</span><span class="p">}</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">]}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_M</span><span class="p">(</span><span class="n">M_lhs</span><span class="p">)</span>
+
+        <span class="c1"># Prepare going from second (first for divergence free equation) derivative basis back to Chebychov-T</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_change</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_operator</span><span class="p">({</span><span class="o">**</span><span class="p">{</span><span class="n">comp</span><span class="p">:</span> <span class="p">{</span><span class="n">comp</span><span class="p">:</span> <span class="n">S2</span><span class="p">}</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">]},</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">S1</span><span class="p">}})</span>
+
+        <span class="c1"># BCs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span>
+            <span class="n">component</span><span class="o">=</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="s1">&#39;p_integral&#39;</span><span class="p">],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;integral&#39;</span><span class="p">,</span> <span class="n">line</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="s1">&#39;T_bottom&#39;</span><span class="p">],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">,</span> <span class="n">line</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="s1">&#39;T_top&#39;</span><span class="p">],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">,</span> <span class="n">line</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="s1">&#39;v_bottom&#39;</span><span class="p">],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">,</span> <span class="n">line</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="s1">&#39;v_bottom&#39;</span><span class="p">],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">,</span> <span class="n">line</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">,</span> <span class="n">line</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="s1">&#39;u_top&#39;</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">,</span> <span class="n">line</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span>
+            <span class="n">component</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span>
+            <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">v</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="s1">&#39;u_bottom&#39;</span><span class="p">],</span>
+            <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">,</span>
+            <span class="n">line</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># eliminate Nyquist mode if needed</span>
+        <span class="k">if</span> <span class="n">nx</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">Nyquist_mode_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_Nyquist_mode_index</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span>
+                    <span class="n">component</span><span class="o">=</span><span class="n">component</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="n">component</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Nyquist&#39;</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">Nyquist_mode_index</span><span class="p">),</span> <span class="n">v</span><span class="o">=</span><span class="mi">0</span>
+                <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_BCs</span><span class="p">()</span>
+
+<div class="viewcode-block" id="RayleighBenard.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_init</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+        <span class="n">f_impl_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init_forward</span>
+
+        <span class="n">Dz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dz</span>
+        <span class="n">Dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dx</span>
+
+        <span class="n">iu</span><span class="p">,</span> <span class="n">iv</span><span class="p">,</span> <span class="n">iT</span><span class="p">,</span> <span class="n">ip</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">([</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">])</span>
+
+        <span class="c1"># evaluate implicit terms</span>
+        <span class="n">f_impl_hat</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_change</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">@</span> <span class="n">u_hat</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">u_hat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">f_impl_hat</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">f_impl_hat</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+
+        <span class="c1"># treat convection explicitly with dealiasing</span>
+        <span class="n">Dx_u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init_forward</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">iu</span><span class="p">,</span> <span class="n">iv</span><span class="p">,</span> <span class="n">iT</span><span class="p">]:</span>
+            <span class="n">Dx_u_hat</span><span class="p">[</span><span class="n">i</span><span class="p">][:]</span> <span class="o">=</span> <span class="p">(</span><span class="n">Dx</span> <span class="o">@</span> <span class="n">u_hat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">Dx_u_hat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">Dz_u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init_forward</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">iu</span><span class="p">,</span> <span class="n">iv</span><span class="p">,</span> <span class="n">iT</span><span class="p">]:</span>
+            <span class="n">Dz_u_hat</span><span class="p">[</span><span class="n">i</span><span class="p">][:]</span> <span class="o">=</span> <span class="p">(</span><span class="n">Dz</span> <span class="o">@</span> <span class="n">u_hat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">Dz_u_hat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="n">padding</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dealiasing</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dealiasing</span><span class="p">]</span>
+        <span class="n">Dx_u_pad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">Dx_u_hat</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+        <span class="n">Dz_u_pad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">Dz_u_hat</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+        <span class="n">u_pad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">u_hat</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+
+        <span class="n">fexpl_pad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">u_pad</span><span class="p">)</span>
+        <span class="n">fexpl_pad</span><span class="p">[</span><span class="n">iu</span><span class="p">][:]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">u_pad</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">*</span> <span class="n">Dx_u_pad</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">+</span> <span class="n">u_pad</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span> <span class="o">*</span> <span class="n">Dz_u_pad</span><span class="p">[</span><span class="n">iu</span><span class="p">])</span>
+        <span class="n">fexpl_pad</span><span class="p">[</span><span class="n">iv</span><span class="p">][:]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">u_pad</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">*</span> <span class="n">Dx_u_pad</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span> <span class="o">+</span> <span class="n">u_pad</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span> <span class="o">*</span> <span class="n">Dz_u_pad</span><span class="p">[</span><span class="n">iv</span><span class="p">])</span>
+        <span class="n">fexpl_pad</span><span class="p">[</span><span class="n">iT</span><span class="p">][:]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">u_pad</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">*</span> <span class="n">Dx_u_pad</span><span class="p">[</span><span class="n">iT</span><span class="p">]</span> <span class="o">+</span> <span class="n">u_pad</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span> <span class="o">*</span> <span class="n">Dz_u_pad</span><span class="p">[</span><span class="n">iT</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">fexpl_pad</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">fexpl_pad</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">))</span><span class="o">.</span><span class="n">real</span>
+
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="RayleighBenard.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.u_exact">[docs]</a>
+    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">noise_level</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">99</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="s1">&#39;v_top&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="s1">&#39;v_bottom&#39;</span><span class="p">]</span>
+        <span class="p">),</span> <span class="s1">&#39;Initial conditions are only implemented for zero velocity gradient&#39;</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">u_init</span>
+        <span class="n">iu</span><span class="p">,</span> <span class="n">iv</span><span class="p">,</span> <span class="n">iT</span><span class="p">,</span> <span class="n">ip</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">([</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">])</span>
+
+        <span class="c1"># linear temperature gradient</span>
+        <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">]:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s1">_top&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s1">_bottom&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s1">_top&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s1">_bottom&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">me</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">comp</span><span class="p">)]</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">+</span> <span class="n">b</span>
+
+        <span class="c1"># perturb slightly</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="n">noise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">u_init</span>
+        <span class="n">noise</span><span class="p">[</span><span class="n">iT</span><span class="p">]</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">me</span><span class="p">[</span><span class="n">iT</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="n">me</span><span class="p">[</span><span class="n">iT</span><span class="p">]</span> <span class="o">+=</span> <span class="n">noise</span><span class="p">[</span><span class="n">iT</span><span class="p">]</span><span class="o">.</span><span class="n">real</span> <span class="o">*</span> <span class="n">noise_level</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
+            <span class="n">me_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">u_init_forward</span>
+            <span class="n">me_hat</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">me</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">me_hat</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">me</span></div>
+
+
+<div class="viewcode-block" id="RayleighBenard.get_fig">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.get_fig">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_fig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a figure suitable to plot the solution of this problem</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self.fig : matplotlib.pyplot.figure.Figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+        <span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="kn">import</span> <span class="n">make_axes_locatable</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.constrained_layout.use&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cax</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">divider</span> <span class="o">=</span> <span class="n">make_axes_locatable</span><span class="p">(</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cax</span> <span class="o">+=</span> <span class="p">[</span><span class="n">divider</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;3%&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.03</span><span class="p">)]</span>
+        <span class="n">divider2</span> <span class="o">=</span> <span class="n">make_axes_locatable</span><span class="p">(</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cax</span> <span class="o">+=</span> <span class="p">[</span><span class="n">divider2</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;3%&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.03</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="RayleighBenard.plot">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.plot">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quantity</span><span class="o">=</span><span class="s1">&#39;T&#39;</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the solution.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Solution to be plotted</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time to display at the top of the figure</span>
+<span class="sd">        fig : matplotlib.pyplot.figure.Figure</span>
+<span class="sd">            Figure with the same structure as a figure generated by `self.get_fig`. If none is supplied, a new figure will be generated.</span>
+<span class="sd">        quantity : (str)</span>
+<span class="sd">            quantity you want to plot</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fig</span><span class="p">()</span> <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">fig</span>
+        <span class="n">axs</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">axes</span>
+
+        <span class="n">imV</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_vorticity</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+        <span class="n">imT</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="n">u</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">quantity</span><span class="p">)]</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="sa">rf</span><span class="s1">&#39;$</span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s1">$&#39;</span><span class="p">,</span> <span class="s1">&#39;vorticity&#39;</span><span class="p">]):</span>
+            <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;t = </span><span class="si">{</span><span class="n">t</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$x$&#39;</span><span class="p">)</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$z$&#39;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">imT</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cax</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">imV</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cax</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="RayleighBenard.compute_vorticity">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_vorticity">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_vorticity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="n">Dz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dz</span>
+        <span class="n">Dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dx</span>
+        <span class="n">iu</span><span class="p">,</span> <span class="n">iv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">([</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">])</span>
+
+        <span class="n">vorticity_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">u_init_forward</span>
+        <span class="n">vorticity_hat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">Dx</span> <span class="o">*</span> <span class="n">u_hat</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">+</span> <span class="n">Dz</span> <span class="o">@</span> <span class="n">u_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">vorticity_hat</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">real</span></div>
+
+
+<div class="viewcode-block" id="RayleighBenard.compute_Nusselt_numbers">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_Nusselt_numbers">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_Nusselt_numbers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the various versions of the Nusselt number. This reflects the type of heat transport.</span>
+<span class="sd">        If the Nusselt number is equal to one, it indicates heat transport due to conduction. If it is larger,</span>
+<span class="sd">        advection is present.</span>
+<span class="sd">        Computing the Nusselt number at various places can be used to check the code.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u: The solution you want to compute the Nusselt numbers of</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Nusselt number averaged over the entire volume and horizontally averaged at the top and bottom.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">iv</span><span class="p">,</span> <span class="n">iT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">([</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">])</span>
+
+        <span class="n">DzT_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">u_init_forward</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+        <span class="n">DzT_hat</span><span class="p">[</span><span class="n">iT</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Dz</span> <span class="o">@</span> <span class="n">u_hat</span><span class="p">[</span><span class="n">iT</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">DzT_hat</span><span class="p">[</span><span class="n">iT</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="c1"># compute vT with dealiasing</span>
+        <span class="n">padding</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dealiasing</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dealiasing</span><span class="p">]</span>
+        <span class="n">u_pad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">u_hat</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+        <span class="n">_me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">u_pad</span><span class="p">)</span>
+        <span class="n">_me</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u_pad</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span> <span class="o">*</span> <span class="n">u_pad</span><span class="p">[</span><span class="n">iT</span><span class="p">]</span>
+        <span class="n">vT_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">_me</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">)</span>
+
+        <span class="n">nusselt_hat</span> <span class="o">=</span> <span class="p">(</span><span class="n">vT_hat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">DzT_hat</span><span class="p">[</span><span class="n">iT</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span>
+        <span class="n">nusselt_no_v_hat</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">DzT_hat</span><span class="p">[</span><span class="n">iT</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span>
+
+        <span class="n">integral_z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nusselt_hat</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_BC</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;integral&#39;</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+        <span class="n">integral_V</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">integral_z</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">L</span>
+        <span class="p">)</span>  <span class="c1"># only the first Fourier mode has non-zero integral with periodic BCs</span>
+        <span class="n">Nusselt_V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">integral_V</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">V</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">Nusselt_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nusselt_hat</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_BC</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+        <span class="n">Nusselt_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nusselt_hat</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_BC</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+        <span class="n">Nusselt_no_v_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nusselt_no_v_hat</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_BC</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+        <span class="n">Nusselt_no_v_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nusselt_no_v_hat</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_BC</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;V&#39;</span><span class="p">:</span> <span class="n">Nusselt_V</span><span class="p">,</span>
+            <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="n">Nusselt_t</span><span class="p">,</span>
+            <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="n">Nusselt_b</span><span class="p">,</span>
+            <span class="s1">&#39;t_no_v&#39;</span><span class="p">:</span> <span class="n">Nusselt_no_v_t</span><span class="p">,</span>
+            <span class="s1">&#39;b_no_v&#39;</span><span class="p">:</span> <span class="n">Nusselt_no_v_b</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="RayleighBenard.compute_viscous_dissipation">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_viscous_dissipation">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_viscous_dissipation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+        <span class="n">iu</span><span class="p">,</span> <span class="n">iv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">([</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">])</span>
+
+        <span class="n">Lap_u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">u_init_forward</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="n">Lap_u_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">Dzz</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dxx</span><span class="p">)</span> <span class="o">@</span> <span class="n">u_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">u_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">Lap_u_hat</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">Dzz</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dxx</span><span class="p">)</span> <span class="o">@</span> <span class="n">u_hat</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">u_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">Lap_u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">Lap_u_hat</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">*</span> <span class="n">Lap_u</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">+</span> <span class="n">u</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span> <span class="o">*</span> <span class="n">Lap_u</span><span class="p">[</span><span class="n">iv</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="RayleighBenard.compute_buoyancy_generation">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_buoyancy_generation">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_buoyancy_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="n">iv</span><span class="p">,</span> <span class="n">iT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">([</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rayleigh</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="n">iT</span><span class="p">])</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CFLLimit">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit">[docs]</a>
+<span class="k">class</span> <span class="nc">CFLLimit</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CFLLimit.dependencies">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit.dependencies">[docs]</a>
+    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">pySDC.implementations.hooks.log_step_size</span> <span class="kn">import</span> <span class="n">LogStepSize</span>
+
+        <span class="n">controller</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">LogCFL</span><span class="p">)</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">LogStepSize</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CFLLimit.setup_status_variables">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit.setup_status_variables">[docs]</a>
+    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add the embedded error variable to the error function.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_status_variable_to_level</span><span class="p">(</span><span class="s1">&#39;CFL_limit&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CFLLimit.setup">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit.setup">[docs]</a>
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define default parameters here.</span>
+
+<span class="sd">        Default parameters are:</span>
+<span class="sd">         - control_order (int): The order relative to other convergence controllers</span>
+<span class="sd">         - dt_max (float): maximal step size</span>
+<span class="sd">         - dt_min (float): minimal step size</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            params (dict): The params passed for this specific convergence controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (dict): The updated params dictionary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span>
+            <span class="s2">&quot;dt_max&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+            <span class="s2">&quot;dt_min&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;cfl&quot;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="CFLLimit.compute_max_step_size">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit.compute_max_step_size">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">compute_max_step_size</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+        <span class="n">grid_spacing_x</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">P</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">cell_wallz</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">nz</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">cell_wallz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">cell_wallz</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">cell_wallz</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">P</span><span class="o">.</span><span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:])</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">grid_spacing_z</span> <span class="o">=</span> <span class="n">cell_wallz</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">cell_wallz</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+        <span class="n">iu</span><span class="p">,</span> <span class="n">iv</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">index</span><span class="p">([</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">P</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+        <span class="n">max_step_size_x</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">grid_spacing_x</span> <span class="o">/</span> <span class="n">P</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">iu</span><span class="p">]))</span>
+        <span class="n">max_step_size_z</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">grid_spacing_z</span> <span class="o">/</span> <span class="n">P</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">iv</span><span class="p">]))</span>
+        <span class="n">max_step_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">max_step_size_x</span><span class="p">,</span> <span class="n">max_step_size_z</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="s1">&#39;comm&#39;</span><span class="p">):</span>
+            <span class="n">max_step_size</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">max_step_size</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">MIN</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">max_step_size</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CFLLimit.get_new_step_size">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit.get_new_step_size">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">CheckConvergence</span><span class="o">.</span><span class="n">check_convergence</span><span class="p">(</span><span class="n">step</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+
+        <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_end_point</span><span class="p">()</span>
+        <span class="n">max_step_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_max_step_size</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">uend</span><span class="p">)</span>
+
+        <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">CFL_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">cfl</span> <span class="o">*</span> <span class="n">max_step_size</span>
+
+        <span class="n">dt_new</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="k">else</span> <span class="nb">max</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt_max</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span><span class="p">])</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">dt_new</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">cfl</span> <span class="o">*</span> <span class="n">max_step_size</span><span class="p">])</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt_min</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;dt max: </span><span class="si">{</span><span class="n">max_step_size</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1"> -&gt; New step size: </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LogCFL">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.LogCFL">[docs]</a>
+<span class="k">class</span> <span class="nc">LogCFL</span><span class="p">(</span><span class="n">Hooks</span><span class="p">):</span>
+
+<div class="viewcode-block" id="LogCFL.post_step">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.LogCFL.post_step">[docs]</a>
+    <span class="k">def</span> <span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Record CFL limit.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">post_step</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
+            <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+            <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
+            <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
+            <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;CFL_limit&#39;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">CFL_limit</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LogAnalysisVariables">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.LogAnalysisVariables">[docs]</a>
+<span class="k">class</span> <span class="nc">LogAnalysisVariables</span><span class="p">(</span><span class="n">Hooks</span><span class="p">):</span>
+
+<div class="viewcode-block" id="LogAnalysisVariables.post_step">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.LogAnalysisVariables.post_step">[docs]</a>
+    <span class="k">def</span> <span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Record Nusselt numbers.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">post_step</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>
+
+        <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_end_point</span><span class="p">()</span>
+        <span class="n">Nusselt</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">compute_Nusselt_numbers</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">uend</span><span class="p">)</span>
+        <span class="n">buoyancy_production</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">compute_buoyancy_generation</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">uend</span><span class="p">)</span>
+        <span class="n">viscous_dissipation</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">compute_viscous_dissipation</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">uend</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="p">[</span><span class="s1">&#39;Nusselt&#39;</span><span class="p">,</span> <span class="s1">&#39;buoyancy_production&#39;</span><span class="p">,</span> <span class="s1">&#39;viscous_dissipation&#39;</span><span class="p">],</span>
+            <span class="p">[</span><span class="n">Nusselt</span><span class="p">,</span> <span class="n">buoyancy_production</span><span class="p">,</span> <span class="n">viscous_dissipation</span><span class="p">],</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
+                <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
+                <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+                <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
+                <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
+                <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
+                <span class="nb">type</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
+            <span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.5.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.RayleighBenard</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    </div>
+  </body>
+</html>

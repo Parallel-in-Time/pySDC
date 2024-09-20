@@ -12,6 +12,7 @@ Submodules
    helpers.problem_helper
    helpers.pysdc_helper
    helpers.setup_helper
+   helpers.spectral_helper
    helpers.stats_helper
    helpers.testing
    helpers.transfer_helper
