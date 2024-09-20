@@ -59,7 +59,7 @@ for qDeltaList in config:
     for figName in [figNameConv, figNameCost]:
         plt.figure(figName)
         plt.gca().set(
-            xlabel="Computation Time" if "cost" in figName else r"$\Delta {t}$",
+            xlabel="Computation Time [s]" if "cost" in figName else r"$\Delta {t}$",
             ylabel=r"$L_2$ error at $T$",
         )
         plt.legend()
