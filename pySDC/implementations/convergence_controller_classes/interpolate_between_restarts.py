@@ -56,7 +56,7 @@ class InterpolateBetweenRestarts(ConvergenceController):
 
                 for m in range(len(level.u)):
                     level.u[m][:] = self.status.u_inter[i][m].reshape(level.prob.init[0])[:]
-                    level.f[m][:] = self.status.f_inter[i][m].reshape(level.prob.init[0])[:]
+                    level.f[m][:] = self.status.f_inter[i][m].reshape(level.f[m].shape)[:]
 
             # reset the status variables
             self.status.perform_interpolation = False
