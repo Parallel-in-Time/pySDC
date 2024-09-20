@@ -13,7 +13,6 @@ def get_controller(dt, num_nodes, useMPI, adaptivity, adaptivity_params, **kwarg
         adaptivity_params (dict): Parameters for convergence controller
 
     Returns:
-       (dict): Stats object generated during the run
        (pySDC.Controller.controller): Controller used in the run
     """
     from pySDC.implementations.problem_classes.polynomial_test_problem import polynomial_testequation

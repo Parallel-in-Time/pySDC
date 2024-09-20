@@ -112,7 +112,7 @@ def run_imex_Euler(t0, dt, Tend):
     return err, radius, exact_radius
 
 
-def run_CrankNicholson(t0, dt, Tend):
+def run_CrankNicolson(t0, dt, Tend):
     """
     Routine to run particular SDC variant
 
@@ -202,8 +202,8 @@ def main_radius(cwd=''):
     radii['implicit-Euler'] = radius
     _, radius, exact_radius = run_imex_Euler(t0=t0, dt=dt, Tend=Tend)
     radii['imex-Euler'] = radius
-    _, radius, exact_radius = run_CrankNicholson(t0=t0, dt=dt, Tend=Tend)
-    radii['CrankNicholson'] = radius
+    _, radius, exact_radius = run_CrankNicolson(t0=t0, dt=dt, Tend=Tend)
+    radii['CrankNicolson'] = radius
 
     xcoords = [t0 + i * dt for i in range(int((Tend - t0) / dt))]
     plot_radius(xcoords, exact_radius, radii)
@@ -219,8 +219,8 @@ def main_error(cwd=''):
     # errors['implicit-Euler'] = err
     # err, _, _ = run_imex_Euler(t0=t0, dt=0.001/512, Tend=Tend)
     # errors['imex-Euler'] = err
-    err, _, _ = run_CrankNicholson(t0=t0, dt=0.001 / 64, Tend=Tend)
-    errors['CrankNicholson'] = err
+    err, _, _ = run_CrankNicolson(t0=t0, dt=0.001 / 64, Tend=Tend)
+    errors['CrankNicolson'] = err
 
 
 if __name__ == "__main__":
