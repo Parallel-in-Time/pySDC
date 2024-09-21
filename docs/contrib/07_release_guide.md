@@ -21,6 +21,13 @@ Commit with the message : `bump version to x.x.x` where `x.x.x` is the new versi
 Then create a pull request, and once all tests passed, you can `Merge and Squash`,
 possibly adding your initials as prefix of the final commit message.
 
+> 🔔 Don't forget to delete the `new-release` branch both locally and on your fork (or the main repo) :
+
+```bash
+git push -d origin new-release  # delete on remote
+git branch -D new-release       # delete locally
+```
+
 Finally, [draft a new release](https://github.com/Parallel-in-Time/pySDC/releases/new) associated to a new tag 
 `v*.*.*` (with `*.*.*` the new version, and the ` + Create new tag: ... on publish` button).
 Add a comprehensive summary of the main changes, with appropriate thanks to all the contributors (cf previous releases), and publish it. This will trigger automatically a release update on [Zenodo](https://zenodo.org/doi/10.5281/zenodo.594191) and [PyPI](https://pypi.org/project/pySDC/).
