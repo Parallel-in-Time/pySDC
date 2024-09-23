@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Publishing a new release (for maintainers only!) &#8212; pySDC 5.5.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=def86cc0" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../_static/documentation_options.js?v=3005adad"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.5.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Publishing a new release (for maintainers only!)</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="publishing-a-new-release-for-maintainers-only">
+<span id="docs-contrib-07-release-guide-publishing-a-new-release-for-maintainers-only"></span><h1>Publishing a new release (for maintainers only!)<a class="headerlink" href="#publishing-a-new-release-for-maintainers-only" title="Link to this heading">¶</a></h1>
+<section id="base-conventions">
+<span id="docs-contrib-07-release-guide-base-conventions"></span><h2>Base conventions<a class="headerlink" href="#base-conventions" title="Link to this heading">¶</a></h2>
+<p>For each version update (a.k.a <strong>releases</strong>), we use <a class="reference external" href="https://semver.org/">semantic versioning</a>:</p>
+<ul class="simple">
+<li><p><strong>patch</strong> (from <code class="docutils literal notranslate"><span class="pre">*.*.{i}</span></code> to <code class="docutils literal notranslate"><span class="pre">*.*.{i+1}</span></code>): minor modifications, bugfixes, code reformating, small new features, new projects or playgrounds, new tests</p></li>
+<li><p><strong>minor</strong> (from <code class="docutils literal notranslate"><span class="pre">*.{i}.*</span></code> to <code class="docutils literal notranslate"><span class="pre">*.{i+1}.0</span></code>): addition of new major features, minor code structure changes without too much impact on the API (backward compatible)</p></li>
+<li><p><strong>major</strong> (from <code class="docutils literal notranslate"><span class="pre">{i}.*.*</span></code> to <code class="docutils literal notranslate"><span class="pre">{i+1}.0.0</span></code>): major changes in code structure, design, and API, with changes potentially breaking backward compatibility</p></li>
+</ul>
+</section>
+<section id="release-pipeline">
+<span id="docs-contrib-07-release-guide-release-pipeline"></span><h2>Release Pipeline<a class="headerlink" href="#release-pipeline" title="Link to this heading">¶</a></h2>
+<p>First, create a <code class="docutils literal notranslate"><span class="pre">new-release</span></code> branch (or choose a similar name), either on your fork or on the main <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> repo. Then, on commit:</p>
+<ol class="arabic simple">
+<li><p>modify the project version number and, if necessary, the list of authors in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code></p></li>
+<li><p>modify the documentation release number in <code class="docutils literal notranslate"><span class="pre">docs/source/conf.py</span></code>, and the version number for minor and major release. Also, if necessary, adapt the list of authors.</p></li>
+<li><p>modify the version number, release date and, if necessary, the list of authors  in <code class="docutils literal notranslate"><span class="pre">CITATION.cff</span></code></p></li>
+<li><p>(for minor and major release <strong>only</strong>) add the release description in the <code class="docutils literal notranslate"><span class="pre">CHANGELOG.md</span></code> file, following the level of details you can find there</p></li>
+</ol>
+<p>Commit with the message: <code class="docutils literal notranslate"><span class="pre">bump</span> <span class="pre">version</span> <span class="pre">to</span> <span class="pre">x.x.x</span></code> where <code class="docutils literal notranslate"><span class="pre">x.x.x</span></code> is the new version.
+Then create a pull request, and once all tests passed, you can <code class="docutils literal notranslate"><span class="pre">Merge</span> <span class="pre">and</span> <span class="pre">Squash</span></code>,
+possibly adding your initials as prefix of the final commit message.</p>
+<blockquote>
+<div><p>🔔 Don’t forget to delete the <code class="docutils literal notranslate"><span class="pre">new-release</span></code> branch both locally and on your fork (or the main repo):</p>
+</div></blockquote>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>push<span class="w"> </span>-d<span class="w"> </span>origin<span class="w"> </span>new-release<span class="w">  </span><span class="c1"># delete on remote</span>
+git<span class="w"> </span>branch<span class="w"> </span>-D<span class="w"> </span>new-release<span class="w">       </span><span class="c1"># delete locally</span>
+</pre></div>
+</div>
+<p>Finally, <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/releases/new">draft a new release</a> associated to a new tag
+<code class="docutils literal notranslate"><span class="pre">v*.*.*</span></code> (with <code class="docutils literal notranslate"><span class="pre">*.*.*</span></code> the new version, and the <code class="docutils literal notranslate"><span class="pre">+</span> <span class="pre">Create</span> <span class="pre">new</span> <span class="pre">tag:</span> <span class="pre">...</span> <span class="pre">on</span> <span class="pre">publish</span></code> button).
+Add a comprehensive summary of the main changes, with appropriate thanks to all the contributors (cf previous releases), and publish it. This will trigger automatically a release update on <a class="reference external" href="https://zenodo.org/doi/10.5281/zenodo.594191">Zenodo</a>.
+For uploading the new release on <a class="reference external" href="https://pypi.org/project/pySDC/">PyPI</a>, this is done manually so you’ll have to ask <a class="reference external" href="https://github.com/pancetta">Robert Speck (&#64;pancetta)</a> for support (ideally send him a quick email).</p>
+<p>⬅️ <a class="reference internal" href="06_new_project.html"><span class="doc">Back to adding Project</span></a> —
+⬆️ <a class="reference internal" href="../../CONTRIBUTING.html"><span class="doc">Contributing Summary</span></a> —
+➡️ <a class="reference external" href="https://www.vecteezy.com/photo/2098203-silver-tabby-cat-sitting-on-green-background">Next to a cute picture of cat</a></p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Publishing a new release (for maintainers only!)</a><ul>
+<li><a class="reference internal" href="#base-conventions">Base conventions</a></li>
+<li><a class="reference internal" href="#release-pipeline">Release Pipeline</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/docs/contrib/07_release_guide.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.5.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Publishing a new release (for maintainers only!)</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    </div>
+  </body>
+</html>

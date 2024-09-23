@@ -78,4 +78,4 @@ We strongly encourage to describe and cite the current version of pySDC already 
 
 |:arrow_left:| :doc:`Back to Documenting Code <./05_documenting_code>` ---
 |:arrow_up:| :doc:`Contributing Summary <./../../CONTRIBUTING>` ---
-|:arrow_right:| `Next to a cute picture of cat <https://www.vecteezy.com/photo/2098203-silver-tabby-cat-sitting-on-green-background>`_
+|:arrow_right:| :doc:`Next to publishing a new release <./07_release_guide>`
