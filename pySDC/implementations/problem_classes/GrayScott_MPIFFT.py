@@ -1,4 +1,3 @@
-import numpy as np
 import scipy.sparse as sp
 
 from pySDC.core.errors import ProblemError
@@ -87,7 +86,8 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
         self.iU = 0
         self.iV = 1
         self.ncomp = 2  # needed for transfer class
-        self.init = (shape, self.comm, self.xp.dtype('float'))
+
+        self.init = (shape, self.comm, self.xp.dtype('complex') if self.spectral else self.xp.dtype('float'))
 
         self._makeAttributeAndRegister(
             'Du',
@@ -200,7 +200,8 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
         assert t == 0.0, 'Exact solution only valid as initial condition'
         assert self.ndim == 2, 'The initial conditions are 2D for now..'
 
-        me = self.dtype_u(self.init, val=0.0)
+        _u = self.xp.zeros_like(self.X[0])
+        _v = self.xp.zeros_like(self.X[0])
 
         inc = self.L[0] / (self.num_blobs + 1)
 
@@ -208,29 +209,24 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
             for j in range(1, self.num_blobs + 1):
 
                 # This assumes that the box is [-L/2, L/2]^2
-                if self.spectral:
-                    tmp = -self.xp.exp(
-                        -80.0
-                        * ((self.X[0] + self.x0 + inc * i + 0.05) ** 2 + (self.X[1] + self.x0 + inc * j + 0.02) ** 2)
-                    )
-                    me[0, ...] += self.fft.forward(tmp)
-                    tmp = self.xp.exp(
-                        -80.0
-                        * ((self.X[0] + self.x0 + inc * i - 0.05) ** 2 + (self.X[1] + self.x0 + inc * j - 0.02) ** 2)
-                    )
-                    me[1, ...] += self.fft.forward(tmp)
-                else:
-                    me[0, ...] += -self.xp.exp(
-                        -80.0
-                        * ((self.X[0] + self.x0 + inc * i + 0.05) ** 2 + (self.X[1] + self.x0 + inc * j + 0.02) ** 2)
-                    )
-                    me[1, ...] += self.xp.exp(
-                        -80.0
-                        * ((self.X[0] + self.x0 + inc * i - 0.05) ** 2 + (self.X[1] + self.x0 + inc * j - 0.02) ** 2)
-                    )
-        me[0] += 1
+                _u[...] += -self.xp.exp(
+                    -80.0 * ((self.X[0] + self.x0 + inc * i + 0.05) ** 2 + (self.X[1] + self.x0 + inc * j + 0.02) ** 2)
+                )
+                _v[...] += self.xp.exp(
+                    -80.0 * ((self.X[0] + self.x0 + inc * i - 0.05) ** 2 + (self.X[1] + self.x0 + inc * j - 0.02) ** 2)
+                )
 
-        return me
+        _u += 1
+
+        u = self.u_init
+        if self.spectral:
+            u[0, ...] = self.fft.forward(_u)
+            u[1, ...] = self.fft.forward(_v)
+        else:
+            u[0, ...] = _u
+            u[1, ...] = _v
+
+        return u
 
     def get_fig(self, n_comps=2):  # pragma: no cover
         """
