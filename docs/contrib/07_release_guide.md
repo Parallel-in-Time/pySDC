@@ -31,7 +31,7 @@ git branch -D new-release       # delete locally
 Finally, [draft a new release](https://github.com/Parallel-in-Time/pySDC/releases/new) associated to a new tag 
 `v*.*.*` (with `*.*.*` the new version, and the ` + Create new tag: ... on publish` button).
 Add a comprehensive summary of the main changes, with appropriate thanks to all the contributors (cf previous releases), and publish it. This will trigger automatically a release update on [Zenodo](https://zenodo.org/doi/10.5281/zenodo.594191).
-For uploading the new release on [PyPI](https://pypi.org/project/pySDC/), this is done manually so you'll have to ask [Robert Speck (@pancetta)](https://github.com/pancetta) for support (eventually send him a quick email).
+For uploading the new release on [PyPI](https://pypi.org/project/pySDC/), this is done manually so you'll have to ask [Robert Speck (@pancetta)](https://github.com/pancetta) for support (ideally send him a quick email).
 
 :arrow_left: [Back to adding Project](./06_new_project.md) ---
 :arrow_up: [Contributing Summary](./../../CONTRIBUTING.md) ---
