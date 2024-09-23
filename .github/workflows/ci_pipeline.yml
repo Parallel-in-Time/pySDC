@@ -4,9 +4,6 @@ name: CI pipeline for pySDC
 
 on:
   push:
-    branches:
-      - '**'
-      - '!new-release'
   pull_request:
   schedule:
     - cron: '1 5 * * 1'
