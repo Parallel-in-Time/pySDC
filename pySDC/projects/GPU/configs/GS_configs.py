@@ -22,6 +22,7 @@ class GrayScott(Config):
     Tend = 6000
     num_frames = 200
     sweeper_type = 'IMEX'
+    res_per_blob = 2**7
 
     def get_LogToFile(self, ranks=None):
         import numpy as np
@@ -130,8 +131,8 @@ class GrayScott(Config):
         description['problem_params']['Dv'] = 0.00001
         description['problem_params']['A'] = 0.04
         description['problem_params']['B'] = 0.1
-        description['problem_params']['L'] = 2 * description['problem_params']['nvars'][0] // 2**7
-        description['problem_params']['num_blobs'] = description['problem_params']['nvars'][0] // 2**7
+        description['problem_params']['L'] = 2 * description['problem_params']['nvars'][0] // self.res_per_blob
+        description['problem_params']['num_blobs'] = description['problem_params']['nvars'][0] // self.res_per_blob
 
         description['problem_class'] = grayscott_imex_diffusion
 
@@ -149,12 +150,12 @@ class GrayScott_dt_adaptivity(GrayScott):
 
 class GrayScott_GoL(GrayScott):
     num_frames = 400
+    res_per_blob = 2**8
 
     def get_description(self, *args, **kwargs):
         from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
         desc = super().get_description(*args, **kwargs)
-        desc['problem_params']['num_blobs'] = 1
         desc['problem_params'] = {**desc['problem_params'], **get_A_B_from_f_k(f=0.010, k=0.049)}
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-5}
         self.Tend = 10000

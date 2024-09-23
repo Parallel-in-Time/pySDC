@@ -185,7 +185,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
 
         return me
 
-    def u_exact(self, t):
+    def u_exact(self, t, seed=10700000):
         r"""
         Routine to compute the exact solution at time :math:`t = 0`, see [3]_.
 
@@ -205,20 +205,29 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
         _u = self.xp.zeros_like(self.X[0])
         _v = self.xp.zeros_like(self.X[0])
 
+        rng = self.xp.random.default_rng(seed)
+
         if self.num_blobs > 0:
             inc = self.L[0] / (self.num_blobs + 1)
 
             for i in range(1, self.num_blobs + 1):
                 for j in range(1, self.num_blobs + 1):
+                    signs = (-1) ** rng.integers(low=0, high=2, size=2)
 
                     # This assumes that the box is [-L/2, L/2]^2
                     _u[...] += -self.xp.exp(
                         -80.0
-                        * ((self.X[0] + self.x0 + inc * i + 0.05) ** 2 + (self.X[1] + self.x0 + inc * j + 0.02) ** 2)
+                        * (
+                            (self.X[0] + self.x0 + inc * i + signs[0] * 0.05) ** 2
+                            + (self.X[1] + self.x0 + inc * j + signs[1] * 0.02) ** 2
+                        )
                     )
                     _v[...] += self.xp.exp(
                         -80.0
-                        * ((self.X[0] + self.x0 + inc * i - 0.05) ** 2 + (self.X[1] + self.x0 + inc * j - 0.02) ** 2)
+                        * (
+                            (self.X[0] + self.x0 + inc * i - signs[0] * 0.05) ** 2
+                            + (self.X[1] + self.x0 + inc * j - signs[1] * 0.02) ** 2
+                        )
                     )
 
             _u += 1
