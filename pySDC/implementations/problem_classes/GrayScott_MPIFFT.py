@@ -46,6 +46,8 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
         Denotes the period of the function to be approximated for the Fourier transform.
     comm : COMM_WORLD, optional
         Communicator for ``mpi4py-fft``.
+    num_blobs : int, optional
+        Number of blobs in the initial conditions.
 
     Attributes
     ----------
@@ -203,20 +205,25 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
         _u = self.xp.zeros_like(self.X[0])
         _v = self.xp.zeros_like(self.X[0])
 
-        inc = self.L[0] / (self.num_blobs + 1)
+        if self.num_blobs > 0:
+            inc = self.L[0] / (self.num_blobs + 1)
 
-        for i in range(1, self.num_blobs + 1):
-            for j in range(1, self.num_blobs + 1):
+            for i in range(1, self.num_blobs + 1):
+                for j in range(1, self.num_blobs + 1):
 
-                # This assumes that the box is [-L/2, L/2]^2
-                _u[...] += -self.xp.exp(
-                    -80.0 * ((self.X[0] + self.x0 + inc * i + 0.05) ** 2 + (self.X[1] + self.x0 + inc * j + 0.02) ** 2)
-                )
-                _v[...] += self.xp.exp(
-                    -80.0 * ((self.X[0] + self.x0 + inc * i - 0.05) ** 2 + (self.X[1] + self.x0 + inc * j - 0.02) ** 2)
-                )
+                    # This assumes that the box is [-L/2, L/2]^2
+                    _u[...] += -self.xp.exp(
+                        -80.0
+                        * ((self.X[0] + self.x0 + inc * i + 0.05) ** 2 + (self.X[1] + self.x0 + inc * j + 0.02) ** 2)
+                    )
+                    _v[...] += self.xp.exp(
+                        -80.0
+                        * ((self.X[0] + self.x0 + inc * i - 0.05) ** 2 + (self.X[1] + self.x0 + inc * j - 0.02) ** 2)
+                    )
 
-        _u += 1
+            _u += 1
+        else:
+            raise NotImplementedError
 
         u = self.u_init
         if self.spectral:
@@ -249,7 +256,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
             divider = make_axes_locatable(axs[1])
             self.cax = divider.append_axes('right', size='3%', pad=0.03)
         else:
-            self.fig, ax = plt.subplots(1, 1, figsize=((4, 3)))
+            self.fig, ax = plt.subplots(1, 1, figsize=((6, 5)))
             divider = make_axes_locatable(ax)
             self.cax = divider.append_axes('right', size='3%', pad=0.03)
         return self.fig

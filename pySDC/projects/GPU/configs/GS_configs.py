@@ -8,12 +8,19 @@ def get_config(args):
         return GrayScott(args)
     elif name == 'GS_dt':
         return GrayScott_dt_adaptivity(args)
+    elif name == 'GS_GoL':
+        return GrayScott_GoL(args)
     else:
         return NotImplementedError(f'Don\'t know config {name}')
 
 
+def get_A_B_from_f_k(f, k):
+    return {'A': f, 'B': f + k}
+
+
 class GrayScott(Config):
-    Tend = 5000
+    Tend = 6000
+    num_frames = 200
     sweeper_type = 'IMEX'
 
     def get_LogToFile(self, ranks=None):
@@ -22,7 +29,7 @@ class GrayScott(Config):
 
         LogToFile.path = './data/'
         LogToFile.file_name = f'{self.get_path(ranks=ranks)}-solution'
-        LogToFile.time_increment = self.Tend / 200
+        LogToFile.time_increment = self.Tend / self.num_frames
 
         def process_solution(L):
             P = L.prob
@@ -65,6 +72,7 @@ class GrayScott(Config):
 
     def plot(self, P, idx, n_procs_list):  # pragma: no cover
         import numpy as np
+        from matplotlib import ticker as tkr
 
         fig = P.get_fig(n_comps=1)
         cax = P.cax
@@ -92,11 +100,12 @@ class GrayScott(Config):
                 buffer[f'u-{rank}']['v'].real,
                 vmin=vmin['v'],
                 vmax=vmax['v'],
+                cmap='binary',
             )
-            fig.colorbar(im, cax)
+            fig.colorbar(im, cax, format=tkr.FormatStrFormatter('%.1f'))
             ax.set_title(f't={buffer[f"u-{rank}"]["t"]:.2f}')
-            ax.set_xlabel('x')
-            ax.set_ylabel('y')
+            ax.set_xlabel('$x$')
+            ax.set_ylabel('$y$')
             ax.set_aspect(1.0)
             ax.set_aspect(1.0)
         return fig
@@ -126,8 +135,6 @@ class GrayScott(Config):
 
         description['problem_class'] = grayscott_imex_diffusion
 
-        # type(self).Tend = 3500 * description['problem_params']['L'] / 2
-
         return description
 
 
@@ -137,4 +144,18 @@ class GrayScott_dt_adaptivity(GrayScott):
 
         desc = super().get_description(*args, **kwargs)
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-5}
+        return desc
+
+
+class GrayScott_GoL(GrayScott):
+    num_frames = 400
+
+    def get_description(self, *args, **kwargs):
+        from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+
+        desc = super().get_description(*args, **kwargs)
+        desc['problem_params']['num_blobs'] = 1
+        desc['problem_params'] = {**desc['problem_params'], **get_A_B_from_f_k(f=0.010, k=0.049)}
+        desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-5}
+        self.Tend = 10000
         return desc
