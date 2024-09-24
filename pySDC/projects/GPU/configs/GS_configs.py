@@ -10,6 +10,8 @@ def get_config(args):
         return GrayScott_dt_adaptivity(args)
     elif name == 'GS_GoL':
         return GrayScott_GoL(args)
+    elif name == 'GS_USkate':
+        return GrayScott_USkate(args)
     else:
         return NotImplementedError(f'Don\'t know config {name}')
 
@@ -114,29 +116,29 @@ class GrayScott(Config):
     def get_description(self, *args, res=-1, **kwargs):
         from pySDC.implementations.problem_classes.GrayScott_MPIFFT import grayscott_imex_diffusion
 
-        description = super().get_description(*args, **kwargs)
+        desc = super().get_description(*args, **kwargs)
 
-        description['step_params']['maxiter'] = 5
+        desc['step_params']['maxiter'] = 5
 
-        description['level_params']['dt'] = 1e0
-        description['level_params']['restol'] = -1
+        desc['level_params']['dt'] = 1e0
+        desc['level_params']['restol'] = -1
 
-        description['sweeper_params']['quad_type'] = 'RADAU-RIGHT'
-        description['sweeper_params']['num_nodes'] = 3
-        description['sweeper_params']['QI'] = 'MIN-SR-S'
-        description['sweeper_params']['QE'] = 'PIC'
+        desc['sweeper_params']['quad_type'] = 'RADAU-RIGHT'
+        desc['sweeper_params']['num_nodes'] = 3
+        desc['sweeper_params']['QI'] = 'MIN-SR-S'
+        desc['sweeper_params']['QE'] = 'PIC'
 
-        description['problem_params']['nvars'] = (2**8 if res == -1 else res,) * 2
-        description['problem_params']['Du'] = 0.00002
-        description['problem_params']['Dv'] = 0.00001
-        description['problem_params']['A'] = 0.04
-        description['problem_params']['B'] = 0.1
-        description['problem_params']['L'] = 2 * description['problem_params']['nvars'][0] // self.res_per_blob
-        description['problem_params']['num_blobs'] = description['problem_params']['nvars'][0] // self.res_per_blob
+        desc['problem_params']['nvars'] = (2**8 if res == -1 else res,) * 2
+        desc['problem_params']['Du'] = 0.00002
+        desc['problem_params']['Dv'] = 0.00001
+        desc['problem_params']['A'] = 0.04
+        desc['problem_params']['B'] = 0.1
+        desc['problem_params']['L'] = 2 * desc['problem_params']['nvars'][0] // self.res_per_blob
+        desc['problem_params']['num_blobs'] = desc['problem_params']['nvars'][0] // self.res_per_blob
 
-        description['problem_class'] = grayscott_imex_diffusion
+        desc['problem_class'] = grayscott_imex_diffusion
 
-        return description
+        return desc
 
 
 class GrayScott_dt_adaptivity(GrayScott):
@@ -159,4 +161,25 @@ class GrayScott_GoL(GrayScott):
         desc['problem_params'] = {**desc['problem_params'], **get_A_B_from_f_k(f=0.010, k=0.049)}
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-5}
         self.Tend = 10000
+        return desc
+
+
+class GrayScott_USkate(GrayScott):
+    '''
+    See arXiv:1501.01990 or http://www.mrob.com/sci/papers/2009smp-figs/index.html
+    '''
+
+    num_frames = 200
+    res_per_blob = 2**7
+
+    def get_description(self, *args, **kwargs):
+        from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+
+        desc = super().get_description(*args, **kwargs)
+        desc['problem_params'] = {**desc['problem_params'], **get_A_B_from_f_k(f=0.062, k=0.0609)}
+        desc['problem_params']['num_blobs'] = -12 * desc['problem_params']['L'] ** 2
+        desc['problem_params']['Du'] = 2e-5
+        desc['problem_params']['Dv'] = 1e-5
+        desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3}
+        self.Tend = 100000
         return desc

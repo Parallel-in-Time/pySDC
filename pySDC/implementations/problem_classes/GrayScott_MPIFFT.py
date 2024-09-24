@@ -47,7 +47,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
     comm : COMM_WORLD, optional
         Communicator for ``mpi4py-fft``.
     num_blobs : int, optional
-        Number of blobs in the initial conditions.
+        Number of blobs in the initial conditions. Negative values give rectangles.
 
     Attributes
     ----------
@@ -202,12 +202,41 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
         assert t == 0.0, 'Exact solution only valid as initial condition'
         assert self.ndim == 2, 'The initial conditions are 2D for now..'
 
-        _u = self.xp.zeros_like(self.X[0])
-        _v = self.xp.zeros_like(self.X[0])
+        xp = self.xp
 
-        rng = self.xp.random.default_rng(seed)
+        _u = xp.zeros_like(self.X[0])
+        _v = xp.zeros_like(self.X[0])
 
-        if self.num_blobs > 0:
+        rng = xp.random.default_rng(seed)
+
+        if self.num_blobs < 0:
+            """
+            Rectangles with stationary background, see arXiv:1501.01990
+            """
+            F, k = self.A, self.B - self.A
+            A = xp.sqrt(F) / (F + k)
+
+            # set stable background state from Equation 2
+            assert 2 * k < xp.sqrt(F) - 2 * F, 'Kill rate is too large to facilitate stable background'
+            _u[...] = (A - xp.sqrt(A**2 - 4)) / (2 * A)
+            _v[...] = xp.sqrt(F) * (A + xp.sqrt(A**2 - 4)) / 2
+
+            for _ in range(-self.num_blobs):
+                x0, y0 = rng.random(size=2) * self.L[0] - self.L[0] / 2
+                lx, ly = rng.random(size=2) * self.L[0] / self.nvars[0] * 30
+
+                mask_x = xp.logical_and(self.X[0] > x0, self.X[0] < x0 + lx)
+                mask_y = xp.logical_and(self.X[1] > y0, self.X[1] < y0 + ly)
+                mask = xp.logical_and(mask_x, mask_y)
+
+                _u[mask] = rng.random()
+                _v[mask] = rng.random()
+
+        elif self.num_blobs > 0:
+            """
+            Blobs as in https://www.chebfun.org/examples/pde/GrayScott.html
+            """
+
             inc = self.L[0] / (self.num_blobs + 1)
 
             for i in range(1, self.num_blobs + 1):
@@ -215,14 +244,14 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
                     signs = (-1) ** rng.integers(low=0, high=2, size=2)
 
                     # This assumes that the box is [-L/2, L/2]^2
-                    _u[...] += -self.xp.exp(
+                    _u[...] += -xp.exp(
                         -80.0
                         * (
                             (self.X[0] + self.x0 + inc * i + signs[0] * 0.05) ** 2
                             + (self.X[1] + self.x0 + inc * j + signs[1] * 0.02) ** 2
                         )
                     )
-                    _v[...] += self.xp.exp(
+                    _v[...] += xp.exp(
                         -80.0
                         * (
                             (self.X[0] + self.x0 + inc * i - signs[0] * 0.05) ** 2
