@@ -72,7 +72,7 @@ export files=$(git diff --staged --name-only HEAD | grep .py | sed -e "s,^,$(git
 if [[ $files != "" ]]
 then
         export ruff_output=$(ruff check --quiet $files)
-        if [[ "$ruff_output" != 0 ]]
+        if [[ "$ruff_output" != "" ]]
         then
                 git interpret-trailers --in-place --trailer "$(echo "$ruff_output" | sed -e 's/^/#/')" "$COMMIT_MSG_FILE"
                 git interpret-trailers --in-place --trailer "#!!!!!!!!!! WARNING: RUFF FAILED !!!!!!!!!!" "$COMMIT_MSG_FILE"
