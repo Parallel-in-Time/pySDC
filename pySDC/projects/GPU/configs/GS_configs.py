@@ -144,6 +144,10 @@ class GrayScott(Config):
 
 
 class GrayScott_dt_adaptivity(GrayScott):
+    """
+    Configuration with dt adaptivity added to base configuration
+    """
+
     def get_description(self, *args, **kwargs):
         from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
@@ -153,6 +157,10 @@ class GrayScott_dt_adaptivity(GrayScott):
 
 
 class GrayScott_GoL(GrayScott):
+    '''
+    This configuration shows gliders that are similar in complexity to Conway's Game of life.
+    '''
+
     num_frames = 400
     res_per_blob = 2**8
 
@@ -171,7 +179,7 @@ class GrayScott_USkate(GrayScott):
     See arXiv:1501.01990 or http://www.mrob.com/sci/papers/2009smp-figs/index.html
     '''
 
-    num_frames = 200
+    num_frames = 400
     res_per_blob = 2**7
 
     def get_description(self, *args, **kwargs):
@@ -183,7 +191,7 @@ class GrayScott_USkate(GrayScott):
         desc['problem_params']['Du'] = 2e-5
         desc['problem_params']['Dv'] = 1e-5
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3}
-        self.Tend = 100000
+        self.Tend = 200000
         return desc
 
 
@@ -193,7 +201,7 @@ class GrayScottScaling(GrayScott):
         desc['problem_params']['L'] = 2
         desc['problem_params']['num_blobs'] = 4
         desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
-        self.Tend = 100 * desc['level_params']['dt']
+        self.Tend = 50 * desc['level_params']['dt']
         return desc
 
     def get_controller_params(self, *args, **kwargs):

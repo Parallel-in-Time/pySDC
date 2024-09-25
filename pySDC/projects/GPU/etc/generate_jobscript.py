@@ -4,6 +4,9 @@ DEFAULT_SRUN_OPTIONS = ['--cpu-bind=sockets']
 
 
 def generate_directories():
+    '''
+    Initialize directories for jobscripts and slurm output
+    '''
     import os
 
     for name in ['jobscripts', 'slurm-out']:
@@ -12,6 +15,18 @@ def generate_directories():
 
 
 def get_jobscript_text(sbatch_options, srun_options, command, cluster):
+    """
+    Generate the text for a jobscript
+
+    Args:
+        sbatch_options (list): List of options for sbatch
+        srun_options (list): Options for the srun command
+        command (str): python (!) command. Will be prefaced by `python <path>/`
+        cluster (str): Name of the cluster you want to run on
+
+    Returns:
+        str: Content of jobscript
+    """
     msg = '#!/usr/bin/bash\n\n'
     for op in DEFAULT_SBATCH_OPTIONS + sbatch_options:
         msg += f'#SBATCH {op}\n'
@@ -27,6 +42,16 @@ def get_jobscript_text(sbatch_options, srun_options, command, cluster):
 
 
 def write_jobscript(sbatch_options, srun_options, command, cluster, submit=True):
+    """
+    Generate a jobscript.
+
+    Args:
+        sbatch_options (list): List of options for sbatch
+        srun_options (list): Options for the srun command
+        command (str): python (!) command. Will be prefaced by `python <path>/`
+        cluster (str): Name of the cluster you want to run on
+        submit (bool): If yes, the script will be submitted to SLURM after it is written
+    """
     generate_directories()
 
     text = get_jobscript_text(sbatch_options, srun_options, command, cluster)
@@ -39,10 +64,3 @@ def write_jobscript(sbatch_options, srun_options, command, cluster, submit=True)
         import os
 
         os.system(f'sbatch {path}')
-
-
-if __name__ == '__main__':
-    sbatch_options = ['--nodes=1']
-    srun_options = []
-    command = 'run_problems.py'
-    write_jobscript(sbatch_options, srun_options, command, 'jusuf')
