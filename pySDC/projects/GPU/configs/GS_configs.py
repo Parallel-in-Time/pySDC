@@ -12,6 +12,8 @@ def get_config(args):
         return GrayScott_GoL(args)
     elif name == 'GS_USkate':
         return GrayScott_USkate(args)
+    elif name == 'GS_scaling':
+        return GrayScottScaling(args)
     else:
         return NotImplementedError(f'Don\'t know config {name}')
 
@@ -183,3 +185,18 @@ class GrayScott_USkate(GrayScott):
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3}
         self.Tend = 100000
         return desc
+
+
+class GrayScottScaling(GrayScott):
+    def get_description(self, *args, **kwargs):
+        desc = super().get_description(*args, **kwargs)
+        desc['problem_params']['L'] = 2
+        desc['problem_params']['num_blobs'] = 4
+        desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
+        self.Tend = 100 * desc['level_params']['dt']
+        return desc
+
+    def get_controller_params(self, *args, **kwargs):
+        params = super().get_controller_params(*args, **kwargs)
+        params['hook_class'] = []
+        return params
