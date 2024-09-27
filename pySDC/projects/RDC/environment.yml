@@ -3,7 +3,6 @@
 name: pySDC
 channels:
   - conda-forge
-  - defaults
 dependencies:
   - numpy
   - dill>=0.2.6
