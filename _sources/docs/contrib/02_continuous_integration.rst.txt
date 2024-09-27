@@ -86,7 +86,7 @@ To obtain this functionality, add the following to ``<pySDC-root-directory>/.git
    if [[ $files != "" ]]
    then
            export ruff_output=$(ruff check --quiet $files)
-           if [[ "$ruff_output" != 0 ]]
+           if [[ "$ruff_output" != "" ]]
            then
                    git interpret-trailers --in-place --trailer "$(echo "$ruff_output" | sed -e 's/^/#/')" "$COMMIT_MSG_FILE"
                    git interpret-trailers --in-place --trailer "#!!!!!!!!!! WARNING: RUFF FAILED !!!!!!!!!!" "$COMMIT_MSG_FILE"
