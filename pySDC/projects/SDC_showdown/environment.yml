@@ -3,7 +3,6 @@
 name: pySDC
 channels:
   - conda-forge
-  - defaults
 dependencies:
   - petsc4py<3.20
   - matplotlib>=3.0
