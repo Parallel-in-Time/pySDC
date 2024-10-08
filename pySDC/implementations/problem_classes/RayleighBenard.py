@@ -191,20 +191,24 @@ class RayleighBenard(GenericSpectralLinear):
         iu, iv, iT, ip = self.index(['u', 'v', 'T', 'p'])
 
         # evaluate implicit terms
-        f_impl_hat = -(self.base_change @ self.L @ u_hat.flatten()).reshape(u_hat.shape)
+        if not hasattr(self, '_L_T_base'):
+            self._L_T_base = self.base_change @ self.L
+        f_impl_hat = -(self._L_T_base @ u_hat.flatten()).reshape(u_hat.shape)
 
         if self.spectral_space:
             f.impl[:] = f_impl_hat
         else:
             f.impl[:] = self.itransform(f_impl_hat).real
 
+        # -------------------------------------------
         # treat convection explicitly with dealiasing
-        Dx_u_hat = self.u_init_forward
-        for i in [iu, iv, iT]:
-            Dx_u_hat[i][:] = (Dx @ u_hat[i].flatten()).reshape(Dx_u_hat[i].shape)
-        Dz_u_hat = self.u_init_forward
-        for i in [iu, iv, iT]:
-            Dz_u_hat[i][:] = (Dz @ u_hat[i].flatten()).reshape(Dz_u_hat[i].shape)
+
+        # start by computing derivatives
+        if not hasattr(self, '_Dx_expanded') or not hasattr(self, '_Dz_expanded'):
+            self._Dx_expanded = self._setup_operator({'u': {'u': Dx}, 'v': {'v': Dx}, 'T': {'T': Dx}, 'p': {}})
+            self._Dz_expanded = self._setup_operator({'u': {'u': Dz}, 'v': {'v': Dz}, 'T': {'T': Dz}, 'p': {}})
+        Dx_u_hat = (self._Dx_expanded @ u_hat.flatten()).reshape(u_hat.shape)
+        Dz_u_hat = (self._Dz_expanded @ u_hat.flatten()).reshape(u_hat.shape)
 
         padding = [self.dealiasing, self.dealiasing]
         Dx_u_pad = self.itransform(Dx_u_hat, padding=padding).real
