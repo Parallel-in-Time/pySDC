@@ -1042,7 +1042,7 @@ Consider <cite>put_BCs_in_rhs_hat</cite> to add BCs with no extra transforms nee
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.put_BCs_in_rhs_hat">
 <span class="sig-name descname"><span class="pre">put_BCs_in_rhs_hat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs_hat</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.put_BCs_in_rhs_hat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.put_BCs_in_rhs_hat" title="Link to this definition">¶</a></dt>
 <dd><p>Put the BCs in the right hand side in spectral space for solving.
-This function needs no transforms.</p>
+This function needs no transforms and caches a mask for faster subsequent use.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>rhs_hat</strong> – Right hand side in spectral space</p>

@@ -1389,7 +1389,7 @@
     <span class="k">def</span> <span class="nf">put_BCs_in_rhs_hat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs_hat</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Put the BCs in the right hand side in spectral space for solving.</span>
-<span class="sd">        This function needs no transforms.</span>
+<span class="sd">        This function needs no transforms and caches a mask for faster subsequent use.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            rhs_hat: Right hand side in spectral space</span>
@@ -1397,22 +1397,28 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            rhs in spectral space with BCs</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">ndim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_rhs_hat_zero_mask&#39;</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Generate a mask where we need to set values in the rhs in spectral space to zero, such that can replace them</span>
+<span class="sd">            by the boundary conditions. The mask is then cached.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rhs_hat_zero_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">rhs_hat</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">bc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_BCs</span><span class="p">:</span>
-                <span class="n">slices</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">axis</span><span class="p">)]</span>
-                    <span class="o">+</span> <span class="p">[</span><span class="n">bc</span><span class="p">[</span><span class="s1">&#39;line&#39;</span><span class="p">]]</span>
-                    <span class="o">+</span> <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">))]</span>
-                <span class="p">)</span>
-                <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="n">bc</span><span class="p">[</span><span class="s1">&#39;axis&#39;</span><span class="p">]:</span>
-                    <span class="n">_slice</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bc</span><span class="p">[</span><span class="s1">&#39;equation&#39;</span><span class="p">])]</span> <span class="o">+</span> <span class="n">slices</span>
-                    <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">N</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">N</span> <span class="o">+</span> <span class="n">bc</span><span class="p">[</span><span class="s1">&#39;line&#39;</span><span class="p">])</span> <span class="o">%</span> <span class="n">N</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">local_slice</span><span class="p">[</span><span class="n">axis</span><span class="p">]]:</span>
-                        <span class="n">_slice</span><span class="p">[</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_slice</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">start</span>
-                        <span class="n">rhs_hat</span><span class="p">[(</span><span class="o">*</span><span class="n">_slice</span><span class="p">,)]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">bc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_BCs</span><span class="p">:</span>
+                    <span class="n">slices</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">axis</span><span class="p">)]</span>
+                        <span class="o">+</span> <span class="p">[</span><span class="n">bc</span><span class="p">[</span><span class="s1">&#39;line&#39;</span><span class="p">]]</span>
+                        <span class="o">+</span> <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">))]</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="n">bc</span><span class="p">[</span><span class="s1">&#39;axis&#39;</span><span class="p">]:</span>
+                        <span class="n">_slice</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bc</span><span class="p">[</span><span class="s1">&#39;equation&#39;</span><span class="p">])]</span> <span class="o">+</span> <span class="n">slices</span>
+                        <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">N</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">N</span> <span class="o">+</span> <span class="n">bc</span><span class="p">[</span><span class="s1">&#39;line&#39;</span><span class="p">])</span> <span class="o">%</span> <span class="n">N</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">local_slice</span><span class="p">[</span><span class="n">axis</span><span class="p">]]:</span>
+                            <span class="n">_slice</span><span class="p">[</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_slice</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">start</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_rhs_hat_zero_mask</span><span class="p">[(</span><span class="o">*</span><span class="n">_slice</span><span class="p">,)]</span> <span class="o">=</span> <span class="kc">True</span>
 
+        <span class="n">rhs_hat</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_rhs_hat_zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="n">rhs_hat</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">rhs_BCs_hat</span></div>
 
 
@@ -1576,18 +1582,22 @@
                 <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;object&#39;</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">fft_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="kn">from</span> <span class="nn">mpi4py_fft</span> <span class="kn">import</span> <span class="n">PFFT</span>
+                <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;object&#39;</span><span class="p">:</span>
+                    <span class="kn">from</span> <span class="nn">mpi4py_fft</span> <span class="kn">import</span> <span class="n">PFFT</span>
 
-                <span class="n">_fft</span> <span class="o">=</span> <span class="n">PFFT</span><span class="p">(</span>
-                    <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">,</span>
-                    <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span>
-                    <span class="n">axes</span><span class="o">=</span><span class="nb">sorted</span><span class="p">(</span><span class="n">axes</span><span class="p">),</span>
-                    <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">,</span>
-                    <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                    <span class="n">backend</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_backend</span><span class="p">,</span>
-                    <span class="n">comm_backend</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_comm_backend</span><span class="p">,</span>
-                    <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span>
-                <span class="p">)</span>
+                    <span class="n">_fft</span> <span class="o">=</span> <span class="n">PFFT</span><span class="p">(</span>
+                        <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">,</span>
+                        <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span>
+                        <span class="n">axes</span><span class="o">=</span><span class="nb">sorted</span><span class="p">(</span><span class="n">axes</span><span class="p">),</span>
+                        <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">,</span>
+                        <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">backend</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_backend</span><span class="p">,</span>
+                        <span class="n">comm_backend</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_comm_backend</span><span class="p">,</span>
+                        <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">_fft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fft</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
+
                 <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;forward&#39;</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">fft_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_fft</span><span class="o">.</span><span class="n">forward</span>
                 <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;backward&#39;</span><span class="p">:</span>
