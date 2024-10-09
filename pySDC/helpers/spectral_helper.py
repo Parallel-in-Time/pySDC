@@ -1560,14 +1560,13 @@ class SpectralHelper:
             if self.comm is not None:
                 _out *= np.prod([self.axes[i].N for i in _axes])
 
-            axes_next_base = axes_collapsed[(trf + 1) % len(axes_collapsed)]
+            axes_next_base = (axes_collapsed + [(-1,)])[trf + 1]
             alignment = alignment if len(axes_next_base) == 0 else self.ndim + axes_next_base[-1]
             result = self.get_aligned(
                 _out, axis_in=self.ndim + _axes[0], axis_out=alignment, fft=fft, forward=True, shape=shape
             )
 
-        fft = self.get_fft(axes=axes, padding=padding)
-        return self.get_aligned(result, axis_in=alignment, axis_out=self.ndim - 1, fft=fft, forward=True, shape=shape)
+        return result
 
     def transform(self, u, axes=None, padding=None):
         """
@@ -1720,14 +1719,13 @@ class SpectralHelper:
                 else:
                     shape[_ax] = _out.shape[_ax]
 
-            axes_next_base = axes_collapsed[(trf + 1) % len(axes_collapsed)]
+            axes_next_base = (axes_collapsed + [(-1,)])[trf + 1]
             alignment = alignment if len(axes_next_base) == 0 else self.ndim + axes_next_base[0]
             result = self.get_aligned(
                 _out, axis_in=self.ndim + _axes[-1], axis_out=alignment, fft=fft, forward=False, shape=shape
             )
 
-        fft = self.get_fft(axes=axes, padding=padding)
-        return self.get_aligned(result, axis_in=alignment, axis_out=self.ndim - 1, fft=fft, shape=shape)
+        return result
 
     def get_aligned(self, u, axis_in, axis_out, fft=None, forward=False, **kwargs):
         """
