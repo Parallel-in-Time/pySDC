@@ -146,7 +146,7 @@ class StepSizeSlopeLimiter(ConvergenceController):
                         S,
                     )
                     L.status.dt_new = dt_new
-                elif abs(L.status.dt_new / L.params.dt - 1) < self.params.dt_rel_min_slope:
+                elif abs(L.status.dt_new / L.params.dt - 1) < self.params.dt_rel_min_slope and not S.status.restart:
                     L.status.dt_new = L.params.dt
                     self.log(
                         f"Step size did not change sufficiently to warrant step size change, keeping {L.status.dt_new:.2e}",
