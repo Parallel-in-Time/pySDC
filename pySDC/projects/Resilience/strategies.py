@@ -130,6 +130,8 @@ class Strategy:
             args['time'] = 0.3
         elif problem.__name__ == "run_AC":
             args['time'] = 1e-2
+        elif problem.__name__ == "run_RBC":
+            args['time'] = 11.5
 
         return args
 
@@ -150,7 +152,7 @@ class Strategy:
         rnd_params['iteration'] = base_params['step_params']['maxiter']
         rnd_params['rank'] = num_procs
 
-        if problem.__name__ in ['run_Schroedinger', 'run_quench', 'run_AC']:
+        if problem.__name__ in ['run_Schroedinger', 'run_quench', 'run_AC', 'run_RBC']:
             rnd_params['min_node'] = 1
 
         if problem.__name__ == "run_quench":
@@ -206,6 +208,8 @@ class Strategy:
             return 500.0
         elif problem.__name__ == "run_AC":
             return 0.025
+        elif problem.__name__ == "run_RBC":
+            return 14
         else:
             raise NotImplementedError('I don\'t have a final time for your problem!')
 
@@ -269,6 +273,9 @@ class Strategy:
                 'nu': 2,
             }
             custom_description['level_params'] = {'restol': -1, 'dt': 0.1 * eps**2}
+        elif problem.__name__ == 'run_RBC':
+            custom_description['level_params']['dt'] = 5e-3
+            custom_description['step_params'] = {'maxiter': 5}
 
         custom_description['convergence_controllers'] = {
             # StepSizeLimiter: {'dt_min': self.get_Tend(problem=problem, num_procs=num_procs) / self.max_steps}
@@ -287,6 +294,7 @@ class Strategy:
             'run_Schroedinger': 150,
             'run_quench': 150,
             'run_AC': 150,
+            'run_RBC': 500,
         }
 
         custom_description['convergence_controllers'][StopAtMaxRuntime] = {
@@ -521,6 +529,7 @@ class AdaptivityStrategy(Strategy):
 
         dt_max = np.inf
         dt_slope_max = np.inf
+        dt_slope_min = 0
 
         if problem.__name__ == "run_piline":
             e_tol = 1e-7
@@ -545,6 +554,9 @@ class AdaptivityStrategy(Strategy):
         elif problem.__name__ == "run_AC":
             e_tol = 1e-7
             # dt_max = 0.1 * base_params['problem_params']['eps'] ** 2
+        elif problem.__name__ == 'run_RBC':
+            e_tol = 1e-3
+            dt_slope_min = 0.25
 
         else:
             raise NotImplementedError(
@@ -555,6 +567,7 @@ class AdaptivityStrategy(Strategy):
         custom_description['convergence_controllers'][Adaptivity] = {
             'e_tol': e_tol,
             'dt_slope_max': dt_slope_max,
+            'dt_rel_min_slope': dt_slope_min,
         }
         custom_description['convergence_controllers'][StepSizeLimiter] = {
             'dt_max': dt_max,
@@ -927,6 +940,9 @@ class HotRodStrategy(Strategy):
             maxiter = 6
         elif problem.__name__ == 'run_AC':
             HotRod_tol = 9.564437e-06
+            maxiter = 6
+        elif problem.__name__ == 'run_RBC':
+            HotRod_tol = 1e0  # 1.#4e-1
             maxiter = 6
         else:
             raise NotImplementedError(
