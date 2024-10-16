@@ -263,3 +263,15 @@ class Sweeper(object):
     @property
     def rank(self):
         return 0
+
+    def updateVariableCoeffs(self, k):
+        """
+        Potentially update QDelta implicit coefficients if variable ...
+
+        Parameters
+        ----------
+        k : int
+            Index of the sweep (0 for initial sweep, 1 for the first one, ...).
+        """
+        if self.params.QI == 'MIN-SR-FLEX':
+            self.QI = self.get_Qdelta_implicit(qd_type="MIN-SR-FLEX", k=k)

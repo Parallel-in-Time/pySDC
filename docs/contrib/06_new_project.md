@@ -22,7 +22,6 @@ The file needs to be named `environment.yml` and needs to follow the structure s
 name: pySDC
 channels:
   - conda-forge
-  - defaults
 dependencies:
   - numpy
   - pip
@@ -57,4 +56,4 @@ We strongly encourage to describe and cite the current version of pySDC already 
 
 :arrow_left: [Back to Documenting Code](./05_documenting_code.md) ---
 :arrow_up: [Contributing Summary](./../../CONTRIBUTING.md) ---
-:arrow_right: [Next to a cute picture of cat](https://www.vecteezy.com/photo/2098203-silver-tabby-cat-sitting-on-green-background)
+:arrow_right: [Next to publishing a new release](./07_release_guide.md)

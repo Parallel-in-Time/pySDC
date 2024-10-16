@@ -3,7 +3,7 @@ import pytest
 SWEEPER_NAMES = [
     'ForwardEuler',
     'ExplicitMidpointMethod',
-    'CrankNicholson',
+    'CrankNicolson',
     'BackwardEuler',
     'ImplicitMidpointMethod',
     'RK4',
@@ -135,7 +135,7 @@ def test_order(sweeper_name, useGPU=False):
         'ExplicitMidpointMethod': 3,
         'ImplicitMidpointMethod': 3,
         'RK4': 5,
-        'CrankNicholson': 3,
+        'CrankNicolson': 3,
         'Cash_Karp': 6,
         'EDIRK4': 5,
         'ESDIRK53': 6,
@@ -221,7 +221,7 @@ def test_stability(sweeper_name, useGPU=False):
         'ExplicitMidpointMethod': False,
         'ImplicitMidpointMethod': True,
         'RK4': False,
-        'CrankNicholson': True,
+        'CrankNicolson': True,
         'Cash_Karp': False,
         'EDIRK4': True,
         'ESDIRK53': True,
@@ -338,7 +338,7 @@ def test_sweeper_equivalence(sweeper_name, useGPU=False):
 
 
 @pytest.mark.cupy
-@pytest.mark.parametrize("sweeper_name", ['BackwardEuler', 'CrankNicholson'])
+@pytest.mark.parametrize("sweeper_name", ['BackwardEuler', 'CrankNicolson'])
 def test_RK_sweepers_equivalence_GPU(sweeper_name):
     test_sweeper_equivalence(sweeper_name, useGPU=True)
 
@@ -357,5 +357,5 @@ def test_RK_sweepers_with_GPU(test_name, sweeper_name):
 
 if __name__ == '__main__':
     # test_rhs_evals('ARK54')
-    test_order('ARK548L2SAERK2')
+    test_order('CrankNicolson')
     # test_order('ARK54')

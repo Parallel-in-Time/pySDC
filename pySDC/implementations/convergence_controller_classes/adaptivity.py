@@ -52,7 +52,7 @@ class AdaptivityBase(ConvergenceController):
         Returns:
             None
         """
-        step_limiter_keys = ['dt_min', 'dt_max', 'dt_slope_min', 'dt_slope_max']
+        step_limiter_keys = ['dt_min', 'dt_max', 'dt_slope_min', 'dt_slope_max', 'dt_rel_min_slope']
         available_keys = [me for me in step_limiter_keys if me in self.params.__dict__.keys()]
 
         if len(available_keys) > 0:

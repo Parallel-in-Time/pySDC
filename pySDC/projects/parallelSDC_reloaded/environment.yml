@@ -3,12 +3,13 @@
 name: pySDC
 channels:
   - conda-forge
-  - defaults
 dependencies:
   - numpy
   - matplotlib>=3.0
   - dill>=0.2.6
   - scipy>=0.17.1
+  - mpich
+  - mpi4py>=3.0.0
   - pip
   - pip:
     - qmat>=0.1.8

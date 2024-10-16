@@ -1,5 +1,4 @@
 import cupy as cp
-from pySDC.core.errors import DataError
 
 try:
     from mpi4py import MPI
@@ -37,6 +36,7 @@ class cupy_mesh(cp.ndarray):
         ):
             obj = cp.ndarray.__new__(cls, init[0], dtype=init[2], **kwargs)
             obj.fill(val)
+            cls.comm = init[1]
         else:
             raise NotImplementedError(type(init))
         return obj

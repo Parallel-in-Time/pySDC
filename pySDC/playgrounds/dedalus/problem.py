@@ -117,7 +117,7 @@ class DedalusProblem(Problem):
         # Update LHS and LHS solvers for each subproblems
         for sp in solver.subproblems:
             if self.init:
-                # Eventually instanciate list of solvers (ony first time step)
+                # Instanciate list of solvers (ony first time step)
                 sp.LHS_solvers = [None] * self.M
                 self.init = False
             for i in range(self.M):
