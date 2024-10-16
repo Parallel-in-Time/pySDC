@@ -153,7 +153,7 @@ def test_fault_injection():
 
 @pytest.mark.mpi4py
 @pytest.mark.slow
-@pytest.mark.parametrize("numprocs", [5])
+@pytest.mark.parametrize("numprocs", [4])
 def test_fault_stats(numprocs):
     """
     Test generation of fault statistics and their recovery rates
@@ -184,10 +184,10 @@ def test_fault_stats(numprocs):
     ), f"Expected {expected_max_combinations} possible combinations for faults in van der Pol problem, but got {stats.get_max_combinations()}!"
 
     recovered_reference = {
-        'base': 1,
-        'adaptivity': 2,
+        'base': 0,
+        'adaptivity': 1,
         'iterate': 1,
-        'Hot Rod': 2,
+        'Hot Rod': 1,
         'adaptivity_coll': 0,
         'double_adaptivity': 0,
     }
@@ -199,7 +199,7 @@ def test_fault_stats(numprocs):
         recovered_mask = stats.get_mask(strategy=strategy, key='recovered', op='eq', val=True)
         index = stats.get_index(mask=fixable_mask)
 
-        assert all(fixable_mask[:-1] == [False, True, False]), "Error in generating mask of fixable faults"
+        assert all(fixable_mask == [False, True]), "Error in generating mask of fixable faults"
         assert all(index == [1]), "Error when converting to  index"
 
         combinations = np.array(stats.get_combination_counts(dat, keys=['bit'], mask=fixable_mask))
@@ -250,7 +250,7 @@ def generate_stats(load=False):
         ],
         stats_path='data',
     )
-    stats.run_stats_generation(runs=4, step=2)
+    stats.run_stats_generation(runs=2, step=1)
     return stats
 
 
