@@ -225,7 +225,7 @@ def generate_stats(load=False):
     from pySDC.projects.Resilience.strategies import (
         BaseStrategy,
         AdaptivityStrategy,
-        IterateStrategy,
+        kAdaptivityStrategy,
         HotRodStrategy,
     )
     from pySDC.projects.Resilience.fault_stats import (
@@ -245,7 +245,7 @@ def generate_stats(load=False):
         strategies=[
             BaseStrategy(),
             AdaptivityStrategy(),
-            IterateStrategy(),
+            kAdaptivityStrategy(),
             HotRodStrategy(),
         ],
         stats_path='data',
