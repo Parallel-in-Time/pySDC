@@ -9,6 +9,7 @@ from pySDC.projects.Resilience.fault_stats import (
     run_vdp,
     run_quench,
     run_AC,
+    run_RBC,
     RECOVERY_THRESH_ABS,
 )
 from pySDC.projects.Resilience.strategies import (
@@ -196,7 +197,7 @@ def compare_recovery_rate_problems(**kwargs):  # pragma: no cover
         None
     """
     stats = [
-        get_stats(run_vdp, **kwargs),
+        get_stats(run_RBC, **kwargs),
         get_stats(run_quench, **kwargs),
         get_stats(run_Schroedinger, **kwargs),
         get_stats(run_AC, **kwargs),
@@ -614,8 +615,35 @@ def make_plots_for_notes():  # pragma: no cover
     analyse_resilience(run_quench, format='png')
 
 
+def make_plots_for_thesis():  # pragma: no cover
+    global JOURNAL
+    JOURNAL = 'TUHH_thesis'
+
+    # plot_adaptivity_stuff()
+    # plot_vdp_solution()
+    compare_recovery_rate_problems(num_procs=1, strategy_type='SDC')
+
+
 if __name__ == "__main__":
-    # make_plots_for_notes()
-    # make_plots_for_SIAM_CSE23()
-    # make_plots_for_TIME_X_website()
-    make_plots_for_adaptivity_paper()
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--target', choices=['adaptivity', 'resilience', 'thesis', 'notes', 'SIAM_CSE23', 'TIME_X_website'], type=str
+    )
+    args = parser.parse_args()
+
+    if args.target == 'adaptivity':
+        make_plots_for_adaptivity_paper()
+    elif args.target == 'resilience':
+        make_plots_for_resilience_paper()
+    elif args.target == 'thesis':
+        make_plots_for_thesis()
+    elif args.target == 'notes':
+        make_plots_for_notes()
+    elif args.target == 'SIAM_CSE23':
+        make_plots_for_SIAM_CSE23()
+    elif args.target == 'TIME_X_website':
+        make_plots_for_TIME_X_website()
+    else:
+        raise NotImplementedError(f'Don\'t know how to make plots for target {args.target}')

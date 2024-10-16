@@ -131,7 +131,7 @@ class Strategy:
         elif problem.__name__ == "run_AC":
             args['time'] = 1e-2
         elif problem.__name__ == "run_RBC":
-            args['time'] = 11.5
+            args['time'] = 20.09
 
         return args
 
@@ -209,7 +209,7 @@ class Strategy:
         elif problem.__name__ == "run_AC":
             return 0.025
         elif problem.__name__ == "run_RBC":
-            return 14
+            return 21
         else:
             raise NotImplementedError('I don\'t have a final time for your problem!')
 
@@ -274,7 +274,7 @@ class Strategy:
             }
             custom_description['level_params'] = {'restol': -1, 'dt': 0.1 * eps**2}
         elif problem.__name__ == 'run_RBC':
-            custom_description['level_params']['dt'] = 5e-3
+            custom_description['level_params']['dt'] = 5e-2
             custom_description['step_params'] = {'maxiter': 5}
 
         custom_description['convergence_controllers'] = {
@@ -381,7 +381,7 @@ class InexactBaseStrategy(Strategy):
             'maxiter': 15,
         }
 
-        if self.newton_inexactness and problem.__name__ not in ['run_Schroedinger', 'run_AC']:
+        if self.newton_inexactness and problem.__name__ not in ['run_Schroedinger', 'run_AC', 'run_RBC']:
             if problem.__name__ == 'run_quench':
                 inexactness_params['ratio'] = 1e-1
                 inexactness_params['min_tol'] = 1e-11
@@ -769,6 +769,8 @@ class IterateStrategy(Strategy):
             restol = 1e-7
         elif problem.__name__ == "run_AC":
             restol = 1e-11
+        elif problem.__name__ == "run_RBC":
+            restol = 1e-4
         else:
             raise NotImplementedError(
                 'I don\'t have a residual tolerance for your problem. Please add one to the \
@@ -840,6 +842,8 @@ class kAdaptivityStrategy(IterateStrategy):
         elif problem.__name__ == "run_AC":
             desc['level_params']['restol'] = 1e-11
             desc['level_params']['dt'] = 0.4 * desc['problem_params']['eps'] ** 2 / 8.0
+        elif problem.__name__ == "run_RBC":
+            desc['level_params']['restol'] = 1e-4
         return desc
 
     def get_custom_description_for_faults(self, problem, *args, **kwargs):
@@ -942,7 +946,7 @@ class HotRodStrategy(Strategy):
             HotRod_tol = 9.564437e-06
             maxiter = 6
         elif problem.__name__ == 'run_RBC':
-            HotRod_tol = 1e0  # 1.#4e-1
+            HotRod_tol = 6.34e-6
             maxiter = 6
         else:
             raise NotImplementedError(
@@ -1880,7 +1884,10 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         dt_max = np.inf
         restol_rel = 1e-4
         restol_min = 1e-12
+        restol_max = 1e-5
+        dt_slope_min = 0
         dt_min = 0
+        abort_at_growing_residual = True
         level_params = {}
         problem_params = {}
 
@@ -1906,6 +1913,13 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
             e_tol = 1.0e-4
             restol_rel = 1e-3
             # dt_max = 0.1 * base_params['problem_params']['eps'] ** 2
+        elif problem.__name__ == "run_RBC":
+            e_tol = 1e-3
+            dt_slope_min = 0.25
+            abort_at_growing_residual = False
+            restol_rel = 1e-4
+            restol_max = 1e-1
+            restol_min = 1e-6
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
@@ -1917,14 +1931,17 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
                 'e_tol': e_tol,
                 'restol_rel': restol_rel if self.use_restol_rel else 1e-11,
                 'restol_min': restol_min if self.use_restol_rel else 1e-12,
+                'restol_max': restol_max if self.use_restol_rel else 1e-5,
                 'restart_at_maxiter': True,
                 'factor_if_not_converged': self.max_slope,
                 'interpolate_between_restarts': self.interpolate_between_restarts,
+                'abort_at_growing_residual': abort_at_growing_residual,
             },
             StepSizeLimiter: {
                 'dt_max': dt_max,
                 'dt_slope_max': self.max_slope,
                 'dt_min': dt_min,
+                'dt_rel_min_slope': dt_slope_min,
             },
         }
         custom_description['level_params'] = level_params

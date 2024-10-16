@@ -21,6 +21,7 @@ from pySDC.projects.Resilience.Lorenz import run_Lorenz
 from pySDC.projects.Resilience.Schroedinger import run_Schroedinger
 from pySDC.projects.Resilience.quench import run_quench
 from pySDC.projects.Resilience.AC import run_AC
+from pySDC.projects.Resilience.RBC import run_RBC
 
 from pySDC.projects.Resilience.strategies import BaseStrategy, AdaptivityStrategy, IterateStrategy, HotRodStrategy
 import logging
@@ -632,6 +633,8 @@ class FaultStats:
             prob_name = 'Quench'
         elif self.prob.__name__ == 'run_AC':
             prob_name = 'Allen-Cahn'
+        elif self.prob.__name__ == 'run_RBC':
+            prob_name = 'Rayleigh-Benard'
         else:
             raise NotImplementedError(f'Name not implemented for problem {self.prob}')
 
@@ -1565,6 +1568,10 @@ def parse_args():
                 kwargs['prob'] = run_Schroedinger
             elif sys.argv[i + 1] == 'run_quench':
                 kwargs['prob'] = run_quench
+            elif sys.argv[i + 1] == 'run_AC':
+                kwargs['prob'] = run_AC
+            elif sys.argv[i + 1] == 'run_RBC':
+                kwargs['prob'] = run_RBC
             else:
                 raise NotImplementedError
         elif 'num_procs' in sys.argv[i]:
@@ -1654,7 +1661,7 @@ def compare_adaptivity_modes():
 
 def main():
     kwargs = {
-        'prob': run_AC,
+        'prob': run_RBC,
         'num_procs': 1,
         'mode': 'default',
         'runs': 2000,

@@ -28,7 +28,7 @@ def u_exact(self, t, u_init=None, t_init=None, recompute=False):
         from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
         convergence_controllers = {
-            Adaptivity: {'e_tol': 1e-8, 'dt_rel_min_slope': 0.25},
+            Adaptivity: {'e_tol': 1e-8, 'dt_rel_min_slope': 0.25, 'dt_min': 1e-5},
         }
         desc = {'convergence_controllers': convergence_controllers}
 
@@ -54,6 +54,8 @@ RayleighBenard._u_exact = RayleighBenard.u_exact
 RayleighBenard.u_exact = u_exact
 EstimateExtrapolationErrorNonMPI.get_extrapolated_error = get_extrapolated_error_DAE
 
+PROBLEM_PARAMS = {'Rayleigh': 2e4, 'nx': 256, 'nz': 128}
+
 
 class ReachTendExactly(ConvergenceController):
 
@@ -61,25 +63,27 @@ class ReachTendExactly(ConvergenceController):
         defaults = {
             "control_order": +50,
             "Tend": None,
+            'min_step_size': 1e-9,
         }
         return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
     def get_new_step_size(self, controller, step, **kwargs):
         L = step.levels[0]
         dt = L.status.dt_new if L.status.dt_new else L.params.dt
-        if self.params.Tend - L.time - L.dt < dt:
-            L.status.dt_new = min([dt, self.params.Tend - L.time - L.dt])
+        time_left = self.params.Tend - L.time - L.dt
+        if time_left < dt:
+            L.status.dt_new = min([dt, max([time_left, self.params.min_step_size])])
 
 
 def run_RBC(
     custom_description=None,
     num_procs=1,
-    Tend=14.0,
+    Tend=21.0,
     hook_class=LogData,
     fault_stuff=None,
     custom_controller_params=None,
     u0=None,
-    t0=11,
+    t0=20.0,
     use_MPI=False,
     **kwargs,
 ):
@@ -112,7 +116,7 @@ def run_RBC(
 
     from mpi4py import MPI
 
-    problem_params = {'comm': MPI.COMM_SELF}
+    problem_params = {'comm': MPI.COMM_SELF, **PROBLEM_PARAMS}
 
     step_params = {}
     step_params['maxiter'] = 5
@@ -176,8 +180,11 @@ def run_RBC(
 
 
 def generate_data_for_fault_stats():
-    prob = RayleighBenard()
-    for t in [11.0, 14.0]:
+    prob = RayleighBenard(**PROBLEM_PARAMS)
+    for t in [
+        20,
+        21,
+    ]:
         prob.u_exact(t)
 
 
@@ -251,5 +258,5 @@ def test_order(t=14, dt=1e-1, steps=6):
 
 if __name__ == '__main__':
     generate_data_for_fault_stats()
-    test_order()
+    # test_order()
     # stats, _, _ = run_RBC()

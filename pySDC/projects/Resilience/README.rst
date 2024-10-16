@@ -50,10 +50,21 @@ Then, navigate to this directory, `pySDC/projects/Resilience/` and run the follo
 .. code-block:: bash
  
     mpirun -np 4 python work_precision.py
-    mpirun -np 4 python fault_stats.py prob run_vdp
-    mpirun -np 4 python fault_stats.py prob run_quench
-    mpirun -np 4 python fault_stats.py prob run_AC
-    mpirun -np 4 python fault_stats.py prob run_Schroedinger
-    python paper_plots.py
+    python paper_plots.py --target=adaptivity
 
 Possibly, you need to create some directories in this one to store and load things, if path errors occur.
+
+Reproduction of the plots in the resilience paper
+-------------------------------------------------
+To reproduce the plots you need to install pySDC using this project's `environment.yml` file, which is in the same directory as this README.
+
+.. code-block:: bash
+ 
+    mpirun -np 4 python work_precision.py
+    mpirun -np 4 python fault_stats.py prob run_Lorenz
+    mpirun -np 4 python fault_stats.py prob run_Schroedinger
+    mpirun -np 4 python fault_stats.py prob run_AC
+    mpirun -np 4 python fault_stats.py prob run_RBC
+    python paper_plots.py --target=resilience
+
+Please be aware that generating the fault data for Rayleigh-Benard requires generating reference solutions, which may take several hours.
