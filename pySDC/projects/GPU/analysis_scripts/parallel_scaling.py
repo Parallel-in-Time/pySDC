@@ -5,6 +5,7 @@ from pySDC.helpers.stats_helper import get_sorted
 from pySDC.projects.GPU.configs.base_config import get_config
 from pySDC.projects.GPU.etc.generate_jobscript import write_jobscript, PROJECT_PATH
 from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
+
 setup_mpl()
 
 
@@ -32,14 +33,22 @@ class ScalingConfig(object):
         if strong:
             return self.base_resolution, [1, self._tasks_time, 2**i]
         else:
-            return self.base_resolution_weak * int(self._tasks_time**(1./self.ndim)) * (2**i), [1, self._tasks_time, (2 * self.ndim) ** i]
+            return self.base_resolution_weak * int(self._tasks_time ** (1.0 / self.ndim)) * (2**i), [
+                1,
+                self._tasks_time,
+                (2 * self.ndim) ** i,
+            ]
 
     def run_scaling_test(self, strong=True):
         max_steps = self.max_steps_space if strong else self.max_steps_space_weak
         for i in range(max_steps):
             res, procs = self.get_resolution_and_tasks(strong, i)
 
-            sbatch_options = [f'-n {np.prod(procs)}', f'-p {self.partition}', f'--tasks-per-node={self.tasks_per_node}'] + self.sbatch_options
+            sbatch_options = [
+                f'-n {np.prod(procs)}',
+                f'-p {self.partition}',
+                f'--tasks-per-node={self.tasks_per_node}',
+            ] + self.sbatch_options
             srun_options = [f'--tasks-per-node={self.tasks_per_node}']
             if self.useGPU:
                 srun_options += ['--cpus-per-task=4', '--gpus-per-task=1']
@@ -116,7 +125,7 @@ class GrayScottSpaceScalingGPU(GPUConfig, ScalingConfig):
     base_resolution = 8192
     config = 'GS_scaling'
     max_steps_space = 7
-    max_steps_space_weak = 4
+    max_steps_space_weak = 5
     tasks_time = 4
 
 
