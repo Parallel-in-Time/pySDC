@@ -1696,10 +1696,6 @@ def main():
     stats_analyser.get_recovered()
     mask = None
 
-    # mask =
-    stats_analyser.scrutinize(HotRodStrategy(), run=1, faults=False)
-    return None
-
     # stats_analyser.compare_strategies()
     stats_analyser.plot_things_per_things(
         'recovered', 'node', False, op=stats_analyser.rec_rate, mask=mask, args={'ylabel': 'recovery rate'}
