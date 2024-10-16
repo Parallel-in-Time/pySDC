@@ -1665,7 +1665,7 @@ def main():
         'num_procs': 1,
         'mode': 'default',
         'runs': 2000,
-        'reload': True,
+        'reload': False,
         **parse_args(),
     }
 
@@ -1689,7 +1689,7 @@ def main():
         stats_path='data/stats-jusuf',
         **kwargs,
     )
-    stats_analyser.run_stats_generation(runs=kwargs['runs'], step=12)
+    stats_analyser.run_stats_generation(runs=kwargs['runs'], step=24)
 
     if MPI.COMM_WORLD.rank > 0:  # make sure only one rank accesses the data
         return None

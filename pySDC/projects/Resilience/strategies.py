@@ -159,6 +159,9 @@ class Strategy:
             rnd_params['iteration'] = 5
         elif problem.__name__ == 'run_Lorenz':
             rnd_params['iteration'] = 5
+        elif problem.__name__ == 'run_RBC':
+            rnd_params['problem_pos'] = [3, 16, 16]
+
         return rnd_params
 
     @property
