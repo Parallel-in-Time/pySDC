@@ -131,7 +131,7 @@ class Strategy:
         elif problem.__name__ == "run_AC":
             args['time'] = 1e-2
         elif problem.__name__ == "run_RBC":
-            args['time'] = 20.09
+            args['time'] = 20.19
 
         return args
 
