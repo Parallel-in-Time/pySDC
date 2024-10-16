@@ -153,29 +153,29 @@ def test_fault_injection():
 
 @pytest.mark.mpi4py
 @pytest.mark.slow
-@pytest.mark.parametrize("numprocs", [4])
-def test_fault_stats(numprocs):
+@pytest.mark.parametrize('strategy_name', ['base', 'adaptivity', 'kAdaptivity', 'HotRod'])
+def test_fault_stats(strategy_name):
     """
     Test generation of fault statistics and their recovery rates
     """
     import numpy as np
-
-    # Set python path once
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-    cmd = f"mpirun -np {numprocs} python {__file__} --test-fault-stats".split()
-
-    p = subprocess.Popen(cmd, env=my_env, cwd=".")
-
-    p.wait()
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-        p.returncode,
-        numprocs,
+    from pySDC.projects.Resilience.strategies import (
+        BaseStrategy,
+        AdaptivityStrategy,
+        kAdaptivityStrategy,
+        HotRodStrategy,
     )
 
-    stats = generate_stats(True)
+    strategies = {
+        'base': BaseStrategy,
+        'adaptivity': AdaptivityStrategy,
+        'kAdaptivity': kAdaptivityStrategy,
+        'HotRod': HotRodStrategy,
+    }
+
+    strategy = strategies[strategy_name]()
+
+    stats = generate_stats(strategy, True)
 
     # test number of possible combinations for faults
     expected_max_combinations = 3840
@@ -193,26 +193,25 @@ def test_fault_stats(numprocs):
     }
     stats.get_recovered()
 
-    for strategy in stats.strategies:
-        dat = stats.load(strategy=strategy, faults=True)
-        fixable_mask = stats.get_fixable_faults_only(strategy)
-        recovered_mask = stats.get_mask(strategy=strategy, key='recovered', op='eq', val=True)
-        index = stats.get_index(mask=fixable_mask)
+    dat = stats.load(strategy=strategy, faults=True)
+    fixable_mask = stats.get_fixable_faults_only(strategy)
+    recovered_mask = stats.get_mask(strategy=strategy, key='recovered', op='eq', val=True)
+    index = stats.get_index(mask=fixable_mask)
 
-        assert all(fixable_mask == [False, True]), "Error in generating mask of fixable faults"
-        assert all(index == [1]), "Error when converting to  index"
+    assert all(fixable_mask == [False, True]), "Error in generating mask of fixable faults"
+    assert all(index == [1]), "Error when converting to  index"
 
-        combinations = np.array(stats.get_combination_counts(dat, keys=['bit'], mask=fixable_mask))
-        assert all(combinations == [1.0, 1.0]), "Error when counting combinations"
+    combinations = np.array(stats.get_combination_counts(dat, keys=['bit'], mask=fixable_mask))
+    assert all(combinations == [1.0, 1.0]), "Error when counting combinations"
 
-        recovered = len(dat['recovered'][recovered_mask])
-        crashed = len(dat['error'][dat['error'] == np.inf])  # on some systems the last run crashes...
-        assert (
-            recovered >= recovered_reference[strategy.name] - crashed
-        ), f'Expected {recovered_reference[strategy.name]} recovered faults, but got {recovered} recovered faults in {strategy.name} strategy!'
+    recovered = len(dat['recovered'][recovered_mask])
+    crashed = len(dat['error'][dat['error'] == np.inf])  # on some systems the last run crashes...
+    assert (
+        recovered >= recovered_reference[strategy.name] - crashed
+    ), f'Expected {recovered_reference[strategy.name]} recovered faults, but got {recovered} recovered faults in {strategy.name} strategy!'
 
 
-def generate_stats(load=False):
+def generate_stats(strategy, load=False):
     """
     Generate stats to check the recovery rate
 
@@ -222,12 +221,6 @@ def generate_stats(load=False):
     Returns:
         Object containing the stats
     """
-    from pySDC.projects.Resilience.strategies import (
-        BaseStrategy,
-        AdaptivityStrategy,
-        kAdaptivityStrategy,
-        HotRodStrategy,
-    )
     from pySDC.projects.Resilience.fault_stats import (
         FaultStats,
     )
@@ -242,12 +235,7 @@ def generate_stats(load=False):
         recovery_thresh=1.1,
         num_procs=1,
         mode='random',
-        strategies=[
-            BaseStrategy(),
-            AdaptivityStrategy(),
-            kAdaptivityStrategy(),
-            HotRodStrategy(),
-        ],
+        strategies=[strategy],
         stats_path='data',
     )
     stats.run_stats_generation(runs=2, step=1)
