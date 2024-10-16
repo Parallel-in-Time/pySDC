@@ -201,6 +201,7 @@ class GrayScottScaling(GrayScott):
         desc['problem_params']['L'] = 2
         desc['problem_params']['num_blobs'] = 4
         desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
+        desc['sweeper_params']['num_nodes'] = 4
         self.Tend = 50 * desc['level_params']['dt']
         return desc
 

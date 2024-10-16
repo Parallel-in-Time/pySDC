@@ -4,6 +4,8 @@ import pickle
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.projects.GPU.configs.base_config import get_config
 from pySDC.projects.GPU.etc.generate_jobscript import write_jobscript, PROJECT_PATH
+from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
+setup_mpl()
 
 
 class ScalingConfig(object):
@@ -30,19 +32,18 @@ class ScalingConfig(object):
         if strong:
             return self.base_resolution, [1, self._tasks_time, 2**i]
         else:
-            return self.base_resolution_weak * (2**i), [1, self._tasks_time, (2 * self.ndim) ** i]
+            return self.base_resolution_weak * int(self._tasks_time**(1./self.ndim)) * (2**i), [1, self._tasks_time, (2 * self.ndim) ** i]
 
     def run_scaling_test(self, strong=True):
         max_steps = self.max_steps_space if strong else self.max_steps_space_weak
         for i in range(max_steps):
             res, procs = self.get_resolution_and_tasks(strong, i)
 
-            sbatch_options = [f'-n {np.prod(procs)}', f'-p {self.partition}'] + self.sbatch_options
+            sbatch_options = [f'-n {np.prod(procs)}', f'-p {self.partition}', f'--tasks-per-node={self.tasks_per_node}'] + self.sbatch_options
+            srun_options = [f'--tasks-per-node={self.tasks_per_node}']
             if self.useGPU:
-                srun_options = ['--cpus-per-task=4', '--gpus-per-task=1'] + self.sbatch_options
+                srun_options += ['--cpus-per-task=4', '--gpus-per-task=1']
                 sbatch_options += ['--cpus-per-task=4', '--gpus-per-task=1']
-            else:
-                srun_options = []
 
             procs = (''.join(f'{me}/' for me in procs))[:-1]
             command = f'run_experiment.py --mode=run --res={res} --config={self.config} --procs={procs}'
@@ -69,20 +70,20 @@ class ScalingConfig(object):
                     stats = pickle.load(file)
 
                 timing_step = get_sorted(stats, type='timing_step')
-
                 timings[np.prod(procs) / self.tasks_per_node] = np.mean([me[1] for me in timing_step])
             except FileNotFoundError:
                 pass
 
-        ax.loglog(timings.keys(), timings.values(), **plotting_params)
         if plot_ideal:
-            ax.loglog(
-                timings.keys(),
-                list(timings.values())[0] * list(timings.keys())[0] / np.array(list(timings.keys())),
-                ls='--',
-                color='grey',
-                label='ideal',
-            )
+            if strong:
+                ax.loglog(
+                    timings.keys(),
+                    list(timings.values())[0] * list(timings.keys())[0] / np.array(list(timings.keys())),
+                    ls='--',
+                    color='grey',
+                    label='ideal',
+                )
+        ax.loglog(timings.keys(), timings.values(), **plotting_params)
         ax.set_xlabel(r'$N_\mathrm{nodes}$')
         ax.set_ylabel(r'$t_\mathrm{step}$')
 
@@ -91,7 +92,6 @@ class CPUConfig(ScalingConfig):
     cluster = 'jusuf'
     partition = 'batch'
     tasks_per_node = 16
-    sbatch_options = ['--tasks-per-node=16']
 
 
 class GPUConfig(ScalingConfig):
@@ -102,36 +102,39 @@ class GPUConfig(ScalingConfig):
 
 
 class GrayScottSpaceScalingCPU(CPUConfig, ScalingConfig):
-    base_resolution = 4096
-    base_resolution_weak = 256
+    base_resolution = 8192
+    base_resolution_weak = 512
     config = 'GS_scaling'
-    max_steps_space = 10
-    max_steps_space_weak = 6
-    tasks_time = 3
+    max_steps_space = 11
+    max_steps_space_weak = 11
+    tasks_time = 4
+    sbatch_options = ['--time=3:30:00']
 
 
 class GrayScottSpaceScalingGPU(GPUConfig, ScalingConfig):
-    base_resolution_weak = 256 * 2
-    base_resolution = 4096
+    base_resolution_weak = 1024
+    base_resolution = 8192
     config = 'GS_scaling'
-    max_steps_space = 6
+    max_steps_space = 7
     max_steps_space_weak = 4
-    tasks_time = 3
+    tasks_time = 4
 
 
 def plot_scalings(strong, problem, kwargs):  # pragma: no cover
     if problem == 'GS':
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=figsize_by_journal('JSC_beamer', 1, 0.45))
 
         plottings_params = [
-            {'plot_ideal': strong, 'marker': 'x', 'label': 'CPU'},
+            {'plot_ideal': True, 'marker': 'x', 'label': 'CPU space parallel'},
             {'marker': '>', 'label': 'CPU space time parallel'},
-            {'marker': '^', 'label': 'GPU'},
+            {'marker': '^', 'label': 'GPU space parallel'},
+            {'marker': '<', 'label': 'GPU space time parallel'},
         ]
         configs = [
             GrayScottSpaceScalingCPU(space_time_parallel=False),
             GrayScottSpaceScalingCPU(space_time_parallel=True),
             GrayScottSpaceScalingGPU(space_time_parallel=False),
+            GrayScottSpaceScalingGPU(space_time_parallel=True),
         ]
 
         for config, params in zip(configs, plottings_params):
