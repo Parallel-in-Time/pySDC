@@ -52,7 +52,6 @@ def u_exact(self, t, u_init=None, t_init=None, recompute=False):
 
 RayleighBenard._u_exact = RayleighBenard.u_exact
 RayleighBenard.u_exact = u_exact
-EstimateExtrapolationErrorNonMPI.get_extrapolated_error = get_extrapolated_error_DAE
 
 PROBLEM_PARAMS = {'Rayleigh': 2e4, 'nx': 256, 'nz': 128}
 
@@ -104,6 +103,8 @@ def run_RBC(
         controller: The controller
         bool: If the code crashed
     """
+    EstimateExtrapolationErrorNonMPI.get_extrapolated_error = get_extrapolated_error_DAE
+
     level_params = {}
     level_params['dt'] = 1e-3
     level_params['restol'] = -1
