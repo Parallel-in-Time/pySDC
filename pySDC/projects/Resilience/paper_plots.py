@@ -447,7 +447,7 @@ def plot_RBC_solution():  # pragma: no cover
     def _plot(t, ax, cax):
         u_hat = prob.u_exact(t)
         u = prob.itransform(u_hat)
-        im = ax.pcolormesh(prob.X, prob.Z, u[prob.index('T')], rasterized=True)
+        im = ax.pcolormesh(prob.X, prob.Z, u[prob.index('T')], rasterized=True, cmap='plasma')
         fig.colorbar(im, cax, label=f'$T(t={{{t}}})$')
 
     _plot(0, axs[0], caxs[0])
@@ -636,12 +636,11 @@ def make_plots_for_adaptivity_paper():  # pragma: no cover
 
 
 def make_plots_for_resilience_paper():  # pragma: no cover
+    compare_recovery_rate_problems(target='resilience', num_procs=1, strategy_type='SDC')
+    plot_RBC_solution()
     plot_recovery_rate(get_stats(run_vdp))
     plot_fault_vdp(0)
     plot_fault_vdp(13)
-    compare_recovery_rate_problems(target='resilience', num_procs=1, strategy_type='SDC')
-
-    plot_RBC_solution()
 
 
 def make_plots_for_notes():  # pragma: no cover
