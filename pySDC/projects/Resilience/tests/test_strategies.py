@@ -17,7 +17,7 @@ STRATEGY_NAMES = [
     'AdaptivityPolynomialError',
     'kAdaptivity',
 ]
-STRATEGY_NAMES_NONMPIONLY = ['adaptiveHR', 'HotRod']
+STRATEGY_NAMES_NONMPIONLY = ['HotRod']
 STRATEGY_NAMES_MPIONLY = ['ARK']
 LOGGER_LEVEL = 30
 
