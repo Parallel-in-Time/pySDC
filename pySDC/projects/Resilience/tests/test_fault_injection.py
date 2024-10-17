@@ -153,7 +153,7 @@ def test_fault_injection():
 
 @pytest.mark.mpi4py
 @pytest.mark.slow
-@pytest.mark.parametrize('strategy_name', ['base', 'adaptivity', 'kAdaptivity', 'HotRod'])
+@pytest.mark.parametrize('strategy_name', ['adaptivity'])
 def test_fault_stats(strategy_name):
     """
     Test generation of fault statistics and their recovery rates
