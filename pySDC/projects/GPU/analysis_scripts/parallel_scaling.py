@@ -22,6 +22,7 @@ class ScalingConfig(object):
     max_steps_space = None
     max_steps_space_weak = None
     sbatch_options = []
+    max_nodes = 9999
 
     def __init__(self, space_time_parallel):
         if space_time_parallel in ['False', False]:
@@ -43,6 +44,10 @@ class ScalingConfig(object):
         max_steps = self.max_steps_space if strong else self.max_steps_space_weak
         for i in range(max_steps):
             res, procs = self.get_resolution_and_tasks(strong, i)
+
+            _nodes = np.prod(procs) // self.tasks_per_node
+            if _nodes > self.max_nodes:
+                break
 
             sbatch_options = [
                 f'-n {np.prod(procs)}',
@@ -101,6 +106,7 @@ class CPUConfig(ScalingConfig):
     cluster = 'jusuf'
     partition = 'batch'
     tasks_per_node = 16
+    max_nodes = 144
 
 
 class GPUConfig(ScalingConfig):
@@ -108,6 +114,7 @@ class GPUConfig(ScalingConfig):
     partition = 'booster'
     tasks_per_node = 4
     useGPU = True
+    max_nodes = 936
 
 
 class GrayScottSpaceScalingCPU(CPUConfig, ScalingConfig):
@@ -127,6 +134,7 @@ class GrayScottSpaceScalingGPU(GPUConfig, ScalingConfig):
     max_steps_space = 7
     max_steps_space_weak = 5
     tasks_time = 4
+    max_nodes = 64
 
 
 def plot_scalings(strong, problem, kwargs):  # pragma: no cover
