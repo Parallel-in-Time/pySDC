@@ -15,7 +15,7 @@ from pySDC.core.errors import ConvergenceError
 import numpy as np
 
 
-def u_exact(self, t, u_init=None, t_init=None, recompute=False):
+def u_exact(self, t, u_init=None, t_init=None, recompute=False, _t0=None):
     import pickle
     import os
 
@@ -38,7 +38,10 @@ def u_exact(self, t, u_init=None, t_init=None, recompute=False):
         if t == t0:
             return u0
         else:
-            stats, _, _ = run_RBC(Tend=t, u0=u0, t0=t0, custom_description=desc)
+            u0 = u0 if _t0 is None else self.u_exact(_t0)
+            _t0 = t0 if _t0 is None else _t0
+
+            stats, _, _ = run_RBC(Tend=t, u0=u0, t0=_t0, custom_description=desc)
 
         u = get_sorted(stats, type='u', recomputed=False)[-1]
         data = u[1]
@@ -60,9 +63,9 @@ class ReachTendExactly(ConvergenceController):
 
     def setup(self, controller, params, description, **kwargs):
         defaults = {
-            "control_order": +50,
+            "control_order": +93,
             "Tend": None,
-            'min_step_size': 1e-9,
+            'min_step_size': 1e-10,
         }
         return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
@@ -70,8 +73,16 @@ class ReachTendExactly(ConvergenceController):
         L = step.levels[0]
         dt = L.status.dt_new if L.status.dt_new else L.params.dt
         time_left = self.params.Tend - L.time - L.dt
-        if time_left < dt:
-            L.status.dt_new = min([dt, max([time_left, self.params.min_step_size])])
+        if time_left <= dt + self.params.min_step_size and not step.status.restart and time_left > 0:
+            L.status.dt_new = (
+                min([dt + self.params.min_step_size, max([time_left, self.params.min_step_size])])
+                + np.finfo('float').eps * 10
+            )
+            if dt != L.status.dt_new:
+                self.log(
+                    f'Reducing step size from {dt:12e} to {L.status.dt_new:.12e} because there is only {time_left:.12e} left.',
+                    step,
+                )
 
 
 def run_RBC(
@@ -182,16 +193,15 @@ def run_RBC(
 
 def generate_data_for_fault_stats():
     prob = RayleighBenard(**PROBLEM_PARAMS)
-    for t in [
-        20,
-        21,
-    ]:
-        prob.u_exact(t)
+    _ts = np.arange(22, dtype=float)
+    for i in range(len(_ts) - 1):
+        prob.u_exact(_ts[i + 1], _t0=_ts[i])
 
 
 def plot_order(t, dt, steps, num_nodes, e_tol=1e-9, restol=1e-9, ax=None, recompute=False):
     from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRun
     from pySDC.implementations.hooks.log_work import LogSDCIterations, LogWork
+    from pySDC.implementations.convergence_controller_classes.crash import StopAtNan
     from pySDC.helpers.stats_helper import get_sorted
     import pickle
     import os
@@ -199,6 +209,7 @@ def plot_order(t, dt, steps, num_nodes, e_tol=1e-9, restol=1e-9, ax=None, recomp
     sweeper_params = {'num_nodes': num_nodes}
     level_params = {'e_tol': e_tol, 'restol': restol}
     step_params = {'maxiter': 99}
+    convergence_controllers = {StopAtNan: {}}
 
     errors = []
     dts = []
@@ -214,7 +225,12 @@ def plot_order(t, dt, steps, num_nodes, e_tol=1e-9, restol=1e-9, ax=None, recomp
 
             level_params['dt'] = dts[-1]
 
-            desc = {'sweeper_params': sweeper_params, 'level_params': level_params, 'step_params': step_params}
+            desc = {
+                'sweeper_params': sweeper_params,
+                'level_params': level_params,
+                'step_params': step_params,
+                'convergence_controllers': convergence_controllers,
+            }
 
             stats, _, _ = run_RBC(
                 Tend=t + dt,
@@ -229,7 +245,10 @@ def plot_order(t, dt, steps, num_nodes, e_tol=1e-9, restol=1e-9, ax=None, recomp
         e = get_sorted(stats, type='e_global_post_run')
         # k = get_sorted(stats, type='k')
 
-        errors += [e[-1][1]]
+        if len(e) > 0:
+            errors += [e[-1][1]]
+        else:
+            errors += [np.nan]
 
     errors = np.array(errors)
     dts = np.array(dts)
@@ -238,7 +257,7 @@ def plot_order(t, dt, steps, num_nodes, e_tol=1e-9, restol=1e-9, ax=None, recomp
 
     errors = errors[mask]
     dts = dts[mask]
-    ax.loglog(dts, errors, label=f'{num_nodes} nodes')
+    ax.loglog(dts, errors, label=f'{num_nodes} nodes', marker='x')
     ax.loglog(
         dts, [max_error * (me / dts[0]) ** (2 * num_nodes - 1) for me in dts], ls='--', label=f'order {2*num_nodes-1}'
     )
@@ -248,16 +267,21 @@ def plot_order(t, dt, steps, num_nodes, e_tol=1e-9, restol=1e-9, ax=None, recomp
 
 
 def test_order(t=14, dt=1e-1, steps=6):
+    prob = RayleighBenard(**PROBLEM_PARAMS)
+    _ts = [0, t, t + dt]
+    for i in range(len(_ts) - 1):
+        prob.u_exact(_ts[i + 1], _t0=_ts[i])
 
     import matplotlib.pyplot as plt
 
     fig, ax = plt.subplots(1, 1)
     for num_nodes in [1, 2, 3, 4]:
-        plot_order(t=t, dt=dt, steps=steps, num_nodes=num_nodes, ax=ax)
+        plot_order(t=t, dt=dt, steps=steps, num_nodes=num_nodes, ax=ax, restol=1e-9)
+    ax.set_title(f't={t:.2f}, dt={dt:.2f}')
     plt.show()
 
 
 if __name__ == '__main__':
     generate_data_for_fault_stats()
-    # test_order()
+    # test_order(t=20, dt=1., steps=7)
     # stats, _, _ = run_RBC()
