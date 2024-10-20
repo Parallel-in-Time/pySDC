@@ -15,7 +15,7 @@ class FrozenClass(object):
 
     def __setattr__(self, key, value):
         """
-        Function called when setting arttributes
+        Function called when setting attributes
 
         Args:
             key: the attribute
@@ -35,7 +35,7 @@ class FrozenClass(object):
         if key in self.attrs:
             return None
         else:
-            super().__getattr__(key)
+            super().__getattribute__(key)
 
     @classmethod
     def add_attr(cls, key, raise_error_if_exists=False):

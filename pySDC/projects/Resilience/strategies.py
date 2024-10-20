@@ -558,7 +558,7 @@ class AdaptivityStrategy(Strategy):
             e_tol = 1e-7
             # dt_max = 0.1 * base_params['problem_params']['eps'] ** 2
         elif problem.__name__ == 'run_RBC':
-            e_tol = 1e-3
+            e_tol = 1e-4
             dt_slope_min = 0.25
 
         else:
@@ -846,7 +846,8 @@ class kAdaptivityStrategy(IterateStrategy):
             desc['level_params']['restol'] = 1e-11
             desc['level_params']['dt'] = 0.4 * desc['problem_params']['eps'] ** 2 / 8.0
         elif problem.__name__ == "run_RBC":
-            desc['level_params']['restol'] = 1e-4
+            desc['level_params']['dt'] = 7e-2
+            desc['level_params']['restol'] = 1e-6
         return desc
 
     def get_custom_description_for_faults(self, problem, *args, **kwargs):
@@ -1325,6 +1326,7 @@ class ARKStrategy(AdaptivityStrategy):
             The custom descriptions you can supply to the problem when running it
         '''
         from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK, Adaptivity
+        from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeSlopeLimiter
         from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
         from pySDC.implementations.sweeper_classes.Runge_Kutta import ARK548L2SA
 
@@ -1345,6 +1347,9 @@ class ARKStrategy(AdaptivityStrategy):
                 },
             },
         }
+
+        if problem.__name__ == "run_RBC":
+            rk_params['convergence_controllers'][StepSizeSlopeLimiter] = {'dt_rel_min_slope': 0.25}
 
         custom_description = merge_descriptions(adaptivity_description, rk_params)
 
@@ -1880,6 +1885,7 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         '''
         from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
         from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeLimiter
+        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
 
         base_params = super().get_custom_description(problem, num_procs)
         custom_description = {}
@@ -1917,12 +1923,13 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
             restol_rel = 1e-3
             # dt_max = 0.1 * base_params['problem_params']['eps'] ** 2
         elif problem.__name__ == "run_RBC":
-            e_tol = 1e-3
+            e_tol = 5e-3
             dt_slope_min = 0.25
             abort_at_growing_residual = False
-            restol_rel = 1e-4
+            restol_rel = 1e-3
             restol_max = 1e-1
-            restol_min = 1e-6
+            restol_min = 5e-7
+            self.max_slope = 4
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\

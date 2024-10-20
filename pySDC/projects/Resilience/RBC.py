@@ -9,6 +9,7 @@ from pySDC.core.convergence_controller import ConvergenceController
 from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import (
     EstimateExtrapolationErrorNonMPI,
 )
+from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
 
 from pySDC.core.errors import ConvergenceError
 
@@ -63,7 +64,7 @@ class ReachTendExactly(ConvergenceController):
 
     def setup(self, controller, params, description, **kwargs):
         defaults = {
-            "control_order": +93,
+            "control_order": +94,
             "Tend": None,
             'min_step_size': 1e-10,
         }
@@ -71,14 +72,19 @@ class ReachTendExactly(ConvergenceController):
 
     def get_new_step_size(self, controller, step, **kwargs):
         L = step.levels[0]
+
+        if not CheckConvergence.check_convergence(step):
+            return None
+
         dt = L.status.dt_new if L.status.dt_new else L.params.dt
         time_left = self.params.Tend - L.time - L.dt
         if time_left <= dt + self.params.min_step_size and not step.status.restart and time_left > 0:
-            L.status.dt_new = (
+            dt_new = (
                 min([dt + self.params.min_step_size, max([time_left, self.params.min_step_size])])
                 + np.finfo('float').eps * 10
             )
-            if dt != L.status.dt_new:
+            if dt_new != L.status.dt_new:
+                L.status.dt_new = dt_new
                 self.log(
                     f'Reducing step size from {dt:12e} to {L.status.dt_new:.12e} because there is only {time_left:.12e} left.',
                     step,
@@ -135,6 +141,9 @@ def run_RBC(
 
     convergence_controllers = {}
     convergence_controllers[ReachTendExactly] = {'Tend': Tend}
+    from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeRounding
+
+    convergence_controllers[StepSizeRounding] = {}
 
     controller_params = {}
     controller_params['logger_level'] = 30
@@ -193,7 +202,7 @@ def run_RBC(
 
 def generate_data_for_fault_stats():
     prob = RayleighBenard(**PROBLEM_PARAMS)
-    _ts = np.arange(22, dtype=float)
+    _ts = np.linspace(0, 22, 220, dtype=float)
     for i in range(len(_ts) - 1):
         prob.u_exact(_ts[i + 1], _t0=_ts[i])
 
@@ -281,7 +290,41 @@ def test_order(t=14, dt=1e-1, steps=6):
     plt.show()
 
 
+def plot_step_size(t0=0, Tend=30, e_tol=1e-3, recompute=False):
+    import matplotlib.pyplot as plt
+    import pickle
+    import os
+    from pySDC.helpers.stats_helper import get_sorted
+
+    path = f'data/stats/RBC-u-{t0:.8f}-{Tend:.8f}-{e_tol:.2e}.pickle'
+    if os.path.exists(path) and not recompute:
+        with open(path, 'rb') as file:
+            stats = pickle.load(file)
+    else:
+        from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+
+        convergence_controllers = {
+            Adaptivity: {'e_tol': e_tol, 'dt_rel_min_slope': 0.25, 'dt_min': 1e-5},
+        }
+        desc = {'convergence_controllers': convergence_controllers}
+
+        stats, _, _ = run_RBC(Tend=Tend, t0=t0, custom_description=desc)
+
+        with open(path, 'wb') as file:
+            pickle.dump(stats, file)
+
+    fig, ax = plt.subplots(1, 1)
+
+    dt = get_sorted(stats, type='dt', recomputed=False)
+    ax.plot([me[0] for me in dt], [me[1] for me in dt])
+    ax.set_ylabel(r'$\Delta t$')
+    ax.set_xlabel(r'$t$')
+    ax.set_yscale('log')
+    plt.show()
+
+
 if __name__ == '__main__':
+    # plot_step_size(0, 3)
     generate_data_for_fault_stats()
     # test_order(t=20, dt=1., steps=7)
     # stats, _, _ = run_RBC()

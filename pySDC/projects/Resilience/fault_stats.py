@@ -1689,7 +1689,8 @@ def main():
         stats_path='data/stats-jusuf',
         **kwargs,
     )
-    stats_analyser.run_stats_generation(runs=kwargs['runs'], step=24)
+    stats_analyser.get_HR_tol(True)
+    stats_analyser.run_stats_generation(runs=kwargs['runs'], step=12)
 
     if MPI.COMM_WORLD.rank > 0:  # make sure only one rank accesses the data
         return None
