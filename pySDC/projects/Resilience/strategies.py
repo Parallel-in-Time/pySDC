@@ -559,7 +559,7 @@ class AdaptivityStrategy(Strategy):
             # dt_max = 0.1 * base_params['problem_params']['eps'] ** 2
         elif problem.__name__ == 'run_RBC':
             e_tol = 1e-4
-            dt_slope_min = 0.25
+            dt_slope_min = 1
 
         else:
             raise NotImplementedError(
@@ -1924,7 +1924,7 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
             # dt_max = 0.1 * base_params['problem_params']['eps'] ** 2
         elif problem.__name__ == "run_RBC":
             e_tol = 5e-3
-            dt_slope_min = 0.25
+            dt_slope_min = 1.0
             abort_at_growing_residual = False
             restol_rel = 1e-3
             restol_max = 1e-1
