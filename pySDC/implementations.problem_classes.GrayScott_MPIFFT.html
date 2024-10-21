@@ -7,11 +7,11 @@
 
     <title>implementations.problem_classes.GrayScott_MPIFFT module &#8212; pySDC 5.5.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=3005adad"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
@@ -51,7 +51,7 @@
 <span id="implementations-problem-classes-grayscott-mpifft-module"></span><h1>implementations.problem_classes.GrayScott_MPIFFT module<a class="headerlink" href="#module-implementations.problem_classes.GrayScott_MPIFFT" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">grayscott_imex_diffusion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Du</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.09</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.086</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_imex_diffusion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">grayscott_imex_diffusion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Du</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.09</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.086</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_blobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_imex_diffusion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">IMEX_Laplacian_MPIFFT</span></code></p>
 <p>The Gray-Scott system <a href="#id15"><span class="problematic" id="id1">[1]_</span></a> describes a reaction-diffusion process of two substances <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(v\)</span>,
 where they diffuse over time. During the reaction <span class="math notranslate nohighlight">\(u\)</span> is used up with overall decay rate <span class="math notranslate nohighlight">\(B\)</span>,
@@ -77,6 +77,7 @@ is computed in explicit fashion).</p>
 <li><p><strong>spectral</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the solution is computed in spectral space.</p></li>
 <li><p><strong>L</strong> (<em>int</em><em>, </em><em>optional</em>) – Denotes the period of the function to be approximated for the Fourier transform.</p></li>
 <li><p><strong>comm</strong> (<em>COMM_WORLD</em><em>, </em><em>optional</em>) – Communicator for <code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code>.</p></li>
+<li><p><strong>num_blobs</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of blobs in the initial conditions. Negative values give rectangles.</p></li>
 </ul>
 </dd>
 </dl>
@@ -173,6 +174,40 @@ Journal of Parallel and Distributed Computing (2019).</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.get_fig">
+<span class="sig-name descname"><span class="pre">get_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_comps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_imex_diffusion.get_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.get_fig" title="Link to this definition">¶</a></dt>
+<dd><p>Get a figure suitable to plot the solution of this problem</p>
+<p>Args:
+n_comps (int): Number of components that fit in the solution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self.fig</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>matplotlib.pyplot.figure.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_imex_diffusion.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.plot" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the solution. Please supply a figure with the same structure as returned by <code class="docutils literal notranslate"><span class="pre">self.get_fig</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Solution to be plotted</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Time to display at the top of the figure</p></li>
+<li><p><strong>fig</strong> (<em>matplotlib.pyplot.figure.Figure</em>) – Figure with the correct structure</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_imex_diffusion.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.solve_system" title="Link to this definition">¶</a></dt>
 <dd><p>Simple FFT solver for the diffusion part.</p>
@@ -196,7 +231,7 @@ Journal of Parallel and Distributed Computing (2019).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.u_exact">
-<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_imex_diffusion.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.u_exact" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10700000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_imex_diffusion.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.u_exact" title="Link to this definition">¶</a></dt>
 <dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t = 0\)</span>, see <a class="footnote-reference brackets" href="#id5" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -532,6 +567,8 @@ the diffusion part will be solved by FFT, and for the linear part a Newton solve
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.Ku"><code class="docutils literal notranslate"><span class="pre">Ku</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.Kv"><code class="docutils literal notranslate"><span class="pre">Kv</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.get_fig"><code class="docutils literal notranslate"><span class="pre">get_fig()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.plot"><code class="docutils literal notranslate"><span class="pre">plot()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
 </ul>
@@ -618,7 +655,7 @@ the diffusion part will be solved by FFT, and for the linear part a Newton solve
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
     </div>
   </body>
 </html>
