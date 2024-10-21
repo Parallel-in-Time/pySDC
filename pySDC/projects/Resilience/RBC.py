@@ -61,6 +61,10 @@ PROBLEM_PARAMS = {'Rayleigh': 2e4, 'nx': 256, 'nz': 128}
 
 
 class ReachTendExactly(ConvergenceController):
+    """
+    This convergence controller will adapt the step size of (hopefully) the last step such that `Tend` is reached very closely.
+    Please pass the same `Tend` that you pass to the controller to the params for this to work.
+    """
 
     def setup(self, controller, params, description, **kwargs):
         defaults = {
@@ -275,7 +279,7 @@ def plot_order(t, dt, steps, num_nodes, e_tol=1e-9, restol=1e-9, ax=None, recomp
     ax.legend(frameon=False)
 
 
-def test_order(t=14, dt=1e-1, steps=6):
+def check_order(t=14, dt=1e-1, steps=6):
     prob = RayleighBenard(**PROBLEM_PARAMS)
     _ts = [0, t, t + dt]
     for i in range(len(_ts) - 1):
@@ -326,5 +330,5 @@ def plot_step_size(t0=0, Tend=30, e_tol=1e-3, recompute=False):
 if __name__ == '__main__':
     # plot_step_size(0, 3)
     generate_data_for_fault_stats()
-    # test_order(t=20, dt=1., steps=7)
+    # check_order(t=20, dt=1., steps=7)
     # stats, _, _ = run_RBC()
