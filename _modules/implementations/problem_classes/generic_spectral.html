@@ -450,6 +450,31 @@
 
     <span class="k">return</span> <span class="kc">None</span></div>
 
+
+
+<div class="viewcode-block" id="get_extrapolated_error_DAE">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.get_extrapolated_error_DAE">[docs]</a>
+<span class="k">def</span> <span class="nf">get_extrapolated_error_DAE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the</span>
+<span class="sd">    solution obtained by the time marching scheme. This function can be used in `EstimateExtrapolationError`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        S (pySDC.Step): The current step</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">u_ex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extrapolated_solution</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+    <span class="n">diff_mask</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">diff_mask</span>
+    <span class="k">if</span> <span class="n">u_ex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_extrapolation_estimate</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">abs</span><span class="p">((</span><span class="n">u_ex</span> <span class="o">-</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])[</span><span class="n">diff_mask</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">prefactor</span>
+        <span class="p">)</span>
+        <span class="c1"># print([abs(me) for me in (u_ex - S.levels[0].u[-1]) * self.coeff.prefactor])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_extrapolation_estimate</span> <span class="o">=</span> <span class="kc">None</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>

@@ -82,14 +82,23 @@ You can see the results below, except for the solution, which looks the same as 
 <p>To reproduce the plots you need to install pySDC with all packages in the mpi4py environment.
 Then, navigate to this directory, <cite>pySDC/projects/Resilience/</cite> and run the following commands:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>work_precision.py
-mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>fault_stats.py<span class="w"> </span>prob<span class="w"> </span>run_vdp
-mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>fault_stats.py<span class="w"> </span>prob<span class="w"> </span>run_quench
-mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>fault_stats.py<span class="w"> </span>prob<span class="w"> </span>run_AC
-mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>fault_stats.py<span class="w"> </span>prob<span class="w"> </span>run_Schroedinger
-python<span class="w"> </span>paper_plots.py
+python<span class="w"> </span>paper_plots.py<span class="w"> </span>--target<span class="o">=</span>adaptivity
 </pre></div>
 </div>
 <p>Possibly, you need to create some directories in this one to store and load things, if path errors occur.</p>
+</section>
+<section id="reproduction-of-the-plots-in-the-resilience-paper">
+<h2>Reproduction of the plots in the resilience paper<a class="headerlink" href="#reproduction-of-the-plots-in-the-resilience-paper" title="Link to this heading">¶</a></h2>
+<p>To reproduce the plots you need to install pySDC using this project’s <cite>environment.yml</cite> file, which is in the same directory as this README.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>work_precision.py
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>fault_stats.py<span class="w"> </span>prob<span class="w"> </span>run_Lorenz
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>fault_stats.py<span class="w"> </span>prob<span class="w"> </span>run_Schroedinger
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>fault_stats.py<span class="w"> </span>prob<span class="w"> </span>run_AC
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>fault_stats.py<span class="w"> </span>prob<span class="w"> </span>run_RBC
+python<span class="w"> </span>paper_plots.py<span class="w"> </span>--target<span class="o">=</span>resilience
+</pre></div>
+</div>
+<p>Please be aware that generating the fault data for Rayleigh-Benard requires generating reference solutions, which may take several hours.</p>
 </section>
 </section>
 
@@ -106,6 +115,7 @@ python<span class="w"> </span>paper_plots.py
 <li><a class="reference internal" href="#">Resilience in SDC</a><ul>
 <li><a class="reference internal" href="#tests">Tests</a></li>
 <li><a class="reference internal" href="#reproduction-of-the-plots-in-the-adaptive-sdc-paper">Reproduction of the plots in the adaptive SDC paper</a></li>
+<li><a class="reference internal" href="#reproduction-of-the-plots-in-the-resilience-paper">Reproduction of the plots in the resilience paper</a></li>
 </ul>
 </li>
 </ul>
