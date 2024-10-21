@@ -12,6 +12,7 @@ from pySDC.projects.Resilience.vdp import run_vdp
 from pySDC.projects.Resilience.Schroedinger import run_Schroedinger
 from pySDC.projects.Resilience.quench import run_quench
 from pySDC.projects.Resilience.AC import run_AC
+from pySDC.projects.Resilience.RBC import run_RBC
 
 from pySDC.helpers.stats_helper import get_sorted, filter_stats
 from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
@@ -38,6 +39,7 @@ MAPPINGS = {
     'k_linear': ('work_linear', sum, None),
     'k_Newton_no_restart': ('work_newton', sum, False),
     'k_rhs': ('work_rhs', sum, None),
+    'k_factorizations': ('work_factorizations', sum, None),
     'num_steps': ('dt', len, None),
     'restart': ('restart', sum, None),
     'dt_mean': ('dt', np.mean, False),
@@ -68,6 +70,14 @@ def get_forbidden_combinations(problem, strategy, **kwargs):
             return True
 
     return False
+
+
+Tends = {
+    'run_RBC': 16,
+}
+t0s = {
+    'run_RBC': 0.2,
+}
 
 
 def single_run(
@@ -132,12 +142,16 @@ def single_run(
     }
     problem_args = {} if problem_args is None else problem_args
 
+    Tend = Tends.get(problem.__name__, None) if Tend is None else Tend
+    t0 = t0s.get(problem.__name__, None)
+
     stats, controller, crash = problem(
         custom_description=description,
         Tend=strategy.get_Tend(problem, num_procs) if Tend is None else Tend,
         hook_class=[LogData, LogWork, LogGlobalErrorPostRun] + hooks,
         custom_controller_params=controller_params,
         use_MPI=True,
+        t0=t0,
         comm=comm_time,
         **problem_args,
     )
@@ -274,6 +288,8 @@ def record_work_precision(
                 exponents = [0, 1, 2, 3, 5][::-1]
             else:
                 exponents = [-3, -2, -1, 0, 0.2, 0.8, 1][::-1]
+        if problem.__name__ == 'run_RBC':
+            exponents = [1, 0, -1, -2, -3, -4]
     elif param == 'dt':
         power = 2.0
         exponents = [-1, 0, 1, 2, 3][::-1]
@@ -294,6 +310,9 @@ def record_work_precision(
             param_range = [1e-5, 1e-6, 1e-7, 1e-8, 1e-9]
         elif param == 'dt':
             param_range = [1.25, 2.5, 5.0, 10.0, 20.0][::-1]
+    if problem.__name__ == 'run_RBC':
+        if param == 'dt':
+            param_range = [2e-1, 1e-1, 8e-2, 6e-2]
 
     # run multiple times with different parameters
     for i in range(len(param_range)):
@@ -538,6 +557,7 @@ def decorate_panel(ax, problem, work_key, precision_key, num_procs=1, title_only
         'k_Newton': 'Newton iterations',
         'k_Newton_no_restart': 'Newton iterations (restarts excluded)',
         'k_rhs': 'right hand side evaluations',
+        'k_factorizations': 'matrix factorizations',
         't': 'wall clock time / s',
         'e_global': 'global error',
         'e_global_rel': 'relative global error',
@@ -785,14 +805,14 @@ def get_configs(mode, problem):
             AdaptivityPolynomialError,
         )
 
-        if problem.__name__ in ['run_Schroedinger', 'run_AC']:
+        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC']:
             from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as parallel_sweeper
         else:
             from pySDC.implementations.sweeper_classes.generic_implicit_MPI import (
                 generic_implicit_MPI as parallel_sweeper,
             )
 
-        newton_inexactness = False if problem.__name__ in ['run_vdp'] else True
+        newton_inexactness = False if problem.__name__ in ['run_vdp', 'run_RBC'] else True
 
         desc = {}
         desc['sweeper_params'] = {'num_nodes': 3, 'QI': 'IE', 'QE': "EE"}
@@ -811,7 +831,7 @@ def get_configs(mode, problem):
         RK_strategies = []
         if problem.__name__ in ['run_Lorenz']:
             RK_strategies.append(ERKStrategy(useMPI=True))
-        if problem.__name__ in ['run_Schroedinger', 'run_AC']:
+        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC']:
             RK_strategies.append(ARKStrategy(useMPI=True))
         else:
             RK_strategies.append(ESDIRKStrategy(useMPI=True))
@@ -1591,12 +1611,12 @@ if __name__ == "__main__":
     ]:
         params = {
             'mode': mode,
-            'runs': 5,
+            'runs': 1,
             'plotting': comm_world.rank == 0,
         }
         params_single = {
             **params,
-            'problem': run_AC,
+            'problem': run_RBC,
         }
         single_problem(**params_single, work_key='t', precision_key='e_global_rel', record=record)
 

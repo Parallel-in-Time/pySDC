@@ -391,3 +391,25 @@ def compute_residual_DAE_MPI(self, stage=None):
     L.status.updated = False
 
     return None
+
+
+def get_extrapolated_error_DAE(self, S, **kwargs):
+    """
+    The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the
+    solution obtained by the time marching scheme. This function can be used in `EstimateExtrapolationError`.
+
+    Args:
+        S (pySDC.Step): The current step
+
+    Returns:
+        None
+    """
+    u_ex = self.get_extrapolated_solution(S)
+    diff_mask = S.levels[0].prob.diff_mask
+    if u_ex is not None:
+        S.levels[0].status.error_extrapolation_estimate = (
+            abs((u_ex - S.levels[0].u[-1])[diff_mask]) * self.coeff.prefactor
+        )
+        # print([abs(me) for me in (u_ex - S.levels[0].u[-1]) * self.coeff.prefactor])
+    else:
+        S.levels[0].status.error_extrapolation_estimate = None
