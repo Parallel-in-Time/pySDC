@@ -72,6 +72,14 @@ def get_forbidden_combinations(problem, strategy, **kwargs):
     return False
 
 
+Tends = {
+    'run_RBC': 16,
+}
+t0s = {
+    'run_RBC': 0.2,
+}
+
+
 def single_run(
     problem,
     strategy,
@@ -134,12 +142,16 @@ def single_run(
     }
     problem_args = {} if problem_args is None else problem_args
 
+    Tend = Tends.get(problem.__name__, None) if Tend is None else Tend
+    t0 = t0s.get(problem.__name__, None)
+
     stats, controller, crash = problem(
         custom_description=description,
         Tend=strategy.get_Tend(problem, num_procs) if Tend is None else Tend,
         hook_class=[LogData, LogWork, LogGlobalErrorPostRun] + hooks,
         custom_controller_params=controller_params,
         use_MPI=True,
+        t0=t0,
         comm=comm_time,
         **problem_args,
     )
@@ -277,7 +289,7 @@ def record_work_precision(
             else:
                 exponents = [-3, -2, -1, 0, 0.2, 0.8, 1][::-1]
         if problem.__name__ == 'run_RBC':
-            exponents = [2, 1, 0, -1]
+            exponents = [1, 0, -1, -2, -3, -4]
     elif param == 'dt':
         power = 2.0
         exponents = [-1, 0, 1, 2, 3][::-1]
@@ -300,7 +312,7 @@ def record_work_precision(
             param_range = [1.25, 2.5, 5.0, 10.0, 20.0][::-1]
     if problem.__name__ == 'run_RBC':
         if param == 'dt':
-            param_range = [7e-2, 6e-2, 5e-2, 4e-2]
+            param_range = [2e-1, 1e-1, 8e-2, 6e-2]
 
     # run multiple times with different parameters
     for i in range(len(param_range)):
@@ -1621,7 +1633,7 @@ if __name__ == "__main__":
         'parallel_efficiency',
         'compare_strategies',
     ]:
-        # all_problems(**all_params, mode=mode)
+        all_problems(**all_params, mode=mode)
         comm_world.Barrier()
 
     if comm_world.rank == 0:

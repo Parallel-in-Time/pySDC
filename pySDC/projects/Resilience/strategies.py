@@ -297,7 +297,7 @@ class Strategy:
             'run_Schroedinger': 150,
             'run_quench': 150,
             'run_AC': 150,
-            'run_RBC': 500,
+            'run_RBC': 1000,
         }
 
         custom_description['convergence_controllers'][StopAtMaxRuntime] = {
@@ -847,7 +847,7 @@ class kAdaptivityStrategy(IterateStrategy):
             desc['level_params']['dt'] = 0.4 * desc['problem_params']['eps'] ** 2 / 8.0
         elif problem.__name__ == "run_RBC":
             desc['level_params']['dt'] = 7e-2
-            desc['level_params']['restol'] = 1e-6
+            desc['level_params']['restol'] = 1e-9
         return desc
 
     def get_custom_description_for_faults(self, problem, *args, **kwargs):
@@ -856,6 +856,8 @@ class kAdaptivityStrategy(IterateStrategy):
             desc['level_params']['dt'] = 5.0
         elif problem.__name__ == 'run_AC':
             desc['level_params']['dt'] = 0.6 * desc['problem_params']['eps'] ** 2
+        elif problem.__name__ == 'run_RBC':
+            desc['level_params']['restol'] = 1e-6
         return desc
 
     def get_reference_value(self, problem, key, op, num_procs=1):
