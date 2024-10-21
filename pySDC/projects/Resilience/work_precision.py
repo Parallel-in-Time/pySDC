@@ -1605,7 +1605,7 @@ if __name__ == "__main__":
 
     record = comm_world.size > 1
     for mode in [
-        'compare_strategies',
+        # 'compare_strategies',
         # 'RK_comp',
         # 'parallel_efficiency',
     ]:
@@ -1621,7 +1621,7 @@ if __name__ == "__main__":
         single_problem(**params_single, work_key='t', precision_key='e_global_rel', record=record)
 
     all_params = {
-        'record': False,
+        'record': True,
         'runs': 5,
         'work_key': 't',
         'precision_key': 'e_global_rel',
