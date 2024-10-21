@@ -9,6 +9,7 @@ from pySDC.projects.Resilience.fault_stats import (
     run_vdp,
     run_quench,
     run_AC,
+    run_RBC,
     RECOVERY_THRESH_ABS,
 )
 from pySDC.projects.Resilience.strategies import (
@@ -187,21 +188,24 @@ def plot_recovery_rate_recoverable_only(stats_analyser, fig, ax, **kwargs):  # p
         )
 
 
-def compare_recovery_rate_problems(**kwargs):  # pragma: no cover
+def compare_recovery_rate_problems(target='resilience', **kwargs):  # pragma: no cover
     """
-    Compare the recovery rate for vdP, Lorenz and Schroedinger problems.
+    Compare the recovery rate for various problems.
     Only faults that can be recovered are shown.
 
     Returns:
         None
     """
-    stats = [
-        get_stats(run_vdp, **kwargs),
-        get_stats(run_quench, **kwargs),
-        get_stats(run_Schroedinger, **kwargs),
-        get_stats(run_AC, **kwargs),
-    ]
-    titles = ['Van der Pol', 'Quench', r'Schr\"odinger', 'Allen-Cahn']
+    if target == 'resilience':
+        problems = [run_Lorenz, run_Schroedinger, run_AC, run_RBC]
+        titles = ['Lorenz', r'Schr\"odinger', 'Allen-Cahn', 'Rayleigh-Benard']
+    elif target == 'thesis':
+        problems = [run_vdp, run_Lorenz, run_AC, run_RBC]  # TODO: swap in Gray-Scott
+        titles = ['Van der Pol', 'Lorenz', 'Allen-Cahn', 'Rayleigh-Benard']
+    else:
+        raise NotImplementedError()
+
+    stats = [get_stats(problem, **kwargs) for problem in problems]
 
     my_setup_mpl()
     fig, axs = plt.subplots(2, 2, figsize=figsize_by_journal(JOURNAL, 1, 0.8), sharey=True)
@@ -420,6 +424,42 @@ def plot_quench_solution():  # pragma: no cover
     savefig(fig, 'quench_sol')
 
 
+def plot_RBC_solution():  # pragma: no cover
+    """
+    Plot solution of Rayleigh-Benard convection
+    """
+    my_setup_mpl()
+
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+    plt.rcParams['figure.constrained_layout.use'] = True
+    fig, axs = plt.subplots(2, 1, sharex=True, sharey=True, figsize=figsize_by_journal(JOURNAL, 1.0, 0.45))
+    caxs = []
+    divider = make_axes_locatable(axs[0])
+    caxs += [divider.append_axes('right', size='3%', pad=0.03)]
+    divider2 = make_axes_locatable(axs[1])
+    caxs += [divider2.append_axes('right', size='3%', pad=0.03)]
+
+    from pySDC.projects.Resilience.RBC import RayleighBenard, PROBLEM_PARAMS
+
+    prob = RayleighBenard(**PROBLEM_PARAMS)
+
+    def _plot(t, ax, cax):
+        u_hat = prob.u_exact(t)
+        u = prob.itransform(u_hat)
+        im = ax.pcolormesh(prob.X, prob.Z, u[prob.index('T')], rasterized=True, cmap='plasma')
+        fig.colorbar(im, cax, label=f'$T(t={{{t}}})$')
+
+    _plot(0, axs[0], caxs[0])
+    _plot(21, axs[1], caxs[1])
+
+    axs[1].set_xlabel('$x$')
+    axs[0].set_ylabel('$z$')
+    axs[1].set_ylabel('$z$')
+
+    savefig(fig, 'RBC_sol', tight_layout=False)
+
+
 def plot_Schroedinger_solution():  # pragma: no cover
     from pySDC.implementations.problem_classes.NonlinearSchroedinger_MPIFFT import nonlinearschroedinger_imex
 
@@ -596,10 +636,11 @@ def make_plots_for_adaptivity_paper():  # pragma: no cover
 
 
 def make_plots_for_resilience_paper():  # pragma: no cover
+    compare_recovery_rate_problems(target='resilience', num_procs=1, strategy_type='SDC')
+    plot_RBC_solution()
     plot_recovery_rate(get_stats(run_vdp))
     plot_fault_vdp(0)
     plot_fault_vdp(13)
-    compare_recovery_rate_problems(num_procs=1, strategy_type='SDC')
 
 
 def make_plots_for_notes():  # pragma: no cover
@@ -614,8 +655,37 @@ def make_plots_for_notes():  # pragma: no cover
     analyse_resilience(run_quench, format='png')
 
 
+def make_plots_for_thesis():  # pragma: no cover
+    global JOURNAL
+    JOURNAL = 'TUHH_thesis'
+
+    plot_RBC_solution()
+    # plot_vdp_solution()
+
+    # plot_adaptivity_stuff()
+    compare_recovery_rate_problems(target='thesis', num_procs=1, strategy_type='SDC')
+
+
 if __name__ == "__main__":
-    # make_plots_for_notes()
-    # make_plots_for_SIAM_CSE23()
-    # make_plots_for_TIME_X_website()
-    make_plots_for_adaptivity_paper()
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--target', choices=['adaptivity', 'resilience', 'thesis', 'notes', 'SIAM_CSE23', 'TIME_X_website'], type=str
+    )
+    args = parser.parse_args()
+
+    if args.target == 'adaptivity':
+        make_plots_for_adaptivity_paper()
+    elif args.target == 'resilience':
+        make_plots_for_resilience_paper()
+    elif args.target == 'thesis':
+        make_plots_for_thesis()
+    elif args.target == 'notes':
+        make_plots_for_notes()
+    elif args.target == 'SIAM_CSE23':
+        make_plots_for_SIAM_CSE23()
+    elif args.target == 'TIME_X_website':
+        make_plots_for_TIME_X_website()
+    else:
+        raise NotImplementedError(f'Don\'t know how to make plots for target {args.target}')
