@@ -6,11 +6,13 @@ import numpy as np
 def get_config(args):
     name = args['config']
     if name[:2] == 'GS':
-        from pySDC.projects.GPU.configs.GS_configs import get_config
-
-        return get_config(args)
+        from pySDC.projects.GPU.configs.GS_configs import get_config as _get_config
+    elif name[:3] == 'RBC':
+        from pySDC.projects.GPU.configs.RBC_configs import get_config as _get_config
     else:
         raise NotImplementedError(f'There is no configuration called {name!r}!')
+
+    return _get_config(args)
 
 
 def get_comms(n_procs_list, comm_world=None, _comm=None, _tot_rank=0, _rank=None, useGPU=False):

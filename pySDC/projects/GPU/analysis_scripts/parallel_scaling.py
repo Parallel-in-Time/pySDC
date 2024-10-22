@@ -4,9 +4,7 @@ import pickle
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.projects.GPU.configs.base_config import get_config
 from pySDC.projects.GPU.etc.generate_jobscript import write_jobscript, PROJECT_PATH
-from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
-
-setup_mpl()
+from pySDC.helpers.plot_helper import figsize_by_journal
 
 
 class ScalingConfig(object):
@@ -22,7 +20,6 @@ class ScalingConfig(object):
     max_steps_space = None
     max_steps_space_weak = None
     sbatch_options = []
-    max_nodes = 9999
 
     def __init__(self, space_time_parallel):
         if space_time_parallel in ['False', False]:
@@ -34,30 +31,19 @@ class ScalingConfig(object):
         if strong:
             return self.base_resolution, [1, self._tasks_time, 2**i]
         else:
-            return self.base_resolution_weak * int(self._tasks_time ** (1.0 / self.ndim)) * (2**i), [
-                1,
-                self._tasks_time,
-                (2 * self.ndim) ** i,
-            ]
+            return self.base_resolution_weak * (2**i), [1, self._tasks_time, (2 * self.ndim) ** i]
 
     def run_scaling_test(self, strong=True):
         max_steps = self.max_steps_space if strong else self.max_steps_space_weak
         for i in range(max_steps):
             res, procs = self.get_resolution_and_tasks(strong, i)
 
-            _nodes = np.prod(procs) // self.tasks_per_node
-            if _nodes > self.max_nodes:
-                break
-
-            sbatch_options = [
-                f'-n {np.prod(procs)}',
-                f'-p {self.partition}',
-                f'--tasks-per-node={self.tasks_per_node}',
-            ] + self.sbatch_options
-            srun_options = [f'--tasks-per-node={self.tasks_per_node}']
+            sbatch_options = [f'-n {np.prod(procs)}', f'-p {self.partition}'] + self.sbatch_options
             if self.useGPU:
-                srun_options += ['--cpus-per-task=4', '--gpus-per-task=1']
+                srun_options = ['--cpus-per-task=4', '--gpus-per-task=1'] + self.sbatch_options
                 sbatch_options += ['--cpus-per-task=4', '--gpus-per-task=1']
+            else:
+                srun_options = []
 
             procs = (''.join(f'{me}/' for me in procs))[:-1]
             command = f'run_experiment.py --mode=run --res={res} --config={self.config} --procs={procs}'
@@ -67,8 +53,10 @@ class ScalingConfig(object):
 
             write_jobscript(sbatch_options, srun_options, command, self.cluster)
 
-    def plot_scaling_test(self, strong, ax, plot_ideal=False, **plotting_params):  # pragma: no cover
+    def plot_scaling_test(self, strong, ax, plot_ideal=False, plot_range=False, **plotting_params):  # pragma: no cover
         timings = {}
+        max_timings = []
+        min_timings = []
 
         max_steps = self.max_steps_space if strong else self.max_steps_space_weak
         for i in range(max_steps):
@@ -84,20 +72,27 @@ class ScalingConfig(object):
                     stats = pickle.load(file)
 
                 timing_step = get_sorted(stats, type='timing_step')
-                timings[np.prod(procs) / self.tasks_per_node] = np.mean([me[1] for me in timing_step])
+
+                key = np.prod(procs) / self.tasks_per_node
+                timings[key] = np.mean([me[1] for me in timing_step])
+                max_timings += [np.max([me[1] for me in timing_step]) - timings[key]]
+                min_timings += [timings[key] - np.min([me[1] for me in timing_step])]
             except FileNotFoundError:
                 pass
 
         if plot_ideal:
-            if strong:
-                ax.loglog(
-                    timings.keys(),
-                    list(timings.values())[0] * list(timings.keys())[0] / np.array(list(timings.keys())),
-                    ls='--',
-                    color='grey',
-                    label='ideal',
-                )
-        ax.loglog(timings.keys(), timings.values(), **plotting_params)
+            ax.loglog(
+                timings.keys(),
+                list(timings.values())[0] * list(timings.keys())[0] / np.array(list(timings.keys())),
+                ls='--',
+                color='grey',
+                label='ideal',
+            )
+        if plot_range:
+            yerr = [min_timings, max_timings]
+            ax.errorbar(timings.keys(), timings.values(), yerr=yerr, **plotting_params)
+        else:
+            ax.loglog(timings.keys(), timings.values(), **plotting_params)
         ax.set_xlabel(r'$N_\mathrm{nodes}$')
         ax.set_ylabel(r'$t_\mathrm{step}$')
 
@@ -106,7 +101,7 @@ class CPUConfig(ScalingConfig):
     cluster = 'jusuf'
     partition = 'batch'
     tasks_per_node = 16
-    max_nodes = 144
+    sbatch_options = ['--tasks-per-node=16']
 
 
 class GPUConfig(ScalingConfig):
@@ -114,52 +109,99 @@ class GPUConfig(ScalingConfig):
     partition = 'booster'
     tasks_per_node = 4
     useGPU = True
-    max_nodes = 936
 
 
 class GrayScottSpaceScalingCPU(CPUConfig, ScalingConfig):
-    base_resolution = 8192
-    base_resolution_weak = 512
+    base_resolution = 4096
+    base_resolution_weak = 256
     config = 'GS_scaling'
-    max_steps_space = 11
-    max_steps_space_weak = 11
-    tasks_time = 4
-    sbatch_options = ['--time=3:30:00']
+    max_steps_space = 10
+    max_steps_space_weak = 6
+    tasks_time = 3
 
 
 class GrayScottSpaceScalingGPU(GPUConfig, ScalingConfig):
-    base_resolution_weak = 1024
-    base_resolution = 8192
+    base_resolution_weak = 256 * 2
+    base_resolution = 4096
     config = 'GS_scaling'
-    max_steps_space = 7
-    max_steps_space_weak = 5
+    max_steps_space = 6
+    max_steps_space_weak = 4
+    tasks_time = 3
+
+
+class RayleighBenardSpaceScalingCPU(CPUConfig, ScalingConfig):
+    base_resolution = 1024
+    base_resolution_weak = 256
+    config = 'RBC_scaling'
+    max_steps_space = 10
+    max_steps_space_weak = 6
     tasks_time = 4
-    max_nodes = 64
+
+
+class RayleighBenardSpaceScalingGPU(GPUConfig, ScalingConfig):
+    base_resolution = 1024
+    base_resolution_weak = 256 * 2
+    config = 'RBC_scaling'
+    max_steps_space = 6
+    max_steps_space_weak = 4
+    tasks_time = 4
+
+
+class RayleighBenardDedalusComparison(CPUConfig, ScalingConfig):
+    base_resolution = 256
+    config = 'RBC_Tibo'
+    max_steps_space = 6
+    tasks_time = 4
+
+
+class RayleighBenardDedalusComparisonGPU(GPUConfig, ScalingConfig):
+    base_resolution_weak = 256
+    base_resolution = 256
+    config = 'RBC_Tibo'
+    max_steps_space = 4
+    max_steps_space_weak = 4
+    tasks_time = 4
 
 
 def plot_scalings(strong, problem, kwargs):  # pragma: no cover
-    if problem == 'GS':
-        fig, ax = plt.subplots(figsize=figsize_by_journal('JSC_beamer', 1, 0.45))
+    plottings_params = [
+        {'plot_ideal': strong, 'marker': 'x', 'label': 'CPU space parallel'},
+        {'marker': '>', 'label': 'CPU space time parallel'},
+        {'marker': '^', 'label': 'GPU space parallel'},
+        {'marker': 'o', 'label': 'GPU space time parallel'},
+    ]
+    fig, ax = plt.subplots(figsize=figsize_by_journal('JSC_beamer', 1, 0.45))
 
-        plottings_params = [
-            {'plot_ideal': True, 'marker': 'x', 'label': 'CPU space parallel'},
-            {'marker': '>', 'label': 'CPU space time parallel'},
-            {'marker': '^', 'label': 'GPU space parallel'},
-            {'marker': '<', 'label': 'GPU space time parallel'},
-        ]
+    if problem == 'GS':
         configs = [
             GrayScottSpaceScalingCPU(space_time_parallel=False),
             GrayScottSpaceScalingCPU(space_time_parallel=True),
             GrayScottSpaceScalingGPU(space_time_parallel=False),
             GrayScottSpaceScalingGPU(space_time_parallel=True),
         ]
+    elif problem == 'RBC':
+        configs = [
+            RayleighBenardSpaceScalingCPU(space_time_parallel=False),
+            RayleighBenardSpaceScalingCPU(space_time_parallel=True),
+            RayleighBenardSpaceScalingGPU(space_time_parallel=False),
+            RayleighBenardSpaceScalingGPU(space_time_parallel=True),
+        ]
+    elif problem == 'RBC_dedalus':
+        configs = [
+            RayleighBenardDedalusComparison(space_time_parallel=False),
+            RayleighBenardDedalusComparison(space_time_parallel=True),
+            RayleighBenardDedalusComparisonGPU(space_time_parallel=False),
+            RayleighBenardDedalusComparisonGPU(space_time_parallel=True),
+        ]
 
-        for config, params in zip(configs, plottings_params):
-            config.plot_scaling_test(strong=strong, ax=ax, **params)
-        ax.legend(frameon=False)
-        fig.savefig(f'{PROJECT_PATH}/plots/{"strong" if strong else "weak"}_scaling_{problem}.pdf', bbox_inches='tight')
     else:
         raise NotImplementedError
+
+    for config, params in zip(configs, plottings_params):
+        config.plot_scaling_test(strong=strong, ax=ax, **params)
+    ax.legend(frameon=False)
+    plt.show()
+    fig.savefig(f'{PROJECT_PATH}/plots/{"strong" if strong else "weak"}_scaling_{problem}.pdf', bbox_inches='tight')
 
 
 if __name__ == '__main__':
@@ -181,6 +223,16 @@ if __name__ == '__main__':
             configClass = GrayScottSpaceScalingCPU
         else:
             configClass = GrayScottSpaceScalingGPU
+    elif args.problem == 'RBC':
+        if args.XPU == 'CPU':
+            configClass = RayleighBenardSpaceScalingCPU
+        else:
+            configClass = RayleighBenardSpaceScalingGPU
+    elif args.problem == 'RBC_dedalus':
+        if args.XPU == 'CPU':
+            configClass = RayleighBenardDedalusComparison
+        else:
+            configClass = RayleighBenardDedalusComparisonGPU
     else:
         raise NotImplementedError(f'Don\'t know problem {args.problem!r}')
 

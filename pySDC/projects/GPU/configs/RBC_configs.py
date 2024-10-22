@@ -1,0 +1,360 @@
+from pySDC.projects.GPU.configs.base_config import Config
+
+
+def get_config(args):
+    name = args['config']
+    if name == 'RBC':
+        return RayleighBenardRegular(args)
+    elif name == 'RBC_dt':
+        return RayleighBenard_dt_adaptivity(args)
+    elif name == 'RBC_k':
+        return RayleighBenard_k_adaptivity(args)
+    elif name == 'RBC_dt_k':
+        return RayleighBenard_dt_k_adaptivity(args)
+    # elif name == 'RBC_RK':
+    #     return RayleighBenardRK(args)
+    # elif name == 'RBC_dedalus':
+    #     return RayleighBenardDedalusComp(args)
+    elif name == 'RBC_Tibo':
+        return RayleighBenard_Thibaut(args)
+    elif name == 'RBC_scaling':
+        return RayleighBenard_scaling(args)
+    else:
+        raise NotImplementedError(f'There is no configuration called {name!r}!')
+
+
+class RayleighBenardRegular(Config):
+    sweeper_type = 'IMEX'
+    Tend = 50
+
+    def get_LogToFile(self, ranks=None):
+        import numpy as np
+        from pySDC.implementations.hooks.log_solution import LogToFileAfterXs as LogToFile
+
+        LogToFile.path = './data/'
+        LogToFile.file_name = f'{self.get_path(ranks=ranks)}-solution'
+        LogToFile.time_increment = 1e-1
+
+        def process_solution(L):
+            P = L.prob
+
+            if P.spectral_space:
+                uend = P.itransform(L.uend)
+
+            if P.useGPU:
+                return {
+                    't': L.time + L.dt,
+                    'u': uend.get().view(np.ndarray),
+                    'X': L.prob.X.get().view(np.ndarray),
+                    'Z': L.prob.Z.get().view(np.ndarray),
+                    'vorticity': L.prob.compute_vorticity(L.uend).get().view(np.ndarray),
+                }
+            else:
+                return {
+                    't': L.time + L.dt,
+                    'u': uend.view(np.ndarray),
+                    'X': L.prob.X.view(np.ndarray),
+                    'Z': L.prob.Z.view(np.ndarray),
+                    'vorticity': L.prob.compute_vorticity(L.uend).view(np.ndarray),
+                }
+
+        def logging_condition(L):
+            sweep = L.sweep
+            if hasattr(sweep, 'comm'):
+                if sweep.comm.rank == sweep.comm.size - 1:
+                    return True
+                else:
+                    return False
+            else:
+                return True
+
+        LogToFile.process_solution = process_solution
+        LogToFile.logging_condition = logging_condition
+        return LogToFile
+
+    def get_controller_params(self, *args, **kwargs):
+        from pySDC.implementations.problem_classes.RayleighBenard import (
+            LogAnalysisVariables,
+        )
+        from pySDC.implementations.hooks.log_step_size import LogStepSize
+
+        controller_params = super().get_controller_params(*args, **kwargs)
+        controller_params['hook_class'] += [LogAnalysisVariables, LogStepSize]
+        return controller_params
+
+    def get_description(self, *args, MPIsweeper=False, res=-1, **kwargs):
+        from pySDC.implementations.problem_classes.RayleighBenard import (
+            RayleighBenard,
+            CFLLimit,
+        )
+        from pySDC.implementations.problem_classes.generic_spectral import (
+            compute_residual_DAE,
+            compute_residual_DAE_MPI,
+        )
+        from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeSlopeLimiter
+
+        desc = super().get_description(*args, MPIsweeper=MPIsweeper, **kwargs)
+
+        if MPIsweeper:
+            desc['sweeper_class'].compute_residual = compute_residual_DAE_MPI
+        else:
+            desc['sweeper_class'].compute_residual = compute_residual_DAE
+
+        desc['level_params']['dt'] = 0.1
+        desc['level_params']['restol'] = 1e-7
+
+        desc['convergence_controllers'][CFLLimit] = {'dt_max': 0.1, 'dt_min': 1e-6, 'cfl': 0.8}
+        desc['convergence_controllers'][StepSizeSlopeLimiter] = {'dt_rel_min_slope': 0.1}
+
+        desc['sweeper_params']['quad_type'] = 'RADAU-RIGHT'
+        desc['sweeper_params']['num_nodes'] = 2
+        desc['sweeper_params']['QI'] = 'MIN-SR-S'
+        desc['sweeper_params']['QE'] = 'PIC'
+
+        desc['problem_params']['Rayleigh'] = 2e6
+        desc['problem_params']['nx'] = 2**8 if res == -1 else res
+        desc['problem_params']['nz'] = desc['problem_params']['nx'] // 4
+        desc['problem_params']['dealiasing'] = 3 / 2
+
+        desc['step_params']['maxiter'] = 3
+
+        desc['problem_class'] = RayleighBenard
+
+        return desc
+
+    def get_initial_condition(self, P, *args, restart_idx=0, **kwargs):
+        if restart_idx > 0:
+            return super().get_initial_condition(P, *args, restart_idx=restart_idx, **kwargs)
+        else:
+            u0 = P.u_exact(t=0, seed=P.comm.rank, noise_level=1e-3)
+            u0_with_pressure = P.solve_system(u0, 1e-9, u0)
+            return u0_with_pressure, 0
+
+    def plot(self, P, idx, n_procs_list, quantitiy='T', quantitiy2='vorticity'):
+        import numpy as np
+
+        cmaps = {'vorticity': 'bwr', 'p': 'bwr'}
+
+        fig = P.get_fig()
+        cax = P.cax
+        axs = fig.get_axes()
+
+        buffer = {}
+        vmin = {quantitiy: np.inf, quantitiy2: np.inf}
+        vmax = {quantitiy: -np.inf, quantitiy2: -np.inf}
+
+        for rank in range(n_procs_list[2]):
+            ranks = self.ranks[:-1] + [rank]
+            LogToFile = self.get_LogToFile(ranks=ranks)
+
+            buffer[f'u-{rank}'] = LogToFile.load(idx)
+
+            vmin[quantitiy2] = min([vmin[quantitiy2], buffer[f'u-{rank}'][quantitiy2].real.min()])
+            vmax[quantitiy2] = max([vmax[quantitiy2], buffer[f'u-{rank}'][quantitiy2].real.max()])
+            vmin[quantitiy] = min([vmin[quantitiy], buffer[f'u-{rank}']['u'][P.index(quantitiy)].real.min()])
+            vmax[quantitiy] = max([vmax[quantitiy], buffer[f'u-{rank}']['u'][P.index(quantitiy)].real.max()])
+
+        for rank in range(n_procs_list[2]):
+            im = axs[1].pcolormesh(
+                buffer[f'u-{rank}']['X'],
+                buffer[f'u-{rank}']['Z'],
+                buffer[f'u-{rank}'][quantitiy2].real,
+                vmin=-vmax[quantitiy2] if cmaps.get(quantitiy2, None) in ['bwr'] else vmin[quantitiy2],
+                vmax=vmax[quantitiy2],
+                cmap=cmaps.get(quantitiy2, None),
+            )
+            fig.colorbar(im, cax[1])
+            im = axs[0].pcolormesh(
+                buffer[f'u-{rank}']['X'],
+                buffer[f'u-{rank}']['Z'],
+                buffer[f'u-{rank}']['u'][P.index(quantitiy)].real,
+                vmin=vmin[quantitiy],
+                vmax=-vmin[quantitiy] if cmaps.get(quantitiy, None) in ['bwr', 'seismic'] else vmax[quantitiy],
+                cmap=cmaps.get(quantitiy, 'plasma'),
+            )
+            fig.colorbar(im, cax[0])
+            axs[0].set_title(f't={buffer[f"u-{rank}"]["t"]:.2f}')
+            axs[1].set_xlabel('x')
+            axs[1].set_ylabel('z')
+            axs[0].set_aspect(1.0)
+            axs[1].set_aspect(1.0)
+        return fig
+
+
+class RayleighBenard_k_adaptivity(RayleighBenardRegular):
+    def get_description(self, *args, **kwargs):
+        from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
+        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit, SpaceAdaptivity
+
+        desc = super().get_description(*args, **kwargs)
+
+        desc['convergence_controllers'][CFLLimit] = {'dt_max': 0.1, 'dt_min': 1e-6, 'cfl': 0.8}
+        desc['convergence_controllers'][SpaceAdaptivity] = {'nz_max': 512}
+        desc['level_params']['restol'] = 1e-7
+        desc['sweeper_params']['num_nodes'] = 4
+        desc['sweeper_params']['QI'] = 'MIN-SR-S'
+        desc['step_params']['maxiter'] = 12
+
+        return desc
+
+    def get_controller_params(self, *args, **kwargs):
+        from pySDC.implementations.problem_classes.RayleighBenard import (
+            LogAnalysisVariables,
+        )
+
+        controller_params = super().get_controller_params(*args, **kwargs)
+        controller_params['hook_class'] = [
+            me for me in controller_params['hook_class'] if me is not LogAnalysisVariables
+        ]
+        return controller_params
+
+
+class RayleighBenard_dt_k_adaptivity(RayleighBenardRegular):
+    def get_description(self, *args, **kwargs):
+        from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
+        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit, SpaceAdaptivity
+
+        desc = super().get_description(*args, **kwargs)
+
+        desc['convergence_controllers'][AdaptivityPolynomialError] = {
+            'e_tol': 1e-3,
+            'abort_at_growing_residual': False,
+            'interpolate_between_restarts': False,
+            'dt_min': 1e-3,
+            'dt_rel_min_slope': 0.1,
+        }
+        desc['convergence_controllers'][SpaceAdaptivity] = {'nz_max': 2**9}
+        desc['convergence_controllers'].pop(CFLLimit)
+        desc['level_params']['restol'] = 1e-7
+        desc['sweeper_params']['num_nodes'] = 3
+        desc['sweeper_params']['QI'] = 'MIN-SR-S'
+        desc['step_params']['maxiter'] = 16
+        desc['problem_params']['nx'] *= 2
+        desc['problem_params']['nz'] *= 2
+
+        return desc
+
+    def get_controller_params(self, *args, **kwargs):
+        from pySDC.implementations.problem_classes.RayleighBenard import (
+            LogAnalysisVariables,
+        )
+
+        controller_params = super().get_controller_params(*args, **kwargs)
+        controller_params['hook_class'] = [
+            me for me in controller_params['hook_class'] if me is not LogAnalysisVariables
+        ]
+        return controller_params
+
+
+class RayleighBenard_dt_adaptivity(RayleighBenardRegular):
+    def get_description(self, *args, **kwargs):
+        from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
+
+        desc = super().get_description(*args, **kwargs)
+
+        desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-4, 'dt_rel_min_slope': 0.1}
+        desc['convergence_controllers'].pop(CFLLimit)
+        desc['level_params']['restol'] = -1
+        desc['sweeper_params']['num_nodes'] = 3
+        desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
+        desc['step_params']['maxiter'] = 5
+        return desc
+
+
+class RayleighBenard_Thibaut(RayleighBenardRegular):
+    Tend = 1
+
+    def get_description(self, *args, **kwargs):
+        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
+
+        desc = super().get_description(*args, **kwargs)
+
+        desc['convergence_controllers'].pop(CFLLimit)
+        desc['level_params']['restol'] = -1
+        desc['level_params']['dt'] = 2e-2 / 4
+        desc['sweeper_params']['num_nodes'] = 4
+        desc['sweeper_params']['QI'] = 'MIN-SR-FLEX'
+        desc['sweeper_params']['node_type'] = 'LEGENDRE'
+        desc['sweeper_params']['quad_type'] = 'RADAU-RIGHT'
+        desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
+        desc['step_params']['maxiter'] = 4
+        return desc
+
+    def get_controller_params(self, *args, **kwargs):
+        controller_params = super().get_controller_params(*args, **kwargs)
+        controller_params['hook_class'] = []
+        return controller_params
+
+
+# class RayleighBenardRK(RayleighBenardRegular):
+#     def get_description(self, *args, **kwargs):
+#         from pySDC.implementations.sweeper_classes.Runge_Kutta import ARK222
+# 
+#         desc = super().get_description(*args, **kwargs)
+# 
+#         desc['sweeper_class'] = ARK222
+# 
+#         desc['step_params']['maxiter'] = 1
+#         # desc['level_params']['dt'] = 0.1
+# 
+#         from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
+# 
+#         desc['convergence_controllers'][CFLLimit] = {'dt_max': 0.1, 'dt_min': 1e-6, 'cfl': 0.2}
+#         return desc
+# 
+#     def get_controller_params(self, *args, **kwargs):
+#         from pySDC.implementations.problem_classes.RayleighBenard import (
+#             LogAnalysisVariables,
+#         )
+# 
+#         controller_params = super().get_controller_params(*args, **kwargs)
+#         controller_params['hook_class'] = [
+#             me for me in controller_params['hook_class'] if me is not LogAnalysisVariables
+#         ]
+#         return controller_params
+
+
+# class RayleighBenardDedalusComp(RayleighBenardRK):
+#     Tend = 150
+# 
+#     def get_description(self, *args, **kwargs):
+#         from pySDC.implementations.sweeper_classes.Runge_Kutta import ARK222
+# 
+#         desc = super().get_description(*args, **kwargs)
+# 
+#         desc['sweeper_class'] = ARK222
+# 
+#         desc['step_params']['maxiter'] = 1
+#         desc['level_params']['dt'] = 5e-3
+# 
+#         from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
+# 
+#         desc['convergence_controllers'].pop(CFLLimit)
+#         return desc
+
+
+class RayleighBenard_scaling(RayleighBenardRegular):
+    Tend = 10
+
+    def get_description(self, *args, **kwargs):
+        from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
+
+        desc = super().get_description(*args, **kwargs)
+
+        desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-4, 'dt_rel_min_slope': 1.}
+        desc['convergence_controllers'].pop(CFLLimit)
+        desc['level_params']['restol'] = -1
+        desc['level_params']['dt'] = 1e-2
+        desc['sweeper_params']['num_nodes'] = 4
+        desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
+        desc['step_params']['maxiter'] = 4
+        return desc
+
+    def get_controller_params(self, *args, **kwargs):
+        from pySDC.implementations.hooks.log_work import LogWork
+
+        params = super().get_controller_params(*args, **kwargs)
+        params['hook_class'] = [LogWork]
+        return params

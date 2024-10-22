@@ -1748,8 +1748,6 @@ class SpectralHelper:
         if self.comm.size == 1:
             return u.copy()
 
-        fft = self.get_fft(**kwargs) if fft is None else fft
-
         global_fft = self.get_fft(**kwargs)
         axisA = [me.axisA for me in global_fft.transfer]
         axisB = [me.axisB for me in global_fft.transfer]
@@ -1786,6 +1784,8 @@ class SpectralHelper:
             return u
         else:  # go the potentially slower route of not reusing transfer classes
             from mpi4py_fft import newDistArray
+
+            fft = self.get_fft(**kwargs) if fft is None else fft
 
             _in = newDistArray(fft, forward).redistribute(axis_in)
             _in[...] = u

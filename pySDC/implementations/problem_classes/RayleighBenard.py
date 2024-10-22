@@ -6,6 +6,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 from pySDC.core.convergence_controller import ConvergenceController
 from pySDC.core.hooks import Hooks
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+from pySDC.core.problem import WorkCounter
 
 
 class RayleighBenard(GenericSpectralLinear):
@@ -175,6 +176,8 @@ class RayleighBenard(GenericSpectralLinear):
                 )
         self.setup_BCs()
 
+        self.work_counters['rhs'] = WorkCounter()
+
     def eval_f(self, u, *args, **kwargs):
         f = self.f_init
 
@@ -225,6 +228,7 @@ class RayleighBenard(GenericSpectralLinear):
         else:
             f.expl[:] = self.itransform(self.transform(fexpl_pad, padding=padding)).real
 
+        self.work_counters['rhs']()
         return f
 
     def u_exact(self, t=0, noise_level=1e-3, seed=99):

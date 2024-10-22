@@ -188,3 +188,15 @@ class LogToFileAfterXs(LogToFile):
         if L.time + L.dt >= self.t_next_log and not step.status.restart:
             super().post_step(step, level_number)
             self.t_next_log = max([L.time + L.dt, self.t_next_log]) + self.time_increment
+
+    def pre_run(self, step, level_number):
+        L = step.levels[level_number]
+        L.uend = L.u[0]
+
+        def process_solution(L):
+            return {
+                **type(self).process_solution(L),
+                't': L.time,
+            }
+
+        self.log_to_file(step, level_number, type(self).logging_condition(L), process_solution=process_solution)

@@ -113,3 +113,7 @@ class NCCLComm(object):
         stream = cp.cuda.get_current_stream()
 
         self.commNCCL.bcast(buff=buf.data.ptr, count=count, datatype=dtype, root=root, stream=stream.ptr)
+
+    def Barrier(self):
+        cp.cuda.get_current_stream().synchronize()
+        self.commMPI.Barrier()
