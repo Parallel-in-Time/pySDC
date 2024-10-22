@@ -53,6 +53,7 @@ Projects
    projects/compression.rst
    projects/second_order.rst
    projects/monodomain.rst
+   projects/GPU.rst
 
 
 API documentation

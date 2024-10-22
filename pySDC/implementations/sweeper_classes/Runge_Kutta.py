@@ -441,9 +441,12 @@ class RungeKuttaIMEX(RungeKutta):
                 rhs += lvl.dt * (self.QI[m + 1, j] * lvl.f[j].impl + self.QE[m + 1, j] * lvl.f[j].expl)
 
             # implicit solve with prefactor stemming from the diagonal of Qd, use previous stage as initial guess
-            lvl.u[m + 1][:] = prob.solve_system(
-                rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m], lvl.time + lvl.dt * self.coll.nodes[m + 1]
-            )
+            if self.QI[m + 1, m + 1] != 0:
+                lvl.u[m + 1][:] = prob.solve_system(
+                    rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m], lvl.time + lvl.dt * self.coll.nodes[m + 1]
+                )
+            else:
+                lvl.u[m + 1][:] = rhs[:]
 
             # update function values (we don't usually need to evaluate the RHS at the solution of the step)
             if m < M - self.coll.num_solution_stages or self.params.eval_rhs_at_right_boundary:

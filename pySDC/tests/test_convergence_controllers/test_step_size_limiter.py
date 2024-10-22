@@ -108,5 +108,17 @@ def test_step_size_limiter():
     assert L.status.dt_new == 0.5
 
 
+@pytest.mark.base
+@pytest.mark.parametrize('dt', [1 / 3, 2 / 30])
+def test_step_size_rounding(dt):
+    from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeRounding
+
+    expect = {
+        1 / 3: 0.3,
+        2 / 30: 0.065,
+    }
+    assert StepSizeRounding._round_step_size(dt, 5, 1) == expect[dt]
+
+
 if __name__ == '__main__':
     test_step_size_slope_limiter()

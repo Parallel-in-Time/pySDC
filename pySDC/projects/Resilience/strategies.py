@@ -130,6 +130,8 @@ class Strategy:
             args['time'] = 10
         elif problem.__name__ == "run_AC":
             args['time'] = 1e-2
+        elif problem.__name__ == "run_RBC":
+            args['time'] = 20.19
 
         return args
 
@@ -150,13 +152,16 @@ class Strategy:
         rnd_params['iteration'] = base_params['step_params']['maxiter']
         rnd_params['rank'] = num_procs
 
-        if problem.__name__ in ['run_Schroedinger', 'run_quench', 'run_AC']:
+        if problem.__name__ in ['run_Schroedinger', 'run_quench', 'run_AC', 'run_RBC']:
             rnd_params['min_node'] = 1
 
         if problem.__name__ == "run_quench":
             rnd_params['iteration'] = 5
         elif problem.__name__ == 'run_Lorenz':
             rnd_params['iteration'] = 5
+        elif problem.__name__ == 'run_RBC':
+            rnd_params['problem_pos'] = [3, 16, 16]
+
         return rnd_params
 
     @property
@@ -206,6 +211,8 @@ class Strategy:
             return 500.0
         elif problem.__name__ == "run_AC":
             return 0.025
+        elif problem.__name__ == "run_RBC":
+            return 21
         else:
             raise NotImplementedError('I don\'t have a final time for your problem!')
 
@@ -269,6 +276,9 @@ class Strategy:
                 'nu': 2,
             }
             custom_description['level_params'] = {'restol': -1, 'dt': 0.1 * eps**2}
+        elif problem.__name__ == 'run_RBC':
+            custom_description['level_params']['dt'] = 5e-2
+            custom_description['step_params'] = {'maxiter': 5}
 
         custom_description['convergence_controllers'] = {
             # StepSizeLimiter: {'dt_min': self.get_Tend(problem=problem, num_procs=num_procs) / self.max_steps}
@@ -287,6 +297,7 @@ class Strategy:
             'run_Schroedinger': 150,
             'run_quench': 150,
             'run_AC': 150,
+            'run_RBC': 1000,
         }
 
         custom_description['convergence_controllers'][StopAtMaxRuntime] = {
@@ -373,7 +384,7 @@ class InexactBaseStrategy(Strategy):
             'maxiter': 15,
         }
 
-        if self.newton_inexactness and problem.__name__ not in ['run_Schroedinger', 'run_AC']:
+        if self.newton_inexactness and problem.__name__ not in ['run_Schroedinger', 'run_AC', 'run_RBC']:
             if problem.__name__ == 'run_quench':
                 inexactness_params['ratio'] = 1e-1
                 inexactness_params['min_tol'] = 1e-11
@@ -523,6 +534,7 @@ class AdaptivityStrategy(Strategy):
 
         dt_max = np.inf
         dt_slope_max = np.inf
+        dt_slope_min = 0
 
         if problem.__name__ == "run_piline":
             e_tol = 1e-7
@@ -547,6 +559,9 @@ class AdaptivityStrategy(Strategy):
         elif problem.__name__ == "run_AC":
             e_tol = 1e-7
             # dt_max = 0.1 * base_params['problem_params']['eps'] ** 2
+        elif problem.__name__ == 'run_RBC':
+            e_tol = 1e-4
+            dt_slope_min = 1
 
         else:
             raise NotImplementedError(
@@ -557,6 +572,7 @@ class AdaptivityStrategy(Strategy):
         custom_description['convergence_controllers'][Adaptivity] = {
             'e_tol': e_tol,
             'dt_slope_max': dt_slope_max,
+            'dt_rel_min_slope': dt_slope_min,
         }
         custom_description['convergence_controllers'][StepSizeLimiter] = {
             'dt_max': dt_max,
@@ -760,6 +776,8 @@ class IterateStrategy(Strategy):
             restol = 1e-7
         elif problem.__name__ == "run_AC":
             restol = 1e-11
+        elif problem.__name__ == "run_RBC":
+            restol = 1e-4
         else:
             raise NotImplementedError(
                 'I don\'t have a residual tolerance for your problem. Please add one to the \
@@ -831,6 +849,9 @@ class kAdaptivityStrategy(IterateStrategy):
         elif problem.__name__ == "run_AC":
             desc['level_params']['restol'] = 1e-11
             desc['level_params']['dt'] = 0.4 * desc['problem_params']['eps'] ** 2 / 8.0
+        elif problem.__name__ == "run_RBC":
+            desc['level_params']['dt'] = 7e-2
+            desc['level_params']['restol'] = 1e-9
         return desc
 
     def get_custom_description_for_faults(self, problem, *args, **kwargs):
@@ -839,6 +860,8 @@ class kAdaptivityStrategy(IterateStrategy):
             desc['level_params']['dt'] = 5.0
         elif problem.__name__ == 'run_AC':
             desc['level_params']['dt'] = 5e-4
+        elif problem.__name__ == 'run_RBC':
+            desc['level_params']['restol'] = 1e-6
         return desc
 
     def get_reference_value(self, problem, key, op, num_procs=1):
@@ -931,6 +954,9 @@ class HotRodStrategy(Strategy):
             maxiter = 6
         elif problem.__name__ == 'run_AC':
             HotRod_tol = 9.564437e-06
+            maxiter = 6
+        elif problem.__name__ == 'run_RBC':
+            HotRod_tol = 6.34e-6
             maxiter = 6
         else:
             raise NotImplementedError(
@@ -1306,6 +1332,7 @@ class ARKStrategy(AdaptivityStrategy):
             The custom descriptions you can supply to the problem when running it
         '''
         from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK, Adaptivity
+        from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeSlopeLimiter
         from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
         from pySDC.implementations.sweeper_classes.Runge_Kutta import ARK548L2SA
 
@@ -1326,6 +1353,9 @@ class ARKStrategy(AdaptivityStrategy):
                 },
             },
         }
+
+        if problem.__name__ == "run_RBC":
+            rk_params['convergence_controllers'][StepSizeSlopeLimiter] = {'dt_rel_min_slope': 0.25}
 
         custom_description = merge_descriptions(adaptivity_description, rk_params)
 
@@ -1861,6 +1891,7 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         '''
         from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
         from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeLimiter
+        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
 
         base_params = super().get_custom_description(problem, num_procs)
         custom_description = {}
@@ -1868,7 +1899,10 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         dt_max = np.inf
         restol_rel = 1e-4
         restol_min = 1e-12
+        restol_max = 1e-5
+        dt_slope_min = 0
         dt_min = 0
+        abort_at_growing_residual = True
         level_params = {}
         problem_params = {}
 
@@ -1894,6 +1928,14 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
             e_tol = 1.0e-4
             restol_rel = 1e-3
             # dt_max = 0.1 * base_params['problem_params']['eps'] ** 2
+        elif problem.__name__ == "run_RBC":
+            e_tol = 5e-3
+            dt_slope_min = 1.0
+            abort_at_growing_residual = False
+            restol_rel = 1e-3
+            restol_max = 1e-1
+            restol_min = 5e-7
+            self.max_slope = 4
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
@@ -1905,14 +1947,17 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
                 'e_tol': e_tol,
                 'restol_rel': restol_rel if self.use_restol_rel else 1e-11,
                 'restol_min': restol_min if self.use_restol_rel else 1e-12,
+                'restol_max': restol_max if self.use_restol_rel else 1e-5,
                 'restart_at_maxiter': True,
                 'factor_if_not_converged': self.max_slope,
                 'interpolate_between_restarts': self.interpolate_between_restarts,
+                'abort_at_growing_residual': abort_at_growing_residual,
             },
             StepSizeLimiter: {
                 'dt_max': dt_max,
                 'dt_slope_max': self.max_slope,
                 'dt_min': dt_min,
+                'dt_rel_min_slope': dt_slope_min,
             },
         }
         custom_description['level_params'] = level_params
