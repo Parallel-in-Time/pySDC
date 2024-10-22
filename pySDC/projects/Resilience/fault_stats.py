@@ -271,8 +271,10 @@ class FaultStats:
                 dat['bit'][i] = faults_run[0][1][4]
                 dat['target'][i] = faults_run[0][1][5]
                 dat['rank'][i] = faults_run[0][1][6]
+
             if crash:
                 print('Code crashed!')
+                dat['error'][i] = np.inf
                 continue
 
             # record the rest of the data
@@ -876,7 +878,7 @@ class FaultStats:
         args=None,
         strategies=None,
         name=None,
-        store=True,
+        store=False,
         ax=None,
         fig=None,
         plotting_args=None,
@@ -933,7 +935,7 @@ class FaultStats:
         return None
 
     def plot_recovery_thresholds(
-        self, strategies=None, thresh_range=None, ax=None, mask=None, **kwargs
+        self, strategies=None, thresh_range=None, ax=None, recoverable_only=False, **kwargs
     ):  # pragma: no cover
         '''
         Plot the recovery rate for a range of thresholds
@@ -942,7 +944,6 @@ class FaultStats:
             strategies (list): List of the strategies you want to plot, if None, all will be plotted
             thresh_range (list): thresholds for deciding whether to accept as recovered
             ax (Matplotlib.axes): Somewhere to plot
-            mask (Numpy.ndarray of shape (n)): The mask you want to know about
 
         Returns:
             None
@@ -961,16 +962,21 @@ class FaultStats:
             fault_free = self.load(strategy=strategy, faults=False)
             with_faults = self.load(strategy=strategy, faults=True)
 
+            if recoverable_only:
+                recoverable_mask = self.get_fixable_faults_only(strategy)
+            else:
+                recoverable_mask = self.get_mask()
+
             for thresh_idx in range(len(thresh_range)):
                 rec_mask = self.get_mask(
                     strategy=strategy,
                     key='error',
                     val=(thresh_range[thresh_idx] * fault_free['error'].mean()),
                     op='gt',
-                    old_mask=mask,
+                    old_mask=recoverable_mask,
                 )
                 rec_rates[strategy_idx][thresh_idx] = 1.0 - len(with_faults['error'][rec_mask]) / len(
-                    with_faults['error']
+                    with_faults['error'][recoverable_mask]
                 )
 
             ax.plot(
@@ -1689,7 +1695,7 @@ def main():
         stats_path='data/stats-jusuf',
         **kwargs,
     )
-    stats_analyser.run_stats_generation(runs=kwargs['runs'], step=12)
+    stats_analyser.run_stats_generation(runs=kwargs['runs'], step=25)
 
     if MPI.COMM_WORLD.rank > 0:  # make sure only one rank accesses the data
         return None
