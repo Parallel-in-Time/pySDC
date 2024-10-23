@@ -23,6 +23,11 @@ LOG_TO_FILE = False
 
 logging.getLogger('matplotlib.texmanager').setLevel(90)
 
+Tends = {'run_RBC': 17.0, 'run_Lorenz': 10.0}
+t0s = {
+    'run_RBC': 10.0,  # 2.,
+}
+
 
 def std_log(x):
     return np.std(np.log(x))
@@ -70,14 +75,6 @@ def get_forbidden_combinations(problem, strategy, **kwargs):
             return True
 
     return False
-
-
-Tends = {
-    'run_RBC': 16,
-}
-t0s = {
-    'run_RBC': 0.2,
-}
 
 
 def single_run(
@@ -289,7 +286,7 @@ def record_work_precision(
             else:
                 exponents = [-3, -2, -1, 0, 0.2, 0.8, 1][::-1]
         if problem.__name__ == 'run_RBC':
-            exponents = [1, 0, -1, -2, -3, -4]
+            exponents = [1, 0, -1, -2]
     elif param == 'dt':
         power = 2.0
         exponents = [-1, 0, 1, 2, 3][::-1]
@@ -312,7 +309,7 @@ def record_work_precision(
             param_range = [1.25, 2.5, 5.0, 10.0, 20.0][::-1]
     if problem.__name__ == 'run_RBC':
         if param == 'dt':
-            param_range = [2e-1, 1e-1, 8e-2, 6e-2]
+            param_range = [6e-2, 4e-2, 3e-2, 2e-2]
 
     # run multiple times with different parameters
     for i in range(len(param_range)):
@@ -788,8 +785,8 @@ def get_configs(mode, problem):
                 'sweeper_params': {'num_nodes': 3, 'quad_type': 'RADAU-RIGHT'},
             },
             'strategies': [
-                AdaptivityStrategy(useMPI=True),
                 BaseStrategy(useMPI=True),
+                AdaptivityStrategy(useMPI=True),
             ],
         }
 
@@ -1611,7 +1608,7 @@ if __name__ == "__main__":
     ]:
         params = {
             'mode': mode,
-            'runs': 1,
+            'runs': 5,
             'plotting': comm_world.rank == 0,
         }
         params_single = {

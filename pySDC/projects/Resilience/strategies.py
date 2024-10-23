@@ -533,6 +533,7 @@ class AdaptivityStrategy(Strategy):
         dt_max = np.inf
         dt_slope_max = np.inf
         dt_slope_min = 0
+        beta = 0.9
 
         if problem.__name__ == "run_piline":
             e_tol = 1e-7
@@ -560,6 +561,7 @@ class AdaptivityStrategy(Strategy):
         elif problem.__name__ == 'run_RBC':
             e_tol = 1e-4
             dt_slope_min = 1
+            beta = 0.5
 
         else:
             raise NotImplementedError(
@@ -571,6 +573,7 @@ class AdaptivityStrategy(Strategy):
             'e_tol': e_tol,
             'dt_slope_max': dt_slope_max,
             'dt_rel_min_slope': dt_slope_min,
+            'beta': beta,
         }
         custom_description['convergence_controllers'][StepSizeLimiter] = {
             'dt_max': dt_max,
@@ -847,7 +850,7 @@ class kAdaptivityStrategy(IterateStrategy):
             desc['level_params']['dt'] = 0.4 * desc['problem_params']['eps'] ** 2 / 8.0
         elif problem.__name__ == "run_RBC":
             desc['level_params']['dt'] = 7e-2
-            desc['level_params']['restol'] = 1e-9
+            desc['level_params']['restol'] = 1e-6
         return desc
 
     def get_custom_description_for_faults(self, problem, *args, **kwargs):
@@ -1901,6 +1904,7 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         abort_at_growing_residual = True
         level_params = {}
         problem_params = {}
+        beta = 0.9
 
         if problem.__name__ == "run_vdp":
             e_tol = 6e-4
@@ -1928,10 +1932,11 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
             e_tol = 5e-3
             dt_slope_min = 1.0
             abort_at_growing_residual = False
-            restol_rel = 1e-3
+            restol_rel = 1e-4
             restol_max = 1e-1
-            restol_min = 5e-7
+            restol_min = 5e-8  # 5e-7
             self.max_slope = 4
+            beta = 0.5
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
@@ -1948,6 +1953,7 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
                 'factor_if_not_converged': self.max_slope,
                 'interpolate_between_restarts': self.interpolate_between_restarts,
                 'abort_at_growing_residual': abort_at_growing_residual,
+                'beta': beta,
             },
             StepSizeLimiter: {
                 'dt_max': dt_max,

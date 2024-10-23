@@ -80,6 +80,11 @@ def test_step_size_slope_limiter():
     limiter.get_new_step_size(controller, S)
     assert L.status.dt_new == 1
 
+    L.params.dt = 1
+    L.status.dt_new = 1 - 1e-1
+    limiter.get_new_step_size(controller, S)
+    assert L.status.dt_new == 1
+
 
 @pytest.mark.base
 def test_step_size_limiter():

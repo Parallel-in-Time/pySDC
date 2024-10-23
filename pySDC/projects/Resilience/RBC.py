@@ -57,7 +57,7 @@ def u_exact(self, t, u_init=None, t_init=None, recompute=False, _t0=None):
 RayleighBenard._u_exact = RayleighBenard.u_exact
 RayleighBenard.u_exact = u_exact
 
-PROBLEM_PARAMS = {'Rayleigh': 2e4, 'nx': 256, 'nz': 128}
+PROBLEM_PARAMS = {'Rayleigh': 2e4, 'nx': 256, 'nz': 128, 'max_cached_factorizations': 30}
 
 
 class ReachTendExactly(ConvergenceController):
@@ -150,7 +150,7 @@ def run_RBC(
     convergence_controllers[StepSizeRounding] = {}
 
     controller_params = {}
-    controller_params['logger_level'] = 30
+    controller_params['logger_level'] = 15
     controller_params['hook_class'] = hook_collection + (hook_class if type(hook_class) == list else [hook_class])
     controller_params['mssdc_jac'] = False
 
@@ -206,9 +206,10 @@ def run_RBC(
 
 def generate_data_for_fault_stats():
     prob = RayleighBenard(**PROBLEM_PARAMS)
-    _ts = np.linspace(0, 22, 220, dtype=float)
+    _ts = np.linspace(0, 22, 221, dtype=float)
     for i in range(len(_ts) - 1):
-        prob.u_exact(_ts[i + 1], _t0=_ts[i])
+        print(f'Generating reference solution from {_ts[i]:.4e} to {_ts[i+1]:.4e}')
+        prob.u_exact(_ts[i + 1], _t0=_ts[i], recompute=False)
 
 
 def plot_order(t, dt, steps, num_nodes, e_tol=1e-9, restol=1e-9, ax=None, recompute=False):
@@ -328,7 +329,7 @@ def plot_step_size(t0=0, Tend=30, e_tol=1e-3, recompute=False):
 
 
 if __name__ == '__main__':
-    # plot_step_size(0, 3)
+    # plot_step_size(0, 30)
     generate_data_for_fault_stats()
     # check_order(t=20, dt=1., steps=7)
     # stats, _, _ = run_RBC()
