@@ -23,6 +23,7 @@ class ScalingConfig(object):
     max_steps_space_weak = None
     sbatch_options = []
     max_nodes = 9999
+    max_tasks = 9999
 
     def __init__(self, space_time_parallel):
         if space_time_parallel in ['False', False]:
@@ -40,13 +41,13 @@ class ScalingConfig(object):
                 (2 * self.ndim) ** i,
             ]
 
-    def run_scaling_test(self, strong=True):
+    def run_scaling_test(self, strong=True, submit=True):
         max_steps = self.max_steps_space if strong else self.max_steps_space_weak
         for i in range(max_steps):
             res, procs = self.get_resolution_and_tasks(strong, i)
 
             _nodes = np.prod(procs) // self.tasks_per_node
-            if _nodes > self.max_nodes:
+            if _nodes > self.max_nodes or procs[-1] > self.max_tasks:
                 break
 
             sbatch_options = [
@@ -65,7 +66,7 @@ class ScalingConfig(object):
             if self.useGPU:
                 command += ' --useGPU=True'
 
-            write_jobscript(sbatch_options, srun_options, command, self.cluster)
+            write_jobscript(sbatch_options, srun_options, command, self.cluster, submit=submit)
 
     def plot_scaling_test(self, strong, ax, plot_ideal=False, **plotting_params):  # pragma: no cover
         timings = {}
@@ -85,6 +86,7 @@ class ScalingConfig(object):
 
                 timing_step = get_sorted(stats, type='timing_step')
                 timings[np.prod(procs) / self.tasks_per_node] = np.mean([me[1] for me in timing_step])
+                # timings[np.prod(procs)] = np.mean([me[1] for me in timing_step])
             except FileNotFoundError:
                 pass
 
@@ -142,19 +144,22 @@ class RayleighBenardSpaceScalingCPU(CPUConfig, ScalingConfig):
     base_resolution = 1024
     base_resolution_weak = 256
     config = 'RBC_scaling'
-    max_steps_space = 10
-    max_steps_space_weak = 6
+    max_steps_space = 13
+    max_steps_space_weak = 10
     tasks_time = 4
-    sbatch_options = ['--time=3:30:00']
+    max_nodes=64
+    # sbatch_options = ['--time=3:30:00']
+    max_tasks = 256
 
 
 class RayleighBenardSpaceScalingGPU(GPUConfig, ScalingConfig):
-    base_resolution_weak = 256 * 2
+    base_resolution_weak = 512
     base_resolution = 1024
     config = 'RBC_scaling'
     max_steps_space = 6
     max_steps_space_weak = 4
     tasks_time = 4
+    max_tasks = 256
 
 
 class RayleighBenardDedalusComparison(CPUConfig, ScalingConfig):
@@ -225,10 +230,12 @@ if __name__ == '__main__':
     parser.add_argument('--problem', type=str, default='GS')
     parser.add_argument('--XPU', type=str, choices=['CPU', 'GPU'], default='CPU')
     parser.add_argument('--space_time', type=str, choices=['True', 'False'], default='False')
+    parser.add_argument('--submit', type=str, choices=['True', 'False'], default='True')
 
     args = parser.parse_args()
 
     strong = args.scaling == 'strong'
+    submit = args.submit == 'True'
 
     if args.problem == 'GS':
         if args.XPU == 'CPU':
@@ -252,7 +259,7 @@ if __name__ == '__main__':
     config = configClass(**kwargs)
 
     if args.mode == 'run':
-        config.run_scaling_test(strong=strong)
+        config.run_scaling_test(strong=strong, submit=submit)
     elif args.mode == 'plot':
         plot_scalings(strong=strong, problem=args.problem, kwargs=kwargs)
     else:

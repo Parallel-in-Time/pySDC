@@ -335,18 +335,21 @@ class RayleighBenard_Thibaut(RayleighBenardRegular):
 
 
 class RayleighBenard_scaling(RayleighBenardRegular):
-    Tend = 10
+    Tend = 7
 
     def get_description(self, *args, **kwargs):
         from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
         from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
+        from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeRounding, StepSizeSlopeLimiter
 
         desc = super().get_description(*args, **kwargs)
 
-        desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-4, 'dt_rel_min_slope': 1.}
+        desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3, 'dt_rel_min_slope': 1., 'beta': 0.5}
+        desc['convergence_controllers'][StepSizeRounding] = {}
+        desc['convergence_controllers'][StepSizeSlopeLimiter] = {'dt_rel_min_slope': 1.}
         desc['convergence_controllers'].pop(CFLLimit)
         desc['level_params']['restol'] = -1
-        desc['level_params']['dt'] = 1e-2
+        desc['level_params']['dt'] = 8e-2
         desc['sweeper_params']['num_nodes'] = 4
         desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
         desc['step_params']['maxiter'] = 4
