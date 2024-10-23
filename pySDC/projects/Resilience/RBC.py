@@ -4,7 +4,7 @@ from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.Resilience.hook import hook_collection, LogData
 from pySDC.projects.Resilience.strategies import merge_descriptions
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.projects.Resilience.sweepers import imex_1st_order_efficient
 from pySDC.core.convergence_controller import ConvergenceController
 from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import (
     EstimateExtrapolationErrorNonMPI,
@@ -157,12 +157,12 @@ def run_RBC(
     if custom_controller_params is not None:
         controller_params = {**controller_params, **custom_controller_params}
 
-    imex_1st_order.compute_residual = compute_residual_DAE
+    imex_1st_order_efficient.compute_residual = compute_residual_DAE
 
     description = {}
     description['problem_class'] = RayleighBenard
     description['problem_params'] = problem_params
-    description['sweeper_class'] = imex_1st_order
+    description['sweeper_class'] = imex_1st_order_efficient
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params

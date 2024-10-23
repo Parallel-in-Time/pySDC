@@ -6,3 +6,4 @@ module load FFTW
 module load Python/3.11.3
 module load mpi4py
 module load FFmpeg/.6.0
+module load texlive
