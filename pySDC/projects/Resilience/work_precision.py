@@ -1612,6 +1612,7 @@ if __name__ == "__main__":
     )
     parser.add_argument('--work_key', type=str, default='t')
     parser.add_argument('--precision_key', type=str, default='e_global_rel')
+    parser.add_argument('--logger_level', type=int, default='25')
 
     args = parser.parse_args()
 
@@ -1630,6 +1631,9 @@ if __name__ == "__main__":
         'plotting': args.plotting == 'True' and comm_world.rank == 0,
         'problem': problems[args.problem],
     }
+
+    LOGGER_LEVEL = params.pop('logger_level')
+
     single_problem(**params)
 
     if comm_world.rank == 0:
