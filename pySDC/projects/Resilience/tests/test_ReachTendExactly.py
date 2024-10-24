@@ -5,7 +5,7 @@ import pytest
 @pytest.mark.parametrize('Tend', [1.2345, 1, 4.0 / 3.0])
 @pytest.mark.parametrize('dt', [0.1, 1.0 / 3.0, 0.999999])
 def test_ReachTendExactly(Tend, dt, num_procs=1):
-    from pySDC.projects.Resilience.RBC import ReachTendExactly
+    from pySDC.projects.Resilience.reachTendExactly import ReachTendExactly
     from pySDC.implementations.hooks.log_solution import LogSolution
     from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit

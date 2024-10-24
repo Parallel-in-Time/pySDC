@@ -25,7 +25,7 @@ logging.getLogger('matplotlib.texmanager').setLevel(90)
 
 Tends = {'run_RBC': 17.0, 'run_Lorenz': 10.0}
 t0s = {
-    'run_RBC': 10.0,  # 2.,
+    'run_RBC': 10.0,
 }
 
 
@@ -1600,38 +1600,37 @@ def aggregate_parallel_efficiency_plot():  # pragma: no cover
 if __name__ == "__main__":
     comm_world = MPI.COMM_WORLD
 
-    record = comm_world.size > 1
-    for mode in [
-        'compare_strategies',
-        # 'RK_comp',
-        # 'parallel_efficiency',
-    ]:
-        params = {
-            'mode': mode,
-            'runs': 5,
-            'plotting': comm_world.rank == 0,
-        }
-        params_single = {
-            **params,
-            'problem': run_RBC,
-        }
-        single_problem(**params_single, work_key='t', precision_key='e_global_rel', record=record)
+    import argparse
 
-    all_params = {
-        'record': False,
-        'runs': 5,
-        'work_key': 't',
-        'precision_key': 'e_global_rel',
-        'plotting': comm_world.rank == 0,
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--mode', type=str, default='compare_strategies')
+    parser.add_argument('--record', type=str, choices=['True', 'False'], default='True')
+    parser.add_argument('--plotting', type=str, choices=['True', 'False'], default='True')
+    parser.add_argument('--runs', type=int, default=5)
+    parser.add_argument(
+        '--problem', type=str, choices=['vdp', 'RBC', 'AC', 'quench', 'Lorenz', 'Schroedinger'], default='vdp'
+    )
+    parser.add_argument('--work_key', type=str, default='t')
+    parser.add_argument('--precision_key', type=str, default='e_global_rel')
+
+    args = parser.parse_args()
+
+    problems = {
+        'Lorenz': run_Lorenz,
+        'vdp': run_vdp,
+        'Schroedinger': run_Schroedinger,
+        'quench': run_quench,
+        'AC': run_AC,
+        'RBC': run_RBC,
     }
 
-    for mode in [
-        'RK_comp',
-        'parallel_efficiency',
-        'compare_strategies',
-    ]:
-        all_problems(**all_params, mode=mode)
-        comm_world.Barrier()
+    params = {
+        **vars(args),
+        'record': args.record == 'True',
+        'plotting': args.plotting == 'True' and comm_world.rank == 0,
+        'problem': problems[args.problem],
+    }
+    single_problem(**params)
 
     if comm_world.rank == 0:
         plt.show()
