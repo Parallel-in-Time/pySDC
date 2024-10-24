@@ -274,7 +274,7 @@ class GenericSpectralLinear(Problem):
                 A, rhs_hat, x0=u0.flatten(), **self.solver_args, callback=self.work_counters[self.solver_type]
             )
         else:
-            raise NotImplementedError(f'Solver {self.solver_type:!} not implemented in {type(self).__name__}!')
+            raise NotImplementedError(f'Solver {self.solver_type=} not implemented in {type(self).__name__}!')
 
         sol_hat = self.spectral.u_init_forward
         sol_hat[...] = (self.Pr @ _sol_hat).reshape(sol_hat.shape)

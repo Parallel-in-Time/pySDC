@@ -229,7 +229,16 @@ class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
         if self.get_convergence(controller, S, **kwargs):
             self.res_last_iter = np.inf
 
-            if self.params.restart_at_maxiter and S.levels[0].status.residual > S.levels[0].params.restol:
+            L = S.levels[0]
+            e_tol_converged = (
+                L.status.increment < L.params.e_tol if (L.params.get('e_tol') and L.status.get('increment')) else False
+            )
+
+            if (
+                self.params.restart_at_maxiter
+                and S.levels[0].status.residual > S.levels[0].params.restol
+                and not e_tol_converged
+            ):
                 self.trigger_restart_upon_nonconvergence(S)
             elif self.get_local_error_estimate(controller, S, **kwargs) > self.params.e_tol:
                 S.status.restart = True
@@ -887,7 +896,7 @@ class AdaptivityPolynomialError(AdaptivityForConvergedCollocationProblems):
             self.log(
                 f'Error target: {self.params.e_tol:.2e}, error estimate: {e_est:.2e}, update_order: {order}',
                 S,
-                level=10,
+                level=11,
             )
             self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
 

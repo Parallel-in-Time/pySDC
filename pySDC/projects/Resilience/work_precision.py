@@ -13,7 +13,6 @@ from pySDC.projects.Resilience.Schroedinger import run_Schroedinger
 from pySDC.projects.Resilience.quench import run_quench
 from pySDC.projects.Resilience.AC import run_AC
 from pySDC.projects.Resilience.RBC import run_RBC
-from pySDC.projects.Resilience.GS import run_GS
 
 from pySDC.helpers.stats_helper import get_sorted, filter_stats
 from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
@@ -23,6 +22,11 @@ LOGGER_LEVEL = 25
 LOG_TO_FILE = False
 
 logging.getLogger('matplotlib.texmanager').setLevel(90)
+
+Tends = {'run_RBC': 16.0, 'run_Lorenz': 10.0}
+t0s = {
+    'run_RBC': 10.0,
+}
 
 
 def std_log(x):
@@ -290,7 +294,7 @@ def record_work_precision(
             else:
                 exponents = [-3, -2, -1, 0, 0.2, 0.8, 1][::-1]
         if problem.__name__ == 'run_RBC':
-            exponents = [1, 0, -1, -2, -3, -4]
+            exponents = [1, 0, 0.5, -1, -2]
     elif param == 'dt':
         power = 2.0
         exponents = [-1, 0, 1, 2, 3][::-1]
@@ -313,7 +317,7 @@ def record_work_precision(
             param_range = [1.25, 2.5, 5.0, 10.0, 20.0][::-1]
     if problem.__name__ == 'run_RBC':
         if param == 'dt':
-            param_range = [2e-1, 1e-1, 8e-2, 6e-2]
+            param_range = [8e-2, 6e-2, 4e-2, 3e-2, 2e-2]
 
     # run multiple times with different parameters
     for i in range(len(param_range)):
@@ -653,6 +657,7 @@ def decorate_panel(ax, problem, work_key, precision_key, num_procs=1, title_only
         'run_Schroedinger': r'Schr\"odinger',
         'run_quench': 'Quench',
         'run_AC': 'Allen-Cahn',
+        'run_RBC': 'Rayleigh Benard',
     }
     ax.set_title(titles.get(problem.__name__, ''))
 
@@ -852,8 +857,8 @@ def get_configs(mode, problem):
                 'sweeper_params': {'num_nodes': 3, 'quad_type': 'RADAU-RIGHT'},
             },
             'strategies': [
-                AdaptivityStrategy(useMPI=True),
                 BaseStrategy(useMPI=True),
+                AdaptivityStrategy(useMPI=True),
             ],
         }
 
@@ -869,14 +874,14 @@ def get_configs(mode, problem):
             AdaptivityPolynomialError,
         )
 
-        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC', 'run_GS']:
+        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC']:
             from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as parallel_sweeper
         else:
             from pySDC.implementations.sweeper_classes.generic_implicit_MPI import (
                 generic_implicit_MPI as parallel_sweeper,
             )
 
-        newton_inexactness = False if problem.__name__ in ['run_vdp', 'run_RBC', 'run_GS'] else True
+        newton_inexactness = False if problem.__name__ in ['run_vdp', 'run_RBC'] else True
 
         desc = {}
         desc['sweeper_params'] = {'num_nodes': 3, 'QI': 'IE', 'QE': "EE"}
@@ -895,7 +900,7 @@ def get_configs(mode, problem):
         RK_strategies = []
         if problem.__name__ in ['run_Lorenz']:
             RK_strategies.append(ERKStrategy(useMPI=True))
-        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC', 'run_GS']:
+        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC']:
             RK_strategies.append(ARKStrategy(useMPI=True))
         else:
             RK_strategies.append(ESDIRKStrategy(useMPI=True))
@@ -1427,7 +1432,9 @@ def save_fig(
     print(f'Stored figure \"{path}\"')
 
 
-def all_problems(mode='compare_strategies', plotting=True, base_path='data', **kwargs):  # pragma: no cover
+def all_problems(
+    mode='compare_strategies', plotting=True, base_path='data', target='adaptivity', **kwargs
+):  # pragma: no cover
     """
     Make a plot comparing various strategies for all problems.
 
@@ -1452,7 +1459,12 @@ def all_problems(mode='compare_strategies', plotting=True, base_path='data', **k
         **kwargs,
     }
 
-    problems = [run_vdp, run_quench, run_Schroedinger, run_AC]
+    if target == 'adaptivity':
+        problems = [run_vdp, run_quench, run_Schroedinger, run_AC]
+    elif target == 'thesis':
+        problems = [run_vdp, run_Lorenz, run_Schroedinger, run_RBC]
+    else:
+        raise NotImplementedError
 
     logger.log(26, f"Doing for all problems {mode}")
     for i in range(len(problems)):
@@ -1470,15 +1482,10 @@ def all_problems(mode='compare_strategies', plotting=True, base_path='data', **k
             'parallel_efficiency': 2,
             'RK_comp': 2,
         }
-        y_right_dt_fixed = [1e18, 4e1, 5, 1e8]
-        y_right_dt = [1e-1, 1e4, 1, 2e-2]
-        y_right_dtk = [1e-4, 1e4, 1e-2, 1e-3]
 
         if shared_params['work_key'] == 'param':
-            for ax, yRfixed, yRdt, yRdtk in zip(fig.get_axes(), y_right_dt_fixed, y_right_dt, y_right_dtk):
-                add_order_line(ax, 1, '--', yRdt, marker=None)
-                add_order_line(ax, 5 / 4, ':', yRdtk, marker=None)
-                add_order_line(ax, 5, '-.', yRfixed, marker=None)
+            for ax, prob in zip(fig.get_axes(), problems):
+                add_param_order_lines(ax, prob)
         save_fig(
             fig=fig,
             name=mode,
@@ -1488,6 +1495,38 @@ def all_problems(mode='compare_strategies', plotting=True, base_path='data', **k
             base_path=base_path,
             ncols=ncols.get(mode, None),
         )
+
+
+def add_param_order_lines(ax, problem):
+    if problem.__name__ == 'run_vdp':
+        yRfixed = 1e18
+        yRdt = 1e-1
+        yRdtk = 1e-4
+    elif problem.__name__ == 'run_quench':
+        yRfixed = 4e1
+        yRdt = 1e4
+        yRdtk = 1e4
+    elif problem.__name__ == 'run_Schroedinger':
+        yRfixed = 5
+        yRdt = 1
+        yRdtk = 1e-2
+    elif problem.__name__ == 'run_AC':
+        yRfixed = 1e8
+        yRdt = 2e-2
+        yRdtk = 1e-3
+    elif problem.__name__ == 'run_Lorenz':
+        yRfixed = 1e4
+        yRdt = 2e-2
+        yRdtk = 4e-3
+    elif problem.__name__ == 'run_RBC':
+        yRfixed = 1e-6
+        yRdt = 4e-5
+        yRdtk = 8e-6
+    else:
+        return None
+    add_order_line(ax, 1, '--', yRdt, marker=None)
+    add_order_line(ax, 5 / 4, ':', yRdtk, marker=None)
+    add_order_line(ax, 5, '-.', yRfixed, marker=None)
 
 
 def ODEs(mode='compare_strategies', plotting=True, base_path='data', **kwargs):  # pragma: no cover
@@ -1667,38 +1706,41 @@ def aggregate_parallel_efficiency_plot():  # pragma: no cover
 if __name__ == "__main__":
     comm_world = MPI.COMM_WORLD
 
-    record = comm_world.size > 1
-    for mode in [
-        'compare_strategies',
-        # 'RK_comp',
-        # 'parallel_efficiency',
-    ]:
-        params = {
-            'mode': mode,
-            'runs': 1,
-            'plotting': comm_world.rank == 0,
-        }
-        params_single = {
-            **params,
-            'problem': run_GS,
-        }
-        single_problem(**params_single, work_key='t', precision_key='e_global_rel', record=record)
+    import argparse
 
-    all_params = {
-        'record': True,
-        'runs': 5,
-        'work_key': 't',
-        'precision_key': 'e_global_rel',
-        'plotting': comm_world.rank == 0,
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--mode', type=str, default='compare_strategies')
+    parser.add_argument('--record', type=str, choices=['True', 'False'], default='True')
+    parser.add_argument('--plotting', type=str, choices=['True', 'False'], default='True')
+    parser.add_argument('--runs', type=int, default=5)
+    parser.add_argument(
+        '--problem', type=str, choices=['vdp', 'RBC', 'AC', 'quench', 'Lorenz', 'Schroedinger'], default='vdp'
+    )
+    parser.add_argument('--work_key', type=str, default='t')
+    parser.add_argument('--precision_key', type=str, default='e_global_rel')
+    parser.add_argument('--logger_level', type=int, default='25')
+
+    args = parser.parse_args()
+
+    problems = {
+        'Lorenz': run_Lorenz,
+        'vdp': run_vdp,
+        'Schroedinger': run_Schroedinger,
+        'quench': run_quench,
+        'AC': run_AC,
+        'RBC': run_RBC,
     }
 
-    for mode in [
-        'RK_comp',
-        'parallel_efficiency',
-        'compare_strategies',
-    ]:
-        all_problems(**all_params, mode=mode)
-        comm_world.Barrier()
+    params = {
+        **vars(args),
+        'record': args.record == 'True',
+        'plotting': args.plotting == 'True' and comm_world.rank == 0,
+        'problem': problems[args.problem],
+    }
+
+    LOGGER_LEVEL = params.pop('logger_level')
+
+    single_problem(**params)
 
     if comm_world.rank == 0:
         plt.show()

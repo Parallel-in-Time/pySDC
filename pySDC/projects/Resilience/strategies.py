@@ -127,7 +127,7 @@ class Strategy:
         elif problem.__name__ == "run_quench":
             args['time'] = 41.0
         elif problem.__name__ == "run_Lorenz":
-            args['time'] = 0.3
+            args['time'] = 10
         elif problem.__name__ == "run_AC":
             args['time'] = 1e-2
         elif problem.__name__ == "run_RBC":
@@ -204,7 +204,7 @@ class Strategy:
         elif problem.__name__ == "run_piline":
             return 20.0
         elif problem.__name__ == "run_Lorenz":
-            return 1.5
+            return 20
         elif problem.__name__ == "run_Schroedinger":
             return 1.0
         elif problem.__name__ == "run_quench":
@@ -213,8 +213,6 @@ class Strategy:
             return 0.025
         elif problem.__name__ == "run_RBC":
             return 21
-        elif problem.__name__ == 'run_GS':
-            return 100
         else:
             raise NotImplementedError('I don\'t have a final time for your problem!')
 
@@ -249,7 +247,7 @@ class Strategy:
 
         elif problem.__name__ == "run_Lorenz":
             custom_description['step_params'] = {'maxiter': 5}
-            custom_description['level_params'] = {'dt': 1e-2}
+            custom_description['level_params'] = {'dt': 1e-3}
             custom_description['problem_params'] = {'stop_at_nan': False}
         elif problem.__name__ == "run_Schroedinger":
             custom_description['step_params'] = {'maxiter': 5}
@@ -281,9 +279,6 @@ class Strategy:
         elif problem.__name__ == 'run_RBC':
             custom_description['level_params']['dt'] = 5e-2
             custom_description['step_params'] = {'maxiter': 5}
-        elif problem.__name__ == 'run_GS':
-            custom_description['level_params']['dt'] = 1.0
-            custom_description['step_params'] = {'maxiter': 5}
 
         custom_description['convergence_controllers'] = {
             # StepSizeLimiter: {'dt_min': self.get_Tend(problem=problem, num_procs=num_procs) / self.max_steps}
@@ -298,7 +293,7 @@ class Strategy:
 
         max_runtime = {
             'run_vdp': 1000,
-            'run_Lorenz': 60,
+            'run_Lorenz': 500,
             'run_Schroedinger': 150,
             'run_quench': 150,
             'run_AC': 150,
@@ -389,7 +384,7 @@ class InexactBaseStrategy(Strategy):
             'maxiter': 15,
         }
 
-        if self.newton_inexactness and problem.__name__ not in ['run_Schroedinger', 'run_AC', 'run_RBC', 'run_GS']:
+        if self.newton_inexactness and problem.__name__ not in ['run_Schroedinger', 'run_AC', 'run_RBC']:
             if problem.__name__ == 'run_quench':
                 inexactness_params['ratio'] = 1e-1
                 inexactness_params['min_tol'] = 1e-11
@@ -450,6 +445,8 @@ class BaseStrategy(Strategy):
         desc = self.get_custom_description(problem, *args, **kwargs)
         if problem.__name__ == "run_quench":
             desc['level_params']['dt'] = 5.0
+        elif problem.__name__ == "run_AC":
+            desc['level_params']['dt'] = 8e-5
         return desc
 
     def get_reference_value(self, problem, key, op, num_procs=1):
@@ -467,9 +464,9 @@ class BaseStrategy(Strategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 2136
+                return 12350
             elif key == 'e_global_post_run' and op == max:
-                return 9.256926357892326e-06
+                return 1.3527453646133836e-07
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -538,13 +535,14 @@ class AdaptivityStrategy(Strategy):
         dt_max = np.inf
         dt_slope_max = np.inf
         dt_slope_min = 0
+        beta = 0.9
 
         if problem.__name__ == "run_piline":
             e_tol = 1e-7
         elif problem.__name__ == "run_vdp":
             e_tol = 2e-5
         elif problem.__name__ == "run_Lorenz":
-            e_tol = 2e-5
+            e_tol = 1e-7
         elif problem.__name__ == "run_Schroedinger":
             e_tol = 4e-7
         elif problem.__name__ == "run_quench":
@@ -565,8 +563,7 @@ class AdaptivityStrategy(Strategy):
         elif problem.__name__ == 'run_RBC':
             e_tol = 1e-4
             dt_slope_min = 1
-        elif problem.__name__ == 'run_GS':
-            e_tol = 1e-4
+            beta = 0.5
 
         else:
             raise NotImplementedError(
@@ -578,6 +575,7 @@ class AdaptivityStrategy(Strategy):
             'e_tol': e_tol,
             'dt_slope_max': dt_slope_max,
             'dt_rel_min_slope': dt_slope_min,
+            'beta': beta,
         }
         custom_description['convergence_controllers'][StepSizeLimiter] = {
             'dt_max': dt_max,
@@ -599,9 +597,9 @@ class AdaptivityStrategy(Strategy):
         """
         if problem.__name__ == 'run_Lorenz':
             if key == 'work_newton' and op == sum:
-                return 1369
+                return 2989
             elif key == 'e_global_post_run' and op == max:
-                return 9.364841517367495e-06
+                return 5.636767497207984e-08
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -613,6 +611,8 @@ class AdaptivityStrategy(Strategy):
         if problem.__name__ == "run_quench":
             desc['level_params']['dt'] = 1.1e1
             desc['convergence_controllers'][Adaptivity]['e_tol'] = 1e-6
+        elif problem.__name__ == "run_AC":
+            desc['convergence_controllers'][Adaptivity]['e_tol'] = 1e-5
         return desc
 
 
@@ -724,7 +724,7 @@ to the strategy'
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 4758
+                return 5092
             elif key == 'e_global_post_run' and op == max:
                 return 4.107116318152748e-06
 
@@ -829,9 +829,9 @@ strategy'
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 1872
+                return 9200
             elif key == 'e_global_post_run' and op == max:
-                return 2.2362043480939064e-05
+                return 2.139863344829962e-05
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -854,7 +854,8 @@ class kAdaptivityStrategy(IterateStrategy):
             desc['level_params']['dt'] = 0.4 * desc['problem_params']['eps'] ** 2 / 8.0
         elif problem.__name__ == "run_RBC":
             desc['level_params']['dt'] = 7e-2
-            desc['level_params']['restol'] = 1e-9
+            desc['level_params']['restol'] = 1e-6
+            desc['level_params']['e_tol'] = 1e-7
         return desc
 
     def get_custom_description_for_faults(self, problem, *args, **kwargs):
@@ -862,7 +863,7 @@ class kAdaptivityStrategy(IterateStrategy):
         if problem.__name__ == 'run_quench':
             desc['level_params']['dt'] = 5.0
         elif problem.__name__ == 'run_AC':
-            desc['level_params']['dt'] = 0.6 * desc['problem_params']['eps'] ** 2
+            desc['level_params']['dt'] = 5e-4
         elif problem.__name__ == 'run_RBC':
             desc['level_params']['restol'] = 1e-6
         return desc
@@ -882,9 +883,9 @@ class kAdaptivityStrategy(IterateStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 2392
+                return 12350
             elif key == 'e_global_post_run' and op == max:
-                return 4.808610118089973e-06
+                return 1.3527453646133836e-07
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -982,7 +983,7 @@ class HotRodStrategy(Strategy):
             'level_params': {},
         }
         if problem.__name__ == "run_AC":
-            custom_description['level_params']['dt'] = 0.8 * base_params['problem_params']['eps'] ** 2 / 8.0
+            custom_description['level_params']['dt'] = 8e-5
         return merge_descriptions(base_params, custom_description)
 
     def get_custom_description_for_faults(self, problem, *args, **kwargs):
@@ -1006,9 +1007,9 @@ class HotRodStrategy(Strategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 2329
+                return 12350
             elif key == 'e_global_post_run' and op == max:
-                return 9.256926357892326e-06
+                return 1.3527453646133836e-07
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1122,9 +1123,9 @@ class AdaptivityCollocationTypeStrategy(AdaptivityCollocationStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 983
+                return 1025
             elif key == 'e_global_post_run' and op == max:
-                return 3.944880392126038e-06
+                return 4.266975256683736e-06
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1161,7 +1162,7 @@ class AdaptivityCollocationRefinementStrategy(AdaptivityCollocationStrategy):
             if key == 'work_newton' and op == sum:
                 return 917
             elif key == 'e_global_post_run' and op == max:
-                return 1.0587702028885815e-05
+                return 1.0874929465387595e-05
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1192,9 +1193,9 @@ class AdaptivityCollocationDerefinementStrategy(AdaptivityCollocationStrategy):
         """
         if problem.__name__ == 'run_Lorenz':
             if key == 'work_newton' and op == sum:
-                return 1358
+                return 1338
             elif key == 'e_global_post_run' and op == max:
-                return 0.00010316526647002888
+                return 0.0001013999955041811
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1275,9 +1276,9 @@ class DIRKStrategy(AdaptivityStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 1456
+                return 5467
             elif key == 'e_global_post_run' and op == max:
-                return 0.00013730538358736055
+                return 7.049480537091313e-07
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1470,9 +1471,9 @@ class ESDIRKStrategy(AdaptivityStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 820
+                return 2963
             elif key == 'e_global_post_run' and op == max:
-                return 3.148061889390874e-06
+                return 4.126039954144289e-09
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1563,7 +1564,7 @@ class ERKStrategy(DIRKStrategy):
             if key == 'work_newton' and op == sum:
                 return 0
             elif key == 'e_global_post_run' and op == max:
-                return 3.5085474063834e-05
+                return 1.509206128957885e-07
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1640,9 +1641,9 @@ class DoubleAdaptivityStrategy(AdaptivityStrategy):
         """
         if problem.__name__ == 'run_Lorenz':
             if key == 'work_newton' and op == sum:
-                return 1369
+                return 2989
             elif key == 'e_global_post_run' and op == max:
-                return 9.364841517367495e-06
+                return 5.636763944494305e-08
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1695,9 +1696,9 @@ class AdaptivityAvoidRestartsStrategy(AdaptivityStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 1369
+                return 2989
             elif key == 'e_global_post_run' and op == max:
-                return 9.364841517367495e-06
+                return 5.636763944494305e-08
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1908,6 +1909,7 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         abort_at_growing_residual = True
         level_params = {}
         problem_params = {}
+        beta = 0.9
 
         if problem.__name__ == "run_vdp":
             e_tol = 6e-4
@@ -1919,7 +1921,7 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         elif problem.__name__ == "run_piline":
             e_tol = 1e-7
         elif problem.__name__ == "run_Lorenz":
-            e_tol = 7e-4
+            e_tol = 2e-4
         elif problem.__name__ == "run_Schroedinger":
             e_tol = 3e-5
         elif problem.__name__ == "run_quench":
@@ -1935,12 +1937,12 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
             e_tol = 5e-3
             dt_slope_min = 1.0
             abort_at_growing_residual = False
-            restol_rel = 1e-3
+            restol_rel = 1e-4
             restol_max = 1e-1
-            restol_min = 5e-7
+            restol_min = 5e-8
             self.max_slope = 4
-        elif problem.__name__ == 'run_GS':
-            e_tol = 1e-3
+            beta = 0.5
+            level_params['e_tol'] = 1e-5
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
@@ -1957,6 +1959,7 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
                 'factor_if_not_converged': self.max_slope,
                 'interpolate_between_restarts': self.interpolate_between_restarts,
                 'abort_at_growing_residual': abort_at_growing_residual,
+                'beta': beta,
             },
             StepSizeLimiter: {
                 'dt_max': dt_max,
@@ -2016,9 +2019,9 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 2124
+                return 2123
             elif key == 'e_global_post_run' and op == max:
-                return 8.484321512014503e-08
+                return 7.931560830343187e-08
 
         super().get_reference_value(problem, key, op, num_procs)
 

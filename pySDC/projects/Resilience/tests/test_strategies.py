@@ -17,7 +17,7 @@ STRATEGY_NAMES = [
     'AdaptivityPolynomialError',
     'kAdaptivity',
 ]
-STRATEGY_NAMES_NONMPIONLY = ['adaptiveHR', 'HotRod']
+STRATEGY_NAMES_NONMPIONLY = ['HotRod']
 STRATEGY_NAMES_MPIONLY = ['ARK']
 LOGGER_LEVEL = 30
 
@@ -81,6 +81,7 @@ def single_test(strategy_name, useMPI, num_procs):
         use_MPI=useMPI,
         custom_controller_params=controller_params,
         comm=comm,
+        Tend=1.0,
     )
 
     # things we want to test

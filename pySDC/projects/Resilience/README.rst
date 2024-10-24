@@ -45,11 +45,24 @@ Reproduction of the plots in the adaptive SDC paper
 ---------------------------------------------------
 To reproduce the plots you need to install pySDC with all packages in the mpi4py environment.
 Then, navigate to this directory, `pySDC/projects/Resilience/` and run the following commands:
-
  
 .. code-block:: bash
  
-    mpirun -np 4 python work_precision.py
+    mpirun -np 4 python work_precision.py --mode=compare_strategies --problem=vdp
+    mpirun -np 4 python work_precision.py --mode=compare_strategies --problem=quench
+    mpirun -np 4 python work_precision.py --mode=compare_strategies --problem=Schroedinger
+    mpirun -np 4 python work_precision.py --mode=compare_strategies --problem=AC
+
+    mpirun -np 12 python work_precision.py --mode=parallel_efficiency --problem=vdp
+    mpirun -np 12 python work_precision.py --mode=parallel_efficiency --problem=quench
+    mpirun -np 12 python work_precision.py --mode=parallel_efficiency --problem=Schroedinger
+    mpirun -np 12 python work_precision.py --mode=parallel_efficiency --problem=AC
+
+    mpirun -np 4 python work_precision.py --mode=RK_comp --problem=vdp
+    mpirun -np 4 python work_precision.py --mode=RK_comp --problem=quench
+    mpirun -np 4 python work_precision.py --mode=RK_comp --problem=Schroedinger
+    mpirun -np 4 python work_precision.py --mode=RK_comp --problem=AC
+
     python paper_plots.py --target=adaptivity
 
 Possibly, you need to create some directories in this one to store and load things, if path errors occur.
@@ -60,7 +73,6 @@ To reproduce the plots you need to install pySDC using this project's `environme
 
 .. code-block:: bash
  
-    mpirun -np 4 python work_precision.py
     mpirun -np 4 python fault_stats.py prob run_Lorenz
     mpirun -np 4 python fault_stats.py prob run_Schroedinger
     mpirun -np 4 python fault_stats.py prob run_AC
