@@ -24,7 +24,7 @@ LOG_TO_FILE = False
 
 logging.getLogger('matplotlib.texmanager').setLevel(90)
 
-Tends = {'run_RBC': 16.0, 'run_Lorenz': 10.0}
+Tends = {'run_RBC': 16.0, 'run_Lorenz': 2.0}
 t0s = {
     'run_RBC': 10.0,
 }
@@ -76,14 +76,6 @@ def get_forbidden_combinations(problem, strategy, **kwargs):
             return True
 
     return False
-
-
-Tends = {
-    'run_RBC': 16,
-}
-t0s = {
-    'run_RBC': 0.2,
-}
 
 
 def single_run(
@@ -298,6 +290,10 @@ def record_work_precision(
             exponents = [1, 0, -0.5, -1, -2]
         if problem.__name__ == 'run_GS':
             exponents = [-2, -1, 0, 1, 2, 3][::-1]
+        if problem.__name__ == 'run_Lorenz':
+            exponents = [0, 1, 2, 3][::-1]
+            if type(strategy).__name__ in ["AdaptivityStrategy"]:
+                exponents = [0, 1, 2, 3, 4, 5][::-1]
     elif param == 'dt':
         power = 2.0
         exponents = [-1, 0, 1, 2, 3][::-1]
@@ -324,6 +320,9 @@ def record_work_precision(
     if problem.__name__ == 'run_GS':
         if param == 'dt':
             param_range = [2, 1, 0.5, 0.1]
+    if problem.__name__ == 'run_Lorenz':
+        if param == 'dt':
+            param_range = [5e-2, 2e-2, 1e-2, 5e-3]
 
     # run multiple times with different parameters
     for i in range(len(param_range)):
@@ -1530,9 +1529,9 @@ def add_param_order_lines(ax, problem):
         yRdt = 2e-2
         yRdtk = 1e-3
     elif problem.__name__ == 'run_Lorenz':
-        yRfixed = 1e4
+        yRfixed = 1e1
         yRdt = 2e-2
-        yRdtk = 4e-3
+        yRdtk = 7e-4
     elif problem.__name__ == 'run_RBC':
         yRfixed = 1e-6
         yRdt = 4e-5

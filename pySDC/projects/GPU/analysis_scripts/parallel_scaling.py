@@ -147,7 +147,7 @@ class RayleighBenardSpaceScalingCPU(CPUConfig, ScalingConfig):
     max_steps_space = 13
     max_steps_space_weak = 10
     tasks_time = 4
-    max_nodes=64
+    max_nodes = 64
     # sbatch_options = ['--time=3:30:00']
     max_tasks = 256
 
