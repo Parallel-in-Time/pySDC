@@ -855,6 +855,7 @@ class kAdaptivityStrategy(IterateStrategy):
         elif problem.__name__ == "run_RBC":
             desc['level_params']['dt'] = 7e-2
             desc['level_params']['restol'] = 1e-6
+            desc['level_params']['e_tol'] = 1e-7
         return desc
 
     def get_custom_description_for_faults(self, problem, *args, **kwargs):
@@ -1938,9 +1939,10 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
             abort_at_growing_residual = False
             restol_rel = 1e-4
             restol_max = 1e-1
-            restol_min = 5e-8  # 5e-7
+            restol_min = 5e-8
             self.max_slope = 4
             beta = 0.5
+            level_params['e_tol'] = 1e-5
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\

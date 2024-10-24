@@ -765,6 +765,23 @@ def make_plots_for_thesis():  # pragma: no cover
     global JOURNAL
     JOURNAL = 'TUHH_thesis'
 
+    from pySDC.projects.Resilience.work_precision import (
+        all_problems,
+    )
+
+    all_params = {
+        'record': False,
+        'work_key': 't',
+        'precision_key': 'e_global_rel',
+        'plotting': True,
+        'base_path': 'data/paper',
+        'target': 'thesis',
+    }
+
+    for mode in ['compare_strategies']:
+        all_problems(**all_params, mode=mode)
+    all_problems(**{**all_params, 'work_key': 'param'}, mode='compare_strategies')
+
     plot_RBC_solution()
     # plot_vdp_solution()
 

@@ -73,7 +73,6 @@ To reproduce the plots you need to install pySDC using this project's `environme
 
 .. code-block:: bash
  
-    mpirun -np 4 python work_precision.py
     mpirun -np 4 python fault_stats.py prob run_Lorenz
     mpirun -np 4 python fault_stats.py prob run_Schroedinger
     mpirun -np 4 python fault_stats.py prob run_AC

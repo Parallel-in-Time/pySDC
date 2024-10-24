@@ -23,7 +23,7 @@ LOG_TO_FILE = False
 
 logging.getLogger('matplotlib.texmanager').setLevel(90)
 
-Tends = {'run_RBC': 17.0, 'run_Lorenz': 10.0}
+Tends = {'run_RBC': 16.0, 'run_Lorenz': 10.0}
 t0s = {
     'run_RBC': 10.0,
 }
@@ -286,7 +286,7 @@ def record_work_precision(
             else:
                 exponents = [-3, -2, -1, 0, 0.2, 0.8, 1][::-1]
         if problem.__name__ == 'run_RBC':
-            exponents = [1, 0, -1, -2]
+            exponents = [1, 0, 0.5, -1, -2]
     elif param == 'dt':
         power = 2.0
         exponents = [-1, 0, 1, 2, 3][::-1]
@@ -309,7 +309,7 @@ def record_work_precision(
             param_range = [1.25, 2.5, 5.0, 10.0, 20.0][::-1]
     if problem.__name__ == 'run_RBC':
         if param == 'dt':
-            param_range = [6e-2, 4e-2, 3e-2, 2e-2]
+            param_range = [8e-2, 6e-2, 4e-2, 3e-2, 2e-2]
 
     # run multiple times with different parameters
     for i in range(len(param_range)):
@@ -586,6 +586,7 @@ def decorate_panel(ax, problem, work_key, precision_key, num_procs=1, title_only
         'run_Schroedinger': r'Schr\"odinger',
         'run_quench': 'Quench',
         'run_AC': 'Allen-Cahn',
+        'run_RBC': 'Rayleigh Benard',
     }
     ax.set_title(titles.get(problem.__name__, ''))
 
@@ -1360,7 +1361,9 @@ def save_fig(
     print(f'Stored figure \"{path}\"')
 
 
-def all_problems(mode='compare_strategies', plotting=True, base_path='data', **kwargs):  # pragma: no cover
+def all_problems(
+    mode='compare_strategies', plotting=True, base_path='data', target='adaptivity', **kwargs
+):  # pragma: no cover
     """
     Make a plot comparing various strategies for all problems.
 
@@ -1385,7 +1388,12 @@ def all_problems(mode='compare_strategies', plotting=True, base_path='data', **k
         **kwargs,
     }
 
-    problems = [run_vdp, run_quench, run_Schroedinger, run_AC]
+    if target == 'adaptivity':
+        problems = [run_vdp, run_quench, run_Schroedinger, run_AC]
+    elif target == 'thesis':
+        problems = [run_vdp, run_Lorenz, run_Schroedinger, run_RBC]
+    else:
+        raise NotImplementedError
 
     logger.log(26, f"Doing for all problems {mode}")
     for i in range(len(problems)):
@@ -1403,15 +1411,10 @@ def all_problems(mode='compare_strategies', plotting=True, base_path='data', **k
             'parallel_efficiency': 2,
             'RK_comp': 2,
         }
-        y_right_dt_fixed = [1e18, 4e1, 5, 1e8]
-        y_right_dt = [1e-1, 1e4, 1, 2e-2]
-        y_right_dtk = [1e-4, 1e4, 1e-2, 1e-3]
 
         if shared_params['work_key'] == 'param':
-            for ax, yRfixed, yRdt, yRdtk in zip(fig.get_axes(), y_right_dt_fixed, y_right_dt, y_right_dtk):
-                add_order_line(ax, 1, '--', yRdt, marker=None)
-                add_order_line(ax, 5 / 4, ':', yRdtk, marker=None)
-                add_order_line(ax, 5, '-.', yRfixed, marker=None)
+            for ax, prob in zip(fig.get_axes(), problems):
+                add_param_order_lines(ax, prob)
         save_fig(
             fig=fig,
             name=mode,
@@ -1421,6 +1424,38 @@ def all_problems(mode='compare_strategies', plotting=True, base_path='data', **k
             base_path=base_path,
             ncols=ncols.get(mode, None),
         )
+
+
+def add_param_order_lines(ax, problem):
+    if problem.__name__ == 'run_vdp':
+        yRfixed = 1e18
+        yRdt = 1e-1
+        yRdtk = 1e-4
+    elif problem.__name__ == 'run_quench':
+        yRfixed = 4e1
+        yRdt = 1e4
+        yRdtk = 1e4
+    elif problem.__name__ == 'run_Schroedinger':
+        yRfixed = 5
+        yRdt = 1
+        yRdtk = 1e-2
+    elif problem.__name__ == 'run_AC':
+        yRfixed = 1e8
+        yRdt = 2e-2
+        yRdtk = 1e-3
+    elif problem.__name__ == 'run_Lorenz':
+        yRfixed = 1e4
+        yRdt = 2e-2
+        yRdtk = 4e-3
+    elif problem.__name__ == 'run_RBC':
+        yRfixed = 1e-6
+        yRdt = 4e-5
+        yRdtk = 8e-6
+    else:
+        return None
+    add_order_line(ax, 1, '--', yRdt, marker=None)
+    add_order_line(ax, 5 / 4, ':', yRdtk, marker=None)
+    add_order_line(ax, 5, '-.', yRfixed, marker=None)
 
 
 def ODEs(mode='compare_strategies', plotting=True, base_path='data', **kwargs):  # pragma: no cover

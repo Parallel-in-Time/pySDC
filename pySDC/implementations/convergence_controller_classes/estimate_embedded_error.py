@@ -109,12 +109,13 @@ class EstimateEmbeddedError(ConvergenceController):
 
     def setup_status_variables(self, controller, **kwargs):
         """
-        Add the embedded error variable to the error function.
+        Add the embedded error to the level status
 
         Args:
             controller (pySDC.Controller): The controller
         """
         self.add_status_variable_to_level('error_embedded_estimate')
+        self.add_status_variable_to_level('increment')
 
     def post_iteration_processing(self, controller, S, **kwargs):
         """
@@ -134,6 +135,7 @@ class EstimateEmbeddedError(ConvergenceController):
         if S.status.iter > 0 or self.params.sweeper_type == "RK":
             for L in S.levels:
                 L.status.error_embedded_estimate = max([self.estimate_embedded_error_serial(L), np.finfo(float).eps])
+                L.status.increment = L.status.error_embedded_estimate * 1
                 self.debug(f'L.status.error_embedded_estimate={L.status.error_embedded_estimate:.5e}', S)
 
         return None
