@@ -557,6 +557,47 @@ def plot_RBC_solution():  # pragma: no cover
     savefig(fig, 'RBC_sol', tight_layout=False)
 
 
+def plot_GS_solution():  # pragma: no cover
+    my_setup_mpl()
+
+    fig, axs = plt.subplots(1, 2, figsize=figsize_by_journal(JOURNAL, 1.0, 0.45), sharex=True, sharey=True)
+
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+    plt.rcParams['figure.constrained_layout.use'] = True
+    cax = []
+    divider = make_axes_locatable(axs[0])
+    cax += [divider.append_axes('right', size='5%', pad=0.05)]
+    divider2 = make_axes_locatable(axs[1])
+    cax += [divider2.append_axes('right', size='5%', pad=0.05)]
+
+    from pySDC.projects.Resilience.GS import grayscott_imex_diffusion
+
+    problem_params = {
+        'num_blobs': -48,
+        'L': 2,
+        'nvars': (128,) * 2,
+        'A': 0.062,
+        'B': 0.1229,
+        'Du': 2e-5,
+        'Dv': 1e-5,
+    }
+    P = grayscott_imex_diffusion(**problem_params)
+    Tend = 1000
+    im = axs[0].pcolormesh(*P.X, P.u_exact(0)[0], rasterized=True, cmap='binary')
+    im1 = axs[1].pcolormesh(*P.X, P.u_exact(Tend)[0], rasterized=True, cmap='binary')
+
+    fig.colorbar(im, cax=cax[0])
+    fig.colorbar(im1, cax=cax[1])
+    axs[0].set_title(r'$u(t=0)$')
+    axs[1].set_title(rf'$u(t={{{Tend}}})$')
+    for ax in axs:
+        ax.set_aspect(1)
+        ax.set_xlabel('$x$')
+        ax.set_ylabel('$y$')
+    savefig(fig, 'GrayScott_sol')
+
+
 def plot_Schroedinger_solution():  # pragma: no cover
     from pySDC.implementations.problem_classes.NonlinearSchroedinger_MPIFFT import nonlinearschroedinger_imex
 
@@ -782,6 +823,7 @@ def make_plots_for_thesis():  # pragma: no cover
         all_problems(**all_params, mode=mode)
     all_problems(**{**all_params, 'work_key': 'param'}, mode='compare_strategies')
 
+    plot_GS_solution()
     plot_RBC_solution()
     # plot_vdp_solution()
 

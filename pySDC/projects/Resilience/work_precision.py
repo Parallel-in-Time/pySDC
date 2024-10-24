@@ -13,6 +13,7 @@ from pySDC.projects.Resilience.Schroedinger import run_Schroedinger
 from pySDC.projects.Resilience.quench import run_quench
 from pySDC.projects.Resilience.AC import run_AC
 from pySDC.projects.Resilience.RBC import run_RBC
+from pySDC.projects.Resilience.GS import run_GS
 
 from pySDC.helpers.stats_helper import get_sorted, filter_stats
 from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
@@ -294,7 +295,9 @@ def record_work_precision(
             else:
                 exponents = [-3, -2, -1, 0, 0.2, 0.8, 1][::-1]
         if problem.__name__ == 'run_RBC':
-            exponents = [1, 0, 0.5, -1, -2]
+            exponents = [1, 0, -0.5, -1, -2]
+        if problem.__name__ == 'run_GS':
+            exponents = [-2, -1, 0, 1, 2, 3][::-1]
     elif param == 'dt':
         power = 2.0
         exponents = [-1, 0, 1, 2, 3][::-1]
@@ -318,6 +321,9 @@ def record_work_precision(
     if problem.__name__ == 'run_RBC':
         if param == 'dt':
             param_range = [8e-2, 6e-2, 4e-2, 3e-2, 2e-2]
+    if problem.__name__ == 'run_GS':
+        if param == 'dt':
+            param_range = [2, 1, 0.5, 0.1]
 
     # run multiple times with different parameters
     for i in range(len(param_range)):
@@ -657,7 +663,8 @@ def decorate_panel(ax, problem, work_key, precision_key, num_procs=1, title_only
         'run_Schroedinger': r'Schr\"odinger',
         'run_quench': 'Quench',
         'run_AC': 'Allen-Cahn',
-        'run_RBC': 'Rayleigh Benard',
+        'run_RBC': 'Rayleigh-Benard',
+        'run_GS': 'Gray-Scott',
     }
     ax.set_title(titles.get(problem.__name__, ''))
 
@@ -1462,7 +1469,7 @@ def all_problems(
     if target == 'adaptivity':
         problems = [run_vdp, run_quench, run_Schroedinger, run_AC]
     elif target == 'thesis':
-        problems = [run_vdp, run_Lorenz, run_Schroedinger, run_RBC]
+        problems = [run_vdp, run_Lorenz, run_GS, run_RBC]
     else:
         raise NotImplementedError
 
@@ -1522,6 +1529,10 @@ def add_param_order_lines(ax, problem):
         yRfixed = 1e-6
         yRdt = 4e-5
         yRdtk = 8e-6
+    elif problem.__name__ == 'run_GS':
+        yRfixed = 4e-3
+        yRdt = 5e0
+        yRdtk = 8e-1
     else:
         return None
     add_order_line(ax, 1, '--', yRdt, marker=None)
@@ -1714,7 +1725,7 @@ if __name__ == "__main__":
     parser.add_argument('--plotting', type=str, choices=['True', 'False'], default='True')
     parser.add_argument('--runs', type=int, default=5)
     parser.add_argument(
-        '--problem', type=str, choices=['vdp', 'RBC', 'AC', 'quench', 'Lorenz', 'Schroedinger'], default='vdp'
+        '--problem', type=str, choices=['vdp', 'RBC', 'AC', 'quench', 'Lorenz', 'Schroedinger', 'GS'], default='vdp'
     )
     parser.add_argument('--work_key', type=str, default='t')
     parser.add_argument('--precision_key', type=str, default='e_global_rel')
@@ -1729,6 +1740,7 @@ if __name__ == "__main__":
         'quench': run_quench,
         'AC': run_AC,
         'RBC': run_RBC,
+        'GS': run_GS,
     }
 
     params = {

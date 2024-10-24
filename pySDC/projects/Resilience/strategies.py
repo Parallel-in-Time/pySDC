@@ -213,6 +213,8 @@ class Strategy:
             return 0.025
         elif problem.__name__ == "run_RBC":
             return 21
+        elif problem.__name__ == "run_GS":
+            return 500
         else:
             raise NotImplementedError('I don\'t have a final time for your problem!')
 
@@ -279,6 +281,9 @@ class Strategy:
         elif problem.__name__ == 'run_RBC':
             custom_description['level_params']['dt'] = 5e-2
             custom_description['step_params'] = {'maxiter': 5}
+        elif problem.__name__ == 'run_GS':
+            custom_description['level_params']['dt'] = 1.0
+            custom_description['step_params'] = {'maxiter': 5}
 
         custom_description['convergence_controllers'] = {
             # StepSizeLimiter: {'dt_min': self.get_Tend(problem=problem, num_procs=num_procs) / self.max_steps}
@@ -298,6 +303,7 @@ class Strategy:
             'run_quench': 150,
             'run_AC': 150,
             'run_RBC': 1000,
+            'run_GS': 100,
         }
 
         custom_description['convergence_controllers'][StopAtMaxRuntime] = {
@@ -384,7 +390,7 @@ class InexactBaseStrategy(Strategy):
             'maxiter': 15,
         }
 
-        if self.newton_inexactness and problem.__name__ not in ['run_Schroedinger', 'run_AC', 'run_RBC']:
+        if self.newton_inexactness and problem.__name__ not in ['run_Schroedinger', 'run_AC', 'run_RBC', 'run_GS']:
             if problem.__name__ == 'run_quench':
                 inexactness_params['ratio'] = 1e-1
                 inexactness_params['min_tol'] = 1e-11
@@ -564,6 +570,8 @@ class AdaptivityStrategy(Strategy):
             e_tol = 1e-4
             dt_slope_min = 1
             beta = 0.5
+        elif problem.__name__ == 'run_GS':
+            e_tol = 1e-5
 
         else:
             raise NotImplementedError(
@@ -781,6 +789,8 @@ class IterateStrategy(Strategy):
             restol = 1e-11
         elif problem.__name__ == "run_RBC":
             restol = 1e-4
+        elif problem.__name__ == "run_GS":
+            restol = 1e-4
         else:
             raise NotImplementedError(
                 'I don\'t have a residual tolerance for your problem. Please add one to the \
@@ -856,6 +866,9 @@ class kAdaptivityStrategy(IterateStrategy):
             desc['level_params']['dt'] = 7e-2
             desc['level_params']['restol'] = 1e-6
             desc['level_params']['e_tol'] = 1e-7
+        elif problem.__name__ == "run_GS":
+            desc['level_params']['dt'] = 1.0
+            desc['level_params']['restol'] = 1e-9
         return desc
 
     def get_custom_description_for_faults(self, problem, *args, **kwargs):
@@ -1943,6 +1956,8 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
             self.max_slope = 4
             beta = 0.5
             level_params['e_tol'] = 1e-5
+        elif problem.__name__ == 'run_GS':
+            e_tol = 1e-4
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\

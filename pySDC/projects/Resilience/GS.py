@@ -9,10 +9,53 @@ from pySDC.implementations.convergence_controller_classes.estimate_extrapolation
     EstimateExtrapolationErrorNonMPI,
 )
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+from pySDC.projects.Resilience.reachTendExactly import ReachTendExactly
 
 from pySDC.core.errors import ConvergenceError
 
 import numpy as np
+
+
+def u_exact(self, t, u_init=None, t_init=None, recompute=False, _t0=None):
+    import pickle
+    import os
+
+    path = f'data/stats/GS-u_init-{t:.8f}.pickle'
+    if os.path.exists(path) and not recompute and t_init is None:
+        with open(path, 'rb') as file:
+            data = pickle.load(file)
+    else:
+        from pySDC.helpers.stats_helper import get_sorted
+        from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+
+        convergence_controllers = {
+            Adaptivity: {'e_tol': 1e-8},
+        }
+        desc = {'convergence_controllers': convergence_controllers}
+
+        u0 = self._u_exact(0) if u_init is None else u_init
+        t0 = 0 if t_init is None else t_init
+
+        if t == t0:
+            return u0
+        else:
+            u0 = u0 if _t0 is None else self.u_exact(_t0)
+            _t0 = t0 if _t0 is None else _t0
+
+            stats, _, _ = run_GS(Tend=t, u0=u0, t0=_t0, custom_description=desc)
+
+        u = get_sorted(stats, type='u', recomputed=False)[-1]
+        data = u[1]
+
+        if t0 == 0:
+            with open(path, 'wb') as file:
+                pickle.dump(data, file)
+
+    return data
+
+
+grayscott_imex_diffusion._u_exact = grayscott_imex_diffusion.u_exact
+grayscott_imex_diffusion.u_exact = u_exact
 
 
 def run_GS(
@@ -52,24 +95,27 @@ def run_GS(
     sweeper_params = {}
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
-    sweeper_params['QI'] = 'LU'
+    sweeper_params['QI'] = 'MIN-SR-S'
     sweeper_params['QE'] = 'PIC'
 
     from mpi4py import MPI
 
     problem_params = {
         'comm': MPI.COMM_SELF,
-        'num_blobs': -20,
-        'L': 1,
+        'num_blobs': -48,
+        'L': 2,
         'nvars': (128,) * 2,
         'A': 0.062,
-        'B': 0.062 + 0.0609,
+        'B': 0.1229,
+        'Du': 2e-5,
+        'Dv': 1e-5,
     }
 
     step_params = {}
     step_params['maxiter'] = 5
 
     convergence_controllers = {}
+    convergence_controllers[ReachTendExactly] = {'Tend': Tend}
 
     controller_params = {}
     controller_params['logger_level'] = 15
