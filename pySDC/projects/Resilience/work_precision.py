@@ -1374,21 +1374,29 @@ def get_configs(mode, problem):
     return configurations
 
 
-def get_fig(x=1, y=1, **kwargs):  # pragma: no cover
+def get_fig(x=1, y=1, target='adaptivity', **kwargs):  # pragma: no cover
     """
     Get a figure to plot in.
 
     Args:
         x (int): How many panels in horizontal direction you want
         y (int): How many panels in vertical direction you want
+        target (str): Where the plot is supposed to end up
 
     Returns:
         matplotlib.pyplot.Figure
     """
     width = 1.0
     ratio = 1.0 if y == 2 else 0.5
+    if target == 'adaptivity':
+        journal = 'Springer_Numerical_Algorithms'
+    elif target == 'thesis':
+        journal = 'TUHH_thesis'
+    else:
+        raise NotImplementedError
+
     keyword_arguments = {
-        'figsize': figsize_by_journal('Springer_Numerical_Algorithms', width, ratio),
+        'figsize': figsize_by_journal(journal, width, ratio),
         'layout': 'constrained',
         **kwargs,
     }
@@ -1453,7 +1461,7 @@ def all_problems(
         None
     """
 
-    fig, axs = get_fig(2, 2)
+    fig, axs = get_fig(2, 2, target=target)
 
     shared_params = {
         'work_key': 'k_SDC',
