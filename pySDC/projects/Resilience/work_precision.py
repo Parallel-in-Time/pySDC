@@ -13,6 +13,7 @@ from pySDC.projects.Resilience.Schroedinger import run_Schroedinger
 from pySDC.projects.Resilience.quench import run_quench
 from pySDC.projects.Resilience.AC import run_AC
 from pySDC.projects.Resilience.RBC import run_RBC
+from pySDC.projects.Resilience.GS import run_GS
 
 from pySDC.helpers.stats_helper import get_sorted, filter_stats
 from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
@@ -495,6 +496,69 @@ def plot_work_precision(
         if meta.get('runs', None) == 1:
             ax.text(0.1, 0.2, "No sampling!", transform=ax.transAxes)
 
+    if problem.__name__ == 'run_vdp':
+        if mode == 'parallel_efficiency':
+            # ax.set_xticks([6e-1, 2e0])
+            ax.set_xticks(
+                ticks=[
+                    0.4,
+                    5e-1,
+                    6e-1,
+                    7e-1,
+                    8e-1,
+                    9e-1,
+                    2e0,
+                ],
+                labels=['']
+                + [r'$5\times 10^{-1}$']
+                + [
+                    '',
+                ]
+                * 4
+                + [r'$2\times 10^0$'],
+                minor=True,
+            )
+        elif mode == 'RK_comp':
+            ax.set_xticks(
+                ticks=[
+                    5e-1,
+                    6e-1,
+                    7e-1,
+                    8e-1,
+                    9e-1,
+                    2e0,
+                ],
+                labels=[r'$5\times 10^{-1}$']
+                + [
+                    '',
+                ]
+                * 4
+                + [r'$2\times 10^0$'],
+                minor=True,
+            )
+    elif problem.__name__ == 'run_quench':
+        if mode == 'RK_comp':
+            ax.set_xticks(
+                ticks=[
+                    0.2,
+                    0.3,
+                    0.4,
+                    5e-1,
+                    6e-1,
+                    7e-1,
+                    8e-1,
+                    9e-1,
+                    2e0,
+                ],
+                labels=['']
+                + [r'$3\times 10^{-1}$']
+                + [
+                    '',
+                ]
+                * 7,
+                minor=True,
+            )
+
 
 def plot_parallel_efficiency_diagonalSDC(
     ax, work_key, precision_key, num_procs_sweeper, num_procs=1, **kwargs
@@ -805,14 +869,14 @@ def get_configs(mode, problem):
             AdaptivityPolynomialError,
         )
 
-        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC']:
+        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC', 'run_GS']:
             from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as parallel_sweeper
         else:
             from pySDC.implementations.sweeper_classes.generic_implicit_MPI import (
                 generic_implicit_MPI as parallel_sweeper,
             )
 
-        newton_inexactness = False if problem.__name__ in ['run_vdp', 'run_RBC'] else True
+        newton_inexactness = False if problem.__name__ in ['run_vdp', 'run_RBC', 'run_GS'] else True
 
         desc = {}
         desc['sweeper_params'] = {'num_nodes': 3, 'QI': 'IE', 'QE': "EE"}
@@ -831,7 +895,7 @@ def get_configs(mode, problem):
         RK_strategies = []
         if problem.__name__ in ['run_Lorenz']:
             RK_strategies.append(ERKStrategy(useMPI=True))
-        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC']:
+        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC', 'run_GS']:
             RK_strategies.append(ARKStrategy(useMPI=True))
         else:
             RK_strategies.append(ESDIRKStrategy(useMPI=True))
@@ -1605,7 +1669,7 @@ if __name__ == "__main__":
 
     record = comm_world.size > 1
     for mode in [
-        # 'compare_strategies',
+        'compare_strategies',
         # 'RK_comp',
         # 'parallel_efficiency',
     ]:
@@ -1616,7 +1680,7 @@ if __name__ == "__main__":
         }
         params_single = {
             **params,
-            'problem': run_RBC,
+            'problem': run_GS,
         }
         single_problem(**params_single, work_key='t', precision_key='e_global_rel', record=record)
 
