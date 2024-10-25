@@ -880,14 +880,14 @@ def get_configs(mode, problem):
             AdaptivityPolynomialError,
         )
 
-        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC']:
+        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC', 'run_GS']:
             from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as parallel_sweeper
         else:
             from pySDC.implementations.sweeper_classes.generic_implicit_MPI import (
                 generic_implicit_MPI as parallel_sweeper,
             )
 
-        newton_inexactness = False if problem.__name__ in ['run_vdp', 'run_RBC'] else True
+        newton_inexactness = False if problem.__name__ in ['run_vdp', 'run_RBC', 'run_GS'] else True
 
         desc = {}
         desc['sweeper_params'] = {'num_nodes': 3, 'QI': 'IE', 'QE': "EE"}
@@ -906,7 +906,7 @@ def get_configs(mode, problem):
         RK_strategies = []
         if problem.__name__ in ['run_Lorenz']:
             RK_strategies.append(ERKStrategy(useMPI=True))
-        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC']:
+        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC', 'run_GS']:
             RK_strategies.append(ARKStrategy(useMPI=True))
         else:
             RK_strategies.append(ESDIRKStrategy(useMPI=True))

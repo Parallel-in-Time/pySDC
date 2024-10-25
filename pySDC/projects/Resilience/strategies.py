@@ -1958,6 +1958,9 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
             level_params['e_tol'] = 1e-5
         elif problem.__name__ == 'run_GS':
             e_tol = 1e-4
+            restol_rel = 4e-3
+            restol_max = 1e-4
+            restol_min = 1e-9
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
