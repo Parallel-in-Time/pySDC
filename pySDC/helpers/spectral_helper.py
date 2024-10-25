@@ -1471,7 +1471,10 @@ class SpectralHelper:
             if padding is not None:
                 shape = list(v.shape)
                 if self.comm:
-                    shape[0] = self.comm.allreduce(v.shape[0])
+                    send_buf = np.array(v.shape[0])
+                    recv_buf = np.array(v.shape[0])
+                    self.comm.Allreduce(send_buf, recv_buf)
+                    shape[0] = int(recv_buf)
                 fft = self.get_fft(axes, 'forward', shape=shape)
             else:
                 fft = self.get_fft(axes, 'forward', **kwargs)
@@ -1643,7 +1646,10 @@ class SpectralHelper:
                 if padding[axis] != 1:
                     shape = list(v.shape)
                     if self.comm:
-                        shape[0] = self.comm.allreduce(v.shape[0])
+                        send_buf = np.array(v.shape[0])
+                        recv_buf = np.array(v.shape[0])
+                        self.comm.Allreduce(send_buf, recv_buf)
+                        shape[0] = int(recv_buf)
                     ifft = self.get_fft(axes, 'backward', shape=shape)
                 else:
                     ifft = self.get_fft(axes, 'backward', padding=padding, **kwargs)
