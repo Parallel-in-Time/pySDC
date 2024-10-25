@@ -27,7 +27,7 @@ class NCCLComm(object):
         Args:
             Name (str): Name of the requested attribute
         """
-        if name not in ['size', 'rank', 'Get_rank', 'Get_size', 'Split']:
+        if name not in ['size', 'rank', 'Get_rank', 'Get_size', 'Split', 'Create_cart', 'Is_inter', 'Get_topology']:
             cp.cuda.get_current_stream().synchronize()
 
         return getattr(self.commMPI, name)
