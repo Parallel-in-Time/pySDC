@@ -114,6 +114,9 @@ class Config(object):
 
         return sweeper
 
+    def prepare_caches(self, prob):
+        pass
+
     def get_path(self, *args, ranks=None, **kwargs):
         ranks = self.ranks if ranks is None else ranks
         return f'{type(self).__name__}{self.args_to_str()}-{ranks[0]}-{ranks[2]}'

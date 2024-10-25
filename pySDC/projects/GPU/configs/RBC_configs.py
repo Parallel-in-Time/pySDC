@@ -130,6 +130,12 @@ class RayleighBenardRegular(Config):
             u0_with_pressure = P.solve_system(u0, 1e-9, u0)
             return u0_with_pressure, 0
 
+    def prepare_caches(self, prob):
+        """
+        Cache the fft objects, which are expensive to create on GPU because graphs have to be initialized.
+        """
+        prob.eval_f(prob.u_init)
+
     def plot(self, P, idx, n_procs_list, quantitiy='T', quantitiy2='vorticity'):
         import numpy as np
 
@@ -290,24 +296,24 @@ class RayleighBenard_Thibaut(RayleighBenardRegular):
 # class RayleighBenardRK(RayleighBenardRegular):
 #     def get_description(self, *args, **kwargs):
 #         from pySDC.implementations.sweeper_classes.Runge_Kutta import ARK222
-# 
+#
 #         desc = super().get_description(*args, **kwargs)
-# 
+#
 #         desc['sweeper_class'] = ARK222
-# 
+#
 #         desc['step_params']['maxiter'] = 1
 #         # desc['level_params']['dt'] = 0.1
-# 
+#
 #         from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
-# 
+#
 #         desc['convergence_controllers'][CFLLimit] = {'dt_max': 0.1, 'dt_min': 1e-6, 'cfl': 0.2}
 #         return desc
-# 
+#
 #     def get_controller_params(self, *args, **kwargs):
 #         from pySDC.implementations.problem_classes.RayleighBenard import (
 #             LogAnalysisVariables,
 #         )
-# 
+#
 #         controller_params = super().get_controller_params(*args, **kwargs)
 #         controller_params['hook_class'] = [
 #             me for me in controller_params['hook_class'] if me is not LogAnalysisVariables
@@ -317,19 +323,19 @@ class RayleighBenard_Thibaut(RayleighBenardRegular):
 
 # class RayleighBenardDedalusComp(RayleighBenardRK):
 #     Tend = 150
-# 
+#
 #     def get_description(self, *args, **kwargs):
 #         from pySDC.implementations.sweeper_classes.Runge_Kutta import ARK222
-# 
+#
 #         desc = super().get_description(*args, **kwargs)
-# 
+#
 #         desc['sweeper_class'] = ARK222
-# 
+#
 #         desc['step_params']['maxiter'] = 1
 #         desc['level_params']['dt'] = 5e-3
-# 
+#
 #         from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
-# 
+#
 #         desc['convergence_controllers'].pop(CFLLimit)
 #         return desc
 
@@ -340,13 +346,16 @@ class RayleighBenard_scaling(RayleighBenardRegular):
     def get_description(self, *args, **kwargs):
         from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
         from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
-        from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeRounding, StepSizeSlopeLimiter
+        from pySDC.implementations.convergence_controller_classes.step_size_limiter import (
+            StepSizeRounding,
+            StepSizeSlopeLimiter,
+        )
 
         desc = super().get_description(*args, **kwargs)
 
-        desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3, 'dt_rel_min_slope': 1., 'beta': 0.5}
+        desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3, 'dt_rel_min_slope': 1.0, 'beta': 0.5}
         desc['convergence_controllers'][StepSizeRounding] = {}
-        desc['convergence_controllers'][StepSizeSlopeLimiter] = {'dt_rel_min_slope': 1.}
+        desc['convergence_controllers'][StepSizeSlopeLimiter] = {'dt_rel_min_slope': 1.0}
         desc['convergence_controllers'].pop(CFLLimit)
         desc['level_params']['restol'] = -1
         desc['level_params']['dt'] = 8e-2
