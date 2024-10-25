@@ -4,7 +4,11 @@ import pytest
 @pytest.mark.mpi4py
 @pytest.mark.parametrize('Tend', [1.2345, 1, 4.0 / 3.0])
 @pytest.mark.parametrize('dt', [0.1, 1.0 / 3.0, 0.999999])
-def test_ReachTendExactly(Tend, dt, num_procs=1):
+@pytest.mark.parametrize('num_procs', [1, 2])
+def test_ReachTendExactly(Tend, dt, num_procs):
+    if dt * num_procs > Tend:
+        return None
+
     from pySDC.projects.Resilience.reachTendExactly import ReachTendExactly
     from pySDC.implementations.hooks.log_solution import LogSolution
     from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
@@ -66,4 +70,4 @@ def test_ReachTendExactly(Tend, dt, num_procs=1):
 
 
 if __name__ == '__main__':
-    test_ReachTendExactly(1.2345, 0.1)
+    test_ReachTendExactly(1.2345, 1.0 / 3.0, 2)
