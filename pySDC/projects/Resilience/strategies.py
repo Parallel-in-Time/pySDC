@@ -132,6 +132,8 @@ class Strategy:
             args['time'] = 1e-2
         elif problem.__name__ == "run_RBC":
             args['time'] = 20.19
+        elif problem.__name__ == "run_GS":
+            args['time'] = 100.0
 
         return args
 
@@ -152,7 +154,7 @@ class Strategy:
         rnd_params['iteration'] = base_params['step_params']['maxiter']
         rnd_params['rank'] = num_procs
 
-        if problem.__name__ in ['run_Schroedinger', 'run_quench', 'run_AC', 'run_RBC']:
+        if problem.__name__ in ['run_Schroedinger', 'run_quench', 'run_AC', 'run_RBC', 'run_GS']:
             rnd_params['min_node'] = 1
 
         if problem.__name__ == "run_quench":
@@ -453,6 +455,8 @@ class BaseStrategy(Strategy):
             desc['level_params']['dt'] = 5.0
         elif problem.__name__ == "run_AC":
             desc['level_params']['dt'] = 8e-5
+        elif problem.__name__ == "run_GS":
+            desc['level_params']['dt'] = 4e-1
         return desc
 
     def get_reference_value(self, problem, key, op, num_procs=1):
@@ -621,6 +625,8 @@ class AdaptivityStrategy(Strategy):
             desc['convergence_controllers'][Adaptivity]['e_tol'] = 1e-6
         elif problem.__name__ == "run_AC":
             desc['convergence_controllers'][Adaptivity]['e_tol'] = 1e-5
+        elif problem.__name__ == "run_GS":
+            desc['convergence_controllers'][Adaptivity]['e_tol'] = 2e-6
         return desc
 
 
@@ -975,6 +981,9 @@ class HotRodStrategy(Strategy):
         elif problem.__name__ == 'run_RBC':
             HotRod_tol = 6.34e-6
             maxiter = 6
+        elif problem.__name__ == 'run_GS':
+            HotRod_tol = 3.22e-5
+            maxiter = 6
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for Hot Rod for your problem. Please add one to the\
@@ -1003,6 +1012,10 @@ class HotRodStrategy(Strategy):
         desc = self.get_custom_description(problem, *args, **kwargs)
         if problem.__name__ == "run_quench":
             desc['level_params']['dt'] = 5.0
+        elif problem.__name__ == "run_AC":
+            desc['level_params']['dt'] = 8e-5
+        elif problem.__name__ == "run_GS":
+            desc['level_params']['dt'] = 4e-1
         return desc
 
     def get_reference_value(self, problem, key, op, num_procs=1):

@@ -22,6 +22,7 @@ from pySDC.projects.Resilience.Schroedinger import run_Schroedinger
 from pySDC.projects.Resilience.quench import run_quench
 from pySDC.projects.Resilience.AC import run_AC
 from pySDC.projects.Resilience.RBC import run_RBC
+from pySDC.projects.Resilience.GS import run_GS
 
 from pySDC.projects.Resilience.strategies import BaseStrategy, AdaptivityStrategy, IterateStrategy, HotRodStrategy
 import logging
@@ -637,6 +638,8 @@ class FaultStats:
             prob_name = 'Allen-Cahn'
         elif self.prob.__name__ == 'run_RBC':
             prob_name = 'Rayleigh-Benard'
+        elif self.prob.__name__ == 'run_GS':
+            prob_name = 'Gray-Scott'
         else:
             raise NotImplementedError(f'Name not implemented for problem {self.prob}')
 
@@ -1578,6 +1581,8 @@ def parse_args():
                 kwargs['prob'] = run_AC
             elif sys.argv[i + 1] == 'run_RBC':
                 kwargs['prob'] = run_RBC
+            elif sys.argv[i + 1] == 'run_GS':
+                kwargs['prob'] = run_GS
             else:
                 raise NotImplementedError
         elif 'num_procs' in sys.argv[i]:
@@ -1667,7 +1672,7 @@ def compare_adaptivity_modes():
 
 def main():
     kwargs = {
-        'prob': run_RBC,
+        'prob': run_GS,
         'num_procs': 1,
         'mode': 'default',
         'runs': 2000,
@@ -1695,7 +1700,7 @@ def main():
         stats_path='data/stats-jusuf',
         **kwargs,
     )
-    stats_analyser.run_stats_generation(runs=kwargs['runs'], step=25)
+    stats_analyser.run_stats_generation(runs=kwargs['runs'], step=12)
 
     if MPI.COMM_WORLD.rank > 0:  # make sure only one rank accesses the data
         return None
