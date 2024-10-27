@@ -48,6 +48,8 @@ def run_experiment(args, config, **kwargs):
 
     previous_stats = config.get_previous_stats(prob, restart_idx=args['restart_idx'])
 
+    config.prepare_caches(prob)
+
     uend, stats = controller.run(u0=u0, t0=t0, Tend=config.Tend)
 
     combined_stats = {**previous_stats, **stats}

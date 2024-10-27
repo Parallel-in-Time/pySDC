@@ -156,10 +156,12 @@ class RayleighBenardSpaceScalingGPU(GPUConfig, ScalingConfig):
     base_resolution_weak = 512
     base_resolution = 1024
     config = 'RBC_scaling'
-    max_steps_space = 6
-    max_steps_space_weak = 4
+    max_steps_space = 9
+    max_steps_space_weak = 9
     tasks_time = 4
     max_tasks = 256
+    sbatch_options = ['--time=0:30:00']
+    max_nodes = 64
 
 
 class RayleighBenardDedalusComparison(CPUConfig, ScalingConfig):
@@ -189,7 +191,6 @@ def plot_scalings(strong, problem, kwargs):  # pragma: no cover
     ]
 
     if problem == 'GS':
-
         configs = [
             GrayScottSpaceScalingCPU(space_time_parallel=False),
             GrayScottSpaceScalingCPU(space_time_parallel=True),

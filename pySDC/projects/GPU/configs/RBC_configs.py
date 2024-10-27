@@ -130,6 +130,12 @@ class RayleighBenardRegular(Config):
             u0_with_pressure = P.solve_system(u0, 1e-9, u0)
             return u0_with_pressure, 0
 
+    def prepare_caches(self, prob):
+        """
+        Cache the fft objects, which are expensive to create on GPU because graphs have to be initialized.
+        """
+        prob.eval_f(prob.u_init)
+
     def plot(self, P, idx, n_procs_list, quantitiy='T', quantitiy2='vorticity'):
         import numpy as np
 
