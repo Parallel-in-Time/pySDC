@@ -10,6 +10,7 @@ from pySDC.projects.Resilience.fault_stats import (
     run_quench,
     run_AC,
     run_RBC,
+    run_GS,
     RECOVERY_THRESH_ABS,
 )
 from pySDC.projects.Resilience.strategies import (
@@ -201,8 +202,8 @@ def compare_recovery_rate_problems(target='resilience', **kwargs):  # pragma: no
         problems = [run_Lorenz, run_Schroedinger, run_AC, run_RBC]
         titles = ['Lorenz', r'Schr\"odinger', 'Allen-Cahn', 'Rayleigh-Benard']
     elif target == 'thesis':
-        problems = [run_vdp, run_Lorenz, run_AC, run_RBC]  # TODO: swap in Gray-Scott
-        titles = ['Van der Pol', 'Lorenz', 'Allen-Cahn', 'Rayleigh-Benard']
+        problems = [run_vdp, run_Lorenz, run_GS, run_RBC]  # TODO: swap in Gray-Scott
+        titles = ['Van der Pol', 'Lorenz', 'Gray-Scott', 'Rayleigh-Benard']
     else:
         raise NotImplementedError()
 
