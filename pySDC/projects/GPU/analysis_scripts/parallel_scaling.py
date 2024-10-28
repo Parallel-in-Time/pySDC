@@ -41,7 +41,7 @@ class ScalingConfig(object):
                 (2 * self.ndim) ** i,
             ]
 
-    def run_scaling_test(self, strong=True, submit=True):
+    def run_scaling_test(self, strong=True, **kwargs):
         max_steps = self.max_steps_space if strong else self.max_steps_space_weak
         for i in range(max_steps):
             res, procs = self.get_resolution_and_tasks(strong, i)
@@ -66,7 +66,7 @@ class ScalingConfig(object):
             if self.useGPU:
                 command += ' --useGPU=True'
 
-            write_jobscript(sbatch_options, srun_options, command, self.cluster, submit=submit)
+            write_jobscript(sbatch_options, srun_options, command, self.cluster, name=f'{type(self).__name__}_{res}', **kwargs)
 
     def plot_scaling_test(self, strong, ax, plot_ideal=False, **plotting_params):  # pragma: no cover
         timings = {}
@@ -232,11 +232,13 @@ if __name__ == '__main__':
     parser.add_argument('--XPU', type=str, choices=['CPU', 'GPU'], default='CPU')
     parser.add_argument('--space_time', type=str, choices=['True', 'False'], default='False')
     parser.add_argument('--submit', type=str, choices=['True', 'False'], default='True')
+    parser.add_argument('--nsys_profiling', type=str, choices=['True', 'False'], default='False')
 
     args = parser.parse_args()
 
     strong = args.scaling == 'strong'
     submit = args.submit == 'True'
+    nsys_profiling = args.nsys_profiling == 'True'
 
     if args.problem == 'GS':
         if args.XPU == 'CPU':
@@ -260,7 +262,7 @@ if __name__ == '__main__':
     config = configClass(**kwargs)
 
     if args.mode == 'run':
-        config.run_scaling_test(strong=strong, submit=submit)
+        config.run_scaling_test(strong=strong, submit=submit, nsys_profiling=nsys_profiling)
     elif args.mode == 'plot':
         plot_scalings(strong=strong, problem=args.problem, kwargs=kwargs)
     else:

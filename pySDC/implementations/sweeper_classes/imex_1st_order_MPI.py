@@ -24,6 +24,9 @@ class imex_1st_order_MPI(SweeperMPI, imex_1st_order):
         L = self.level
         P = L.prob
 
+        if self.useGPU:
+            self.xp.cuda.Device().synchronize()
+
         me = P.dtype_u(P.init, val=0.0)
         for m in [self.coll.num_nodes - 1] if last_only else range(self.coll.num_nodes):
             recvBuf = me if m == self.rank else None
@@ -33,6 +36,9 @@ class imex_1st_order_MPI(SweeperMPI, imex_1st_order):
                 root=m,
                 op=MPI.SUM,
             )
+
+        if self.useGPU:
+            self.xp.cuda.Device().synchronize()
 
         return me
 

@@ -234,6 +234,9 @@ class GenericSpectralLinear(Problem):
             A = self.M + dt * self.L
             A = self.Pl @ self.spectral.put_BCs_in_matrix(A) @ self.Pr
 
+        if self.useGPU:
+            self.xp.cuda.Device().synchronize()
+
         # import numpy as np
         # if A.shape[0] < 200:
         #     import matplotlib.pyplot as plt
@@ -275,6 +278,9 @@ class GenericSpectralLinear(Problem):
             )
         else:
             raise NotImplementedError(f'Solver {self.solver_type=} not implemented in {type(self).__name__}!')
+
+        if self.useGPU:
+            self.xp.cuda.Device().synchronize()
 
         sol_hat = self.spectral.u_init_forward
         sol_hat[...] = (self.Pr @ _sol_hat).reshape(sol_hat.shape)
