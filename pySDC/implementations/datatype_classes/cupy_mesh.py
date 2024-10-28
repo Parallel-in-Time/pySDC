@@ -71,11 +71,7 @@ class cupy_mesh(cp.ndarray):
 
         if self.comm is not None:
             if self.comm.Get_size() > 1:
-                global_absval = local_absval * 0
-                if isinstance(self.comm, NCCLComm):
-                    self.comm.Allreduce(sendbuf=local_absval, recvbuf=global_absval, op=MPI.MAX)
-                else:
-                    global_absval = self.comm.allreduce(sendobj=float(local_absval), op=MPI.MAX)
+                global_absval = self.comm.allreduce(sendobj=float(local_absval), op=MPI.MAX)
             else:
                 global_absval = local_absval
         else:

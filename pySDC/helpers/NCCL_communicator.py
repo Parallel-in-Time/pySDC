@@ -71,6 +71,30 @@ class NCCLComm(object):
         else:
             raise NotImplementedError('Don\'t know what NCCL operation to use to replace this MPI operation!')
 
+    def reduce(self, sendobj, op=MPI.SUM, root=0):
+        sync = False
+        if not type(sendobj) in [int, float]:
+            sync = True
+        if hasattr(sendobj, 'data'):
+            if hasattr(sendobj.data, 'ptr'):
+                sync = True
+        if sync:
+            cp.cuda.Device().synchronize()
+
+        return self.commMPI.reduce(sendobj, op=op, root=root)
+
+    def allreduce(self, sendobj, op=MPI.SUM):
+        sync = False
+        if not type(sendobj) in [int, float]:
+            sync = True
+        if hasattr(sendobj, 'data'):
+            if hasattr(sendobj.data, 'ptr'):
+                sync = True
+        if sync:
+            cp.cuda.Device().synchronize()
+
+        return self.commMPI.allreduce(sendobj, op=op)
+
     def Reduce(self, sendbuf, recvbuf, op=MPI.SUM, root=0):
         if not hasattr(sendbuf.data, 'ptr'):
             return self.commMPI.Reduce(sendbuf=sendbuf, recvbuf=recvbuf, op=op, root=root)
