@@ -552,7 +552,7 @@ class AdaptivityStrategy(Strategy):
         elif problem.__name__ == "run_vdp":
             e_tol = 2e-5
         elif problem.__name__ == "run_Lorenz":
-            e_tol = 1e-7
+            e_tol = 1e-6 if num_procs == 4 else 1e-7
         elif problem.__name__ == "run_Schroedinger":
             e_tol = 4e-7
         elif problem.__name__ == "run_quench":
@@ -888,6 +888,8 @@ class kAdaptivityStrategy(IterateStrategy):
             desc['level_params']['dt'] = 5e-4
         elif problem.__name__ == 'run_RBC':
             desc['level_params']['restol'] = 1e-3 if num_procs == 4 else 1e-6
+        elif problem.__name__ == 'run_Lorenz':
+            desc['level_params']['dt'] = 8e-3 if num_procs == 4 else 1e-3
         return desc
 
     def get_reference_value(self, problem, key, op, num_procs=1):
