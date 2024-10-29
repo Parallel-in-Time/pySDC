@@ -729,7 +729,7 @@ def plot_recovery_rate_per_acceptance_threshold(problem):  # pragma no cover
     stats_analyser = get_stats(problem)
     fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.8, 0.4))
 
-    stats_analyser.plot_recovery_thresholds(thresh_range=np.linspace(1.0, 2.0, 1000), recoverable_only=True, ax=ax)
+    stats_analyser.plot_recovery_thresholds(thresh_range=np.linspace(1.0, 2.0, 1000), recoverable_only=False, ax=ax)
     savefig(fig, 'recovery_rate_per_thresh')
 
 

@@ -985,7 +985,7 @@ class FaultStats:
             ax.plot(
                 thresh_range, rec_rates[strategy_idx], **{'color': strategy.color, 'label': strategy.label, **kwargs}
             )
-        ax.legend(frameon=False)
+        ax.legend(frameon=True)
         ax.set_ylabel('recovery rate')
         ax.set_xlabel('threshold as ratio to fault-free error')
 
@@ -1673,10 +1673,10 @@ def compare_adaptivity_modes():
 def main():
     kwargs = {
         'prob': run_Lorenz,
-        'num_procs': 4,
+        'num_procs': 1,
         'mode': 'default',
-        'runs': 2000,
-        'reload': False,
+        'runs': 4000,
+        'reload': True,
         **parse_args(),
     }
 

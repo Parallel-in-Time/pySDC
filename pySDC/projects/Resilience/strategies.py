@@ -449,12 +449,12 @@ class BaseStrategy(Strategy):
             desc['level_params']['dt'] = 1e-2 * desc['problem_params']['eps'] ** 2
         return desc
 
-    def get_custom_description_for_faults(self, problem, *args, **kwargs):
-        desc = self.get_custom_description(problem, *args, **kwargs)
+    def get_custom_description_for_faults(self, problem, num_procs, *args, **kwargs):
+        desc = self.get_custom_description(problem, num_procs, *args, **kwargs)
         if problem.__name__ == "run_quench":
             desc['level_params']['dt'] = 5.0
         elif problem.__name__ == "run_AC":
-            desc['level_params']['dt'] = 8e-5
+            desc['level_params']['dt'] = 4e-5 if num_procs == 4 else 8e-5
         elif problem.__name__ == "run_GS":
             desc['level_params']['dt'] = 4e-1
         return desc
@@ -885,11 +885,12 @@ class kAdaptivityStrategy(IterateStrategy):
         if problem.__name__ == 'run_quench':
             desc['level_params']['dt'] = 5.0
         elif problem.__name__ == 'run_AC':
-            desc['level_params']['dt'] = 5e-4
+            desc['level_params']['dt'] = 4e-4 if num_procs == 4 else 5e-4
+            desc['level_params']['restol'] = 1e-5 if num_procs == 4 else 1e-11
         elif problem.__name__ == 'run_RBC':
             desc['level_params']['restol'] = 1e-3 if num_procs == 4 else 1e-6
         elif problem.__name__ == 'run_Lorenz':
-            desc['level_params']['dt'] = 8e-3 if num_procs == 4 else 1e-3
+            desc['level_params']['dt'] = 8e-3
         return desc
 
     def get_reference_value(self, problem, key, op, num_procs=1):
@@ -1962,7 +1963,7 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
             restol_rel = 1e-1
         elif problem.__name__ == "run_AC":
             e_tol = 1.0e-4
-            restol_rel = 1e-3
+            restol_rel = 1e-3 if num_procs == 4 else 1e-3
             # dt_max = 0.1 * base_params['problem_params']['eps'] ** 2
         elif problem.__name__ == "run_RBC":
             e_tol = 5e-2 if num_procs == 4 else 5e-3
@@ -2008,8 +2009,8 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         custom_description['problem_params'] = problem_params
         return merge_descriptions(base_params, custom_description)
 
-    def get_custom_description_for_faults(self, problem, *args, **kwargs):
-        desc = self.get_custom_description(problem, *args, **kwargs)
+    def get_custom_description_for_faults(self, problem, num_procs, *args, **kwargs):
+        desc = self.get_custom_description(problem, num_procs, *args, **kwargs)
         if problem.__name__ == "run_quench":
             from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
 
@@ -2018,7 +2019,9 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         elif problem.__name__ == "run_AC":
             from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
 
-            desc['convergence_controllers'][AdaptivityPolynomialError]['e_tol'] = 1e-3
+            desc['convergence_controllers'][AdaptivityPolynomialError]['e_tol'] = 6e-3 if num_procs == 4 else 1e-3
+            if num_procs == 4:
+                desc['step_params'] = {'maxiter': 50}
         return desc
 
     def get_random_params(self, problem, num_procs):
