@@ -1672,8 +1672,8 @@ def compare_adaptivity_modes():
 
 def main():
     kwargs = {
-        'prob': run_GS,
-        'num_procs': 1,
+        'prob': run_RBC,
+        'num_procs': 4,
         'mode': 'default',
         'runs': 2000,
         'reload': False,

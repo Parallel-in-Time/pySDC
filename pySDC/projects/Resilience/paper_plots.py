@@ -727,8 +727,10 @@ def work_precision():  # pragma: no cover
 
 def plot_recovery_rate_per_acceptance_threshold(problem):  # pragma no cover
     stats_analyser = get_stats(problem)
+    fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.8, 0.4))
 
-    stats_analyser.plot_recovery_thresholds(thresh_range=np.linspace(0.5, 1.5, 1000), recoverable_only=True)
+    stats_analyser.plot_recovery_thresholds(thresh_range=np.linspace(1.0, 2.0, 1000), recoverable_only=True, ax=ax)
+    savefig(fig, 'recovery_rate_per_thresh')
 
 
 def make_plots_for_TIME_X_website():  # pragma: no cover
@@ -781,13 +783,13 @@ def make_plots_for_adaptivity_paper():  # pragma: no cover
 
 
 def make_plots_for_resilience_paper():  # pragma: no cover
-    plot_Lorenz_solution()
-    plot_fault_Lorenz(0)
-    plot_fault_Lorenz(20)
-    plot_RBC_solution()
-    compare_recovery_rate_problems(target='resilience', num_procs=1, strategy_type='SDC')
+    # plot_Lorenz_solution()
+    # plot_fault_Lorenz(0)
+    # plot_fault_Lorenz(20)
+    # plot_RBC_solution()
+    # compare_recovery_rate_problems(target='resilience', num_procs=1, strategy_type='SDC')
     # plot_recovery_rate(get_stats(run_Lorenz))
-    # plot_recovery_rate_per_acceptance_threshold(run_Lorenz)
+    plot_recovery_rate_per_acceptance_threshold(run_Lorenz)
     plt.show()
 
 
@@ -830,6 +832,7 @@ def make_plots_for_thesis():  # pragma: no cover
 
     # plot_adaptivity_stuff()
     compare_recovery_rate_problems(target='thesis', num_procs=1, strategy_type='SDC')
+    plot_recovery_rate_per_acceptance_threshold(run_Lorenz)
 
 
 if __name__ == "__main__":

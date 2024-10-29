@@ -281,7 +281,7 @@ class Strategy:
             }
             custom_description['level_params'] = {'restol': -1, 'dt': 0.1 * eps**2}
         elif problem.__name__ == 'run_RBC':
-            custom_description['level_params']['dt'] = 5e-2
+            custom_description['level_params']['dt'] = 2.5e-2 if num_procs == 4 else 5e-2
             custom_description['step_params'] = {'maxiter': 5}
         elif problem.__name__ == 'run_GS':
             custom_description['level_params']['dt'] = 1.0
@@ -571,7 +571,10 @@ class AdaptivityStrategy(Strategy):
             e_tol = 1e-7
             # dt_max = 0.1 * base_params['problem_params']['eps'] ** 2
         elif problem.__name__ == 'run_RBC':
-            e_tol = 1e-4
+            if num_procs == 4:
+                e_tol = 2e-2
+            else:
+                e_tol = 1e-4
             dt_slope_min = 1
             beta = 0.5
         elif problem.__name__ == 'run_GS':
@@ -877,14 +880,14 @@ class kAdaptivityStrategy(IterateStrategy):
             desc['level_params']['restol'] = 1e-9
         return desc
 
-    def get_custom_description_for_faults(self, problem, *args, **kwargs):
-        desc = self.get_custom_description(problem, *args, **kwargs)
+    def get_custom_description_for_faults(self, problem, num_procs, *args, **kwargs):
+        desc = self.get_custom_description(problem, num_procs, *args, **kwargs)
         if problem.__name__ == 'run_quench':
             desc['level_params']['dt'] = 5.0
         elif problem.__name__ == 'run_AC':
             desc['level_params']['dt'] = 5e-4
         elif problem.__name__ == 'run_RBC':
-            desc['level_params']['restol'] = 1e-6
+            desc['level_params']['restol'] = 1e-3 if num_procs == 4 else 1e-6
         return desc
 
     def get_reference_value(self, problem, key, op, num_procs=1):
@@ -979,7 +982,7 @@ class HotRodStrategy(Strategy):
             HotRod_tol = 9.564437e-06
             maxiter = 6
         elif problem.__name__ == 'run_RBC':
-            HotRod_tol = 6.34e-6
+            HotRod_tol = 3e-4 if num_procs == 4 else 6.34e-6
             maxiter = 6
         elif problem.__name__ == 'run_GS':
             HotRod_tol = 3.22e-5
@@ -1960,10 +1963,10 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
             restol_rel = 1e-3
             # dt_max = 0.1 * base_params['problem_params']['eps'] ** 2
         elif problem.__name__ == "run_RBC":
-            e_tol = 5e-3
+            e_tol = 5e-2 if num_procs == 4 else 5e-3
             dt_slope_min = 1.0
             abort_at_growing_residual = False
-            restol_rel = 1e-4
+            restol_rel = 1e-2 if num_procs == 4 else 1e-4
             restol_max = 1e-1
             restol_min = 5e-8
             self.max_slope = 4
