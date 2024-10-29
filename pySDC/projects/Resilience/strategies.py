@@ -2022,6 +2022,12 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
             desc['convergence_controllers'][AdaptivityPolynomialError]['e_tol'] = 6e-3 if num_procs == 4 else 1e-3
             if num_procs == 4:
                 desc['step_params'] = {'maxiter': 50}
+        elif problem.__name__ == "run_Lorenz":
+            from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
+
+            desc['convergence_controllers'][AdaptivityPolynomialError]['e_tol'] = 2e-4
+            desc['convergence_controllers'][AdaptivityPolynomialError]['restol_min'] = 1e-11
+            desc['convergence_controllers'][AdaptivityPolynomialError]['restol_rel'] = 1e-11
         return desc
 
     def get_random_params(self, problem, num_procs):
@@ -2040,7 +2046,7 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         if problem.__name__ == "run_quench":
             rnd_params['iteration'] = 1
         elif problem.__name__ == 'run_Lorenz':
-            rnd_params['iteration'] = 4
+            rnd_params['iteration'] = 5
         return rnd_params
 
     def get_reference_value(self, problem, key, op, num_procs=1):

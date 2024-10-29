@@ -234,6 +234,28 @@ def compare_recovery_rate_problems(target='resilience', **kwargs):  # pragma: no
     savefig(fig, f'compare_equations{name}.pdf')
 
 
+def plot_recovery_rate_detailed_Lorenz():  # pragma: no cover
+    stats = get_stats(run_Lorenz, num_procs=1, strategy_type='SDC')
+    stats.get_recovered()
+    mask = None
+
+    for x in ['node', 'iteration', 'bit']:
+        fig, ax = plt.subplots(1, 1, figsize=figsize_by_journal(JOURNAL, 0.8, 0.5))
+
+        stats.plot_things_per_things(
+            'recovered',
+            x,
+            False,
+            op=stats.rec_rate,
+            mask=mask,
+            args={'ylabel': 'recovery rate'},
+            ax=ax,
+        )
+        ax.set_ylim((-0.05, 1.05))
+
+        savefig(fig, f'recovery_rate_Lorenz_{x}')
+
+
 def plot_adaptivity_stuff():  # pragma: no cover
     """
     Plot the solution for a van der Pol problem as well as the local error and cost associated with the base scheme and
@@ -727,9 +749,10 @@ def work_precision():  # pragma: no cover
 
 def plot_recovery_rate_per_acceptance_threshold(problem):  # pragma no cover
     stats_analyser = get_stats(problem)
-    fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.8, 0.4))
+    fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.8, 0.5))
 
     stats_analyser.plot_recovery_thresholds(thresh_range=np.linspace(1.0, 2.0, 1000), recoverable_only=False, ax=ax)
+    ax.set_ylim((-0.05, 1.05))
     savefig(fig, 'recovery_rate_per_thresh')
 
 
@@ -789,6 +812,7 @@ def make_plots_for_resilience_paper():  # pragma: no cover
     # plot_RBC_solution()
     # compare_recovery_rate_problems(target='resilience', num_procs=1, strategy_type='SDC')
     # plot_recovery_rate(get_stats(run_Lorenz))
+    plot_recovery_rate_detailed_Lorenz()
     plot_recovery_rate_per_acceptance_threshold(run_Lorenz)
     plt.show()
 

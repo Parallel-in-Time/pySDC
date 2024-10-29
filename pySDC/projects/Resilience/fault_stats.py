@@ -968,7 +968,7 @@ class FaultStats:
             if recoverable_only:
                 recoverable_mask = self.get_fixable_faults_only(strategy)
             else:
-                recoverable_mask = self.get_mask()
+                recoverable_mask = self.get_mask(strategy=strategy)
 
             for thresh_idx in range(len(thresh_range)):
                 rec_mask = self.get_mask(
@@ -985,7 +985,7 @@ class FaultStats:
             ax.plot(
                 thresh_range, rec_rates[strategy_idx], **{'color': strategy.color, 'label': strategy.label, **kwargs}
             )
-        ax.legend(frameon=True)
+        ax.legend(frameon=False)
         ax.set_ylabel('recovery rate')
         ax.set_xlabel('threshold as ratio to fault-free error')
 
