@@ -190,9 +190,9 @@ class IMEXSDCCore(object):
 
     @classmethod
     def setupNN(cls, nnType, **params):
-        if nnType == "FNOP-C":
+        if nnType == "FNOP-1":
             from fnop.inference.inference import FNOInference as ModelClass
-        elif nnType == "FNOP-T":
+        elif nnType == "FNOP-2":
             from fnop.fno import FourierNeuralOp as ModelClass
         cls.model = ModelClass(**params)
         cls.initSweep = "NN"
