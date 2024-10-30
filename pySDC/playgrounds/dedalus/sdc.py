@@ -266,6 +266,10 @@ class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
         self.firstEval = True
         self.firstStep = True
 
+        # FNO state
+        if self.initSweep == "NN":
+            self.stateFNO = [field.copy() for field in self.solver.state]
+
     @property
     def M(self):
         return len(self.nodes)
@@ -573,7 +577,9 @@ class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
                 # => evaluate current state with NN to be used
                 # for the tendencies at k=0 for the initial guess of next step
                 current = solver.state
-                state = [field.copy() for field in current]
+                state = self.stateFNO
+                for c, f in zip(current, state):
+                    np.copyto(f.data, c.data)
                 uState = self._toNumpy(state)
                 uNext = self.model(uState)
                 np.clip(uNext[2], a_min=0, a_max=1, out=uNext[2]) # temporary : clip buoyancy between 0 and 1
