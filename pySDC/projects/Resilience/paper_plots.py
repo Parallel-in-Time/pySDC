@@ -186,7 +186,7 @@ def plot_recovery_rate_recoverable_only(stats_analyser, fig, ax, **kwargs):  # p
             ax=ax,
             fig=fig,
             strategies=[stats_analyser.strategies[i]],
-            plotting_args={'markevery': 5},
+            plotting_args={'markevery': 10 if stats_analyser.prob.__name__ in ['run_RBC', 'run_Schroedinger'] else 5},
         )
 
 
@@ -220,7 +220,7 @@ def compare_recovery_rate_problems(target='resilience', **kwargs):  # pragma: no
         ax.get_legend().remove()
 
     if kwargs.get('strategy_type', 'SDC') == 'SDC':
-        axs[1, 1].legend(frameon=False, loc="lower right")
+        axs[1, 0].legend(frameon=False, loc="lower right")
     else:
         axs[0, 1].legend(frameon=False, loc="lower right")
     axs[0, 0].set_ylim((-0.05, 1.05))
@@ -250,8 +250,14 @@ def plot_recovery_rate_detailed_Lorenz():  # pragma: no cover
             mask=mask,
             args={'ylabel': 'recovery rate'},
             ax=ax,
+            plotting_args={'markevery': 5 if x == 'bit' else 1},
         )
         ax.set_ylim((-0.05, 1.05))
+
+        if x == 'node':
+            ax.set_xticks([0, 1, 2, 3])
+        elif x == 'iteration':
+            ax.set_xticks([1, 2, 3, 4, 5])
 
         savefig(fig, f'recovery_rate_Lorenz_{x}')
 
@@ -751,7 +757,8 @@ def plot_recovery_rate_per_acceptance_threshold(problem):  # pragma no cover
     stats_analyser = get_stats(problem)
     fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.8, 0.5))
 
-    stats_analyser.plot_recovery_thresholds(thresh_range=np.linspace(1.0, 2.0, 1000), recoverable_only=False, ax=ax)
+    stats_analyser.plot_recovery_thresholds(thresh_range=np.logspace(-1, 4, 500), recoverable_only=False, ax=ax)
+    ax.set_xscale('log')
     ax.set_ylim((-0.05, 1.05))
     savefig(fig, 'recovery_rate_per_thresh')
 
@@ -806,12 +813,18 @@ def make_plots_for_adaptivity_paper():  # pragma: no cover
 
 
 def make_plots_for_resilience_paper():  # pragma: no cover
-    # plot_Lorenz_solution()
-    # plot_fault_Lorenz(0)
-    # plot_fault_Lorenz(20)
-    # plot_RBC_solution()
-    # compare_recovery_rate_problems(target='resilience', num_procs=1, strategy_type='SDC')
-    # plot_recovery_rate(get_stats(run_Lorenz))
+    global JOURNAL
+    JOURNAL = 'Springer_proceedings'
+
+    plot_Lorenz_solution()
+    plot_RBC_solution()
+    plot_AC_solution()
+    plot_Schroedinger_solution()
+
+    plot_fault_Lorenz(0)
+    plot_fault_Lorenz(20)
+    compare_recovery_rate_problems(target='resilience', num_procs=1, strategy_type='SDC')
+    plot_recovery_rate(get_stats(run_Lorenz))
     plot_recovery_rate_detailed_Lorenz()
     plot_recovery_rate_per_acceptance_threshold(run_Lorenz)
     plt.show()

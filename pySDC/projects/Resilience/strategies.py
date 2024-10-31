@@ -505,24 +505,24 @@ class AdaptivityStrategy(Strategy):
     def label(self):
         return r'$\Delta t$-adaptivity'
 
-    def get_fixable_params(self, maxiter, **kwargs):
-        """
-        Here faults occurring in the last iteration cannot be fixed.
+    # def get_fixable_params(self, maxiter, **kwargs):
+    #     """
+    #     Here faults occurring in the last iteration cannot be fixed.
 
-        Args:
-            maxiter (int): Max. iterations until convergence is declared
+    #     Args:
+    #         maxiter (int): Max. iterations until convergence is declared
 
-        Returns:
-            (list): Contains dictionaries of keyword arguments for `FaultStats.get_mask`
-        """
-        self.fixable += [
-            {
-                'key': 'iteration',
-                'op': 'lt',
-                'val': maxiter,
-            }
-        ]
-        return self.fixable
+    #     Returns:
+    #         (list): Contains dictionaries of keyword arguments for `FaultStats.get_mask`
+    #     """
+    #     self.fixable += [
+    #         {
+    #             'key': 'iteration',
+    #             'op': 'lt',
+    #             'val': maxiter,
+    #         }
+    #     ]
+    #     return self.fixable
 
     def get_custom_description(self, problem, num_procs):
         '''

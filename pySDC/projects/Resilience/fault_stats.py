@@ -720,7 +720,7 @@ class FaultStats:
         else:
             try:
                 with_faults = self.load(faults=True, **kwargs)
-                with_faults['recovered'] = with_faults['error'] < self.get_thresh(kwargs['strategy'])
+                with_faults['recovered'] = with_faults['error'] <= self.get_thresh(kwargs['strategy'])
                 self.store(faults=True, dat=with_faults, **kwargs)
             except KeyError as error:
                 print(
@@ -1672,7 +1672,7 @@ def compare_adaptivity_modes():
 
 def main():
     kwargs = {
-        'prob': run_Lorenz,
+        'prob': run_RBC,
         'num_procs': 1,
         'mode': 'default',
         'runs': 4000,
@@ -1695,12 +1695,12 @@ def main():
             AdaptivityPolynomialError(**strategy_args),
         ],
         faults=[False, True],
-        recovery_thresh=1.15,
+        recovery_thresh=1.1,
         recovery_thresh_abs=RECOVERY_THRESH_ABS.get(kwargs.get('prob', None), 0),
         stats_path='data/stats-jusuf',
         **kwargs,
     )
-    stats_analyser.run_stats_generation(runs=kwargs['runs'], step=12)
+    stats_analyser.run_stats_generation(runs=kwargs['runs'], step=8)
 
     if MPI.COMM_WORLD.rank > 0:  # make sure only one rank accesses the data
         return None
