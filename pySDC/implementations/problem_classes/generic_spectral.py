@@ -99,6 +99,9 @@ class GenericSpectralLinear(Problem):
 
         if useGPU:
             self.setup_GPU()
+            if self.solver_args is not None:
+                if 'rtol' in self.solver_args.keys():
+                    self.solver_args['tol'] = self.solver_args.pop('rtol')
 
         for base in bases:
             self.spectral.add_axis(**base)
@@ -252,8 +255,9 @@ class GenericSpectralLinear(Problem):
         if self.solver_type.lower() == 'cached_direct':
             if dt not in self.cached_factorizations.keys():
                 if len(self.cached_factorizations) >= self.max_cached_factorizations:
-                    self.cached_factorizations.pop(list(self.cached_factorizations.keys())[0])
-                    self.logger.debug(f'Evicted matrix factorization for {dt=:.6f} from cache')
+                    to_evict = list(self.cached_factorizations.keys())[0]
+                    self.cached_factorizations.pop(to_evict)
+                    self.logger.debug(f'Evicted matrix factorization for {to_evict=:.6f} from cache')
                 self.cached_factorizations[dt] = self.spectral.linalg.factorized(A)
                 self.logger.debug(f'Cached matrix factorization for {dt=:.6f}')
                 self.work_counters['factorizations']()
@@ -277,9 +281,10 @@ class GenericSpectralLinear(Problem):
 
             if dt not in self.cached_factorizations.keys():
                 if len(self.cached_factorizations) >= self.max_cached_factorizations:
-                    self.cached_factorizations.pop(list(self.cached_factorizations.keys())[0])
-                    self.logger.debug(f'Evicted matrix factorization for {dt=:.6f} from cache')
-                iLU = linalg.spilu(A, drop_tol=dt * 1e-6, fill_factor=100)
+                    to_evict = list(self.cached_factorizations.keys())[0]
+                    self.cached_factorizations.pop(to_evict)
+                    self.logger.debug(f'Evicted matrix factorization for {to_evict=:.6f} from cache')
+                iLU = linalg.spilu(A, drop_tol=dt * 1e-4, fill_factor=np.prod(self.init[0]) * 10)
                 self.cached_factorizations[dt] = linalg.LinearOperator(A.shape, iLU.solve)
                 self.logger.debug(f'Cached matrix factorization for {dt=:.6f}')
                 self.work_counters['factorizations']()

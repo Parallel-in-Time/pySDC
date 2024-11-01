@@ -19,6 +19,8 @@ def get_config(args):
         return RayleighBenard_Thibaut(args)
     elif name == 'RBC_scaling':
         return RayleighBenard_scaling(args)
+    elif name == 'RBC_scaling_GMRES':
+        return RayleighBenard_scaling_GMRES(args)
     elif name == 'RBC_GMRES':
         return RayleighBenard_GMRES(args)
     else:
@@ -129,7 +131,6 @@ class RayleighBenardRegular(Config):
             return super().get_initial_condition(P, *args, restart_idx=restart_idx, **kwargs)
         else:
             u0 = P.u_exact(t=0, seed=P.comm.rank, noise_level=1e-3)
-            return u0, 0
             u0_with_pressure = P.solve_system(u0, 1e-9, u0)
             return u0_with_pressure, 0
 
@@ -188,24 +189,6 @@ class RayleighBenardRegular(Config):
             axs[0].set_aspect(1.0)
             axs[1].set_aspect(1.0)
         return fig
-
-
-class RayleighBenard_GMRES(RayleighBenardRegular):
-    def get_description(self, *args, **kwargs):
-        from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
-        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
-
-        desc = super().get_description(*args, **kwargs)
-
-        desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-4}
-        desc['convergence_controllers'].pop(CFLLimit)
-        desc['level_params']['restol'] = -1
-        desc['sweeper_params']['num_nodes'] = 3
-        desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
-        desc['step_params']['maxiter'] = 5
-
-        desc['problem_params']['solver_type'] = 'gmres+ilu'
-        return desc
 
 
 class RayleighBenard_k_adaptivity(RayleighBenardRegular):
@@ -383,6 +366,7 @@ class RayleighBenard_scaling(RayleighBenardRegular):
         desc['sweeper_params']['num_nodes'] = 4
         desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
         desc['step_params']['maxiter'] = 4
+        # desc['problem_params']['max_cached_factorizations'] = 4
         return desc
 
     def get_controller_params(self, *args, **kwargs):
@@ -391,3 +375,32 @@ class RayleighBenard_scaling(RayleighBenardRegular):
         params = super().get_controller_params(*args, **kwargs)
         params['hook_class'] = [LogWork]
         return params
+
+
+class RayleighBenard_scaling_GMRES(RayleighBenard_scaling):
+    def get_description(self, *args, **kwargs):
+
+        desc = super().get_description(*args, **kwargs)
+
+        desc['problem_params']['solver_type'] = 'gmres+ilu'
+        desc['problem_params']['solver_args'] = {'rtol': 1e-9, 'atol': 1e-12}
+        return desc
+
+
+class RayleighBenard_GMRES(RayleighBenardRegular):
+    def get_description(self, *args, **kwargs):
+        from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
+
+        desc = super().get_description(*args, **kwargs)
+
+        desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-4}
+        desc['convergence_controllers'].pop(CFLLimit)
+        desc['level_params']['restol'] = -1
+        desc['sweeper_params']['num_nodes'] = 3
+        # desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
+        desc['step_params']['maxiter'] = 5
+
+        desc['problem_params']['solver_type'] = 'gmres+ilu'
+        desc['problem_params']['solver_args'] = {'rtol': 1e-8, 'atol': 1e-12}
+        return desc
