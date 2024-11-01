@@ -129,6 +129,7 @@ class RayleighBenardRegular(Config):
             return super().get_initial_condition(P, *args, restart_idx=restart_idx, **kwargs)
         else:
             u0 = P.u_exact(t=0, seed=P.comm.rank, noise_level=1e-3)
+            return u0, 0
             u0_with_pressure = P.solve_system(u0, 1e-9, u0)
             return u0_with_pressure, 0
 

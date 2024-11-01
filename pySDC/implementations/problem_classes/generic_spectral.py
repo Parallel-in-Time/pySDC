@@ -230,7 +230,7 @@ class GenericSpectralLinear(Problem):
         rhs_hat = self.spectral.put_BCs_in_rhs_hat(rhs_hat)
         rhs_hat = self.Pl @ rhs_hat.flatten()
 
-        if dt not in self.cached_factorizations.keys():
+        if dt not in self.cached_factorizations.keys() or not self.solver_type.lower() == 'cached_direct':
             A = self.M + dt * self.L
             A = self.Pl @ self.spectral.put_BCs_in_matrix(A) @ self.Pr
 
@@ -270,13 +270,19 @@ class GenericSpectralLinear(Problem):
                 x0=u0.flatten(),
                 **self.solver_args,
                 callback=self.work_counters[self.solver_type],
-                callback_type='legacy',
+                callback_type='pr_norm',
             )
         elif self.solver_type.lower() == 'gmres+ilu':
             linalg = self.spectral.linalg
 
-            iLU = linalg.spilu(A, drop_tol=1e-10)
-            P = linalg.LinearOperator(A.shape, iLU.solve)
+            if dt not in self.cached_factorizations.keys():
+                if len(self.cached_factorizations) >= self.max_cached_factorizations:
+                    self.cached_factorizations.pop(list(self.cached_factorizations.keys())[0])
+                    self.logger.debug(f'Evicted matrix factorization for {dt=:.6f} from cache')
+                iLU = linalg.spilu(A, drop_tol=dt * 1e-6, fill_factor=100)
+                self.cached_factorizations[dt] = linalg.LinearOperator(A.shape, iLU.solve)
+                self.logger.debug(f'Cached matrix factorization for {dt=:.6f}')
+                self.work_counters['factorizations']()
 
             _sol_hat, _ = linalg.gmres(
                 A,
@@ -284,8 +290,8 @@ class GenericSpectralLinear(Problem):
                 x0=u0.flatten(),
                 **self.solver_args,
                 callback=self.work_counters[self.solver_type],
-                callback_type='legacy',
-                M=P,
+                callback_type='pr_norm',
+                M=self.cached_factorizations[dt],
             )
         elif self.solver_type.lower() == 'cg':
             _sol_hat, _ = sp.linalg.cg(
