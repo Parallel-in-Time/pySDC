@@ -272,6 +272,21 @@ class GenericSpectralLinear(Problem):
                 callback=self.work_counters[self.solver_type],
                 callback_type='legacy',
             )
+        elif self.solver_type.lower() == 'gmres+ilu':
+            linalg = self.spectral.linalg
+
+            iLU = linalg.spilu(A, drop_tol=1e-10)
+            P = linalg.LinearOperator(A.shape, iLU.solve)
+
+            _sol_hat, _ = linalg.gmres(
+                A,
+                rhs_hat,
+                x0=u0.flatten(),
+                **self.solver_args,
+                callback=self.work_counters[self.solver_type],
+                callback_type='legacy',
+                M=P,
+            )
         elif self.solver_type.lower() == 'cg':
             _sol_hat, _ = sp.linalg.cg(
                 A, rhs_hat, x0=u0.flatten(), **self.solver_args, callback=self.work_counters[self.solver_type]

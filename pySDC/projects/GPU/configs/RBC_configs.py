@@ -19,6 +19,8 @@ def get_config(args):
         return RayleighBenard_Thibaut(args)
     elif name == 'RBC_scaling':
         return RayleighBenard_scaling(args)
+    elif name == 'RBC_GMRES':
+        return RayleighBenard_GMRES(args)
     else:
         raise NotImplementedError(f'There is no configuration called {name!r}!')
 
@@ -185,6 +187,24 @@ class RayleighBenardRegular(Config):
             axs[0].set_aspect(1.0)
             axs[1].set_aspect(1.0)
         return fig
+
+
+class RayleighBenard_GMRES(RayleighBenardRegular):
+    def get_description(self, *args, **kwargs):
+        from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
+
+        desc = super().get_description(*args, **kwargs)
+
+        desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-4}
+        desc['convergence_controllers'].pop(CFLLimit)
+        desc['level_params']['restol'] = -1
+        desc['sweeper_params']['num_nodes'] = 3
+        desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
+        desc['step_params']['maxiter'] = 5
+
+        desc['problem_params']['solver_type'] = 'gmres+ilu'
+        return desc
 
 
 class RayleighBenard_k_adaptivity(RayleighBenardRegular):
