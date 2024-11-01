@@ -278,13 +278,26 @@ class GenericSpectralLinear(Problem):
             )
         elif self.solver_type.lower() == 'gmres+ilu':
             linalg = self.spectral.linalg
+            import scipy.sparse.linalg as CPU_linalg
 
             if dt not in self.cached_factorizations.keys():
                 if len(self.cached_factorizations) >= self.max_cached_factorizations:
                     to_evict = list(self.cached_factorizations.keys())[0]
                     self.cached_factorizations.pop(to_evict)
                     self.logger.debug(f'Evicted matrix factorization for {to_evict=:.6f} from cache')
-                iLU = linalg.spilu(A, drop_tol=dt * 1e-4, fill_factor=np.prod(self.init[0]) * 10)
+
+                if self.useGPU:
+                    A_CPU = A.get()
+                else:
+                    A_CPU = A
+
+                iLU_CPU = CPU_linalg.spilu(A_CPU, drop_tol=dt * 1e-4, fill_factor=np.prod(self.init[0]) * 10)
+
+                if self.useGPU:
+                    iLU = linalg.SuperLU(iLU_CPU)
+                else:
+                    iLU = iLU_CPU
+
                 self.cached_factorizations[dt] = linalg.LinearOperator(A.shape, iLU.solve)
                 self.logger.debug(f'Cached matrix factorization for {dt=:.6f}')
                 self.work_counters['factorizations']()
