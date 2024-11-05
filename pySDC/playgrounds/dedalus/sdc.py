@@ -189,12 +189,13 @@ class IMEXSDCCore(object):
         cls.diagonal = diagonal
 
     @classmethod
-    def setupNN(cls, nnType, **params):
+    def setupNN(cls, nnType, nEval=1, **params):
         if nnType == "FNOP-1":
             from fnop.inference.inference import FNOInference as ModelClass
         elif nnType == "FNOP-2":
             from fnop.training.fno_pysdc import FourierNeuralOp as ModelClass
         cls.model = ModelClass(**params)
+        cls.nModelEval = nEval
         cls.initSweep = "NN"
 
     # -------------------------------------------------------------------------
@@ -581,7 +582,7 @@ class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
                 for c, f in zip(current, state):
                     np.copyto(f.data, c.data)
                 uState = self._toNumpy(state)
-                uNext = self.model(uState)
+                uNext = self.model(uState, nEval=self.nModelEval)
                 np.clip(uNext[2], a_min=0, a_max=1, out=uNext[2]) # temporary : clip buoyancy between 0 and 1
                 self._setStateWith(uNext, state)
                 solver.state = state
