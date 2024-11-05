@@ -226,8 +226,10 @@ class GenericSpectralLinear(Problem):
 
         if self.spectral_space:
             rhs_hat = rhs.copy()
+            u0_hat = self.Pr.T @ u0.copy().flatten()
         else:
             rhs_hat = self.spectral.transform(rhs)
+            u0_hat = self.Pr.T @ self.spectral.transform(u0).flatten()
 
         rhs_hat = (self.M @ rhs_hat.flatten()).reshape(rhs_hat.shape)
         rhs_hat = self.spectral.put_BCs_in_rhs_hat(rhs_hat)
@@ -267,37 +269,32 @@ class GenericSpectralLinear(Problem):
 
         elif self.solver_type.lower() == 'direct':
             _sol_hat = sp.linalg.spsolve(A, rhs_hat)
+        elif self.solver_type.lower() == 'lsqr':
+            lsqr = sp.linalg.lsqr(
+                A,
+                rhs_hat,
+                x0=u0_hat,
+                **self.solver_args,
+            )
+            _sol_hat = lsqr[0]
         elif self.solver_type.lower() == 'gmres':
             _sol_hat, _ = sp.linalg.gmres(
                 A,
                 rhs_hat,
-                x0=u0.flatten(),
+                x0=u0_hat,
                 **self.solver_args,
                 callback=self.work_counters[self.solver_type],
                 callback_type='pr_norm',
             )
         elif self.solver_type.lower() == 'gmres+ilu':
             linalg = self.spectral.linalg
-            import scipy.sparse.linalg as CPU_linalg
 
             if dt not in self.cached_factorizations.keys():
                 if len(self.cached_factorizations) >= self.max_cached_factorizations:
                     to_evict = list(self.cached_factorizations.keys())[0]
                     self.cached_factorizations.pop(to_evict)
                     self.logger.debug(f'Evicted matrix factorization for {to_evict=:.6f} from cache')
-
-                if self.useGPU:
-                    A_CPU = A.get()
-                else:
-                    A_CPU = A
-
-                iLU_CPU = CPU_linalg.spilu(A_CPU, drop_tol=dt * 1e-4, fill_factor=np.prod(self.init[0]) * 10)
-
-                if self.useGPU:
-                    iLU = linalg.SuperLU(iLU_CPU)
-                else:
-                    iLU = iLU_CPU
-
+                iLU = linalg.spilu(A, drop_tol=dt * 1e-4, fill_factor=100)
                 self.cached_factorizations[dt] = linalg.LinearOperator(A.shape, iLU.solve)
                 self.logger.debug(f'Cached matrix factorization for {dt=:.6f}')
                 self.work_counters['factorizations']()
@@ -305,7 +302,7 @@ class GenericSpectralLinear(Problem):
             _sol_hat, _ = linalg.gmres(
                 A,
                 rhs_hat,
-                x0=u0.flatten(),
+                x0=u0_hat,
                 **self.solver_args,
                 callback=self.work_counters[self.solver_type],
                 callback_type='pr_norm',
@@ -313,7 +310,7 @@ class GenericSpectralLinear(Problem):
             )
         elif self.solver_type.lower() == 'cg':
             _sol_hat, _ = sp.linalg.cg(
-                A, rhs_hat, x0=u0.flatten(), **self.solver_args, callback=self.work_counters[self.solver_type]
+                A, rhs_hat, x0=u0_hat, **self.solver_args, callback=self.work_counters[self.solver_type]
             )
         else:
             raise NotImplementedError(f'Solver {self.solver_type=} not implemented in {type(self).__name__}!')

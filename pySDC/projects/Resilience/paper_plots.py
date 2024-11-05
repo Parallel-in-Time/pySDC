@@ -487,8 +487,19 @@ def plot_fault_Lorenz(bit=0):  # pragma: no cover
             )
             ax.set_title(f'Fault in bit {faults[idx][1][4]}')
 
-    ax.legend(frameon=True, loc='lower left')
     ax.set_xlabel(r'$t$')
+
+    h, l = ax.get_legend_handles_labels()
+    fig.legend(
+        h,
+        l,
+        loc='outside lower center',
+        ncols=3,
+        frameon=False,
+        fancybox=True,
+        borderaxespad=0.01,
+    )
+
     savefig(fig, f'fault_bit_{bit}')
 
 
@@ -845,6 +856,10 @@ def make_plots_for_notes():  # pragma: no cover
 def make_plots_for_thesis():  # pragma: no cover
     global JOURNAL
     JOURNAL = 'TUHH_thesis'
+
+    from pySDC.projects.Resilience.RBC import plot_factorizations_over_time
+
+    plot_factorizations_over_time(t0=0, Tend=50)
 
     from pySDC.projects.Resilience.work_precision import (
         all_problems,

@@ -946,6 +946,9 @@ def get_configs(mode, problem):
         desc['sweeper_params'] = {'num_nodes': 3, 'QI': 'IE', 'QE': 'EE'}
         desc['step_params'] = {'maxiter': 5}
 
+        if problem.__name__ in ['run_RBC', 'run_GS']:
+            desc['sweeper_params']['QE'] = 'PIC'
+
         ls = {
             1: '-',
             2: '--',
