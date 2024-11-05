@@ -17,27 +17,7 @@ class ButcherTableau(object):
             nodes (numpy.ndarray): Butcher tableau nodes
             matrix (numpy.ndarray): Butcher tableau entries
         """
-        # check if the arguments have the correct form
-        if type(matrix) != np.ndarray:
-            raise ParameterError('Runge-Kutta matrix needs to be supplied as  a numpy array!')
-        elif len(np.unique(matrix.shape)) != 1 or len(matrix.shape) != 2:
-            raise ParameterError('Runge-Kutta matrix needs to be a square 2D numpy array!')
-
-        if type(weights) != np.ndarray:
-            raise ParameterError('Weights need to be supplied as a numpy array!')
-        elif len(weights.shape) != 1:
-            raise ParameterError(f'Incompatible dimension of weights! Need 1, got {len(weights.shape)}')
-        elif len(weights) != matrix.shape[0]:
-            raise ParameterError(f'Incompatible number of weights! Need {matrix.shape[0]}, got {len(weights)}')
-
-        if type(nodes) != np.ndarray:
-            raise ParameterError('Nodes need to be supplied as a numpy array!')
-        elif len(nodes.shape) != 1:
-            raise ParameterError(f'Incompatible dimension of nodes! Need 1, got {len(nodes.shape)}')
-        elif len(nodes) != matrix.shape[0]:
-            raise ParameterError(f'Incompatible number of nodes! Need {matrix.shape[0]}, got {len(nodes)}')
-
-        self.globally_stiffly_accurate = np.allclose(matrix[-1], weights)
+        self.check_method(weights, nodes, matrix)
 
         self.tleft = 0.0
         self.tright = 1.0
@@ -61,31 +41,14 @@ class ButcherTableau(object):
         # check if the RK scheme is implicit
         self.implicit = any(matrix[i, i] != 0 for i in range(self.num_nodes))
 
-
-class ButcherTableauEmbedded(object):
-    def __init__(self, weights, nodes, matrix):
+    def check_method(self, weights, nodes, matrix):
         """
-        Initialization routine to get a quadrature matrix out of a Butcher tableau for embedded RK methods.
-
-        Be aware that the method that generates the final solution should be in the first row of the weights matrix.
-
-        Args:
-            weights (numpy.ndarray): Butcher tableau weights
-            nodes (numpy.ndarray): Butcher tableau nodes
-            matrix (numpy.ndarray): Butcher tableau entries
+        Check that the method is entered in the correct format
         """
-        # check if the arguments have the correct form
         if type(matrix) != np.ndarray:
             raise ParameterError('Runge-Kutta matrix needs to be supplied as  a numpy array!')
         elif len(np.unique(matrix.shape)) != 1 or len(matrix.shape) != 2:
             raise ParameterError('Runge-Kutta matrix needs to be a square 2D numpy array!')
-
-        if type(weights) != np.ndarray:
-            raise ParameterError('Weights need to be supplied as a numpy array!')
-        elif len(weights.shape) != 2:
-            raise ParameterError(f'Incompatible dimension of weights! Need 2, got {len(weights.shape)}')
-        elif len(weights[0]) != matrix.shape[0]:
-            raise ParameterError(f'Incompatible number of weights! Need {matrix.shape[0]}, got {len(weights[0])}')
 
         if type(nodes) != np.ndarray:
             raise ParameterError('Nodes need to be supplied as a numpy array!')
@@ -94,30 +57,40 @@ class ButcherTableauEmbedded(object):
         elif len(nodes) != matrix.shape[0]:
             raise ParameterError(f'Incompatible number of nodes! Need {matrix.shape[0]}, got {len(nodes)}')
 
-        # Set number of nodes, left and right interval boundaries
-        self.num_nodes = matrix.shape[0]
-        self.tleft = 0.0
-        self.tright = 1.0
+        self.check_weights(weights, nodes, matrix)
 
-        self.nodes = np.append(np.append([0], nodes), [1, 1])
-        self.weights = weights
-        self.Qmat = np.zeros([self.num_nodes + 1, self.num_nodes + 1])
-        self.Qmat[1:, 1:] = matrix
+    def check_weights(self, weights, nodes, matrix):
+        """
+        Check that the weights of the method are entered in the correct format
+        """
+        if type(weights) != np.ndarray:
+            raise ParameterError('Weights need to be supplied as a numpy array!')
+        elif len(weights.shape) != 1:
+            raise ParameterError(f'Incompatible dimension of weights! Need 1, got {len(weights.shape)}')
+        elif len(weights) != matrix.shape[0]:
+            raise ParameterError(f'Incompatible number of weights! Need {matrix.shape[0]}, got {len(weights)}')
 
-        self.left_is_node = True
-        self.right_is_node = self.nodes[-1] == self.tright
+    @property
+    def globally_stiffly_accurate(self):
+        return np.allclose(self.Qmat[-1, 1:], self.weights)
 
-        self.globally_stiffly_accurate = np.allclose(matrix[-1], weights[0])
 
-        # compute distances between the nodes
-        if self.num_nodes > 1:
-            self.delta_m = self.nodes[1:] - self.nodes[:-1]
-        else:
-            self.delta_m = np.zeros(1)
-        self.delta_m[0] = self.nodes[0] - self.tleft
+class ButcherTableauEmbedded(ButcherTableau):
 
-        # check if the RK scheme is implicit
-        self.implicit = any(matrix[i, i] != 0 for i in range(self.num_nodes))
+    def check_weights(self, weights, nodes, matrix):
+        """
+        Check that the weights of the method are entered in the correct format
+        """
+        if type(weights) != np.ndarray:
+            raise ParameterError('Weights need to be supplied as a numpy array!')
+        elif len(weights.shape) != 2:
+            raise ParameterError(f'Incompatible dimension of weights! Need 2, got {len(weights.shape)}')
+        elif len(weights[0]) != matrix.shape[0]:
+            raise ParameterError(f'Incompatible number of weights! Need {matrix.shape[0]}, got {len(weights[0])}')
+
+    @property
+    def globally_stiffly_accurate(self):
+        return np.allclose(self.Qmat[-1, 1:], self.weights[0])
 
 
 class RungeKutta(Sweeper):
@@ -294,7 +267,11 @@ class RungeKutta(Sweeper):
         """
         In this Runge-Kutta implementation, the solution to the step is always stored in the last node
         """
-        if self.coll.globally_stiffly_accurate:
+        if self.level.f[1] is None:
+            self.level.uend = self.level.u[0]
+            if type(self.coll) == ButcherTableauEmbedded:
+                self.u_secondary = self.level.u[0].copy()
+        elif self.coll.globally_stiffly_accurate:
             self.level.uend = self.level.u[-1]
             if type(self.coll) == ButcherTableauEmbedded:
                 self.u_secondary = self.level.u[0].copy()
@@ -467,7 +444,11 @@ class RungeKuttaIMEX(RungeKutta):
         """
         In this Runge-Kutta implementation, the solution to the step is always stored in the last node
         """
-        if self.coll.globally_stiffly_accurate and self.coll_explicit.globally_stiffly_accurate:
+        if self.level.f[1] is None:
+            self.level.uend = self.level.u[0]
+            if type(self.coll) == ButcherTableauEmbedded:
+                self.u_secondary = self.level.u[0].copy()
+        elif self.coll.globally_stiffly_accurate and self.coll_explicit.globally_stiffly_accurate:
             self.level.uend = self.level.u[-1]
             if type(self.coll) == ButcherTableauEmbedded:
                 self.u_secondary = self.level.u[0].copy()

@@ -93,11 +93,8 @@ class EstimateEmbeddedError(ConvergenceController):
             dtype_u: The embedded error estimate
         """
         if self.params.sweeper_type == "RK":
-            if L.f[1] is None:
-                return -1
-            else:
-                L.sweep.compute_end_point()
-                return abs(L.uend - L.sweep.u_secondary)
+            L.sweep.compute_end_point()
+            return abs(L.uend - L.sweep.u_secondary)
         elif self.params.sweeper_type == "SDC":
             # order rises by one between sweeps
             return abs(L.uold[-1] - L.u[-1])
