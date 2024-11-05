@@ -93,10 +93,13 @@ class EstimateEmbeddedError(ConvergenceController):
             dtype_u: The embedded error estimate
         """
         if self.params.sweeper_type == "RK":
-            # lower order solution is stored in the second to last entry of L.u
-            return abs(L.u[-2] - L.u[-1])
+            if L.f[1] is None:
+                return -1
+            else:
+                L.sweep.compute_end_point()
+                return abs(L.uend - L.sweep.u_secondary)
         elif self.params.sweeper_type == "SDC":
-            # order rises by one between sweeps, making this so ridiculously easy
+            # order rises by one between sweeps
             return abs(L.uold[-1] - L.u[-1])
         elif self.params.sweeper_type == 'MPI':
             comm = L.sweep.comm
