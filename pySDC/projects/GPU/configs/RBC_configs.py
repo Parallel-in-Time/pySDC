@@ -11,8 +11,8 @@ def get_config(args):
         return RayleighBenard_k_adaptivity(args)
     elif name == 'RBC_dt_k':
         return RayleighBenard_dt_k_adaptivity(args)
-    # elif name == 'RBC_RK':
-    #     return RayleighBenardRK(args)
+    elif name == 'RBC_RK':
+        return RayleighBenardRK(args)
     # elif name == 'RBC_dedalus':
     #     return RayleighBenardDedalusComp(args)
     elif name == 'RBC_Tibo':
@@ -293,32 +293,34 @@ class RayleighBenard_Thibaut(RayleighBenardRegular):
         return controller_params
 
 
-# class RayleighBenardRK(RayleighBenardRegular):
-#     def get_description(self, *args, **kwargs):
-#         from pySDC.implementations.sweeper_classes.Runge_Kutta import ARK222
-#
-#         desc = super().get_description(*args, **kwargs)
-#
-#         desc['sweeper_class'] = ARK222
-#
-#         desc['step_params']['maxiter'] = 1
-#         # desc['level_params']['dt'] = 0.1
-#
-#         from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
-#
-#         desc['convergence_controllers'][CFLLimit] = {'dt_max': 0.1, 'dt_min': 1e-6, 'cfl': 0.2}
-#         return desc
-#
-#     def get_controller_params(self, *args, **kwargs):
-#         from pySDC.implementations.problem_classes.RayleighBenard import (
-#             LogAnalysisVariables,
-#         )
-#
-#         controller_params = super().get_controller_params(*args, **kwargs)
-#         controller_params['hook_class'] = [
-#             me for me in controller_params['hook_class'] if me is not LogAnalysisVariables
-#         ]
-#         return controller_params
+class RayleighBenardRK(RayleighBenardRegular):
+    Tend = 4
+
+    def get_description(self, *args, **kwargs):
+        from pySDC.implementations.sweeper_classes.Runge_Kutta import ARK2
+
+        desc = super().get_description(*args, **kwargs)
+
+        desc['sweeper_class'] = ARK2
+
+        desc['step_params']['maxiter'] = 1
+        # desc['level_params']['dt'] = 0.1
+
+        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
+
+        desc['convergence_controllers'][CFLLimit] = {'dt_max': 0.1, 'dt_min': 1e-6, 'cfl': 0.2}
+        return desc
+
+    def get_controller_params(self, *args, **kwargs):
+        from pySDC.implementations.problem_classes.RayleighBenard import (
+            LogAnalysisVariables,
+        )
+
+        controller_params = super().get_controller_params(*args, **kwargs)
+        controller_params['hook_class'] = [
+            me for me in controller_params['hook_class'] if me is not LogAnalysisVariables
+        ]
+        return controller_params
 
 
 # class RayleighBenardDedalusComp(RayleighBenardRK):
