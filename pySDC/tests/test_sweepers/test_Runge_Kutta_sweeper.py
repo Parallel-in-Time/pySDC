@@ -27,6 +27,7 @@ IMEX_SWEEPERS = [
     'IMEXEuler',
     'ARK32',
     'ARK2',
+    'ARK3',
 ]
 
 
@@ -168,6 +169,7 @@ def test_order(sweeper_name, useGPU=False):
         'ARK548L2SA': 6,
         'IMEXEuler': 2,
         'ARK2': 3,
+        'ARK3': 4,
         'ARK32': 4,
         'ARK324L2SAERK': 4,
         'ARK324L2SAESDIRK': 4,

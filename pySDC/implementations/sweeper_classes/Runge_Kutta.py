@@ -761,8 +761,26 @@ class ARK32(RungeKuttaIMEX):
 
 
 class ARK2(RungeKuttaIMEX):
+    """
+    Second order two stage singly diagonally implicit globally stiffly accurate IMEX RK method with explicit first stage.
+    Can be used to integrate simple DAEs because explicit and implicit part are both stiffly accurate.
+    """
+
     generator_IMP = RK_SCHEMES["ARK222EDIRK"]()
     generator_EXP = RK_SCHEMES["ARK222ERK"]()
+
+    nodes, weights, matrix = generator_IMP.genCoeffs()
+    _, weights_explicit, matrix_explicit = generator_EXP.genCoeffs()
+
+
+class ARK3(RungeKuttaIMEX):
+    """
+    Third order four stage singly diagonally implicit globally stiffly accurate IMEX RK method with explicit first stage.
+    Can be used to integrate simple DAEs because explicit and implicit part are both stiffly accurate.
+    """
+
+    generator_IMP = RK_SCHEMES["ARK443ESDIRK"]()
+    generator_EXP = RK_SCHEMES["ARK443ERK"]()
 
     nodes, weights, matrix = generator_IMP.genCoeffs()
     _, weights_explicit, matrix_explicit = generator_EXP.genCoeffs()
