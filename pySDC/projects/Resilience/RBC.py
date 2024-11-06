@@ -101,6 +101,7 @@ def run_RBC(
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'LU'
     sweeper_params['QE'] = 'PIC'
+    sweeper_params['initial_guess'] = 'copy'
 
     from mpi4py import MPI
 

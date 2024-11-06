@@ -948,6 +948,7 @@ def get_configs(mode, problem):
 
         if problem.__name__ in ['run_RBC', 'run_GS']:
             desc['sweeper_params']['QE'] = 'PIC'
+            desc['sweeper_params']['QI'] = 'LU'
 
         ls = {
             1: '-',
@@ -985,7 +986,7 @@ def get_configs(mode, problem):
                 },
             }
 
-        configurations[num_procs * 200 + 79] = {
+        configurations[200 + 79] = {
             'strategies': [
                 AdaptivityPolynomialError(useMPI=True, newton_inexactness=newton_inexactness, linear_inexactness=True)
             ],
