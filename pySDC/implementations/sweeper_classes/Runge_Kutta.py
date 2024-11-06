@@ -267,26 +267,28 @@ class RungeKutta(Sweeper):
         """
         In this Runge-Kutta implementation, the solution to the step is always stored in the last node
         """
-        if self.level.f[1] is None:
-            self.level.uend = self.level.u[0]
+        lvl = self.level
+
+        if lvl.f[1] is None:
+            lvl.uend = lvl.prob.dtype_u(lvl.u[0])
             if type(self.coll) == ButcherTableauEmbedded:
-                self.u_secondary = self.level.u[0].copy()
+                self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
         elif self.coll.globally_stiffly_accurate:
-            self.level.uend = self.level.u[-1]
+            lvl.uend = lvl.prob.dtype_u(lvl.u[-1])
             if type(self.coll) == ButcherTableauEmbedded:
-                self.u_secondary = self.level.u[0].copy()
-                for w2, k in zip(self.coll.weights[1], self.level.f[1:]):
-                    self.u_secondary += self.level.dt * w2 * k
+                self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
+                for w2, k in zip(self.coll.weights[1], lvl.f[1:]):
+                    self.u_secondary += lvl.dt * w2 * k
         else:
-            self.level.uend = self.level.u[0].copy()
+            lvl.uend = lvl.prob.dtype_u(lvl.u[0])
             if type(self.coll) == ButcherTableau:
-                for w, k in zip(self.coll.weights, self.level.f[1:]):
-                    self.level.uend += self.level.dt * w * k
+                for w, k in zip(self.coll.weights, lvl.f[1:]):
+                    lvl.uend += lvl.dt * w * k
             elif type(self.coll) == ButcherTableauEmbedded:
-                self.u_secondary = self.level.u[0].copy()
-                for w1, w2, k in zip(self.coll.weights[0], self.coll.weights[1], self.level.f[1:]):
-                    self.level.uend += self.level.dt * w1 * k
-                    self.u_secondary += self.level.dt * w2 * k
+                self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
+                for w1, w2, k in zip(self.coll.weights[0], self.coll.weights[1], lvl.f[1:]):
+                    lvl.uend += lvl.dt * w1 * k
+                    self.u_secondary += lvl.dt * w2 * k
 
     @property
     def level(self):
@@ -444,32 +446,34 @@ class RungeKuttaIMEX(RungeKutta):
         """
         In this Runge-Kutta implementation, the solution to the step is always stored in the last node
         """
-        if self.level.f[1] is None:
-            self.level.uend = self.level.u[0]
+        lvl = self.level
+
+        if lvl.f[1] is None:
+            lvl.uend = lvl.prob.dtype_u(lvl.u[0])
             if type(self.coll) == ButcherTableauEmbedded:
-                self.u_secondary = self.level.u[0].copy()
+                self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
         elif self.coll.globally_stiffly_accurate and self.coll_explicit.globally_stiffly_accurate:
-            self.level.uend = self.level.u[-1]
+            lvl.uend = lvl.u[-1]
             if type(self.coll) == ButcherTableauEmbedded:
-                self.u_secondary = self.level.u[0].copy()
-                for w2, w2E, k in zip(self.coll.weights[1], self.coll_explicit.weights[1], self.level.f[1:]):
-                    self.u_secondary += self.level.dt * (w2 * k.impl + w2E * k.expl)
+                self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
+                for w2, w2E, k in zip(self.coll.weights[1], self.coll_explicit.weights[1], lvl.f[1:]):
+                    self.u_secondary += lvl.dt * (w2 * k.impl + w2E * k.expl)
         else:
-            self.level.uend = self.level.u[0].copy()
+            lvl.uend = lvl.prob.dtype_u(lvl.u[0])
             if type(self.coll) == ButcherTableau:
-                for w, wE, k in zip(self.coll.weights, self.coll_explicit.weights, self.level.f[1:]):
-                    self.level.uend += self.level.dt * (w * k.impl + wE * k.expl)
+                for w, wE, k in zip(self.coll.weights, self.coll_explicit.weights, lvl.f[1:]):
+                    lvl.uend += lvl.dt * (w * k.impl + wE * k.expl)
             elif type(self.coll) == ButcherTableauEmbedded:
-                self.u_secondary = self.level.u[0].copy()
+                self.u_secondary = lvl.u[0].copy()
                 for w1, w2, w1E, w2E, k in zip(
                     self.coll.weights[0],
                     self.coll.weights[1],
                     self.coll_explicit.weights[0],
                     self.coll_explicit.weights[1],
-                    self.level.f[1:],
+                    lvl.f[1:],
                 ):
-                    self.level.uend += self.level.dt * (w1 * k.impl + w1E * k.expl)
-                    self.u_secondary += self.level.dt * (w2 * k.impl + w2E * k.expl)
+                    lvl.uend += lvl.dt * (w1 * k.impl + w1E * k.expl)
+                    self.u_secondary += lvl.dt * (w2 * k.impl + w2E * k.expl)
 
 
 class ForwardEuler(RungeKutta):

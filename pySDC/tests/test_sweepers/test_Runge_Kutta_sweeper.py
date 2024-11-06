@@ -120,11 +120,15 @@ def single_run(sweeper_name, dt, lambdas, use_RK_sweeper=True, Tend=None, useGPU
         sweeper = controller.MS[0].levels[0].sweep
         sweeper.QI = rk_sweeper.get_Q_matrix()
         sweeper.coll = rk_sweeper.get_Butcher_tableau()
+        _compute_end_point = type(sweeper).compute_end_point
         type(sweeper).compute_end_point = rk_sweeper.compute_end_point
 
     prob = controller.MS[0].levels[0].prob
     ic = prob.u_exact(0)
     u_end, stats = controller.run(ic, 0.0, 5 * dt if Tend is None else Tend)
+
+    if not use_RK_sweeper:
+        type(sweeper).compute_end_point = _compute_end_point
 
     return stats, ic, controller
 
