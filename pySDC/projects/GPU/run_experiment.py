@@ -46,14 +46,11 @@ def run_experiment(args, config, **kwargs):
 
     u0, t0 = config.get_initial_condition(prob, restart_idx=args['restart_idx'])
 
-    previous_stats = config.get_previous_stats(prob, restart_idx=args['restart_idx'])
-
     config.prepare_caches(prob)
 
     uend, stats = controller.run(u0=u0, t0=t0, Tend=config.Tend)
 
-    combined_stats = {**previous_stats, **stats}
-    combined_stats = filter_stats(combined_stats, comm=config.comm_world)
+    combined_stats = filter_stats(stats, comm=config.comm_world)
 
     if config.comm_world.rank == config.comm_world.size - 1:
         path = f'data/{config.get_path()}-stats-whole-run.pickle'

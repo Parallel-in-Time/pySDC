@@ -150,15 +150,6 @@ class Config(object):
         else:
             return P.u_exact(t=0), 0
 
-    def get_previous_stats(self, P, restart_idx):
-        if restart_idx == 0:
-            return {}
-        else:
-            hook = self.get_LogToFile()
-            path = LogStats.get_stats_path(hook, counter_offset=0)
-            with open(path, 'rb') as file:
-                return pickle.load(file)
-
     def get_LogToFile(self):
         return None
 
@@ -166,8 +157,26 @@ class Config(object):
 class LogStats(ConvergenceController):
 
     @staticmethod
-    def get_stats_path(hook, counter_offset=-1):
-        return f'{hook.path}/{hook.file_name}_{hook.format_index(hook.counter+counter_offset)}-stats.pickle'
+    def get_stats_path(hook, counter_offset=-1, index=None):
+        index = hook.counter + counter_offset if index is None else index
+        return f'{hook.path}/{hook.file_name}_{hook.format_index(index)}-stats.pickle'
+
+    def merge_all_stats(self, controller):
+        hook = self.params.hook
+
+        stats = {}
+        for i in range(hook.counter):
+            with open(self.get_stats_path(hook, index=i), 'rb') as file:
+                _stats = pickle.load(file)
+                stats = {**stats, **_stats}
+
+        stats = {**stats, **controller.return_stats()}
+        return stats
+
+    def reset_stats(self, controller):
+        for hook in controller.hooks:
+            hook.reset_stats()
+        self.logger.debug('Reset stats')
 
     def setup(self, controller, params, *args, **kwargs):
         params['control_order'] = 999
@@ -193,4 +202,13 @@ class LogStats(ConvergenceController):
                 with open(path, 'wb') as file:
                     pickle.dump(stats, file)
                     self.log(f'Stored stats in {path!r}', S)
+                self.reset_stats(controller)
             self.counter = hook.counter
+
+    def post_run_processing(self, controller, *args, **kwargs):
+        stats = self.merge_all_stats(controller)
+
+        def return_stats():
+            return stats
+
+        controller.return_stats = return_stats

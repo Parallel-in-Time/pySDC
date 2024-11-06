@@ -160,6 +160,9 @@ class controller_MPI(Controller):
         for hook in self.hooks:
             hook.post_run(step=self.S, level_number=0)
 
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.post_run_processing(self, self.S, comm=self.comm)
+
         comm_active.Free()
 
         return uend, self.return_stats()
