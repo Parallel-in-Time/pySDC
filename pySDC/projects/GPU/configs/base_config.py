@@ -68,7 +68,7 @@ class Config(object):
         if args['mode'] == 'run':
             self.comms = get_comms(n_procs_list=self.n_procs_list, useGPU=args['useGPU'], comm_world=self.comm_world)
         else:
-            self.comms = [self.comm_world, self.comm_world, self.comm_world]
+            self.comms = [MPI.COMM_SELF, MPI.COMM_SELF, MPI.COMM_SELF]
         self.ranks = [me.rank for me in self.comms]
 
     def get_description(self, *args, MPIsweeper=False, useGPU=False, **kwargs):

@@ -302,6 +302,9 @@ def record_work_precision(
         exponents = [-2, -1, 0, 1, 2, 3]
         if problem.__name__ == 'run_vdp':
             exponents = [-4, -3, -2, -1, 0, 1]
+    elif param == 'cfl':
+        power = 2
+        exponents = [-4, -3, -2, -1, 0, 1]
     else:
         raise NotImplementedError(f"I don't know how to get default value for parameter \"{param}\"")
 
@@ -878,6 +881,7 @@ def get_configs(mode, problem):
             ESDIRKStrategy,
             ARKStrategy,
             AdaptivityPolynomialError,
+            ARK3_CFL_Strategy,
         )
 
         if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC', 'run_GS']:
@@ -892,9 +896,11 @@ def get_configs(mode, problem):
         desc = {}
         desc['sweeper_params'] = {'num_nodes': 3, 'QI': 'IE', 'QE': "EE"}
         desc['step_params'] = {'maxiter': 5}
+        num_procs_dt = 4
 
         desc_poly = {}
         desc_poly['sweeper_class'] = parallel_sweeper
+        num_procs_dt_k = 3
 
         ls = {
             1: '-',
@@ -906,8 +912,19 @@ def get_configs(mode, problem):
         RK_strategies = []
         if problem.__name__ in ['run_Lorenz']:
             RK_strategies.append(ERKStrategy(useMPI=True))
-        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC', 'run_GS']:
+        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_GS']:
             RK_strategies.append(ARKStrategy(useMPI=True))
+        elif problem.__name__ == 'run_RBC':
+            RK_strategies.append(ARK3_CFL_Strategy(useMPI=True))
+            desc['sweeper_params']['num_nodes'] = 2
+            desc['sweeper_params']['QI'] = 'LU'
+            desc['sweeper_params']['QE'] = 'PIC'
+            desc['sweeper_params']['QE'] = 'PIC'
+            desc['step_params']['maxiter'] = 3
+            num_procs_dt = 1
+
+            desc_poly['sweeper_params'] = {'num_nodes': 2}
+            num_procs_dt_k = 2
         else:
             RK_strategies.append(ESDIRKStrategy(useMPI=True))
 
@@ -915,8 +932,8 @@ def get_configs(mode, problem):
             'custom_description': desc_poly,
             'strategies': [AdaptivityPolynomialError(useMPI=True, newton_inexactness=newton_inexactness)],
             'num_procs': 1,
-            'num_procs_sweeper': 3,
-            'plotting_params': {'label': r'$\Delta t$-$k$-adaptivity $N$=1x3'},
+            'num_procs_sweeper': num_procs_dt_k,
+            'plotting_params': {'label': rf'$\Delta t$-$k$-adaptivity $N$=1x{num_procs_dt_k}'},
         }
         configurations[-1] = {
             'strategies': RK_strategies,
@@ -925,8 +942,8 @@ def get_configs(mode, problem):
         configurations[2] = {
             'strategies': [AdaptivityStrategy(useMPI=True)],
             'custom_description': desc,
-            'num_procs': 4,
-            'plotting_params': {'label': r'$\Delta t$-adaptivity $N$=4x1'},
+            'num_procs': num_procs_dt,
+            'plotting_params': {'label': rf'$\Delta t$-adaptivity $N$={num_procs_dt}x1'},
         }
 
     elif mode == 'parallel_efficiency':
@@ -946,7 +963,7 @@ def get_configs(mode, problem):
         desc['sweeper_params'] = {'num_nodes': 3, 'QI': 'IE', 'QE': 'EE'}
         desc['step_params'] = {'maxiter': 5}
 
-        if problem.__name__ in ['run_RBC', 'run_GS']:
+        if problem.__name__ in ['run_RBC']:
             desc['sweeper_params']['QE'] = 'PIC'
             desc['sweeper_params']['QI'] = 'LU'
 

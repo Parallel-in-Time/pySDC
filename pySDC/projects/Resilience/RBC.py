@@ -370,7 +370,6 @@ def plot_factorizations_over_time(t0=0, Tend=50, e_tol=1e-3, recompute=False, ad
     axs[1].set_yscale('log')
     axs[0].legend(frameon=False)
     savefig(fig, f'RBC_step_size_controller_{adaptivity_mode}')
-    plt.show()
 
 
 if __name__ == '__main__':

@@ -294,21 +294,21 @@ class RayleighBenard_Thibaut(RayleighBenardRegular):
 
 
 class RayleighBenardRK(RayleighBenardRegular):
-    Tend = 4
 
     def get_description(self, *args, **kwargs):
-        from pySDC.implementations.sweeper_classes.Runge_Kutta import ARK2
+        from pySDC.implementations.sweeper_classes.Runge_Kutta import ARK3
+        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
+        from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeSlopeLimiter
 
         desc = super().get_description(*args, **kwargs)
 
-        desc['sweeper_class'] = ARK2
+        desc['sweeper_class'] = ARK3
 
         desc['step_params']['maxiter'] = 1
         # desc['level_params']['dt'] = 0.1
 
-        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
-
-        desc['convergence_controllers'][CFLLimit] = {'dt_max': 0.1, 'dt_min': 1e-6, 'cfl': 0.2}
+        desc['convergence_controllers'][CFLLimit] = {'dt_max': 0.1, 'dt_min': 1e-6, 'cfl': 0.5}
+        desc['convergence_controllers'][StepSizeSlopeLimiter] = {'dt_rel_min_slope': 0.1}
         return desc
 
     def get_controller_params(self, *args, **kwargs):

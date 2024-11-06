@@ -1419,6 +1419,63 @@ class ARKStrategy(AdaptivityStrategy):
         super().get_reference_value(problem, key, op, num_procs)
 
 
+class ARK3_CFL_Strategy(BaseStrategy):
+    """
+    This is special for RBC with CFL number for accuracy
+    """
+
+    def __init__(self, **kwargs):
+        '''
+        Initialization routine
+        '''
+        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
+
+        super().__init__(**kwargs)
+        self.color = 'violet'
+        self.marker = '^'
+        self.name = 'ARK3'
+        self.bar_plot_x_label = 'ARK3'
+        self.precision_parameter = 'cfl'
+        self.precision_parameter_loc = ['convergence_controllers', CFLLimit, 'cfl']
+        self.max_steps = 1e5
+
+    @property
+    def label(self):
+        return 'ARK3'
+
+    def get_custom_description(self, problem, num_procs):
+        '''
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            num_procs (int): Number of processes you intend to run with
+
+        Returns:
+            The custom descriptions you can supply to the problem when running it
+        '''
+        from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
+        from pySDC.implementations.sweeper_classes.Runge_Kutta import ARK3
+        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
+        from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeSlopeLimiter
+
+        desc = super().get_custom_description(problem, num_procs)
+
+        rk_params = {
+            'step_params': {'maxiter': 1},
+            'sweeper_class': ARK3,
+            'convergence_controllers': {
+                CFLLimit: {
+                    'cfl': 0.5,
+                    'dt_max': 0.1,
+                },
+                StepSizeSlopeLimiter: {'dt_rel_min_slope': 0.2},
+            },
+        }
+
+        custom_description = merge_descriptions(desc, rk_params)
+
+        return custom_description
+
+
 class ESDIRKStrategy(AdaptivityStrategy):
     '''
     ESDIRK5(3)
@@ -2007,6 +2064,7 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         }
         custom_description['level_params'] = level_params
         custom_description['problem_params'] = problem_params
+
         return merge_descriptions(base_params, custom_description)
 
     def get_custom_description_for_faults(self, problem, num_procs, *args, **kwargs):
