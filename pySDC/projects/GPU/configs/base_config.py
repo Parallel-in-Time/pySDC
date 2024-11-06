@@ -195,8 +195,8 @@ class LogStats(ConvergenceController):
         for _hook in controller.hooks:
             _hook.post_step(S, 0)
 
-        if self.counter < hook.counter:
-            path = self.get_stats_path(hook)
+        while self.counter < hook.counter:
+            path = self.get_stats_path(hook, index=self.counter)
             stats = controller.return_stats()
             if hook.logging_condition(S.levels[0]):
                 with open(path, 'wb') as file:
