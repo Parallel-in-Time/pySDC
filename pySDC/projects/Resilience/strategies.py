@@ -1431,7 +1431,7 @@ class ARK3_CFL_Strategy(BaseStrategy):
         from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
 
         super().__init__(**kwargs)
-        self.color = 'red'
+        self.color = 'maroon'
         self.marker = '<'
         self.name = 'ARK3'
         self.bar_plot_x_label = 'ARK3'

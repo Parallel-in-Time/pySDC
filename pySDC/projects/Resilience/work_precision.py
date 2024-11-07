@@ -1015,6 +1015,79 @@ def get_configs(mode, problem):
             ],
             'num_procs': 1,
         }
+    elif mode == 'parallel_efficiency_thesis':
+        """
+        Compare parallel runs of the step size adaptive SDC
+        """
+        from pySDC.projects.Resilience.strategies import AdaptivityStrategy, AdaptivityPolynomialError
+
+        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_GS', 'run_RBC']:
+            from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as parallel_sweeper
+        else:
+            from pySDC.implementations.sweeper_classes.generic_implicit_MPI import (
+                generic_implicit_MPI as parallel_sweeper,
+            )
+
+        desc = {}
+        desc['sweeper_params'] = {'num_nodes': 3, 'QI': 'IE', 'QE': 'EE'}
+        desc['step_params'] = {'maxiter': 5}
+
+        if problem.__name__ in ['run_RBC']:
+            desc['sweeper_params']['QE'] = 'PIC'
+            desc['sweeper_params']['QI'] = 'LU'
+
+        ls = {
+            1: '-',
+            2: '--',
+            3: '-.',
+            4: '--',
+            5: ':',
+            12: ':',
+        }
+
+        newton_inexactness = False if problem.__name__ in ['run_vdp'] else True
+
+        for num_procs in [4, 1]:
+            plotting_params = (
+                {'ls': ls[num_procs], 'label': fr'$\Delta t$-adaptivity $N$={num_procs}x1'} if num_procs > 1 else {}
+            )
+            configurations[num_procs] = {
+                'strategies': [AdaptivityStrategy(useMPI=True)],
+                'custom_description': desc.copy(),
+                'num_procs': num_procs,
+                'plotting_params': plotting_params.copy(),
+            }
+            configurations[num_procs * 100 + 79] = {
+                'custom_description': {'sweeper_class': parallel_sweeper},
+                'strategies': [
+                    AdaptivityPolynomialError(
+                        useMPI=True, newton_inexactness=newton_inexactness, linear_inexactness=True
+                    )
+                ],
+                'num_procs_sweeper': 3,
+                'num_procs': num_procs,
+                'plotting_params': {
+                    'ls': ls.get(num_procs * 3, '-'),
+                    'label': rf'$\Delta t$-$k$-adaptivity $N$={num_procs}x3',
+                },
+            }
+            configurations[num_procs * 200 + 79] = {
+                'custom_description': {'sweeper_class': parallel_sweeper, 'QI': 'MIN-SR-S', 'QE': 'PIC'},
+                'strategies': [AdaptivityStrategy(useMPI=True)],
+                'num_procs_sweeper': 3,
+                'num_procs': num_procs,
+                'plotting_params': {
+                    'ls': ls.get(num_procs * 3, '-'),
+                    'label': rf'$\Delta t$-adaptivity $N$={num_procs}x3',
+                },
+            }
+
+        configurations[300 + 79] = {
+            'strategies': [
+                AdaptivityPolynomialError(useMPI=True, newton_inexactness=newton_inexactness, linear_inexactness=True)
+            ],
+            'num_procs': 1,
+        }
 
     elif mode == 'interpolate_between_restarts':
         """
