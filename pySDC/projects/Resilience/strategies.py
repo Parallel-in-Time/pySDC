@@ -1431,8 +1431,8 @@ class ARK3_CFL_Strategy(BaseStrategy):
         from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
 
         super().__init__(**kwargs)
-        self.color = 'violet'
-        self.marker = '^'
+        self.color = 'red'
+        self.marker = '<'
         self.name = 'ARK3'
         self.bar_plot_x_label = 'ARK3'
         self.precision_parameter = 'cfl'
@@ -1465,7 +1465,7 @@ class ARK3_CFL_Strategy(BaseStrategy):
             'convergence_controllers': {
                 CFLLimit: {
                     'cfl': 0.5,
-                    'dt_max': 0.1,
+                    'dt_max': 1.0,
                 },
                 StepSizeSlopeLimiter: {'dt_rel_min_slope': 0.2},
             },
@@ -1608,7 +1608,7 @@ class ERKStrategy(DIRKStrategy):
 
     @property
     def label(self):
-        return 'CP5(4)'
+        return 'CK5(4)'
 
     def get_random_params(self, problem, num_procs):
         '''

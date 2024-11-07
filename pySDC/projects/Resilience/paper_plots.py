@@ -874,7 +874,7 @@ def make_plots_for_thesis():  # pragma: no cover
         'target': 'thesis',
     }
 
-    for mode in ['compare_strategies', 'parallel_efficiency']:
+    for mode in ['compare_strategies', 'parallel_efficiency', 'RK_comp']:
         all_problems(**all_params, mode=mode)
     all_problems(**{**all_params, 'work_key': 'param'}, mode='compare_strategies')
 

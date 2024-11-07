@@ -159,7 +159,10 @@ def single_run(
     t_last = perf_counter()
 
     # record all the metrics
-    stats_all = filter_stats(stats, comm=comm_sweep)
+    if comm_sweep.size > 1:
+        stats_all = filter_stats(stats, comm=comm_sweep)
+    else:
+        stats_all = stats
     comm_sweep.Free()
 
     for key, mapping in MAPPINGS.items():
@@ -304,7 +307,7 @@ def record_work_precision(
             exponents = [-4, -3, -2, -1, 0, 1]
     elif param == 'cfl':
         power = 2
-        exponents = [-4, -3, -2, -1, 0, 1]
+        exponents = [-3, -2, -1, 0, 1]
     else:
         raise NotImplementedError(f"I don't know how to get default value for parameter \"{param}\"")
 
@@ -903,11 +906,11 @@ def get_configs(mode, problem):
         num_procs_dt_k = 3
 
         ls = {
-            1: '-',
+            1: '--',
             2: '--',
-            3: '-.',
-            4: ':',
-            5: ':',
+            3: '-',
+            4: '-',
+            5: '-',
         }
         RK_strategies = []
         if problem.__name__ in ['run_Lorenz']:
@@ -933,7 +936,10 @@ def get_configs(mode, problem):
             'strategies': [AdaptivityPolynomialError(useMPI=True, newton_inexactness=newton_inexactness)],
             'num_procs': 1,
             'num_procs_sweeper': num_procs_dt_k,
-            'plotting_params': {'label': rf'$\Delta t$-$k$-adaptivity $N$=1x{num_procs_dt_k}'},
+            'plotting_params': {
+                'label': rf'$\Delta t$-$k$-adaptivity $N$=1x{num_procs_dt_k}',
+                'ls': ls[num_procs_dt_k],
+            },
         }
         configurations[-1] = {
             'strategies': RK_strategies,
@@ -943,7 +949,7 @@ def get_configs(mode, problem):
             'strategies': [AdaptivityStrategy(useMPI=True)],
             'custom_description': desc,
             'num_procs': num_procs_dt,
-            'plotting_params': {'label': rf'$\Delta t$-adaptivity $N$={num_procs_dt}x1'},
+            'plotting_params': {'label': rf'$\Delta t$-adaptivity $N$={num_procs_dt}x1', 'ls': ls[num_procs_dt]},
         }
 
     elif mode == 'parallel_efficiency':

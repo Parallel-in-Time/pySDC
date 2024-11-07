@@ -784,3 +784,12 @@ class ARK3(RungeKuttaIMEX):
 
     nodes, weights, matrix = generator_IMP.genCoeffs()
     _, weights_explicit, matrix_explicit = generator_EXP.genCoeffs()
+
+
+# class ARK4(RungeKuttaIMEX):
+#
+#     generator_IMP = RK_SCHEMES["ARK4EDIRK"]()
+#     generator_EXP = RK_SCHEMES["ARK4ERK"]()
+#
+#     nodes, weights, matrix = generator_IMP.genCoeffs()
+#     _, weights_explicit, matrix_explicit = generator_EXP.genCoeffs()
