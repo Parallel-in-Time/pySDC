@@ -83,7 +83,14 @@ def test_run_experiment(restart_idx=0):
             LogToFile.logging_condition = logging_condition
             return LogToFile
 
-    args = {'procs': [1, 1, 1], 'useGPU': False, 'res': -1, 'logger_level': 15, 'restart_idx': restart_idx}
+    args = {
+        'procs': [1, 1, 1],
+        'useGPU': False,
+        'res': -1,
+        'logger_level': 15,
+        'restart_idx': restart_idx,
+        'mode': 'run',
+    }
     config = VdPConfig(args)
     run_experiment(args, config)
 
