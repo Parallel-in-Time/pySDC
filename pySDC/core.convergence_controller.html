@@ -261,6 +261,23 @@ This variable is an integer and you can see what the current order is by using
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="core.convergence_controller.ConvergenceController.post_run_processing">
+<span class="sig-name descname"><span class="pre">post_run_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/convergence_controller.html#ConvergenceController.post_run_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.convergence_controller.ConvergenceController.post_run_processing" title="Link to this definition">¶</a></dt>
+<dd><p>Do whatever you want to after the run here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="core.convergence_controller.ConvergenceController.post_spread_processing">
 <span class="sig-name descname"><span class="pre">post_spread_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/convergence_controller.html#ConvergenceController.post_spread_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.convergence_controller.ConvergenceController.post_spread_processing" title="Link to this definition">¶</a></dt>
 <dd><p>This function is called at the end of the <cite>SPREAD</cite> stage in the controller</p>
@@ -520,6 +537,7 @@ relevant information about the controller are known.</p>
 <li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.get_new_step_size"><code class="docutils literal notranslate"><span class="pre">get_new_step_size()</span></code></a></li>
 <li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.log"><code class="docutils literal notranslate"><span class="pre">log()</span></code></a></li>
 <li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing()</span></code></a></li>
+<li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.post_run_processing"><code class="docutils literal notranslate"><span class="pre">post_run_processing()</span></code></a></li>
 <li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.post_spread_processing"><code class="docutils literal notranslate"><span class="pre">post_spread_processing()</span></code></a></li>
 <li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.post_step_processing"><code class="docutils literal notranslate"><span class="pre">post_step_processing()</span></code></a></li>
 <li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.pre_iteration_processing"><code class="docutils literal notranslate"><span class="pre">pre_iteration_processing()</span></code></a></li>

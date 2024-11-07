@@ -964,8 +964,29 @@
 <div class="viewcode-block" id="ARK2">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK2">[docs]</a>
 <span class="k">class</span> <span class="nc">ARK2</span><span class="p">(</span><span class="n">RungeKuttaIMEX</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Second order two stage singly diagonally implicit globally stiffly accurate IMEX RK method with explicit first stage.</span>
+<span class="sd">    Can be used to integrate simple DAEs because explicit and implicit part are both stiffly accurate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">generator_IMP</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;ARK222EDIRK&quot;</span><span class="p">]()</span>
     <span class="n">generator_EXP</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;ARK222ERK&quot;</span><span class="p">]()</span>
+
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator_IMP</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">()</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">weights_explicit</span><span class="p">,</span> <span class="n">matrix_explicit</span> <span class="o">=</span> <span class="n">generator_EXP</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="ARK3">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK3">[docs]</a>
+<span class="k">class</span> <span class="nc">ARK3</span><span class="p">(</span><span class="n">RungeKuttaIMEX</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Third order four stage singly diagonally implicit globally stiffly accurate IMEX RK method with explicit first stage.</span>
+<span class="sd">    Can be used to integrate simple DAEs because explicit and implicit part are both stiffly accurate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator_IMP</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;ARK443ESDIRK&quot;</span><span class="p">]()</span>
+    <span class="n">generator_EXP</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;ARK443ERK&quot;</span><span class="p">]()</span>
 
     <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator_IMP</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">()</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">weights_explicit</span><span class="p">,</span> <span class="n">matrix_explicit</span> <span class="o">=</span> <span class="n">generator_EXP</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">()</span></div>
