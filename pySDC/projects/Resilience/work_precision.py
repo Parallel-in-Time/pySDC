@@ -297,6 +297,7 @@ def record_work_precision(
                 exponents = [-3, -2, -1, 0, 0.2, 0.8, 1][::-1]
         if problem.__name__ == 'run_RBC':
             exponents = [1, 0, -0.5, -1, -2]
+            # exponents = [3, 2, 1, 0]
         if problem.__name__ == 'run_GS':
             exponents = [-2, -1, 0, 1, 2, 3][::-1]
         if problem.__name__ == 'run_Lorenz':
@@ -905,7 +906,9 @@ def get_configs(mode, problem):
         desc = {}
         desc['sweeper_params'] = {'num_nodes': 3, 'QI': 'IE', 'QE': "EE"}
         desc['step_params'] = {'maxiter': 5}
-        num_procs_dt = 4
+        num_procs_dt = {
+            'run_RBC': 1,
+        }.get(problem.__name__, 4)
 
         desc_poly = {}
         desc_poly['sweeper_class'] = parallel_sweeper
@@ -917,6 +920,7 @@ def get_configs(mode, problem):
             3: '-',
             4: '-',
             5: '-',
+            12: ':',
         }
         RK_strategies = []
         if problem.__name__ in ['run_Lorenz']:
@@ -930,33 +934,56 @@ def get_configs(mode, problem):
             desc['sweeper_params']['QE'] = 'PIC'
             desc['sweeper_params']['QE'] = 'PIC'
             desc['step_params']['maxiter'] = 3
-            num_procs_dt = 1
 
             desc_poly['sweeper_params'] = {'num_nodes': 2}
             num_procs_dt_k = 2
         else:
             RK_strategies.append(ESDIRKStrategy(useMPI=True))
 
-        configurations[3] = {
-            'custom_description': desc_poly,
-            'strategies': [AdaptivityPolynomialError(useMPI=True, newton_inexactness=newton_inexactness)],
-            'num_procs': 1,
-            'num_procs_sweeper': num_procs_dt_k,
-            'plotting_params': {
-                'label': rf'$\Delta t$-$k$-adaptivity $N$=1x{num_procs_dt_k}',
-                'ls': ls[num_procs_dt_k],
-            },
-        }
         configurations[-1] = {
             'strategies': RK_strategies,
             'num_procs': 1,
         }
-        configurations[2] = {
-            'strategies': [AdaptivityStrategy(useMPI=True)],
-            'custom_description': desc,
-            'num_procs': num_procs_dt,
-            'plotting_params': {'label': rf'$\Delta t$-adaptivity $N$={num_procs_dt}x1', 'ls': ls[num_procs_dt]},
-        }
+        if problem.__name__ == 'run_Lorenz':
+            configurations[3] = {
+                'custom_description': desc_poly,
+                'strategies': [AdaptivityPolynomialError(useMPI=True, newton_inexactness=newton_inexactness)],
+                'num_procs': 4,
+                'num_procs_sweeper': num_procs_dt_k,
+                'plotting_params': {
+                    'label': rf'$\Delta t$-$k$-adaptivity $N$=4x{num_procs_dt_k}',
+                    'ls': ls[num_procs_dt_k * 4],
+                },
+            }
+        else:
+            configurations[3] = {
+                'custom_description': desc_poly,
+                'strategies': [AdaptivityPolynomialError(useMPI=True, newton_inexactness=newton_inexactness)],
+                'num_procs': 1,
+                'num_procs_sweeper': num_procs_dt_k,
+                'plotting_params': {
+                    'label': rf'$\Delta t$-$k$-adaptivity $N$=1x{num_procs_dt_k}',
+                    'ls': ls[num_procs_dt_k],
+                },
+            }
+        if problem.__name__ in ['run_Lorenz', 'run_RBC']:
+            configurations[2] = {
+                'strategies': [AdaptivityStrategy(useMPI=True)],
+                'custom_description': {**desc, 'sweeper_class': parallel_sweeper},
+                'num_procs': num_procs_dt,
+                'num_procs_sweeper': num_procs_dt_k,
+                'plotting_params': {
+                    'label': rf'$\Delta t$-adaptivity $N$={num_procs_dt}x3',
+                    'ls': ls[num_procs_dt * num_procs_dt_k],
+                },
+            }
+        else:
+            configurations[2] = {
+                'strategies': [AdaptivityStrategy(useMPI=True)],
+                'custom_description': desc,
+                'num_procs': num_procs_dt,
+                'plotting_params': {'label': rf'$\Delta t$-adaptivity $N$={num_procs_dt}x1', 'ls': ls[num_procs_dt]},
+            }
 
     elif mode == 'parallel_efficiency':
         """
@@ -1056,14 +1083,14 @@ def get_configs(mode, problem):
         newton_inexactness = False if problem.__name__ in ['run_vdp'] else True
 
         for num_procs in [4, 1]:
-            plotting_params = (
-                {'ls': ls[num_procs], 'label': fr'$\Delta t$-adaptivity $N$={num_procs}x1'} if num_procs > 1 else {}
-            )
             configurations[num_procs] = {
                 'strategies': [AdaptivityStrategy(useMPI=True)],
                 'custom_description': desc.copy(),
                 'num_procs': num_procs,
-                'plotting_params': plotting_params.copy(),
+                'plotting_params': {
+                    'ls': ls.get(num_procs, '-'),
+                    'label': rf'$\Delta t$-adaptivity $N$={num_procs}x1',
+                },
             }
             configurations[num_procs * 200 + 79] = {
                 'custom_description': {
@@ -1119,7 +1146,7 @@ def get_configs(mode, problem):
                     'label': rf'$\Delta t$-$k$-adaptivity $N$={num_procs}x3',
                 },
             }
-            configurations[num_procs * 100 + 79] = {
+            configurations[num_procs * 200 + 79] = {
                 'custom_description': {'sweeper_params': {'QI': QI, 'QE': 'PIC'}},
                 'strategies': [
                     AdaptivityPolynomialError(
@@ -1129,7 +1156,7 @@ def get_configs(mode, problem):
                 'num_procs_sweeper': 1,
                 'num_procs': num_procs,
                 'plotting_params': {
-                    'ls': ls.get(num_procs * 3, '-'),
+                    'ls': ls.get(num_procs, '-'),
                     'label': rf'$\Delta t$-$k$-adaptivity $N$={num_procs}x1',
                 },
             }
@@ -1638,6 +1665,8 @@ def all_problems(
     if plotting and shared_params['comm_world'].rank == 0:
         ncols = {
             'parallel_efficiency': 2,
+            'parallel_efficiency_dt': 2,
+            'parallel_efficiency_dt_k': 2,
             'RK_comp': 2,
         }
 
