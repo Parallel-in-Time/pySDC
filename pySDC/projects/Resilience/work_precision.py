@@ -160,7 +160,13 @@ def single_run(
 
     # record all the metrics
     if comm_sweep.size > 1:
-        stats_all = filter_stats(stats, comm=comm_sweep)
+        try:
+            stats_all = filter_stats(stats, comm=comm_sweep)
+        except MPI.Exception:
+            for key in MAPPINGS.keys():
+                data[key] += [np.nan]
+            return stats
+
     else:
         stats_all = stats
     comm_sweep.Free()
@@ -1028,6 +1034,8 @@ def get_configs(mode, problem):
                 generic_implicit_MPI as parallel_sweeper,
             )
 
+        QI = 'MIN-SR-NS' if problem.__name__ in ['run_Lorenz'] else 'MIN-SR-S'
+
         desc = {}
         desc['sweeper_params'] = {'num_nodes': 3, 'QI': 'IE', 'QE': 'EE'}
         desc['step_params'] = {'maxiter': 5}
@@ -1060,7 +1068,7 @@ def get_configs(mode, problem):
             configurations[num_procs * 200 + 79] = {
                 'custom_description': {
                     'sweeper_class': parallel_sweeper,
-                    'sweeper_params': {'QI': 'MIN-SR-S', 'QE': 'PIC'},
+                    'sweeper_params': {'QI': QI, 'QE': 'PIC'},
                 },
                 'strategies': [AdaptivityStrategy(useMPI=True)],
                 'num_procs_sweeper': 3,
@@ -1083,13 +1091,7 @@ def get_configs(mode, problem):
                 generic_implicit_MPI as parallel_sweeper,
             )
 
-        desc = {}
-        desc['sweeper_params'] = {'num_nodes': 3, 'QI': 'IE', 'QE': 'EE'}
-        desc['step_params'] = {'maxiter': 5}
-
-        if problem.__name__ in ['run_RBC']:
-            desc['sweeper_params']['QE'] = 'PIC'
-            desc['sweeper_params']['QI'] = 'LU'
+        QI = 'MIN-SR-NS' if problem.__name__ in ['run_Lorenz'] else 'MIN-SR-S'
 
         ls = {
             1: '-',
@@ -1104,7 +1106,7 @@ def get_configs(mode, problem):
 
         for num_procs in [4, 1]:
             configurations[num_procs * 100 + 79] = {
-                'custom_description': {'sweeper_class': parallel_sweeper},
+                'custom_description': {'sweeper_class': parallel_sweeper, 'sweeper_params': {'QI': QI, 'QE': 'PIC'}},
                 'strategies': [
                     AdaptivityPolynomialError(
                         useMPI=True, newton_inexactness=newton_inexactness, linear_inexactness=True
@@ -1118,7 +1120,7 @@ def get_configs(mode, problem):
                 },
             }
             configurations[num_procs * 100 + 79] = {
-                'custom_description': {'sweeper_class': parallel_sweeper},
+                'custom_description': {'sweeper_params': {'QI': QI, 'QE': 'PIC'}},
                 'strategies': [
                     AdaptivityPolynomialError(
                         useMPI=True, newton_inexactness=newton_inexactness, linear_inexactness=True
