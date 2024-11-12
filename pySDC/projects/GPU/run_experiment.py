@@ -39,6 +39,10 @@ def run_experiment(args, config, **kwargs):
     )
     controller_params = config.get_controller_params(logger_level=args['logger_level'])
 
+    if args['useGPU']:
+        from pySDC.implementations.hooks.timings import GPUTimings
+        controller_params['hook_class'].append(GPUTimings)
+
     # controller = controller_MPI(controller_params, description, config.comms[0])
     assert (
         config.comms[0].size == 1

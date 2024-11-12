@@ -47,7 +47,7 @@ class ScalingConfig(object):
             res, procs = self.get_resolution_and_tasks(strong, i)
 
             _nodes = np.prod(procs) // self.tasks_per_node
-            if _nodes > self.max_nodes or procs[-1] > self.max_tasks:
+            if _nodes > self.max_nodes or (procs[-1] > self.max_tasks and strong):
                 break
 
             sbatch_options = [
@@ -84,10 +84,14 @@ class ScalingConfig(object):
                 with open(path, 'rb') as file:
                     stats = pickle.load(file)
 
-                timing_step = get_sorted(stats, type='timing_step')
+                if args['useGPU']:
+                    timing_step = get_sorted(stats, type='GPU_timing_step')
+                else:
+                    timing_step = get_sorted(stats, type='timing_step')
                 timings[np.prod(procs) / self.tasks_per_node] = np.mean([me[1] for me in timing_step])
+                # timings[np.prod(procs) / self.tasks_per_node] = timing_step = get_sorted(stats, type='timing_run')[-1][1] / len(get_sorted(stats, type='timing_step'))
                 # timings[np.prod(procs)] = np.mean([me[1] for me in timing_step])
-            except FileNotFoundError:
+            except (FileNotFoundError, ValueError):
                 pass
 
         if plot_ideal:
@@ -142,7 +146,7 @@ class GrayScottSpaceScalingGPU(GPUConfig, ScalingConfig):
 
 class RayleighBenardSpaceScalingCPU(CPUConfig, ScalingConfig):
     base_resolution = 1024
-    base_resolution_weak = 256
+    base_resolution_weak = 128
     config = 'RBC_scaling'
     max_steps_space = 13
     max_steps_space_weak = 10
@@ -153,14 +157,14 @@ class RayleighBenardSpaceScalingCPU(CPUConfig, ScalingConfig):
 
 
 class RayleighBenardSpaceScalingGPU(GPUConfig, ScalingConfig):
-    base_resolution_weak = 512
+    base_resolution_weak = 256
     base_resolution = 1024
     config = 'RBC_scaling'
     max_steps_space = 9
     max_steps_space_weak = 9
     tasks_time = 4
     max_tasks = 256
-    sbatch_options = ['--time=0:30:00']
+    sbatch_options = ['--time=0:15:00']
     max_nodes = 64
 
 

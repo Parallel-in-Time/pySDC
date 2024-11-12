@@ -103,6 +103,7 @@ class GenericSpectralLinear(Problem):
                 if 'rtol' in self.solver_args.keys():
                     self.solver_args['tol'] = self.solver_args.pop('rtol')
 
+
         for base in bases:
             self.spectral.add_axis(**base)
         self.spectral.add_component(components)
@@ -231,6 +232,9 @@ class GenericSpectralLinear(Problem):
             rhs_hat = self.spectral.transform(rhs)
             u0_hat = self.Pr.T @ self.spectral.transform(u0).flatten()
 
+        if self.useGPU:
+            self.xp.cuda.Device().synchronize()
+
         rhs_hat = (self.M @ rhs_hat.flatten()).reshape(rhs_hat.shape)
         rhs_hat = self.spectral.put_BCs_in_rhs_hat(rhs_hat)
         rhs_hat = self.Pl @ rhs_hat.flatten()
@@ -238,9 +242,6 @@ class GenericSpectralLinear(Problem):
         if dt not in self.cached_factorizations.keys() or not self.solver_type.lower() == 'cached_direct':
             A = self.M + dt * self.L
             A = self.Pl @ self.spectral.put_BCs_in_matrix(A) @ self.Pr
-
-        if self.useGPU:
-            self.xp.cuda.Device().synchronize()
 
         # import numpy as np
         # if A.shape[0] < 200:
@@ -257,9 +258,8 @@ class GenericSpectralLinear(Problem):
         if self.solver_type.lower() == 'cached_direct':
             if dt not in self.cached_factorizations.keys():
                 if len(self.cached_factorizations) >= self.max_cached_factorizations:
-                    to_evict = list(self.cached_factorizations.keys())[0]
-                    self.cached_factorizations.pop(to_evict)
-                    self.logger.debug(f'Evicted matrix factorization for {to_evict=:.6f} from cache')
+                    self.cached_factorizations.pop(list(self.cached_factorizations.keys())[0])
+                    self.logger.debug(f'Evicted matrix factorization for {dt=:.6f} from cache')
                 self.cached_factorizations[dt] = self.spectral.linalg.factorized(A)
                 self.logger.debug(f'Cached matrix factorization for {dt=:.6f}')
                 self.work_counters['factorizations']()
@@ -315,11 +315,11 @@ class GenericSpectralLinear(Problem):
         else:
             raise NotImplementedError(f'Solver {self.solver_type=} not implemented in {type(self).__name__}!')
 
-        if self.useGPU:
-            self.xp.cuda.Device().synchronize()
-
         sol_hat = self.spectral.u_init_forward
         sol_hat[...] = (self.Pr @ _sol_hat).reshape(sol_hat.shape)
+
+        if self.useGPU:
+            self.xp.cuda.Device().synchronize()
 
         if self.spectral_space:
             return sol_hat
