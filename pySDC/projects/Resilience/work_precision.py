@@ -925,13 +925,15 @@ def get_configs(mode, problem):
         RK_strategies = []
         if problem.__name__ in ['run_Lorenz']:
             RK_strategies.append(ERKStrategy(useMPI=True))
+            desc_poly['sweeper_params'] = {'QI': 'MIN-SR-S', 'QE': 'PIC'}
+            desc['sweeper_params']['QI'] = 'MIN-SR-S'
+            desc['sweeper_params']['QE'] = 'PIC'
         if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_GS']:
             RK_strategies.append(ARKStrategy(useMPI=True))
         elif problem.__name__ == 'run_RBC':
             RK_strategies.append(ARK3_CFL_Strategy(useMPI=True))
             desc['sweeper_params']['num_nodes'] = 2
-            desc['sweeper_params']['QI'] = 'LU'
-            desc['sweeper_params']['QE'] = 'PIC'
+            desc['sweeper_params']['QI'] = 'MIN-SR-S'
             desc['sweeper_params']['QE'] = 'PIC'
             desc['step_params']['maxiter'] = 3
 
@@ -1061,8 +1063,6 @@ def get_configs(mode, problem):
                 generic_implicit_MPI as parallel_sweeper,
             )
 
-        QI = 'MIN-SR-NS' if problem.__name__ in ['run_Lorenz'] else 'MIN-SR-S'
-
         desc = {}
         desc['sweeper_params'] = {'num_nodes': 3, 'QI': 'IE', 'QE': 'EE'}
         desc['step_params'] = {'maxiter': 5}
@@ -1095,7 +1095,7 @@ def get_configs(mode, problem):
             configurations[num_procs * 200 + 79] = {
                 'custom_description': {
                     'sweeper_class': parallel_sweeper,
-                    'sweeper_params': {'QI': QI, 'QE': 'PIC'},
+                    'sweeper_params': {'QI': 'MIN-SR-S', 'QE': 'PIC'},
                 },
                 'strategies': [AdaptivityStrategy(useMPI=True)],
                 'num_procs_sweeper': 3,
@@ -1118,8 +1118,6 @@ def get_configs(mode, problem):
                 generic_implicit_MPI as parallel_sweeper,
             )
 
-        QI = 'MIN-SR-NS' if problem.__name__ in ['run_Lorenz'] else 'MIN-SR-S'
-
         ls = {
             1: '-',
             2: '--',
@@ -1133,7 +1131,10 @@ def get_configs(mode, problem):
 
         for num_procs in [4, 1]:
             configurations[num_procs * 100 + 79] = {
-                'custom_description': {'sweeper_class': parallel_sweeper, 'sweeper_params': {'QI': QI, 'QE': 'PIC'}},
+                'custom_description': {
+                    'sweeper_class': parallel_sweeper,
+                    'sweeper_params': {'QI': 'MIN-SR-S', 'QE': 'PIC'},
+                },
                 'strategies': [
                     AdaptivityPolynomialError(
                         useMPI=True, newton_inexactness=newton_inexactness, linear_inexactness=True
@@ -1147,7 +1148,7 @@ def get_configs(mode, problem):
                 },
             }
             configurations[num_procs * 200 + 79] = {
-                'custom_description': {'sweeper_params': {'QI': QI, 'QE': 'PIC'}},
+                'custom_description': {'sweeper_params': {'QI': 'MIN-SR-S', 'QE': 'PIC'}},
                 'strategies': [
                     AdaptivityPolynomialError(
                         useMPI=True, newton_inexactness=newton_inexactness, linear_inexactness=True
