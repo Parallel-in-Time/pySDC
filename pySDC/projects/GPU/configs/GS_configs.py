@@ -14,6 +14,8 @@ def get_config(args):
         return GrayScott_USkate(args)
     elif name == 'GS_scaling':
         return GrayScottScaling(args)
+    elif name == 'GS_large':
+        return GrayScottLarge(args)
     else:
         return NotImplementedError(f'Don\'t know config {name}')
 
@@ -106,6 +108,7 @@ class GrayScott(Config):
                 vmin=vmin['v'],
                 vmax=vmax['v'],
                 cmap='binary',
+                rasterized=True,
             )
             fig.colorbar(im, cax, format=tkr.FormatStrFormatter('%.1f'))
             ax.set_title(f't={buffer[f"u-{rank}"]["t"]:.2f}')
@@ -179,7 +182,7 @@ class GrayScott_USkate(GrayScott):
     See arXiv:1501.01990 or http://www.mrob.com/sci/papers/2009smp-figs/index.html
     '''
 
-    num_frames = 400
+    num_frames = 200
     res_per_blob = 2**7
 
     def get_description(self, *args, **kwargs):
@@ -209,3 +212,11 @@ class GrayScottScaling(GrayScott):
         params = super().get_controller_params(*args, **kwargs)
         params['hook_class'] = []
         return params
+
+class GrayScottLarge(GrayScott_USkate):
+    def get_description(self, *args, **kwargs):
+        desc = super().get_description(*args, **kwargs)
+        desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
+        desc['sweeper_params']['num_nodes'] = 4
+        desc['step_params']['maxiter'] = 4
+        return desc
