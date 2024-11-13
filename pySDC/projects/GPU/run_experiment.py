@@ -40,7 +40,8 @@ def run_experiment(args, config, **kwargs):
     controller_params = config.get_controller_params(logger_level=args['logger_level'])
 
     if args['useGPU']:
-        from pySDC.implementations.hooks.timings import GPUTimings
+        from pySDC.implementations.hooks.log_timings import GPUTimings
+
         controller_params['hook_class'].append(GPUTimings)
 
     # controller = controller_MPI(controller_params, description, config.comms[0])
@@ -106,7 +107,7 @@ def make_video(args, config):  # pragma: no cover
     path = f'simulation_plots/{config.get_path(ranks=[0,0,0])}-%06d.png'
     path_target = f'videos/{args["config"]}.mp4'
 
-    cmd = f'ffmpeg -i {path} -pix_fmt yuv420p -r 9 -s 2048:1536 {path_target}'.split()
+    cmd = f'ffmpeg -i {path} -pix_fmt yuv420p -r 9 -s 2048:1536 -y {path_target}'.split()
 
     subprocess.run(cmd)
 
