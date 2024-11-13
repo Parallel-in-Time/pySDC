@@ -933,7 +933,7 @@ def get_configs(mode, problem):
         elif problem.__name__ == 'run_RBC':
             RK_strategies.append(ARK3_CFL_Strategy(useMPI=True))
             desc['sweeper_params']['num_nodes'] = 2
-            desc['sweeper_params']['QI'] = 'MIN-SR-S'
+            desc['sweeper_params']['QI'] = 'LU'
             desc['sweeper_params']['QE'] = 'PIC'
             desc['step_params']['maxiter'] = 3
 
@@ -968,7 +968,7 @@ def get_configs(mode, problem):
                     'ls': ls[num_procs_dt_k],
                 },
             }
-        if problem.__name__ in ['run_Lorenz', 'run_RBC']:
+        if problem.__name__ in ['run_Lorenz']:
             configurations[2] = {
                 'strategies': [AdaptivityStrategy(useMPI=True)],
                 'custom_description': {**desc, 'sweeper_class': parallel_sweeper},
