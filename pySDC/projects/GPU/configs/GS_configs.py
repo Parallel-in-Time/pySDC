@@ -213,10 +213,22 @@ class GrayScottScaling(GrayScott):
         params['hook_class'] = []
         return params
 
+
 class GrayScottLarge(GrayScott_USkate):
+    Tend = 25000
+    num_frames = 100
+
     def get_description(self, *args, **kwargs):
+        from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+
         desc = super().get_description(*args, **kwargs)
         desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
         desc['sweeper_params']['num_nodes'] = 4
+        desc['sweeper_params']['QI'] = 'MIN-SR-S'
+        desc['sweeper_params']['QE'] = 'PIC'
         desc['step_params']['maxiter'] = 4
+
+        # desc['problem_params']['nvars'] = (2**18//900 * 4, 2**18)
+
+        desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3}
         return desc

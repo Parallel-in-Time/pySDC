@@ -1,6 +1,7 @@
 import numpy as np
 from pySDC.projects.GPU.etc.generate_jobscript import write_jobscript
 
+
 class LargeSim:
     config = None
     params = {}
@@ -14,12 +15,11 @@ class LargeSim:
     @property
     def plotting_params(self):
         return {
-                'tasks_per_node': 20,
-                'partition': 'develgpus',
-                'cluster': 'jusuf',
-                'time': '0:20:00',
+            'tasks_per_node': 20,
+            'partition': 'develgpus',
+            'cluster': 'jusuf',
+            'time': '0:20:00',
         }
-
 
     def write_jobscript_for_run(self, submit=True):
         procs = self.params['procs']
@@ -35,6 +35,7 @@ class LargeSim:
             f'-p {partition}',
             f'--tasks-per-node={tasks_per_node}',
             f'--time={time}',
+            '--mail-type=ALL',
         ]
 
         srun_options = [f'--tasks-per-node={tasks_per_node}']
@@ -112,13 +113,13 @@ class GSLarge(LargeSim):
         Test params with a small run.
         """
         self.params = {
-                'procs': [1, 4, 4],
-                'useGPU': False,
-                'tasks_per_node': 16,
-                'partition': 'develgpus',
-                'cluster': 'jusuf',
-                'res': 512,
-                'time': '0:30:00',
+            'procs': [1, 4, 4],
+            'useGPU': False,
+            'tasks_per_node': 16,
+            'partition': 'develgpus',
+            'cluster': 'jusuf',
+            'res': 512,
+            'time': '0:30:00',
         }
 
 
