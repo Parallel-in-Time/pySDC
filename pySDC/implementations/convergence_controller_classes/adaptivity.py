@@ -229,7 +229,16 @@ class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
         if self.get_convergence(controller, S, **kwargs):
             self.res_last_iter = np.inf
 
-            if self.params.restart_at_maxiter and S.levels[0].status.residual > S.levels[0].params.restol:
+            L = S.levels[0]
+            e_tol_converged = (
+                L.status.increment < L.params.e_tol if (L.params.get('e_tol') and L.status.get('increment')) else False
+            )
+
+            if (
+                self.params.restart_at_maxiter
+                and S.levels[0].status.residual > S.levels[0].params.restol
+                and not e_tol_converged
+            ):
                 self.trigger_restart_upon_nonconvergence(S)
             elif self.get_local_error_estimate(controller, S, **kwargs) > self.params.e_tol:
                 S.status.restart = True
