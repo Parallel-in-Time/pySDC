@@ -97,6 +97,6 @@ def test_poisson_problem(N, deg, Dirichlet_recombination):
 
 
 if __name__ == '__main__':
-    test_differentiation_matrix(8, 1)
-    # test_poisson_problem(6, 1, True)
+    # test_differentiation_matrix(6, 2)
+    test_poisson_problem(6, 1, True)
     # test_integration()
