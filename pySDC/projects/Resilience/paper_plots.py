@@ -561,7 +561,7 @@ def plot_quench_solution():  # pragma: no cover
     savefig(fig, 'quench_sol')
 
 
-def plot_RBC_solution():  # pragma: no cover
+def plot_RBC_solution(setup='resilience'):  # pragma: no cover
     """
     Plot solution of Rayleigh-Benard convection
     """
@@ -587,14 +587,18 @@ def plot_RBC_solution():  # pragma: no cover
         im = ax.pcolormesh(prob.X, prob.Z, u[prob.index('T')], rasterized=True, cmap='plasma')
         fig.colorbar(im, cax, label=f'$T(t={{{t}}})$')
 
-    _plot(0, axs[0], caxs[0])
-    _plot(21, axs[1], caxs[1])
+    if setup == 'resilience':
+        _plot(0, axs[0], caxs[0])
+        _plot(21, axs[1], caxs[1])
+    elif setup == 'work-precision':
+        _plot(10, axs[0], caxs[0])
+        _plot(16, axs[1], caxs[1])
 
     axs[1].set_xlabel('$x$')
     axs[0].set_ylabel('$z$')
     axs[1].set_ylabel('$z$')
 
-    savefig(fig, 'RBC_sol', tight_layout=False)
+    savefig(fig, f'RBC_sol_{setup}', tight_layout=False)
 
 
 def plot_GS_solution():  # pragma: no cover
@@ -874,12 +878,12 @@ def make_plots_for_thesis():  # pragma: no cover
         'target': 'thesis',
     }
 
-    for mode in ['compare_strategies', 'parallel_efficiency', 'RK_comp']:
+    for mode in ['compare_strategies', 'parallel_efficiency_dt_k', 'parallel_efficiency_dt', 'RK_comp']:
         all_problems(**all_params, mode=mode)
     all_problems(**{**all_params, 'work_key': 'param'}, mode='compare_strategies')
 
     plot_GS_solution()
-    plot_RBC_solution()
+    plot_RBC_solution('work-precision')
     # plot_vdp_solution()
 
     # plot_adaptivity_stuff()
