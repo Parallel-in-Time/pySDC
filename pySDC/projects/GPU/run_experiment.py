@@ -21,6 +21,7 @@ def parse_args():
     parser.add_argument(
         '--logger_level', type=int, help='Logger level on the first rank in space and in the sweeper', default=15
     )
+    parser.add_argument('-o', type=str, help='output path', default='./')
 
     return vars(parser.parse_args())
 
@@ -32,6 +33,7 @@ def run_experiment(args, config, **kwargs):
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.helpers.stats_helper import filter_stats
 
+    type(config).base_path = args['o']
     description = config.get_description(
         useGPU=args['useGPU'], MPIsweeper=args['procs'][1] > 1, res=args['res'], **kwargs
     )
@@ -53,7 +55,7 @@ def run_experiment(args, config, **kwargs):
     combined_stats = filter_stats(stats, comm=config.comm_world)
 
     if config.comm_world.rank == config.comm_world.size - 1:
-        path = f'data/{config.get_path()}-stats-whole-run.pickle'
+        path = f'{config.base_path}/data/{config.get_path()}-stats-whole-run.pickle'
         with open(path, 'wb') as file:
             pickle.dump(combined_stats, file)
         print(f'Stored stats in {path}', flush=True)
@@ -65,6 +67,7 @@ def plot_experiment(args, config):  # pragma: no cover
     import gc
     import matplotlib.pyplot as plt
 
+    type(config).base_path = args['o']
     description = config.get_description()
 
     P = description['problem_class'](**description['problem_params'])

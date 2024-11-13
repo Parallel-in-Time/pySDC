@@ -5,6 +5,7 @@ from pySDC.projects.GPU.etc.generate_jobscript import write_jobscript
 class LargeSim:
     config = None
     params = {}
+    path = '/p/scratch/ccstma/baumann7/large_runs'
 
     def setup_CPU_params(self):
         raise NotImplementedError()
@@ -45,7 +46,7 @@ class LargeSim:
             sbatch_options += ['--cpus-per-task=4', '--gpus-per-task=1']
 
         procs = (''.join(f'{me}/' for me in procs))[:-1]
-        command = f'run_experiment.py --mode=run --res={res} --config={self.config} --procs={procs}'
+        command = f'run_experiment.py --mode=run --res={res} --config={self.config} --procs={procs} -o {self.path}'
 
         if useGPU:
             command += ' --useGPU=True'
@@ -71,7 +72,7 @@ class LargeSim:
         srun_options = [f'--tasks-per-node={tasks_per_node}']
 
         procs_sim = (''.join(f'{me}/' for me in procs_sim))[:-1]
-        command = f'run_experiment.py --mode=plot --res={res} --config={self.config} --procs={procs_sim}'
+        command = f'run_experiment.py --mode=plot --res={res} --config={self.config} --procs={procs_sim} -o {self.path}'
 
         if useGPU:
             command += ' --useGPU=True'

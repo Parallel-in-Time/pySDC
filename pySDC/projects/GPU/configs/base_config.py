@@ -58,6 +58,7 @@ def get_comms(n_procs_list, comm_world=None, _comm=None, _tot_rank=0, _rank=None
 class Config(object):
     sweeper_type = None
     Tend = None
+    base_path = './'
 
     def __init__(self, args, comm_world=None):
         from mpi4py import MPI

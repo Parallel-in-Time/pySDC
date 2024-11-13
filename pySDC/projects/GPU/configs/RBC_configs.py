@@ -31,7 +31,7 @@ class RayleighBenardRegular(Config):
         import numpy as np
         from pySDC.implementations.hooks.log_solution import LogToFileAfterXs as LogToFile
 
-        LogToFile.path = './data/'
+        LogToFile.path = f'{self.base_path}/data/'
         LogToFile.file_name = f'{self.get_path(ranks=ranks)}-solution'
         LogToFile.time_increment = 1e-1
 
