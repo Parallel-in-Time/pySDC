@@ -103,7 +103,6 @@ class GenericSpectralLinear(Problem):
                 if 'rtol' in self.solver_args.keys():
                     self.solver_args['tol'] = self.solver_args.pop('rtol')
 
-
         for base in bases:
             self.spectral.add_axis(**base)
         self.spectral.add_component(components)
@@ -227,10 +226,12 @@ class GenericSpectralLinear(Problem):
 
         if self.spectral_space:
             rhs_hat = rhs.copy()
-            u0_hat = self.Pr.T @ u0.copy().flatten()
+            if u0 is not None:
+                u0_hat = self.Pr.T @ u0.copy().flatten()
         else:
             rhs_hat = self.spectral.transform(rhs)
-            u0_hat = self.Pr.T @ self.spectral.transform(u0).flatten()
+            if u0 is not None:
+                u0_hat = self.Pr.T @ self.spectral.transform(u0).flatten()
 
         if self.useGPU:
             self.xp.cuda.Device().synchronize()

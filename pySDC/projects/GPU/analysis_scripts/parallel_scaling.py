@@ -66,7 +66,9 @@ class ScalingConfig(object):
             if self.useGPU:
                 command += ' --useGPU=True'
 
-            write_jobscript(sbatch_options, srun_options, command, self.cluster, name=f'{type(self).__name__}_{res}', **kwargs)
+            write_jobscript(
+                sbatch_options, srun_options, command, self.cluster, name=f'{type(self).__name__}_{res}', **kwargs
+            )
 
     def plot_scaling_test(self, strong, ax, plot_ideal=False, **plotting_params):  # pragma: no cover
         timings = {}
