@@ -122,10 +122,7 @@ class LogToFile(Hooks):
             )
 
         if not os.path.isdir(self.path):
-            try:
-                os.mkdir(self.path)
-            except FileExistsError:
-                pass
+            os.makedirs(self.path, exist_ok=True)
 
     def log_to_file(self, step, level_number, condition, process_solution=None):
         if level_number > 0:
