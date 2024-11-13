@@ -9,7 +9,7 @@ except ImportError:
 
 class Timings(Hooks):
     """
-    Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)
+    Abstract base class for recoding timings
 
     Attributes:
         __t0_setup (float): private variable to get starting time of setup
@@ -313,6 +313,9 @@ class Timings(Hooks):
 
 
 class CPUTimings(Timings):
+    """
+    Hook for recording CPU timings of important operations during a pySDC run.
+    """
 
     def _compute_time_elapsed(self, event_after, event_before):
         return event_after - event_before
@@ -322,11 +325,15 @@ class CPUTimings(Timings):
 
 
 class GPUTimings(Timings):
+    """
+    Hook for recording GPU timings of important operations during a pySDC run.
+    """
+
     prefix = 'GPU_'
 
     def _compute_time_elapsed(self, event_after, event_before):
         event_after.synchronize()
-        return cp.cuda.get_elapsed_time(event_before, event_after)
+        return cp.cuda.get_elapsed_time(event_before, event_after) / 1e3
 
     def _get_event(self):
         event = cp.cuda.Event()

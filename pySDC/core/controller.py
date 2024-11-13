@@ -7,7 +7,7 @@ from pySDC.core.base_transfer import BaseTransfer
 from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
 from pySDC.implementations.hooks.default_hook import DefaultHooks
-from pySDC.implementations.hooks.timings import CPUTimings
+from pySDC.implementations.hooks.log_timings import CPUTimings
 
 
 # short helper class to add params as attributes
