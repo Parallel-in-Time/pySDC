@@ -243,7 +243,9 @@ class GrayScottLarge(GrayScott_USkate):
         fig = P.get_fig(n_comps=1)
         cax = P.cax
         ax = fig.get_axes()[0]
-        ax_ins = zoomed_inset_axes(ax, 2, loc=1)
+
+        zoom = 8
+        ax_ins = zoomed_inset_axes(ax, zoom, loc=1)
 
         buffer = {}
         vmin = {'u': np.inf, 'v': np.inf}
@@ -280,8 +282,9 @@ class GrayScottLarge(GrayScott_USkate):
                 rasterized=True,
             )
 
-        ax_ins.set_xlim((me / 8 for me in ax.get_xlim()))
-        ax_ins.set_ylim((me / 8 for me in ax.get_ylim()))
+        box_size = ax.get_xlim()[1] - ax.get_xlim()[0]
+        ax_ins.set_xlim(0, box_size / zoom / 3)
+        ax_ins.set_ylim(0, box_size / zoom / 3)
         ax_ins.set_xticks([])
         ax_ins.set_yticks([])
         mark_inset(ax, ax_ins, loc1=2, loc2=4, fc="none", ec="0.5")
