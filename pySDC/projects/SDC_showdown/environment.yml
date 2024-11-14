@@ -4,6 +4,7 @@ name: pySDC
 channels:
   - conda-forge
 dependencies:
+  - mpich
   - petsc4py
   - matplotlib>=3.0
   - dill>=0.2.6

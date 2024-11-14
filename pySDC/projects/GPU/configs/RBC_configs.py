@@ -387,7 +387,7 @@ class RayleighBenard_large(RayleighBenardRegular):
         desc['convergence_controllers'][AdaptivityPolynomialError] = {
             'e_tol': 1e-3,
             'abort_at_growing_residual': False,
-            'interpolate_between_restarts': True,
+            'interpolate_between_restarts': False,
             'dt_min': 1e-3,
             'dt_rel_min_slope': 2,
         }

@@ -73,8 +73,6 @@ class NCCLComm(object):
 
     def reduce(self, sendobj, op=MPI.SUM, root=0):
         sync = False
-        if not type(sendobj) in [int, float]:
-            sync = True
         if hasattr(sendobj, 'data'):
             if hasattr(sendobj.data, 'ptr'):
                 sync = True
@@ -85,8 +83,6 @@ class NCCLComm(object):
 
     def allreduce(self, sendobj, op=MPI.SUM):
         sync = False
-        if not type(sendobj) in [int, float]:
-            sync = True
         if hasattr(sendobj, 'data'):
             if hasattr(sendobj.data, 'ptr'):
                 sync = True
