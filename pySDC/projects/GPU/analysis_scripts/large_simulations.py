@@ -6,6 +6,7 @@ class LargeSim:
     config = None
     params = {}
     path = '/p/scratch/ccstma/baumann7/large_runs'
+    email = 't.baumann@fz-juelich.de'
 
     def setup_CPU_params(self):
         raise NotImplementedError()
@@ -37,6 +38,7 @@ class LargeSim:
             f'--tasks-per-node={tasks_per_node}',
             f'--time={time}',
             '--mail-type=ALL',
+            f'--mail-user={self.email}',
         ]
 
         srun_options = [f'--tasks-per-node={tasks_per_node}']
@@ -114,13 +116,27 @@ class GSLarge(LargeSim):
         Test params with a small run.
         """
         self.params = {
-            'procs': [1, 4, 4],
+            'procs': [1, 4, 280],
             'useGPU': False,
             'tasks_per_node': 16,
-            'partition': 'develgpus',
+            'partition': 'batch',
             'cluster': 'jusuf',
-            'res': 512,
+            'res': 2**13,
             'time': '0:30:00',
+        }
+
+    def setup_GPU_params(self):
+        """
+        Test params with a small run.
+        """
+        self.params = {
+            'procs': [1, 4, 1],
+            'useGPU': True,
+            'tasks_per_node': 4,
+            'partition': 'develbooster',
+            'cluster': 'booster',
+            'res': 2**18,
+            'time': '0:10:00',
         }
 
 
