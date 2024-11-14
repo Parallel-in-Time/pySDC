@@ -19,6 +19,8 @@ def get_config(args):
         return RayleighBenard_Thibaut(args)
     elif name == 'RBC_scaling':
         return RayleighBenard_scaling(args)
+    elif name == 'RBC_large':
+        return RayleighBenard_large(args)
     else:
         raise NotImplementedError(f'There is no configuration called {name!r}!')
 
@@ -73,13 +75,10 @@ class RayleighBenardRegular(Config):
         return LogToFile
 
     def get_controller_params(self, *args, **kwargs):
-        from pySDC.implementations.problem_classes.RayleighBenard import (
-            LogAnalysisVariables,
-        )
         from pySDC.implementations.hooks.log_step_size import LogStepSize
 
         controller_params = super().get_controller_params(*args, **kwargs)
-        controller_params['hook_class'] += [LogAnalysisVariables, LogStepSize]
+        controller_params['hook_class'] += [LogStepSize]
         return controller_params
 
     def get_description(self, *args, MPIsweeper=False, res=-1, **kwargs):
@@ -190,12 +189,11 @@ class RayleighBenardRegular(Config):
 class RayleighBenard_k_adaptivity(RayleighBenardRegular):
     def get_description(self, *args, **kwargs):
         from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
-        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit, SpaceAdaptivity
+        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
 
         desc = super().get_description(*args, **kwargs)
 
         desc['convergence_controllers'][CFLLimit] = {'dt_max': 0.1, 'dt_min': 1e-6, 'cfl': 0.8}
-        desc['convergence_controllers'][SpaceAdaptivity] = {'nz_max': 512}
         desc['level_params']['restol'] = 1e-7
         desc['sweeper_params']['num_nodes'] = 4
         desc['sweeper_params']['QI'] = 'MIN-SR-S'
@@ -218,7 +216,7 @@ class RayleighBenard_k_adaptivity(RayleighBenardRegular):
 class RayleighBenard_dt_k_adaptivity(RayleighBenardRegular):
     def get_description(self, *args, **kwargs):
         from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
-        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit, SpaceAdaptivity
+        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
 
         desc = super().get_description(*args, **kwargs)
 
@@ -229,7 +227,6 @@ class RayleighBenard_dt_k_adaptivity(RayleighBenardRegular):
             'dt_min': 1e-3,
             'dt_rel_min_slope': 0.1,
         }
-        desc['convergence_controllers'][SpaceAdaptivity] = {'nz_max': 2**9}
         desc['convergence_controllers'].pop(CFLLimit)
         desc['level_params']['restol'] = 1e-7
         desc['sweeper_params']['num_nodes'] = 3
@@ -373,3 +370,47 @@ class RayleighBenard_scaling(RayleighBenardRegular):
         params = super().get_controller_params(*args, **kwargs)
         params['hook_class'] = [LogWork]
         return params
+
+
+class RayleighBenard_large(RayleighBenardRegular):
+    res_per_plume = 256
+    vertical_res = 1024
+    Ra = 2e6
+    relaxation_steps = 5
+
+    def get_description(self, *args, **kwargs):
+        from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
+        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
+
+        desc = super().get_description(*args, **kwargs)
+
+        desc['convergence_controllers'][AdaptivityPolynomialError] = {
+            'e_tol': 1e-3,
+            'abort_at_growing_residual': False,
+            'interpolate_between_restarts': True,
+            'dt_min': 1e-3,
+            'dt_rel_min_slope': 2,
+        }
+        desc['convergence_controllers'].pop(CFLLimit)
+        desc['level_params']['restol'] = 1e-7
+        desc['level_params']['e_tol'] = 1e-7
+        desc['sweeper_params']['num_nodes'] = 4
+        desc['sweeper_params']['QI'] = 'MIN-SR-S'
+        desc['sweeper_params']['QE'] = 'PIC'
+        desc['step_params']['maxiter'] = 16
+
+        # desc['problem_params']['nx'] *= 2
+        desc['problem_params']['nz'] = self.vertical_res
+        desc['problem_params']['Rayleigh'] = self.Ra
+        desc['problem_params']['Lx'] = desc['problem_params']['nx'] // self.res_per_plume * 2
+
+        return desc
+
+    def get_initial_condition(self, P, *args, restart_idx=0, **kwargs):
+        if restart_idx > 0:
+            return super().get_initial_condition(P, *args, restart_idx=restart_idx, **kwargs)
+        else:
+            u0 = P.u_exact(t=0, seed=P.comm.rank, noise_level=1e-3)
+            for _ in range(self.relaxation_steps):
+                u0 = P.solve_system(u0, 1e-1, u0)
+            return u0, 0

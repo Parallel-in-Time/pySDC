@@ -58,6 +58,7 @@ class RayleighBenard(GenericSpectralLinear):
         BCs=None,
         dealiasing=3 / 2,
         comm=None,
+        Lx=8,
         **kwargs,
     ):
         """
@@ -71,6 +72,7 @@ class RayleighBenard(GenericSpectralLinear):
             BCs (dict): Vertical boundary conditions
             dealiasing (float): Dealiasing for evaluating the non-linear part in real space
             comm (mpi4py.Intracomm): Space communicator
+            Lx (float): Horizontal length of the domain
         """
         BCs = {} if BCs is None else BCs
         BCs = {
@@ -98,11 +100,12 @@ class RayleighBenard(GenericSpectralLinear):
             'BCs',
             'dealiasing',
             'comm',
+            'Lx',
             localVars=locals(),
             readOnly=True,
         )
 
-        bases = [{'base': 'fft', 'N': nx, 'x0': 0, 'x1': 8}, {'base': 'ultraspherical', 'N': nz}]
+        bases = [{'base': 'fft', 'N': nx, 'x0': 0, 'x1': self.Lx}, {'base': 'ultraspherical', 'N': nz}]
         components = ['u', 'v', 'T', 'p']
         super().__init__(bases, components, comm=comm, **kwargs)
 
