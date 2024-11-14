@@ -184,6 +184,7 @@ class GrayScott_USkate(GrayScott):
 
     num_frames = 200
     res_per_blob = 2**7
+    Tend = 200000
 
     def get_description(self, *args, **kwargs):
         from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
@@ -194,7 +195,6 @@ class GrayScott_USkate(GrayScott):
         desc['problem_params']['Du'] = 2e-5
         desc['problem_params']['Dv'] = 1e-5
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3}
-        self.Tend = 200000
         return desc
 
 
@@ -233,3 +233,63 @@ class GrayScottLarge(GrayScott_USkate):
 
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3}
         return desc
+
+    def plot(self, P, idx, n_procs_list):  # pragma: no cover
+        import numpy as np
+        from matplotlib import ticker as tkr
+        from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
+        from mpl_toolkits.axes_grid1.inset_locator import mark_inset
+
+        fig = P.get_fig(n_comps=1)
+        cax = P.cax
+        ax = fig.get_axes()[0]
+        ax_ins = zoomed_inset_axes(ax, 2, loc=1)
+
+        buffer = {}
+        vmin = {'u': np.inf, 'v': np.inf}
+        vmax = {'u': -np.inf, 'v': -np.inf}
+
+        for rank in range(n_procs_list[2]):
+            ranks = [0, 0] + [rank]
+            LogToFile = self.get_LogToFile(ranks=ranks)
+
+            buffer[f'u-{rank}'] = LogToFile.load(idx)
+
+            vmin['v'] = min([vmin['v'], buffer[f'u-{rank}']['v'].real.min()])
+            vmax['v'] = max([vmax['v'], buffer[f'u-{rank}']['v'].real.max()])
+            vmin['u'] = min([vmin['u'], buffer[f'u-{rank}']['u'].real.min()])
+            vmax['u'] = max([vmax['u'], buffer[f'u-{rank}']['u'].real.max()])
+
+        for rank in range(n_procs_list[2]):
+            im = ax.pcolormesh(
+                buffer[f'u-{rank}']['X'],
+                buffer[f'u-{rank}']['Y'],
+                buffer[f'u-{rank}']['v'].real,
+                vmin=vmin['v'],
+                vmax=vmax['v'],
+                cmap='binary',
+                rasterized=True,
+            )
+            ax_ins.pcolormesh(
+                buffer[f'u-{rank}']['X'],
+                buffer[f'u-{rank}']['Y'],
+                buffer[f'u-{rank}']['v'].real,
+                vmin=vmin['v'],
+                vmax=vmax['v'],
+                cmap='binary',
+                rasterized=True,
+            )
+
+        ax_ins.set_xlim((me / 8 for me in ax.get_xlim()))
+        ax_ins.set_ylim((me / 8 for me in ax.get_ylim()))
+        ax_ins.set_xticks([])
+        ax_ins.set_yticks([])
+        mark_inset(ax, ax_ins, loc1=2, loc2=4, fc="none", ec="0.5")
+        fig.colorbar(im, cax, format=tkr.FormatStrFormatter('%.1f'))
+        ax.set_title(f't={buffer[f"u-{rank}"]["t"]:.2f}')
+        ax.set_xlabel('$x$')
+        ax.set_ylabel('$y$')
+        ax.set_aspect(1.0)
+        ax.set_aspect(1.0)
+
+        return fig

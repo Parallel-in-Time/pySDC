@@ -896,7 +896,7 @@ class AdaptivityPolynomialError(AdaptivityForConvergedCollocationProblems):
             self.log(
                 f'Error target: {self.params.e_tol:.2e}, error estimate: {e_est:.2e}, update_order: {order}',
                 S,
-                level=11,
+                level=10,
             )
             self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
 
