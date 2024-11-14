@@ -139,12 +139,30 @@ class GSLarge(LargeSim):
             'time': '0:10:00',
         }
 
+class RBCLarge(LargeSim):
+    config = 'RBC_large'
+
+    def setup_CPU_params(self):
+        """
+        Test params with a small run.
+        """
+        self.params = {
+            'procs': [1, 4, 32],
+            'useGPU': False,
+            'tasks_per_node': 16,
+            'partition': 'batch',
+            'cluster': 'jusuf',
+            'res': 256,
+            'time': '3:30:00',
+        }
+
+
 
 if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--problem', type=str, default='GS')
+    parser.add_argument('--problem', type=str, default='GS', choices=['RBC', 'GS'])
     parser.add_argument('--XPU', type=str, choices=['CPU', 'GPU'], default='CPU')
     parser.add_argument('--mode', type=str, choices=['run', 'plot', 'video'], default='plot')
     parser.add_argument('--submit', type=str, choices=['yes', 'no'], default='yes')
@@ -153,6 +171,8 @@ if __name__ == '__main__':
 
     if args.problem == 'GS':
         cls = GSLarge
+    elif args.problem == 'RBC':
+        cls = RBCLarge
     else:
         raise NotImplementedError
 

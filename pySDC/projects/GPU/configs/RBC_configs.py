@@ -375,7 +375,7 @@ class RayleighBenard_scaling(RayleighBenardRegular):
 class RayleighBenard_large(RayleighBenardRegular):
     res_per_plume = 256
     vertical_res = 1024
-    Ra = 2e6
+    Ra = 2e7
     relaxation_steps = 5
 
     def get_description(self, *args, **kwargs):
