@@ -75,9 +75,7 @@ class CheckConvergence(ConvergenceController):
         iter_converged = S.status.iter >= S.params.maxiter
         res_converged = L.status.residual <= L.params.restol
         e_tol_converged = (
-            L.status.error_embedded_estimate < L.params.e_tol
-            if (L.params.get('e_tol') and L.status.get('error_embedded_estimate'))
-            else False
+            L.status.increment < L.params.e_tol if (L.params.get('e_tol') and L.status.get('increment')) else False
         )
         converged = (
             iter_converged or res_converged or e_tol_converged or S.status.force_done
