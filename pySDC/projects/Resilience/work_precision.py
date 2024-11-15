@@ -1085,7 +1085,7 @@ def get_configs(mode, problem):
         for num_procs in [4, 1]:
             configurations[num_procs] = {
                 'strategies': [AdaptivityStrategy(useMPI=True)],
-                'custom_description': desc.copy(),
+                'custom_description': desc.copy() if num_procs > 1 else {},
                 'num_procs': num_procs,
                 'plotting_params': {
                     'ls': ls.get(num_procs, '-'),
@@ -1096,6 +1096,7 @@ def get_configs(mode, problem):
                 'custom_description': {
                     'sweeper_class': parallel_sweeper,
                     'sweeper_params': {'QI': 'MIN-SR-S', 'QE': 'PIC'},
+                    'step_params': {'maxiter': 5},
                 },
                 'strategies': [AdaptivityStrategy(useMPI=True)],
                 'num_procs_sweeper': 3,

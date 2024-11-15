@@ -97,6 +97,7 @@ def run_GS(
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'MIN-SR-S'
     sweeper_params['QE'] = 'PIC'
+    sweeper_params['initial_guess'] = 'copy'
 
     from mpi4py import MPI
 
