@@ -1071,6 +1071,13 @@ def get_configs(mode, problem):
             desc['sweeper_params']['QE'] = 'PIC'
             desc['sweeper_params']['QI'] = 'LU'
 
+        desc_serial = (
+            {
+                'step_params': {'maxiter': 5},
+                'sweeper_params': {'num_nodes': 3, 'quad_type': 'RADAU-RIGHT'},
+            },
+        )
+
         ls = {
             1: '-',
             2: '--',
@@ -1085,7 +1092,7 @@ def get_configs(mode, problem):
         for num_procs in [4, 1]:
             configurations[num_procs] = {
                 'strategies': [AdaptivityStrategy(useMPI=True)],
-                'custom_description': desc.copy() if num_procs > 1 else {},
+                'custom_description': desc.copy() if num_procs > 1 else desc_serial,
                 'num_procs': num_procs,
                 'plotting_params': {
                     'ls': ls.get(num_procs, '-'),
@@ -1128,13 +1135,17 @@ def get_configs(mode, problem):
             12: ':',
         }
 
+        QI = {
+            (4, 'run_Lorenz'): 'MIN-SR-S',
+        }
+
         newton_inexactness = False if problem.__name__ in ['run_vdp'] else True
 
         for num_procs in [4, 1]:
             configurations[num_procs * 100 + 79] = {
                 'custom_description': {
                     'sweeper_class': parallel_sweeper,
-                    'sweeper_params': {'QI': 'MIN-SR-S', 'QE': 'PIC'},
+                    'sweeper_params': {'QI': QI.get((num_procs, problem.__name__), 'MIN-SR-S'), 'QE': 'PIC'},
                 },
                 'strategies': [
                     AdaptivityPolynomialError(
@@ -1149,7 +1160,7 @@ def get_configs(mode, problem):
                 },
             }
             configurations[num_procs * 200 + 79] = {
-                # 'custom_description': {'sweeper_params': {'QI': 'MIN-SR-S', 'QE': 'PIC'}},
+                'sweeper_params': {'QI': QI.get((num_procs, problem.__name__), 'MIN-SR-S'), 'QE': 'PIC'},
                 'strategies': [
                     AdaptivityPolynomialError(
                         useMPI=True, newton_inexactness=newton_inexactness, linear_inexactness=True
