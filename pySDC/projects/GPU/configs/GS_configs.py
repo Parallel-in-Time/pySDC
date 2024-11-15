@@ -1,4 +1,5 @@
 from pySDC.projects.GPU.configs.base_config import Config
+from mpi4py_fft.distarray import newDistArray
 
 
 def get_config(args):
@@ -42,7 +43,12 @@ class GrayScott(Config):
             P = L.prob
 
             if P.spectral:
-                uend = P.itransform(L.uend)
+
+                tmpu = newDistArray(P.fft, False)
+                tmpv = newDistArray(P.fft, False)
+                tmpu[:] = P.fft.backward(L.uend[0, ...], tmpu)
+                tmpv[:] = P.fft.backward(L.uend[1, ...], tmpv)
+                uend = P.xp.stack((tmpu, tmpv))
             else:
                 uend = L.uend
 
@@ -215,8 +221,7 @@ class GrayScottScaling(GrayScott):
 
 
 class GrayScottLarge(GrayScott_USkate):
-    # Tend = 25000
-    Tend = 10000
+    Tend = 25000
     num_frames = 100
 
     def get_description(self, *args, **kwargs):
@@ -228,6 +233,7 @@ class GrayScottLarge(GrayScott_USkate):
         desc['sweeper_params']['QI'] = 'MIN-SR-S'
         desc['sweeper_params']['QE'] = 'PIC'
         desc['step_params']['maxiter'] = 4
+        desc['problem_params']['spectral'] = True
 
         # desc['problem_params']['nvars'] = (2**18, 2**18//900 * 2,)
 

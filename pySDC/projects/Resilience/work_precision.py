@@ -1071,12 +1071,10 @@ def get_configs(mode, problem):
             desc['sweeper_params']['QE'] = 'PIC'
             desc['sweeper_params']['QI'] = 'LU'
 
-        desc_serial = (
-            {
-                'step_params': {'maxiter': 5},
-                'sweeper_params': {'num_nodes': 3, 'quad_type': 'RADAU-RIGHT'},
-            },
-        )
+        desc_serial = {
+            'step_params': {'maxiter': 5},
+            'sweeper_params': {'num_nodes': 3, 'quad_type': 'RADAU-RIGHT'},
+        }
 
         ls = {
             1: '-',
