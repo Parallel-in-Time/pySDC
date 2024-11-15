@@ -1149,7 +1149,7 @@ def get_configs(mode, problem):
                 },
             }
             configurations[num_procs * 200 + 79] = {
-                'custom_description': {'sweeper_params': {'QI': 'MIN-SR-S', 'QE': 'PIC'}},
+                # 'custom_description': {'sweeper_params': {'QI': 'MIN-SR-S', 'QE': 'PIC'}},
                 'strategies': [
                     AdaptivityPolynomialError(
                         useMPI=True, newton_inexactness=newton_inexactness, linear_inexactness=True
