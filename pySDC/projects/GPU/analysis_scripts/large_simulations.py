@@ -74,7 +74,9 @@ class LargeSim:
         srun_options = [f'--tasks-per-node={tasks_per_node}']
 
         procs_sim = (''.join(f'{me}/' for me in procs_sim))[:-1]
-        command = f'run_experiment.py --mode={mode} --res={res} --config={self.config} --procs={procs_sim} -o {self.path}'
+        command = (
+            f'run_experiment.py --mode={mode} --res={res} --config={self.config} --procs={procs_sim} -o {self.path}'
+        )
 
         if useGPU:
             command += ' --useGPU=True'
@@ -190,7 +192,7 @@ if __name__ == '__main__':
     elif args.mode == 'plot':
         sim.write_jobscript_for_plotting(num_procs=args.num_procs, submit=args.submit)
     elif args.mode == 'plot_series':
-        sim.write_jobscript_for_plotting(num_procs=args.num_procs, submit=args.submit, mode='plot_series')
+        sim.write_jobscript_for_plotting(num_procs=1, submit=args.submit, mode='plot_series')
     elif args.mode == 'video':
         sim.write_jobscript_for_video(num_procs=args.num_procs, submit=args.submit)
     else:
