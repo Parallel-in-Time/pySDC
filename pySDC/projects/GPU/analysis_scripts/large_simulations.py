@@ -139,6 +139,7 @@ class GSLarge(LargeSim):
             'time': '0:10:00',
         }
 
+
 class RBCLarge(LargeSim):
     config = 'RBC_large'
 
@@ -155,7 +156,6 @@ class RBCLarge(LargeSim):
             'res': 256,
             'time': '3:30:00',
         }
-
 
 
 if __name__ == '__main__':
@@ -189,6 +189,8 @@ if __name__ == '__main__':
         sim.write_jobscript_for_run(submit=args.submit)
     elif args.mode == 'plot':
         sim.write_jobscript_for_plotting(num_procs=args.num_procs, submit=args.submit)
+    elif args.mode == 'plot_series':
+        sim.plot_series()
     elif args.mode == 'video':
         sim.write_jobscript_for_video(num_procs=args.num_procs, submit=args.submit)
     else:

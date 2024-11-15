@@ -12,7 +12,11 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--useGPU', type=cast_to_bool, help='Toggle for GPUs', default=False)
     parser.add_argument(
-        '--mode', type=str, help='Mode for this script', default=None, choices=['run', 'plot', 'render', 'video']
+        '--mode',
+        type=str,
+        help='Mode for this script',
+        default=None,
+        choices=['run', 'plot', 'render', 'plot_series', 'video'],
     )
     parser.add_argument('--config', type=str, help='Configuration to load', default=None)
     parser.add_argument('--restart_idx', type=int, help='Restart from file by index', default=0)
@@ -97,6 +101,46 @@ def plot_experiment(args, config):  # pragma: no cover
         gc.collect()
 
 
+def plot_series(args, config):  # pragma: no cover
+    import numpy as np
+    import gc
+    import matplotlib.pyplot as plt
+    from pySDC.helpers.plot_helper import figsize_by_journal, setup_mpl
+
+    setup_mpl()
+
+    fig, axs = plt.subplots(
+        3, 3, figsize=figsize_by_journal("TUHH_thesis", 1.0, 1.2), sharex=True, sharey=True, layout="compressed"
+    )
+
+    type(config).base_path = args['o']
+    description = config.get_description()
+
+    P = description['problem_class'](**description['problem_params'])
+
+    idxs = np.linspace(0, config.num_frames * 0.9, 9, dtype=int)
+
+    for idx, ax in zip(idxs, axs.flatten()):
+        try:
+            _fig = config.plot(P=P, idx=idx, n_procs_list=args['procs'], ax=ax)
+        except FileNotFoundError:
+            break
+
+        plt.close(_fig)
+        del _fig
+        gc.collect()
+
+    for ax in axs.flatten():
+        if ax != axs[-1, 0]:
+            ax.set_xlabel('')
+            ax.set_ylabel('')
+
+    path = f'plots/{config.get_path(ranks=[0,0,0])}-series.pdf'
+    fig.savefig(path, dpi=300)
+    print(f'Stored figure {path!r}', flush=True)
+    plt.show()
+
+
 def make_video(args, config):  # pragma: no cover
     comm = config.comm_world
     if comm.rank > 0:
@@ -123,5 +167,7 @@ if __name__ == '__main__':
         run_experiment(args, config)
     elif args['mode'] in ['plot', 'render']:  # pragma: no cover
         plot_experiment(args, config)
+    elif args['mode'] == 'plot_series':  # pragma: no cover
+        plot_series(args, config)
     elif args['mode'] == 'video':  # pragma: no cover
         make_video(args, config)

@@ -223,6 +223,7 @@ class GrayScottScaling(GrayScott):
 class GrayScottLarge(GrayScott_USkate):
     Tend = 25000
     num_frames = 100
+    res_per_blob = 2**9
 
     def get_description(self, *args, **kwargs):
         from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
@@ -233,14 +234,13 @@ class GrayScottLarge(GrayScott_USkate):
         desc['sweeper_params']['QI'] = 'MIN-SR-S'
         desc['sweeper_params']['QE'] = 'PIC'
         desc['step_params']['maxiter'] = 4
-        desc['problem_params']['spectral'] = True
 
         # desc['problem_params']['nvars'] = (2**18, 2**18//900 * 2,)
 
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3}
         return desc
 
-    def plot(self, P, idx, n_procs_list):  # pragma: no cover
+    def plot(self, P, idx, n_procs_list, ax=None):  # pragma: no cover
         import numpy as np
         from matplotlib import ticker as tkr
         from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
@@ -248,7 +248,7 @@ class GrayScottLarge(GrayScott_USkate):
 
         fig = P.get_fig(n_comps=1)
         cax = P.cax
-        ax = fig.get_axes()[0]
+        ax = fig.get_axes()[0] if ax is None else ax
 
         zoom = 8
         ax_ins = zoomed_inset_axes(ax, zoom, loc=1)
@@ -263,10 +263,10 @@ class GrayScottLarge(GrayScott_USkate):
 
             buffer[f'u-{rank}'] = LogToFile.load(idx)
 
-            vmin['v'] = min([vmin['v'], buffer[f'u-{rank}']['v'].real.min()])
-            vmax['v'] = max([vmax['v'], buffer[f'u-{rank}']['v'].real.max()])
-            vmin['u'] = min([vmin['u'], buffer[f'u-{rank}']['u'].real.min()])
-            vmax['u'] = max([vmax['u'], buffer[f'u-{rank}']['u'].real.max()])
+            vmin['v'] = 0
+            vmax['v'] = 0.5
+            vmin['u'] = 0
+            vmax['u'] = 0.5
 
         for rank in range(n_procs_list[2]):
             im = ax.pcolormesh(
@@ -302,3 +302,23 @@ class GrayScottLarge(GrayScott_USkate):
         ax.set_aspect(1.0)
 
         return fig
+
+    def get_initial_condition(self, P, *args, restart_idx=0, **kwargs):
+        if restart_idx > 0:
+            return super().get_initial_condition(P, *args, restart_idx=restart_idx, **kwargs)
+        else:
+            _u0 = P.u_exact(t=0)
+            xp = P.xp
+            rng = xp.random.default_rng(0)
+            for _ in range(4):
+                x0, y0 = rng.random(size=2) * P.L[0] - P.L[0] / 2
+                lx, ly = rng.random(size=2) * P.L[0]
+
+                mask_x = xp.logical_and(P.X[0] > x0, P.X[0] < x0 + lx)
+                mask_y = xp.logical_and(P.X[1] > y0, P.X[1] < y0 + ly)
+                mask = xp.logical_and(mask_x, mask_y)
+
+                _u0[0][mask] = rng.random()
+                _u0[1][mask] = rng.random()
+
+            return _u0, 0
