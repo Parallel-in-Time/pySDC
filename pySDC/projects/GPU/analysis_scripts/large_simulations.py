@@ -17,7 +17,7 @@ class LargeSim:
     @property
     def plotting_params(self):
         return {
-            'tasks_per_node': 20,
+            'tasks_per_node': 10,
             'partition': 'develgpus',
             'cluster': 'jusuf',
             'time': '0:20:00',
@@ -116,13 +116,13 @@ class GSLarge(LargeSim):
         Test params with a small run.
         """
         self.params = {
-            'procs': [1, 4, 280],
+            'procs': [1, 4, 240],
             'useGPU': False,
             'tasks_per_node': 16,
             'partition': 'batch',
             'cluster': 'jusuf',
             'res': 2**13,
-            'time': '0:30:00',
+            'time': '0:15:00',
         }
 
     def setup_GPU_params(self):
