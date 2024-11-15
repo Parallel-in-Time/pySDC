@@ -223,7 +223,7 @@ class GrayScottScaling(GrayScott):
 class GrayScottLarge(GrayScott_USkate):
     Tend = 25000
     num_frames = 100
-    res_per_blob = 2**9
+    res_per_blob = 2**8
 
     def get_description(self, *args, **kwargs):
         from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
@@ -310,9 +310,9 @@ class GrayScottLarge(GrayScott_USkate):
             _u0 = P.u_exact(t=0)
             xp = P.xp
             rng = xp.random.default_rng(0)
-            for _ in range(4):
+            for _ in range(16):
                 x0, y0 = rng.random(size=2) * P.L[0] - P.L[0] / 2
-                lx, ly = rng.random(size=2) * P.L[0]
+                lx, ly = rng.random(size=2) * P.L[0] / 4
 
                 mask_x = xp.logical_and(P.X[0] > x0, P.X[0] < x0 + lx)
                 mask_y = xp.logical_and(P.X[1] > y0, P.X[1] < y0 + ly)
@@ -321,4 +321,6 @@ class GrayScottLarge(GrayScott_USkate):
                 _u0[0][mask] = rng.random()
                 _u0[1][mask] = rng.random()
 
+            for _ in range(5):
+                _u0 = P.solve_system(_u0, factor=1, t=0, u0=_u0)
             return _u0, 0
