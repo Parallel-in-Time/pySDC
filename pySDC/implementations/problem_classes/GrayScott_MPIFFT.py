@@ -223,7 +223,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
 
             for _ in range(-self.num_blobs):
                 x0, y0 = rng.random(size=2) * self.L[0] - self.L[0] / 2
-                lx, ly = rng.random(size=2) * self.L[0] / self.nvars[0] * 30
+                lx, ly = rng.random(size=2) * self.L[0] / self.nvars[0] * 80
 
                 mask_x = xp.logical_and(self.X[0] > x0, self.X[0] < x0 + lx)
                 mask_y = xp.logical_and(self.X[1] > y0, self.X[1] < y0 + ly)

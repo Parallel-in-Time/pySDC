@@ -166,7 +166,7 @@ if __name__ == '__main__':
     parser.add_argument('--XPU', type=str, choices=['CPU', 'GPU'], default='CPU')
     parser.add_argument('--mode', type=str, choices=['run', 'plot', 'video'], default='plot')
     parser.add_argument('--submit', type=str, choices=['yes', 'no'], default='yes')
-    parser.add_argument('--num_procs', type=int, default=20)
+    parser.add_argument('--num_procs', type=int, default=10)
     args = parser.parse_args()
 
     if args.problem == 'GS':
