@@ -261,7 +261,8 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
 
             _u += 1
         else:
-            raise NotImplementedError
+            _u[...] = rng.random(_u.shape)
+            _v[...] = rng.random(_v.shape)
 
         u = self.u_init
         if self.spectral:

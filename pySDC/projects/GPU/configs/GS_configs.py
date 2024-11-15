@@ -236,6 +236,7 @@ class GrayScottLarge(GrayScott_USkate):
         desc['step_params']['maxiter'] = 4
 
         # desc['problem_params']['nvars'] = (2**18, 2**18//900 * 2,)
+        desc['problem_params']['num_blobs'] = 0
 
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3}
         return desc
