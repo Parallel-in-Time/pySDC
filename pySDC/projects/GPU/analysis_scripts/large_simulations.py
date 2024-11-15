@@ -55,7 +55,7 @@ class LargeSim:
 
         write_jobscript(sbatch_options, srun_options, command, cluster, submit=submit)
 
-    def write_jobscript_for_plotting(self, num_procs=20, submit=True):
+    def write_jobscript_for_plotting(self, num_procs=20, mode='plot', submit=True):
         procs_sim = self.params['procs']
         useGPU = self.params['useGPU']
         res = self.params['res']
@@ -74,7 +74,7 @@ class LargeSim:
         srun_options = [f'--tasks-per-node={tasks_per_node}']
 
         procs_sim = (''.join(f'{me}/' for me in procs_sim))[:-1]
-        command = f'run_experiment.py --mode=plot --res={res} --config={self.config} --procs={procs_sim} -o {self.path}'
+        command = f'run_experiment.py --mode={mode} --res={res} --config={self.config} --procs={procs_sim} -o {self.path}'
 
         if useGPU:
             command += ' --useGPU=True'
@@ -164,7 +164,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--problem', type=str, default='GS', choices=['RBC', 'GS'])
     parser.add_argument('--XPU', type=str, choices=['CPU', 'GPU'], default='CPU')
-    parser.add_argument('--mode', type=str, choices=['run', 'plot', 'video'], default='plot')
+    parser.add_argument('--mode', type=str, choices=['run', 'plot', 'video', 'plot_series'], default='plot')
     parser.add_argument('--submit', type=str, choices=['yes', 'no'], default='yes')
     parser.add_argument('--num_procs', type=int, default=10)
     args = parser.parse_args()
@@ -190,7 +190,7 @@ if __name__ == '__main__':
     elif args.mode == 'plot':
         sim.write_jobscript_for_plotting(num_procs=args.num_procs, submit=args.submit)
     elif args.mode == 'plot_series':
-        sim.plot_series()
+        sim.write_jobscript_for_plotting(num_procs=args.num_procs, submit=args.submit, mode='plot_series')
     elif args.mode == 'video':
         sim.write_jobscript_for_video(num_procs=args.num_procs, submit=args.submit)
     else:
