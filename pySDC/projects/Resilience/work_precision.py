@@ -1134,7 +1134,10 @@ def get_configs(mode, problem):
         }
 
         QI = {
-            (4, 'run_Lorenz'): 'MIN-SR-S',
+            (1, 3, 'run_Lorenz'): 'MIN-SR-NS',
+            (1, 1, 'run_Lorenz'): 'MIN-SR-NS',
+            (4, 1, 'run_Lorenz'): 'IE',
+            (1, 1, 'run_RBC'): 'MIN-SR-S',
         }
 
         newton_inexactness = False if problem.__name__ in ['run_vdp'] else True
@@ -1143,7 +1146,7 @@ def get_configs(mode, problem):
             configurations[num_procs * 100 + 79] = {
                 'custom_description': {
                     'sweeper_class': parallel_sweeper,
-                    'sweeper_params': {'QI': QI.get((num_procs, problem.__name__), 'MIN-SR-S'), 'QE': 'PIC'},
+                    'sweeper_params': {'QI': QI.get((num_procs, 3, problem.__name__), 'MIN-SR-S'), 'QE': 'PIC'},
                 },
                 'strategies': [
                     AdaptivityPolynomialError(
@@ -1158,7 +1161,9 @@ def get_configs(mode, problem):
                 },
             }
             configurations[num_procs * 200 + 79] = {
-                'sweeper_params': {'QI': QI.get((num_procs, problem.__name__), 'MIN-SR-S'), 'QE': 'PIC'},
+                'custom_description': {
+                    'sweeper_params': {'QI': QI.get((num_procs, 1, problem.__name__), 'MIN-SR-S'), 'QE': 'PIC'},
+                },
                 'strategies': [
                     AdaptivityPolynomialError(
                         useMPI=True, newton_inexactness=newton_inexactness, linear_inexactness=True
