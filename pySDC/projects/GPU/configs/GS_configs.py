@@ -250,10 +250,10 @@ class GrayScottScaling(GrayScott):
         return params
 
 
-class GrayScottLarge(GrayScott_USkate):
+class GrayScottLarge(GrayScott):
     Tend = 10000
     num_frames = 100
-    res_per_blob = 2**6
+    res_per_blob = 2**7
     ndim = 3
 
     def get_description(self, *args, **kwargs):
@@ -269,7 +269,7 @@ class GrayScottLarge(GrayScott_USkate):
         # desc['problem_params']['spectral'] = True
 
         # desc['problem_params']['nvars'] = (2**18, 2**18//900 * 2,)
-        desc['problem_params']['num_blobs'] *= -1
+        # desc['problem_params']['num_blobs'] *= -1
 
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3}
         return desc
