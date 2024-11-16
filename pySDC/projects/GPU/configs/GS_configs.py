@@ -30,7 +30,7 @@ class GrayScott(Config):
     num_frames = 200
     sweeper_type = 'IMEX'
     res_per_blob = 2**7
-    ndim = 3
+    ndim = 2
 
     def get_LogToFile(self, ranks=None):
         import numpy as np
@@ -58,7 +58,7 @@ class GrayScott(Config):
                     't': L.time + L.dt,
                     'u': uend[0].get().view(np.ndarray),
                     'v': uend[1].get().view(np.ndarray),
-                    'X': [me.get().view(np.ndarray) for me in L.prob.X], 
+                    'X': [me.get().view(np.ndarray) for me in L.prob.X],
                 }
             else:
                 return {
@@ -185,6 +185,8 @@ class GrayScott_dt_adaptivity(GrayScott):
     Configuration with dt adaptivity added to base configuration
     """
 
+    ndim = 2
+
     def get_description(self, *args, **kwargs):
         from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
@@ -252,6 +254,7 @@ class GrayScottLarge(GrayScott_USkate):
     Tend = 10000
     num_frames = 100
     res_per_blob = 2**6
+    ndim = 3
 
     def get_description(self, *args, **kwargs):
         from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
@@ -262,9 +265,11 @@ class GrayScottLarge(GrayScott_USkate):
         desc['sweeper_params']['QI'] = 'MIN-SR-S'
         desc['sweeper_params']['QE'] = 'PIC'
         desc['step_params']['maxiter'] = 4
+        desc['level_params']['dt'] = 1e-3
+        # desc['problem_params']['spectral'] = True
 
         # desc['problem_params']['nvars'] = (2**18, 2**18//900 * 2,)
-        # desc['problem_params']['num_blobs'] = 0
+        desc['problem_params']['num_blobs'] *= -1
 
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3}
         return desc
@@ -337,19 +342,19 @@ class GrayScottLarge(GrayScott_USkate):
             return super().get_initial_condition(P, *args, restart_idx=restart_idx, **kwargs)
         else:
             _u0 = P.u_exact(t=0)
-            xp = P.xp
-            rng = xp.random.default_rng(0)
-            for _ in range(16):
-                x0, y0 = rng.random(size=2) * P.L[0] - P.L[0] / 2
-                lx, ly = rng.random(size=2) * P.L[0] / 4
+            # xp = P.xp
+            # rng = xp.random.default_rng(0)
+            # for _ in range(16):
+            #     x0, y0 = rng.random(size=2) * P.L[0] - P.L[0] / 2
+            #     lx, ly = rng.random(size=2) * P.L[0] / 4
 
-                mask_x = xp.logical_and(P.X[0] > x0, P.X[0] < x0 + lx)
-                mask_y = xp.logical_and(P.X[1] > y0, P.X[1] < y0 + ly)
-                mask = xp.logical_and(mask_x, mask_y)
+            #     mask_x = xp.logical_and(P.X[0] > x0, P.X[0] < x0 + lx)
+            #     mask_y = xp.logical_and(P.X[1] > y0, P.X[1] < y0 + ly)
+            #     mask = xp.logical_and(mask_x, mask_y)
 
-                _u0[0][mask] = rng.random()
-                _u0[1][mask] = rng.random()
+            #     _u0[0][mask] = rng.random()
+            #     _u0[1][mask] = rng.random()
 
-            for _ in range(5):
-                _u0 = P.solve_system(_u0, factor=1, t=0, u0=_u0)
+            # for _ in range(5):
+            #     _u0 = P.solve_system(_u0, factor=1, t=0, u0=_u0)
             return _u0, 0
