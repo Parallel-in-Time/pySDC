@@ -53,7 +53,8 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IMEX_Laplacian_MPIFFT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectral</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.283185307179586</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.COMM_WORLD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useGPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_MPIFFT_Laplacian.html#IMEX_Laplacian_MPIFFT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
 <p>Generic base class for IMEX problems using a spectral method to solve the Laplacian implicitly and a possible rest
-explicitly. The FFTs are done with``mpi4py-fft`` <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+explicitly. The FFTs are done with``mpi4py-fft`` <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.
+Works in two and three dimensions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -149,6 +150,16 @@ Journal of Parallel and Distributed Computing (2019).</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.getLaplacian">
+<span class="sig-name descname"><span class="pre">getLaplacian</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_MPIFFT_Laplacian.html#IMEX_Laplacian_MPIFFT.getLaplacian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.getLaplacian" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.getLocalGrid">
+<span class="sig-name descname"><span class="pre">getLocalGrid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_MPIFFT_Laplacian.html#IMEX_Laplacian_MPIFFT.getLocalGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.getLocalGrid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.setup_GPU">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setup_GPU</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_MPIFFT_Laplacian.html#IMEX_Laplacian_MPIFFT.setup_GPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.setup_GPU" title="Link to this definition">¶</a></dt>
 <dd><p>switch to GPU modules</p>
@@ -205,6 +216,8 @@ Journal of Parallel and Distributed Computing (2019).</p>
 <li><a class="reference internal" href="#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.fft_backend"><code class="docutils literal notranslate"><span class="pre">fft_backend</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.fft_comm_backend"><code class="docutils literal notranslate"><span class="pre">fft_comm_backend</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.getLaplacian"><code class="docutils literal notranslate"><span class="pre">getLaplacian()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.getLocalGrid"><code class="docutils literal notranslate"><span class="pre">getLocalGrid()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.setup_GPU"><code class="docutils literal notranslate"><span class="pre">setup_GPU()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.xp"><code class="docutils literal notranslate"><span class="pre">xp</span></code></a></li>

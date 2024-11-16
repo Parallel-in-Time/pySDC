@@ -68,7 +68,7 @@
 <span class="sd">        Args:</span>
 <span class="sd">            Name (str): Name of the requested attribute</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="s1">&#39;rank&#39;</span><span class="p">,</span> <span class="s1">&#39;Get_rank&#39;</span><span class="p">,</span> <span class="s1">&#39;Get_size&#39;</span><span class="p">,</span> <span class="s1">&#39;Split&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="s1">&#39;rank&#39;</span><span class="p">,</span> <span class="s1">&#39;Get_rank&#39;</span><span class="p">,</span> <span class="s1">&#39;Get_size&#39;</span><span class="p">,</span> <span class="s1">&#39;Split&#39;</span><span class="p">,</span> <span class="s1">&#39;Create_cart&#39;</span><span class="p">,</span> <span class="s1">&#39;Is_inter&#39;</span><span class="p">,</span> <span class="s1">&#39;Get_topology&#39;</span><span class="p">]:</span>
             <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_current_stream</span><span class="p">()</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">commMPI</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
@@ -121,6 +121,32 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Don</span><span class="se">\&#39;</span><span class="s1">t know what NCCL operation to use to replace this MPI operation!&#39;</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="NCCLComm.reduce">
+<a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.reduce">[docs]</a>
+    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sendobj</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">sync</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendobj</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendobj</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;ptr&#39;</span><span class="p">):</span>
+                <span class="n">sync</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">sync</span><span class="p">:</span>
+            <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">Device</span><span class="p">()</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">commMPI</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">sendobj</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">op</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NCCLComm.allreduce">
+<a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.allreduce">[docs]</a>
+    <span class="k">def</span> <span class="nf">allreduce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sendobj</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span><span class="p">):</span>
+        <span class="n">sync</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendobj</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendobj</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;ptr&#39;</span><span class="p">):</span>
+                <span class="n">sync</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">sync</span><span class="p">:</span>
+            <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">Device</span><span class="p">()</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">commMPI</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">sendobj</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">op</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="NCCLComm.Reduce">
 <a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.Reduce">[docs]</a>
     <span class="k">def</span> <span class="nf">Reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sendbuf</span><span class="p">,</span> <span class="n">recvbuf</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
@@ -171,6 +197,13 @@
         <span class="n">stream</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_current_stream</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">commNCCL</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">buff</span><span class="o">=</span><span class="n">buf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ptr</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">,</span> <span class="n">datatype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="o">.</span><span class="n">ptr</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NCCLComm.Barrier">
+<a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.Barrier">[docs]</a>
+    <span class="k">def</span> <span class="nf">Barrier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_current_stream</span><span class="p">()</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">commMPI</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span></div>
 </div>
 
 </pre></div>
