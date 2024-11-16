@@ -200,7 +200,6 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
             Exact solution.
         """
         assert t == 0.0, 'Exact solution only valid as initial condition'
-        assert self.ndim == 2, 'The initial conditions are 2D for now..'
 
         xp = self.xp
 
@@ -222,12 +221,13 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
             _v[...] = xp.sqrt(F) * (A + xp.sqrt(A**2 - 4)) / 2
 
             for _ in range(-self.num_blobs):
-                x0, y0 = rng.random(size=2) * self.L[0] - self.L[0] / 2
-                lx, ly = rng.random(size=2) * self.L[0] / self.nvars[0] * 80
+                x0 = rng.random(size=self.ndim) * self.L[0] - self.L[0] / 2
+                l = rng.random(size=self.ndim) * self.L[0] / self.nvars[0] * 80
 
-                mask_x = xp.logical_and(self.X[0] > x0, self.X[0] < x0 + lx)
-                mask_y = xp.logical_and(self.X[1] > y0, self.X[1] < y0 + ly)
-                mask = xp.logical_and(mask_x, mask_y)
+                masks = [xp.logical_and(self.X[i] > x0[i], self.X[i] < x0[i] + l[i]) for i in range(self.ndim)]
+                mask = masks[0]
+                for m in masks[1:]:
+                    mask = xp.logical_and(mask, m)
 
                 _u[mask] = rng.random()
                 _v[mask] = rng.random()
@@ -236,6 +236,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
             """
             Blobs as in https://www.chebfun.org/examples/pde/GrayScott.html
             """
+            assert self.ndim == 2, 'The initial conditions are 2D for now..'
 
             inc = self.L[0] / (self.num_blobs + 1)
 

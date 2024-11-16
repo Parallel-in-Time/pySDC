@@ -30,6 +30,7 @@ class GrayScott(Config):
     num_frames = 200
     sweeper_type = 'IMEX'
     res_per_blob = 2**7
+    ndim = 3
 
     def get_LogToFile(self, ranks=None):
         import numpy as np
@@ -57,16 +58,14 @@ class GrayScott(Config):
                     't': L.time + L.dt,
                     'u': uend[0].get().view(np.ndarray),
                     'v': uend[1].get().view(np.ndarray),
-                    'X': L.prob.X[0].get().view(np.ndarray),
-                    'Y': L.prob.X[1].get().view(np.ndarray),
+                    'X': L.prob.X.get().view(np.ndarray),
                 }
             else:
                 return {
                     't': L.time + L.dt,
                     'u': uend[0],
                     'v': uend[1],
-                    'X': L.prob.X[0],
-                    'Y': L.prob.X[1],
+                    'X': L.prob.X,
                 }
 
         def logging_condition(L):
@@ -83,7 +82,7 @@ class GrayScott(Config):
         LogToFile.logging_condition = logging_condition
         return LogToFile
 
-    def plot(self, P, idx, n_procs_list):  # pragma: no cover
+    def plot(self, P, idx, n_procs_list, projection='xy'):  # pragma: no cover
         import numpy as np
         from matplotlib import ticker as tkr
 
@@ -107,20 +106,49 @@ class GrayScott(Config):
             vmax['u'] = max([vmax['u'], buffer[f'u-{rank}']['u'].real.max()])
 
         for rank in range(n_procs_list[2]):
-            im = ax.pcolormesh(
-                buffer[f'u-{rank}']['X'],
-                buffer[f'u-{rank}']['Y'],
-                buffer[f'u-{rank}']['v'].real,
-                vmin=vmin['v'],
-                vmax=vmax['v'],
-                cmap='binary',
-                rasterized=True,
-            )
+            if len(buffer[f'u-{rank}']['X']) == 2:
+                ax.set_xlabel('$x$')
+                ax.set_ylabel('$y$')
+                im = ax.pcolormesh(
+                    buffer[f'u-{rank}']['X'][0],
+                    buffer[f'u-{rank}']['X'][1],
+                    buffer[f'u-{rank}']['v'].real,
+                    vmin=vmin['v'],
+                    vmax=vmax['v'],
+                    cmap='binary',
+                )
+            else:
+                v3d = buffer[f'u-{rank}']['v'].real
+
+                if projection == 'xy':
+                    slices = [slice(None), slice(None), v3d.shape[2] // 2]
+                    x = buffer[f'u-{rank}']['X'][0][*slices]
+                    y = buffer[f'u-{rank}']['X'][1][*slices]
+                    ax.set_xlabel('$x$')
+                    ax.set_ylabel('$y$')
+                elif projection == 'xz':
+                    slices = [slice(None), v3d.shape[1] // 2, slice(None)]
+                    x = buffer[f'u-{rank}']['X'][0][*slices]
+                    y = buffer[f'u-{rank}']['X'][2][*slices]
+                    ax.set_xlabel('$x$')
+                    ax.set_ylabel('$z$')
+                elif projection == 'yz':
+                    slices = [v3d.shape[0] // 2, slice(None), slice(None)]
+                    x = buffer[f'u-{rank}']['X'][1][*slices]
+                    y = buffer[f'u-{rank}']['X'][2][*slices]
+                    ax.set_xlabel('$y$')
+                    ax.set_ylabel('$z$')
+
+                im = ax.pcolormesh(
+                    x,
+                    y,
+                    v3d[*slices],
+                    vmin=vmin['v'],
+                    vmax=vmax['v'],
+                    cmap='binary',
+                )
             fig.colorbar(im, cax, format=tkr.FormatStrFormatter('%.1f'))
             ax.set_title(f't={buffer[f"u-{rank}"]["t"]:.2f}')
-            ax.set_xlabel('$x$')
-            ax.set_ylabel('$y$')
-            ax.set_aspect(1.0)
             ax.set_aspect(1.0)
         return fig
 
@@ -139,7 +167,7 @@ class GrayScott(Config):
         desc['sweeper_params']['QI'] = 'MIN-SR-S'
         desc['sweeper_params']['QE'] = 'PIC'
 
-        desc['problem_params']['nvars'] = (2**8 if res == -1 else res,) * 2
+        desc['problem_params']['nvars'] = (2**8 if res == -1 else res,) * self.ndim
         desc['problem_params']['Du'] = 0.00002
         desc['problem_params']['Dv'] = 0.00001
         desc['problem_params']['A'] = 0.04
