@@ -11,6 +11,7 @@ class IMEX_Laplacian_MPIFFT(Problem):
     r"""
     Generic base class for IMEX problems using a spectral method to solve the Laplacian implicitly and a possible rest
     explicitly. The FFTs are done with``mpi4py-fft`` [1]_.
+    Works in two and three dimensions.
 
     Parameters
     ----------
