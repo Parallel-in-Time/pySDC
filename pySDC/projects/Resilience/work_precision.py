@@ -937,7 +937,7 @@ def get_configs(mode, problem):
             desc['sweeper_params']['QE'] = 'PIC'
             desc['step_params']['maxiter'] = 3
 
-            desc_poly['sweeper_params'] = {'num_nodes': 2}
+            desc_poly['sweeper_params'] = {'num_nodes': 2, 'QI': 'MIN-SR-S'}
             num_procs_dt_k = 2
         else:
             RK_strategies.append(ESDIRKStrategy(useMPI=True))
@@ -1137,7 +1137,8 @@ def get_configs(mode, problem):
             (1, 3, 'run_Lorenz'): 'MIN-SR-NS',
             (1, 1, 'run_Lorenz'): 'MIN-SR-NS',
             (4, 1, 'run_Lorenz'): 'IE',
-            (1, 1, 'run_RBC'): 'MIN-SR-S',
+            (1, 3, 'run_RBC'): 'MIN-SR-S',
+            (4, 3, 'run_RBC'): 'MIN-SR-S',
         }
 
         newton_inexactness = False if problem.__name__ in ['run_vdp'] else True

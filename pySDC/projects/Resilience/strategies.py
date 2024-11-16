@@ -375,7 +375,10 @@ class InexactBaseStrategy(Strategy):
     def get_custom_description(self, problem, num_procs=1):
         from pySDC.implementations.convergence_controller_classes.inexactness import NewtonInexactness
 
-        preconditioner = 'MIN-SR-NS' if problem.__name__ in ['run_Lorenz'] else 'MIN-SR-S'
+        preconditioner = {
+            'run_Lorenz': 'MIN-SR-NS',
+            'run_RBC': 'LU',
+        }.get(problem.__name__, 'MIN-SR-S')
 
         desc = {}
         desc['sweeper_params'] = {'QI': preconditioner}
