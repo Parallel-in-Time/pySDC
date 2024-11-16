@@ -1137,8 +1137,6 @@ def get_configs(mode, problem):
             (1, 3, 'run_Lorenz'): 'MIN-SR-NS',
             (1, 1, 'run_Lorenz'): 'MIN-SR-NS',
             (4, 1, 'run_Lorenz'): 'IE',
-            (1, 3, 'run_RBC'): 'MIN-SR-S',
-            (4, 3, 'run_RBC'): 'MIN-SR-S',
         }
 
         newton_inexactness = False if problem.__name__ in ['run_vdp'] else True

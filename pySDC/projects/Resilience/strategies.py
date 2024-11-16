@@ -377,7 +377,6 @@ class InexactBaseStrategy(Strategy):
 
         preconditioner = {
             'run_Lorenz': 'MIN-SR-NS',
-            'run_RBC': 'LU',
         }.get(problem.__name__, 'MIN-SR-S')
 
         desc = {}

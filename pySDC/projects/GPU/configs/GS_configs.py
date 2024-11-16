@@ -251,7 +251,7 @@ class GrayScottScaling(GrayScott):
 class GrayScottLarge(GrayScott_USkate):
     Tend = 10000
     num_frames = 100
-    res_per_blob = 2**7
+    res_per_blob = 2**6
 
     def get_description(self, *args, **kwargs):
         from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
