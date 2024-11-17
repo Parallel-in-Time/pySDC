@@ -297,13 +297,13 @@ class GrayScottLarge(GrayScott):
         desc['level_params']['dt'] = 1e-1
         # desc['problem_params']['spectral'] = True
 
-        # desc['problem_params']['nvars'] = (2048, 2048, 32)
+        # desc['problem_params']['nvars'] = (2700, 2700, 3)
         # desc['problem_params']['num_blobs'] *= -1
         # desc['problem_params']['num_blobs'] = 40
 
         desc['problem_params']['L'] = 2 * desc['problem_params']['nvars'][0] // self.res_per_blob
-        desc['problem_params']['num_blobs'] = desc['problem_params']['nvars'][0] // self.res_per_blob
-        desc['problem_params']['num_blobs'] = 16 / 4 * desc['problem_params']['L']
+        # desc['problem_params']['num_blobs'] = desc['problem_params']['nvars'][0] // self.res_per_blob
+        desc['problem_params']['num_blobs'] = int(3 * desc['problem_params']['L'])
 
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3}
         return desc

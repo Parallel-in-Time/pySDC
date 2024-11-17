@@ -261,7 +261,6 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
                         )
                     elif self.ndim == 3:
                         z_pos = self.x0 + rng.random() * self.L[2]
-                        print(z_pos)
                         # This assumes that the box is [-L/2, L/2]^2
                         _u[...] += -xp.exp(
                             -80.0

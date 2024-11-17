@@ -40,6 +40,8 @@ class LargeSim:
             '--mail-type=ALL',
             f'--mail-user={self.email}',
         ]
+        if 'reservation' in self.params.keys():
+            sbatch_options += [f'--reservation={self.params["reservation"]}']
 
         srun_options = [f'--tasks-per-node={tasks_per_node}']
 
@@ -118,12 +120,12 @@ class GSLarge(LargeSim):
         Test params with a small run.
         """
         self.params = {
-            'procs': [1, 4, 200],
+            'procs': [1, 1, 900],
             'useGPU': False,
             'tasks_per_node': 16,
             'partition': 'batch',
             'cluster': 'jusuf',
-            'res': 2**10,
+            'res': 2700,
             'time': '0:15:00',
         }
 
@@ -132,13 +134,14 @@ class GSLarge(LargeSim):
         Test params with a small run.
         """
         self.params = {
-            'procs': [1, 4, 1],
+            'procs': [1, 4, 900],
             'useGPU': True,
             'tasks_per_node': 4,
-            'partition': 'develbooster',
+            'partition': 'largebooster',
             'cluster': 'booster',
-            'res': 2**9,
+            'res': 2700,
             'time': '0:20:00',
+            'reservation': 'big-days-20241119',
         }
 
 
