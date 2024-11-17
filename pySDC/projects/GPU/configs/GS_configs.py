@@ -83,7 +83,7 @@ class GrayScott(Config):
         LogToFile.logging_condition = logging_condition
         return LogToFile
 
-    def plot(self, P, idx, n_procs_list, projection=1, projection_type='flat'):  # pragma: no cover
+    def plot(self, P, idx, n_procs_list, projection=2, projection_type='flat'):  # pragma: no cover
         import numpy as np
         from matplotlib import ticker as tkr
 
@@ -303,6 +303,7 @@ class GrayScottLarge(GrayScott):
 
         desc['problem_params']['L'] = 2 * desc['problem_params']['nvars'][0] // self.res_per_blob
         desc['problem_params']['num_blobs'] = desc['problem_params']['nvars'][0] // self.res_per_blob
+        desc['problem_params']['num_blobs'] = 16 / 4 * desc['problem_params']['L']
 
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3}
         return desc
