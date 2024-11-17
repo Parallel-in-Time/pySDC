@@ -242,7 +242,6 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
             for i in range(1, self.num_blobs + 1):
                 for j in range(1, self.num_blobs + 1):
                     signs = (-1) ** rng.integers(low=0, high=2, size=self.ndim)
-                    print(i, j)
 
                     if self.ndim == 2:
                         # This assumes that the box is [-L/2, L/2]^2
@@ -267,7 +266,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
                             * (
                                 (self.X[0] + self.x0 + inc * i + signs[0] * 0.05) ** 2
                                 + (self.X[1] + self.x0 + inc * j + signs[1] * 0.02) ** 2
-                                + (self.X[2] + self.x0 + inc * j + signs[2] * 0.035) ** 2
+                                + (self.X[2] + self.x0 + self.L[2] // 2 + signs[2] * 0.035) ** 2
                             )
                         )
                         _v[...] += xp.exp(
@@ -275,7 +274,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
                             * (
                                 (self.X[0] + self.x0 + inc * i - signs[0] * 0.05) ** 2
                                 + (self.X[1] + self.x0 + inc * j - signs[1] * 0.02) ** 2
-                                + (self.X[2] + self.x0 + inc * j - signs[2] * 0.035) ** 2
+                                + (self.X[2] + self.x0 + +self.L[2] // 2 - signs[2] * 0.035) ** 2
                             )
                         )
                     else:

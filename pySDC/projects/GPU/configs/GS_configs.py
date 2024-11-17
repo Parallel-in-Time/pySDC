@@ -83,7 +83,7 @@ class GrayScott(Config):
         LogToFile.logging_condition = logging_condition
         return LogToFile
 
-    def plot(self, P, idx, n_procs_list, projection='xy'):  # pragma: no cover
+    def plot(self, P, idx, n_procs_list, projection=1, projection_type='flat'):  # pragma: no cover
         import numpy as np
         from matplotlib import ticker as tkr
 
@@ -121,29 +121,34 @@ class GrayScott(Config):
             else:
                 v3d = buffer[f'u-{rank}']['v'].real
 
-                if projection == 'xy':
+                if projection == 2:
                     slices = [slice(None), slice(None), v3d.shape[2] // 2]
                     x = buffer[f'u-{rank}']['X'][0][*slices]
                     y = buffer[f'u-{rank}']['X'][1][*slices]
                     ax.set_xlabel('$x$')
                     ax.set_ylabel('$y$')
-                elif projection == 'xz':
+                elif projection == 1:
                     slices = [slice(None), v3d.shape[1] // 2, slice(None)]
                     x = buffer[f'u-{rank}']['X'][0][*slices]
                     y = buffer[f'u-{rank}']['X'][2][*slices]
                     ax.set_xlabel('$x$')
                     ax.set_ylabel('$z$')
-                elif projection == 'yz':
+                elif projection == 0:
                     slices = [v3d.shape[0] // 2, slice(None), slice(None)]
                     x = buffer[f'u-{rank}']['X'][1][*slices]
                     y = buffer[f'u-{rank}']['X'][2][*slices]
                     ax.set_xlabel('$y$')
                     ax.set_ylabel('$z$')
 
+                if projection_type == 'sum':
+                    v = v3d.sum(axis=projection)
+                else:
+                    v = v3d[*slices]
+
                 im = ax.pcolormesh(
                     x,
                     y,
-                    v3d[*slices],
+                    v,
                     vmin=vmin['v'],
                     vmax=vmax['v'],
                     cmap='binary',
@@ -277,7 +282,7 @@ class GrayScottScaling3D(GrayScottScaling):
 class GrayScottLarge(GrayScott):
     Tend = 10000
     num_frames = 100
-    res_per_blob = 2**8
+    res_per_blob = 2**6
     ndim = 3
 
     def get_description(self, *args, **kwargs):
@@ -292,9 +297,12 @@ class GrayScottLarge(GrayScott):
         desc['level_params']['dt'] = 1e-3
         # desc['problem_params']['spectral'] = True
 
-        desc['problem_params']['nvars'] = (2048, 2048, 32)
+        # desc['problem_params']['nvars'] = (2048, 2048, 32)
         # desc['problem_params']['num_blobs'] *= -1
-        desc['problem_params']['num_blobs'] = 20
+        # desc['problem_params']['num_blobs'] = 40
+
+        desc['problem_params']['L'] = 4 * desc['problem_params']['nvars'][0] // self.res_per_blob
+        desc['problem_params']['num_blobs'] = desc['problem_params']['nvars'][0] // self.res_per_blob
 
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3}
         return desc
