@@ -282,7 +282,7 @@ class GrayScottScaling3D(GrayScottScaling):
 class GrayScottLarge(GrayScott):
     Tend = 10000
     num_frames = 100
-    res_per_blob = 2**6
+    res_per_blob = 2**7
     ndim = 3
 
     def get_description(self, *args, **kwargs):
@@ -294,14 +294,14 @@ class GrayScottLarge(GrayScott):
         desc['sweeper_params']['QI'] = 'MIN-SR-S'
         desc['sweeper_params']['QE'] = 'PIC'
         desc['step_params']['maxiter'] = 4
-        desc['level_params']['dt'] = 1e-3
+        desc['level_params']['dt'] = 1e-1
         # desc['problem_params']['spectral'] = True
 
         # desc['problem_params']['nvars'] = (2048, 2048, 32)
         # desc['problem_params']['num_blobs'] *= -1
         # desc['problem_params']['num_blobs'] = 40
 
-        desc['problem_params']['L'] = 4 * desc['problem_params']['nvars'][0] // self.res_per_blob
+        desc['problem_params']['L'] = 2 * desc['problem_params']['nvars'][0] // self.res_per_blob
         desc['problem_params']['num_blobs'] = desc['problem_params']['nvars'][0] // self.res_per_blob
 
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3}

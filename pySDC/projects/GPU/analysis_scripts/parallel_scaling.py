@@ -24,6 +24,8 @@ class ScalingConfig(object):
     sbatch_options = []
     max_nodes = 9999
     max_tasks = 9999
+    space_offset_weak = 0
+    space_offset_strong = 0
 
     def __init__(self, space_time_parallel):
         if space_time_parallel in ['False', False]:
@@ -33,12 +35,12 @@ class ScalingConfig(object):
 
     def get_resolution_and_tasks(self, strong, i):
         if strong:
-            return self.base_resolution, [1, self._tasks_time, 2**i]
+            return self.base_resolution, [1, self._tasks_time, 2 ** (i + self.space_offset_strong)]
         else:
             return self.base_resolution_weak * int(self._tasks_time ** (1.0 / self.ndim)) * (2**i), [
                 1,
                 self._tasks_time,
-                (2 * self.ndim) ** i,
+                (2**self.ndim) ** i * (self.space_offset_weak if self._tasks_time == 1 else 1),
             ]
 
     def run_scaling_test(self, strong=True, **kwargs):
@@ -136,7 +138,8 @@ class GrayScottSpaceScalingCPU3D(CPUConfig, ScalingConfig):
 
 
 class GrayScottSpaceScalingGPU3D(GPUConfig, ScalingConfig):
-    base_resolution_weak = 1024
+    ndim = 3
+    base_resolution_weak = 400
     base_resolution = 512
     config = 'GS_scaling3D'
     max_steps_space = 9
@@ -144,9 +147,11 @@ class GrayScottSpaceScalingGPU3D(GPUConfig, ScalingConfig):
     tasks_time = 4
     max_nodes = 64
     sbatch_options = ['--time=0:07:00']
+    space_offset_weak = 4
 
 
 class GrayScottSpaceScalingCPU(CPUConfig, ScalingConfig):
+    ndim = 3
     base_resolution = 8192
     base_resolution_weak = 512
     config = 'GS_scaling'

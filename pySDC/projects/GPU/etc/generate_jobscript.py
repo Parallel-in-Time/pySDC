@@ -66,6 +66,7 @@ def write_jobscript(sbatch_options, srun_options, command, cluster, submit=True,
     path = f'{PROJECT_PATH}/etc/jobscripts/{command.replace(" ", "").replace("/", "_")}-{cluster}.sh'
     with open(path, 'w') as file:
         file.write(text)
+    print(f'Written jobscript {path!r}')
 
     if submit:
         import os
