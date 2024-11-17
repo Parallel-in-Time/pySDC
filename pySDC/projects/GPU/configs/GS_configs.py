@@ -15,6 +15,8 @@ def get_config(args):
         return GrayScott_USkate(args)
     elif name == 'GS_scaling':
         return GrayScottScaling(args)
+    elif name == 'GS_scaling3D':
+        return GrayScottScaling3D(args)
     elif name == 'GS_large':
         return GrayScottLarge(args)
     else:
@@ -44,7 +46,6 @@ class GrayScott(Config):
             P = L.prob
 
             if P.spectral:
-
                 tmpu = newDistArray(P.fft, False)
                 tmpv = newDistArray(P.fft, False)
                 tmpu[:] = P.fft.backward(L.uend[0, ...], tmpu)
@@ -250,10 +251,33 @@ class GrayScottScaling(GrayScott):
         return params
 
 
+class GrayScottScaling3D(GrayScottScaling):
+    ndim = 3
+
+    def get_description(self, *args, **kwargs):
+        from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+
+        desc = super().get_description(*args, **kwargs)
+        desc['problem_params']['L'] = 2
+        desc['problem_params']['num_blobs'] = 4
+        desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
+        desc['sweeper_params']['num_nodes'] = 4
+        desc['step_params']['maxiter'] = 4
+        desc['level_params']['dt'] = 0.1
+        # desc['convergence_controllers'].pop(Adaptivity)
+        self.Tend = 50 * desc['level_params']['dt']
+        return desc
+
+    def get_controller_params(self, *args, **kwargs):
+        params = super().get_controller_params(*args, **kwargs)
+        params['hook_class'] = []
+        return params
+
+
 class GrayScottLarge(GrayScott):
     Tend = 10000
     num_frames = 100
-    res_per_blob = 2**7
+    res_per_blob = 2**8
     ndim = 3
 
     def get_description(self, *args, **kwargs):
@@ -268,8 +292,9 @@ class GrayScottLarge(GrayScott):
         desc['level_params']['dt'] = 1e-3
         # desc['problem_params']['spectral'] = True
 
-        # desc['problem_params']['nvars'] = (2**18, 2**18//900 * 2,)
+        desc['problem_params']['nvars'] = (2048, 2048, 32)
         # desc['problem_params']['num_blobs'] *= -1
+        desc['problem_params']['num_blobs'] = 20
 
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3}
         return desc

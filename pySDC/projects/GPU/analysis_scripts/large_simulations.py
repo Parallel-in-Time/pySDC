@@ -53,7 +53,7 @@ class LargeSim:
         if useGPU:
             command += ' --useGPU=True'
 
-        write_jobscript(sbatch_options, srun_options, command, cluster, submit=submit)
+        write_jobscript(sbatch_options, srun_options, command, cluster, submit=submit, name=f'{self.config}')
 
     def write_jobscript_for_plotting(self, num_procs=20, mode='plot', submit=True):
         procs_sim = self.params['procs']

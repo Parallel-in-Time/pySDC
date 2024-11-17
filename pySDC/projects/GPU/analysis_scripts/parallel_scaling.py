@@ -125,6 +125,27 @@ class GPUConfig(ScalingConfig):
     max_nodes = 936
 
 
+class GrayScottSpaceScalingCPU3D(CPUConfig, ScalingConfig):
+    base_resolution = 512
+    base_resolution_weak = 512
+    config = 'GS_scaling3D'
+    max_steps_space = 11
+    max_steps_space_weak = 11
+    tasks_time = 4
+    sbatch_options = ['--time=3:30:00']
+
+
+class GrayScottSpaceScalingGPU3D(GPUConfig, ScalingConfig):
+    base_resolution_weak = 1024
+    base_resolution = 512
+    config = 'GS_scaling3D'
+    max_steps_space = 9
+    max_steps_space_weak = 5
+    tasks_time = 4
+    max_nodes = 64
+    sbatch_options = ['--time=0:07:00']
+
+
 class GrayScottSpaceScalingCPU(CPUConfig, ScalingConfig):
     base_resolution = 8192
     base_resolution_weak = 512
@@ -203,6 +224,13 @@ def plot_scalings(strong, problem, kwargs):  # pragma: no cover
             GrayScottSpaceScalingGPU(space_time_parallel=False),
             GrayScottSpaceScalingGPU(space_time_parallel=True),
         ]
+    elif problem == 'GS3D':
+        configs = [
+            GrayScottSpaceScalingCPU3D(space_time_parallel=False),
+            GrayScottSpaceScalingCPU3D(space_time_parallel=True),
+            GrayScottSpaceScalingGPU3D(space_time_parallel=False),
+            GrayScottSpaceScalingGPU3D(space_time_parallel=True),
+        ]
     elif problem == 'RBC':
         configs = [
             RayleighBenardSpaceScalingCPU(space_time_parallel=False),
@@ -251,6 +279,11 @@ if __name__ == '__main__':
             configClass = GrayScottSpaceScalingCPU
         else:
             configClass = GrayScottSpaceScalingGPU
+    elif args.problem == 'GS3D':
+        if args.XPU == 'CPU':
+            configClass = GrayScottSpaceScalingCPU3D
+        else:
+            configClass = GrayScottSpaceScalingGPU3D
     elif args.problem == 'RBC':
         if args.XPU == 'CPU':
             configClass = RayleighBenardSpaceScalingCPU
