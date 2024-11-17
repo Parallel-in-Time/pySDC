@@ -91,10 +91,12 @@ class Config(object):
 
     def get_controller_params(self, *args, logger_level=15, **kwargs):
         from pySDC.implementations.hooks.log_work import LogWork
+        from pySDC.implementations.hooks.log_step_size import LogStepSize
+        from pySDC.implementations.hooks.log_restarts import LogRestarts
 
         controller_params = {}
         controller_params['logger_level'] = logger_level if self.comm_world.rank == 0 else 40
-        controller_params['hook_class'] = [LogWork]
+        controller_params['hook_class'] = [LogWork, LogStepSize, LogRestarts]
         logToFile = self.get_LogToFile()
         if logToFile:
             controller_params['hook_class'] += [logToFile]
