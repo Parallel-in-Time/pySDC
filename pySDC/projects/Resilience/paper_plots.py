@@ -457,7 +457,7 @@ def plot_fault_Lorenz(bit=0):  # pragma: no cover
     ls = ['--', '-']
     markers = [None, strategy.marker]
     do_faults = [False, True]
-    superscripts = ['*', '']
+    superscripts = [r'\mathrm{no~faults}', '']
     labels = ['x', 'x']
 
     run = 19 + 20 * bit
@@ -476,7 +476,7 @@ def plot_fault_Lorenz(bit=0):  # pragma: no cover
             [me[1][0] for me in u],
             ls=ls[i],
             color=colors[i],
-            label=rf'${{{labels[i]}}}^{{{superscripts[i]}}}$',
+            label=rf'${{{labels[i]}}}_{{{superscripts[i]}}}$',
             marker=markers[i],
             markevery=500,
         )
@@ -570,7 +570,7 @@ def plot_RBC_solution(setup='resilience'):  # pragma: no cover
     from mpl_toolkits.axes_grid1 import make_axes_locatable
 
     plt.rcParams['figure.constrained_layout.use'] = True
-    fig, axs = plt.subplots(2, 1, sharex=True, sharey=True, figsize=figsize_by_journal(JOURNAL, 1.0, 0.45))
+    fig, axs = plt.subplots(2, 1, sharex=True, sharey=True, figsize=figsize_by_journal(JOURNAL, 1.0, 0.5))
     caxs = []
     divider = make_axes_locatable(axs[0])
     caxs += [divider.append_axes('right', size='3%', pad=0.03)]
@@ -775,6 +775,7 @@ def plot_recovery_rate_per_acceptance_threshold(problem):  # pragma no cover
     stats_analyser.plot_recovery_thresholds(thresh_range=np.logspace(-1, 4, 500), recoverable_only=False, ax=ax)
     ax.set_xscale('log')
     ax.set_ylim((-0.05, 1.05))
+    ax.set_xlabel('relative threshold')
     savefig(fig, 'recovery_rate_per_thresh')
 
 
