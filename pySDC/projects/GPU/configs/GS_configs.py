@@ -370,6 +370,37 @@ class GrayScottLarge(GrayScott):
     #     ax.set_aspect(1.0)
 
     #     return fig
+    def plot(self, P, idx, n_procs_list, projection=2, projection_type='flat'):  # pragma: no cover
+        import numpy as np
+        from matplotlib import ticker as tkr
+        import matplotlib.pyplot as plt
+        import gc
+
+        fig = plt.figure()
+        ax = fig.add_subplot(projection='3d')
+
+        vmin = 0.1
+        vmax = 0.5
+        nlevels = 50
+
+        levels = np.linspace(vmin, vmax, nlevels + 1)
+
+        for rank in range(n_procs_list[2]):
+            gc.collect()
+            ranks = [0, 0] + [rank]
+            LogToFile = self.get_LogToFile(ranks=ranks)
+
+            data = LogToFile.load(idx)
+            u = data['u']
+            grid = data['X']
+
+            for l1, l2 in zip(levels[:-1], levels[1:]):
+                mask = np.logical_and(u > l1, u < l2)
+                if mask.any():
+                    ax.scatter(grid[0][mask], grid[1][mask], grid[2][mask], alpha=l1 / 2, color='black')
+
+            gc.collect()
+        return fig
 
     def get_initial_condition(self, P, *args, restart_idx=0, **kwargs):
         if restart_idx > 0:
