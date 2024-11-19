@@ -23,7 +23,7 @@ class LargeSim:
             'time': '0:20:00',
         }
 
-    def write_jobscript_for_run(self, submit=True):
+    def write_jobscript_for_run(self, submit=True, restart_idx=0):
         procs = self.params['procs']
         useGPU = self.params['useGPU']
         partition = self.params['partition']
@@ -50,14 +50,14 @@ class LargeSim:
             sbatch_options += ['--cpus-per-task=4', '--gpus-per-task=1']
 
         procs = (''.join(f'{me}/' for me in procs))[:-1]
-        command = f'run_experiment.py --mode=run --res={res} --config={self.config} --procs={procs} -o {self.path}'
+        command = f'run_experiment.py --mode=run --res={res} --config={self.config} --procs={procs} -o {self.path} --restart_idx {restart_idx}'
 
         if useGPU:
             command += ' --useGPU=True'
 
         write_jobscript(sbatch_options, srun_options, command, cluster, submit=submit, name=f'{self.config}')
 
-    def write_jobscript_for_plotting(self, num_procs=20, mode='plot', submit=True):
+    def write_jobscript_for_plotting(self, num_procs=20, mode='plot', submit=True, restart_idx=0):
         procs_sim = self.params['procs']
         useGPU = self.params['useGPU']
         res = self.params['res']
@@ -76,9 +76,7 @@ class LargeSim:
         srun_options = [f'--tasks-per-node={tasks_per_node}']
 
         procs_sim = (''.join(f'{me}/' for me in procs_sim))[:-1]
-        command = (
-            f'run_experiment.py --mode={mode} --res={res} --config={self.config} --procs={procs_sim} -o {self.path}'
-        )
+        command = f'run_experiment.py --mode={mode} --res={res} --config={self.config} --procs={procs_sim} -o {self.path} --restart_idx {restart_idx}'
 
         if useGPU:
             command += ' --useGPU=True'
@@ -172,6 +170,7 @@ if __name__ == '__main__':
     parser.add_argument('--mode', type=str, choices=['run', 'plot', 'video', 'plot_series'], default='plot')
     parser.add_argument('--submit', type=str, choices=['yes', 'no'], default='yes')
     parser.add_argument('--num_procs', type=int, default=10)
+    parser.add_argument('--restart_idx', type=int, default=0)
     args = parser.parse_args()
 
     if args.problem == 'GS':
@@ -191,9 +190,9 @@ if __name__ == '__main__':
         raise NotImplementedError()
 
     if args.mode == 'run':
-        sim.write_jobscript_for_run(submit=args.submit)
+        sim.write_jobscript_for_run(submit=args.submit, restart_idx=args.restart_idx)
     elif args.mode == 'plot':
-        sim.write_jobscript_for_plotting(num_procs=args.num_procs, submit=args.submit)
+        sim.write_jobscript_for_plotting(num_procs=args.num_procs, submit=args.submit, restart_idx=args.restart_idx)
     elif args.mode == 'plot_series':
         sim.write_jobscript_for_plotting(num_procs=1, submit=args.submit, mode='plot_series')
     elif args.mode == 'video':

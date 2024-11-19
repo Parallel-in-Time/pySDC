@@ -380,27 +380,60 @@ class GrayScottLarge(GrayScott):
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d')
 
-        vmin = 0.1
-        vmax = 0.5
-        nlevels = 50
+        thresh = 0.35
 
-        levels = np.linspace(vmin, vmax, nlevels + 1)
+        data = self.get_LogToFile().load(0)
 
+        min_pos = [-20, 2, 12]
+        box_size = 2
+
+        not_in_slab = {}
+
+        ax.set_xlim(min_pos[0], min_pos[0] + box_size)
+        ax.set_ylim(min_pos[1], min_pos[1] + box_size)
+        ax.set_zlim(min_pos[2], min_pos[2] + box_size)
+
+        grid = None
         for rank in range(n_procs_list[2]):
             gc.collect()
             ranks = [0, 0] + [rank]
             LogToFile = self.get_LogToFile(ranks=ranks)
 
             data = LogToFile.load(idx)
-            u = data['u']
+            u = data['v'][1:, 1:, 1:]
             grid = data['X']
 
-            for l1, l2 in zip(levels[:-1], levels[1:]):
-                mask = np.logical_and(u > l1, u < l2)
-                if mask.any():
-                    ax.scatter(grid[0][mask], grid[1][mask], grid[2][mask], alpha=l1 / 2, color='black')
+            if not_in_slab.get(rank, False):
+                continue
+
+            mask = np.logical_and(grid[0] < min_pos[0] + box_size, grid[0] >= min_pos[0])
+
+            if not mask.any():
+                not_in_slab[rank] = True
+                # print(f'{rank} does not contain data within the slab', flush=True)
+                if not (grid[0] < min_pos[0] + box_size).any():
+                    break
+                continue
+
+            for i in range(1, self.ndim):
+                mask = np.logical_and(mask, grid[i] >= min_pos[i])
+                mask = np.logical_and(mask, grid[i] < min_pos[i] + box_size)
+
+            mask = u > thresh
+
+            # print(rank, u[mask].shape, flush=True)
+            if mask.any():
+                filled = np.zeros_like(u).astype(bool)
+                filled[mask] = True
+                ax.voxels(grid[0], grid[1], grid[2], filled, alpha=1, color='black', shade=None)
+                print(f'{rank} plotted ', flush=True)
+                # ax.scatter(grid[0][mask], grid[1][mask], grid[2][mask], alpha=0.1, color='black', marker='.')
 
             gc.collect()
+
+        ax.set_xlabel('$x$')
+        ax.set_ylabel('$y$')
+        ax.set_zlabel('$z$')
         return fig
 
     def get_initial_condition(self, P, *args, restart_idx=0, **kwargs):
