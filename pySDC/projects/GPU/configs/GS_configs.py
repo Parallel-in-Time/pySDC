@@ -83,7 +83,7 @@ class GrayScott(Config):
         LogToFile.logging_condition = logging_condition
         return LogToFile
 
-    def plot(self, P, idx, n_procs_list, projection=2, projection_type='flat'):  # pragma: no cover
+    def plot(self, P, idx, n_procs_list, projection=0, projection_type='flat'):  # pragma: no cover
         import numpy as np
         from matplotlib import ticker as tkr
 
@@ -96,6 +96,7 @@ class GrayScott(Config):
         vmax = {'u': -np.inf, 'v': -np.inf}
 
         for rank in range(n_procs_list[2]):
+            # for rank in [n_procs_list[2] // 2]:
             ranks = [0, 0] + [rank]
             LogToFile = self.get_LogToFile(ranks=ranks)
 
@@ -107,6 +108,7 @@ class GrayScott(Config):
             vmax['u'] = max([vmax['u'], buffer[f'u-{rank}']['u'].real.max()])
 
         for rank in range(n_procs_list[2]):
+            # for rank in [n_procs_list[2] // 2]:
             if len(buffer[f'u-{rank}']['X']) == 2:
                 ax.set_xlabel('$x$')
                 ax.set_ylabel('$y$')
@@ -295,14 +297,13 @@ class GrayScottLarge(GrayScott):
         desc['sweeper_params']['QE'] = 'PIC'
         desc['step_params']['maxiter'] = 4
         desc['level_params']['dt'] = 1e-1
-        # desc['problem_params']['spectral'] = True
+        desc['problem_params']['spectral'] = False
 
         # desc['problem_params']['nvars'] = (2700, 2700, 3)
         # desc['problem_params']['num_blobs'] *= -1
         # desc['problem_params']['num_blobs'] = 40
 
         desc['problem_params']['L'] = 2 * desc['problem_params']['nvars'][0] // self.res_per_blob
-        # desc['problem_params']['num_blobs'] = desc['problem_params']['nvars'][0] // self.res_per_blob
         desc['problem_params']['num_blobs'] = int(3 * desc['problem_params']['L'])
 
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3}
@@ -407,19 +408,4 @@ class GrayScottLarge(GrayScott):
             return super().get_initial_condition(P, *args, restart_idx=restart_idx, **kwargs)
         else:
             _u0 = P.u_exact(t=0)
-            # xp = P.xp
-            # rng = xp.random.default_rng(0)
-            # for _ in range(16):
-            #     x0, y0 = rng.random(size=2) * P.L[0] - P.L[0] / 2
-            #     lx, ly = rng.random(size=2) * P.L[0] / 4
-
-            #     mask_x = xp.logical_and(P.X[0] > x0, P.X[0] < x0 + lx)
-            #     mask_y = xp.logical_and(P.X[1] > y0, P.X[1] < y0 + ly)
-            #     mask = xp.logical_and(mask_x, mask_y)
-
-            #     _u0[0][mask] = rng.random()
-            #     _u0[1][mask] = rng.random()
-
-            # for _ in range(5):
-            #     _u0 = P.solve_system(_u0, factor=1, t=0, u0=_u0)
             return _u0, 0

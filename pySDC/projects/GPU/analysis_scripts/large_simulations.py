@@ -134,12 +134,12 @@ class GSLarge(LargeSim):
         Test params with a small run.
         """
         self.params = {
-            'procs': [1, 4, 900],
+            'procs': [1, 4, 896],
             'useGPU': True,
             'tasks_per_node': 4,
             'partition': 'largebooster',
             'cluster': 'booster',
-            'res': 2700,
+            'res': 2688,
             'time': '0:20:00',
             'reservation': 'big-days-20241119',
         }
