@@ -385,13 +385,13 @@ class GrayScottLarge(GrayScott):
         data = self.get_LogToFile().load(0)
 
         min_pos = [-20, 2, 12]
-        box_size = 2
+        box_size = [
+            4,
+        ] * 3
 
-        not_in_slab = {}
-
-        ax.set_xlim(min_pos[0], min_pos[0] + box_size)
-        ax.set_ylim(min_pos[1], min_pos[1] + box_size)
-        ax.set_zlim(min_pos[2], min_pos[2] + box_size)
+        ax.set_xlim(min_pos[0], min_pos[0] + box_size[0])
+        ax.set_ylim(min_pos[1], min_pos[1] + box_size[1])
+        ax.set_zlim(min_pos[2], min_pos[2] + box_size[2])
 
         grid = None
         for rank in range(n_procs_list[2]):
@@ -400,24 +400,26 @@ class GrayScottLarge(GrayScott):
             LogToFile = self.get_LogToFile(ranks=ranks)
 
             data = LogToFile.load(idx)
-            u = data['v'][1:, 1:, 1:]
+            u = data['v']
             grid = data['X']
 
-            if not_in_slab.get(rank, False):
+            x = grid[0][:, 0, 0]
+            y = grid[1][0, :, 0]
+            z = grid[2][0, 0, :]
+            grids1d = [x, y, z]
+
+            if min_pos[0] > x.max():
                 continue
+            elif (min_pos[0] + box_size[0]) < x.min():
+                break
 
-            mask = np.logical_and(grid[0] < min_pos[0] + box_size, grid[0] >= min_pos[0])
+            slice_starts = [np.searchsorted(grids1d[i], min_pos[i]) for i in range(self.ndim)]
+            slice_ends = [np.searchsorted(grids1d[i], min_pos[i] + box_size[i]) for i in range(self.ndim)]
+            slices = [slice(slice_starts[i], slice_ends[i]) for i in range(self.ndim)]
+            slice_data = [slice(slice_starts[i] + 1, slice_ends[i]) for i in range(self.ndim)]
 
-            if not mask.any():
-                not_in_slab[rank] = True
-                # print(f'{rank} does not contain data within the slab', flush=True)
-                if not (grid[0] < min_pos[0] + box_size).any():
-                    break
+            if any(abs(slice_starts[i] - slice_ends[i]) <= 1 for i in range(self.ndim)):
                 continue
-
-            for i in range(1, self.ndim):
-                mask = np.logical_and(mask, grid[i] >= min_pos[i])
-                mask = np.logical_and(mask, grid[i] < min_pos[i] + box_size)
 
             mask = u > thresh
 
@@ -425,7 +427,16 @@ class GrayScottLarge(GrayScott):
             if mask.any():
                 filled = np.zeros_like(u).astype(bool)
                 filled[mask] = True
-                ax.voxels(grid[0], grid[1], grid[2], filled, alpha=1, color='black', shade=None)
+                ax.voxels(
+                    grid[0][*slices],
+                    grid[1][*slices],
+                    grid[2][*slices],
+                    filled[*slice_data],
+                    alpha=1,
+                    color='black',
+                    shade=None,
+                )
+                # ax.voxels(grid[0], grid[1], grid[2], filled[1:, 1:, 1:], alpha=1, color='black', shade=None)
                 print(f'{rank} plotted ', flush=True)
                 # ax.scatter(grid[0][mask], grid[1][mask], grid[2][mask], alpha=0.1, color='black', marker='.')
 
