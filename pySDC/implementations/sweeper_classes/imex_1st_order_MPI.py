@@ -92,7 +92,6 @@ class imex_1st_order_MPI(SweeperMPI, imex_1st_order):
 
         L = self.level
         P = L.prob
-        L.uend = P.dtype_u(P.init, val=0.0)
 
         # check if Mth node is equal to right point and do_coll_update is false, perform a simple copy
         if self.coll.right_is_node and not self.params.do_coll_update:
