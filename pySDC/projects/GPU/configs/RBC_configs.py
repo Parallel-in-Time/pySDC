@@ -363,7 +363,7 @@ class RayleighBenard_scaling(RayleighBenardRegular):
         desc['level_params']['restol'] = -1
         desc['level_params']['dt'] = 8e-2
         desc['sweeper_params']['num_nodes'] = 4
-        desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
+        # desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
         desc['step_params']['maxiter'] = 4
         desc['problem_params']['max_cached_factorizations'] = 4
         return desc
