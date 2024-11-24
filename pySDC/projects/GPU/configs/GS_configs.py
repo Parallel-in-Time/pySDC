@@ -260,6 +260,7 @@ class GrayScottScaling(GrayScott):
 
 class GrayScottScaling3D(GrayScottScaling):
     ndim = 3
+    nsteps = 15
 
     def get_description(self, *args, **kwargs):
         from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
@@ -271,8 +272,7 @@ class GrayScottScaling3D(GrayScottScaling):
         desc['sweeper_params']['num_nodes'] = 4
         desc['step_params']['maxiter'] = 4
         desc['level_params']['dt'] = 0.1
-        # desc['convergence_controllers'].pop(Adaptivity)
-        self.Tend = 50 * desc['level_params']['dt']
+        self.Tend = self.nsteps * desc['level_params']['dt']
         return desc
 
     def get_controller_params(self, *args, **kwargs):
@@ -299,7 +299,7 @@ class GrayScottLarge(GrayScott):
         desc['level_params']['dt'] = 1e-1
         desc['problem_params']['spectral'] = False
 
-        # desc['problem_params']['nvars'] = (2700, 2700, 3)
+        desc['problem_params']['nvars'] = (3840, 3840, 20)
         # desc['problem_params']['num_blobs'] *= -1
         # desc['problem_params']['num_blobs'] = 40
 
@@ -380,11 +380,12 @@ class GrayScottLarge(GrayScott):
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d')
 
-        thresh = 0.35
+        thresh = 0.25
 
         data = self.get_LogToFile().load(0)
 
         min_pos = [-20, 2, 12]
+        # box_size = [4, 8, 8]
         box_size = [
             4,
         ] * 3
@@ -392,6 +393,7 @@ class GrayScottLarge(GrayScott):
         ax.set_xlim(min_pos[0], min_pos[0] + box_size[0])
         ax.set_ylim(min_pos[1], min_pos[1] + box_size[1])
         ax.set_zlim(min_pos[2], min_pos[2] + box_size[2])
+        ax.set_aspect('equal')
 
         grid = None
         for rank in range(n_procs_list[2]):
@@ -402,6 +404,7 @@ class GrayScottLarge(GrayScott):
             data = LogToFile.load(idx)
             u = data['v']
             grid = data['X']
+            ax.set_title(f't={data["t"]:.2f}')
 
             x = grid[0][:, 0, 0]
             y = grid[1][0, :, 0]
@@ -423,7 +426,6 @@ class GrayScottLarge(GrayScott):
 
             mask = u > thresh
 
-            # print(rank, u[mask].shape, flush=True)
             if mask.any():
                 filled = np.zeros_like(u).astype(bool)
                 filled[mask] = True
@@ -432,12 +434,9 @@ class GrayScottLarge(GrayScott):
                     grid[1][*slices],
                     grid[2][*slices],
                     filled[*slice_data],
-                    alpha=1,
-                    color='black',
-                    shade=None,
+                    alpha=0.5,
+                    facecolors='teal',
                 )
-                # ax.voxels(grid[0], grid[1], grid[2], filled[1:, 1:, 1:], alpha=1, color='black', shade=None)
-                print(f'{rank} plotted ', flush=True)
                 # ax.scatter(grid[0][mask], grid[1][mask], grid[2][mask], alpha=0.1, color='black', marker='.')
 
             gc.collect()

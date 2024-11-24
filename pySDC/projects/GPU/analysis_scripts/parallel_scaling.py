@@ -12,111 +12,145 @@ setup_mpl()
 class ScalingConfig(object):
     cluster = None
     config = ''
-    base_resolution = -1
-    base_resolution_weak = -1
     useGPU = False
     partition = None
     tasks_per_node = None
     ndim = 2
     tasks_time = 1
-    max_steps_space = None
-    max_steps_space_weak = None
     sbatch_options = []
-    max_nodes = 9999
-    max_tasks = 9999
-    space_offset_weak = 0
-    space_offset_strong = 0
+    experiments = []
 
-    def __init__(self, space_time_parallel):
-        if space_time_parallel in ['False', False]:
-            self._tasks_time = 1
-        else:
-            self._tasks_time = self.tasks_time
+    def run_scaling_test(self, **kwargs):
+        for experiment in self.experiments:
+            i = experiment['start']
+            res = experiment['res']
 
-    def get_resolution_and_tasks(self, strong, i):
-        if strong:
-            return self.base_resolution, [1, self._tasks_time, 2 ** (i + self.space_offset_strong)]
-        else:
-            return self.base_resolution_weak * int(self._tasks_time ** (1.0 / self.ndim)) * (2**i), [
-                1,
-                self._tasks_time,
-                (2**self.ndim) ** i * (self.space_offset_weak if self._tasks_time == 1 else 1),
-            ]
+            tasks_time = self.tasks_time if experiment['PinT'] else 1
 
-    def run_scaling_test(self, strong=True, **kwargs):
-        max_steps = self.max_steps_space if strong else self.max_steps_space_weak
-        for i in range(max_steps):
-            res, procs = self.get_resolution_and_tasks(strong, i)
+            while i <= experiment['stop']:
+                procs = [1, tasks_time, int(np.ceil(i / tasks_time))]
 
-            _nodes = np.prod(procs) // self.tasks_per_node
-            if _nodes > self.max_nodes or (procs[-1] > self.max_tasks and strong):
-                break
+                _nodes = np.prod(procs) // self.tasks_per_node
 
-            sbatch_options = [
-                f'-n {np.prod(procs)}',
-                f'-p {self.partition}',
-                f'--tasks-per-node={self.tasks_per_node}',
-            ] + self.sbatch_options
-            srun_options = [f'--tasks-per-node={self.tasks_per_node}']
-            if self.useGPU:
-                srun_options += ['--cpus-per-task=4', '--gpus-per-task=1']
-                sbatch_options += ['--cpus-per-task=4', '--gpus-per-task=1']
+                sbatch_options = [
+                    f'-n {np.prod(procs)}',
+                    f'-p {self.partition}',
+                    f'--tasks-per-node={self.tasks_per_node}',
+                ] + self.sbatch_options
+                srun_options = [f'--tasks-per-node={self.tasks_per_node}']
+                if self.useGPU:
+                    srun_options += ['--cpus-per-task=4', '--gpus-per-task=1']
+                    sbatch_options += ['--cpus-per-task=4', '--gpus-per-task=1']
 
-            procs = (''.join(f'{me}/' for me in procs))[:-1]
-            command = f'run_experiment.py --mode=run --res={res} --config={self.config} --procs={procs}'
+                procs = (''.join(f'{me}/' for me in procs))[:-1]
+                command = f'run_experiment.py --mode=run --res={res} --config={self.config} --procs={procs}'
 
-            if self.useGPU:
-                command += ' --useGPU=True'
+                if self.useGPU:
+                    command += ' --useGPU=True'
 
-            write_jobscript(
-                sbatch_options, srun_options, command, self.cluster, name=f'{type(self).__name__}_{res}', **kwargs
-            )
-
-    def plot_scaling_test(self, strong, ax, plot_ideal=False, **plotting_params):  # pragma: no cover
-        timings = {}
-
-        max_steps = self.max_steps_space if strong else self.max_steps_space_weak
-        for i in range(max_steps):
-            res, procs = self.get_resolution_and_tasks(strong, i)
-
-            args = {'useGPU': self.useGPU, 'config': self.config, 'res': res, 'procs': procs, 'mode': None}
-
-            config = get_config(args)
-
-            path = f'data/{config.get_path(ranks=[me -1 for me in procs])}-stats-whole-run.pickle'
-            try:
-                with open(path, 'rb') as file:
-                    stats = pickle.load(file)
-
-                if args['useGPU']:
-                    timing_step = get_sorted(stats, type='GPU_timing_step')
-                else:
-                    timing_step = get_sorted(stats, type='timing_step')
-                timings[np.prod(procs) / self.tasks_per_node] = np.mean([me[1] for me in timing_step])
-                # timings[np.prod(procs) / self.tasks_per_node] = timing_step = get_sorted(stats, type='timing_run')[-1][1] / len(get_sorted(stats, type='timing_step'))
-                # timings[np.prod(procs)] = np.mean([me[1] for me in timing_step])
-            except (FileNotFoundError, ValueError):
-                pass
-
-        if plot_ideal:
-            if strong:
-                ax.loglog(
-                    timings.keys(),
-                    list(timings.values())[0] * list(timings.keys())[0] / np.array(list(timings.keys())),
-                    ls='--',
-                    color='grey',
-                    label='ideal',
+                write_jobscript(
+                    sbatch_options, srun_options, command, self.cluster, name=f'{type(self).__name__}_{res}', **kwargs
                 )
-        ax.loglog(timings.keys(), timings.values(), **plotting_params)
+
+                i *= 2
+
+    def plot_scaling_test(self, ax, quantity='time', **plotting_params):  # pragma: no cover
+        from matplotlib.colors import TABLEAU_COLORS
+
+        cmap = TABLEAU_COLORS
+        colors = list(cmap.values())
+
+        for experiment in self.experiments:
+            tasks_time = self.tasks_time if experiment['PinT'] else 1
+            timings = {}
+
+            plotting_params = {
+                (False, False): {
+                    'ls': '--',
+                    'label': f'CPU ${{{experiment["res"]}}}^{{{self.ndim}}}$',
+                    'color': colors[2],
+                },
+                (False, True): {
+                    'ls': '-.',
+                    'label': f'CPU PinT ${{{experiment["res"]}}}^{{{self.ndim}}}$',
+                    'color': colors[3],
+                },
+                (True, False): {
+                    'ls': '-',
+                    'label': f'GPU ${{{experiment["res"]}}}^{{{self.ndim}}}$',
+                    'color': colors[0],
+                },
+                (True, True): {
+                    'ls': ':',
+                    'label': f'GPU PinT ${{{experiment["res"]}}}^{{{self.ndim}}}$',
+                    'color': colors[1],
+                },
+            }
+
+            i = experiment['start']
+            res = experiment['res']
+
+            while i <= experiment['stop']:
+                procs = [1, tasks_time, int(np.ceil(i / tasks_time))]
+                args = {'useGPU': self.useGPU, 'config': self.config, 'res': res, 'procs': procs, 'mode': None}
+
+                config = get_config(args)
+
+                path = f'data/{config.get_path(ranks=[me -1 for me in procs])}-stats-whole-run.pickle'
+                try:
+                    with open(path, 'rb') as file:
+                        stats = pickle.load(file)
+
+                    if args['useGPU']:
+                        timing_step = get_sorted(stats, type='GPU_timing_step')
+                    else:
+                        timing_step = get_sorted(stats, type='timing_step')
+
+                    t_mean = np.mean([me[1] for me in timing_step])
+
+                    if quantity == 'throughput':
+                        timings[np.prod(procs) / self.tasks_per_node] = experiment['res'] ** self.ndim / t_mean
+                    elif quantity == 'efficiency':
+                        timings[np.prod(procs) / self.tasks_per_node] = (
+                            experiment['res'] ** self.ndim / t_mean / np.prod(procs)
+                        )
+                    elif quantity == 'time':
+                        timings[np.prod(procs) / self.tasks_per_node] = t_mean
+                    else:
+                        raise NotImplementedError
+                except (FileNotFoundError, ValueError):
+                    pass
+                i *= 2
+
+            ax.loglog(
+                timings.keys(),
+                timings.values(),
+                **plotting_params[(self.useGPU, experiment['PinT'])],
+                marker=experiment['marker'],
+            )
+        # if plot_ideal:
+        #     if strong:
+        #         ax.loglog(
+        #             timings.keys(),
+        #             list(timings.values())[0] * list(timings.keys())[0] / np.array(list(timings.keys())),
+        #             ls='--',
+        #             color='grey',
+        #             label='ideal',
+        #         )
         ax.set_xlabel(r'$N_\mathrm{nodes}$')
-        ax.set_ylabel(r'$t_\mathrm{step}$')
+        labels = {
+            'throughput': 'throughput / DoF/s',
+            'time': r'$t_\mathrm{step}$ / s',
+            'efficiency': 'efficiency / DoF/s/task',
+        }
+        ax.set_ylabel(labels[quantity])
 
 
 class CPUConfig(ScalingConfig):
-    cluster = 'jusuf'
+    # cluster = 'jusuf'
+    cluster = 'juwels'
     partition = 'batch'
     tasks_per_node = 16
-    max_nodes = 144
 
 
 class GPUConfig(ScalingConfig):
@@ -128,48 +162,61 @@ class GPUConfig(ScalingConfig):
 
 
 class GrayScottSpaceScalingCPU3D(CPUConfig, ScalingConfig):
-    base_resolution = 512
-    base_resolution_weak = 512
+    ndim = 3
     config = 'GS_scaling3D'
-    max_steps_space = 11
-    max_steps_space_weak = 11
     tasks_time = 4
-    sbatch_options = ['--time=3:30:00']
+    sbatch_options = ['--time=1:30:00']
+    experiments = [
+        {'res': 512, 'PinT': True, 'start': 1, 'stop': 1024, 'marker': '>'},
+        {'res': 512, 'PinT': False, 'start': 1, 'stop': 1024, 'marker': '>'},
+        {'res': 1024, 'PinT': True, 'start': 256, 'stop': 2048, 'marker': 'x'},
+        {'res': 1024, 'PinT': False, 'start': 256, 'stop': 2048, 'marker': 'x'},
+        # {'res': 2304, 'PinT': True, 'start': 768, 'stop': 6144, 'marker': '.'},
+        # {'res': 2304, 'PinT': False, 'start': 768, 'stop': 6144, 'marker': '.'},
+    ]
 
 
 class GrayScottSpaceScalingGPU3D(GPUConfig, ScalingConfig):
     ndim = 3
-    base_resolution_weak = 400
-    base_resolution = 512
     config = 'GS_scaling3D'
-    max_steps_space = 9
-    max_steps_space_weak = 5
     tasks_time = 4
     max_nodes = 64
     sbatch_options = ['--time=0:07:00']
-    space_offset_weak = 4
+
+    experiments = [
+        {'res': 512, 'PinT': True, 'start': 1, 'stop': 512, 'marker': '>'},
+        {'res': 512, 'PinT': False, 'start': 1, 'stop': 256, 'marker': '>'},
+        {'res': 1024, 'PinT': True, 'start': 16, 'stop': 512, 'marker': 'x'},
+        {'res': 1024, 'PinT': False, 'start': 16, 'stop': 1024, 'marker': 'x'},
+        {'res': 2304, 'PinT': True, 'start': 768, 'stop': 1536, 'marker': '.'},
+        {'res': 2304, 'PinT': False, 'start': 192, 'stop': 768, 'marker': '.'},
+        # {'res': 3840, 'PinT': True, 'start': 768, 'stop': 1536, 'marker': 'o'},
+        {'res': 4608, 'PinT': False, 'start': 1536, 'stop': 1536, 'marker': 'o'},
+        {'res': 4480, 'PinT': True, 'start': 3584, 'stop': 3584, 'marker': 'x'},
+        {'res': 4480, 'PinT': False, 'start': 2240, 'stop': 2240, 'marker': 'x'},
+    ]
 
 
-class GrayScottSpaceScalingCPU(CPUConfig, ScalingConfig):
-    ndim = 3
-    base_resolution = 8192
-    base_resolution_weak = 512
-    config = 'GS_scaling'
-    max_steps_space = 11
-    max_steps_space_weak = 11
-    tasks_time = 4
-    sbatch_options = ['--time=3:30:00']
-
-
-class GrayScottSpaceScalingGPU(GPUConfig, ScalingConfig):
-    base_resolution_weak = 1024
-    base_resolution = 8192
-    config = 'GS_scaling'
-    max_steps_space = 7
-    max_steps_space_weak = 5
-    tasks_time = 4
-    max_nodes = 64
-    sbatch_options = ['--time=3:30:00']
+# class GrayScottSpaceScalingCPU(CPUConfig, ScalingConfig):
+#     ndim = 3
+#     base_resolution = 8192
+#     base_resolution_weak = 512
+#     config = 'GS_scaling'
+#     max_steps_space = 11
+#     max_steps_space_weak = 11
+#     tasks_time = 4
+#     sbatch_options = ['--time=3:30:00']
+#
+#
+# class GrayScottSpaceScalingGPU(GPUConfig, ScalingConfig):
+#     base_resolution_weak = 1024
+#     base_resolution = 8192
+#     config = 'GS_scaling'
+#     max_steps_space = 7
+#     max_steps_space_weak = 5
+#     tasks_time = 4
+#     max_nodes = 64
+#     sbatch_options = ['--time=3:30:00']
 
 
 class RayleighBenardSpaceScalingCPU(CPUConfig, ScalingConfig):
@@ -212,60 +259,59 @@ class RayleighBenardDedalusComparisonGPU(GPUConfig, ScalingConfig):
     tasks_time = 4
 
 
-def plot_scalings(strong, problem, kwargs):  # pragma: no cover
-    fig, ax = plt.subplots(figsize=figsize_by_journal('JSC_beamer', 1, 0.45))
-
-    plottings_params = [
-        {'plot_ideal': True, 'marker': 'x', 'label': 'CPU space parallel'},
-        {'marker': '>', 'label': 'CPU space time parallel'},
-        {'marker': '^', 'label': 'GPU space parallel'},
-        {'marker': '<', 'label': 'GPU space time parallel'},
-    ]
-
+def plot_scalings(problem, **kwargs):  # pragma: no cover
     if problem == 'GS':
         configs = [
-            GrayScottSpaceScalingCPU(space_time_parallel=False),
-            GrayScottSpaceScalingCPU(space_time_parallel=True),
-            GrayScottSpaceScalingGPU(space_time_parallel=False),
-            GrayScottSpaceScalingGPU(space_time_parallel=True),
+            GrayScottSpaceScalingCPU(),
+            GrayScottSpaceScalingGPU(),
         ]
     elif problem == 'GS3D':
         configs = [
-            GrayScottSpaceScalingCPU3D(space_time_parallel=False),
-            GrayScottSpaceScalingCPU3D(space_time_parallel=True),
-            GrayScottSpaceScalingGPU3D(space_time_parallel=False),
-            GrayScottSpaceScalingGPU3D(space_time_parallel=True),
+            GrayScottSpaceScalingCPU3D(),
+            GrayScottSpaceScalingGPU3D(),
         ]
     elif problem == 'RBC':
         configs = [
-            RayleighBenardSpaceScalingCPU(space_time_parallel=False),
-            RayleighBenardSpaceScalingCPU(space_time_parallel=True),
-            RayleighBenardSpaceScalingGPU(space_time_parallel=False),
-            RayleighBenardSpaceScalingGPU(space_time_parallel=True),
+            RayleighBenardSpaceScalingCPU(),
+            RayleighBenardSpaceScalingGPU(),
         ]
     elif problem == 'RBC_dedalus':
         configs = [
-            RayleighBenardDedalusComparison(space_time_parallel=False),
-            RayleighBenardDedalusComparison(space_time_parallel=True),
-            RayleighBenardDedalusComparisonGPU(space_time_parallel=False),
-            RayleighBenardDedalusComparisonGPU(space_time_parallel=True),
+            RayleighBenardDedalusComparison(),
+            RayleighBenardDedalusComparisonGPU(),
         ]
 
     else:
         raise NotImplementedError
 
-    for config, params in zip(configs, plottings_params):
-        config.plot_scaling_test(strong=strong, ax=ax, **params)
+    ideal_lines = {
+        ('GS3D', 'throughput'): {'x': [0.25, 400], 'y': [5e6, 8e9]},
+        ('GS3D', 'time'): {'x': [0.25, 400], 'y': [80, 5e-2]},
+    }
+
+    fig, ax = plt.subplots(figsize=figsize_by_journal('TUHH_thesis', 1, 0.6))
+    configs[1].plot_scaling_test(ax=ax, quantity='efficiency')
     ax.legend(frameon=False)
-    plt.show()
-    fig.savefig(f'{PROJECT_PATH}/plots/{"strong" if strong else "weak"}_scaling_{problem}.pdf', bbox_inches='tight')
+    path = f'{PROJECT_PATH}/plots/scaling_{problem}_efficiency.pdf'
+    fig.savefig(path, bbox_inches='tight')
+    print(f'Saved {path!r}', flush=True)
+
+    for quantity in ['throughput', 'time']:
+        fig, ax = plt.subplots(figsize=figsize_by_journal('TUHH_thesis', 1, 0.6))
+        for config in configs:
+            config.plot_scaling_test(ax=ax, quantity=quantity)
+        if (problem, quantity) in ideal_lines.keys():
+            ax.loglog(*ideal_lines[(problem, quantity)].values(), color='black', ls=':', label='ideal')
+        ax.legend(frameon=False)
+        path = f'{PROJECT_PATH}/plots/scaling_{problem}_{quantity}.pdf'
+        fig.savefig(path, bbox_inches='tight')
+        print(f'Saved {path!r}', flush=True)
 
 
 if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--scaling', type=str, choices=['strong', 'weak'], default='strong')
     parser.add_argument('--mode', type=str, choices=['run', 'plot'], default='run')
     parser.add_argument('--problem', type=str, default='GS')
     parser.add_argument('--XPU', type=str, choices=['CPU', 'GPU'], default='CPU')
@@ -275,7 +321,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    strong = args.scaling == 'strong'
     submit = args.submit == 'True'
     nsys_profiling = args.nsys_profiling == 'True'
 
@@ -302,12 +347,11 @@ if __name__ == '__main__':
     else:
         raise NotImplementedError(f'Don\'t know problem {args.problem!r}')
 
-    kwargs = {'space_time_parallel': args.space_time}
-    config = configClass(**kwargs)
+    config = configClass()
 
     if args.mode == 'run':
-        config.run_scaling_test(strong=strong, submit=submit, nsys_profiling=nsys_profiling)
+        config.run_scaling_test(submit=submit, nsys_profiling=nsys_profiling)
     elif args.mode == 'plot':
-        plot_scalings(strong=strong, problem=args.problem, kwargs=kwargs)
+        plot_scalings(problem=args.problem)
     else:
         raise NotImplementedError(f'Don\'t know mode {args.mode!r}')

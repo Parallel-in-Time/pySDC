@@ -20,7 +20,7 @@ class LargeSim:
             'tasks_per_node': 10,
             'partition': 'develgpus',
             'cluster': 'jusuf',
-            'time': '0:20:00',
+            'time': '3:60:00',
         }
 
     def write_jobscript_for_run(self, submit=True, restart_idx=0):
@@ -131,6 +131,17 @@ class GSLarge(LargeSim):
         """
         Test params with a small run.
         """
+        self.params = {
+            'procs': [1, 4, 2],
+            'useGPU': True,
+            'tasks_per_node': 4,
+            'partition': 'develbooster',
+            'cluster': 'booster',
+            'res': 3840,
+            'time': '0:20:00',
+        }
+
+    def setup_GPU_paramsFull(self):
         self.params = {
             'procs': [1, 4, 896],
             'useGPU': True,
