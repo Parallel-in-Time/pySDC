@@ -32,7 +32,7 @@ class GrayScott(Config):
     num_frames = 200
     sweeper_type = 'IMEX'
     res_per_blob = 2**7
-    ndim = 2
+    ndim = 3
 
     def get_LogToFile(self, ranks=None):
         import numpy as np
@@ -108,7 +108,6 @@ class GrayScott(Config):
             vmax['u'] = max([vmax['u'], buffer[f'u-{rank}']['u'].real.max()])
 
         for rank in range(n_procs_list[2]):
-            # for rank in [n_procs_list[2] // 2]:
             if len(buffer[f'u-{rank}']['X']) == 2:
                 ax.set_xlabel('$x$')
                 ax.set_ylabel('$y$')

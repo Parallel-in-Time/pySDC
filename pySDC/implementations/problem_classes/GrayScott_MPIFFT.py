@@ -236,6 +236,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
             """
             Blobs as in https://www.chebfun.org/examples/pde/GrayScott.html
             """
+            assert self.ndim == 2, 'The initial conditions are 2D for now..'
 
             inc = self.L[0] / (self.num_blobs + 1)
 
