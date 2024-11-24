@@ -9,6 +9,28 @@ from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
 setup_mpl()
 
 
+class Experiment(object):
+    def __init__(self, res, PinT=False, start=0, stop=-1, sequence=None, marker='x'):
+        self.res = res
+        self.PinT = PinT
+        self.start = start
+        self.stop = stop
+        self._sequence = sequence
+        self.marker = marker
+
+    @property
+    def sequence(self):
+        if self._sequence is not None:
+            return self._sequence
+        else:
+            sequence = []
+            i = self.start
+            while i <= self.stop:
+                sequence += [i]
+                i *= 2
+            return sequence
+
+
 class ScalingConfig(object):
     cluster = None
     config = ''
@@ -22,15 +44,12 @@ class ScalingConfig(object):
 
     def run_scaling_test(self, **kwargs):
         for experiment in self.experiments:
-            i = experiment['start']
-            res = experiment['res']
+            res = experiment.res
 
-            tasks_time = self.tasks_time if experiment['PinT'] else 1
+            tasks_time = self.tasks_time if experiment.PinT else 1
 
-            while i <= experiment['stop']:
+            for i in experiment.sequence:
                 procs = [1, tasks_time, int(np.ceil(i / tasks_time))]
-
-                _nodes = np.prod(procs) // self.tasks_per_node
 
                 sbatch_options = [
                     f'-n {np.prod(procs)}',
@@ -52,8 +71,6 @@ class ScalingConfig(object):
                     sbatch_options, srun_options, command, self.cluster, name=f'{type(self).__name__}_{res}', **kwargs
                 )
 
-                i *= 2
-
     def plot_scaling_test(self, ax, quantity='time', **plotting_params):  # pragma: no cover
         from matplotlib.colors import TABLEAU_COLORS
 
@@ -61,36 +78,36 @@ class ScalingConfig(object):
         colors = list(cmap.values())
 
         for experiment in self.experiments:
-            tasks_time = self.tasks_time if experiment['PinT'] else 1
+            tasks_time = self.tasks_time if experiment.PinT else 1
             timings = {}
 
             plotting_params = {
                 (False, False): {
                     'ls': '--',
-                    'label': f'CPU ${{{experiment["res"]}}}^{{{self.ndim}}}$',
+                    'label': f'CPU ${{{experiment.res}}}^{{{self.ndim}}}$',
                     'color': colors[2],
                 },
                 (False, True): {
                     'ls': '-.',
-                    'label': f'CPU PinT ${{{experiment["res"]}}}^{{{self.ndim}}}$',
+                    'label': f'CPU PinT ${{{experiment.res}}}^{{{self.ndim}}}$',
                     'color': colors[3],
                 },
                 (True, False): {
                     'ls': '-',
-                    'label': f'GPU ${{{experiment["res"]}}}^{{{self.ndim}}}$',
+                    'label': f'GPU ${{{experiment.res}}}^{{{self.ndim}}}$',
                     'color': colors[0],
                 },
                 (True, True): {
                     'ls': ':',
-                    'label': f'GPU PinT ${{{experiment["res"]}}}^{{{self.ndim}}}$',
+                    'label': f'GPU PinT ${{{experiment.res}}}^{{{self.ndim}}}$',
                     'color': colors[1],
                 },
             }
 
-            i = experiment['start']
-            res = experiment['res']
+            i = experiment.start
+            res = experiment.res
 
-            while i <= experiment['stop']:
+            while i <= experiment.stop:
                 procs = [1, tasks_time, int(np.ceil(i / tasks_time))]
                 args = {'useGPU': self.useGPU, 'config': self.config, 'res': res, 'procs': procs, 'mode': None}
 
@@ -109,10 +126,10 @@ class ScalingConfig(object):
                     t_mean = np.mean([me[1] for me in timing_step])
 
                     if quantity == 'throughput':
-                        timings[np.prod(procs) / self.tasks_per_node] = experiment['res'] ** self.ndim / t_mean
+                        timings[np.prod(procs) / self.tasks_per_node] = experiment.res**self.ndim / t_mean
                     elif quantity == 'efficiency':
                         timings[np.prod(procs) / self.tasks_per_node] = (
-                            experiment['res'] ** self.ndim / t_mean / np.prod(procs)
+                            experiment.res**self.ndim / t_mean / np.prod(procs)
                         )
                     elif quantity == 'time':
                         timings[np.prod(procs) / self.tasks_per_node] = t_mean
@@ -125,8 +142,8 @@ class ScalingConfig(object):
             ax.loglog(
                 timings.keys(),
                 timings.values(),
-                **plotting_params[(self.useGPU, experiment['PinT'])],
-                marker=experiment['marker'],
+                **plotting_params[(self.useGPU, experiment.PinT)],
+                marker=experiment.marker,
             )
         # if plot_ideal:
         #     if strong:
@@ -158,7 +175,6 @@ class GPUConfig(ScalingConfig):
     partition = 'booster'
     tasks_per_node = 4
     useGPU = True
-    max_nodes = 936
 
 
 class GrayScottSpaceScalingCPU3D(CPUConfig, ScalingConfig):
@@ -167,80 +183,85 @@ class GrayScottSpaceScalingCPU3D(CPUConfig, ScalingConfig):
     tasks_time = 4
     sbatch_options = ['--time=1:30:00']
     experiments = [
-        {'res': 512, 'PinT': True, 'start': 1, 'stop': 1024, 'marker': '>'},
-        {'res': 512, 'PinT': False, 'start': 1, 'stop': 1024, 'marker': '>'},
-        {'res': 1024, 'PinT': True, 'start': 256, 'stop': 2048, 'marker': 'x'},
-        {'res': 1024, 'PinT': False, 'start': 256, 'stop': 2048, 'marker': 'x'},
+        Experiment(res=512, PinT=False, start=1, stop=256, marker='>'),
+        Experiment(res=512, PinT=True, start=1, stop=1024, marker='>'),
+        Experiment(res=1024, PinT=False, start=256, stop=512, marker='x'),
+        Experiment(res=1024, PinT=True, start=256, stop=2048, marker='x'),
         # {'res': 2304, 'PinT': True, 'start': 768, 'stop': 6144, 'marker': '.'},
         # {'res': 2304, 'PinT': False, 'start': 768, 'stop': 6144, 'marker': '.'},
     ]
 
 
 class GrayScottSpaceScalingGPU3D(GPUConfig, ScalingConfig):
-    ndim = 3
+    ndim = 2
     config = 'GS_scaling3D'
     tasks_time = 4
-    max_nodes = 64
     sbatch_options = ['--time=0:07:00']
 
     experiments = [
-        {'res': 512, 'PinT': True, 'start': 1, 'stop': 512, 'marker': '>'},
-        {'res': 512, 'PinT': False, 'start': 1, 'stop': 256, 'marker': '>'},
-        {'res': 1024, 'PinT': True, 'start': 16, 'stop': 512, 'marker': 'x'},
-        {'res': 1024, 'PinT': False, 'start': 16, 'stop': 1024, 'marker': 'x'},
-        {'res': 2304, 'PinT': True, 'start': 768, 'stop': 1536, 'marker': '.'},
-        {'res': 2304, 'PinT': False, 'start': 192, 'stop': 768, 'marker': '.'},
-        # {'res': 3840, 'PinT': True, 'start': 768, 'stop': 1536, 'marker': 'o'},
-        {'res': 4608, 'PinT': False, 'start': 1536, 'stop': 1536, 'marker': 'o'},
-        {'res': 4480, 'PinT': True, 'start': 3584, 'stop': 3584, 'marker': 'x'},
-        {'res': 4480, 'PinT': False, 'start': 2240, 'stop': 2240, 'marker': 'x'},
+        Experiment(res=512, PinT=True, start=1, stop=512, marker='>'),
+        Experiment(res=512, PinT=False, start=1, stop=256, marker='>'),
+        Experiment(res=1024, PinT=True, start=16, stop=512, marker='x'),
+        Experiment(res=1024, PinT=False, start=16, stop=1024, marker='x'),
+        Experiment(res=2304, PinT=True, start=768, stop=1536, marker='.'),
+        Experiment(res=2304, PinT=False, start=192, stop=768, marker='.'),
+        Experiment(res=4608, PinT=False, start=1536, stop=1536, marker='o'),
+        Experiment(res=4480, PinT=True, start=3584, stop=3584, marker='x'),
+        Experiment(res=4480, PinT=False, sequence=[1494, 2240], marker='x'),
+        # Experiment(**# {'res': 3840, 'PinT': True, 'start': 768, 'stop': 1536, 'marker': 'o'}),
     ]
 
 
-# class GrayScottSpaceScalingCPU(CPUConfig, ScalingConfig):
-#     ndim = 3
-#     base_resolution = 8192
-#     base_resolution_weak = 512
-#     config = 'GS_scaling'
-#     max_steps_space = 11
-#     max_steps_space_weak = 11
-#     tasks_time = 4
-#     sbatch_options = ['--time=3:30:00']
-#
-#
-# class GrayScottSpaceScalingGPU(GPUConfig, ScalingConfig):
-#     base_resolution_weak = 1024
-#     base_resolution = 8192
-#     config = 'GS_scaling'
-#     max_steps_space = 7
-#     max_steps_space_weak = 5
-#     tasks_time = 4
-#     max_nodes = 64
-#     sbatch_options = ['--time=3:30:00']
-
-
 class RayleighBenardSpaceScalingCPU(CPUConfig, ScalingConfig):
-    base_resolution = 1024
-    base_resolution_weak = 128
+    ndim = 2
     config = 'RBC_scaling'
-    max_steps_space = 13
-    max_steps_space_weak = 10
     tasks_time = 4
-    max_nodes = 64
-    # sbatch_options = ['--time=3:30:00']
-    max_tasks = 256
+    sbatch_options = ['--time=0:25:00']
+
+    experiments = [
+        # Experiment(res=1024, PinT=True, start=4, stop=1024, marker='x'),
+        # Experiment(res=1024, PinT=False, start=1, stop=128, marker='x'),
+        Experiment(res=2048, PinT=True, start=32, stop=1024, marker='.'),
+        Experiment(res=2048, PinT=False, start=4, stop=256, marker='.'),
+    ]
 
 
 class RayleighBenardSpaceScalingGPU(GPUConfig, ScalingConfig):
-    base_resolution_weak = 256
-    base_resolution = 1024
+    ndim = 3
     config = 'RBC_scaling'
-    max_steps_space = 9
-    max_steps_space_weak = 9
     tasks_time = 4
-    max_tasks = 256
     sbatch_options = ['--time=0:15:00']
-    max_nodes = 64
+
+    experiments = [
+        Experiment(res=1024, PinT=True, start=4, stop=128, marker='x'),
+        Experiment(res=1024, PinT=False, start=1, stop=32, marker='x'),
+        Experiment(res=2048, PinT=True, start=16, stop=128, marker='.'),
+        Experiment(res=2048, PinT=False, start=16, stop=128, marker='.'),
+    ]
+
+
+# class RayleighBenardSpaceScalingCPU(CPUConfig, ScalingConfig):
+#     base_resolution = 1024
+#     base_resolution_weak = 128
+#     config = 'RBC_scaling'
+#     max_steps_space = 13
+#     max_steps_space_weak = 10
+#     tasks_time = 4
+#     max_nodes = 64
+#     # sbatch_options = ['--time=3:30:00']
+#     max_tasks = 256
+#
+#
+# class RayleighBenardSpaceScalingGPU(GPUConfig, ScalingConfig):
+#     base_resolution_weak = 256
+#     base_resolution = 1024
+#     config = 'RBC_scaling'
+#     max_steps_space = 9
+#     max_steps_space_weak = 9
+#     tasks_time = 4
+#     max_tasks = 256
+#     sbatch_options = ['--time=0:15:00']
+#     max_nodes = 64
 
 
 class RayleighBenardDedalusComparison(CPUConfig, ScalingConfig):
