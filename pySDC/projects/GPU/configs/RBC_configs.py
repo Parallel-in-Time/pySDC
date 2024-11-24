@@ -19,6 +19,10 @@ def get_config(args):
         return RayleighBenard_Thibaut(args)
     elif name == 'RBC_scaling':
         return RayleighBenard_scaling(args)
+    elif name == 'RBC_scaling_x':
+        return RayleighBenard_scaling_x(args)
+    elif name == 'RBC_scaling_z':
+        return RayleighBenard_scaling_z(args)
     elif name == 'RBC_large':
         return RayleighBenard_large(args)
     else:
@@ -359,8 +363,8 @@ class RayleighBenard_scaling(RayleighBenardRegular):
         desc['level_params']['restol'] = -1
         desc['level_params']['dt'] = 8e-2
         desc['sweeper_params']['num_nodes'] = 4
-        # desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
-        desc['step_params']['maxiter'] = 7
+        desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
+        desc['step_params']['maxiter'] = 4
         desc['problem_params']['max_cached_factorizations'] = 4
         return desc
 
@@ -370,6 +374,26 @@ class RayleighBenard_scaling(RayleighBenardRegular):
         params = super().get_controller_params(*args, **kwargs)
         params['hook_class'] = [LogWork]
         return params
+
+
+class RayleighBenard_scaling_x(RayleighBenard_scaling):
+    vertical_res = 256
+
+    def get_description(self, *args, res=-1, **kwargs):
+        desc = super().get_description(*args, **kwargs)
+        desc['problem_params']['nx'] = res
+        desc['problem_params']['nz'] = self.vertical_res
+        return desc
+
+
+class RayleighBenard_scaling_z(RayleighBenard_scaling):
+    horizontal_res = 1024
+
+    def get_description(self, *args, res=-1, **kwargs):
+        desc = super().get_description(*args, **kwargs)
+        desc['problem_params']['nx'] = self.horizontal_res
+        desc['problem_params']['nz'] = res
+        return desc
 
 
 class RayleighBenard_large(RayleighBenardRegular):
