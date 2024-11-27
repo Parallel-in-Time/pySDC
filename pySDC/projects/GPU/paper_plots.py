@@ -1,9 +1,18 @@
 """ Make plots for publications """
+
 import matplotlib.pyplot as plt
 from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
 
+
 def plot_scalings_seperately(problem, journal='TUHH_thesis', **kwargs):  # pragma: no cover
-    from pySDC.projects.GPU.analysis_scripts.parallel_scaling import plot_scalings, GrayScottSpaceScalingGPU3D, GrayScottSpaceScalingCPU3D, RayleighBenardSpaceScalingCPU, RayleighBenardSpaceScalingGPU, PROJECT_PATH
+    from pySDC.projects.GPU.analysis_scripts.parallel_scaling import (
+        plot_scalings,
+        GrayScottSpaceScalingGPU3D,
+        GrayScottSpaceScalingCPU3D,
+        RayleighBenardSpaceScalingCPU,
+        RayleighBenardSpaceScalingGPU,
+        PROJECT_PATH,
+    )
 
     if problem == 'GS3D':
         configs = [
@@ -42,16 +51,16 @@ def plot_scalings_seperately(problem, journal='TUHH_thesis', **kwargs):  # pragm
         fig.savefig(path, bbox_inches='tight')
         print(f'Saved {path!r}', flush=True)
 
+
 def make_plots_for_thesis():  # pragma: no cover
     plot_scalings_seperately('GS3D')
+
 
 if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--target', choices=['thesis'], type=str
-    )
+    parser.add_argument('--target', choices=['thesis'], type=str)
     args = parser.parse_args()
 
     if args.target == 'thesis':
