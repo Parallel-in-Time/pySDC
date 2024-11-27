@@ -65,6 +65,7 @@ def run_experiment(args, config, **kwargs):
 
     if config.comm_world.rank == config.comm_world.size - 1:
         path = f'{config.base_path}/data/{config.get_path()}-stats-whole-run.pickle'
+        # path = f'/p/project1/ccstma/baumann7/pySDC/pySDC/projects/GPU/data/{config.get_path()}-stats-whole-run.pickle'
         with open(path, 'wb') as file:
             pickle.dump(combined_stats, file)
         print(f'Stored stats in {path}', flush=True)

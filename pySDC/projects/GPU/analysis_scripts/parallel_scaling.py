@@ -107,7 +107,7 @@ class ScalingConfig(object):
             i = experiment.start
             res = experiment.res
 
-            while i <= experiment.stop:
+            for i in experiment.sequence:
                 procs = [1, tasks_time, int(np.ceil(i / tasks_time))]
                 args = {'useGPU': self.useGPU, 'config': self.config, 'res': res, 'procs': procs, 'mode': None}
 
@@ -137,7 +137,6 @@ class ScalingConfig(object):
                         raise NotImplementedError
                 except (FileNotFoundError, ValueError):
                     pass
-                i *= 2
 
             ax.loglog(
                 timings.keys(),
@@ -145,15 +144,6 @@ class ScalingConfig(object):
                 **plotting_params[(self.useGPU, experiment.PinT)],
                 marker=experiment.marker,
             )
-        # if plot_ideal:
-        #     if strong:
-        #         ax.loglog(
-        #             timings.keys(),
-        #             list(timings.values())[0] * list(timings.keys())[0] / np.array(list(timings.keys())),
-        #             ls='--',
-        #             color='grey',
-        #             label='ideal',
-        #         )
         ax.set_xlabel(r'$N_\mathrm{nodes}$')
         labels = {
             'throughput': 'throughput / DoF/s',
@@ -193,7 +183,7 @@ class GrayScottSpaceScalingCPU3D(CPUConfig, ScalingConfig):
 
 
 class GrayScottSpaceScalingGPU3D(GPUConfig, ScalingConfig):
-    ndim = 2
+    ndim = 3
     config = 'GS_scaling3D'
     tasks_time = 4
     sbatch_options = ['--time=0:07:00']
@@ -205,10 +195,9 @@ class GrayScottSpaceScalingGPU3D(GPUConfig, ScalingConfig):
         Experiment(res=1024, PinT=False, start=16, stop=1024, marker='x'),
         Experiment(res=2304, PinT=True, start=768, stop=1536, marker='.'),
         Experiment(res=2304, PinT=False, start=192, stop=768, marker='.'),
-        Experiment(res=4608, PinT=False, start=1536, stop=1536, marker='o'),
-        Experiment(res=4480, PinT=True, start=3584, stop=3584, marker='x'),
-        Experiment(res=4480, PinT=False, sequence=[1494, 2240], marker='x'),
-        # Experiment(**# {'res': 3840, 'PinT': True, 'start': 768, 'stop': 1536, 'marker': 'o'}),
+        # Experiment(res=4608, PinT=False, start=1536, stop=1536, marker='o'),
+        Experiment(res=4480, PinT=True, sequence=[3584], marker='o'),
+        Experiment(res=4480, PinT=False, sequence=[1494], marker='o'),
     ]
 
 
@@ -216,13 +205,15 @@ class RayleighBenardSpaceScalingCPU(CPUConfig, ScalingConfig):
     ndim = 2
     config = 'RBC_scaling'
     tasks_time = 4
-    sbatch_options = ['--time=0:25:00']
+    sbatch_options = ['--time=1:25:00']
 
     experiments = [
-        # Experiment(res=1024, PinT=True, start=4, stop=1024, marker='x'),
-        # Experiment(res=1024, PinT=False, start=1, stop=128, marker='x'),
-        Experiment(res=2048, PinT=True, start=32, stop=1024, marker='.'),
-        Experiment(res=2048, PinT=False, start=4, stop=256, marker='.'),
+        Experiment(res=512, PinT=True, start=4, stop=512, marker='x'),
+        Experiment(res=512, PinT=False, start=1, stop=128, marker='x'),
+        Experiment(res=1024, PinT=True, start=4, stop=1024, marker='x'),
+        Experiment(res=1024, PinT=False, start=1, stop=128, marker='x'),
+        Experiment(res=2048, PinT=True, start=128, stop=1024, marker='.'),
+        Experiment(res=2048, PinT=False, start=128, stop=256, marker='.'),
     ]
 
 
