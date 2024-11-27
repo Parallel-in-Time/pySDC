@@ -54,20 +54,23 @@ class GrayScott(Config):
             else:
                 uend = L.uend
 
+            data = {
+                't': L.time + L.dt,
+                'local_slice': P.fft.local_slice(False),
+                'shape': P.fft.global_shape(False),
+            }
+
             if P.useGPU:
-                return {
-                    't': L.time + L.dt,
-                    'u': uend[0].get().view(np.ndarray),
-                    'v': uend[1].get().view(np.ndarray),
-                    'X': [me.get().view(np.ndarray) for me in L.prob.X],
-                }
+                data['u'] = uend[0].get().view(np.ndarray)
+                data['v'] = uend[1].get().view(np.ndarray)
+                if L.time == 0:
+                    data['X'] = [me.get().view(np.ndarray) for me in L.prob.X]
             else:
-                return {
-                    't': L.time + L.dt,
-                    'u': uend[0],
-                    'v': uend[1],
-                    'X': L.prob.X,
-                }
+                data['u'] = uend[0]
+                data['v'] = uend[1]
+                if L.time == 0:
+                    data['X'] = L.prob.X
+            return data
 
         def logging_condition(L):
             sweep = L.sweep
@@ -298,7 +301,6 @@ class GrayScottLarge(GrayScott):
         desc['level_params']['dt'] = 1e-1
         desc['problem_params']['spectral'] = False
 
-        desc['problem_params']['nvars'] = (3840, 3840, 20)
         # desc['problem_params']['num_blobs'] *= -1
         # desc['problem_params']['num_blobs'] = 40
 
