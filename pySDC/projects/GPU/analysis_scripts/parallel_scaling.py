@@ -41,6 +41,7 @@ class ScalingConfig(object):
     tasks_time = 1
     sbatch_options = []
     experiments = []
+    OMP_NUM_THREADS = 1
 
     def run_scaling_test(self, **kwargs):
         for experiment in self.experiments:
@@ -58,8 +59,8 @@ class ScalingConfig(object):
                 ] + self.sbatch_options
                 srun_options = [f'--tasks-per-node={self.tasks_per_node}']
                 if self.useGPU:
-                    srun_options += ['--cpus-per-task=4', '--gpus-per-task=1']
-                    sbatch_options += ['--cpus-per-task=4', '--gpus-per-task=1']
+                    srun_options += [f'--cpus-per-task={self.OMP_NUM_THREADS}', '--gpus-per-task=1']
+                    sbatch_options += [f'--cpus-per-task={self.OMP_NUM_THREADS}', '--gpus-per-task=1']
 
                 procs = (''.join(f'{me}/' for me in procs))[:-1]
                 command = f'run_experiment.py --mode=run --res={res} --config={self.config} --procs={procs}'
@@ -68,7 +69,7 @@ class ScalingConfig(object):
                     command += ' --useGPU=True'
 
                 write_jobscript(
-                    sbatch_options, srun_options, command, self.cluster, name=f'{type(self).__name__}_{res}', **kwargs
+                    sbatch_options, srun_options, command, self.cluster, name=f'{type(self).__name__}_{res}', OMP_NUM_THREADS=self.OMP_NUM_THREADS, **kwargs
                 )
 
     def plot_scaling_test(self, ax, quantity='time', **plotting_params):  # pragma: no cover
@@ -159,19 +160,27 @@ class CPUConfig(ScalingConfig):
     partition = 'batch'
     tasks_per_node = 16
 
+class JurecaCPU(ScalingConfig):
+    cluster = 'jureca'
+    partition = 'dc-cpu'
+    tasks_per_node = 64
+    OMP_NUM_THREADS = 1
+
 
 class GPUConfig(ScalingConfig):
     cluster = 'booster'
     partition = 'booster'
     tasks_per_node = 4
     useGPU = True
+    OMP_NUM_THREADS = 12
 
 
-class GrayScottSpaceScalingCPU3D(CPUConfig, ScalingConfig):
+class GrayScottSpaceScalingCPU3D(JurecaCPU, ScalingConfig):
     ndim = 3
     config = 'GS_scaling3D'
     tasks_time = 4
-    sbatch_options = ['--time=1:30:00']
+    tasks_per_node = 16
+    sbatch_options = ['--time=0:45:00']
     experiments = [
         Experiment(res=512, PinT=False, start=1, stop=256, marker='>'),
         Experiment(res=512, PinT=True, start=1, stop=1024, marker='>'),
@@ -201,19 +210,25 @@ class GrayScottSpaceScalingGPU3D(GPUConfig, ScalingConfig):
     ]
 
 
-class RayleighBenardSpaceScalingCPU(CPUConfig, ScalingConfig):
+class RayleighBenardSpaceScalingCPU(JurecaCPU, ScalingConfig):
     ndim = 2
     config = 'RBC_scaling'
     tasks_time = 4
-    sbatch_options = ['--time=1:25:00']
+    sbatch_options = ['--time=0:15:00']
+    # cluster = 'jusuf'
+    # partition = 'batch'
+    tasks_per_node = 64
+    OMP_NUM_THREADS = 1
 
     experiments = [
-        Experiment(res=512, PinT=True, start=4, stop=512, marker='x'),
-        Experiment(res=512, PinT=False, start=1, stop=128, marker='x'),
-        Experiment(res=1024, PinT=True, start=4, stop=1024, marker='x'),
-        Experiment(res=1024, PinT=False, start=1, stop=128, marker='x'),
-        Experiment(res=2048, PinT=True, start=128, stop=1024, marker='.'),
-        Experiment(res=2048, PinT=False, start=128, stop=256, marker='.'),
+        Experiment(res=1024, PinT=False, start=1, stop=128, marker='.'),
+        Experiment(res=1024, PinT=True, start=4, stop=1024, marker='.'),
+        Experiment(res=2048, PinT=False, start=32, stop=256, marker='x'),
+        Experiment(res=2048, PinT=True, start=128, stop=1024, marker='x'),
+        Experiment(res=4096, PinT=False, start=256, stop=1024, marker='o'),
+        Experiment(res=4096, PinT=True, start=1024, stop=4096, marker='o'),
+        # Experiment(res=8192, PinT=False, sequence=[2048], marker='o'),
+        # Experiment(res=16384, PinT=False, sequence=[4096], marker='o'),
     ]
 
 
@@ -224,10 +239,10 @@ class RayleighBenardSpaceScalingGPU(GPUConfig, ScalingConfig):
     sbatch_options = ['--time=0:15:00']
 
     experiments = [
-        Experiment(res=1024, PinT=True, start=4, stop=128, marker='x'),
-        Experiment(res=1024, PinT=False, start=1, stop=32, marker='x'),
-        Experiment(res=2048, PinT=True, start=16, stop=128, marker='.'),
-        Experiment(res=2048, PinT=False, start=16, stop=128, marker='.'),
+        Experiment(res=1024, PinT=False, start=1, stop=32, marker='.'),
+        Experiment(res=1024, PinT=True, start=4, stop=128, marker='.'),
+        Experiment(res=2048, PinT=False, start=64, stop=2048, marker='x'),
+        Experiment(res=2048, PinT=True, start=16, stop=512, marker='x'),
     ]
 
 
@@ -284,8 +299,8 @@ def plot_scalings(problem, **kwargs):  # pragma: no cover
         ]
     elif problem == 'RBC':
         configs = [
-            RayleighBenardSpaceScalingCPU(),
             RayleighBenardSpaceScalingGPU(),
+            RayleighBenardSpaceScalingCPU(),
         ]
     elif problem == 'RBC_dedalus':
         configs = [

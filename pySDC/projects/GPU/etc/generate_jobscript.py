@@ -14,7 +14,7 @@ def generate_directories():
         os.makedirs(path, exist_ok=True)
 
 
-def get_jobscript_text(sbatch_options, srun_options, command, cluster, name='Coffeebreak', nsys_profiling=False):
+def get_jobscript_text(sbatch_options, srun_options, command, cluster, name='Coffeebreak', nsys_profiling=False, OMP_NUM_THREADS=1):
     """
     Generate the text for a jobscript
 
@@ -35,7 +35,7 @@ def get_jobscript_text(sbatch_options, srun_options, command, cluster, name='Cof
     for op in DEFAULT_SBATCH_OPTIONS + sbatch_options:
         msg += f'#SBATCH {op}\n'
 
-    msg += f'\nexport OMP_NUM_THREADS=1\n'
+    msg += f'\nexport OMP_NUM_THREADS={OMP_NUM_THREADS}\n'
     msg += f'\nsource {PROJECT_PATH}/etc/venv_{cluster.lower()}/activate.sh\n'
 
     srun_cmd = 'srun'
