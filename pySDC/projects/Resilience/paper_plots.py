@@ -885,11 +885,16 @@ def make_plots_for_thesis():  # pragma: no cover
 
     plot_GS_solution()
     plot_RBC_solution('work-precision')
-    # plot_vdp_solution()
+    plot_vdp_solution()
 
-    # plot_adaptivity_stuff()
+    plot_adaptivity_stuff()
+
+    plot_fault_Lorenz(0)
+    plot_fault_Lorenz(20)
     compare_recovery_rate_problems(target='thesis', num_procs=1, strategy_type='SDC')
     plot_recovery_rate_per_acceptance_threshold(run_Lorenz)
+    plot_recovery_rate(get_stats(run_Lorenz))
+    plot_recovery_rate_detailed_Lorenz()
 
 
 if __name__ == "__main__":
