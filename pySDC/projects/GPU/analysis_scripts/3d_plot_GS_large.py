@@ -29,11 +29,33 @@ def plot(n_time, n_space, useGPU, n_frames, base_path, space_range, res, start_f
             v['values'][local_slice_flat] = _data['v'].flatten()
             # _v[*_data['local_slice']] = _data['v']
 
-        # v = pv.wrap(_v)
+            # _v[*_data['local_slice']] = _data['v']
+            print(f'loaded data from task {procs} with slice {_data["local_slice"]}', flush=True)
+
+        # print('finished loading data', flush=True)
+        # # plot slice
+        # v_slice = pv.wrap(_v[:60, ...])
+        # print('wrapped data', flush=True)
+        # contours = v_slice.contour(isosurfaces=[0.3])
+        # p.add_mesh(contours, opacity=0.7, cmap=['teal'])
+        # p.remove_scalar_bar()
+        # p.camera.azimuth += 15
+
+        # p.camera.Elevation(0.7)
+        # plotting_path = './simulation_plots/'
+
+        # path = f'{plotting_path}/GS_large_slice_{i:06d}.png'
+        # p.camera.tight(view='yz')
+        # p.screenshot(path, window_size=(4096, 4096))
+        # print(f'Saved {path}', flush=True)
 
         # plot whole thing
+        # v = pv.wrap(_v)
+        print('wrapped data', flush=True)
         contours = v.contour(isosurfaces=[0.3])
+        print('created contour', flush=True)
         p.add_mesh(contours, opacity=0.7, cmap=['teal'])
+        print('plotted contour', flush=True)
         p.remove_scalar_bar()
         p.camera.azimuth += 15
 
@@ -95,6 +117,7 @@ if __name__ == '__main__':
     parser.add_argument('--nframes', type=int, default=100)
     parser.add_argument('--start', type=int, default=0)
     parser.add_argument('--base_path', type=str, default='/p/scratch/ccstma/baumann7/large_runs/data/')
+    parser.add_argument('--space_range', type=int, default=None)
     args = parser.parse_args()
 
     from pySDC.projects.GPU.analysis_scripts.large_simulations import GSLarge
@@ -108,21 +131,15 @@ if __name__ == '__main__':
     else:
         raise NotImplementedError()
 
+    space_range = range(sim.params['procs'][2] if args.space_range is None else args.space_range)
+
     if args.mode == 'plot':
+        pv.global_theme.allow_empty_mesh = True
         try:
             pv.start_xvfb()
         except OSError:
             pass
-        plot(
-            n_time=sim.params['procs'][1],
-            n_space=sim.params['procs'][2],
-            useGPU=sim.params['useGPU'],
-            base_path=args.base_path,
-            space_range=range(sim.params['procs'][2]),
-            n_frames=args.nframes,
-            res=sim.params['res'],
-            start_frame=args.start,
-        )
+        plot(n_time = sim.params['procs'][1], n_space=sim.params['procs'][2], useGPU=sim.params['useGPU'], base_path=args.base_path, space_range=space_range, n_frames=args.nframes, res=sim.params['res'], start_frame=args.start)
     elif args.mode == 'video':
         for view in [None, 'slice']:  #'xy', 'xz', 'yz']:
             video(view)

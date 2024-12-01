@@ -127,7 +127,7 @@ class GSLarge(LargeSim):
             'time': '0:15:00',
         }
 
-    def setup_GPU_params(self):
+    def setup_GPU_params_test(self):
         """
         Test params with a small run.
         """
@@ -141,7 +141,7 @@ class GSLarge(LargeSim):
             'time': '0:20:00',
         }
 
-    def setup_GPU_params_real_deal(self):
+    def setup_GPU_params(self):
         """
         Params we actually want to use for the large simulation
         """
