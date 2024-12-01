@@ -30,7 +30,7 @@ def plot(n_time, n_space, useGPU, n_frames, base_path, space_range, res, start_f
             # _v[*_data['local_slice']] = _data['v']
 
             # _v[*_data['local_slice']] = _data['v']
-            print(f'loaded data from task {procs} with slice {_data["local_slice"]}', flush=True)
+            # print(f'loaded data from task {procs} with slice {_data["local_slice"]}', flush=True)
 
         # print('finished loading data', flush=True)
         # # plot slice
@@ -50,12 +50,8 @@ def plot(n_time, n_space, useGPU, n_frames, base_path, space_range, res, start_f
         # print(f'Saved {path}', flush=True)
 
         # plot whole thing
-        # v = pv.wrap(_v)
-        print('wrapped data', flush=True)
         contours = v.contour(isosurfaces=[0.3])
-        print('created contour', flush=True)
         p.add_mesh(contours, opacity=0.7, cmap=['teal'])
-        print('plotted contour', flush=True)
         p.remove_scalar_bar()
         p.camera.azimuth += 15
 
