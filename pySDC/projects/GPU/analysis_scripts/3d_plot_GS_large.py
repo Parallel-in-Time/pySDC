@@ -10,6 +10,7 @@ def plot(n_time, n_space, useGPU, n_frames, base_path, space_range, res, start_f
         p = pv.Plotter(off_screen=True)
 
         _v = None
+        v = None
         gc.collect()
         for procs in space_range:
             gc.collect()
@@ -18,12 +19,17 @@ def plot(n_time, n_space, useGPU, n_frames, base_path, space_range, res, start_f
             with open(path, 'rb') as file:
                 _data = pickle.load(file)
 
-            if _v is None:
-                _v = np.zeros(_data['shape'])
+            # if _v is None:
+            # _v = np.zeros(_data['shape'])
+            if v is None:
+                v = pv.ImageData(dimensions=_data['shape'])
+                v['values'] = np.zeros(np.prod(_data['shape']))
 
-            _v[*_data['local_slice']] = _data['v']
+            local_slice_flat = slice(np.prod(_data['v'].shape) * procs, np.prod(_data['v'].shape) * (procs + 1))
+            v['values'][local_slice_flat] = _data['v'].flatten()
+            # _v[*_data['local_slice']] = _data['v']
 
-        v = pv.wrap(_v)
+        # v = pv.wrap(_v)
 
         # plot whole thing
         contours = v.contour(isosurfaces=[0.3])
@@ -45,6 +51,7 @@ def plot(n_time, n_space, useGPU, n_frames, base_path, space_range, res, start_f
         #     p.screenshot(path, window_size=(4096, 4096))
         #     print(f'Saved {path}', flush=True)
 
+        continue
         # plot slice
         v_slice = pv.wrap(_v[:10, ...])
         contours = v_slice.contour(isosurfaces=[0.3])
