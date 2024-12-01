@@ -118,12 +118,12 @@ class GSLarge(LargeSim):
         Test params with a small run.
         """
         self.params = {
-            'procs': [1, 1, 900],
+            'procs': [1, 1, 64],
             'useGPU': False,
             'tasks_per_node': 16,
             'partition': 'batch',
             'cluster': 'jusuf',
-            'res': 2700,
+            'res': 256,
             'time': '0:15:00',
         }
 
@@ -132,16 +132,33 @@ class GSLarge(LargeSim):
         Test params with a small run.
         """
         self.params = {
-            'procs': [1, 4, 2],
+            'procs': [1, 4, 1],
             'useGPU': True,
             'tasks_per_node': 4,
             'partition': 'develbooster',
             'cluster': 'booster',
-            'res': 3840,
+            'res': 512,
             'time': '0:20:00',
         }
 
+    def setup_GPU_params_real_deal(self):
+        """
+        Params we actually want to use for the large simulation
+        """
+        self.params = {
+            'procs': [1, 4, 192],
+            'useGPU': True,
+            'tasks_per_node': 4,
+            'partition': 'booster',
+            'cluster': 'booster',
+            'res': 2304,
+            'time': '1:00:00',
+        }
+
     def setup_GPU_paramsFull(self):
+        """
+        Config for a stupid run on the whole machine.
+        """
         self.params = {
             'procs': [1, 4, 896],
             'useGPU': True,

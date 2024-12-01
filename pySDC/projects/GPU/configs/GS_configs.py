@@ -284,7 +284,7 @@ class GrayScottScaling3D(GrayScottScaling):
 
 
 class GrayScottLarge(GrayScott):
-    Tend = 10000
+    Tend = 5000
     num_frames = 100
     res_per_blob = 2**7
     ndim = 3
@@ -305,7 +305,7 @@ class GrayScottLarge(GrayScott):
         # desc['problem_params']['num_blobs'] = 40
 
         desc['problem_params']['L'] = 2 * desc['problem_params']['nvars'][0] // self.res_per_blob
-        desc['problem_params']['num_blobs'] = int(3 * desc['problem_params']['L'])
+        desc['problem_params']['num_blobs'] = int(1 * desc['problem_params']['L'])
 
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3}
         return desc

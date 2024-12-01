@@ -43,6 +43,9 @@ class ScalingConfig(object):
     experiments = []
     OMP_NUM_THREADS = 1
 
+    def format_resolution(self, resolution):
+        return f'${{{resolution}}}^{{{self.ndim}}}$'
+
     def run_scaling_test(self, **kwargs):
         for experiment in self.experiments:
             res = experiment.res
@@ -85,22 +88,22 @@ class ScalingConfig(object):
             plotting_params = {
                 (False, False): {
                     'ls': '--',
-                    'label': f'CPU ${{{experiment.res}}}^{{{self.ndim}}}$',
+                    'label': f'CPU {self.format_resolution(experiment.res)}',
                     'color': colors[2],
                 },
                 (False, True): {
                     'ls': '-.',
-                    'label': f'CPU PinT ${{{experiment.res}}}^{{{self.ndim}}}$',
+                    'label': f'CPU PinT {self.format_resolution(experiment.res)}',
                     'color': colors[3],
                 },
                 (True, False): {
                     'ls': '-',
-                    'label': f'GPU ${{{experiment.res}}}^{{{self.ndim}}}$',
+                    'label': f'GPU {self.format_resolution(experiment.res)}',
                     'color': colors[0],
                 },
                 (True, True): {
                     'ls': ':',
-                    'label': f'GPU PinT ${{{experiment.res}}}^{{{self.ndim}}}$',
+                    'label': f'GPU PinT {self.format_resolution(experiment.res)}',
                     'color': colors[1],
                 },
             }
@@ -210,13 +213,16 @@ class GrayScottSpaceScalingGPU3D(GPUConfig, ScalingConfig):
     ]
 
 
-class RayleighBenardSpaceScalingCPU(JurecaCPU, ScalingConfig):
+
+class RBCBaseConfig(ScalingConfig):
+    def format_resolution(self, resolution):
+        return fr'${{{resolution}}}\times{{{resolution//4}}}$'
+
+class RayleighBenardSpaceScalingCPU(JurecaCPU, RBCBaseConfig):
     ndim = 2
     config = 'RBC_scaling'
     tasks_time = 4
     sbatch_options = ['--time=0:15:00']
-    # cluster = 'jusuf'
-    # partition = 'batch'
     tasks_per_node = 64
     OMP_NUM_THREADS = 1
 
@@ -231,9 +237,17 @@ class RayleighBenardSpaceScalingCPU(JurecaCPU, ScalingConfig):
         # Experiment(res=16384, PinT=False, sequence=[4096], marker='o'),
     ]
 
+class RayleighBenardSpaceScalingCPULarge(RayleighBenardSpaceScalingCPU):
+    tasks_per_node = 32
 
-class RayleighBenardSpaceScalingGPU(GPUConfig, ScalingConfig):
-    ndim = 3
+    experiments = [
+        Experiment(res=8192, PinT=False, sequence=[512, 1024, 2048], marker='o'),
+        # Experiment(res=16384, PinT=False, sequence=[4096], marker='o'),
+    ]
+
+
+class RayleighBenardSpaceScalingGPU(GPUConfig, RBCBaseConfig):
+    ndim = 2
     config = 'RBC_scaling'
     tasks_time = 4
     sbatch_options = ['--time=0:15:00']
@@ -241,8 +255,8 @@ class RayleighBenardSpaceScalingGPU(GPUConfig, ScalingConfig):
     experiments = [
         Experiment(res=1024, PinT=False, start=1, stop=32, marker='.'),
         Experiment(res=1024, PinT=True, start=4, stop=128, marker='.'),
-        Experiment(res=2048, PinT=False, start=64, stop=2048, marker='x'),
-        Experiment(res=2048, PinT=True, start=16, stop=512, marker='x'),
+        Experiment(res=2048, PinT=False, start=16, stop=256, marker='x'),
+        Experiment(res=2048, PinT=True, start=16, stop=256, marker='x'),
     ]
 
 
@@ -270,7 +284,7 @@ class RayleighBenardSpaceScalingGPU(GPUConfig, ScalingConfig):
 #     max_nodes = 64
 
 
-class RayleighBenardDedalusComparison(CPUConfig, ScalingConfig):
+class RayleighBenardDedalusComparison(CPUConfig, RBCBaseConfig):
     base_resolution = 256
     config = 'RBC_Tibo'
     max_steps_space = 6
@@ -319,11 +333,12 @@ def plot_scalings(problem, **kwargs):  # pragma: no cover
     fig, ax = plt.subplots(figsize=figsize_by_journal('TUHH_thesis', 1, 0.6))
     configs[1].plot_scaling_test(ax=ax, quantity='efficiency')
     ax.legend(frameon=False)
+    ax.set_yscale('linear')
     path = f'{PROJECT_PATH}/plots/scaling_{problem}_efficiency.pdf'
     fig.savefig(path, bbox_inches='tight')
     print(f'Saved {path!r}', flush=True)
 
-    for quantity in ['throughput', 'time']:
+    for quantity in ['time', 'throughput']:
         fig, ax = plt.subplots(figsize=figsize_by_journal('TUHH_thesis', 1, 0.6))
         for config in configs:
             config.plot_scaling_test(ax=ax, quantity=quantity)
@@ -351,34 +366,35 @@ if __name__ == '__main__':
     submit = args.submit == 'True'
     nsys_profiling = args.nsys_profiling == 'True'
 
-    if args.problem == 'GS':
+    config_classes = []
+
+    if args.problem == 'GS3D':
         if args.XPU == 'CPU':
-            configClass = GrayScottSpaceScalingCPU
+            config_classes += [GrayScottSpaceScalingCPU3D]
         else:
-            configClass = GrayScottSpaceScalingGPU
-    elif args.problem == 'GS3D':
-        if args.XPU == 'CPU':
-            configClass = GrayScottSpaceScalingCPU3D
-        else:
-            configClass = GrayScottSpaceScalingGPU3D
+            config_classes += [GrayScottSpaceScalingGPU3D]
     elif args.problem == 'RBC':
         if args.XPU == 'CPU':
-            configClass = RayleighBenardSpaceScalingCPU
+            config_classes += [
+                    RayleighBenardSpaceScalingCPU,
+                    RayleighBenardSpaceScalingCPULarge
+                    ]
         else:
-            configClass = RayleighBenardSpaceScalingGPU
+            config_classes += [RayleighBenardSpaceScalingGPU]
     elif args.problem == 'RBC_dedalus':
         if args.XPU == 'CPU':
-            configClass = RayleighBenardDedalusComparison
+            config_classes += [RayleighBenardDedalusComparison]
         else:
-            configClass = RayleighBenardDedalusComparisonGPU
+            config_classes += [RayleighBenardDedalusComparisonGPU]
     else:
         raise NotImplementedError(f'Don\'t know problem {args.problem!r}')
 
-    config = configClass()
+    for configClass in config_classes:
+        config = configClass()
 
-    if args.mode == 'run':
-        config.run_scaling_test(submit=submit, nsys_profiling=nsys_profiling)
-    elif args.mode == 'plot':
-        plot_scalings(problem=args.problem)
-    else:
-        raise NotImplementedError(f'Don\'t know mode {args.mode!r}')
+        if args.mode == 'run':
+            config.run_scaling_test(submit=submit, nsys_profiling=nsys_profiling)
+        elif args.mode == 'plot':
+            plot_scalings(problem=args.problem)
+        else:
+            raise NotImplementedError(f'Don\'t know mode {args.mode!r}')
