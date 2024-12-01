@@ -3,11 +3,15 @@ import pickle
 import pyvista as pv
 import subprocess
 import gc
+from mpi4py import MPI
 
 
 def plot(n_time, n_space, useGPU, n_frames, base_path, space_range, res, start_frame=0):
-    for i in range(start_frame, n_frames):
+    comm = MPI.COMM_WORLD
+
+    for idx in range(start_frame, n_frames, comm.size):
         p = pv.Plotter(off_screen=True)
+        i = idx + comm.rank
 
         _v = None
         v = None
@@ -16,6 +20,7 @@ def plot(n_time, n_space, useGPU, n_frames, base_path, space_range, res, start_f
             gc.collect()
 
             path = f'{base_path}/GrayScottLarge-res_{res}-useGPU_{useGPU}-procs_1_{n_time}_{n_space}-0-{procs}-solution_{i:06d}.pickle'
+            print(f'{comm.rank} loading {path}', flush=True)
             with open(path, 'rb') as file:
                 _data = pickle.load(file)
 
@@ -135,7 +140,16 @@ if __name__ == '__main__':
             pv.start_xvfb()
         except OSError:
             pass
-        plot(n_time = sim.params['procs'][1], n_space=sim.params['procs'][2], useGPU=sim.params['useGPU'], base_path=args.base_path, space_range=space_range, n_frames=args.nframes, res=sim.params['res'], start_frame=args.start)
+        plot(
+            n_time=sim.params['procs'][1],
+            n_space=sim.params['procs'][2],
+            useGPU=sim.params['useGPU'],
+            base_path=args.base_path,
+            space_range=space_range,
+            n_frames=args.nframes,
+            res=sim.params['res'],
+            start_frame=args.start,
+        )
     elif args.mode == 'video':
         for view in [None, 'slice']:  #'xy', 'xz', 'yz']:
             video(view)
