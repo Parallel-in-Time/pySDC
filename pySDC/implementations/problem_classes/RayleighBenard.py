@@ -21,7 +21,7 @@ class RayleighBenard(GenericSpectralLinear):
         v_t - nu (v_xx + v_zz) + p_z - T = -uv_x - vv_z
 
     with u the horizontal velocity, v the vertical velocity (in z-direction), T the temperature, p the pressure, indices
-    denoting derivatives, kappa=(Rayleigh * Prandl)**(-1/2) and nu = (Rayleigh / Prandl)**(-1/2). Everything on the left
+    denoting derivatives, kappa=(Rayleigh * Prandtl)**(-1/2) and nu = (Rayleigh / Prandtl)**(-1/2). Everything on the left
     hand side, that is the viscous part, the pressure gradient and the buoyancy due to temperature are treated
     implicitly, while the non-linear convection part on the right hand side is integrated explicitly.
 
@@ -37,7 +37,7 @@ class RayleighBenard(GenericSpectralLinear):
     facilitate the Dirichlet BCs.
 
     Parameters:
-        Prandl (float): Prandl number
+        Prandtl (float): Prandtl number
         Rayleigh (float): Rayleigh number
         nx (int): Horizontal resolution
         nz (int): Vertical resolution
@@ -51,7 +51,7 @@ class RayleighBenard(GenericSpectralLinear):
 
     def __init__(
         self,
-        Prandl=1,
+        Prandtl=1,
         Rayleigh=2e6,
         nx=256,
         nz=64,
@@ -65,7 +65,7 @@ class RayleighBenard(GenericSpectralLinear):
         Constructor. `kwargs` are forwarded to parent class constructor.
 
         Args:
-            Prandl (float): Prandtl number
+            Prandtl (float): Prandtl number
             Rayleigh (float): Rayleigh number
             nx (int): Resolution in x-direction
             nz (int): Resolution in z direction
@@ -93,7 +93,7 @@ class RayleighBenard(GenericSpectralLinear):
             except ModuleNotFoundError:
                 pass
         self._makeAttributeAndRegister(
-            'Prandl',
+            'Prandtl',
             'Rayleigh',
             'nx',
             'nz',
@@ -131,8 +131,8 @@ class RayleighBenard(GenericSpectralLinear):
         self.Dz = S1 @ Dz
         self.Dzz = S2 @ Dzz
 
-        kappa = (Rayleigh * Prandl) ** (-1 / 2.0)
-        nu = (Rayleigh / Prandl) ** (-1 / 2.0)
+        kappa = (Rayleigh * Prandtl) ** (-1 / 2.0)
+        nu = (Rayleigh / Prandtl) ** (-1 / 2.0)
 
         # construct operators
         L_lhs = {

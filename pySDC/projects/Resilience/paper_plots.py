@@ -143,7 +143,8 @@ def plot_recovery_rate(stats_analyser, **kwargs):  # pragma: no cover
         None
     """
     my_setup_mpl()
-    fig, axs = plt.subplots(1, 2, figsize=(TEXTWIDTH, 5 * cm), sharex=True, sharey=True)
+    # fig, axs = plt.subplots(1, 2, figsize=(TEXTWIDTH, 5 * cm), sharex=True, sharey=True)
+    fig, axs = plt.subplots(1, 2, figsize=figsize_by_journal(JOURNAL, 1, 0.4), sharex=True)
     stats_analyser.plot_things_per_things(
         'recovered',
         'bit',
@@ -593,6 +594,9 @@ def plot_RBC_solution(setup='resilience'):  # pragma: no cover
     elif setup == 'work-precision':
         _plot(10, axs[0], caxs[0])
         _plot(16, axs[1], caxs[1])
+    elif setup == 'resilience_thesis':
+        _plot(20, axs[0], caxs[0])
+        _plot(21, axs[1], caxs[1])
 
     axs[1].set_xlabel('$x$')
     axs[0].set_ylabel('$z$')
@@ -627,7 +631,7 @@ def plot_GS_solution():  # pragma: no cover
         'Dv': 1e-5,
     }
     P = grayscott_imex_diffusion(**problem_params)
-    Tend = 1000
+    Tend = 500
     im = axs[0].pcolormesh(*P.X, P.u_exact(0)[0], rasterized=True, cmap='binary')
     im1 = axs[1].pcolormesh(*P.X, P.u_exact(Tend)[0], rasterized=True, cmap='binary')
 
@@ -715,7 +719,7 @@ def plot_AC_solution():  # pragma: no cover
     savefig(fig, 'AC_sol')
 
 
-def plot_vdp_solution():  # pragma: no cover
+def plot_vdp_solution(setup='adaptivity'):  # pragma: no cover
     """
     Plot the solution of van der Pol problem over time to illustrate the varying time scales.
 
@@ -730,24 +734,41 @@ def plot_vdp_solution():  # pragma: no cover
     else:
         fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 1.0, 0.33))
 
-    custom_description = {
-        'convergence_controllers': {Adaptivity: {'e_tol': 1e-7, 'dt_max': 1e0}},
-        'problem_params': {'mu': 1000, 'crash_at_maxiter': False},
-        'level_params': {'dt': 1e-3},
-    }
+    if setup == 'adaptivity':
+        custom_description = {
+            'convergence_controllers': {Adaptivity: {'e_tol': 1e-7, 'dt_max': 1e0}},
+            'problem_params': {'mu': 1000, 'crash_at_maxiter': False},
+            'level_params': {'dt': 1e-3},
+        }
+        Tend = 2000
+    elif setup == 'resilience':
+        custom_description = {
+            'convergence_controllers': {Adaptivity: {'e_tol': 1e-7, 'dt_max': 1e0}},
+            'problem_params': {'mu': 5, 'crash_at_maxiter': False},
+            'level_params': {'dt': 1e-3},
+        }
+        Tend = 50
 
-    stats, _, _ = run_vdp(custom_description=custom_description, Tend=2000)
+    stats, _, _ = run_vdp(custom_description=custom_description, Tend=Tend)
 
     u = get_sorted(stats, type='u', recomputed=False)
     _u = np.array([me[1][0] for me in u])
     _x = np.array([me[0] for me in u])
 
-    x1 = _x[abs(_u - 1.1) < 1e-2][0]
-    ax.plot(_x, _u, color='black')
-    ax.axvspan(x1, x1 + 20, alpha=0.4)
+    name = ''
+    if setup == 'adaptivity':
+        x1 = _x[abs(_u - 1.1) < 1e-2][0]
+        ax.plot(_x, _u, color='black')
+        ax.axvspan(x1, x1 + 20, alpha=0.4)
+    elif setup == 'resilience':
+        x1 = _x[abs(_u - 2.0) < 1e-2][0]
+        ax.plot(_x, _u, color='black')
+        ax.axvspan(x1, x1 + 11.5, alpha=0.4)
+        name = '_resilience'
+
     ax.set_ylabel(r'$u$')
     ax.set_xlabel(r'$t$')
-    savefig(fig, 'vdp_sol')
+    savefig(fig, f'vdp_sol{name}')
 
 
 def work_precision():  # pragma: no cover
@@ -884,8 +905,10 @@ def make_plots_for_thesis():  # pragma: no cover
     all_problems(**{**all_params, 'work_key': 'param'}, mode='compare_strategies')
 
     plot_GS_solution()
-    plot_RBC_solution('work-precision')
-    plot_vdp_solution()
+    for setup in ['resilience_thesis', 'work_precision']:
+        plot_RBC_solution(setup)
+    for setup in ['resilience', 'adaptivity']:
+        plot_vdp_solution(setup=setup)
 
     plot_adaptivity_stuff()
 

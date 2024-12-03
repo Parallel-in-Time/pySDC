@@ -109,7 +109,7 @@ class FaultStats:
         Returns:
             float: Tend to put into the run
         '''
-        return self.strategies[0].get_Tend(self.prob, self.num_procs)
+        return self.strategies[0].get_Tend(self.prob, self.num_procs, resilience_experiment=True)
 
     def run_stats_generation(
         self, runs=1000, step=None, comm=None, kwargs_range=None, faults=None, _reload=False, _runs_partial=0
@@ -839,10 +839,10 @@ class FaultStats:
         me_recovered = np.zeros_like(me)
 
         for i in range(len(me)):
-            _mask = (dat[thingB] == admissable_thingB[i]) & mask
+            _mask = np.logical_and((dat[thingB] == admissable_thingB[i]), mask)
             if _mask.any():
                 me[i] = op(dat, no_faults, thingA, _mask)
-                me_recovered[i] = op(dat, no_faults, thingA, _mask & dat['recovered'])
+                me_recovered[i] = op(dat, no_faults, thingA, np.logical_and(_mask, dat['recovered']))
 
         if recovered:
             ax.plot(
@@ -1517,7 +1517,7 @@ class FaultStats:
 
         HR_strategy = HotRodStrategy(useMPI=self.use_MPI)
 
-        description = HR_strategy.get_custom_description(self.prob, self.num_procs)
+        description = HR_strategy.get_custom_description_for_faults(self.prob, self.num_procs)
         description['convergence_controllers'][HotRod]['HotRod_tol'] = 1e2
 
         stats, _, _ = self.single_run(HR_strategy, force_params=description)
@@ -1672,7 +1672,7 @@ def compare_adaptivity_modes():
 
 def main():
     kwargs = {
-        'prob': run_RBC,
+        'prob': run_vdp,
         'num_procs': 1,
         'mode': 'default',
         'runs': 4000,
@@ -1700,6 +1700,8 @@ def main():
         stats_path='data/stats-jusuf',
         **kwargs,
     )
+    stats_analyser.get_recovered()
+
     stats_analyser.run_stats_generation(runs=kwargs['runs'], step=8)
 
     if MPI.COMM_WORLD.rank > 0:  # make sure only one rank accesses the data
