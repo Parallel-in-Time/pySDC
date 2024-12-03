@@ -15,19 +15,27 @@ class PlotRBC:
         _name = '-stats' if stats else ''
         return f'{self.base_path}/data/RayleighBenard_large-res_{self.res}-useGPU_False-procs_{self.procs[0]}_{self.procs[1]}_{self.procs[2]}-0-{n_space}-solution_{idx:06d}{_name}.pickle'
 
-    def plot_verification():
-        res = 128
-        procs = [1, 1, 4]
-        path = f'./data/RayleighBenard_large-res_{res}-useGPU_False-procs_{procs[0]}_{procs[1]}_{procs[2]}-0-0-solution_000002-stats.pickle'
-        with open(path, 'rb') as file:
-            data = pickle.load(file)
+    def plot_verification(self):
+        stats = {}
+        for idx in range(999):
+            try:
+                path = self.get_path(idx=idx, n_space=0, stats=True)
+                with open(path, 'rb') as file:
+                    stats = {**stats, **pickle.load(file)}
+            except FileNotFoundError:
+                break
 
-        print(get_list_of_types(data))
+        nu = get_sorted(stats, type='Nusselt', recomputed=False)
+        fig, ax = plt.subplots(figsize=figsize_by_journal('TUHH_thesis', 0.8, 0.6))
+        for key in ['t', 'b', 'V']:
+            ax.plot([me[0] for me in nu], [me[1][key] for me in nu], label=fr'$Nu_\mathrm{{{key}}}$')
+        ax.legend(frameon=False)
+        ax.set_xlabel('$t$')
+        fig.savefig('plots/RBC_large_Nusselt.pdf', bbox_inches='tight')
+        # print(get_list_of_types(stats))
 
     def plot_series(self):
-        indices = [0, 55]  # [0, 10, 20, 49]
-
-        setup_mpl()
+        indices = [0, 50, 80, 150]  # [0, 10, 20, 49]
 
         from mpl_toolkits.axes_grid1 import make_axes_locatable
 
@@ -52,7 +60,6 @@ class PlotRBC:
 
         def plot_single(idx, ax):
             for r in range(self.procs[2]):
-                print(r)
                 path = self.get_path(idx=idx, n_space=r)
                 with open(path, 'rb') as file:
                     data = pickle.load(file)
@@ -70,6 +77,8 @@ class PlotRBC:
 
 
 if __name__ == '__main__':
-    # plotter = PlotRBC(128, [1, 1, 4], '.')
-    plotter = PlotRBC(4096, [1, 4, 1024], '/p/scratch/ccstma/baumann7/large_runs/')
-    plotter.plot_series()
+    setup_mpl()
+    plotter = PlotRBC(256, [1, 4, 1], '.')
+    # plotter = PlotRBC(4096, [1, 4, 1024], '/p/scratch/ccstma/baumann7/large_runs/')
+    # plotter.plot_series()
+    plotter.plot_verification()
