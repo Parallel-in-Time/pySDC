@@ -25,7 +25,7 @@ class PlotRBC:
         print(get_list_of_types(data))
 
     def plot_series(self):
-        indices = [49]  # [0, 10, 20, 49]
+        indices = [0, 55]  # [0, 10, 20, 49]
 
         setup_mpl()
 
@@ -33,7 +33,7 @@ class PlotRBC:
 
         plt.rcParams['figure.constrained_layout.use'] = True
         fig, axs = plt.subplots(
-            len(indices), 1, figsize=figsize_by_journal('TUHH_thesis', 1, 1), sharex=True, sharey=True
+            len(indices), 1, figsize=figsize_by_journal('TUHH_thesis', 1, 1.3), sharex=True, sharey=True
         )
         caxs = {}
         for i in range(len(indices)):
@@ -52,14 +52,19 @@ class PlotRBC:
 
         def plot_single(idx, ax):
             for r in range(self.procs[2]):
+                print(r)
                 path = self.get_path(idx=idx, n_space=r)
                 with open(path, 'rb') as file:
                     data = pickle.load(file)
-            return ax.pcolormesh(X[r], Z[r], data['u'][2], vmin=0, vmax=2, cmap='plasma', rasterized=True), data['t']
+                im = ax.pcolormesh(X[r], Z[r], data['u'][2], vmin=0, vmax=2, cmap='plasma', rasterized=True), data['t']
+            return im
 
         for i, ax in zip(indices, axs):
             im, t = plot_single(i, ax)
             fig.colorbar(im, caxs[ax], label=f'$T(t={{{t:.1f}}})$')
+
+        axs[-1].set_xlabel('$x$')
+        axs[-1].set_ylabel('$z$')
         fig.savefig('plots/RBC_large_series.pdf', bbox_inches='tight')
         plt.show()
 
