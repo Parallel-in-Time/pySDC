@@ -58,16 +58,22 @@ def plot(n_time, n_space, useGPU, n_frames, base_path, space_range, res, start_f
         # print(f'Saved {path}', flush=True)
 
         # plot whole thing
-        contours = v.contour(isosurfaces=[0.3])
+        contours = v.contour(isosurfaces=[0.3], method='flying_edges', progress_bar=True)
+        print('done with contour', flush=True)
         p.add_mesh(contours, opacity=0.7, cmap=['teal'])
+        print('added mesh', flush=True)
         p.remove_scalar_bar()
+        print('removed scalar bar', flush=True)
         p.camera.azimuth += 15
+        print('azimuth', flush=True)
 
         p.camera.Elevation(0.7)
+        print('elevation', flush=True)
         plotting_path = './simulation_plots/'
 
         path = f'{plotting_path}/GS_large_{i:06d}.png'
         p.camera.zoom(1.1)
+        print('zoom', flush=True)
         p.screenshot(path, window_size=(4096, 4096))
         print(f'Saved {path}', flush=True)
 
@@ -80,7 +86,7 @@ def plot(n_time, n_space, useGPU, n_frames, base_path, space_range, res, start_f
         continue
         # plot slice
         v_slice = pv.wrap(_v[:10, ...])
-        contours = v_slice.contour(isosurfaces=[0.3])
+        contours = v_slice.contour(isosurfaces=[0.3], method='flying_edges', progress_bar=True)
         p.add_mesh(contours, opacity=0.7, cmap=['teal'])
         p.remove_scalar_bar()
         p.camera.azimuth += 15
@@ -140,7 +146,7 @@ if __name__ == '__main__':
     if args.mode == 'plot':
         pv.global_theme.allow_empty_mesh = True
         try:
-            pv.start_xvfb()
+            pv.start_xvfb(window_size=(4096, 4096))
         except OSError:
             pass
         plot(

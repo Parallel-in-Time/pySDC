@@ -409,12 +409,13 @@ class RayleighBenard_scaling_z(RayleighBenard_scaling):
 class RayleighBenard_large(RayleighBenardRegular):
     # res_per_plume = 256
     # vertical_res = 1024
-    Ra = 2e8
+    Ra = 2e7
     relaxation_steps = 5
 
     def get_description(self, *args, **kwargs):
         from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
         from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
+        from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeRounding
 
         desc = super().get_description(*args, **kwargs)
 
@@ -422,13 +423,15 @@ class RayleighBenard_large(RayleighBenardRegular):
             'e_tol': 1e-4,
             'abort_at_growing_residual': False,
             'interpolate_between_restarts': False,
-            'dt_min': 1e-3,
+            'dt_min': 1e-5,
             'dt_rel_min_slope': 2,
             'beta': 0.5,
         }
+        desc['convergence_controllers'][StepSizeRounding] = {}
         desc['convergence_controllers'].pop(CFLLimit)
-        desc['level_params']['restol'] = 1e-7
-        desc['level_params']['e_tol'] = 1e-7
+        desc['level_params']['restol'] = 1e-6
+        desc['level_params']['e_tol'] = 1e-6
+        desc['level_params']['dt'] = 1e-4
         desc['sweeper_params']['num_nodes'] = 4
         desc['sweeper_params']['QI'] = 'MIN-SR-S'
         desc['sweeper_params']['QE'] = 'PIC'

@@ -35,7 +35,7 @@ class PlotRBC:
         # print(get_list_of_types(stats))
 
     def plot_series(self):
-        indices = [0, 50, 80, 150]  # [0, 10, 20, 49]
+        indices = [0, 20, 56, 62, 65]  # [0, 10, 20, 49]
 
         from mpl_toolkits.axes_grid1 import make_axes_locatable
 
