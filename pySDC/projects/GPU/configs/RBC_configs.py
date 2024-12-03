@@ -409,11 +409,12 @@ class RayleighBenard_large(RayleighBenardRegular):
         desc = super().get_description(*args, **kwargs)
 
         desc['convergence_controllers'][AdaptivityPolynomialError] = {
-            'e_tol': 1e-3,
+            'e_tol': 1e-4,
             'abort_at_growing_residual': False,
             'interpolate_between_restarts': False,
             'dt_min': 1e-3,
             'dt_rel_min_slope': 2,
+            'beta': 0.5,
         }
         desc['convergence_controllers'].pop(CFLLimit)
         desc['level_params']['restol'] = 1e-7
@@ -423,10 +424,9 @@ class RayleighBenard_large(RayleighBenardRegular):
         desc['sweeper_params']['QE'] = 'PIC'
         desc['step_params']['maxiter'] = 16
 
-        # desc['problem_params']['nx'] *= 2
-        desc['problem_params']['nz'] = self.vertical_res
         desc['problem_params']['Rayleigh'] = self.Ra
-        desc['problem_params']['Lx'] = desc['problem_params']['nx'] // self.res_per_plume * 2
+        desc['problem_params']['max_cached_factorizations'] = 4
+        # desc['problem_params']['Lx'] = desc['problem_params']['nx'] // self.res_per_plume * 2
 
         return desc
 

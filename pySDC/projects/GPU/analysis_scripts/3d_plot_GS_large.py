@@ -6,7 +6,7 @@ import gc
 from mpi4py import MPI
 
 
-def plot(n_time, n_space, useGPU, n_frames, base_path, space_range, res, start_frame=0):
+def plot(n_time, n_space, useGPU, n_frames, base_path, space_range, res, start_frame=0, zoom=[1, 1, 1], origin=[0,0,0]):
     comm = MPI.COMM_WORLD
 
     for idx in range(start_frame, n_frames, comm.size):
@@ -20,17 +20,20 @@ def plot(n_time, n_space, useGPU, n_frames, base_path, space_range, res, start_f
             gc.collect()
 
             path = f'{base_path}/GrayScottLarge-res_{res}-useGPU_{useGPU}-procs_1_{n_time}_{n_space}-0-{procs}-solution_{i:06d}.pickle'
-            print(f'{comm.rank} loading {path}', flush=True)
             with open(path, 'rb') as file:
                 _data = pickle.load(file)
 
             # if _v is None:
             # _v = np.zeros(_data['shape'])
             if v is None:
-                v = pv.ImageData(dimensions=_data['shape'])
-                v['values'] = np.zeros(np.prod(_data['shape']))
+                # shape = [int((_data['shape'][i] * zoom[i]) // 1) for i in range 3]
+                shape = _data['shape']
+                v = pv.ImageData(dimensions=shape)
+                v['values'] = np.zeros(np.prod(shape))
 
+            # local_slice_flat = slice(np.prod(shape) * procs, np.prod(shape) * (procs + 1))
             local_slice_flat = slice(np.prod(_data['v'].shape) * procs, np.prod(_data['v'].shape) * (procs + 1))
+            # local_slice = [slice(origin[i] 
             v['values'][local_slice_flat] = _data['v'].flatten()
             # _v[*_data['local_slice']] = _data['v']
 
