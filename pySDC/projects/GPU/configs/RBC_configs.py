@@ -47,22 +47,25 @@ class RayleighBenardRegular(Config):
             if P.spectral_space:
                 uend = P.itransform(L.uend)
 
+            data = {
+                't': L.time + L.dt,
+                'local_slice': P.local_slice,
+                'shape': P.global_shape,
+            }
+
             if P.useGPU:
-                return {
-                    't': L.time + L.dt,
-                    'u': uend.get().view(np.ndarray),
-                    'X': L.prob.X.get().view(np.ndarray),
-                    'Z': L.prob.Z.get().view(np.ndarray),
-                    'vorticity': L.prob.compute_vorticity(L.uend).get().view(np.ndarray),
-                }
+                data['u'] = uend.get().view(np.ndarray)
+                data['vorticity'] = L.prob.compute_vorticity(L.uend).get().view(np.ndarray)
+                if L.time == 0:
+                    data['X'] = L.prob.X.get()
+                    data['Z'] = L.prob.Z.get()
             else:
-                return {
-                    't': L.time + L.dt,
-                    'u': uend.view(np.ndarray),
-                    'X': L.prob.X.view(np.ndarray),
-                    'Z': L.prob.Z.view(np.ndarray),
-                    'vorticity': L.prob.compute_vorticity(L.uend).view(np.ndarray),
-                }
+                data['u'] = uend.view(np.ndarray)
+                data['vorticity'] = L.prob.compute_vorticity(L.uend).view(np.ndarray)
+                if L.time == 0:
+                    data['X'] = L.prob.X
+                    data['Z'] = L.prob.Z
+            return data
 
         def logging_condition(L):
             sweep = L.sweep
@@ -152,6 +155,9 @@ class RayleighBenardRegular(Config):
         vmin = {quantitiy: np.inf, quantitiy2: np.inf}
         vmax = {quantitiy: -np.inf, quantitiy2: -np.inf}
 
+        X = {}
+        Z = {}
+
         for rank in range(n_procs_list[2]):
             ranks = self.ranks[:-1] + [rank]
             LogToFile = self.get_LogToFile(ranks=ranks)
@@ -163,10 +169,14 @@ class RayleighBenardRegular(Config):
             vmin[quantitiy] = min([vmin[quantitiy], buffer[f'u-{rank}']['u'][P.index(quantitiy)].real.min()])
             vmax[quantitiy] = max([vmax[quantitiy], buffer[f'u-{rank}']['u'][P.index(quantitiy)].real.max()])
 
+            first_frame = LogToFile.load(0)
+            X[rank] = first_frame['X']
+            Z[rank] = first_frame['Z']
+
         for rank in range(n_procs_list[2]):
             im = axs[1].pcolormesh(
-                buffer[f'u-{rank}']['X'],
-                buffer[f'u-{rank}']['Z'],
+                X[rank],
+                Z[rank],
                 buffer[f'u-{rank}'][quantitiy2].real,
                 vmin=-vmax[quantitiy2] if cmaps.get(quantitiy2, None) in ['bwr'] else vmin[quantitiy2],
                 vmax=vmax[quantitiy2],
@@ -174,8 +184,8 @@ class RayleighBenardRegular(Config):
             )
             fig.colorbar(im, cax[1])
             im = axs[0].pcolormesh(
-                buffer[f'u-{rank}']['X'],
-                buffer[f'u-{rank}']['Z'],
+                X[rank],
+                Z[rank],
                 buffer[f'u-{rank}']['u'][P.index(quantitiy)].real,
                 vmin=vmin[quantitiy],
                 vmax=-vmin[quantitiy] if cmaps.get(quantitiy, None) in ['bwr', 'seismic'] else vmax[quantitiy],
@@ -429,6 +439,15 @@ class RayleighBenard_large(RayleighBenardRegular):
         # desc['problem_params']['Lx'] = desc['problem_params']['nx'] // self.res_per_plume * 2
 
         return desc
+
+    def get_controller_params(self, *args, **kwargs):
+        from pySDC.implementations.problem_classes.RayleighBenard import (
+            LogAnalysisVariables,
+        )
+
+        controller_params = super().get_controller_params(*args, **kwargs)
+        controller_params['hook_class'] += [LogAnalysisVariables]
+        return controller_params
 
     def get_initial_condition(self, P, *args, restart_idx=0, **kwargs):
         if restart_idx > 0:
