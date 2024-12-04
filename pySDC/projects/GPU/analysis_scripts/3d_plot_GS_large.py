@@ -4,6 +4,7 @@ import pyvista as pv
 import subprocess
 import gc
 from mpi4py import MPI
+from tqdm import tqdm
 
 
 def plot(
@@ -20,6 +21,9 @@ def plot(
     zoom=1e-2,
 ):
     comm = MPI.COMM_WORLD
+
+    space_range = tqdm(space_range)
+    space_range.set_description('load files')
 
     for idx in range(start_frame, n_frames, comm.size):
         i = idx + comm.rank
@@ -42,7 +46,7 @@ def plot(
             v['values'][local_slice_flat] = _data['v'].flatten()
 
         sampled = pv.ImageData(dimensions=(n_samples,) * 3, spacing=(1 / n_samples,) * 3)
-        zoomed = pv.ImageData(dimensions=(int(n_samples * zoom),) * 3, spacing=(1 / n_samples,) * 3)
+        zoomed = pv.ImageData(dimensions=(n_samples,) * 3, spacing=(zoom / n_samples,) * 3, origin=[0.8, 0.47, 0.03])
 
         for grid, name in zip([sampled, zoomed], ['', '_zoom']):
             p = pv.Plotter(off_screen=True)
@@ -59,20 +63,13 @@ def plot(
 
             path = f'{plotting_path}/GS_large_{i:06d}{name}.png'
             p.camera.zoom(1.1)
-            p.screenshot(path, window_size=(4096, 4096))
+            p.screenshot(path, window_size=(plot_resolution,) * 2)
             print(f'Saved {path}', flush=True)
 
 
 def video(view=None):
-    if view is None:
-        path = 'simulation_plots/GS_large_%06d.png'
-        path_target = 'videos/GS_large.mp4'
-    elif view == 'slice':
-        path = 'simulation_plots/GS_large_slice_%06d.png'
-        path_target = 'videos/GS_large_slice.mp4'
-    else:
-        path = f'simulation_plots/GS_large_{view}_%06d.png'
-        path_target = f'videos/GS_large_{view}.mp4'
+    path = f'simulation_plots/GS_large_%06d{view}.png'
+    path_target = f'videos/GS_large{view}.mp4'
 
     cmd = f'ffmpeg -i {path} -pix_fmt yuv420p -r 9 -s 2048:1536 -y {path_target}'.split()
 
@@ -89,7 +86,7 @@ if __name__ == '__main__':
     parser.add_argument('--start', type=int, default=0)
     parser.add_argument('--base_path', type=str, default='/p/scratch/ccstma/baumann7/large_runs/data/')
     parser.add_argument('--space_range', type=int, default=None)
-    parser.add_argument('--zoom', type=float, default=1e-2)
+    parser.add_argument('--zoom', type=float, default=9e-2)
     parser.add_argument('--n_samples', type=int, default=1024)
     args = parser.parse_args()
 
@@ -125,7 +122,7 @@ if __name__ == '__main__':
             zoom=args.zoom,
         )
     elif args.mode == 'video':
-        for view in [None, 'slice']:  #'xy', 'xz', 'yz']:
+        for view in ['', '_zoom']:
             video(view)
     else:
         raise NotImplementedError()
