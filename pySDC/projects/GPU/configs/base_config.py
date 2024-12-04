@@ -198,6 +198,12 @@ class LogStats(ConvergenceController):
         for _hook in controller.hooks:
             _hook.post_step(S, 0)
 
+        P = S.levels[0].prob
+        if hasattr(P, 'comm'):
+            if P.comm.rank > 0:
+                print(P.comm.rank, 'exiting', flush=True)
+                return None
+
         while self.counter < hook.counter:
             path = self.get_stats_path(hook, index=self.counter)
             stats = controller.return_stats()
