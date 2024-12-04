@@ -6,14 +6,24 @@ import gc
 from mpi4py import MPI
 
 
-def plot(n_time, n_space, useGPU, n_frames, base_path, space_range, res, start_frame=0, zoom=[1, 1, 1], origin=[0,0,0]):
+def plot(
+    n_time,
+    n_space,
+    useGPU,
+    n_frames,
+    base_path,
+    space_range,
+    res,
+    start_frame=0,
+    plot_resolution=2048,
+    n_samples=1024,
+    zoom=1e-2,
+):
     comm = MPI.COMM_WORLD
 
     for idx in range(start_frame, n_frames, comm.size):
-        p = pv.Plotter(off_screen=True)
         i = idx + comm.rank
 
-        _v = None
         v = None
         gc.collect()
         for procs in space_range:
@@ -23,77 +33,34 @@ def plot(n_time, n_space, useGPU, n_frames, base_path, space_range, res, start_f
             with open(path, 'rb') as file:
                 _data = pickle.load(file)
 
-            # if _v is None:
-            # _v = np.zeros(_data['shape'])
             if v is None:
-                # shape = [int((_data['shape'][i] * zoom[i]) // 1) for i in range 3]
                 shape = _data['shape']
-                v = pv.ImageData(dimensions=shape)
+                v = pv.ImageData(dimensions=shape, spacing=tuple([1 / me for me in shape]))
                 v['values'] = np.zeros(np.prod(shape))
 
-            # local_slice_flat = slice(np.prod(shape) * procs, np.prod(shape) * (procs + 1))
             local_slice_flat = slice(np.prod(_data['v'].shape) * procs, np.prod(_data['v'].shape) * (procs + 1))
-            # local_slice = [slice(origin[i] 
             v['values'][local_slice_flat] = _data['v'].flatten()
-            # _v[*_data['local_slice']] = _data['v']
 
-            # _v[*_data['local_slice']] = _data['v']
-            # print(f'loaded data from task {procs} with slice {_data["local_slice"]}', flush=True)
+        sampled = pv.ImageData(dimensions=(n_samples,) * 3, spacing=(1 / n_samples,) * 3)
+        zoomed = pv.ImageData(dimensions=(int(n_samples * zoom),) * 3, spacing=(1 / n_samples,) * 3)
 
-        # print('finished loading data', flush=True)
-        # # plot slice
-        # v_slice = pv.wrap(_v[:60, ...])
-        # print('wrapped data', flush=True)
-        # contours = v_slice.contour(isosurfaces=[0.3])
-        # p.add_mesh(contours, opacity=0.7, cmap=['teal'])
-        # p.remove_scalar_bar()
-        # p.camera.azimuth += 15
+        for grid, name in zip([sampled, zoomed], ['', '_zoom']):
+            p = pv.Plotter(off_screen=True)
+            contours = grid.sample(v, progress_bar=True).contour(
+                isosurfaces=[0.3], method='flying_edges', progress_bar=True
+            )
 
-        # p.camera.Elevation(0.7)
-        # plotting_path = './simulation_plots/'
+            p.add_mesh(contours, opacity=0.5, cmap=['teal'])
+            p.remove_scalar_bar()
+            p.camera.azimuth += 15
 
-        # path = f'{plotting_path}/GS_large_slice_{i:06d}.png'
-        # p.camera.tight(view='yz')
-        # p.screenshot(path, window_size=(4096, 4096))
-        # print(f'Saved {path}', flush=True)
+            p.camera.Elevation(0.7)
+            plotting_path = './simulation_plots/'
 
-        # plot whole thing
-        contours = v.contour(isosurfaces=[0.3])
-        p.add_mesh(contours, opacity=0.7, cmap=['teal'])
-        p.remove_scalar_bar()
-        p.camera.azimuth += 15
-
-        p.camera.Elevation(0.7)
-        plotting_path = './simulation_plots/'
-
-        path = f'{plotting_path}/GS_large_{i:06d}.png'
-        p.camera.zoom(1.1)
-        p.screenshot(path, window_size=(4096, 4096))
-        print(f'Saved {path}', flush=True)
-
-        # for view in ['xy', 'xz', 'yz']:
-        #     path = f'{plotting_path}/GS_large_{view}_{i:06d}.png'
-        #     p.camera.tight(view=view)
-        #     p.screenshot(path, window_size=(4096, 4096))
-        #     print(f'Saved {path}', flush=True)
-
-        continue
-        # plot slice
-        v_slice = pv.wrap(_v[:10, ...])
-        contours = v_slice.contour(isosurfaces=[0.3])
-        p.add_mesh(contours, opacity=0.7, cmap=['teal'])
-        p.remove_scalar_bar()
-        p.camera.azimuth += 15
-
-        p.camera.Elevation(0.7)
-        plotting_path = './simulation_plots/'
-
-        path = f'{plotting_path}/GS_large_slice_{i:06d}.png'
-        p.camera.tight(view='yz')
-        p.screenshot(path, window_size=(4096, 4096))
-        print(f'Saved {path}', flush=True)
-
-    print('done')
+            path = f'{plotting_path}/GS_large_{i:06d}{name}.png'
+            p.camera.zoom(1.1)
+            p.screenshot(path, window_size=(4096, 4096))
+            print(f'Saved {path}', flush=True)
 
 
 def video(view=None):
@@ -122,6 +89,8 @@ if __name__ == '__main__':
     parser.add_argument('--start', type=int, default=0)
     parser.add_argument('--base_path', type=str, default='/p/scratch/ccstma/baumann7/large_runs/data/')
     parser.add_argument('--space_range', type=int, default=None)
+    parser.add_argument('--zoom', type=float, default=1e-2)
+    parser.add_argument('--n_samples', type=int, default=1024)
     args = parser.parse_args()
 
     from pySDC.projects.GPU.analysis_scripts.large_simulations import GSLarge
@@ -152,6 +121,8 @@ if __name__ == '__main__':
             n_frames=args.nframes,
             res=sim.params['res'],
             start_frame=args.start,
+            n_samples=args.n_samples,
+            zoom=args.zoom,
         )
     elif args.mode == 'video':
         for view in [None, 'slice']:  #'xy', 'xz', 'yz']:
