@@ -17,13 +17,13 @@ class PlotRBC:
 
     def plot_verification(self):
         stats = {}
-        for idx in range(999):
+        for idx in range(500):
             try:
                 path = self.get_path(idx=idx, n_space=0, stats=True)
                 with open(path, 'rb') as file:
                     stats = {**stats, **pickle.load(file)}
             except FileNotFoundError:
-                break
+                continue
 
         nu = get_sorted(stats, type='Nusselt', recomputed=False)
         fig, ax = plt.subplots(figsize=figsize_by_journal('TUHH_thesis', 0.8, 0.6))
@@ -32,10 +32,11 @@ class PlotRBC:
         ax.legend(frameon=False)
         ax.set_xlabel('$t$')
         fig.savefig('plots/RBC_large_Nusselt.pdf', bbox_inches='tight')
+        print('saved Nusselt number figure', flush=True)
         # print(get_list_of_types(stats))
 
     def plot_series(self):
-        indices = [0, 20, 56, 62, 65]  # [0, 10, 20, 49]
+        indices = [0, 56, 70, 77, 82, 95]  # [0, 10, 20, 49]
 
         from mpl_toolkits.axes_grid1 import make_axes_locatable
 
@@ -78,7 +79,7 @@ class PlotRBC:
 
 if __name__ == '__main__':
     setup_mpl()
-    plotter = PlotRBC(256, [1, 4, 1], '.')
-    # plotter = PlotRBC(4096, [1, 4, 1024], '/p/scratch/ccstma/baumann7/large_runs/')
-    # plotter.plot_series()
+    # plotter = PlotRBC(256, [1, 4, 1], '.')
+    plotter = PlotRBC(4096, [1, 4, 1024], '/p/scratch/ccstma/baumann7/large_runs/')
     plotter.plot_verification()
+    plotter.plot_series()

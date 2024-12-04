@@ -182,7 +182,6 @@ class RayleighBenardRegular(Config):
                 vmax=vmax[quantitiy2],
                 cmap=cmaps.get(quantitiy2, None),
             )
-            fig.colorbar(im, cax[1])
             im = axs[0].pcolormesh(
                 X[rank],
                 Z[rank],
@@ -191,12 +190,13 @@ class RayleighBenardRegular(Config):
                 vmax=-vmin[quantitiy] if cmaps.get(quantitiy, None) in ['bwr', 'seismic'] else vmax[quantitiy],
                 cmap=cmaps.get(quantitiy, 'plasma'),
             )
-            fig.colorbar(im, cax[0])
-            axs[0].set_title(f't={buffer[f"u-{rank}"]["t"]:.2f}')
-            axs[1].set_xlabel('x')
-            axs[1].set_ylabel('z')
-            axs[0].set_aspect(1.0)
-            axs[1].set_aspect(1.0)
+        fig.colorbar(im, cax[1])
+        fig.colorbar(im, cax[0])
+        axs[0].set_title(f't={buffer[f"u-{rank}"]["t"]:.2f}')
+        axs[1].set_xlabel('x')
+        axs[1].set_ylabel('z')
+        axs[0].set_aspect(1.0)
+        axs[1].set_aspect(1.0)
         return fig
 
 

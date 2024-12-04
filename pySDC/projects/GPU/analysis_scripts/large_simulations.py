@@ -181,11 +181,11 @@ class RBCLarge(LargeSim):
         self.params = {
             'procs': [1, 4, 16],
             'useGPU': False,
-            'tasks_per_node': 64,
+            'tasks_per_node': 128,
             'partition': 'dc-cpu',
             'cluster': 'jureca',
             'res': 1024,
-            'time': '10:30:00',
+            'time': '4:30:00',
         }
 
 
