@@ -179,12 +179,12 @@ class RBCLarge(LargeSim):
         Test params with a small run.
         """
         self.params = {
-            'procs': [1, 4, 16],
+            'procs': [1, 4, 1024],
             'useGPU': False,
             'tasks_per_node': 128,
             'partition': 'dc-cpu',
             'cluster': 'jureca',
-            'res': 1024,
+            'res': 4096,
             'time': '4:30:00',
         }
 

@@ -174,7 +174,7 @@ class RayleighBenardRegular(Config):
             Z[rank] = first_frame['Z']
 
         for rank in range(n_procs_list[2]):
-            im = axs[1].pcolormesh(
+            im2 = axs[1].pcolormesh(
                 X[rank],
                 Z[rank],
                 buffer[f'u-{rank}'][quantitiy2].real,
@@ -190,7 +190,7 @@ class RayleighBenardRegular(Config):
                 vmax=-vmin[quantitiy] if cmaps.get(quantitiy, None) in ['bwr', 'seismic'] else vmax[quantitiy],
                 cmap=cmaps.get(quantitiy, 'plasma'),
             )
-        fig.colorbar(im, cax[1])
+        fig.colorbar(im2, cax[1])
         fig.colorbar(im, cax[0])
         axs[0].set_title(f't={buffer[f"u-{rank}"]["t"]:.2f}')
         axs[1].set_xlabel('x')
@@ -420,7 +420,7 @@ class RayleighBenard_large(RayleighBenardRegular):
         desc = super().get_description(*args, **kwargs)
 
         desc['convergence_controllers'][AdaptivityPolynomialError] = {
-            'e_tol': 1e-4,
+            'e_tol': 1e-5,
             'abort_at_growing_residual': False,
             'interpolate_between_restarts': False,
             'dt_min': 1e-5,
@@ -429,9 +429,9 @@ class RayleighBenard_large(RayleighBenardRegular):
         }
         desc['convergence_controllers'][StepSizeRounding] = {}
         desc['convergence_controllers'].pop(CFLLimit)
-        desc['level_params']['restol'] = 1e-6
-        desc['level_params']['e_tol'] = 1e-6
-        desc['level_params']['dt'] = 1e-4
+        desc['level_params']['restol'] = 3e-6
+        desc['level_params']['e_tol'] = 3e-6
+        desc['level_params']['dt'] = 5e-3
         desc['sweeper_params']['num_nodes'] = 4
         desc['sweeper_params']['QI'] = 'MIN-SR-S'
         desc['sweeper_params']['QE'] = 'PIC'

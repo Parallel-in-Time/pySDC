@@ -83,7 +83,7 @@ class PlotRBC:
         self.save_fig(fig, 'verification')
 
     def plot_series(self):
-        indices = [0, 56, 70, 77, 82, 95]  # [0, 10, 20, 49]
+        indices = [0, 56, 70, 82, 100, 132]
 
         from mpl_toolkits.axes_grid1 import make_axes_locatable
 

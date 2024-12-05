@@ -203,6 +203,7 @@ class LogStats(ConvergenceController):
         if hasattr(P, 'comm'):
             if P.comm.rank > 0:
                 skip_logging = True
+                return None
 
         while self.counter < hook.counter:
             path = self.get_stats_path(hook, index=self.counter)
