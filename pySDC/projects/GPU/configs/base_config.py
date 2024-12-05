@@ -199,15 +199,15 @@ class LogStats(ConvergenceController):
             _hook.post_step(S, 0)
 
         P = S.levels[0].prob
+        skip_logging = False
         if hasattr(P, 'comm'):
             if P.comm.rank > 0:
-                print(P.comm.rank, 'exiting', flush=True)
-                return None
+                skip_logging = True
 
         while self.counter < hook.counter:
             path = self.get_stats_path(hook, index=self.counter)
             stats = controller.return_stats()
-            if hook.logging_condition(S.levels[0]):
+            if hook.logging_condition(S.levels[0]) and not skip_logging:
                 with open(path, 'wb') as file:
                     pickle.dump(stats, file)
                     self.log(f'Stored stats in {path!r}', S)

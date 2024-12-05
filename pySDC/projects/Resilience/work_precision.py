@@ -1577,6 +1577,8 @@ def get_fig(x=1, y=1, target='adaptivity', **kwargs):  # pragma: no cover
         journal = 'Springer_Numerical_Algorithms'
     elif target == 'thesis':
         journal = 'TUHH_thesis'
+    elif target == 'talk':
+        journal = 'JSC_beamer'
     else:
         raise NotImplementedError
 
@@ -1646,7 +1648,10 @@ def all_problems(
         None
     """
 
-    fig, axs = get_fig(2, 2, target=target)
+    if target == 'talk':
+        fig, axs = get_fig(4, 1, target=target)
+    else:
+        fig, axs = get_fig(2, 2, target=target)
 
     shared_params = {
         'work_key': 'k_SDC',
@@ -1661,7 +1666,7 @@ def all_problems(
 
     if target == 'adaptivity':
         problems = [run_vdp, run_quench, run_Schroedinger, run_AC]
-    elif target == 'thesis':
+    elif target in ['thesis', 'talk']:
         problems = [run_vdp, run_Lorenz, run_GS, run_RBC]
     else:
         raise NotImplementedError
@@ -1684,6 +1689,10 @@ def all_problems(
             'parallel_efficiency_dt_k': 2,
             'RK_comp': 2,
         }
+        if target == 'talk':
+            _ncols = 4
+        else:
+            _ncols = ncols.get(mode, None)
 
         if shared_params['work_key'] == 'param':
             for ax, prob in zip(fig.get_axes(), problems):
@@ -1695,7 +1704,7 @@ def all_problems(
             precision_key=shared_params['precision_key'],
             legend=True,
             base_path=base_path,
-            ncols=ncols.get(mode, None),
+            ncols=_ncols,
         )
 
 

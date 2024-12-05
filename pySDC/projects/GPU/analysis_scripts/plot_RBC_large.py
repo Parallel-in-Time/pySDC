@@ -134,8 +134,8 @@ class PlotRBC:
 
 if __name__ == '__main__':
     setup_mpl()
-    # plotter = PlotRBC(256, [1, 4, 1], '.')
-    plotter = PlotRBC(4096, [1, 4, 1024], '/p/scratch/ccstma/baumann7/large_runs/')
+    plotter = PlotRBC(128, [1, 1, 4], '.')
+    # plotter = PlotRBC(4096, [1, 4, 1024], '/p/scratch/ccstma/baumann7/large_runs/')
     plotter.plot_work()
     plotter.plot_step_size()
     plotter.plot_verification()

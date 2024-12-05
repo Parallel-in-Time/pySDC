@@ -46,9 +46,9 @@ def get_stats(problem, path='data/stats-jusuf', num_procs=1, strategy_type='SDC'
         FaultStats: Object to analyse resilience statistics from
     """
     if strategy_type == 'SDC':
-        strategies = [BaseStrategy(), AdaptivityStrategy(), IterateStrategy()]
+        strategies = [BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), AdaptivityPolynomialError()]
         if JOURNAL not in ['JSC_beamer']:
-            strategies += [HotRodStrategy(), AdaptivityPolynomialError()]
+            strategies += [HotRodStrategy()]
     elif strategy_type == 'RK':
         strategies = [DIRKStrategy()]
         if problem.__name__ in ['run_Lorenz', 'run_vdp']:
@@ -202,7 +202,7 @@ def compare_recovery_rate_problems(target='resilience', **kwargs):  # pragma: no
     if target == 'resilience':
         problems = [run_Lorenz, run_Schroedinger, run_AC, run_RBC]
         titles = ['Lorenz', r'Schr\"odinger', 'Allen-Cahn', 'Rayleigh-Benard']
-    elif target == 'thesis':
+    elif target in ['thesis', 'talk']:
         problems = [run_vdp, run_Lorenz, run_GS, run_RBC]  # TODO: swap in Gray-Scott
         titles = ['Van der Pol', 'Lorenz', 'Gray-Scott', 'Rayleigh-Benard']
     else:
@@ -228,6 +228,10 @@ def compare_recovery_rate_problems(target='resilience', **kwargs):  # pragma: no
     axs[1, 0].set_ylabel('recovery rate')
     axs[0, 0].set_ylabel('recovery rate')
 
+    if target == 'talk':
+        axs[0, 0].set_xlabel('')
+        axs[0, 1].set_xlabel('')
+
     name = ''
     for key, val in kwargs.items():
         name = f'{name}_{key}-{val}'
@@ -235,13 +239,16 @@ def compare_recovery_rate_problems(target='resilience', **kwargs):  # pragma: no
     savefig(fig, f'compare_equations{name}.pdf')
 
 
-def plot_recovery_rate_detailed_Lorenz():  # pragma: no cover
+def plot_recovery_rate_detailed_Lorenz(target='resilience'):  # pragma: no cover
     stats = get_stats(run_Lorenz, num_procs=1, strategy_type='SDC')
     stats.get_recovered()
     mask = None
 
     for x in ['node', 'iteration', 'bit']:
-        fig, ax = plt.subplots(1, 1, figsize=figsize_by_journal(JOURNAL, 0.8, 0.5))
+        if target == 'talk':
+            fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.6, 0.6))
+        else:
+            fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.8, 0.5))
 
         stats.plot_things_per_things(
             'recovered',
@@ -423,7 +430,7 @@ def plot_fault_vdp(bit=0):  # pragma: no cover
     savefig(fig, f'fault_bit_{bit}')
 
 
-def plot_fault_Lorenz(bit=0):  # pragma: no cover
+def plot_fault_Lorenz(bit=0, target='resilience'):  # pragma: no cover
     """
     Make a plot showing the impact of a fault on the Lorenz attractor without any resilience.
     The faults are inserted in the last iteration in the last node in x such that you can best see the impact.
@@ -453,7 +460,10 @@ def plot_fault_Lorenz(bit=0):  # pragma: no cover
     strategy = BaseStrategy()
 
     my_setup_mpl()
-    fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.8, 0.5))
+    if target == 'resilience':
+        fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.4, 0.6))
+    else:
+        fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.8, 0.5))
     colors = ['grey', strategy.color, 'magenta']
     ls = ['--', '-']
     markers = [None, strategy.marker]
@@ -789,9 +799,13 @@ def work_precision():  # pragma: no cover
     all_problems(**{**all_params, 'work_key': 'param'}, mode='compare_strategies')
 
 
-def plot_recovery_rate_per_acceptance_threshold(problem):  # pragma no cover
+def plot_recovery_rate_per_acceptance_threshold(problem, target='resilience'):  # pragma no cover
     stats_analyser = get_stats(problem)
-    fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.8, 0.5))
+
+    if target == 'talk':
+        fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.4, 0.6))
+    else:
+        fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.8, 0.5))
 
     stats_analyser.plot_recovery_thresholds(thresh_range=np.logspace(-1, 4, 500), recoverable_only=False, ax=ax)
     ax.set_xscale('log')
@@ -920,12 +934,49 @@ def make_plots_for_thesis():  # pragma: no cover
     plot_recovery_rate_detailed_Lorenz()
 
 
+def make_plots_for_TUHH_seminar():  # pragma: no cover
+    global JOURNAL
+    JOURNAL = 'JSC_beamer'
+
+    from pySDC.projects.Resilience.work_precision import (
+        all_problems,
+    )
+
+    all_params = {
+        'record': False,
+        'work_key': 't',
+        'precision_key': 'e_global_rel',
+        'plotting': True,
+        'base_path': 'data/paper',
+        'target': 'talk',
+    }
+
+    for mode in ['compare_strategies', 'parallel_efficiency_dt_k', 'parallel_efficiency_dt', 'RK_comp']:
+        all_problems(**all_params, mode=mode)
+    all_problems(**{**all_params, 'work_key': 'param'}, mode='compare_strategies')
+
+    # plot_GS_solution()
+    # for setup in ['resilience_thesis', 'work_precision']:
+    #     plot_RBC_solution(setup)
+    # for setup in ['resilience', 'adaptivity']:
+    #     plot_vdp_solution(setup=setup)
+
+    # plot_adaptivity_stuff()
+
+    # plot_fault_Lorenz(20, target='talk')
+    compare_recovery_rate_problems(target='talk', num_procs=1, strategy_type='SDC')
+    plot_recovery_rate_per_acceptance_threshold(run_Lorenz, target='talk')
+    plot_recovery_rate_detailed_Lorenz(target='talk')
+
+
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--target', choices=['adaptivity', 'resilience', 'thesis', 'notes', 'SIAM_CSE23', 'TIME_X_website'], type=str
+        '--target',
+        choices=['adaptivity', 'resilience', 'thesis', 'notes', 'SIAM_CSE23', 'TIME_X_website', 'TUHH_seminar'],
+        type=str,
     )
     args = parser.parse_args()
 
@@ -941,5 +992,7 @@ if __name__ == "__main__":
         make_plots_for_SIAM_CSE23()
     elif args.target == 'TIME_X_website':
         make_plots_for_TIME_X_website()
+    elif args.target == 'TUHH_seminar':
+        make_plots_for_TUHH_seminar()
     else:
         raise NotImplementedError(f'Don\'t know how to make plots for target {args.target}')

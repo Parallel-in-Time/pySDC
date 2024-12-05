@@ -148,7 +148,12 @@ class EstimatePolynomialError(ConvergenceController):
                 L.status.order_embedded_estimate = coll.num_nodes * 1
 
             if self.comm:
-                buf = np.array(abs(u_inter - high_order_sol) if self.comm.rank == rank else 0.0)
+                buf = np.array(
+                    np.max([abs(u_inter[i] - high_order_sol[i]) for i in range(u_inter.shape[0])])
+                    if self.comm.rank == rank
+                    else 0.0
+                )
+                # buf = np.array(abs(u_inter - high_order_sol) if self.comm.rank == rank else 0.0)
                 self.comm.Bcast(buf, root=rank)
                 L.status.error_embedded_estimate = float(buf)
             else:
