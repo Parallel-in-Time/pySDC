@@ -7,6 +7,26 @@ from mpi4py import MPI
 from tqdm import tqdm
 
 
+class Grid:
+    def __init__(self, grid, label):
+        self.grid = grid
+        self.label = label
+
+    def get_camera_path(self):
+        import os
+
+        os.makedirs('etc/cameras', exist_ok=True)
+        return f'etc/cameras/cam{self.label}_{len(self.grid.x)}.pickle'
+
+    def get_camera_pos(self):
+        with open(self.get_camera_path(), 'rb') as file:
+            return pickle.load(file)
+
+    def set_camera_pos(self, pos):
+        with open(self.get_camera_path(), 'wb') as file:
+            pickle.dump(pos, file)
+
+
 def plot(
     n_time,
     n_space,
@@ -45,12 +65,16 @@ def plot(
             local_slice_flat = slice(np.prod(_data['v'].shape) * procs, np.prod(_data['v'].shape) * (procs + 1))
             v['values'][local_slice_flat] = _data['v'].flatten()
 
-        sampled = pv.ImageData(dimensions=(n_samples,) * 3, spacing=(1 / n_samples,) * 3)
-        zoomed = pv.ImageData(dimensions=(n_samples,) * 3, spacing=(zoom / n_samples,) * 3, origin=[0.8, 0.47, 0.03])
+        sampled = Grid(pv.ImageData(dimensions=(n_samples,) * 3, spacing=(1 / n_samples,) * 3), '')
+        zoomed = Grid(
+            pv.ImageData(dimensions=(n_samples,) * 3, spacing=(zoom / n_samples,) * 3, origin=[0.8, 0.47, 0.03]),
+            '_zoomed',
+        )
 
-        for grid, name in zip([sampled, zoomed], ['', '_zoom']):
+        for grid in [sampled, zoomed]:
+
             p = pv.Plotter(off_screen=True)
-            contours = grid.sample(v, progress_bar=True).contour(
+            contours = grid.grid.sample(v, progress_bar=True, categorical=True).contour(
                 isosurfaces=[0.3], method='flying_edges', progress_bar=True
             )
 
@@ -61,8 +85,12 @@ def plot(
             p.camera.Elevation(0.7)
             plotting_path = './simulation_plots/'
 
-            path = f'{plotting_path}/GS_large_{i:06d}{name}.png'
-            p.camera.zoom(1.1)
+            path = f'{plotting_path}/GS_large_{i:06d}{grid.label}.png'
+
+            if idx == 0:
+                grid.set_camera_pos(p.camera_position)
+
+            p.camera_position = grid.get_camera_pos()
             p.screenshot(path, window_size=(plot_resolution,) * 2)
             print(f'Saved {path}', flush=True)
 
