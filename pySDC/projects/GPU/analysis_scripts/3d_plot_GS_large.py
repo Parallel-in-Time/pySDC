@@ -73,7 +73,7 @@ def plot(
         zoomed = Grid(
             pv.ImageData(dimensions=(n_samples,) * 3, spacing=(zoom / n_samples,) * 3, origin=[0.8, 0.47, 0.03]),
             '_zoomed',
-            [1.0, 0.1],
+            [1.0, 12],
         )
 
         for grid in [sampled, zoomed]:
@@ -97,8 +97,7 @@ def plot(
 
             p.camera_position = grid.get_camera_pos()
 
-            p.camera.zoom(grid.get_zoom(frame))
-            print(grid.get_zoom(frame))
+            p.camera.distance *= grid.get_zoom(frame)
 
             p.screenshot(path, window_size=(plot_resolution,) * 2)
             print(f'Saved {path}', flush=True)
