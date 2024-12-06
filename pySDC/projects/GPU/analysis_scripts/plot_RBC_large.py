@@ -3,6 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pySDC.helpers.stats_helper import get_sorted, get_list_of_types
 from pySDC.helpers.plot_helper import figsize_by_journal, setup_mpl
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
 
 try:
     from tqdm import tqdm
@@ -62,10 +65,7 @@ class PlotRBC:
         config = get_config(
             {
                 'config': 'RBC_large',
-                'procs': [
-                    1,
-                ]
-                * 3,
+                'procs': [1, 1, self.procs[2]],
                 'res': self.res,
                 'mode': None,
                 'useGPU': False,
@@ -101,7 +101,7 @@ class PlotRBC:
 
     def compute_CFL_limit(self):
         frame_range = range(self.max_frames)
-        if tqdm:
+        if tqdm and comm.rank == 0:
             frame_range = tqdm(frame_range)
             frame_range.set_description('Loading files')
 
@@ -112,12 +112,20 @@ class PlotRBC:
                 CFL[_cfl['t']] = _cfl['CFL']
             except FileNotFoundError:
                 pass
+
+        if comm.rank == 0:
+            with open(self._get_CFL_limit_path(), 'wb') as file:
+                pickle.dump(CFL, file)
+            print(f'Stored {self._get_CFL_limit_path()!r}')
         return CFL
+
+    def _get_CFL_limit_path(self):
+        return f'{self.base_path}/data/RayleighBenard_large-res_{self.res}-useGPU_False-procs_{self.procs[0]}_{self.procs[1]}_{self.procs[2]}-CFL_limit.pickle'
 
     def get_CFL_limit(self, recompute=False):
         import os
 
-        path = f'{self.base_path}/data/RayleighBenard_large-res_{self.res}-useGPU_False-procs_{self.procs[0]}_{self.procs[1]}_{self.procs[2]}-CFL_limit.pickle'
+        path = self._get_CFL_limit_path()
 
         if os.path.exists(path) and not recompute:
             with open(path, 'rb') as file:
@@ -214,10 +222,15 @@ class PlotRBC:
 
 if __name__ == '__main__':
     setup_mpl()
-    # plotter = PlotRBC(256, [1, 4, 1], '.', 100)
+    # plotter = PlotRBC(128, [1, 1, 4], '.', 100)
     plotter = PlotRBC(4096, [1, 4, 1024], '/p/scratch/ccstma/baumann7/large_runs/', 200)
-    plotter.plot_work()
+
+    if MPI.COMM_WORLD.size > 1:
+        plotter.compute_CFL_limit()
+        exit()
+
     plotter.plot_step_size()
+    plotter.plot_work()
     plotter.plot_verification()
     plotter.plot_series()
     plt.show()
