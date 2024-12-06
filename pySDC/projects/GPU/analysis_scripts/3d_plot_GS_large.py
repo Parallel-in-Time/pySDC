@@ -93,11 +93,9 @@ def plot(
             path = f'{plotting_path}/GS_large_{i:06d}{grid.label}.png'
 
             if frame == 0:
-                grid.set_camera_pos(p.camera_position)
+                grid.set_camera_pos(p.camera.position)
 
-            p.camera_position = grid.get_camera_pos()
-
-            p.camera.distance *= grid.get_zoom(frame)
+            p.camera.position = tuple(pos * grid.get_zoom(frame) for pos in grid.get_camera_pos())
 
             p.screenshot(path, window_size=(plot_resolution,) * 2)
             print(f'Saved {path}', flush=True)
