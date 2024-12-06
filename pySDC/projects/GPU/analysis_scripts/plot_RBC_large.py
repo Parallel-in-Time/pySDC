@@ -140,13 +140,24 @@ class PlotRBC:
 
     def plot_work(self):
         fig, ax = self.get_fig()
-        for key in ['factorizations', 'rhs']:
+        for key, label in zip(['factorizations', 'rhs'], ['LU decompositions', 'rhs evaluations']):
             work = get_sorted(self.stats, type=f'work_{key}')
-            ax.plot([me[0] for me in work], np.cumsum([4 * me[1] for me in work]), label=fr'\#{key}')
+            ax.plot([me[0] for me in work], np.cumsum([4 * me[1] for me in work]), label=fr'\#{label}')
         ax.set_yscale('log')
         ax.set_xlabel('$t$')
         ax.legend(frameon=False)
         self.save_fig(fig, 'work')
+
+    def plot_residual(self):
+        fig, ax = self.get_fig()
+        residual = get_sorted(self.stats, type='residual_post_step')
+        increment = get_sorted(self.stats, type='error_embedded_estimate')
+        ax.plot([me[0] for me in residual], [me[1] for me in residual], label=r'residual')
+        ax.plot([me[0] for me in increment], [me[1] for me in increment], label=r'$\epsilon$')
+        ax.set_yscale('log')
+        ax.set_xlabel('$t$')
+        ax.legend(frameon=False)
+        self.save_fig(fig, 'residual')
 
     def plot_step_size(self):
         fig, ax = self.get_fig()
@@ -223,13 +234,14 @@ class PlotRBC:
 
 if __name__ == '__main__':
     setup_mpl()
-    # plotter = PlotRBC(128, [1, 1, 4], '.', 100)
+    # plotter = PlotRBC(256, [1, 4, 1], '.', 100)
     plotter = PlotRBC(4096, [1, 4, 1024], '/p/scratch/ccstma/baumann7/large_runs/', 200)
 
     if comm.size > 1:
         plotter.compute_CFL_limit()
         exit()
 
+    plotter.plot_residual()
     plotter.plot_step_size()
     plotter.plot_work()
     plotter.plot_verification()
