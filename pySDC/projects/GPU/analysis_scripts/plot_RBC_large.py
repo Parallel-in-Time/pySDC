@@ -73,7 +73,7 @@ class PlotRBC:
         )
         desc = config.get_description(res=self.res)
 
-        return RayleighBenard(**desc['problem_params'])
+        return RayleighBenard(**{**desc['problem_params'], 'comm': comm})
 
     @property
     def prob(self):
@@ -86,24 +86,22 @@ class PlotRBC:
 
         u = self.prob.u_init
 
-        frame_range = range(self.procs[2])
+        path = self.get_path(idx=frame, n_space=comm.rank)
+        with open(path, 'rb') as file:
+            data = pickle.load(file)
 
-        for r in frame_range:
-            path = self.get_path(idx=frame, n_space=r)
-            with open(path, 'rb') as file:
-                data = pickle.load(file)
-
-            for i in range(u.shape[0]):
-                u[i][*data['local_slice']] = data['u'][i]
+        for i in range(u.shape[0]):
+            u[i] = data['u'][i]
 
         CFL = CFLLimit.compute_max_step_size(self.prob, u)
         return {'CFL': CFL, 't': data['t']}
 
     def compute_CFL_limit(self):
         frame_range = range(self.max_frames)
+
         if tqdm and comm.rank == 0:
             frame_range = tqdm(frame_range)
-            frame_range.set_description('Loading files')
+            frame_range.set_description('Computing CFL')
 
         CFL = {}
         for frame in frame_range:
@@ -124,6 +122,9 @@ class PlotRBC:
 
     def get_CFL_limit(self, recompute=False):
         import os
+
+        _ = self.prob
+        comm.Barrier()
 
         path = self._get_CFL_limit_path()
 
@@ -225,7 +226,7 @@ if __name__ == '__main__':
     # plotter = PlotRBC(128, [1, 1, 4], '.', 100)
     plotter = PlotRBC(4096, [1, 4, 1024], '/p/scratch/ccstma/baumann7/large_runs/', 200)
 
-    if MPI.COMM_WORLD.size > 1:
+    if comm.size > 1:
         plotter.compute_CFL_limit()
         exit()
 
