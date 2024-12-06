@@ -8,9 +8,10 @@ from tqdm import tqdm
 
 
 class Grid:
-    def __init__(self, grid, label):
+    def __init__(self, grid, label, zoom_range):
         self.grid = grid
         self.label = label
+        self.zoom_range = zoom_range
 
     def get_camera_path(self):
         import os
@@ -25,6 +26,9 @@ class Grid:
     def set_camera_pos(self, pos):
         with open(self.get_camera_path(), 'wb') as file:
             pickle.dump(pos, file)
+
+    def get_zoom(self, frame):
+        return (self.zoom_range[1] - self.zoom_range[0]) * frame / 100 + self.zoom_range[0]
 
 
 def plot(
@@ -45,8 +49,8 @@ def plot(
     space_range = tqdm(space_range)
     space_range.set_description('load files')
 
-    for idx in range(start_frame, n_frames, comm.size):
-        i = idx + comm.rank
+    for frame in range(start_frame, n_frames, comm.size):
+        i = frame + comm.rank
 
         v = None
         gc.collect()
@@ -65,10 +69,11 @@ def plot(
             local_slice_flat = slice(np.prod(_data['v'].shape) * procs, np.prod(_data['v'].shape) * (procs + 1))
             v['values'][local_slice_flat] = _data['v'].flatten()
 
-        sampled = Grid(pv.ImageData(dimensions=(n_samples,) * 3, spacing=(1 / n_samples,) * 3), '')
+        sampled = Grid(pv.ImageData(dimensions=(n_samples,) * 3, spacing=(1 / n_samples,) * 3), '', [1.0, 1.0])
         zoomed = Grid(
             pv.ImageData(dimensions=(n_samples,) * 3, spacing=(zoom / n_samples,) * 3, origin=[0.8, 0.47, 0.03]),
             '_zoomed',
+            [1.0, 0.1],
         )
 
         for grid in [sampled, zoomed]:
@@ -87,10 +92,14 @@ def plot(
 
             path = f'{plotting_path}/GS_large_{i:06d}{grid.label}.png'
 
-            if idx == 0:
+            if frame == 0:
                 grid.set_camera_pos(p.camera_position)
 
             p.camera_position = grid.get_camera_pos()
+
+            p.camera.zoom(grid.get_zoom(frame))
+            print(grid.get_zoom(frame))
+
             p.screenshot(path, window_size=(plot_resolution,) * 2)
             print(f'Saved {path}', flush=True)
 
