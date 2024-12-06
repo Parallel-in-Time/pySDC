@@ -11,21 +11,23 @@ except ModuleNotFoundError:
 
 
 class PlotRBC:
-    def __init__(self, res, procs, base_path):
+    def __init__(self, res, procs, base_path, max_frames=500):
         self.res = res
         self.procs = procs
         self.base_path = base_path
+        self.max_frames = max_frames
 
         self._stats = None
+        self._prob = None
 
     def get_path(self, idx, n_space, n_time=0, stats=False):
         _name = '-stats' if stats else ''
         return f'{self.base_path}/data/RayleighBenard_large-res_{self.res}-useGPU_False-procs_{self.procs[0]}_{self.procs[1]}_{self.procs[2]}-{n_time}-{n_space}-solution_{idx:06d}{_name}.pickle'
 
-    def get_stats(self, max_frames=350):
+    def get_stats(self):
         self._stats = {}
 
-        frame_range = range(max_frames)
+        frame_range = range(self.max_frames)
         if tqdm:
             frame_range = tqdm(frame_range)
             frame_range.set_description('Loading files')
@@ -53,6 +55,80 @@ class PlotRBC:
     def get_fig(self, *args, **kwargs):
         return plt.subplots(*args, figsize=figsize_by_journal('TUHH_thesis', 0.8, 0.6), **kwargs)
 
+    def get_problem(self):
+        from pySDC.projects.GPU.configs.RBC_configs import get_config
+        from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
+
+        config = get_config(
+            {
+                'config': 'RBC_large',
+                'procs': [
+                    1,
+                ]
+                * 3,
+                'res': self.res,
+                'mode': None,
+                'useGPU': False,
+            }
+        )
+        desc = config.get_description(res=self.res)
+
+        return RayleighBenard(**desc['problem_params'])
+
+    @property
+    def prob(self):
+        if self._prob is None:
+            self._prob = self.get_problem()
+        return self._prob
+
+    def _compute_CFL_single_frame(self, frame):
+        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
+
+        u = self.prob.u_init
+
+        frame_range = range(self.procs[2])
+
+        for r in frame_range:
+            path = self.get_path(idx=frame, n_space=r)
+            with open(path, 'rb') as file:
+                data = pickle.load(file)
+
+            for i in range(u.shape[0]):
+                u[i][*data['local_slice']] = data['u'][i]
+
+        CFL = CFLLimit.compute_max_step_size(self.prob, u)
+        return {'CFL': CFL, 't': data['t']}
+
+    def compute_CFL_limit(self):
+        frame_range = range(self.max_frames)
+        if tqdm:
+            frame_range = tqdm(frame_range)
+            frame_range.set_description('Loading files')
+
+        CFL = {}
+        for frame in frame_range:
+            try:
+                _cfl = self._compute_CFL_single_frame(frame)
+                CFL[_cfl['t']] = _cfl['CFL']
+            except FileNotFoundError:
+                pass
+        return CFL
+
+    def get_CFL_limit(self, recompute=False):
+        import os
+
+        path = f'{self.base_path}/data/RayleighBenard_large-res_{self.res}-useGPU_False-procs_{self.procs[0]}_{self.procs[1]}_{self.procs[2]}-CFL_limit.pickle'
+
+        if os.path.exists(path) and not recompute:
+            with open(path, 'rb') as file:
+                CFL = pickle.load(file)
+        else:
+            CFL = self.compute_CFL_limit()
+            with open(path, 'wb') as file:
+                pickle.dump(CFL, file)
+            print(f'Stored {path!r}')
+        return CFL
+
     def plot_work(self):
         fig, ax = self.get_fig()
         for key in ['factorizations', 'rhs']:
@@ -65,11 +141,15 @@ class PlotRBC:
 
     def plot_step_size(self):
         fig, ax = self.get_fig()
-        nu = get_sorted(self.stats, type='dt', recomputed=False)
-        ax.plot([me[0] for me in nu], [me[1] for me in nu])
+        dt = get_sorted(self.stats, type='dt', recomputed=False)
+        CFL = self.get_CFL_limit()
+
+        ax.plot([me[0] for me in dt], [me[1] for me in dt], label=r'$\Delta t$')
+        ax.plot(CFL.keys(), CFL.values(), label='CFL limit')
         ax.set_yscale('log')
         ax.set_xlabel('$t$')
         ax.set_ylabel(r'$\Delta t$')
+        ax.legend(frameon=False)
         self.save_fig(fig, 'dt')
 
     def plot_verification(self):
@@ -134,8 +214,8 @@ class PlotRBC:
 
 if __name__ == '__main__':
     setup_mpl()
-    plotter = PlotRBC(128, [1, 1, 4], '.')
-    # plotter = PlotRBC(4096, [1, 4, 1024], '/p/scratch/ccstma/baumann7/large_runs/')
+    # plotter = PlotRBC(256, [1, 4, 1], '.', 100)
+    plotter = PlotRBC(4096, [1, 4, 1024], '/p/scratch/ccstma/baumann7/large_runs/', 200)
     plotter.plot_work()
     plotter.plot_step_size()
     plotter.plot_verification()
