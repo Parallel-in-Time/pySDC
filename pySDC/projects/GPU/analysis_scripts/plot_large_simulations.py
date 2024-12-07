@@ -16,11 +16,12 @@ except ModuleNotFoundError:
 class PlotLargeRun:  # pragma: no cover
     name = None
 
-    def __init__(self, res, procs, base_path, max_frames=500):
+    def __init__(self, res, procs, base_path, max_frames=500, useGPU='False'):
         self.res = res
         self.procs = procs
         self.base_path = base_path
         self.max_frames = max_frames
+        self.useGPU = useGPU
 
         self._stats = None
         self._prob = None
@@ -92,7 +93,7 @@ class PlotRBC(PlotLargeRun):  # pragma: no cover
 
     def get_path(self, idx, n_space, n_time=0, stats=False):
         _name = '-stats' if stats else ''
-        return f'{self.base_path}/data/RayleighBenard_large-res_{self.res}-useGPU_False-procs_{self.procs[0]}_{self.procs[1]}_{self.procs[2]}-{n_time}-{n_space}-solution_{idx:06d}{_name}.pickle'
+        return f'{self.base_path}/data/RayleighBenard_large-res_{self.res}-useGPU_{self.useGPU}-procs_{self.procs[0]}_{self.procs[1]}_{self.procs[2]}-{n_time}-{n_space}-solution_{idx:06d}{_name}.pickle'
 
     def plot_verification(self):
         fig, ax = self.get_fig()
@@ -171,7 +172,7 @@ class PlotRBC(PlotLargeRun):  # pragma: no cover
         return CFL
 
     def _get_CFL_limit_path(self):
-        return f'{self.base_path}/data/RayleighBenard_large-res_{self.res}-useGPU_False-procs_{self.procs[0]}_{self.procs[1]}_{self.procs[2]}-CFL_limit.pickle'
+        return f'{self.base_path}/data/RayleighBenard_large-res_{self.res}-useGPU_{self.useGPU}-procs_{self.procs[0]}_{self.procs[1]}_{self.procs[2]}-CFL_limit.pickle'
 
     def get_CFL_limit(self, recompute=False):
         import os
@@ -287,14 +288,13 @@ class PlotGS(PlotLargeRun):  # pragma: no cover
 
     def get_path(self, idx, n_space, n_time=0, stats=False):
         _name = '-stats' if stats else ''
-        return f'{self.base_path}/data/GrayScottLarge-res_{self.res}-useGPU_False-procs_{self.procs[0]}_{self.procs[1]}_{self.procs[2]}-{n_time}-{n_space}-solution_{idx:06d}{_name}.pickle'
+        return f'{self.base_path}/data/GrayScottLarge-res_{self.res}-useGPU_{self.useGPU}-procs_{self.procs[0]}_{self.procs[1]}_{self.procs[2]}-{n_time}-{n_space}-solution_{idx:06d}{_name}.pickle'
 
     def plot_step_size(self):
         fig, ax = self.get_fig()
         dt = get_sorted(self.stats, type='dt', recomputed=False)
 
         ax.plot([me[0] for me in dt], [me[1] for me in dt], label=r'$\Delta t$')
-        ax.set_yscale('log')
         ax.set_xlabel('$t$')
         ax.set_ylabel(r'$\Delta t$')
         ax.legend(frameon=False)
@@ -320,7 +320,7 @@ if __name__ == '__main__':  # pragma: no cover
         if args.config == 'test':
             plotter = PlotGS(64, [1, 1, 4], '.', 100)
         else:
-            plotter = PlotGS(2304, [1, 4, 192], '.', 91)
+            plotter = PlotGS(2304, [1, 4, 192], '/p/scratch/ccstma/baumann7/large_runs/', 91, 'True')
 
     if args.problem == 'RBC':
         if comm.size > 1:
