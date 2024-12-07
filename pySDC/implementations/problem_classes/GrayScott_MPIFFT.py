@@ -19,7 +19,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
         \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),
 
     .. math::
-        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u
+        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B v
 
     in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`N=2,3`. Spatial discretization is done by using
     Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [2]_, see also
@@ -260,7 +260,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
                         )
                     elif self.ndim == 3:
                         z_pos = self.x0 + rng.random() * self.L[2]
-                        # This assumes that the box is [-L/2, L/2]^2
+                        # This assumes that the box is [-L/2, L/2]^3
                         _u[...] += -xp.exp(
                             -80.0
                             * (

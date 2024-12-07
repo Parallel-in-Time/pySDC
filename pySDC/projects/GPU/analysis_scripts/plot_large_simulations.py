@@ -13,7 +13,9 @@ except ModuleNotFoundError:
     tqdm = None
 
 
-class PlotRBC:
+class PlotLargeRun:  # pragma: no cover
+    name = None
+
     def __init__(self, res, procs, base_path, max_frames=500):
         self.res = res
         self.procs = procs
@@ -22,10 +24,6 @@ class PlotRBC:
 
         self._stats = None
         self._prob = None
-
-    def get_path(self, idx, n_space, n_time=0, stats=False):
-        _name = '-stats' if stats else ''
-        return f'{self.base_path}/data/RayleighBenard_large-res_{self.res}-useGPU_False-procs_{self.procs[0]}_{self.procs[1]}_{self.procs[2]}-{n_time}-{n_space}-solution_{idx:06d}{_name}.pickle'
 
     def get_stats(self):
         self._stats = {}
@@ -50,13 +48,74 @@ class PlotRBC:
             self.get_stats()
         return self._stats
 
+    def get_fig(self, *args, **kwargs):
+        return plt.subplots(*args, figsize=figsize_by_journal('TUHH_thesis', 0.8, 0.6), **kwargs)
+
     def save_fig(self, fig, name):
-        path = f'plots/RBC_large_{name}.pdf'
+        path = f'plots/{self.name}_{name}.pdf'
         fig.savefig(path, bbox_inches='tight')
         print(f'Saved {path!r}', flush=True)
 
-    def get_fig(self, *args, **kwargs):
-        return plt.subplots(*args, figsize=figsize_by_journal('TUHH_thesis', 0.8, 0.6), **kwargs)
+    @property
+    def prob(self):
+        if self._prob is None:
+            self._prob = self.get_problem()
+        return self._prob
+
+    def plot_work(self):
+        fig, ax = self.get_fig()
+        for key, label in zip(['factorizations', 'rhs'], ['LU decompositions', 'rhs evaluations']):
+            work = get_sorted(self.stats, type=f'work_{key}')
+            ax.plot([me[0] for me in work], np.cumsum([4 * me[1] for me in work]), label=fr'\#{label}')
+        ax.set_yscale('log')
+        ax.set_xlabel('$t$')
+        ax.legend(frameon=False)
+        self.save_fig(fig, 'work')
+
+    def plot_residual(self):
+        fig, ax = self.get_fig()
+        residual = get_sorted(self.stats, type='residual_post_step')
+        increment = get_sorted(self.stats, type='error_embedded_estimate')
+        ax.plot([me[0] for me in residual], [me[1] for me in residual], label=r'residual')
+        ax.plot([me[0] for me in increment], [me[1] for me in increment], label=r'$\epsilon$')
+        ax.set_yscale('log')
+        ax.set_xlabel('$t$')
+        ax.legend(frameon=False)
+        self.save_fig(fig, 'residual')
+
+    def get_problem(self):
+        raise NotImplementedError()
+
+
+class PlotRBC(PlotLargeRun):  # pragma: no cover
+    name = 'RBC_large'
+
+    def get_path(self, idx, n_space, n_time=0, stats=False):
+        _name = '-stats' if stats else ''
+        return f'{self.base_path}/data/RayleighBenard_large-res_{self.res}-useGPU_False-procs_{self.procs[0]}_{self.procs[1]}_{self.procs[2]}-{n_time}-{n_space}-solution_{idx:06d}{_name}.pickle'
+
+    def plot_verification(self):
+        fig, ax = self.get_fig()
+
+        nu = get_sorted(self.stats, type='Nusselt', recomputed=False)
+        for key in ['t', 'b', 'V']:
+            ax.plot([me[0] for me in nu], [me[1][key] for me in nu], label=fr'$Nu_\mathrm{{{key}}}$')
+        ax.legend(frameon=False)
+        ax.set_xlabel('$t$')
+        self.save_fig(fig, 'verification')
+
+    def plot_step_size(self):
+        fig, ax = self.get_fig()
+        dt = get_sorted(self.stats, type='dt', recomputed=False)
+        CFL = self.get_CFL_limit()
+
+        ax.plot([me[0] for me in dt], [me[1] for me in dt], label=r'$\Delta t$')
+        ax.plot(CFL.keys(), CFL.values(), label='CFL limit')
+        ax.set_yscale('log')
+        ax.set_xlabel('$t$')
+        ax.set_ylabel(r'$\Delta t$')
+        ax.legend(frameon=False)
+        self.save_fig(fig, 'dt')
 
     def get_problem(self):
         from pySDC.projects.GPU.configs.RBC_configs import get_config
@@ -74,12 +133,6 @@ class PlotRBC:
         desc = config.get_description(res=self.res)
 
         return RayleighBenard(**{**desc['problem_params'], 'comm': comm})
-
-    @property
-    def prob(self):
-        if self._prob is None:
-            self._prob = self.get_problem()
-        return self._prob
 
     def _compute_CFL_single_frame(self, frame):
         from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
@@ -138,50 +191,6 @@ class PlotRBC:
             print(f'Stored {path!r}')
         return CFL
 
-    def plot_work(self):
-        fig, ax = self.get_fig()
-        for key, label in zip(['factorizations', 'rhs'], ['LU decompositions', 'rhs evaluations']):
-            work = get_sorted(self.stats, type=f'work_{key}')
-            ax.plot([me[0] for me in work], np.cumsum([4 * me[1] for me in work]), label=fr'\#{label}')
-        ax.set_yscale('log')
-        ax.set_xlabel('$t$')
-        ax.legend(frameon=False)
-        self.save_fig(fig, 'work')
-
-    def plot_residual(self):
-        fig, ax = self.get_fig()
-        residual = get_sorted(self.stats, type='residual_post_step')
-        increment = get_sorted(self.stats, type='error_embedded_estimate')
-        ax.plot([me[0] for me in residual], [me[1] for me in residual], label=r'residual')
-        ax.plot([me[0] for me in increment], [me[1] for me in increment], label=r'$\epsilon$')
-        ax.set_yscale('log')
-        ax.set_xlabel('$t$')
-        ax.legend(frameon=False)
-        self.save_fig(fig, 'residual')
-
-    def plot_step_size(self):
-        fig, ax = self.get_fig()
-        dt = get_sorted(self.stats, type='dt', recomputed=False)
-        CFL = self.get_CFL_limit()
-
-        ax.plot([me[0] for me in dt], [me[1] for me in dt], label=r'$\Delta t$')
-        ax.plot(CFL.keys(), CFL.values(), label='CFL limit')
-        ax.set_yscale('log')
-        ax.set_xlabel('$t$')
-        ax.set_ylabel(r'$\Delta t$')
-        ax.legend(frameon=False)
-        self.save_fig(fig, 'dt')
-
-    def plot_verification(self):
-        fig, ax = self.get_fig()
-
-        nu = get_sorted(self.stats, type='Nusselt', recomputed=False)
-        for key in ['t', 'b', 'V']:
-            ax.plot([me[0] for me in nu], [me[1][key] for me in nu], label=fr'$Nu_\mathrm{{{key}}}$')
-        ax.legend(frameon=False)
-        ax.set_xlabel('$t$')
-        self.save_fig(fig, 'verification')
-
     def plot_series(self):
         indices = [0, 56, 70, 82, 100, 132]
 
@@ -232,18 +241,57 @@ class PlotRBC:
         self.save_fig(fig, 'series')
 
 
-if __name__ == '__main__':
+class PlotGS(PlotLargeRun):  # pragma: no cover
+    name = 'GS_large'
+
+    def get_path(self, idx, n_space, n_time=0, stats=False):
+        _name = '-stats' if stats else ''
+        return f'{self.base_path}/data/GrayScottLarge-res_{self.res}-useGPU_False-procs_{self.procs[0]}_{self.procs[1]}_{self.procs[2]}-{n_time}-{n_space}-solution_{idx:06d}{_name}.pickle'
+
+    def plot_step_size(self):
+        fig, ax = self.get_fig()
+        dt = get_sorted(self.stats, type='dt', recomputed=False)
+
+        ax.plot([me[0] for me in dt], [me[1] for me in dt], label=r'$\Delta t$')
+        ax.set_yscale('log')
+        ax.set_xlabel('$t$')
+        ax.set_ylabel(r'$\Delta t$')
+        ax.legend(frameon=False)
+        self.save_fig(fig, 'dt')
+
+
+if __name__ == '__main__':  # pragma: no cover
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--problem', type=str, default='GS', choices=['RBC', 'GS'])
+    parser.add_argument('--config', type=str, default='production', choices=['production', 'test'])
+    args = parser.parse_args()
+
     setup_mpl()
-    # plotter = PlotRBC(256, [1, 4, 1], '.', 100)
-    plotter = PlotRBC(4096, [1, 4, 1024], '/p/scratch/ccstma/baumann7/large_runs/', 200)
 
-    if comm.size > 1:
-        plotter.compute_CFL_limit()
-        exit()
+    if parser.problem == 'RBC':
+        if parser.config == 'test':
+            plotter = PlotRBC(256, [1, 4, 1], '.', 100)
+        else:
+            plotter = PlotRBC(4096, [1, 4, 1024], '/p/scratch/ccstma/baumann7/large_runs/', 200)
+    elif parser.problem == 'GS':
+        if parser.config == 'test':
+            plotter = PlotGS(64, [1, 1, 4], '.', 100)
+        else:
+            plotter = PlotGS(2304, [1, 4, 192], '.', 91)
 
-    plotter.plot_residual()
-    plotter.plot_step_size()
-    plotter.plot_work()
-    plotter.plot_verification()
-    plotter.plot_series()
+    if parser.problem == 'RBC':
+        if comm.size > 1:
+            plotter.compute_CFL_limit()
+            exit()
+
+        plotter.plot_residual()
+        plotter.plot_step_size()
+        plotter.plot_work()
+        plotter.plot_verification()
+        plotter.plot_series()
+    else:
+        plotter.plot_step_size()
+
     plt.show()
