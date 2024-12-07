@@ -429,8 +429,8 @@ class RayleighBenard_large(RayleighBenardRegular):
         }
         desc['convergence_controllers'][StepSizeRounding] = {}
         desc['convergence_controllers'].pop(CFLLimit)
-        desc['level_params']['restol'] = 3e-6
-        desc['level_params']['e_tol'] = 3e-6
+        desc['level_params']['restol'] = 5e-6
+        desc['level_params']['e_tol'] = 5e-6
         desc['level_params']['dt'] = 5e-3
         desc['sweeper_params']['num_nodes'] = 4
         desc['sweeper_params']['QI'] = 'MIN-SR-S'

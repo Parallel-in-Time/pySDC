@@ -74,8 +74,8 @@ class PlotLargeRun:  # pragma: no cover
 
     def plot_residual(self):
         fig, ax = self.get_fig()
-        residual = get_sorted(self.stats, type='residual_post_step')
-        increment = get_sorted(self.stats, type='error_embedded_estimate')
+        residual = get_sorted(self.stats, type='residual_post_step', recomputed=False)
+        increment = get_sorted(self.stats, type='error_embedded_estimate', recomputed=False)
         ax.plot([me[0] for me in residual], [me[1] for me in residual], label=r'residual')
         ax.plot([me[0] for me in increment], [me[1] for me in increment], label=r'$\epsilon$')
         ax.set_yscale('log')
@@ -176,9 +176,6 @@ class PlotRBC(PlotLargeRun):  # pragma: no cover
     def get_CFL_limit(self, recompute=False):
         import os
 
-        _ = self.prob
-        comm.Barrier()
-
         path = self._get_CFL_limit_path()
 
         if os.path.exists(path) and not recompute:
@@ -191,8 +188,52 @@ class PlotRBC(PlotLargeRun):  # pragma: no cover
             print(f'Stored {path!r}')
         return CFL
 
+    def plot_work(self):
+        fig, ax = self.get_fig()
+        for key, label in zip(['factorizations', 'rhs'], ['LU decompositions', 'rhs evaluations']):
+            work = get_sorted(self.stats, type=f'work_{key}')
+            ax.plot([me[0] for me in work], np.cumsum([4 * me[1] for me in work]), label=fr'\#{label}')
+        ax.set_yscale('log')
+        ax.set_xlabel('$t$')
+        ax.legend(frameon=False)
+        self.save_fig(fig, 'work')
+
+    def plot_residual(self):
+        fig, ax = self.get_fig()
+        residual = get_sorted(self.stats, type='residual_post_step', recomputed=False)
+        increment = get_sorted(self.stats, type='error_embedded_estimate', recomputed=False)
+        ax.plot([me[0] for me in residual], [me[1] for me in residual], label=r'residual')
+        ax.plot([me[0] for me in increment], [me[1] for me in increment], label=r'$\epsilon$')
+        ax.set_yscale('log')
+        ax.set_xlabel('$t$')
+        ax.legend(frameon=False)
+        self.save_fig(fig, 'residual')
+
+    def plot_step_size(self):
+        fig, ax = self.get_fig()
+        dt = get_sorted(self.stats, type='dt', recomputed=False)
+        CFL = self.get_CFL_limit()
+
+        ax.plot([me[0] for me in dt], [me[1] for me in dt], label=r'$\Delta t$')
+        ax.plot(CFL.keys(), CFL.values(), label='CFL limit')
+        ax.set_yscale('log')
+        ax.set_xlabel('$t$')
+        ax.set_ylabel(r'$\Delta t$')
+        ax.legend(frameon=False)
+        self.save_fig(fig, 'dt')
+
+    def plot_verification(self):
+        fig, ax = self.get_fig()
+
+        nu = get_sorted(self.stats, type='Nusselt', recomputed=False)
+        for key in ['t', 'b', 'V']:
+            ax.plot([me[0] for me in nu], [me[1][key] for me in nu], label=fr'$Nu_\mathrm{{{key}}}$')
+        ax.legend(frameon=False)
+        ax.set_xlabel('$t$')
+        self.save_fig(fig, 'verification')
+
     def plot_series(self):
-        indices = [0, 56, 70, 82, 100, 132]
+        indices = [0, 56, 82, 100, 162, 186]
 
         from mpl_toolkits.axes_grid1 import make_axes_locatable
 
@@ -270,18 +311,18 @@ if __name__ == '__main__':  # pragma: no cover
 
     setup_mpl()
 
-    if parser.problem == 'RBC':
-        if parser.config == 'test':
+    if args.problem == 'RBC':
+        if args.config == 'test':
             plotter = PlotRBC(256, [1, 4, 1], '.', 100)
         else:
             plotter = PlotRBC(4096, [1, 4, 1024], '/p/scratch/ccstma/baumann7/large_runs/', 200)
-    elif parser.problem == 'GS':
-        if parser.config == 'test':
+    elif args.problem == 'GS':
+        if args.config == 'test':
             plotter = PlotGS(64, [1, 1, 4], '.', 100)
         else:
             plotter = PlotGS(2304, [1, 4, 192], '.', 91)
 
-    if parser.problem == 'RBC':
+    if args.problem == 'RBC':
         if comm.size > 1:
             plotter.compute_CFL_limit()
             exit()

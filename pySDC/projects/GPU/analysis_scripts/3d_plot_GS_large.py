@@ -73,10 +73,10 @@ def plot(
         zoomed = Grid(
             pv.ImageData(dimensions=(n_samples,) * 3, spacing=(zoom / n_samples,) * 3, origin=[0.8, 0.47, 0.03]),
             '_zoomed',
-            [1.0, 12],
+            [1.0, 1.2],
         )
 
-        for grid in [sampled, zoomed]:
+        for grid in [zoomed]:
 
             p = pv.Plotter(off_screen=True)
             contours = grid.grid.sample(v, progress_bar=True, categorical=True).contour(
@@ -87,7 +87,7 @@ def plot(
             p.remove_scalar_bar()
             p.camera.azimuth += 15
 
-            p.camera.Elevation(0.7)
+            p.camera.Elevation(0.9)
             plotting_path = './simulation_plots/'
 
             path = f'{plotting_path}/GS_large_{i:06d}{grid.label}.png'
@@ -156,7 +156,7 @@ if __name__ == '__main__':
             zoom=args.zoom,
         )
     elif args.mode == 'video':
-        for view in ['', '_zoom']:
+        for view in ['', '_zoomed']:
             video(view)
     else:
         raise NotImplementedError()
