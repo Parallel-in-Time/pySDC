@@ -14,7 +14,9 @@ def generate_directories():
         os.makedirs(path, exist_ok=True)
 
 
-def get_jobscript_text(sbatch_options, srun_options, command, cluster, name='Coffeebreak', nsys_profiling=False, OMP_NUM_THREADS=1):
+def get_jobscript_text(
+    sbatch_options, srun_options, command, cluster, name='Coffeebreak', nsys_profiling=False, OMP_NUM_THREADS=1
+):
     """
     Generate the text for a jobscript
 

@@ -72,7 +72,13 @@ class ScalingConfig(object):
                     command += ' --useGPU=True'
 
                 write_jobscript(
-                    sbatch_options, srun_options, command, self.cluster, name=f'{type(self).__name__}_{res}', OMP_NUM_THREADS=self.OMP_NUM_THREADS, **kwargs
+                    sbatch_options,
+                    srun_options,
+                    command,
+                    self.cluster,
+                    name=f'{type(self).__name__}_{res}',
+                    OMP_NUM_THREADS=self.OMP_NUM_THREADS,
+                    **kwargs,
                 )
 
     def plot_scaling_test(self, ax, quantity='time', **plotting_params):  # pragma: no cover
@@ -163,6 +169,7 @@ class CPUConfig(ScalingConfig):
     partition = 'batch'
     tasks_per_node = 16
 
+
 class JurecaCPU(ScalingConfig):
     cluster = 'jureca'
     partition = 'dc-cpu'
@@ -213,10 +220,10 @@ class GrayScottSpaceScalingGPU3D(GPUConfig, ScalingConfig):
     ]
 
 
-
 class RBCBaseConfig(ScalingConfig):
     def format_resolution(self, resolution):
         return fr'${{{resolution}}}\times{{{resolution//4}}}$'
+
 
 class RayleighBenardSpaceScalingCPU(JurecaCPU, RBCBaseConfig):
     ndim = 2
@@ -236,6 +243,7 @@ class RayleighBenardSpaceScalingCPU(JurecaCPU, RBCBaseConfig):
         # Experiment(res=8192, PinT=False, sequence=[2048], marker='o'),
         # Experiment(res=16384, PinT=False, sequence=[4096], marker='o'),
     ]
+
 
 class RayleighBenardSpaceScalingCPULarge(RayleighBenardSpaceScalingCPU):
     tasks_per_node = 32
@@ -301,12 +309,12 @@ class RayleighBenardDedalusComparisonGPU(GPUConfig, ScalingConfig):
 
 
 def plot_scalings(problem, **kwargs):  # pragma: no cover
-    if problem == 'GS':
-        configs = [
-            GrayScottSpaceScalingCPU(),
-            GrayScottSpaceScalingGPU(),
-        ]
-    elif problem == 'GS3D':
+    # if problem == 'GS':
+    #     configs = [
+    #         GrayScottSpaceScalingCPU(),
+    #         GrayScottSpaceScalingGPU(),
+    #     ]
+    if problem == 'GS3D':
         configs = [
             GrayScottSpaceScalingCPU3D(),
             GrayScottSpaceScalingGPU3D(),
@@ -375,10 +383,7 @@ if __name__ == '__main__':
             config_classes += [GrayScottSpaceScalingGPU3D]
     elif args.problem == 'RBC':
         if args.XPU == 'CPU':
-            config_classes += [
-                    RayleighBenardSpaceScalingCPU,
-                    RayleighBenardSpaceScalingCPULarge
-                    ]
+            config_classes += [RayleighBenardSpaceScalingCPU, RayleighBenardSpaceScalingCPULarge]
         else:
             config_classes += [RayleighBenardSpaceScalingGPU]
     elif args.problem == 'RBC_dedalus':

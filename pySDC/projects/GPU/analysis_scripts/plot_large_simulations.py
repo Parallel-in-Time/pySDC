@@ -210,29 +210,6 @@ class PlotRBC(PlotLargeRun):  # pragma: no cover
         ax.legend(frameon=False)
         self.save_fig(fig, 'residual')
 
-    def plot_step_size(self):
-        fig, ax = self.get_fig()
-        dt = get_sorted(self.stats, type='dt', recomputed=False)
-        CFL = self.get_CFL_limit()
-
-        ax.plot([me[0] for me in dt], [me[1] for me in dt], label=r'$\Delta t$')
-        ax.plot(CFL.keys(), CFL.values(), label='CFL limit')
-        ax.set_yscale('log')
-        ax.set_xlabel('$t$')
-        ax.set_ylabel(r'$\Delta t$')
-        ax.legend(frameon=False)
-        self.save_fig(fig, 'dt')
-
-    def plot_verification(self):
-        fig, ax = self.get_fig()
-
-        nu = get_sorted(self.stats, type='Nusselt', recomputed=False)
-        for key in ['t', 'b', 'V']:
-            ax.plot([me[0] for me in nu], [me[1][key] for me in nu], label=fr'$Nu_\mathrm{{{key}}}$')
-        ax.legend(frameon=False)
-        ax.set_xlabel('$t$')
-        self.save_fig(fig, 'verification')
-
     def plot_series(self):
         indices = [0, 56, 82, 100, 162, 186]
 
@@ -300,6 +277,45 @@ class PlotGS(PlotLargeRun):  # pragma: no cover
         ax.legend(frameon=False)
         self.save_fig(fig, 'dt')
 
+    def plot_series(self, test=False):
+        if test:
+            indices = [0, 1, 2, 3, 4, 5]
+            process = 0
+        else:
+            indices = [0, 10, 20, 30, 40, 90]
+            process = 96
+
+        from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+        # get grid
+        path = self.get_path(idx=0, n_space=process)
+        with open(path, 'rb') as file:
+            data = pickle.load(file)
+        X = data['X']
+
+        if tqdm:
+            frame_range = tqdm(indices)
+            frame_range.set_description('Plotting slice')
+
+        for frame in frame_range:
+
+            plt.rcParams['figure.constrained_layout.use'] = True
+            fig, ax = plt.subplots(1, 1, figsize=figsize_by_journal('TUHH_thesis', 0.4, 1.1))
+            divider = make_axes_locatable(ax)
+            cax = divider.append_axes('right', size='3%', pad=0.03)
+
+            path = self.get_path(idx=frame, n_space=process)
+            with open(path, 'rb') as file:
+                data = pickle.load(file)
+            im = ax.pcolormesh(X[1][0], X[2][0], data['u'][0], cmap='binary', rasterized=True)
+
+            fig.colorbar(im, cax)  # , label=f'$T(t={{{t:.1f}}})$')
+
+            ax.set_xlabel('$y$')
+            ax.set_ylabel('$z$')
+            ax.set_aspect(1)
+            self.save_fig(fig, f'series_{frame}_t={data["t"]:.0f}')
+
 
 if __name__ == '__main__':  # pragma: no cover
     import argparse
@@ -333,6 +349,7 @@ if __name__ == '__main__':  # pragma: no cover
         plotter.plot_verification()
         plotter.plot_series()
     else:
+        plotter.plot_series(args.config == 'test')
         plotter.plot_step_size()
 
     plt.show()
