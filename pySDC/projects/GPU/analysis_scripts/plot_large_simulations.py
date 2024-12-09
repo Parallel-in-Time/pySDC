@@ -282,7 +282,7 @@ class PlotGS(PlotLargeRun):  # pragma: no cover
             indices = [0, 1, 2, 3, 4, 5]
             process = 0
         else:
-            indices = [0, 10, 20, 30, 40, 90]
+            indices = [0, 10, 20, 30, 40, 91]
             process = 96
 
         from mpl_toolkits.axes_grid1 import make_axes_locatable
