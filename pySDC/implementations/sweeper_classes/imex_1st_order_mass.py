@@ -15,16 +15,14 @@ class imex_1st_order_mass(imex_1st_order):
         Returns:
             None
         """
-
-        # get current level and problem description
         L = self.level
         P = L.prob
+        M = self.coll.num_nodes
 
         # only if the level has been touched before
         assert L.status.unlocked
 
-        # get number of collocation nodes for easier access
-        M = self.coll.num_nodes
+        self.updateVariableCoeffs(L.status.sweep)
 
         # gather all terms which are known already (e.g. from the previous iteration)
         # this corresponds to u0 + QF(u^k) - QIFI(u^k) - QEFE(u^k) + tau
