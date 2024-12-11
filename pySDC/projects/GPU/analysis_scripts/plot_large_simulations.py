@@ -283,8 +283,8 @@ class PlotGS(PlotLargeRun):  # pragma: no cover
             process = 0
             layer = 0
         else:
-            indices = [91] # [0, 10, 20, 30, 40, 91]
-            process = 120# 141#20#96  # 11
+            indices = [91]  # [0, 10, 20, 30, 40, 91]
+            process = 120  # 141#20#96  # 11
             layer = 6
 
         from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -312,7 +312,9 @@ class PlotGS(PlotLargeRun):  # pragma: no cover
 
             # im = ax.pcolormesh(X[1][0], X[2][0], np.max(data['v'], axis=0), cmap='binary', rasterized=True, vmin=0, vmax=0.5)
             # im = ax.pcolormesh(X[1][layer], X[2][layer], data['v'][layer], cmap='binary', rasterized=True, vmin=0, vmax=0.5)
-            im = ax.pcolormesh(X[1][layer], X[2][layer], data['v'][layer], cmap='binary', rasterized=True, vmin=0, vmax=0.5)
+            im = ax.pcolormesh(
+                X[1][layer], X[2][layer], data['v'][layer], cmap='binary', rasterized=True, vmin=0, vmax=0.5
+            )
             ax.set_xlim((9, 14))
             ax.set_ylim((-4, 1))
 
