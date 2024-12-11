@@ -297,6 +297,11 @@ class RayleighBenardDedalusComparison(CPUConfig, RBCBaseConfig):
     config = 'RBC_Tibo'
     max_steps_space = 6
     tasks_time = 4
+    experiments = [
+        Experiment(res=256, PinT=False, start=1, stop=64, marker='.'),
+        Experiment(res=256, PinT=True, start=4, stop=256, marker='.'),
+    ]
+
 
 
 class RayleighBenardDedalusComparisonGPU(GPUConfig, ScalingConfig):
@@ -336,6 +341,8 @@ def plot_scalings(problem, **kwargs):  # pragma: no cover
     ideal_lines = {
         ('GS3D', 'throughput'): {'x': [0.25, 400], 'y': [5e6, 8e9]},
         ('GS3D', 'time'): {'x': [0.25, 400], 'y': [80, 5e-2]},
+        ('RBC', 'throughput'): {'x': [1/10, 64], 'y': [2e4, 2e4*640]},
+        ('RBC', 'time'): {'x': [1/10, 64], 'y': [60, 60/640]},
     }
 
     fig, ax = plt.subplots(figsize=figsize_by_journal('TUHH_thesis', 1, 0.6))
@@ -383,7 +390,7 @@ if __name__ == '__main__':
             config_classes += [GrayScottSpaceScalingGPU3D]
     elif args.problem == 'RBC':
         if args.XPU == 'CPU':
-            config_classes += [RayleighBenardSpaceScalingCPU, RayleighBenardSpaceScalingCPULarge]
+            config_classes += [RayleighBenardSpaceScalingCPU]
         else:
             config_classes += [RayleighBenardSpaceScalingGPU]
     elif args.problem == 'RBC_dedalus':

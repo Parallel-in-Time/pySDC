@@ -54,7 +54,7 @@ class PlotLargeRun:  # pragma: no cover
 
     def save_fig(self, fig, name):
         path = f'plots/{self.name}_{name}.pdf'
-        fig.savefig(path, bbox_inches='tight')
+        fig.savefig(path, bbox_inches='tight', dpi=300)
         print(f'Saved {path!r}', flush=True)
 
     @property
@@ -281,9 +281,11 @@ class PlotGS(PlotLargeRun):  # pragma: no cover
         if test:
             indices = [0, 1, 2, 3, 4, 5]
             process = 0
+            layer = 0
         else:
-            indices = [0, 10, 20, 30, 40, 91]
-            process = 96
+            indices = [91] # [0, 10, 20, 30, 40, 91]
+            process = 120# 141#20#96  # 11
+            layer = 6
 
         from mpl_toolkits.axes_grid1 import make_axes_locatable
 
@@ -300,14 +302,19 @@ class PlotGS(PlotLargeRun):  # pragma: no cover
         for frame in frame_range:
 
             plt.rcParams['figure.constrained_layout.use'] = True
-            fig, ax = plt.subplots(1, 1, figsize=figsize_by_journal('TUHH_thesis', 0.4, 1.1))
+            fig, ax = plt.subplots(1, 1, figsize=figsize_by_journal('TUHH_thesis', 0.7, 1.1))
             divider = make_axes_locatable(ax)
             cax = divider.append_axes('right', size='3%', pad=0.03)
 
             path = self.get_path(idx=frame, n_space=process)
             with open(path, 'rb') as file:
                 data = pickle.load(file)
-            im = ax.pcolormesh(X[1][0], X[2][0], data['u'][0], cmap='binary', rasterized=True)
+
+            # im = ax.pcolormesh(X[1][0], X[2][0], np.max(data['v'], axis=0), cmap='binary', rasterized=True, vmin=0, vmax=0.5)
+            # im = ax.pcolormesh(X[1][layer], X[2][layer], data['v'][layer], cmap='binary', rasterized=True, vmin=0, vmax=0.5)
+            im = ax.pcolormesh(X[1][layer], X[2][layer], data['v'][layer], cmap='binary', rasterized=True, vmin=0, vmax=0.5)
+            ax.set_xlim((9, 14))
+            ax.set_ylim((-4, 1))
 
             fig.colorbar(im, cax)  # , label=f'$T(t={{{t:.1f}}})$')
 
