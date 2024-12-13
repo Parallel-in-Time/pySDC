@@ -19,10 +19,6 @@ def get_config(args):
         return RayleighBenard_Thibaut(args)
     elif name == 'RBC_scaling':
         return RayleighBenard_scaling(args)
-    elif name == 'RBC_scaling_x':
-        return RayleighBenard_scaling_x(args)
-    elif name == 'RBC_scaling_z':
-        return RayleighBenard_scaling_z(args)
     elif name == 'RBC_large':
         return RayleighBenard_large(args)
     else:
@@ -384,26 +380,6 @@ class RayleighBenard_scaling(RayleighBenardRegular):
         params = super().get_controller_params(*args, **kwargs)
         params['hook_class'] = [LogWork]
         return params
-
-
-class RayleighBenard_scaling_x(RayleighBenard_scaling):
-    vertical_res = 256
-
-    def get_description(self, *args, res=-1, **kwargs):
-        desc = super().get_description(*args, **kwargs)
-        desc['problem_params']['nx'] = res
-        desc['problem_params']['nz'] = self.vertical_res
-        return desc
-
-
-class RayleighBenard_scaling_z(RayleighBenard_scaling):
-    horizontal_res = 1024
-
-    def get_description(self, *args, res=-1, **kwargs):
-        desc = super().get_description(*args, **kwargs)
-        desc['problem_params']['nx'] = self.horizontal_res
-        desc['problem_params']['nz'] = res
-        return desc
 
 
 class RayleighBenard_large(RayleighBenardRegular):
