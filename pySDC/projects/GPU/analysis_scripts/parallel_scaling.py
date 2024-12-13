@@ -137,12 +137,16 @@ class ScalingConfig(object):
 
                     if quantity == 'throughput':
                         timings[np.prod(procs) / self.tasks_per_node] = experiment.res**self.ndim / t_mean
+                    elif quantity == 'throughput_per_task':
+                        timings[np.prod(procs)] = experiment.res**self.ndim / t_mean
                     elif quantity == 'efficiency':
                         timings[np.prod(procs) / self.tasks_per_node] = (
                             experiment.res**self.ndim / t_mean / np.prod(procs)
                         )
                     elif quantity == 'time':
                         timings[np.prod(procs) / self.tasks_per_node] = t_mean
+                    elif quantity == 'time_per_task':
+                        timings[np.prod(procs)] = t_mean
                     else:
                         raise NotImplementedError
                 except (FileNotFoundError, ValueError):
@@ -154,10 +158,15 @@ class ScalingConfig(object):
                 **plotting_params[(self.useGPU, experiment.PinT)],
                 marker=experiment.marker,
             )
-        ax.set_xlabel(r'$N_\mathrm{nodes}$')
+        if 'per_task' in quantity:
+            ax.set_xlabel(r'$N_\mathrm{procs}$')
+        else:
+            ax.set_xlabel(r'$N_\mathrm{nodes}$')
         labels = {
             'throughput': 'throughput / DoF/s',
+            'throughput_per_task': 'throughput / DoF/s',
             'time': r'$t_\mathrm{step}$ / s',
+            'time_per_task': r'$t_\mathrm{step}$ / s',
             'efficiency': 'efficiency / DoF/s/task',
         }
         ax.set_ylabel(labels[quantity])
@@ -293,13 +302,15 @@ class RayleighBenardSpaceScalingGPU(GPUConfig, RBCBaseConfig):
 
 
 class RayleighBenardDedalusComparison(CPUConfig, RBCBaseConfig):
+    cluster = 'jusuf'
+    tasks_per_node = 64
     base_resolution = 256
     config = 'RBC_Tibo'
     max_steps_space = 6
     tasks_time = 4
     experiments = [
         Experiment(res=256, PinT=False, start=1, stop=64, marker='.'),
-        Experiment(res=256, PinT=True, start=4, stop=256, marker='.'),
+        # Experiment(res=256, PinT=True, start=4, stop=256, marker='.'),
     ]
 
 
@@ -310,6 +321,10 @@ class RayleighBenardDedalusComparisonGPU(GPUConfig, ScalingConfig):
     max_steps_space = 4
     max_steps_space_weak = 4
     tasks_time = 4
+    experiments = [
+        Experiment(res=256, PinT=False, start=1, stop=1, marker='.'),
+        # Experiment(res=256, PinT=True, start=4, stop=256, marker='.'),
+    ]
 
 
 def plot_scalings(problem, **kwargs):  # pragma: no cover
@@ -340,25 +355,33 @@ def plot_scalings(problem, **kwargs):  # pragma: no cover
     ideal_lines = {
         ('GS3D', 'throughput'): {'x': [0.25, 400], 'y': [5e6, 8e9]},
         ('GS3D', 'time'): {'x': [0.25, 400], 'y': [80, 5e-2]},
-        ('RBC', 'throughput'): {'x': [1 / 10, 64], 'y': [2e4, 2e4 * 640]},
-        ('RBC', 'time'): {'x': [1 / 10, 64], 'y': [60, 60 / 640]},
+        ('RBC', 'throughput'): {'x': [1/10, 64], 'y': [2e4, 2e4*640]},
+        ('RBC', 'time'): {'x': [1/10, 64], 'y': [60, 60/640]},
+        ('RBC', 'time_per_task'): {'x': [1, 640], 'y': [60, 60/640]},
+        ('RBC', 'throughput_per_task'): {'x': [1/1, 640], 'y': [2e4, 2e4*640]},
     }
 
     fig, ax = plt.subplots(figsize=figsize_by_journal('TUHH_thesis', 1, 0.6))
     configs[1].plot_scaling_test(ax=ax, quantity='efficiency')
-    ax.legend(frameon=False)
+    # ax.legend(frameon=False)
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+    ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
     ax.set_yscale('linear')
     path = f'{PROJECT_PATH}/plots/scaling_{problem}_efficiency.pdf'
     fig.savefig(path, bbox_inches='tight')
     print(f'Saved {path!r}', flush=True)
 
-    for quantity in ['time', 'throughput']:
+    for quantity in ['time', 'throughput', 'time_per_task', 'throughput_per_task'][::-1]:
         fig, ax = plt.subplots(figsize=figsize_by_journal('TUHH_thesis', 1, 0.6))
         for config in configs:
             config.plot_scaling_test(ax=ax, quantity=quantity)
         if (problem, quantity) in ideal_lines.keys():
             ax.loglog(*ideal_lines[(problem, quantity)].values(), color='black', ls=':', label='ideal')
-        ax.legend(frameon=False)
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+        ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
         path = f'{PROJECT_PATH}/plots/scaling_{problem}_{quantity}.pdf'
         fig.savefig(path, bbox_inches='tight')
         print(f'Saved {path!r}', flush=True)

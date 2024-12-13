@@ -291,7 +291,7 @@ class RayleighBenard_Thibaut(RayleighBenardRegular):
         desc['level_params']['restol'] = -1
         desc['level_params']['dt'] = 2e-2 / 4
         desc['sweeper_params']['num_nodes'] = 4
-        desc['sweeper_params']['QI'] = 'MIN-SR-FLEX'
+        desc['sweeper_params']['QI'] = 'MIN-SR-S'
         desc['sweeper_params']['node_type'] = 'LEGENDRE'
         desc['sweeper_params']['quad_type'] = 'RADAU-RIGHT'
         desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
