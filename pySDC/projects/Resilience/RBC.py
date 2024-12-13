@@ -172,9 +172,9 @@ def run_RBC(
     return stats, controller, crash
 
 
-def generate_data_for_fault_stats():
+def generate_data_for_fault_stats(Tend):
     prob = RayleighBenard(**PROBLEM_PARAMS)
-    _ts = np.linspace(0, 22, 221, dtype=float)
+    _ts = np.linspace(0, Tend, Tend * 10 + 1, dtype=float)
     for i in range(len(_ts) - 1):
         print(f'Generating reference solution from {_ts[i]:.4e} to {_ts[i+1]:.4e}')
         prob.u_exact(_ts[i + 1], _t0=_ts[i], recompute=False)
@@ -374,8 +374,8 @@ def plot_factorizations_over_time(t0=0, Tend=50, e_tol=1e-3, recompute=False, ad
 
 if __name__ == '__main__':
     # plot_step_size(0, 30)
-    plot_factorizations_over_time(e_tol=1e-3, adaptivity_mode='dt')
+    generate_data_for_fault_stats(Tend=30)
+    # plot_factorizations_over_time(e_tol=1e-3, adaptivity_mode='dt')
     # plot_factorizations_over_time(recompute=False, e_tol=1e-5, adaptivity_mode='dt_k')
-    # generate_data_for_fault_stats()
     # check_order(t=20, dt=1., steps=7)
     # stats, _, _ = run_RBC()

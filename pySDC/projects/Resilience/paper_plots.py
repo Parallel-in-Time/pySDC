@@ -580,13 +580,14 @@ def plot_RBC_solution(setup='resilience'):  # pragma: no cover
 
     from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+    nplots = 3 if setup == 'thesis_intro' else 2
+    aspect = 0.8 if nplots == 3 else 0.5
     plt.rcParams['figure.constrained_layout.use'] = True
-    fig, axs = plt.subplots(2, 1, sharex=True, sharey=True, figsize=figsize_by_journal(JOURNAL, 1.0, 0.5))
+    fig, axs = plt.subplots(nplots, 1, sharex=True, sharey=True, figsize=figsize_by_journal(JOURNAL, 1.0, aspect))
     caxs = []
-    divider = make_axes_locatable(axs[0])
-    caxs += [divider.append_axes('right', size='3%', pad=0.03)]
-    divider2 = make_axes_locatable(axs[1])
-    caxs += [divider2.append_axes('right', size='3%', pad=0.03)]
+    for ax in axs:
+        divider = make_axes_locatable(ax)
+        caxs += [divider.append_axes('right', size='3%', pad=0.03)]
 
     from pySDC.projects.Resilience.RBC import RayleighBenard, PROBLEM_PARAMS
 
@@ -607,15 +608,20 @@ def plot_RBC_solution(setup='resilience'):  # pragma: no cover
     elif setup == 'resilience_thesis':
         _plot(20, axs[0], caxs[0])
         _plot(21, axs[1], caxs[1])
+    elif setup == 'thesis_intro':
+        _plot(0, axs[0], caxs[0])
+        _plot(18, axs[1], caxs[1])
+        _plot(30, axs[2], caxs[2])
 
-    axs[1].set_xlabel('$x$')
-    axs[0].set_ylabel('$z$')
-    axs[1].set_ylabel('$z$')
+    for ax in axs:
+        ax.set_ylabel('$z$')
+        ax.set_aspect(1)
+    axs[-1].set_xlabel('$x$')
 
     savefig(fig, f'RBC_sol_{setup}', tight_layout=False)
 
 
-def plot_GS_solution():  # pragma: no cover
+def plot_GS_solution(tend=500):  # pragma: no cover
     my_setup_mpl()
 
     fig, axs = plt.subplots(1, 2, figsize=figsize_by_journal(JOURNAL, 1.0, 0.45), sharex=True, sharey=True)
@@ -641,19 +647,19 @@ def plot_GS_solution():  # pragma: no cover
         'Dv': 1e-5,
     }
     P = grayscott_imex_diffusion(**problem_params)
-    Tend = 500
-    im = axs[0].pcolormesh(*P.X, P.u_exact(0)[0], rasterized=True, cmap='binary')
-    im1 = axs[1].pcolormesh(*P.X, P.u_exact(Tend)[0], rasterized=True, cmap='binary')
+    Tend = tend
+    im = axs[0].pcolormesh(*P.X, P.u_exact(0)[1], rasterized=True, cmap='binary')
+    im1 = axs[1].pcolormesh(*P.X, P.u_exact(Tend)[1], rasterized=True, cmap='binary')
 
     fig.colorbar(im, cax=cax[0])
     fig.colorbar(im1, cax=cax[1])
-    axs[0].set_title(r'$u(t=0)$')
-    axs[1].set_title(rf'$u(t={{{Tend}}})$')
+    axs[0].set_title(r'$v(t=0)$')
+    axs[1].set_title(rf'$v(t={{{Tend}}})$')
     for ax in axs:
         ax.set_aspect(1)
         ax.set_xlabel('$x$')
         ax.set_ylabel('$y$')
-    savefig(fig, 'GrayScott_sol')
+    savefig(fig, f'GrayScott_sol{f"_{tend}" if tend != 500 else ""}')
 
 
 def plot_Schroedinger_solution():  # pragma: no cover
@@ -896,6 +902,8 @@ def make_plots_for_notes():  # pragma: no cover
 def make_plots_for_thesis():  # pragma: no cover
     global JOURNAL
     JOURNAL = 'TUHH_thesis'
+    for setup in ['thesis_intro', 'resilience_thesis', 'work_precision']:
+        plot_RBC_solution(setup)
 
     from pySDC.projects.Resilience.RBC import plot_factorizations_over_time
 
@@ -918,9 +926,8 @@ def make_plots_for_thesis():  # pragma: no cover
         all_problems(**all_params, mode=mode)
     all_problems(**{**all_params, 'work_key': 'param'}, mode='compare_strategies')
 
-    plot_GS_solution()
-    for setup in ['resilience_thesis', 'work_precision']:
-        plot_RBC_solution(setup)
+    for tend in [500, 2000]:
+        plot_GS_solution(tend=tend)
     for setup in ['resilience', 'adaptivity']:
         plot_vdp_solution(setup=setup)
 
