@@ -15,8 +15,8 @@ def test_eval_f(nx, nz, direction, spectral_space):
     X, Z = P.X, P.Z
     cos, sin = np.cos, np.sin
 
-    kappa = (P.Rayleigh * P.Prandl) ** (-1 / 2)
-    nu = (P.Rayleigh / P.Prandl) ** (-1 / 2)
+    kappa = (P.Rayleigh * P.Prandtl) ** (-1 / 2)
+    nu = (P.Rayleigh / P.Prandtl) ** (-1 / 2)
 
     if direction == 'x':
         y = sin(X * np.pi)

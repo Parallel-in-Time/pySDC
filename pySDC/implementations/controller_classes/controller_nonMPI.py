@@ -171,6 +171,10 @@ class controller_nonMPI(Controller):
             for hook in self.hooks:
                 hook.post_run(step=S, level_number=0)
 
+        for S in self.MS:
+            for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+                C.post_run_processing(self, S, MS=MS_active)
+
         return uend, self.return_stats()
 
     def restart_block(self, active_slots, time, u0):

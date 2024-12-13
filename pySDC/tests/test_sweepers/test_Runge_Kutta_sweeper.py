@@ -18,10 +18,16 @@ SWEEPER_NAMES = [
     'ARK548L2SAERK',
     'ARK548L2SAESDIRK2',
     'ARK548L2SAERK2',
+    'ARK324L2SAERK',
+    'ARK324L2SAESDIRK',
 ]
 IMEX_SWEEPERS = [
     'ARK54',
     'ARK548L2SA',
+    'IMEXEuler',
+    'ARK32',
+    'ARK2',
+    'ARK3',
 ]
 
 
@@ -61,6 +67,7 @@ def single_run(sweeper_name, dt, lambdas, use_RK_sweeper=True, Tend=None, useGPU
     from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
     from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedError
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+    from pySDC.implementations.sweeper_classes.Runge_Kutta import ButcherTableauEmbedded
 
     level_params = {'dt': dt}
 
@@ -93,13 +100,19 @@ def single_run(sweeper_name, dt, lambdas, use_RK_sweeper=True, Tend=None, useGPU
         'problem_class': problem_class,
         'sweeper_params': sweeper_params,
         'problem_params': problem_params,
-        'convergence_controllers': {EstimateEmbeddedError: {}},
+        'convergence_controllers': {},
     }
 
     controller_params = {
         'logger_level': 40,
         'hook_class': [LogWork, LogGlobalErrorPostRun, LogSolution, LogEmbeddedErrorEstimate],
     }
+
+    if (
+        hasattr(description['sweeper_class'], 'ButcherTableauClass')
+        and description['sweeper_class'].ButcherTableauClass == ButcherTableauEmbedded
+    ):
+        description['convergence_controllers'][EstimateEmbeddedError] = {}
 
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
@@ -108,10 +121,15 @@ def single_run(sweeper_name, dt, lambdas, use_RK_sweeper=True, Tend=None, useGPU
         sweeper = controller.MS[0].levels[0].sweep
         sweeper.QI = rk_sweeper.get_Q_matrix()
         sweeper.coll = rk_sweeper.get_Butcher_tableau()
+        _compute_end_point = type(sweeper).compute_end_point
+        type(sweeper).compute_end_point = rk_sweeper.compute_end_point
 
     prob = controller.MS[0].levels[0].prob
     ic = prob.u_exact(0)
     u_end, stats = controller.run(ic, 0.0, 5 * dt if Tend is None else Tend)
+
+    if not use_RK_sweeper:
+        type(sweeper).compute_end_point = _compute_end_point
 
     return stats, ic, controller
 
@@ -149,6 +167,12 @@ def test_order(sweeper_name, useGPU=False):
         'ARK548L2SAESDIRK2': 6,
         'ARK54': 6,
         'ARK548L2SA': 6,
+        'IMEXEuler': 2,
+        'ARK2': 3,
+        'ARK3': 4,
+        'ARK32': 4,
+        'ARK324L2SAERK': 4,
+        'ARK324L2SAESDIRK': 4,
     }
 
     dt_max = {
@@ -160,6 +184,7 @@ def test_order(sweeper_name, useGPU=False):
         'ARK548L2SAERK2': 1e0,
         'ARK54': 5e-2,
         'ARK548L2SA': 5e-2,
+        'IMEXEuler': 1e-2,
     }
 
     lambdas = [[-1.0e-1 + 0j]]
@@ -233,6 +258,8 @@ def test_stability(sweeper_name, useGPU=False):
         'ARK548L2SAERK': False,
         'ARK548L2SAESDIRK2': True,
         'ARK548L2SAERK2': False,
+        'ARK324L2SAERK': False,
+        'ARK324L2SAESDIRK': True,
     }
 
     re = -np.logspace(-3, 2, 50)
@@ -271,7 +298,7 @@ def test_rhs_evals(sweeper_name, useGPU=False):
     stats, _, controller = single_run(sweeper_name, 1.0, lambdas, Tend=10.0, useGPU=useGPU)
 
     sweep = controller.MS[0].levels[0].sweep
-    num_stages = sweep.coll.num_nodes - sweep.coll.num_solution_stages
+    num_stages = sweep.coll.num_nodes
 
     rhs_evaluations = [me[1] for me in get_sorted(stats, type='work_rhs')]
 
@@ -357,5 +384,7 @@ def test_RK_sweepers_with_GPU(test_name, sweeper_name):
 
 if __name__ == '__main__':
     # test_rhs_evals('ARK54')
-    test_order('CrankNicolson')
+    test_order('ARK2')
+    # test_order('ARK54')
+    # test_sweeper_equivalence('Cash_Karp')
     # test_order('ARK54')

@@ -6,11 +6,13 @@ import numpy as np
 def get_config(args):
     name = args['config']
     if name[:2] == 'GS':
-        from pySDC.projects.GPU.configs.GS_configs import get_config
-
-        return get_config(args)
+        from pySDC.projects.GPU.configs.GS_configs import get_config as _get_config
+    elif name[:3] == 'RBC':
+        from pySDC.projects.GPU.configs.RBC_configs import get_config as _get_config
     else:
         raise NotImplementedError(f'There is no configuration called {name!r}!')
+
+    return _get_config(args)
 
 
 def get_comms(n_procs_list, comm_world=None, _comm=None, _tot_rank=0, _rank=None, useGPU=False):
@@ -56,6 +58,7 @@ def get_comms(n_procs_list, comm_world=None, _comm=None, _tot_rank=0, _rank=None
 class Config(object):
     sweeper_type = None
     Tend = None
+    base_path = './'
 
     def __init__(self, args, comm_world=None):
         from mpi4py import MPI
@@ -66,7 +69,7 @@ class Config(object):
         if args['mode'] == 'run':
             self.comms = get_comms(n_procs_list=self.n_procs_list, useGPU=args['useGPU'], comm_world=self.comm_world)
         else:
-            self.comms = [self.comm_world, self.comm_world, self.comm_world]
+            self.comms = [MPI.COMM_SELF, MPI.COMM_SELF, MPI.COMM_SELF]
         self.ranks = [me.rank for me in self.comms]
 
     def get_description(self, *args, MPIsweeper=False, useGPU=False, **kwargs):
@@ -88,10 +91,12 @@ class Config(object):
 
     def get_controller_params(self, *args, logger_level=15, **kwargs):
         from pySDC.implementations.hooks.log_work import LogWork
+        from pySDC.implementations.hooks.log_step_size import LogStepSize
+        from pySDC.implementations.hooks.log_restarts import LogRestarts
 
         controller_params = {}
         controller_params['logger_level'] = logger_level if self.comm_world.rank == 0 else 40
-        controller_params['hook_class'] = [LogWork]
+        controller_params['hook_class'] = [LogWork, LogStepSize, LogRestarts]
         logToFile = self.get_LogToFile()
         if logToFile:
             controller_params['hook_class'] += [logToFile]
@@ -111,6 +116,9 @@ class Config(object):
             raise NotImplementedError(f'Don\'t know the sweeper for {self.sweeper_type=}')
 
         return sweeper
+
+    def prepare_caches(self, prob):
+        pass
 
     def get_path(self, *args, ranks=None, **kwargs):
         ranks = self.ranks if ranks is None else ranks
@@ -145,15 +153,6 @@ class Config(object):
         else:
             return P.u_exact(t=0), 0
 
-    def get_previous_stats(self, P, restart_idx):
-        if restart_idx == 0:
-            return {}
-        else:
-            hook = self.get_LogToFile()
-            path = LogStats.get_stats_path(hook, counter_offset=0)
-            with open(path, 'rb') as file:
-                return pickle.load(file)
-
     def get_LogToFile(self):
         return None
 
@@ -161,8 +160,26 @@ class Config(object):
 class LogStats(ConvergenceController):
 
     @staticmethod
-    def get_stats_path(hook, counter_offset=-1):
-        return f'{hook.path}/{hook.file_name}_{hook.format_index(hook.counter+counter_offset)}-stats.pickle'
+    def get_stats_path(hook, counter_offset=-1, index=None):
+        index = hook.counter + counter_offset if index is None else index
+        return f'{hook.path}/{hook.file_name}_{hook.format_index(index)}-stats.pickle'
+
+    def merge_all_stats(self, controller):
+        hook = self.params.hook
+
+        stats = {}
+        for i in range(hook.counter):
+            with open(self.get_stats_path(hook, index=i), 'rb') as file:
+                _stats = pickle.load(file)
+                stats = {**stats, **_stats}
+
+        stats = {**stats, **controller.return_stats()}
+        return stats
+
+    def reset_stats(self, controller):
+        for hook in controller.hooks:
+            hook.reset_stats()
+        self.logger.debug('Reset stats')
 
     def setup(self, controller, params, *args, **kwargs):
         params['control_order'] = 999
@@ -181,11 +198,27 @@ class LogStats(ConvergenceController):
         for _hook in controller.hooks:
             _hook.post_step(S, 0)
 
-        if self.counter < hook.counter:
-            path = self.get_stats_path(hook)
+        P = S.levels[0].prob
+        skip_logging = False
+        if hasattr(P, 'comm'):
+            if P.comm.rank > 0:
+                skip_logging = True
+                return None
+
+        while self.counter < hook.counter:
+            path = self.get_stats_path(hook, index=self.counter)
             stats = controller.return_stats()
-            if hook.logging_condition(S.levels[0]):
+            if hook.logging_condition(S.levels[0]) and not skip_logging:
                 with open(path, 'wb') as file:
                     pickle.dump(stats, file)
                     self.log(f'Stored stats in {path!r}', S)
+                self.reset_stats(controller)
             self.counter = hook.counter
+
+    def post_run_processing(self, controller, *args, **kwargs):
+        stats = self.merge_all_stats(controller)
+
+        def return_stats():
+            return stats
+
+        controller.return_stats = return_stats

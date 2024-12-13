@@ -43,14 +43,13 @@ class imex_1st_order_MPI(SweeperMPI, imex_1st_order):
         Returns:
             None
         """
-
         L = self.level
         P = L.prob
 
         # only if the level has been touched before
         assert L.status.unlocked
 
-        # get number of collocation nodes for easier access
+        self.updateVariableCoeffs(L.status.sweep)
 
         # gather all terms which are known already (e.g. from the previous iteration)
         # this corresponds to u0 + QF(u^k) - QdF(u^k) + tau
@@ -92,7 +91,6 @@ class imex_1st_order_MPI(SweeperMPI, imex_1st_order):
 
         L = self.level
         P = L.prob
-        L.uend = P.dtype_u(P.init, val=0.0)
 
         # check if Mth node is equal to right point and do_coll_update is false, perform a simple copy
         if self.coll.right_is_node and not self.params.do_coll_update:

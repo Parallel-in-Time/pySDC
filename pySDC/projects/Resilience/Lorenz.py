@@ -49,6 +49,7 @@ def run_Lorenz(
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'IE'
+    sweeper_params['initial_guess'] = 'copy'
 
     problem_params = {
         'newton_tol': 1e-9,

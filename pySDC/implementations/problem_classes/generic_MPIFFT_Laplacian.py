@@ -1,18 +1,17 @@
 import numpy as np
 from mpi4py import MPI
-from mpi4py_fft import PFFT
+from mpi4py_fft import PFFT, newDistArray
 
 from pySDC.core.errors import ProblemError
 from pySDC.core.problem import Problem, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
-
-from mpi4py_fft import newDistArray
 
 
 class IMEX_Laplacian_MPIFFT(Problem):
     r"""
     Generic base class for IMEX problems using a spectral method to solve the Laplacian implicitly and a possible rest
     explicitly. The FFTs are done with``mpi4py-fft`` [1]_.
+    Works in two and three dimensions.
 
     Parameters
     ----------
@@ -86,6 +85,7 @@ class IMEX_Laplacian_MPIFFT(Problem):
             collapse=True,
             backend=self.fft_backend,
             comm_backend=self.fft_comm_backend,
+            grid=(-1,),
         )
 
         # get test data to figure out type and dimensions
@@ -99,14 +99,24 @@ class IMEX_Laplacian_MPIFFT(Problem):
             'nvars', 'spectral', 'L', 'alpha', 'comm', 'x0', 'useGPU', localVars=locals(), readOnly=True
         )
 
-        # get local mesh
+        self.getLocalGrid()
+        self.getLaplacian()
+
+        # Need this for diagnostics
+        self.dx = self.L[0] / nvars[0]
+        self.dy = self.L[1] / nvars[1]
+
+        # work counters
+        self.work_counters['rhs'] = WorkCounter()
+
+    def getLocalGrid(self):
         X = list(self.xp.ogrid[self.fft.local_slice(False)])
         N = self.fft.global_shape()
         for i in range(len(N)):
-            X[i] = x0 + (X[i] * L[i] / N[i])
+            X[i] = self.x0 + (X[i] * self.L[i] / N[i])
         self.X = [self.xp.broadcast_to(x, self.fft.shape(False)) for x in X]
 
-        # get local wavenumbers and Laplace operator
+    def getLaplacian(self):
         s = self.fft.local_slice()
         N = self.fft.global_shape()
         k = [self.xp.fft.fftfreq(n, 1.0 / n).astype(int) for n in N]
@@ -117,14 +127,7 @@ class IMEX_Laplacian_MPIFFT(Problem):
             Ks[i] = (Ks[i] * Lp[i]).astype(float)
         K = [self.xp.broadcast_to(k, self.fft.shape(True)) for k in Ks]
         K = self.xp.array(K).astype(float)
-        self.K2 = self.xp.sum(K * K, 0, dtype=float)  # Laplacian in spectral space
-
-        # Need this for diagnostics
-        self.dx = self.L[0] / nvars[0]
-        self.dy = self.L[1] / nvars[1]
-
-        # work counters
-        self.work_counters['rhs'] = WorkCounter()
+        self.K2 = self.xp.sum(K * K, 0, dtype=float)
 
     def eval_f(self, u, t):
         """

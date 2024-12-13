@@ -10,4 +10,5 @@ module load Python
 module load FFTW
 module load mpi4py
 module load FFmpeg/.6.0
-module load SciPy-Stack
+# module load SciPy-Stack
+module load texlive

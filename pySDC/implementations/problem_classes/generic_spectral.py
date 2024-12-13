@@ -28,21 +28,26 @@ class GenericSpectralLinear(Problem):
         Pr (sparse matrix): Right preconditioner
     """
 
-    @classmethod
-    def setup_GPU(cls):
+    def setup_GPU(self):
         """switch to GPU modules"""
         import cupy as cp
         from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh
         from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
-        cls.dtype_u = cupy_mesh
+        self.dtype_u = cupy_mesh
 
         GPU_versions = {
             mesh: cupy_mesh,
             imex_mesh: imex_cupy_mesh,
         }
 
-        cls.dtype_f = GPU_versions[cls.dtype_f]
+        self.dtype_f = GPU_versions[self.dtype_f]
+
+        if self.comm is not None:
+            from pySDC.helpers.NCCL_communicator import NCCLComm
+
+            if not isinstance(self.comm, NCCLComm):
+                self.__dict__['comm'] = NCCLComm(self.comm)
 
     def __init__(
         self,
@@ -94,6 +99,9 @@ class GenericSpectralLinear(Problem):
 
         if useGPU:
             self.setup_GPU()
+            if self.solver_args is not None:
+                if 'rtol' in self.solver_args.keys():
+                    self.solver_args['tol'] = self.solver_args.pop('rtol')
 
         for base in bases:
             self.spectral.add_axis(**base)
@@ -218,14 +226,21 @@ class GenericSpectralLinear(Problem):
 
         if self.spectral_space:
             rhs_hat = rhs.copy()
+            if u0 is not None:
+                u0_hat = self.Pr.T @ u0.copy().flatten()
         else:
             rhs_hat = self.spectral.transform(rhs)
+            if u0 is not None:
+                u0_hat = self.Pr.T @ self.spectral.transform(u0).flatten()
+
+        if self.useGPU:
+            self.xp.cuda.Device().synchronize()
 
         rhs_hat = (self.M @ rhs_hat.flatten()).reshape(rhs_hat.shape)
         rhs_hat = self.spectral.put_BCs_in_rhs_hat(rhs_hat)
         rhs_hat = self.Pl @ rhs_hat.flatten()
 
-        if dt not in self.cached_factorizations.keys():
+        if dt not in self.cached_factorizations.keys() or not self.solver_type.lower() == 'cached_direct':
             A = self.M + dt * self.L
             A = self.Pl @ self.spectral.put_BCs_in_matrix(A) @ self.Pr
 
@@ -255,24 +270,57 @@ class GenericSpectralLinear(Problem):
 
         elif self.solver_type.lower() == 'direct':
             _sol_hat = sp.linalg.spsolve(A, rhs_hat)
+        elif self.solver_type.lower() == 'lsqr':
+            lsqr = sp.linalg.lsqr(
+                A,
+                rhs_hat,
+                x0=u0_hat,
+                **self.solver_args,
+            )
+            _sol_hat = lsqr[0]
         elif self.solver_type.lower() == 'gmres':
             _sol_hat, _ = sp.linalg.gmres(
                 A,
                 rhs_hat,
-                x0=u0.flatten(),
+                x0=u0_hat,
                 **self.solver_args,
                 callback=self.work_counters[self.solver_type],
-                callback_type='legacy',
+                callback_type='pr_norm',
+            )
+        elif self.solver_type.lower() == 'gmres+ilu':
+            linalg = self.spectral.linalg
+
+            if dt not in self.cached_factorizations.keys():
+                if len(self.cached_factorizations) >= self.max_cached_factorizations:
+                    to_evict = list(self.cached_factorizations.keys())[0]
+                    self.cached_factorizations.pop(to_evict)
+                    self.logger.debug(f'Evicted matrix factorization for {to_evict=:.6f} from cache')
+                iLU = linalg.spilu(A, drop_tol=dt * 1e-4, fill_factor=100)
+                self.cached_factorizations[dt] = linalg.LinearOperator(A.shape, iLU.solve)
+                self.logger.debug(f'Cached matrix factorization for {dt=:.6f}')
+                self.work_counters['factorizations']()
+
+            _sol_hat, _ = linalg.gmres(
+                A,
+                rhs_hat,
+                x0=u0_hat,
+                **self.solver_args,
+                callback=self.work_counters[self.solver_type],
+                callback_type='pr_norm',
+                M=self.cached_factorizations[dt],
             )
         elif self.solver_type.lower() == 'cg':
             _sol_hat, _ = sp.linalg.cg(
-                A, rhs_hat, x0=u0.flatten(), **self.solver_args, callback=self.work_counters[self.solver_type]
+                A, rhs_hat, x0=u0_hat, **self.solver_args, callback=self.work_counters[self.solver_type]
             )
         else:
-            raise NotImplementedError(f'Solver {self.solver_type:!} not implemented in {type(self).__name__}!')
+            raise NotImplementedError(f'Solver {self.solver_type=} not implemented in {type(self).__name__}!')
 
         sol_hat = self.spectral.u_init_forward
         sol_hat[...] = (self.Pr @ _sol_hat).reshape(sol_hat.shape)
+
+        if self.useGPU:
+            self.xp.cuda.Device().synchronize()
 
         if self.spectral_space:
             return sol_hat
@@ -319,7 +367,6 @@ def compute_residual_DAE(self, stage=''):
             res[m] += L.tau[m]
         # use abs function from data type here
         res_norm.append(abs(res[m]))
-        # print(m, [abs(me) for me in res[m]], [abs(me) for me in L.u[0] - L.u[m + 1]])
 
     # find maximal residual over the nodes
     if L.params.residual_type == 'full_abs':
