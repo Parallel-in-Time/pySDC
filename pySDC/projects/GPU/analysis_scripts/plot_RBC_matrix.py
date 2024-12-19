@@ -61,6 +61,36 @@ def plot_ultraspherical():
     plt.show()
 
 
+def plot_DCT():
+    fig, axs = plt.subplots(1, 3, figsize=figsize_by_journal('TUHH_thesis', 1, 0.28), sharey=True)
+
+    N = 8
+    color = 'black'
+
+    x = np.linspace(0, 3, N)
+    y = x**3 - 4 * x**2
+    axs[0].plot(y, marker='o', color=color)
+
+    y_m = np.append(y, y[::-1])
+    axs[1].scatter(np.arange(2 * N)[::2], y_m[::2], marker='<', color=color)
+    axs[1].scatter(np.arange(2 * N)[1::2], y_m[1::2], marker='>', color=color)
+    axs[1].plot(np.arange(2 * N), y_m, color=color)
+
+    v = y_m[::2]
+    axs[2].plot(np.arange(N), v, color=color, marker='x')
+
+    axs[0].set_title('original')
+    axs[1].set_title('mirrored')
+    axs[2].set_title('periodically reordered')
+
+    for ax in axs:
+        # ax.set_xlabel(r'$n$')
+        ax.set_yticks([])
+    fig.savefig('plots/DCT_via_FFT.pdf', bbox_inches='tight', dpi=300)
+
+
 if __name__ == '__main__':
     setup_mpl()
-    plot_ultraspherical()
+    plot_DCT()
+    # plot_ultraspherical()
+    plt.show()
