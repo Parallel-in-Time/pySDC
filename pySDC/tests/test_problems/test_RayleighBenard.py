@@ -286,10 +286,36 @@ def test_Nyquist_mode_elimination():
     assert np.allclose(u[:, Nyquist_mode_index, :], 0)
 
 
+@pytest.mark.mpi4py
+def test_apply_BCs():
+    from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
+    import numpy as np
+
+    BCs = {
+        'u_top': np.random.rand(),
+        'u_bottom': np.random.rand(),
+        'v_top': np.random.rand(),
+        'v_bottom': np.random.rand(),
+        'T_top': np.random.rand(),
+        'T_bottom': np.random.rand(),
+    }
+    P = RayleighBenard(nx=5, nz=2**2, BCs=BCs)
+
+    u_in = P.u_init
+    u_in[...] = np.random.rand(*u_in.shape)
+    u_in_hat = P.transform(u_in)
+
+    u_hat = P.apply_BCs(u_in_hat)
+    u = P.itransform(u_hat)
+
+    P.check_BCs(u)
+
+
 if __name__ == '__main__':
     # test_eval_f(2**0, 2**2, 'z', True)
     # test_Poisson_problem(1, 'T')
-    test_Poisson_problem_v()
+    # test_Poisson_problem_v()
+    test_apply_BCs()
     # test_Nusselt_numbers(1)
     # test_buoyancy_computation()
     # test_viscous_dissipation()
