@@ -152,7 +152,7 @@ class RayleighBenard(GenericSpectralLinear):
         )
         self.add_BC(component='T', equation='T', axis=1, x=-1, v=self.BCs['T_bottom'], kind='Dirichlet', line=-1)
         self.add_BC(component='T', equation='T', axis=1, x=1, v=self.BCs['T_top'], kind='Dirichlet', line=-2)
-        self.add_BC(component='v', equation='v', axis=1, x=1, v=self.BCs['v_bottom'], kind='Dirichlet', line=-1)
+        self.add_BC(component='v', equation='v', axis=1, x=1, v=self.BCs['v_top'], kind='Dirichlet', line=-1)
         self.add_BC(component='v', equation='v', axis=1, x=-1, v=self.BCs['v_bottom'], kind='Dirichlet', line=-2)
         self.remove_BC(component='v', equation='v', axis=1, x=-1, kind='Dirichlet', line=-2, scalar=True)
         self.add_BC(component='u', equation='u', axis=1, v=self.BCs['u_top'], x=1, kind='Dirichlet', line=-2)
@@ -256,6 +256,45 @@ class RayleighBenard(GenericSpectralLinear):
             return me_hat
         else:
             return me
+
+    def apply_BCs(self, sol):
+        """
+        Enforce the Dirichlet BCs at the top and bottom for arbitrary solution.
+        The function modifies the last two modes of u, v, and T in order to achieve this.
+        Note that the pressure is not modified here and the Nyquist mode is not altered either.
+
+        Args:
+            sol: Some solution that does not need to enforce boundary conditions
+
+        Returns:
+            Modified version of the solution that satisfies Dirichlet BCs.
+        """
+        ultraspherical = self.spectral.axes[-1]
+
+        if self.spectral_space:
+            sol_half_hat = self.itransform(sol, axes=(-2,))
+        else:
+            sol_half_hat = self.transform(sol, axes=(-1,))
+
+        BC_bottom = ultraspherical.get_BC(x=-1, kind='dirichlet')
+        BC_top = ultraspherical.get_BC(x=1, kind='dirichlet')
+
+        M = np.array([BC_top[-2:], BC_bottom[-2:]])
+        M_I = np.linalg.inv(M)
+        rhs = np.empty((2, self.nx), dtype=complex)
+        for component in ['u', 'v', 'T']:
+            i = self.index(component)
+            rhs[0] = self.BCs[f'{component}_top'] - self.xp.sum(sol_half_hat[i, :, :-2] * BC_top[:-2], axis=1)
+            rhs[1] = self.BCs[f'{component}_bottom'] - self.xp.sum(sol_half_hat[i, :, :-2] * BC_bottom[:-2], axis=1)
+
+            BC_vals = M_I @ rhs
+
+            sol_half_hat[i, :, -2:] = BC_vals.T
+
+        if self.spectral_space:
+            return self.transform(sol_half_hat, axes=(-2,))
+        else:
+            return self.itransform(sol_half_hat, axes=(-1,))
 
     def get_fig(self):  # pragma: no cover
         """
