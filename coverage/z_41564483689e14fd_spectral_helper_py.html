@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">773 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">711<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">62<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">713<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">60<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">31<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_41564483689e14fd_stats_helper_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.6.7">coverage.py v7.6.7</a>,
-            created at 2024-11-16 14:51 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.6.9">coverage.py v7.6.9</a>,
+            created at 2024-12-20 13:04 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -1244,8 +1244,8 @@
     <p class="pln"><span class="n"><a id="t1162" href="#t1162">1162</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t1163" href="#t1163">1163</a></span><span class="t">                    <span class="key">if</span> <span class="nam">axis</span> <span class="op">==</span> <span class="num">0</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t1164" href="#t1164">1164</a></span><span class="t">                        <span class="nam">get</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">axes</span><span class="op">[</span><span class="nam">axis</span><span class="op">]</span><span class="op">.</span><span class="nam">get_BC</span><span class="op">(</span><span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span> <span class="op">@</span> <span class="nam">u_hat</span><span class="op">[</span><span class="nam">self</span><span class="op">.</span><span class="nam">index</span><span class="op">(</span><span class="nam">BC</span><span class="op">[</span><span class="str">'component'</span><span class="op">]</span><span class="op">)</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t1165" href="#t1165">1165</a></span><span class="t">                    <span class="key">elif</span> <span class="nam">axis</span> <span class="op">==</span> <span class="num">1</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t1166" href="#t1166">1166</a></span><span class="t">                        <span class="nam">get</span> <span class="op">=</span> <span class="nam">u_hat</span><span class="op">[</span><span class="nam">self</span><span class="op">.</span><span class="nam">index</span><span class="op">(</span><span class="nam">BC</span><span class="op">[</span><span class="str">'component'</span><span class="op">]</span><span class="op">)</span><span class="op">]</span> <span class="op">@</span> <span class="nam">self</span><span class="op">.</span><span class="nam">axes</span><span class="op">[</span><span class="nam">axis</span><span class="op">]</span><span class="op">.</span><span class="nam">get_BC</span><span class="op">(</span><span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t1165" href="#t1165">1165</a></span><span class="t">                    <span class="key">elif</span> <span class="nam">axis</span> <span class="op">==</span> <span class="num">1</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t1166" href="#t1166">1166</a></span><span class="t">                        <span class="nam">get</span> <span class="op">=</span> <span class="nam">u_hat</span><span class="op">[</span><span class="nam">self</span><span class="op">.</span><span class="nam">index</span><span class="op">(</span><span class="nam">BC</span><span class="op">[</span><span class="str">'component'</span><span class="op">]</span><span class="op">)</span><span class="op">]</span> <span class="op">@</span> <span class="nam">self</span><span class="op">.</span><span class="nam">axes</span><span class="op">[</span><span class="nam">axis</span><span class="op">]</span><span class="op">.</span><span class="nam">get_BC</span><span class="op">(</span><span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t1167" href="#t1167">1167</a></span><span class="t">                    <span class="nam">want</span> <span class="op">=</span> <span class="nam">BC</span><span class="op">[</span><span class="str">'v'</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t1168" href="#t1168">1168</a></span><span class="t">                    <span class="key">assert</span> <span class="nam">self</span><span class="op">.</span><span class="nam">xp</span><span class="op">.</span><span class="nam">allclose</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t1169" href="#t1169">1169</a></span><span class="t">                        <span class="nam">get</span><span class="op">,</span> <span class="nam">want</span>&nbsp;</span><span class="r"></span></p>
@@ -2127,8 +2127,8 @@
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_41564483689e14fd_stats_helper_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.6.7">coverage.py v7.6.7</a>,
-            created at 2024-11-16 14:51 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.6.9">coverage.py v7.6.9</a>,
+            created at 2024-12-20 13:04 +0000
         </p>
     </div>
 </footer>

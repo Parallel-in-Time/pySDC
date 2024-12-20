@@ -222,6 +222,22 @@ facilitate the Dirichlet BCs.</p>
 </dd>
 </dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.apply_BCs">
+<span class="sig-name descname"><span class="pre">apply_BCs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.apply_BCs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.apply_BCs" title="Link to this definition">¶</a></dt>
+<dd><p>Enforce the Dirichlet BCs at the top and bottom for arbitrary solution.
+The function modifies the last two modes of u, v, and T in order to achieve this.
+Note that the pressure is not modified here and the Nyquist mode is not altered either.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sol</strong> – Some solution that does not need to enforce boundary conditions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Modified version of the solution that satisfies Dirichlet BCs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.compute_Nusselt_numbers">
 <span class="sig-name descname"><span class="pre">compute_Nusselt_numbers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.compute_Nusselt_numbers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_Nusselt_numbers" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the various versions of the Nusselt number. This reflects the type of heat transport.
@@ -358,6 +374,7 @@ Computing the Nusselt number at various places can be used to check the code.</p
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard"><code class="docutils literal notranslate"><span class="pre">RayleighBenard</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.apply_BCs"><code class="docutils literal notranslate"><span class="pre">apply_BCs()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_Nusselt_numbers"><code class="docutils literal notranslate"><span class="pre">compute_Nusselt_numbers()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_buoyancy_generation"><code class="docutils literal notranslate"><span class="pre">compute_buoyancy_generation()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_viscous_dissipation"><code class="docutils literal notranslate"><span class="pre">compute_viscous_dissipation()</span></code></a></li>
