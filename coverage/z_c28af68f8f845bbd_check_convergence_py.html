@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_c28af68f8f845bbd_check_iteration_estimator_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.9">coverage.py v7.6.9</a>,
-            created at 2024-12-20 13:04 +0000
+            created at 2024-12-20 14:51 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -155,7 +155,7 @@
     <p class="pln"><span class="n"><a id="t73" href="#t73">73</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t74" href="#t74">74</a></span><span class="t">        <span class="com"># get residual and check against prescribed tolerance (plus check number of iterations)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t75" href="#t75">75</a></span><span class="t">        <span class="nam">iter_converged</span> <span class="op">=</span> <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">iter</span> <span class="op">>=</span> <span class="nam">S</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">maxiter</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t76" href="#t76">76</a></span><span class="t">        <span class="nam">res_converged</span> <span class="op">=</span> <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">residual</span> <span class="op">&lt;=</span> <span class="nam">L</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">restol</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t76" href="#t76">76</a></span><span class="t">        <span class="nam">res_converged</span> <span class="op">=</span> <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">residual</span> <span class="op">&lt;=</span> <span class="nam">L</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">restol</span> <span class="key">and</span> <span class="op">(</span><span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">iter</span> <span class="op">></span> <span class="num">0</span> <span class="key">or</span> <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">sweep</span> <span class="op">></span> <span class="num">0</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t77" href="#t77">77</a></span><span class="t">        <span class="nam">e_tol_converged</span> <span class="op">=</span> <span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t78" href="#t78">78</a></span><span class="t">            <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">increment</span> <span class="op">&lt;</span> <span class="nam">L</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">e_tol</span> <span class="key">if</span> <span class="op">(</span><span class="nam">L</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">'e_tol'</span><span class="op">)</span> <span class="key">and</span> <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">'increment'</span><span class="op">)</span><span class="op">)</span> <span class="key">else</span> <span class="key">False</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t79" href="#t79">79</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -249,7 +249,7 @@
             <a class="nav" href="z_c28af68f8f845bbd_check_iteration_estimator_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.9">coverage.py v7.6.9</a>,
-            created at 2024-12-20 13:04 +0000
+            created at 2024-12-20 14:51 +0000
         </p>
     </div>
 </footer>
