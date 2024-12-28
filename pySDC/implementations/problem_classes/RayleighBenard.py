@@ -131,8 +131,10 @@ class RayleighBenard(GenericSpectralLinear):
         self.Dz = S1 @ Dz
         self.Dzz = S2 @ Dzz
 
-        kappa = (Rayleigh * Prandtl) ** (-1 / 2.0)
-        nu = (Rayleigh / Prandtl) ** (-1 / 2.0)
+        # compute rescaled Rayleigh number to extract viscosity and thermal diffusivity
+        Ra = Rayleigh / (abs(BCs['T_top'] - BCs['T_bottom']) * self.axes[1].L ** 3)
+        kappa = (Ra * Prandtl) ** (-1 / 2.0)
+        nu = (Ra / Prandtl) ** (-1 / 2.0)
 
         # construct operators
         L_lhs = {

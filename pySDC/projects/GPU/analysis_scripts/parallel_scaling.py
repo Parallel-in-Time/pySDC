@@ -134,6 +134,7 @@ class ScalingConfig(object):
                         timing_step = get_sorted(stats, type='timing_step')
 
                     t_mean = np.mean([me[1] for me in timing_step])
+                    t_min = np.min([me[1] for me in timing_step][1:])
 
                     if quantity == 'throughput':
                         timings[np.prod(procs) / self.tasks_per_node] = experiment.res**self.ndim / t_mean
@@ -147,6 +148,8 @@ class ScalingConfig(object):
                         timings[np.prod(procs) / self.tasks_per_node] = t_mean
                     elif quantity == 'time_per_task':
                         timings[np.prod(procs)] = t_mean
+                    elif quantity == 'min_time_per_task':
+                        timings[np.prod(procs)] = t_min
                     else:
                         raise NotImplementedError
                 except (FileNotFoundError, ValueError):
@@ -167,6 +170,7 @@ class ScalingConfig(object):
             'throughput_per_task': 'throughput / DoF/s',
             'time': r'$t_\mathrm{step}$ / s',
             'time_per_task': r'$t_\mathrm{step}$ / s',
+            'min_time_per_task': r'minimal $t_\mathrm{step}$ / s',
             'efficiency': 'efficiency / DoF/s/task',
         }
         ax.set_ylabel(labels[quantity])
@@ -358,6 +362,7 @@ def plot_scalings(problem, **kwargs):  # pragma: no cover
         ('RBC', 'throughput'): {'x': [1 / 10, 64], 'y': [2e4, 2e4 * 640]},
         ('RBC', 'time'): {'x': [1 / 10, 64], 'y': [60, 60 / 640]},
         ('RBC', 'time_per_task'): {'x': [1, 640], 'y': [60, 60 / 640]},
+        ('RBC', 'min_time_per_task'): {'x': [1, 640], 'y': [60, 60 / 640]},
         ('RBC', 'throughput_per_task'): {'x': [1 / 1, 640], 'y': [2e4, 2e4 * 640]},
     }
 
@@ -373,7 +378,7 @@ def plot_scalings(problem, **kwargs):  # pragma: no cover
     fig.savefig(path, bbox_inches='tight')
     print(f'Saved {path!r}', flush=True)
 
-    for quantity in ['time', 'throughput', 'time_per_task', 'throughput_per_task'][::-1]:
+    for quantity in ['time', 'throughput', 'time_per_task', 'throughput_per_task', 'min_time_per_task'][::-1]:
         fig, ax = plt.subplots(figsize=figsize_by_journal('TUHH_thesis', 1, 0.6))
         for config in configs:
             config.plot_scaling_test(ax=ax, quantity=quantity)
