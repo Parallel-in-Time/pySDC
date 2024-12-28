@@ -35,7 +35,7 @@ class Sweeper(object):
 
 
     All possible QDelta matrix coefficients are generated with
-    `qmat <https://qmat.readthedocs.io/en/latest/autoapi/qmat/qdelta/index.html>`_,
+    `qmat <https://qmat.readthedocs.io/en/latest/api/qmat/qdelta/index.html>`_,
     check it out to see all available coefficient types.
 
     Attributes:
