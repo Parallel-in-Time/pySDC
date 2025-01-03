@@ -11,6 +11,7 @@ from collections import deque
 # Dedalus import
 from dedalus.core.system import CoeffSystem
 from dedalus.tools.array import apply_sparse, csr_matvecs
+from mpi4py import MPI
 
 # QMat imports
 from qmat.qcoeff.collocation import Collocation
@@ -205,11 +206,7 @@ class IMEXSDCCore(object):
     # -------------------------------------------------------------------------
     @classmethod
     def getMaxOrder(cls):
-        # TODO : adapt to non-LEGENDRE node distributions
-        M = len(cls.nodes)
-        return 2*M if cls.quadType == 'GAUSS' else \
-            2*M-1 if cls.quadType.startswith('RADAU') else \
-            2*M-2  # LOBATTO
+        return cls.coll.order
 
     @classmethod
     def getInfos(cls):
@@ -378,7 +375,6 @@ class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
         wall_time : float
             Current wall time.
         """
-
         solver = self.solver
         # Evaluate non linear term on current state
         t0 = solver.sim_time
@@ -614,6 +610,7 @@ class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
                     continue
 
             tEval = t0+dt*tau[m]
+
             # In case NN is used for initial guess (last sweep only)
             if self.initSweep == "NN" and k == (self.nSweeps-1):
                 # => evaluate current state with NN to be used
@@ -719,3 +716,137 @@ class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
         self.solver.sim_time += dt
         self.firstEval = True
         self.firstStep = False
+
+def initSpaceTimeMPI(nProcSpace=None, nProcTime=None, groupTime=False):
+
+    gComm = MPI.COMM_WORLD
+    gRank = gComm.Get_rank()
+    gSize = gComm.Get_size()
+
+    if (nProcTime is None) and (nProcSpace is None):
+        nProcTime = 1
+        nProcSpace = gSize // nProcTime
+    elif nProcSpace is None:
+        nProcSpace = gSize // nProcTime
+    elif nProcTime is None:
+        nProcTime = gSize // nProcSpace
+
+    if gRank == 0:
+        print("Starting space-time MPI initialization ...")
+
+    # Check for inadequate decomposition
+    if (gSize != nProcSpace*nProcTime) and (gSize != 1):
+        raise ValueError(f'product of nps ({nProcSpace}) with npt ({nProcTime}) is not '
+                         f'equal to the total number of processes ({gSize})')
+
+    # Information message
+    if gSize == 1:
+        print(" -- no parallelisation at all")
+        return gComm, None, None
+    else:
+        if nProcSpace != 1:
+            if gRank == 0:
+                print(" -- space parallelisation activated : {} mpi processes"
+                      .format(nProcSpace))
+        else:
+            if gRank == 0:
+                print(" -- no space parallelisation")
+        if nProcTime != 1:
+            if gRank == 0:
+                print(" -- time parallelisation activated : {} mpi processes"
+                      .format(nProcTime))
+        else:
+            if gRank == 0:
+                print(" -- no time parallelisation")
+        if gRank == 0:
+            print(' -- finished MPI initialization')
+
+        # MPI decomposition -- space are close
+        if groupTime:
+            sColor = gRank % nProcTime
+            sComm = gComm.Split(sColor, gRank)
+            gComm.Barrier()
+            tColor = (gRank - gRank % nProcTime) / nProcTime
+            tComm = gComm.Split(tColor, gRank)
+            gComm.Barrier()
+        else:
+            tColor = gRank % nProcSpace
+            tComm = gComm.Split(tColor, gRank)
+            gComm.Barrier()
+            sColor = (gRank - gRank % nProcSpace) / nProcSpace
+            sComm = gComm.Split(sColor, gRank)
+            gComm.Barrier()
+            
+        return gComm, sComm, tComm
+
+
+class SDCIMEX_MPI(SpectralDeferredCorrectionIMEX):
+
+    comm:MPI.Intracomm = None
+
+    @classmethod
+    def initSpaceTimeComms(cls, nProcSpace=None, groupTime=False):
+        gComm, sComm, cls.comm = initSpaceTimeMPI(nProcSpace, cls.getM(), groupTime)
+        return gComm, sComm, cls.comm
+    
+    @property
+    def rank(self):
+        return self.comm.Get_rank()
+
+    def __init__(self, solver):
+
+        assert isinstance(self.comm, MPI.Intracomm), "comm is not a MPI communicator"
+
+        # Store class attributes as instance attributes
+        self.infos = self.getInfos()
+
+        # Store solver as attribute
+        self.solver = solver
+        self.subproblems = [sp for sp in solver.subproblems if sp.size]
+        self.stages = self.M    # need this for solver.log_stats()
+
+        # Create coefficient systems for steps history
+        c = lambda: CoeffSystem(solver.subproblems, dtype=solver.dtype)
+        self.MX0, self.RHS = c(), c()
+        self.LX = deque([c() for _ in range(2)])
+        self.F = deque([c() for _ in range(2)])
+
+        # Attributes
+        self.axpy = blas.get_blas_funcs('axpy', dtype=solver.dtype)
+        self.dt = None
+        
+        self.firstEval = (self.rank == 0)
+        self.firstStep = True
+
+
+    def _updateLHS(self, dt, init=False):
+        """Update LHS and LHS solvers for each subproblem
+
+        Parameters
+        ----------
+        dt : float
+            Time-step for the updated LHS.
+        init : bool, optional
+            Wether or not initialize the LHS_solvers attribute for each
+            subproblem. The default is False.
+        """
+        # Attribute references
+        qI = self.QDeltaI
+        solver = self.solver
+
+        # Update LHS and LHS solvers for each subproblems
+        for sp in solver.subproblems:
+            if init:
+                # Potentially instantiate list of solver (ony first time step)
+                sp.LHS_solvers = [[None for _ in range(self.M)] for _ in range(self.nSweeps)]
+            for k in range(self.nSweeps):
+                m = self.rank
+                if solver.store_expanded_matrices:
+                    raise NotImplementedError("code correction required")
+                    np.copyto(sp.LHS.data, sp.M_exp.data)
+                    self.axpy(a=dt*qI[k, m, m], x=sp.L_exp.data, y=sp.LHS.data)
+                else:
+                    sp.LHS = (sp.M_min + dt*qI[k, m, m]*sp.L_min)
+                sp.LHS_solvers[k][m] = solver.matsolver(sp.LHS, solver)
+            if self.initSweep == "QDELTA":
+                raise NotImplementedError()
