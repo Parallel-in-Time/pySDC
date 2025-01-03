@@ -968,7 +968,7 @@ class SDCIMEX_MPI2(SDCIMEX_MPI):
         if rank == M-1: # copy last rank state into buffer
             pos = 0
             for f, size in zip(state, sizes):
-                np.copyto(buffer[pos:size], f.data.flat)
+                np.copyto(buffer[pos:pos+size], f.data.flat)
                 pos += size
 
         self.comm.Bcast(buffer, root=self.M-1)
@@ -976,7 +976,7 @@ class SDCIMEX_MPI2(SDCIMEX_MPI):
         if rank != M-1: # copy buffer data into state
             pos = 0
             for f, size in zip(state, sizes):
-                np.copyto(f.data, buffer[pos:size].reshape(f.data.shape))
+                np.copyto(f.data, buffer[pos:pos+size].reshape(f.data.shape))
                 pos += size
 
     def _computeMX0(self, MX0:CoeffSystem):
