@@ -10,7 +10,8 @@ from typing import Type, TypeVar
 try:
     from mpi4py import MPI
 except ImportError:
-    pass
+    class MPI:
+        COMM_WORLD = None
 
 T = TypeVar("T")
 
