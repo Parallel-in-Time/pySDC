@@ -52,7 +52,10 @@ class FieldsIO():
         self.nItems = None   # number of values (dof) stored into one field
 
     def __str__(self):
-        return f"FieldsIO[{self.__class__.__name__}, {self.dtype.__name__}, file:{self.fileName}]<{hex(id(self))}>"
+        return f"FieldsIO[{self.__class__.__name__}|{self.dtype.__name__}|file:{self.fileName}]<{hex(id(self))}>"
+
+    def __repr__(self):
+        return self.__str__()
 
     @classmethod
     def fromFile(cls, fileName):
@@ -425,12 +428,12 @@ if __name__ == "__main__":
     y = np.linspace(0, 1, num=64, endpoint=False)
     nY = y.size
 
-    dim = 1
+    nDim = 1
     dType = np.float64
 
-    if dim == 1:
+    if nDim == 1:
         u0 = np.array([-1, 1])[:, None]*x[None, :]
-    if dim == 2:
+    if nDim == 2:
         u0 = np.array([-1, 1])[:, None, None]*x[None, :, None]*y[None, None, :]
     fileName = "test.pysdc"
 
@@ -446,7 +449,7 @@ if __name__ == "__main__":
         fileName = "test_MPI.pysdc"
 
 
-    if dim == 1:
+    if nDim == 1:
         (iLocX, ), (nLocX, ) = bounds
         pRankX, = blocks.ranks
         Cart1D.setupMPI(comm, iLocX, nLocX)
@@ -460,7 +463,7 @@ if __name__ == "__main__":
         f1 = Cart1D(dType, fileName)
         f1.setHeader(nVar=u0.shape[0], gridX=x)
 
-    if dim == 2:
+    if nDim == 2:
         (iLocX, iLocY), (nLocX, nLocY) = bounds
         pRankX, pRankY = blocks.ranks
         Cart2D.setupMPI(comm, iLocX, nLocX, iLocY, nLocY)

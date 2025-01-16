@@ -1,11 +1,13 @@
 import pytest
 import numpy as np
 
+from base import DTYPES
 
-@pytest.mark.parametrize("dtypeIdx", range(6))
+
+@pytest.mark.parametrize("dtypeIdx", DTYPES.keys())
 @pytest.mark.parametrize("nDim", range(3))
 def testHeader(nDim, dtypeIdx):
-    from base import FieldsIO, Scal0D, Cart1D, Cart2D, DTYPES
+    from base import FieldsIO, Scal0D, Cart1D, Cart2D
 
     fileName = "testHeader.pysdc"
     dtype = DTYPES[dtypeIdx]
@@ -24,6 +26,7 @@ def testHeader(nDim, dtypeIdx):
         args = {"nVar": 10, "gridX": gridX, "gridY": gridY}
 
     f1 = Class(dtype, fileName)
+    assert f1.__str__() == f1.__repr__(), "__repr__ and __str__ do not return the same result"
     try:
         f1.initialize()
     except AssertionError:
@@ -56,11 +59,11 @@ def testHeader(nDim, dtypeIdx):
         assert np.allclose(val, f2.header[key]), f"header's discrepancy for {key} in written {f2}"
 
 
-@pytest.mark.parametrize("dtypeIdx", range(6))
+@pytest.mark.parametrize("dtypeIdx", DTYPES.keys())
 @pytest.mark.parametrize("nSteps", [1, 2, 10, 100])
 @pytest.mark.parametrize("nVar", [1, 2, 5])
 def testScal0D(nVar, nSteps, dtypeIdx):
-    from base import FieldsIO, Scal0D, DTYPES
+    from base import FieldsIO, Scal0D
 
     fileName = "testScal0D.pysdc"
     dtype = DTYPES[dtypeIdx]
@@ -75,7 +78,8 @@ def testScal0D(nVar, nSteps, dtypeIdx):
     times = np.arange(nSteps)/nSteps
 
     for t in times:
-        f1.addField(t, u0*t)
+        ut = (u0*t).astype(f1.dtype)
+        f1.addField(t, ut)
 
     assert f1.nFields == nSteps, f"{f1} do not have nFields == nSteps"
     assert np.allclose(f1.times, times), f"{f1} has wrong times stored in file"
@@ -95,7 +99,7 @@ def testScal0D(nVar, nSteps, dtypeIdx):
         assert np.allclose(u2, u1), f"{idx}'s fields in {f1} has incorrect values"
 
 
-@pytest.mark.parametrize("dtypeIdx", range(6))
+@pytest.mark.parametrize("dtypeIdx", DTYPES.keys())
 @pytest.mark.parametrize("nSteps", [1, 2, 5, 10])
 @pytest.mark.parametrize("nX", [5, 10, 16, 32, 64])
 @pytest.mark.parametrize("nVar", [1, 2, 5])
@@ -119,7 +123,8 @@ def testCart1D(nVar, nX, nSteps, dtypeIdx):
     times = np.arange(nSteps)/nSteps
 
     for t in times:
-        f1.addField(t, u0*t)
+        ut = (u0*t).astype(f1.dtype)
+        f1.addField(t, ut)
 
     assert f1.nFields == nSteps, f"{f1} do not have nFields == nSteps"
     assert np.allclose(f1.times, times), f"{f1} has wrong times stored in file"
@@ -140,7 +145,7 @@ def testCart1D(nVar, nX, nSteps, dtypeIdx):
 
 
 
-@pytest.mark.parametrize("dtypeIdx", range(6))
+@pytest.mark.parametrize("dtypeIdx", DTYPES.keys())
 @pytest.mark.parametrize("nSteps", [1, 2, 5, 10])
 @pytest.mark.parametrize("nY", [5, 10, 16])
 @pytest.mark.parametrize("nX", [5, 10, 16])
@@ -148,7 +153,7 @@ def testCart1D(nVar, nX, nSteps, dtypeIdx):
 def testCart2D(nVar, nX, nY, nSteps, dtypeIdx):
     from base import FieldsIO, Cart2D, DTYPES
 
-    fileName = "testCart1D.pysdc"
+    fileName = "testCart2D.pysdc"
     dtype = DTYPES[dtypeIdx]
 
     gridX = np.linspace(0, 1, num=nX, endpoint=False)
@@ -166,7 +171,8 @@ def testCart2D(nVar, nX, nY, nSteps, dtypeIdx):
     times = np.arange(nSteps)/nSteps
 
     for t in times:
-        f1.addField(t, u0*t)
+        ut = (u0*t).astype(f1.dtype)
+        f1.addField(t, ut)
 
     assert f1.nFields == nSteps, f"{f1} do not have nFields == nSteps"
     assert np.allclose(f1.times, times), f"{f1} has wrong times stored in file"
@@ -184,3 +190,180 @@ def testCart2D(nVar, nX, nY, nSteps, dtypeIdx):
         assert t2 == t, f"{idx}'s fields in {f1} has incorrect time"
         assert u2.shape == u1.shape, f"{idx}'s fields in {f1} has incorrect shape"
         assert np.allclose(u2, u1), f"{idx}'s fields in {f1} has incorrect values"
+
+
+def initGrid(nVar, nX, nY=None):
+    nDim = 1
+    if nY is not None:
+        nDim += 1
+    x = np.linspace(0, 1, num=nX, endpoint=False)
+    grids = (x, )
+    gridSizes = (nX, )
+    u0 = np.array(np.arange(nVar)+1)[:, None]*x[None, :]
+
+    if nDim > 1:
+        y = np.linspace(0, 1, num=nY, endpoint=False)
+        grids += (y, )
+        gridSizes += (nY, )
+        u0 = u0[:, :, None]*y[None, None, :]
+
+    return grids, gridSizes, u0
+
+
+def writeFields_MPI(fileName, nDim, dtypeIdx, algo, nSteps, nVar, nX, nY=None):
+    grids, gridSizes, u0 = initGrid(nVar, nX, nY)
+
+    from mpi4py import MPI
+    comm = MPI.COMM_WORLD
+    MPI_SIZE = comm.Get_size()
+    MPI_RANK = comm.Get_rank()
+
+    from blocks import BlockDecomposition
+    blocks = BlockDecomposition(MPI_SIZE, gridSizes, algo, MPI_RANK)
+
+    from time import sleep
+
+    from base import Cart1D, Cart2D
+    if nDim == 1:
+        (iLocX, ), (nLocX, ) = blocks.localBounds
+        pRankX, = blocks.ranks
+        Cart1D.setupMPI(comm, iLocX, nLocX)
+        u0 = u0[:, iLocX:iLocX+nLocX]
+
+        MPI.COMM_WORLD.Barrier()
+        sleep(0.01*MPI_RANK)
+        print(f"[Rank {MPI_RANK}] pRankX={pRankX} ({iLocX}, {nLocX})")
+        MPI.COMM_WORLD.Barrier()
+
+        f1 = Cart1D(DTYPES[dtypeIdx], fileName)
+        f1.setHeader(nVar=nVar, gridX=grids[0])
+    
+    if nDim == 2:
+        (iLocX, iLocY), (nLocX, nLocY) = blocks.localBounds
+        Cart2D.setupMPI(comm, iLocX, nLocX, iLocY, nLocY)
+        u0 = u0[:, iLocX:iLocX+nLocX, iLocY:iLocY+nLocY]
+
+        f1 = Cart2D(DTYPES[dtypeIdx], fileName)
+        f1.setHeader(nVar=nVar, gridX=grids[0], gridY=grids[1])
+
+    u0 = np.asarray(u0, dtype=f1.dtype)
+    f1.initialize()
+
+    times = np.arange(nSteps)/nSteps
+    for t in times:
+        ut = (u0*t).astype(f1.dtype)
+        f1.addField(t, ut)
+
+    return u0
+
+
+def compareFields_MPI(fileName, u0, nSteps):
+    from base import FieldsIO
+    f2 = FieldsIO.fromFile(fileName)
+    
+    times = np.arange(nSteps)/nSteps
+    for idx, t in enumerate(times):
+        u1 = u0*t
+        t2, u2 = f2.readField(idx)
+        assert t2 == t, f"{idx}'s fields in {f2} has incorrect time"
+        assert u2.shape == u1.shape, f"{idx}'s fields in {f2} has incorrect shape"
+        assert np.allclose(u2, u1), f"{idx}'s fields in {f2} has incorrect values"
+
+    
+@pytest.mark.parametrize("nX", [61, 16, 32])
+@pytest.mark.parametrize("nVar", [1, 4])
+@pytest.mark.parametrize("nSteps", [1, 10])
+@pytest.mark.parametrize("algo", ["ChatGPT", "Hybrid"])
+@pytest.mark.parametrize("dtypeIdx", [0, 1])
+@pytest.mark.parametrize("nProcs", [1, 2, 4])
+def testCart1D_MPI(nProcs, dtypeIdx, algo, nSteps, nVar, nX):
+    
+    import subprocess
+    fileName = "testCart1D_MPI.pysdc"
+
+    cmd = f"mpirun -np {nProcs} python {__file__} --fileName {fileName} --nDim 1 "
+    cmd += f"--dtypeIdx {dtypeIdx} --algo {algo} --nSteps {nSteps} --nVar {nVar} --nX {nX}"
+
+    p = subprocess.Popen(cmd.split(), cwd=".")
+    p.wait()
+    assert p.returncode == 0, f"MPI write with {nProcs} did not return code 0, but {p.returncode}"
+
+    from base import FieldsIO, Cart1D
+
+    f2:Cart1D = FieldsIO.fromFile(fileName)
+
+    assert type(f2) == Cart1D, f"incorrect type in MPI written fields {f2}"
+    assert f2.nFields == nSteps, f"incorrect nFields in MPI written fields {f2}"
+    assert f2.nVar == nVar, f"incorrect nVar in MPI written fields {f2}"
+    assert f2.nX == nX, f"incorrect nX in MPI written fields {f2}"
+
+    grids, _, u0 = initGrid(nVar, nX)
+    assert np.allclose(f2.header['gridX'], grids[0]), f"incorrect gridX in MPI written fields {f2}"
+
+    times = np.arange(nSteps)/nSteps
+    for idx, t in enumerate(times):
+        u1 = u0*t
+        t2, u2 = f2.readField(idx)
+        assert t2 == t, f"{idx}'s fields in {f2} has incorrect time"
+        assert u2.shape == u1.shape, f"{idx}'s fields in {f2} has incorrect shape"
+        assert np.allclose(u2, u1), f"{idx}'s fields in {f2} has incorrect values"
+
+
+@pytest.mark.parametrize("nY", [61, 16, 32])
+@pytest.mark.parametrize("nX", [61, 16, 32])
+@pytest.mark.parametrize("nVar", [1, 4])
+@pytest.mark.parametrize("nSteps", [1, 10])
+@pytest.mark.parametrize("algo", ["ChatGPT", "Hybrid"])
+@pytest.mark.parametrize("dtypeIdx", [0, 1])
+@pytest.mark.parametrize("nProcs", [1, 2, 4])
+def testCart2D_MPI(nProcs, dtypeIdx, algo, nSteps, nVar, nX, nY):
+    
+    import subprocess
+    fileName = "testCart2D_MPI.pysdc"
+
+    cmd = f"mpirun -np {nProcs} python {__file__} --fileName {fileName} --nDim 2 "
+    cmd += f"--dtypeIdx {dtypeIdx} --algo {algo} --nSteps {nSteps} --nVar {nVar} --nX {nX} --nY {nY}"
+
+    p = subprocess.Popen(cmd.split(), cwd=".")
+    p.wait()
+    assert p.returncode == 0, f"MPI write with {nProcs} did not return code 0, but {p.returncode}"
+
+    from base import FieldsIO, Cart2D
+
+    f2:Cart2D = FieldsIO.fromFile(fileName)
+
+    assert type(f2) == Cart2D, f"incorrect type in MPI written fields {f2}"
+    assert f2.nFields == nSteps, f"incorrect nFields in MPI written fields {f2}"
+    assert f2.nVar == nVar, f"incorrect nVar in MPI written fields {f2}"
+    assert f2.nX == nX, f"incorrect nX in MPI written fields {f2}"
+    assert f2.nY == nY, f"incorrect nY in MPI written fields {f2}"
+
+    grids, _, u0 = initGrid(nVar, nX, nY)
+    assert np.allclose(f2.header['gridX'], grids[0]), f"incorrect gridX in MPI written fields {f2}"
+    assert np.allclose(f2.header['gridY'], grids[1]), f"incorrect gridY in MPI written fields {f2}"
+
+    times = np.arange(nSteps)/nSteps
+    for idx, t in enumerate(times):
+        u1 = u0*t
+        t2, u2 = f2.readField(idx)
+        assert t2 == t, f"{idx}'s fields in {f2} has incorrect time"
+        assert u2.shape == u1.shape, f"{idx}'s fields in {f2} has incorrect shape"
+        assert np.allclose(u2, u1), f"{idx}'s fields in {f2} has incorrect values"
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--fileName', type=str, help='fileName of the file')
+    parser.add_argument('--nDim', type=int, help='space dimension', choices=[1, 2])
+    parser.add_argument('--dtypeIdx', type=int, help="dtype index", choices=DTYPES.keys())
+    parser.add_argument('--algo', type=str, help="algorithm used for block decomposition", choices=["ChatGPT", "Hybrid"])
+    parser.add_argument('--nSteps', type=int, help="number of field variables")
+    parser.add_argument('--nVar', type=int, help="number of field variables")
+    parser.add_argument('--nX', type=int, help="number of grid points in x dimension")
+    parser.add_argument('--nY', type=int, help="number of grid points in y dimension")
+    args = parser.parse_args()
+
+    u0 = writeFields_MPI(**args.__dict__)
+    compareFields_MPI(args.fileName, u0, args.nSteps)

@@ -12,7 +12,7 @@ class BlockDecomposition(object):
     algo : str, optional
         Algorithm used for hte block decomposition :
 
-        - Hybrid : approach minimizing interface communication, taken from
+        - Hybrid : approach minimizing interface communication, inspired from
         the `[Hybrid CFD solver] <https://web.stanford.edu/group/ctr/ResBriefs07/5_larsson1_pp47_58.pdf>`_.
         - ChatGPT : quickly generated using `[ChatGPT] <https://chatgpt.com>`_.
 
@@ -22,7 +22,6 @@ class BlockDecomposition(object):
     order : str, optional
         The order used when computing the rank block distribution. Default is `C`.
     """
-
     def __init__(self, nProcs, gridSizes, algo="Hybrid", gRank=None, order="C"):
         dim = len(gridSizes)
         assert dim in [1, 2, 3], "block decomposition only works for 1D, 2D or 3D domains"
