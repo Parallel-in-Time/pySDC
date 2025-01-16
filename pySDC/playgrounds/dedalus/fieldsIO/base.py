@@ -4,10 +4,17 @@
 Base generic script for fields IO
 """
 import os
+import sys
 import numpy as np
 from typing import Type, TypeVar
-from mpi4py import MPI
-from time import time
+try:
+    from mpi4py import MPI
+except ImportError:
+    pass
+
+
+from time import time, sleep
+from blocks import BlockDecomposition
 
 T = TypeVar("T")
 
@@ -230,6 +237,7 @@ class Cart1D(Scal0D):
         cls.comm = comm
         cls.iLocX = iLocX
         cls.nLocX = nLocX
+        cls.mpiFile = None
 
     @property
     def MPI_ON(self):
@@ -241,18 +249,33 @@ class Cart1D(Scal0D):
         if self.comm is None: return True
         return self.comm.Get_rank() == 0
 
-    def MPI_FILE_OPEN(self, mode)->MPI.File:
+    def MPI_FILE_OPEN(self, mode):
         amode = {
             "r": MPI.MODE_RDONLY,
             "a": MPI.MODE_WRONLY | MPI.MODE_APPEND,
             }[mode]
-        return MPI.File.Open(self.comm, self.fileName, amode)
+        self.mpiFile = MPI.File.Open(self.comm, self.fileName, amode)
+
+    def MPI_WRITE(self, data):
+        self.mpiFile.Write(data)
+
+    def MPI_WRITE_AT(self, offset, data:np.ndarray):
+        self.mpiFile.Write_at(offset, data)
+
+    def MPI_READ_AT(self, offset, data):
+        self.mpiFile.Read_at(offset, data)
+
+    def MPI_FILE_CLOSE(self):
+        self.mpiFile.Close()
+        self.mpiFile = None
 
     def initialize(self):
         if self.MPI_ROOT:
             super().initialize()
-        self.comm.Barrier()
-        self.initialized = True
+        if self.MPI_ON:
+            self.comm.Barrier()
+            self.initialized = True
+
 
     def addField(self, time, field):
         if not self.MPI_ON: return super().addField(time, field)
@@ -265,15 +288,15 @@ class Cart1D(Scal0D):
             f"expected {(self.nVar, self.nLocX)} shape, got {field.shape}"
 
         offset0 = self.fileSize
-        mpiFile = self.MPI_FILE_OPEN(mode="a")
+        self.MPI_FILE_OPEN(mode="a")
         if self.MPI_ROOT:
-            mpiFile.Write(np.array(time, dtype=T_DTYPE))
+            self.MPI_WRITE(np.array(time, dtype=T_DTYPE))
         offset0 += self.tSize
 
         for iVar in range(self.nVar):
             offset = offset0 + (iVar*self.nX + self.iLocX)*self.itemSize
-            mpiFile.Write_at_all(offset, field[iVar])
-        mpiFile.Close()
+            self.MPI_WRITE_AT(offset, field[iVar])
+        self.MPI_FILE_CLOSE()
 
 
     def readField(self, idx):
@@ -287,11 +310,11 @@ class Cart1D(Scal0D):
 
         field = np.empty((self.nVar, self.nLocX), dtype=self.dtype)
 
-        mpiFile = self.MPI_FILE_OPEN(mode="r")
+        self.MPI_FILE_OPEN(mode="r")
         for iVar in range(self.nVar):
             offset = offset0 + (iVar*self.nX + self.iLocX)*self.itemSize
-            mpiFile.Read_at_all(offset, field[iVar])
-        mpiFile.Close()
+            self.MPI_READ_AT(offset, field[iVar])
+        self.MPI_FILE_CLOSE()
 
         return t, field
 
@@ -331,9 +354,7 @@ class Cart2D(Cart1D):
     # -------------------------------------------------------------------------
     @classmethod
     def setupMPI(cls, comm:MPI.Intracomm, iLocX, nLocX, iLocY, nLocY):
-        cls.comm = comm
-        cls.iLocX = iLocX
-        cls.nLocX = nLocX
+        super().setupMPI(comm, iLocX, nLocX)
         cls.iLocY = iLocY
         cls.nLocY = nLocY
 
@@ -349,9 +370,9 @@ class Cart2D(Cart1D):
             f"expected {(self.nVar, self.nLocX, self.nLocY)} shape, got {field.shape}"
 
         offset0 = self.fileSize
-        mpiFile = self.MPI_FILE_OPEN(mode="a")
+        self.MPI_FILE_OPEN(mode="a")
         if self.MPI_ROOT:
-            mpiFile.Write(np.array(time, dtype=T_DTYPE))
+            self.MPI_WRITE(np.array(time, dtype=T_DTYPE))
         offset0 += self.tSize
 
         for iVar in range(self.nVar):
@@ -359,8 +380,8 @@ class Cart2D(Cart1D):
                 offset = offset0 + (
                     iVar*self.nX*self.nY + (self.iLocX + iX)*self.nY + self.iLocY
                     )*self.itemSize
-                mpiFile.Write_at_all(offset, field[iVar, iX])
-        mpiFile.Close()
+                self.MPI_WRITE_AT(offset, field[iVar, iX])
+        self.MPI_FILE_CLOSE()
 
 
     def readField(self, idx):
@@ -374,14 +395,14 @@ class Cart2D(Cart1D):
 
         field = np.empty((self.nVar, self.nLocX, self.nLocY), dtype=self.dtype)
 
-        mpiFile = self.MPI_FILE_OPEN(mode="r")
+        self.MPI_FILE_OPEN(mode="r")
         for iVar in range(self.nVar):
             for iX in range(self.nLocX):
                 offset = offset0 + (
                     iVar*self.nX*self.nY + (self.iLocX + iX)*self.nY + self.iLocY
                     )*self.itemSize
-                mpiFile.Read_at_all(offset, field[iVar, iX])
-        mpiFile.Close()
+                self.MPI_READ_AT(offset, field[iVar, iX])
+        self.MPI_FILE_CLOSE()
 
         return t, field
 
@@ -404,7 +425,7 @@ if __name__ == "__main__":
     y = np.linspace(0, 1, num=64, endpoint=False)
     nY = y.size
 
-    dim = 2
+    dim = 1
     dType = np.float64
 
     if dim == 1:
@@ -416,41 +437,39 @@ if __name__ == "__main__":
     comm = MPI.COMM_WORLD
     MPI_SIZE = comm.Get_size()
     MPI_RANK = comm.Get_rank()
+
+    gridSizes = u0.shape[1:]
+    algo = sys.argv[1] if len(sys.argv) > 1 else "ChatGPT"
+    blocks = BlockDecomposition(MPI_SIZE, gridSizes, algo, MPI_RANK)
+    bounds = blocks.localBounds
     if MPI_SIZE > 1:
         fileName = "test_MPI.pysdc"
-        if dim == 1:
-            pSizeX = MPI_SIZE
-            pRankX = MPI_RANK
-        if dim == 2:
-            assert MPI_SIZE == 4
-            pSizeX = MPI_SIZE // 2
-            pRankX = MPI_RANK // 2
-            pSizeY = MPI_SIZE // 2
-            pRankY = MPI_RANK % 2
-    else:
-        pSizeX, pRankX = 1, 0
-        pSizeY, pRankY = 1, 0
-
-    def decomposeDirection(nItems, pSize, pRank):
-        n0 = nItems // pSize
-        nRest = nItems - pSize*n0
-        nLoc = n0 + 1*(pRank < nRest)
-        iLoc = pRank*n0 + nRest*(pRank >= nRest) + pRank*(pRank < nRest)
-        return iLoc, nLoc
 
 
-    iLocX, nLocX = decomposeDirection(nX, pSizeX, pRankX)
     if dim == 1:
+        (iLocX, ), (nLocX, ) = bounds
+        pRankX, = blocks.ranks
         Cart1D.setupMPI(comm, iLocX, nLocX)
         u0 = u0[:, iLocX:iLocX+nLocX]
+
+        MPI.COMM_WORLD.Barrier()
+        sleep(0.01*MPI_RANK)
+        print(f"[Rank {MPI_RANK}] pRankX={pRankX} ({iLocX}, {nLocX})")
+        MPI.COMM_WORLD.Barrier()
 
         f1 = Cart1D(dType, fileName)
         f1.setHeader(nVar=u0.shape[0], gridX=x)
 
     if dim == 2:
-        iLocY, nLocY = decomposeDirection(nY, pSizeY, pRankY)
+        (iLocX, iLocY), (nLocX, nLocY) = bounds
+        pRankX, pRankY = blocks.ranks
         Cart2D.setupMPI(comm, iLocX, nLocX, iLocY, nLocY)
         u0 = u0[:, iLocX:iLocX+nLocX, iLocY:iLocY+nLocY]
+
+        MPI.COMM_WORLD.Barrier()
+        sleep(0.01*MPI_RANK)
+        print(f"[Rank {MPI_RANK}] pRankX={pRankX} ({iLocX}, {nLocX}), pRankY={pRankY} ({iLocY}, {nLocY})")
+        MPI.COMM_WORLD.Barrier()
 
         f1 = Cart2D(dType, fileName)
         f1.setHeader(nVar=u0.shape[0], gridX=x, gridY=y)
@@ -465,7 +484,7 @@ if __name__ == "__main__":
     for t in np.arange(nTimes)/nTimes:
         f1.addField(t, t*u0)
     if MPI_RANK == 0:
-        print(f" -> done in {time()-tBeg:1.2f}s !")
+        print(f" -> done in {time()-tBeg:1.4f}s !")
 
     f2 = FieldsIO.fromFile(fileName)
     t, u = f2.readField(2)
