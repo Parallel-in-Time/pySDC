@@ -41,10 +41,10 @@ See :class:`pySDC.tests.test_helpers.test_fieldsIO.writeFields_MPI` for an illus
 
 Warning
 -------
-To use MPI collective writing, you need to call first the class methods :class:`Cart1D.initMPI` 
+To use MPI collective writing, you need to call first the class methods :class:`Cart1D.initMPI`
 or :class:`Cart2D.initMPI` from the associated class (cf their docstring).
 Also, their associated `setHeader` methods **must be given the global grids coordinates**,
-wether code is run in parallel or not. 
+wether code is run in parallel or not.
 """
 import os
 import numpy as np
