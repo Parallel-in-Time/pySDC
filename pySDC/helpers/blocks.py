@@ -118,6 +118,7 @@ class BlockDecomposition(object):
 
 
 if __name__ == "__main__":
+    # Base usage of this module for a 2D decomposition
     from mpi4py import MPI
     from time import sleep
 
