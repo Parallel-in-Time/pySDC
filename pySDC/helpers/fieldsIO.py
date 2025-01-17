@@ -38,6 +38,13 @@ Notes
 -----
 🚀 :class:`Cart1D` and :class:`Cart2D` are compatible with a MPI-based cartesian decomposition.
 See :class:`pySDC.tests.test_helpers.test_fieldsIO.writeFields_MPI` for an illustrative example.
+
+Warning
+-------
+To use MPI collective writing, you need to call first the class methods :class:`Cart1D.initMPI` 
+or :class:`Cart2D.initMPI` from the associated class (cf their docstring).
+Also, their associated `setHeader` methods **must be given the global grids coordinates**,
+wether code is run in parallel or not. 
 """
 import os
 import numpy as np
@@ -82,6 +89,8 @@ class FieldsIO:
 
     tSize = T_DTYPE().itemsize
 
+    ALLOW_OVERWRITE = False
+
     def __init__(self, dtype, fileName):
         """
         Parameters
@@ -91,7 +100,7 @@ class FieldsIO:
         fileName : str
             File.
         """
-        assert dtype in DTYPES_AVAIL, f"dtype not available ({dtype})"
+        assert dtype in DTYPES_AVAIL, f"{dtype=} not available"
         self.dtype = dtype
         self.fileName = fileName
         self.initialized = False
@@ -170,6 +179,11 @@ class FieldsIO:
         assert self.header is not None, "header must be set before initializing FieldsIO"
         assert not self.initialized, "FieldsIO already initialized"
 
+        if not self.ALLOW_OVERWRITE:
+            assert not os.path.isfile(
+                self.fileName
+            ), "file already exists, use FieldsIO.ALLOW_OVERWRITE = True to allow overwriting"
+
         with open(self.fileName, "w+b") as f:
             self.hBase.tofile(f)
             for array in self.hInfos:
@@ -240,8 +254,8 @@ class FieldsIO:
         """Number of fields currently stored in the binary file"""
         return int((self.fileSize - self.hSize) // (self.tSize + self.fSize))
 
-    def check(self, idx):
-        """Utility method to check a positional index for a stored field"""
+    def formatIndex(self, idx):
+        """Utility method to format a fields index to a positional integer (negative starts from last field index, like python lists)"""
         nFields = self.nFields
         if idx < 0:
             idx = nFields + idx
@@ -262,7 +276,7 @@ class FieldsIO:
 
     def time(self, idx):
         """Time stored at a given field index"""
-        idx = self.check(idx)
+        idx = self.formatIndex(idx)
         offset = self.hSize + idx * (self.tSize + self.fSize)
         with open(self.fileName, "rb") as f:
             t = np.fromfile(f, dtype=T_DTYPE, count=1, offset=offset)[0]
@@ -285,7 +299,7 @@ class FieldsIO:
         field : np.ndarray
             Read fields in a numpy array.
         """
-        idx = self.check(idx)
+        idx = self.formatIndex(idx)
         offset = self.hSize + idx * (self.tSize + self.fSize)
         with open(self.fileName, "rb") as f:
             f.seek(offset)
@@ -494,7 +508,12 @@ class Cart1D(Scal0D):
     def initialize(self):
         """Initialize the binary file (write header) in MPI mode"""
         if self.MPI_ROOT:
-            super().initialize()
+            try:
+                super().initialize()
+            except AssertionError as e:
+                print(f"{type(e): {e}}")
+                self.comm.Abort()
+
         if self.MPI_ON:
             self.comm.Barrier()  # Important, should not be removed !
             self.initialized = True
@@ -502,7 +521,7 @@ class Cart1D(Scal0D):
     def addField(self, time, field):
         """
         Append one field solution at the end of the file with one given time,
-        eventually using MPI.
+        possibly using MPI.
 
         Parameters
         ----------
@@ -538,7 +557,7 @@ class Cart1D(Scal0D):
     def readField(self, idx):
         """
         Read one field stored in the binary file, corresponding to the given
-        time index, eventually in MPI mode.
+        time index, possibly in MPI mode.
 
         Parameters
         ----------
@@ -558,7 +577,7 @@ class Cart1D(Scal0D):
         """
         if not self.MPI_ON:
             return super().readField(idx)
-        idx = self.check(idx)
+        idx = self.formatIndex(idx)
 
         offset0 = self.hSize + idx * (self.fSize + self.tSize)
         with open(self.fileName, "rb") as f:
@@ -651,7 +670,7 @@ class Cart2D(Cart1D):
     def addField(self, time, field):
         """
         Append one field solution at the end of the file with one given time,
-        eventually using MPI.
+        possibly using MPI.
 
         Parameters
         ----------
@@ -712,7 +731,7 @@ class Cart2D(Cart1D):
         """
         if not self.MPI_ON:
             return super().readField(idx)
-        idx = self.check(idx)
+        idx = self.formatIndex(idx)
 
         offset0 = self.hSize + idx * (self.tSize + self.fSize)
         with open(self.fileName, "rb") as f:

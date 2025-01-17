@@ -1,7 +1,9 @@
 import pytest
 import numpy as np
 
-from pySDC.helpers.fieldsIO import DTYPES
+from pySDC.helpers.fieldsIO import DTYPES, FieldsIO
+
+FieldsIO.ALLOW_OVERWRITE = True
 
 
 @pytest.mark.parametrize("dtypeIdx", DTYPES.keys())

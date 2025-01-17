@@ -9,7 +9,7 @@ class BlockDecomposition(object):
     gridSizes : list[int]
         Number of grid points in each dimension
     algo : str, optional
-        Algorithm used for hte block decomposition :
+        Algorithm used for the block decomposition :
 
         - Hybrid : approach minimizing interface communication, inspired from
           the `[Hybrid CFD solver] <https://web.stanford.edu/group/ctr/ResBriefs07/5_larsson1_pp47_58.pdf>`_.
