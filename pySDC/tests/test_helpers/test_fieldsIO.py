@@ -216,29 +216,20 @@ def writeFields_MPI(fileName, nDim, dtypeIdx, algo, nSteps, nVar, nX, nY=None):
     grids, gridSizes, u0 = initGrid(nVar, nX, nY)
 
     from mpi4py import MPI
+    from pySDC.helpers.blocks import BlockDecomposition
+    from pySDC.helpers.fieldsIO import Cart1D, Cart2D
 
     comm = MPI.COMM_WORLD
     MPI_SIZE = comm.Get_size()
     MPI_RANK = comm.Get_rank()
 
-    from pySDC.helpers.blocks import BlockDecomposition
-
     blocks = BlockDecomposition(MPI_SIZE, gridSizes, algo, MPI_RANK)
-
-    from time import sleep
-
-    from pySDC.helpers.fieldsIO import Cart1D, Cart2D
 
     if nDim == 1:
         (iLocX,), (nLocX,) = blocks.localBounds
         (pRankX,) = blocks.ranks
         Cart1D.setupMPI(comm, iLocX, nLocX)
         u0 = u0[:, iLocX : iLocX + nLocX]
-
-        MPI.COMM_WORLD.Barrier()
-        sleep(0.01 * MPI_RANK)
-        print(f"[Rank {MPI_RANK}] pRankX={pRankX} ({iLocX}, {nLocX})")
-        MPI.COMM_WORLD.Barrier()
 
         f1 = Cart1D(DTYPES[dtypeIdx], fileName)
         f1.setHeader(nVar=nVar, gridX=grids[0])
