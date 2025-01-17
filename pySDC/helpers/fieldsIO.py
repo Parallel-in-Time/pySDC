@@ -43,15 +43,18 @@ import os
 import numpy as np
 from typing import Type, TypeVar
 
+T = TypeVar("T")
+
 try:
     from mpi4py import MPI
 except ImportError:
 
     class MPI:
         COMM_WORLD = None
+        Intracomm = T
 
 
-T = TypeVar("T")
+
 
 # Supported data types
 DTYPES = {
