@@ -20,7 +20,7 @@ Example
 >>> # Write some fields in files
 >>> x = np.linspace(0, 1, 101)
 >>> fOut = Cart2D(np.float64, "file.pysdc")
->>> fOut.setHeader(nVar=2, gridX=x)
+>>> fOut.setHeader(nVar=2, coordX=x)
 >>> fOut.initialize()
 >>> times = [0, 1, 2]
 >>> u0 = np.array([-1, 1])[:, None]*x[None, :]
@@ -365,7 +365,7 @@ class Cart1D(Scal0D):
     # -------------------------------------------------------------------------
     # Overriden methods
     # -------------------------------------------------------------------------
-    def setHeader(self, nVar, gridX):
+    def setHeader(self, nVar, coordX):
         """
         Set the descriptive grid structure to be stored in the file header.
 
@@ -373,21 +373,21 @@ class Cart1D(Scal0D):
         ----------
         nVar : int
             Number of 1D variables stored.
-        gridX : np.1darray
+        coordX : np.1darray
             The grid coordinates in X direction.
 
         Note
         ----
-        When used in MPI decomposition mode, `gridX` **must** be the global grid.
+        When used in MPI decomposition mode, `coordX` **must** be the global grid.
         """
-        grids = self.setupGrids(gridX=gridX)
+        grids = self.setupCoords(coordX=coordX)
         self.header = {"nVar": int(nVar), **grids}
         self.nItems = nVar * self.nX
 
     @property
     def hInfos(self):
         """Array representing the grid structure to be written in the binary file."""
-        return [np.array([self.nVar, self.nX], dtype=np.int64), np.array(self.header["gridX"], dtype=np.float64)]
+        return [np.array([self.nVar, self.nX], dtype=np.int64), np.array(self.header["coordX"], dtype=np.float64)]
 
     def readHeader(self, f):
         """
@@ -399,8 +399,8 @@ class Cart1D(Scal0D):
             File to read the header from.
         """
         nVar, nX = np.fromfile(f, dtype=np.int64, count=2)
-        gridX = np.fromfile(f, dtype=np.float64, count=nX)
-        self.setHeader(nVar, gridX)
+        coordX = np.fromfile(f, dtype=np.float64, count=nX)
+        self.setHeader(nVar, coordX)
 
     def reshape(self, fields: np.ndarray):
         fields.shape = (self.nVar, self.nX)
@@ -411,10 +411,10 @@ class Cart1D(Scal0D):
     @property
     def nX(self):
         """Number of points in x direction"""
-        return self.header["gridX"].size
+        return self.header["coordX"].size
 
     @staticmethod
-    def setupGrids(**grids):
+    def setupCoords(**grids):
         """Utility function to setup grids in multuple dimensions, given the keyword arguments"""
         grids = {name: np.asarray(grid, dtype=np.float64) for name, grid in grids.items() if name.startswith("grid")}
         for name, grid in grids.items():
@@ -437,7 +437,7 @@ class Cart1D(Scal0D):
         comm : MPI.Intracomm
             The space decomposition communicator.
         iLocX : int
-            Starting index of the local sub-domain in the global `gridX`.
+            Starting index of the local sub-domain in the global `coordX`.
         nLocX : int
             Number of points in the local sub-domain.
         """
@@ -602,7 +602,7 @@ class Cart2D(Cart1D):
     # -------------------------------------------------------------------------
     # Overriden methods
     # -------------------------------------------------------------------------
-    def setHeader(self, nVar, gridX, gridY):
+    def setHeader(self, nVar, coordX, coordY):
         """
         Set the descriptive grid structure to be stored in the file header.
 
@@ -610,17 +610,17 @@ class Cart2D(Cart1D):
         ----------
         nVar : int
             Number of 1D variables stored.
-        gridX : np.1darray
+        coordX : np.1darray
             The grid coordinates in x direction.
-        gridY : np.1darray
+        coordY : np.1darray
             The grid coordinates in y direction.
 
         Note
         ----
-        When used in MPI decomposition mode, `gridX` and `gridY` **must** be the global grid.
+        When used in MPI decomposition mode, `coordX` and `coordX` **must** be the global grid.
         """
-        grids = self.setupGrids(gridX=gridX, gridY=gridY)
-        self.header = {"nVar": int(nVar), **grids}
+        coords = self.setupCoords(coordX=coordX, coordY=coordY)
+        self.header = {"nVar": int(nVar), **coords}
         self.nItems = nVar * self.nX * self.nY
 
     @property
@@ -628,8 +628,8 @@ class Cart2D(Cart1D):
         """Array representing the grid structure to be written in the binary file."""
         return [
             np.array([self.nVar, self.nX, self.nY], dtype=np.int64),
-            np.array(self.header["gridX"], dtype=np.float64),
-            np.array(self.header["gridY"], dtype=np.float64),
+            np.array(self.header["coordX"], dtype=np.float64),
+            np.array(self.header["coordY"], dtype=np.float64),
         ]
 
     def readHeader(self, f):
@@ -642,9 +642,9 @@ class Cart2D(Cart1D):
             File to read the header from.
         """
         nVar, nX, nY = np.fromfile(f, dtype=np.int64, count=3)
-        gridX = np.fromfile(f, dtype=np.float64, count=nX)
-        gridY = np.fromfile(f, dtype=np.float64, count=nY)
-        self.setHeader(nVar, gridX, gridY)
+        coordX = np.fromfile(f, dtype=np.float64, count=nX)
+        coordY = np.fromfile(f, dtype=np.float64, count=nY)
+        self.setHeader(nVar, coordX, coordY)
 
     def reshape(self, fields: np.ndarray):
         """Reshape the fields to a [nVar, nX, nY] array (inplace operation)"""
@@ -656,7 +656,7 @@ class Cart2D(Cart1D):
     @property
     def nY(self):
         """Number of points in y direction"""
-        return self.header["gridY"].size
+        return self.header["coordY"].size
 
     # -------------------------------------------------------------------------
     # MPI-parallel implementation

@@ -14,18 +14,18 @@ def testHeader(nDim, dtypeIdx):
     fileName = "testHeader.pysdc"
     dtype = DTYPES[dtypeIdx]
 
-    gridX = np.linspace(0, 1, num=256, endpoint=False)
-    gridY = np.linspace(0, 1, num=64, endpoint=False)
+    coordX = np.linspace(0, 1, num=256, endpoint=False)
+    coordY = np.linspace(0, 1, num=64, endpoint=False)
 
     if nDim == 0:
         Class = Scal0D
         args = {"nVar": 20}
     elif nDim == 1:
         Class = Cart1D
-        args = {"nVar": 10, "gridX": gridX}
+        args = {"nVar": 10, "coordX": coordX}
     elif nDim == 2:
         Class = Cart2D
-        args = {"nVar": 10, "gridX": gridX, "gridY": gridY}
+        args = {"nVar": 10, "coordX": coordX, "coordY": coordY}
 
     f1 = Class(dtype, fileName)
     assert f1.__str__() == f1.__repr__(), "__repr__ and __str__ do not return the same result"
@@ -112,11 +112,11 @@ def testCart1D(nVar, nX, nSteps, dtypeIdx):
     fileName = "testCart1D.pysdc"
     dtype = DTYPES[dtypeIdx]
 
-    gridX = np.linspace(0, 1, num=nX, endpoint=False)
-    nX = gridX.size
+    coordX = np.linspace(0, 1, num=nX, endpoint=False)
+    nX = coordX.size
 
     f1 = Cart1D(dtype, fileName)
-    f1.setHeader(nVar=nVar, gridX=gridX)
+    f1.setHeader(nVar=nVar, coordX=coordX)
 
     assert f1.nItems == nVar * nX, f"{f1} do not have nItems == nVar*nX"
     assert f1.nX == nX, f"{f1} has incorrect nX"
@@ -159,11 +159,11 @@ def testCart2D(nVar, nX, nY, nSteps, dtypeIdx):
     fileName = "testCart2D.pysdc"
     dtype = DTYPES[dtypeIdx]
 
-    gridX = np.linspace(0, 1, num=nX, endpoint=False)
-    gridY = np.linspace(0, 1, num=nY, endpoint=False)
+    coordX = np.linspace(0, 1, num=nX, endpoint=False)
+    coordY = np.linspace(0, 1, num=nY, endpoint=False)
 
     f1 = Cart2D(dtype, fileName)
-    f1.setHeader(nVar=nVar, gridX=gridX, gridY=gridY)
+    f1.setHeader(nVar=nVar, coordX=coordX, coordY=coordY)
 
     assert f1.nItems == nVar * nX * nY, f"{f1} do not have nItems == nVar*nX"
     assert f1.nX == nX, f"{f1} has incorrect nX"
@@ -201,21 +201,21 @@ def initGrid(nVar, nX, nY=None):
     if nY is not None:
         nDim += 1
     x = np.linspace(0, 1, num=nX, endpoint=False)
-    grids = (x,)
+    coords = (x,)
     gridSizes = (nX,)
     u0 = np.array(np.arange(nVar) + 1)[:, None] * x[None, :]
 
     if nDim > 1:
         y = np.linspace(0, 1, num=nY, endpoint=False)
-        grids += (y,)
+        coords += (y,)
         gridSizes += (nY,)
         u0 = u0[:, :, None] * y[None, None, :]
 
-    return grids, gridSizes, u0
+    return coords, gridSizes, u0
 
 
 def writeFields_MPI(fileName, nDim, dtypeIdx, algo, nSteps, nVar, nX, nY=None):
-    grids, gridSizes, u0 = initGrid(nVar, nX, nY)
+    coords, gridSizes, u0 = initGrid(nVar, nX, nY)
 
     from mpi4py import MPI
     from pySDC.helpers.blocks import BlockDecomposition
@@ -234,7 +234,7 @@ def writeFields_MPI(fileName, nDim, dtypeIdx, algo, nSteps, nVar, nX, nY=None):
         u0 = u0[:, iLocX : iLocX + nLocX]
 
         f1 = Cart1D(DTYPES[dtypeIdx], fileName)
-        f1.setHeader(nVar=nVar, gridX=grids[0])
+        f1.setHeader(nVar=nVar, coordX=coords[0])
 
     if nDim == 2:
         (iLocX, iLocY), (nLocX, nLocY) = blocks.localBounds
@@ -242,7 +242,7 @@ def writeFields_MPI(fileName, nDim, dtypeIdx, algo, nSteps, nVar, nX, nY=None):
         u0 = u0[:, iLocX : iLocX + nLocX, iLocY : iLocY + nLocY]
 
         f1 = Cart2D(DTYPES[dtypeIdx], fileName)
-        f1.setHeader(nVar=nVar, gridX=grids[0], gridY=grids[1])
+        f1.setHeader(nVar=nVar, coordX=coords[0], coordY=coords[1])
 
     u0 = np.asarray(u0, dtype=f1.dtype)
     f1.initialize()
@@ -298,8 +298,8 @@ def testCart1D_MPI(nProcs, dtypeIdx, algo, nSteps, nVar, nX):
     assert f2.nVar == nVar, f"incorrect nVar in MPI written fields {f2}"
     assert f2.nX == nX, f"incorrect nX in MPI written fields {f2}"
 
-    grids, _, u0 = initGrid(nVar, nX)
-    assert np.allclose(f2.header['gridX'], grids[0]), f"incorrect gridX in MPI written fields {f2}"
+    coords, _, u0 = initGrid(nVar, nX)
+    assert np.allclose(f2.header['coordX'], coords[0]), f"incorrect coordX in MPI written fields {f2}"
 
     times = np.arange(nSteps) / nSteps
     for idx, t in enumerate(times):
@@ -342,8 +342,8 @@ def testCart2D_MPI(nProcs, dtypeIdx, algo, nSteps, nVar, nX, nY):
     assert f2.nY == nY, f"incorrect nY in MPI written fields {f2}"
 
     grids, _, u0 = initGrid(nVar, nX, nY)
-    assert np.allclose(f2.header['gridX'], grids[0]), f"incorrect gridX in MPI written fields {f2}"
-    assert np.allclose(f2.header['gridY'], grids[1]), f"incorrect gridY in MPI written fields {f2}"
+    assert np.allclose(f2.header['coordX'], grids[0]), f"incorrect coordX in MPI written fields {f2}"
+    assert np.allclose(f2.header['coordY'], grids[1]), f"incorrect coordY in MPI written fields {f2}"
 
     times = np.arange(nSteps) / nSteps
     for idx, t in enumerate(times):
