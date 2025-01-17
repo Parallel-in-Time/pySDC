@@ -55,6 +55,9 @@ jobs:
       - name: Install additional packages as needed
         run: |
           micromamba install -y --file etc/environment-tests.yml --freeze-installed
+      - name: Install pySDC as a package in the current environment
+        run: |
+          pip install --no-deps -e .
       - name: Run pytest for CPU stuff
         run: |
           echo "print('Loading sitecustomize.py...')
