@@ -54,8 +54,6 @@ except ImportError:
         Intracomm = T
 
 
-
-
 # Supported data types
 DTYPES = {
     0: np.float64,  # double precision
