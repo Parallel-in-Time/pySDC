@@ -100,8 +100,13 @@ class FieldsIO:
         fileName : str
             File.
         """
-        assert dtype in DTYPES_AVAIL, f"{dtype=} not available"
-        self.dtype = dtype
+        avail = False
+        for key in DTYPES_AVAIL:
+            if key == dtype:
+                self.dtype = key
+                avail = True
+                break
+        assert avail, f"{dtype=} not available"
         self.fileName = fileName
         self.initialized = False
 
