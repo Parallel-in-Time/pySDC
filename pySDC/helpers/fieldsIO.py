@@ -333,7 +333,7 @@ class Scal0D(FieldsIO):
         self.nItems = self.nVar
 
     @property
-    def hinfos(self):
+    def hInfos(self):
         """Array representing the grid structure to be written in the binary file."""
         return [np.array([self.nVar], dtype=np.int64)]
 
@@ -380,8 +380,8 @@ class Cart1D(Scal0D):
         ----
         When used in MPI decomposition mode, `coordX` **must** be the global grid.
         """
-        grids = self.setupCoords(coordX=coordX)
-        self.header = {"nVar": int(nVar), **grids}
+        coords = self.setupCoords(coordX=coordX)
+        self.header = {"nVar": int(nVar), **coords}
         self.nItems = nVar * self.nX
 
     @property
@@ -414,12 +414,12 @@ class Cart1D(Scal0D):
         return self.header["coordX"].size
 
     @staticmethod
-    def setupCoords(**grids):
+    def setupCoords(**coords):
         """Utility function to setup grids in multuple dimensions, given the keyword arguments"""
-        grids = {name: np.asarray(grid, dtype=np.float64) for name, grid in grids.items() if name.startswith("grid")}
-        for name, grid in grids.items():
-            assert grid.ndim == 1, f"{name} must be one dimensional"
-        return grids
+        coords = {name: np.asarray(coord, dtype=np.float64) for name, coord in coords.items()}
+        for name, coord in coords.items():
+            assert coord.ndim == 1, f"{name} must be one dimensional"
+        return coords
 
     # -------------------------------------------------------------------------
     # MPI-parallel implementation
@@ -511,8 +511,11 @@ class Cart1D(Scal0D):
             try:
                 super().initialize()
             except AssertionError as e:
-                print(f"{type(e): {e}}")
-                self.comm.Abort()
+                if self.MPI_ON:
+                    print(f"{type(e)}: {e}")
+                    self.comm.Abort()
+                else:
+                    raise e
 
         if self.MPI_ON:
             self.comm.Barrier()  # Important, should not be removed !
