@@ -210,9 +210,10 @@ jobs:
         run: |
           . /home/firedrake/firedrake/bin/activate
 
-          mv data data_firedrake
+          cd ./pySDC
+          mv data ../data_firedrake
           coverage combine
-          mv .coverage coverage_firedrake.dat
+          mv .coverage ../coverage_firedrake.dat
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
