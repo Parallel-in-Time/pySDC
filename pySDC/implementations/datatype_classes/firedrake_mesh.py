@@ -64,8 +64,8 @@ class firedrake_mesh(object):
             me = firedrake_mesh(self)
             me.functionspace.assign(other * self.functionspace)
             return me
-        except TypeError:
-            raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
+        except TypeError as e:
+            raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self))) from e
 
     def __abs__(self):
         """

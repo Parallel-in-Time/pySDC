@@ -47,6 +47,7 @@ def test_subtraction(n=3, v1=1, v2=2):
 @pytest.mark.firedrake
 def test_right_multiplication(n=3, v1=1, v2=2):
     from pySDC.implementations.datatype_classes.firedrake_mesh import firedrake_mesh
+    from pySDC.core.errors import DataError
     import numpy as np
     import firedrake as fd
 
@@ -62,6 +63,11 @@ def test_right_multiplication(n=3, v1=1, v2=2):
 
     assert np.allclose(b.dat._numpy_data, v1 * v2)
     assert np.allclose(a.dat._numpy_data, v1)
+
+    try:
+        'Dat kölsche Dom' * b
+    except DataError:
+        pass
 
 
 @pytest.mark.firedrake
