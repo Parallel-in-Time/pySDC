@@ -80,7 +80,7 @@ class fenics_mesh(object):
         Args:
             other (float): factor
         Raises:
-            DataError: is other is not a float
+            DataError: if other is not a float
         Returns:
             fenics_mesh: copy of original values scaled by factor
         """

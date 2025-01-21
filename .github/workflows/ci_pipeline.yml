@@ -169,6 +169,57 @@ jobs:
           path: |
             data_libpressio
             coverage_libpressio.dat
+
+  user_firedrake_tests:
+    runs-on: ubuntu-latest
+    container:
+      image: firedrakeproject/firedrake-vanilla:latest
+      options: --user root
+      volumes:
+        - ${{ github.workspace }}:/repositories
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - name: Checkout pySDC
+        uses: actions/checkout@v4
+        with: 
+          path: ./pySDC
+      - name: Checkout gusto
+        uses: actions/checkout@v4
+        with:
+          repository: firedrakeproject/gusto
+          path: ./gusto_repo
+      - name: Install pySDC
+        run: |
+          . /home/firedrake/firedrake/bin/activate
+          python -m pip install --no-deps -e /repositories/pySDC
+          python -m pip install qmat
+      - name: Install gusto
+        run: |
+          . /home/firedrake/firedrake/bin/activate
+          python -m pip install -e /repositories/gusto_repo
+      - name: run pytest
+        run: |
+          . /home/firedrake/firedrake/bin/activate
+          firedrake-clean
+          cd ./pySDC
+          coverage run -m pytest --continue-on-collection-errors -v --durations=0 /repositories/pySDC/pySDC/tests -m firedrake
+        timeout-minutes: 120
+      - name: Make coverage report
+        run: |
+          . /home/firedrake/firedrake/bin/activate
+
+          mv data data_firedrake
+          coverage combine
+          mv .coverage coverage_firedrake.dat
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts-firedrake
+          path: |
+            data_firedrake
+            coverage_firedrake.dat
          
   user_monodomain_tests_linux:
     runs-on: ubuntu-latest
