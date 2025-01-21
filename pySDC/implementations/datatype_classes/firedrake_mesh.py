@@ -60,11 +60,11 @@ class firedrake_mesh(object):
             fenics_mesh: copy of original values scaled by factor
         """
 
-        if type(other) in [int, float, complex]:
+        try:
             me = firedrake_mesh(self)
             me.functionspace.assign(other * self.functionspace)
             return me
-        else:
+        except TypeError:
             raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
 
     def __abs__(self):
