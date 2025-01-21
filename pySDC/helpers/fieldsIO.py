@@ -69,8 +69,8 @@ except ImportError:
 DTYPES = {
     0: np.float64,  # double precision
     1: np.complex128,
-    2: np.float128,  # quadruple precision
-    3: np.complex256,
+    2: np.longdouble,  # quadruple precision
+    3: np.clongdouble,
     4: np.float32,  # single precision
     5: np.complex64,
 }
