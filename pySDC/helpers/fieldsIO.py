@@ -49,6 +49,7 @@ wether code is run in parallel or not.
 import os
 import numpy as np
 from typing import Type, TypeVar
+import logging
 
 T = TypeVar("T")
 
@@ -69,11 +70,26 @@ except ImportError:
 DTYPES = {
     0: np.float64,  # double precision
     1: np.complex128,
-    2: np.float128,  # quadruple precision
-    3: np.complex256,
-    4: np.float32,  # single precision
-    5: np.complex64,
 }
+try:
+    DTYPES.update(
+        {
+            2: np.float128,  # quadruple precision
+            3: np.complex256,
+        }
+    )
+except AttributeError:
+    logging.getLogger('FieldsIO').debug('Warning: Quadruple precision not available on this machine')
+try:
+    DTYPES.update(
+        {
+            4: np.float32,  # single precision
+            5: np.complex64,
+        }
+    )
+except AttributeError:
+    logging.getLogger('FieldsIO').debug('Warning: Single precision not available on this machine')
+
 DTYPES_AVAIL = {val: key for key, val in DTYPES.items()}
 
 # Header dtype
@@ -100,7 +116,7 @@ class FieldsIO:
         fileName : str
             File.
         """
-        assert dtype in DTYPES_AVAIL, f"{dtype=} not available"
+        assert dtype in DTYPES_AVAIL, f"{dtype=} not available. Supported on this machine: {list(DTYPES_AVAIL.keys())}"
         self.dtype = dtype
         self.fileName = fileName
         self.initialized = False
