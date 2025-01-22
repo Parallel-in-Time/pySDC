@@ -49,6 +49,7 @@ wether code is run in parallel or not.
 import os
 import numpy as np
 from typing import Type, TypeVar
+import logging
 
 T = TypeVar("T")
 
@@ -78,8 +79,6 @@ try:
         }
     )
 except AttributeError:
-    import logging
-
     logging.getLogger('FieldsIO').debug('Warning: Quadruple precision not available on this machine')
 try:
     DTYPES.update(
@@ -89,8 +88,6 @@ try:
         }
     )
 except AttributeError:
-    import logging
-
     logging.getLogger('FieldsIO').debug('Warning: Single precision not available on this machine')
 
 DTYPES_AVAIL = {val: key for key, val in DTYPES.items()}
