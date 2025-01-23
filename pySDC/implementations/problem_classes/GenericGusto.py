@@ -43,7 +43,7 @@ class GenericGusto(Problem):
             apply_bcs (bool, optional): whether to apply the equation's boundary
                 conditions. Defaults to True.
             solver_params (dict, optional): Solver parameters for the nonlinear variational problems
-            stop_at_divergence (bool): Whether to raise an error when the variational problems do not converge
+            stop_at_divergence (bool, optional): Whether to raise an error when the variational problems do not converge. Defaults to False
             LHS_cache_size (int): Size of the cache for solvers
             residual (Firedrake.form, optional): Overwrite the residual of the equation, e.g. after adding spatial methods.
             *active_labels (:class:`Label`): labels indicating which terms of
