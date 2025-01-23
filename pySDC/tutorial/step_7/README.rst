@@ -64,3 +64,28 @@ This is work in progress in very early stages! The tensor datatype is the simple
 If you want to work on this, your input is appreciated!
 
 .. include:: doc_step_7_D.rst
+
+
+Part E: pySDC and Firedrake
+---------------------------
+
+`Firedrake <https://github.com/firedrakeproject/firedrake>`_ is a finite element library with similar features as FEniCS.
+The below example runs the same heat equation as in the FEniCS example, but implemented in Firedrake.
+See the problem class implementation as a blueprint for how to implement problems with Firedrake in a way that pySDC can understand: `pySDC/implementations/problem_classes/HeatFiredrake.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/problem_classes/HeatFiredrake.py>`_
+
+.. include:: doc_step_7_E.rst
+
+
+Part F: pySDC and Gusto
+---------------------------
+
+`Gusto <https://github.com/firedrakeproject/gusto>`_ is a toolkit for geophysical simulations that uses `Firedrake <https://github.com/firedrakeproject/firedrake>`_ for spatial discretization.
+The below example is an adaptation of the Williamson 5 test case as implemented in Gusto.
+This coupling works slightly different to the other examples within this tutorial, as timestepping is part of Gusto.
+The aim of the coupling is not a spatial discretization, but to use the equations that are implemented in Gusto.
+A Gusto equation includes the basic form of the equation set, but a crucial part is to modify terms in the discretized equations with spatial methods, such as upwinding schemes.
+We get the finished equation set into pySDC by setting up pySDC as a time discretization for Gusto and instantiating a Gusto timestepper.
+During this instantiation the equation, and the residual that is used for solving systems, is modified with all the spatial methods.
+Afterwards, you have a Gusto timestepping scheme that you can run in Gusto and a pySDC controller that you can run by itself.
+
+.. include:: doc_step_7_F.rst
