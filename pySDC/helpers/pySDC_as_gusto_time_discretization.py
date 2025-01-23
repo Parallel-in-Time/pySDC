@@ -43,11 +43,8 @@ class pySDC_integrator(TimeDiscretisation):
         controller_params,
         domain,
         field_name=None,
-        subcycling_options=None,
         solver_parameters=None,
-        limiter=None,
         options=None,
-        augmentation=None,
         t0=0,
         imex=False,
     ):
@@ -62,20 +59,12 @@ class pySDC_integrator(TimeDiscretisation):
                 mesh and the compatible function spaces.
             field_name (str, optional): name of the field to be evolved.
                 Defaults to None.
-            subcycling_options(:class:`SubcyclingOptions`, optional): an object
-                containing options for subcycling the time discretisation.
-                Defaults to None.
             solver_parameters (dict, optional): dictionary of parameters to
                 pass to the underlying solver. Defaults to None.
-            limiter (:class:`Limiter` object, optional): a limiter to apply to
-                the evolving field to enforce monotonicity. Defaults to None.
             options (:class:`AdvectionOptions`, optional): an object containing
                 options to either be passed to the spatial discretisation, or
                 to control the "wrapper" methods, such as Embedded DG or a
                 recovery method. Defaults to None.
-            augmentation (:class:`Augmentation`): allows the equation solved in
-                this time discretisation to be augmented, for instances with
-                extra terms of another auxiliary variable. Defaults to None.
         """
 
         self._residual = None
@@ -83,11 +72,8 @@ class pySDC_integrator(TimeDiscretisation):
         super().__init__(
             domain=domain,
             field_name=field_name,
-            subcycling_options=subcycling_options,
             solver_parameters=solver_parameters,
-            limiter=limiter,
             options=options,
-            augmentation=augmentation,
         )
 
         self.description = description
