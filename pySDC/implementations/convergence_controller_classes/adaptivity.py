@@ -307,6 +307,7 @@ class Adaptivity(AdaptivityBase):
         """
         defaults = {
             "embedded_error_flavor": 'standard',
+            "rel_error": False,
         }
         return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
@@ -328,6 +329,9 @@ class Adaptivity(AdaptivityBase):
         controller.add_convergence_controller(
             EstimateEmbeddedError.get_implementation(self.params.embedded_error_flavor, self.params.useMPI),
             description=description,
+            params={
+                'rel_error': self.params.rel_error,
+            },
         )
 
         # load contraction factor estimator if necessary
@@ -837,6 +841,8 @@ class AdaptivityPolynomialError(AdaptivityForConvergedCollocationProblems):
 
         defaults = {
             'control_order': -50,
+            'problem_mesh_type': 'numpyesque',
+            'rel_error': False,
             **super().setup(controller, params, description, **kwargs),
             **params,
         }
@@ -858,16 +864,27 @@ class AdaptivityPolynomialError(AdaptivityForConvergedCollocationProblems):
         Returns:
             None
         """
-        from pySDC.implementations.convergence_controller_classes.estimate_polynomial_error import (
-            EstimatePolynomialError,
-        )
+        if self.params.problem_mesh_type.lower() == 'numpyesque':
+            from pySDC.implementations.convergence_controller_classes.estimate_polynomial_error import (
+                EstimatePolynomialError as error_estimation_cls,
+            )
+        elif self.params.problem_mesh_type.lower() == 'firedrake':
+            from pySDC.implementations.convergence_controller_classes.estimate_polynomial_error import (
+                EstimatePolynomialErrorFiredrake as error_estimation_cls,
+            )
+        else:
+            raise NotImplementedError(
+                f'Don\'t know what error estimation class to use for problems with mesh type {self.params.problem_mesh_type}'
+            )
 
         super().dependencies(controller, description, **kwargs)
 
         controller.add_convergence_controller(
-            EstimatePolynomialError,
+            error_estimation_cls,
             description=description,
-            params={},
+            params={
+                'rel_error': self.params.rel_error,
+            },
         )
         return None
 
