@@ -6,7 +6,7 @@ This is Test Case 5 (flow over a mountain) of Williamson et al, 1992:
 ``A standard test set for numerical approximations to the shallow water
 equations in spherical geometry'', JCP.
 
-This script is adapted from the Gusto examples.
+This script is adapted from the Gusto example: https://github.com/firedrakeproject/gusto/blob/main/examples/shallow_water/williamson_5.py
 
 The pySDC coupling works by setting up pySDC as a time integrator within Gusto.
 To this end, you need to construct a pySDC description and controller parameters as usual and pass them when
