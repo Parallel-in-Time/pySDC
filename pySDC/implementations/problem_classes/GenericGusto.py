@@ -183,7 +183,7 @@ class GenericGustoImex(GenericGusto):
     dtype_f = IMEX_firedrake_mesh
     rhs_n_labels = 2
 
-    def evaluate_individual_term(self, u, label):
+    def evaluate_labeled_term(self, u, label):
         self._u.assign(u.functionspace)
 
         if label not in self.solvers.keys():
@@ -210,8 +210,8 @@ class GenericGustoImex(GenericGusto):
 
     def eval_f(self, u, *args):
         me = self.dtype_f(self.init)
-        me.impl.assign(self.evaluate_individual_term(u, implicit))
-        me.expl.assign(self.evaluate_individual_term(u, explicit))
+        me.impl.assign(self.evaluate_labeled_term(u, implicit))
+        me.expl.assign(self.evaluate_labeled_term(u, explicit))
         self.work_counters['rhs']()
         return me
 
