@@ -57,6 +57,7 @@ class EstimateEmbeddedError(ConvergenceController):
         return {
             "control_order": -80,
             "sweeper_type": sweeper_type,
+            "rel_error": False,
             **super().setup(controller, params, description, **kwargs),
         }
 
@@ -94,13 +95,24 @@ class EstimateEmbeddedError(ConvergenceController):
         """
         if self.params.sweeper_type == "RK":
             L.sweep.compute_end_point()
-            return abs(L.uend - L.sweep.u_secondary)
+            if self.params.rel_error:
+                return abs(L.uend - L.sweep.u_secondary) / abs(L.uend)
+            else:
+                return abs(L.uend - L.sweep.u_secondary)
         elif self.params.sweeper_type == "SDC":
             # order rises by one between sweeps
-            return abs(L.uold[-1] - L.u[-1])
+            if self.params.rel_error:
+                return abs(L.uold[-1] - L.u[-1]) / abs(L.u[-1])
+            else:
+                return abs(L.uold[-1] - L.u[-1])
         elif self.params.sweeper_type == 'MPI':
             comm = L.sweep.comm
-            return comm.bcast(abs(L.uold[comm.rank + 1] - L.u[comm.rank + 1]), root=comm.size - 1)
+            if self.params.rel_error:
+                return comm.bcast(
+                    abs(L.uold[comm.rank + 1] - L.u[comm.rank + 1]) / abs(L.u[comm.rank + 1]), root=comm.size - 1
+                )
+            else:
+                return comm.bcast(abs(L.uold[comm.rank + 1] - L.u[comm.rank + 1]), root=comm.size - 1)
         else:
             raise NotImplementedError(
                 f"Don't know how to estimate embedded error for sweeper type \

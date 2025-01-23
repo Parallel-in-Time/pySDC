@@ -1,7 +1,7 @@
 import pytest
 
 
-def get_controller(dt, num_nodes, quad_type, useMPI, useGPU):
+def get_controller(dt, num_nodes, quad_type, useMPI, useGPU, rel_error):
     """
     Get a controller prepared for polynomial test equation
 
@@ -64,7 +64,7 @@ def get_controller(dt, num_nodes, quad_type, useMPI, useGPU):
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
-    description['convergence_controllers'] = {EstimatePolynomialError: {}}
+    description['convergence_controllers'] = {EstimatePolynomialError: {'rel_error': rel_error}}
 
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
     return controller
@@ -177,13 +177,15 @@ def check_order(dts, **kwargs):
 @pytest.mark.base
 @pytest.mark.parametrize('num_nodes', [2, 3, 4, 5])
 @pytest.mark.parametrize('quad_type', ['RADAU-RIGHT', 'GAUSS'])
-def test_interpolation_error(num_nodes, quad_type):
+@pytest.mark.parametrize('rel_error', [True, False])
+def test_interpolation_error(num_nodes, quad_type, rel_error):
     import numpy as np
 
     kwargs = {
         'num_nodes': num_nodes,
         'quad_type': quad_type,
         'useMPI': False,
+        'rel_error': rel_error,
     }
     steps = np.logspace(-1, -4, 20)
     check_order(steps, **kwargs)
@@ -200,6 +202,7 @@ def test_interpolation_error_GPU(num_nodes, quad_type):
         'quad_type': quad_type,
         'useMPI': False,
         'useGPU': True,
+        'rel_error': False,
     }
     steps = np.logspace(-1, -4, 20)
     check_order(steps, **kwargs)
@@ -228,6 +231,77 @@ def test_interpolation_error_MPI(num_nodes, quad_type):
     )
 
 
+@pytest.mark.firedrake
+def test_polynomial_error_firedrake(dt=1.0, num_nodes=3, useMPI=False):
+    from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.convergence_controller_classes.estimate_polynomial_error import (
+        EstimatePolynomialErrorFiredrake,
+        LagrangeApproximation,
+    )
+    import numpy as np
+
+    if useMPI:
+        from pySDC.implementations.sweeper_classes.generic_implicit_MPI import generic_implicit_MPI as sweeper_class
+        from mpi4py import MPI
+
+        comm = MPI.COMM_WORLD
+    else:
+        from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit as sweeper_class
+
+        comm = None
+
+    level_params = {}
+    level_params['dt'] = dt
+    level_params['restol'] = 1.0
+
+    sweeper_params = {}
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
+    sweeper_params['num_nodes'] = num_nodes
+    sweeper_params['comm'] = comm
+
+    problem_params = {'n': 1}
+
+    step_params = {}
+    step_params['maxiter'] = 0
+
+    controller_params = {}
+    controller_params['logger_level'] = 30
+    controller_params['mssdc_jac'] = False
+
+    description = {}
+    description['problem_class'] = Heat1DForcedFiredrake
+    description['problem_params'] = problem_params
+    description['sweeper_class'] = sweeper_class
+    description['sweeper_params'] = sweeper_params
+    description['level_params'] = level_params
+    description['step_params'] = step_params
+    description['convergence_controllers'] = {EstimatePolynomialErrorFiredrake: {}}
+
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+
+    L = controller.MS[0].levels[0]
+
+    cont = controller.convergence_controllers[
+        np.arange(len(controller.convergence_controllers))[
+            [type(me).__name__ == 'EstimatePolynomialErrorFiredrake' for me in controller.convergence_controllers]
+        ][0]
+    ]
+
+    nodes = np.append(np.append(0, L.sweep.coll.nodes), 1.0)
+    estimate_on_node = cont.params.estimate_on_node
+    interpolator = LagrangeApproximation(points=[nodes[i] for i in range(num_nodes + 1) if i != estimate_on_node])
+    cont.interpolation_matrix = np.array(interpolator.getInterpolationMatrix([nodes[estimate_on_node]]))
+
+    for i in range(num_nodes + 1):
+        L.u[i] = L.prob.u_init
+        L.u[i].functionspace.assign(nodes[i])
+
+    u_inter = cont.get_interpolated_solution(L)
+    error = abs(u_inter - L.u[estimate_on_node])
+    assert np.isclose(error, 0)
+
+
 if __name__ == "__main__":
     import sys
     import numpy as np
@@ -238,7 +312,8 @@ if __name__ == "__main__":
         kwargs = {
             'num_nodes': int(sys.argv[1]),
             'quad_type': sys.argv[2],
+            'rel_error': False,
         }
         check_order(steps, useMPI=True, **kwargs)
     else:
-        check_order(steps, useMPI=False, num_nodes=3, quad_type='RADAU-RIGHT')
+        check_order(steps, useMPI=False, num_nodes=3, quad_type='RADAU-RIGHT', rel_error=False)
