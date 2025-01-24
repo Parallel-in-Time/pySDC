@@ -5,7 +5,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 class mesh_to_mesh(SpaceTransfer):
     """
-    Custon base_transfer class, implements Transfer.py
+    Custom base_transfer class, implements Transfer.py
 
     This implementation can restrict and prolong between nd meshes with dirichlet-0 or periodic boundaries
     via matrix-vector products
@@ -14,18 +14,6 @@ class mesh_to_mesh(SpaceTransfer):
         Rspace: spatial restriction matrix, dim. Nf x Nc
         Pspace: spatial prolongation matrix, dim. Nc x Nf
     """
-
-    def __init__(self, fine_prob, coarse_prob, params):
-        """
-        Initialization routine
-
-        Args:
-            fine_prob: fine problem
-            coarse_prob: coarse problem
-            params: parameters for the transfer operators
-        """
-        # invoke super initialization
-        super(mesh_to_mesh, self).__init__(fine_prob, coarse_prob, params)
 
     def restrict(self, F):
         """
