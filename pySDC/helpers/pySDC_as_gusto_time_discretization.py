@@ -96,6 +96,7 @@ class pySDC_integrator(TimeDiscretisation):
             'equation': equation,
             'solver_parameters': self.solver_parameters,
             'residual': self._residual,
+            **self.description['problem_params'],
         }
         self.description['level_params']['dt'] = float(self.domain.dt)
 

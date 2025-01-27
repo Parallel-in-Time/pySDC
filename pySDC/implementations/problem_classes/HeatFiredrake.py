@@ -53,7 +53,7 @@ class Heat1DForcedFiredrake(Problem):
     dtype_u = firedrake_mesh
     dtype_f = IMEX_firedrake_mesh
 
-    def __init__(self, n=30, nu=0.1, c=0.0, LHS_cache_size=12, comm=None):
+    def __init__(self, n=30, nu=0.1, c=0.0, order=4, LHS_cache_size=12, mesh=None, comm=None):
         """
         Initialization
 
@@ -61,18 +61,22 @@ class Heat1DForcedFiredrake(Problem):
             n (int): Number of degrees of freedom
             nu (float): Diffusion parameter
             c (float): Boundary condition constant
+            order (int): Order of finite elements
             LHS_cache_size (int): Size of the cache for solvers
-            comm (mpi4pi.Intracomm): MPI communicator for spatial parallelism
+            mesh (Firedrake mesh, optional): Give a custom mesh, for instance from a hierarchy
+            comm (mpi4pi.Intracomm, optional): MPI communicator for spatial parallelism
         """
         comm = MPI.COMM_WORLD if comm is None else comm
 
         # prepare Firedrake mesh and function space
-        self.mesh = fd.UnitIntervalMesh(n, comm=comm)
-        self.V = fd.FunctionSpace(self.mesh, "CG", 4)
+        self.mesh = fd.UnitIntervalMesh(n, comm=comm) if mesh is None else mesh
+        self.V = fd.FunctionSpace(self.mesh, "CG", order)
 
         # prepare pySDC problem class infrastructure by passing the function space to super init
         super().__init__(self.V)
-        self._makeAttributeAndRegister('n', 'nu', 'c', 'LHS_cache_size', 'comm', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister(
+            'n', 'nu', 'c', 'order', 'LHS_cache_size', 'comm', localVars=locals(), readOnly=True
+        )
 
         # prepare caches and IO variables for solvers
         self.solvers = {}
@@ -191,6 +195,10 @@ class Heat1DForcedFiredrake(Problem):
         self.work_counters['solves']()
         return me
 
+    @fd.utils.cached_property
+    def x(self):
+        return fd.SpatialCoordinate(self.mesh)
+
     def u_exact(self, t):
         r"""
         Routine to compute the exact solution at time :math:`t`.
@@ -206,6 +214,5 @@ class Heat1DForcedFiredrake(Problem):
             Exact solution.
         """
         me = self.u_init
-        x = fd.SpatialCoordinate(self.mesh)
-        me.interpolate(np.cos(t) * fd.sin(np.pi * x[0]) + self.c)
+        me.interpolate(np.cos(t) * fd.sin(np.pi * self.x[0]) + self.c)
         return me
