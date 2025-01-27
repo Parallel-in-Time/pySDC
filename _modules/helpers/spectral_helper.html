@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>helpers.spectral_helper &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
     
@@ -37,15 +37,15 @@
           <div class="body" role="main">
             
   <h1>Source code for helpers.spectral_helper</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
-<span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">factorial</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.special</span><span class="w"> </span><span class="kn">import</span> <span class="n">factorial</span>
 
 
 <div class="viewcode-block" id="SpectralHelper1D">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D">[docs]</a>
-<span class="k">class</span> <span class="nc">SpectralHelper1D</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SpectralHelper1D</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstract base class for 1D spectral discretizations. Defines a common interface with parameters and functions that</span>
 <span class="sd">    all bases need to have.</span>
@@ -67,7 +67,7 @@
     <span class="n">linalg</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">linalg</span>
     <span class="n">xp</span> <span class="o">=</span> <span class="n">np</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">useGPU</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">useGPU</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor</span>
 
@@ -89,13 +89,13 @@
 <div class="viewcode-block" id="SpectralHelper1D.setup_GPU">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.setup_GPU">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;switch to GPU modules&quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">cupy</span> <span class="k">as</span> <span class="nn">cp</span>
-        <span class="kn">import</span> <span class="nn">cupyx.scipy.sparse</span> <span class="k">as</span> <span class="nn">sparse_lib</span>
-        <span class="kn">import</span> <span class="nn">cupyx.scipy.sparse.linalg</span> <span class="k">as</span> <span class="nn">linalg</span>
-        <span class="kn">import</span> <span class="nn">cupyx.scipy.fft</span> <span class="k">as</span> <span class="nn">fft_lib</span>
-        <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span> <span class="kn">import</span> <span class="n">cupy_mesh</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">cupyx.scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sparse_lib</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">cupyx.scipy.sparse.linalg</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">linalg</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">cupyx.scipy.fft</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">fft_lib</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">cupy_mesh</span>
 
         <span class="bp">cls</span><span class="o">.</span><span class="n">xp</span> <span class="o">=</span> <span class="n">cp</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">sparse_lib</span> <span class="o">=</span> <span class="n">sparse_lib</span>
@@ -105,7 +105,7 @@
 
 <div class="viewcode-block" id="SpectralHelper1D.get_Id">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.get_Id">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_Id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_Id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get identity matrix</span>
 
@@ -117,7 +117,7 @@
 
 <div class="viewcode-block" id="SpectralHelper1D.get_zero">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.get_zero">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_zero</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_zero</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a matrix with all zeros of the correct size.</span>
 
@@ -129,19 +129,19 @@
 
 <div class="viewcode-block" id="SpectralHelper1D.get_differentiation_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.get_differentiation_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_differentiation_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_differentiation_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="SpectralHelper1D.get_integration_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.get_integration_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_integration_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_integration_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="SpectralHelper1D.get_wavenumbers">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.get_wavenumbers">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_wavenumbers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_wavenumbers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the grid in spectral space</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -150,7 +150,7 @@
 
 <div class="viewcode-block" id="SpectralHelper1D.get_empty_operator_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.get_empty_operator_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_empty_operator_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">O</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_empty_operator_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">O</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a matrix of operators to be filled with the connections between the solution components.</span>
 
@@ -166,7 +166,7 @@
 
 <div class="viewcode-block" id="SpectralHelper1D.get_basis_change_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.get_basis_change_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_basis_change_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_basis_change_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Some spectral discretization change the basis during differentiation. This method can be used to transfer</span>
 <span class="sd">        between the various bases.</span>
@@ -187,7 +187,7 @@
 
 <div class="viewcode-block" id="SpectralHelper1D.get_BC">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.get_BC">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_BC</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_BC</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To facilitate boundary conditions (BCs) we use either a basis where all functions satisfy the BCs automatically,</span>
 <span class="sd">        as is the case in FFT basis for periodic BCs, or boundary bordering. In boundary bordering, specific lines in</span>
@@ -205,7 +205,7 @@
 
 <div class="viewcode-block" id="SpectralHelper1D.get_filter_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.get_filter_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_filter_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">kmax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_filter_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">kmax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a bandpass filter.</span>
 
@@ -234,7 +234,7 @@
 
 <div class="viewcode-block" id="SpectralHelper1D.get_1dgrid">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.get_1dgrid">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_1dgrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_1dgrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the grid in physical space</span>
 
@@ -248,7 +248,7 @@
 
 <div class="viewcode-block" id="ChebychevHelper">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper">[docs]</a>
-<span class="k">class</span> <span class="nc">ChebychevHelper</span><span class="p">(</span><span class="n">SpectralHelper1D</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChebychevHelper</span><span class="p">(</span><span class="n">SpectralHelper1D</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The Chebychev base consists of special kinds of polynomials, with the main advantage that you can easily transform</span>
 <span class="sd">    between physical and spectral space by discrete cosine transform.</span>
@@ -259,7 +259,7 @@
 <span class="sd">    This implementation is largely based on the Dedalus paper (arXiv:1905.10388).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">transform_type</span><span class="o">=</span><span class="s1">&#39;fft&#39;</span><span class="p">,</span> <span class="n">x0</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">transform_type</span><span class="o">=</span><span class="s1">&#39;fft&#39;</span><span class="p">,</span> <span class="n">x0</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor.</span>
 <span class="sd">        Please refer to the parent class for additional arguments. Notably, you have to supply a resolution `N` and you</span>
@@ -284,7 +284,7 @@
 
 <div class="viewcode-block" id="ChebychevHelper.get_1dgrid">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_1dgrid">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_1dgrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_1dgrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Generates a 1D grid with Chebychev points. These are clustered at the boundary. You need this kind of grid to</span>
 <span class="sd">        use discrete cosine transformation (DCT) to get the Chebychev representation. If you want a different grid, you</span>
@@ -298,14 +298,14 @@
 
 <div class="viewcode-block" id="ChebychevHelper.get_wavenumbers">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_wavenumbers">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_wavenumbers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_wavenumbers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the domain in spectral space&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ChebychevHelper.get_conv">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_conv">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_conv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_conv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Get conversion matrix between different kinds of polynomials. The supported kinds are</span>
 <span class="sd">         - T: Chebychev polynomials of first kind</span>
@@ -329,7 +329,7 @@
         <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span>
         <span class="n">xp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span>
 
-        <span class="k">def</span> <span class="nf">get_forward_conv</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_forward_conv</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;T2U&#39;</span><span class="p">:</span>
                 <span class="n">mat</span> <span class="o">=</span> <span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="o">-</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">2</span><span class="p">),</span> <span class="n">offsets</span><span class="o">=+</span><span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="mf">2.0</span>
                 <span class="n">mat</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="mi">2</span>
@@ -346,14 +346,14 @@
         <span class="k">except</span> <span class="ne">NotImplementedError</span> <span class="k">as</span> <span class="n">E</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">fwd</span> <span class="o">=</span> <span class="n">get_forward_conv</span><span class="p">(</span><span class="n">name</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-                <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+                <span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
 
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span> <span class="o">==</span> <span class="n">sp</span><span class="p">:</span>
                     <span class="n">mat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">fwd</span><span class="o">.</span><span class="n">tocsc</span><span class="p">())</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">mat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">fwd</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">()))</span>
             <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span> <span class="kn">from</span> <span class="nn">E</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span> <span class="kn">from</span><span class="w"> </span><span class="nn">E</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mat</span>
         <span class="k">return</span> <span class="n">mat</span></div>
@@ -361,7 +361,7 @@
 
 <div class="viewcode-block" id="ChebychevHelper.get_basis_change_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_basis_change_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_basis_change_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conv</span><span class="o">=</span><span class="s1">&#39;T2T&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_basis_change_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conv</span><span class="o">=</span><span class="s1">&#39;T2T&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        As the differentiation matrix in Chebychev-T base is dense but is sparse when simultaneously changing base to</span>
 <span class="sd">        Chebychev-U, you may need a basis change matrix to transfer the other matrices as well. This function returns a</span>
@@ -379,7 +379,7 @@
 
 <div class="viewcode-block" id="ChebychevHelper.get_integration_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_integration_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_integration_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lbnd</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_integration_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lbnd</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get matrix for integration</span>
 
@@ -405,7 +405,7 @@
 
 <div class="viewcode-block" id="ChebychevHelper.get_differentiation_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_differentiation_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_differentiation_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_differentiation_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Keep in mind that the T2T differentiation matrix is dense.</span>
 
@@ -426,7 +426,7 @@
 
 <div class="viewcode-block" id="ChebychevHelper.get_norm">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_norm">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Get normalization for converting Chebychev coefficients and DCT</span>
 
@@ -444,7 +444,7 @@
 
 <div class="viewcode-block" id="ChebychevHelper.get_fft_shuffle">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_fft_shuffle">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_fft_shuffle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forward</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_fft_shuffle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forward</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        In order to more easily parallelize using distributed FFT libraries, we express the DCT via an FFT following</span>
 <span class="sd">        doi.org/10.1109/TASSP.1980.1163351. The idea is based on reshuffling the data to be periodic and rotating it</span>
@@ -470,7 +470,7 @@
 
 <div class="viewcode-block" id="ChebychevHelper.get_fft_shift">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_fft_shift">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_fft_shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forward</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_fft_shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forward</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        As described in the docstring for `get_fft_shuffle`, we need to rotate in the complex plane in order to use FFT for DCT.</span>
 
@@ -494,7 +494,7 @@
 
 <div class="viewcode-block" id="ChebychevHelper.get_fft_utils">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_fft_utils">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_fft_utils</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_fft_utils</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the required utilities for using FFT to do DCT as described in the docstring for `get_fft_shuffle` and keep</span>
 <span class="sd">        them cached.</span>
@@ -517,7 +517,7 @@
 
 <div class="viewcode-block" id="ChebychevHelper.transform">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.transform">[docs]</a>
-    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        1D DCT along axis. `kwargs` will be passed on to the FFT library.</span>
 
@@ -553,7 +553,7 @@
 
 <div class="viewcode-block" id="ChebychevHelper.itransform">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.itransform">[docs]</a>
-    <span class="k">def</span> <span class="nf">itransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">itransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        1D inverse DCT along axis.</span>
 
@@ -588,7 +588,7 @@
 
 <div class="viewcode-block" id="ChebychevHelper.get_BC">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_BC">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_BC</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_BC</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get boundary condition row for boundary bordering. `kwargs` will be passed on to implementations of the BC of</span>
 <span class="sd">        the kind you choose. Specifically, `x` for `&#39;dirichlet&#39;` boundary condition, which is the coordinate at which to</span>
@@ -607,7 +607,7 @@
 
 <div class="viewcode-block" id="ChebychevHelper.get_integ_BC_row">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_integ_BC_row">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_integ_BC_row</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_integ_BC_row</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a row for generating integral BCs with T polynomials.</span>
 <span class="sd">        It returns the values of the integrals of T polynomials over the entire interval.</span>
@@ -624,7 +624,7 @@
 
 <div class="viewcode-block" id="ChebychevHelper.get_Dirichlet_BC_row">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_Dirichlet_BC_row">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_Dirichlet_BC_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_Dirichlet_BC_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a row for generating Dirichlet BCs at x with T polynomials.</span>
 <span class="sd">        It returns the values of the T polynomials at x.</span>
@@ -649,7 +649,7 @@
 
 <div class="viewcode-block" id="ChebychevHelper.get_Dirichlet_recombination_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_Dirichlet_recombination_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_Dirichlet_recombination_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_Dirichlet_recombination_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Get matrix for Dirichlet recombination, which changes the basis to have sparse boundary conditions.</span>
 <span class="sd">        This makes for a good right preconditioner.</span>
@@ -668,7 +668,7 @@
 
 <div class="viewcode-block" id="UltrasphericalHelper">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.UltrasphericalHelper">[docs]</a>
-<span class="k">class</span> <span class="nc">UltrasphericalHelper</span><span class="p">(</span><span class="n">ChebychevHelper</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UltrasphericalHelper</span><span class="p">(</span><span class="n">ChebychevHelper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This implementation follows https://doi.org/10.1137/120865458.</span>
 <span class="sd">    The ultraspherical method works in Chebychev polynomials as well, but also uses various Gegenbauer polynomials.</span>
@@ -681,7 +681,7 @@
 
 <div class="viewcode-block" id="UltrasphericalHelper.get_differentiation_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.UltrasphericalHelper.get_differentiation_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_differentiation_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_differentiation_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Notice that while sparse, this matrix is not diagonal, which means the inversion cannot be parallelized easily.</span>
 
@@ -700,7 +700,7 @@
 
 <div class="viewcode-block" id="UltrasphericalHelper.get_S">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.UltrasphericalHelper.get_S">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_S</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_S</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get matrix for bumping the derivative base by one from lmbda to lmbda + 1. This is the same language as in</span>
 <span class="sd">        https://doi.org/10.1137/120865458.</span>
@@ -729,7 +729,7 @@
 
 <div class="viewcode-block" id="UltrasphericalHelper.get_basis_change_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.UltrasphericalHelper.get_basis_change_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_basis_change_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p_in</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">p_out</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_basis_change_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p_in</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">p_out</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a conversion matrix from derivative base `p_in` to `p_out`.</span>
 
@@ -746,7 +746,7 @@
 
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># We have to invert the matrix on CPU because the GPU equivalent is not implemented in CuPy at the time of writing.</span>
-            <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">useGPU</span><span class="p">:</span>
                 <span class="n">mat_fwd</span> <span class="o">=</span> <span class="n">mat_fwd</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
@@ -758,7 +758,7 @@
 
 <div class="viewcode-block" id="UltrasphericalHelper.get_integration_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.UltrasphericalHelper.get_integration_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_integration_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_integration_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get an integration matrix. Please use `UltrasphericalHelper.get_integration_constant` afterwards to compute the</span>
 <span class="sd">        integration constant such that integration starts from x=-1.</span>
@@ -793,7 +793,7 @@
 
 <div class="viewcode-block" id="UltrasphericalHelper.get_integration_constant">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.UltrasphericalHelper.get_integration_constant">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_integration_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u_hat</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_integration_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u_hat</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get integration constant for lower bound of -1. See documentation of `UltrasphericalHelper.get_integration_matrix` for details.</span>
 
@@ -815,8 +815,8 @@
 
 <div class="viewcode-block" id="FFTHelper">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper">[docs]</a>
-<span class="k">class</span> <span class="nc">FFTHelper</span><span class="p">(</span><span class="n">SpectralHelper1D</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FFTHelper</span><span class="p">(</span><span class="n">SpectralHelper1D</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor.</span>
 <span class="sd">        Please refer to the parent class for additional arguments. Notably, you have to supply a resolution `N` and you</span>
@@ -832,7 +832,7 @@
 
 <div class="viewcode-block" id="FFTHelper.get_1dgrid">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper.get_1dgrid">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_1dgrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_1dgrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        We use equally spaced points including the left boundary and not including the right one, which is the left boundary.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -842,7 +842,7 @@
 
 <div class="viewcode-block" id="FFTHelper.get_wavenumbers">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper.get_wavenumbers">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_wavenumbers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_wavenumbers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Be careful that this ordering is very unintuitive.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -851,7 +851,7 @@
 
 <div class="viewcode-block" id="FFTHelper.get_differentiation_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper.get_differentiation_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_differentiation_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_differentiation_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This matrix is diagonal, allowing to invert concurrently.</span>
 
@@ -865,7 +865,7 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">useGPU</span><span class="p">:</span>
             <span class="c1"># Have to raise the matrix to power p on CPU because the GPU equivalent is not implemented in CuPy at the time of writing.</span>
-            <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
 
             <span class="n">D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_power</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
@@ -875,7 +875,7 @@
 
 <div class="viewcode-block" id="FFTHelper.get_integration_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper.get_integration_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_integration_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_integration_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get integration matrix to compute `p`-th integral over the entire domain.</span>
 
@@ -892,7 +892,7 @@
 
 <div class="viewcode-block" id="FFTHelper.transform">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper.transform">[docs]</a>
-    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        1D FFT along axis. `kwargs` are passed on to the FFT library.</span>
 
@@ -908,7 +908,7 @@
 
 <div class="viewcode-block" id="FFTHelper.itransform">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper.itransform">[docs]</a>
-    <span class="k">def</span> <span class="nf">itransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">itransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Inverse 1D FFT.</span>
 
@@ -924,7 +924,7 @@
 
 <div class="viewcode-block" id="FFTHelper.get_BC">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper.get_BC">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_BC</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_BC</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a sort of boundary condition. You can use `kind=integral`, to fix the integral, or you can use `kind=Nyquist`.</span>
 <span class="sd">        The latter is not really a boundary condition, but is used to set the Nyquist mode to some value, preferably zero.</span>
@@ -951,7 +951,7 @@
 
 <div class="viewcode-block" id="FFTHelper.get_Nyquist_mode_index">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper.get_Nyquist_mode_index">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_Nyquist_mode_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_Nyquist_mode_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the index of the Nyquist mode, i.e. the mode with the lowest wavenumber, which doesn&#39;t have a positive</span>
 <span class="sd">        counterpart for even resolution. This means real waves of this wave number cannot be properly resolved and you</span>
@@ -968,7 +968,7 @@
 
 <div class="viewcode-block" id="FFTHelper.get_integ_BC_row">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper.get_integ_BC_row">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_integ_BC_row</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_integ_BC_row</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Only the 0-mode has non-zero integral with FFT basis in periodic BCs</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -981,7 +981,7 @@
 
 <div class="viewcode-block" id="SpectralHelper">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper">[docs]</a>
-<span class="k">class</span> <span class="nc">SpectralHelper</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SpectralHelper</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class has three functions:</span>
 <span class="sd">      - Easily assemble matrices containing multiple equations</span>
@@ -1020,12 +1020,12 @@
 <div class="viewcode-block" id="SpectralHelper.setup_GPU">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.setup_GPU">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;switch to GPU modules&quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">cupy</span> <span class="k">as</span> <span class="nn">cp</span>
-        <span class="kn">import</span> <span class="nn">cupyx.scipy.sparse</span> <span class="k">as</span> <span class="nn">sparse_lib</span>
-        <span class="kn">import</span> <span class="nn">cupyx.scipy.sparse.linalg</span> <span class="k">as</span> <span class="nn">linalg</span>
-        <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span> <span class="kn">import</span> <span class="n">cupy_mesh</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">cupyx.scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sparse_lib</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">cupyx.scipy.sparse.linalg</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">linalg</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">cupy_mesh</span>
 
         <span class="bp">cls</span><span class="o">.</span><span class="n">xp</span> <span class="o">=</span> <span class="n">cp</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">sparse_lib</span> <span class="o">=</span> <span class="n">sparse_lib</span>
@@ -1037,7 +1037,7 @@
         <span class="bp">cls</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">cupy_mesh</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">useGPU</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">useGPU</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor</span>
 
@@ -1063,36 +1063,36 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fft_cache</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">u_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get empty data container in physical space</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">u_init_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_init_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get empty data container in spectral space</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init_forward</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get shape of individual solution component</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">ndim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ndim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">ncomponents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ncomponents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">V</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">V</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get domain volume</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1100,7 +1100,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.add_axis">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.add_axis">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add an axis to the domain by deciding on suitable 1D base.</span>
 <span class="sd">        Arguments to the bases are forwarded using `*args` and `**kwargs`. Please refer to the documentation of the 1D</span>
@@ -1126,7 +1126,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.add_component">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.add_component">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add solution component(s).</span>
 
@@ -1146,7 +1146,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.index">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.index">[docs]</a>
-    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the index of component `name`.</span>
 
@@ -1166,7 +1166,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.get_empty_operator_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_empty_operator_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_empty_operator_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_empty_operator_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a matrix of operators to be filled with the connections between the solution components.</span>
 
@@ -1180,7 +1180,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.get_BC">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_BC">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_BC</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">line</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_BC</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">line</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Use this method for boundary bordering. It gets the respective matrix row and embeds it into a matrix.</span>
 <span class="sd">        Pay attention that if you have multiple BCs in a single equation, you need to put them in different lines.</span>
@@ -1232,7 +1232,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.remove_BC">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.remove_BC">[docs]</a>
-    <span class="k">def</span> <span class="nf">remove_BC</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">equation</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">line</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_BC</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">equation</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">line</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove a BC from the matrix. This is useful e.g. when you add a non-scalar BC and then need to selectively</span>
 <span class="sd">        remove single BCs again, as in incompressible Navier-Stokes, for instance.</span>
@@ -1269,7 +1269,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.add_BC">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.add_BC">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_BC</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">equation</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">line</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_BC</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">equation</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">line</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add a BC to the matrix. Note that you need to convert the list of lists of BCs that this method generates to a</span>
 <span class="sd">        single sparse matrix by calling `setup_BCs` after adding/removing all BCs.</span>
@@ -1324,7 +1324,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.setup_BCs">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.setup_BCs">[docs]</a>
-    <span class="k">def</span> <span class="nf">setup_BCs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_BCs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert the list of lists of BCs to the boundary condition operator.</span>
 <span class="sd">        Also, boundary bordering requires to zero out all other entries in the matrix in rows containing a boundary</span>
@@ -1345,7 +1345,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.check_BCs">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.check_BCs">[docs]</a>
-    <span class="k">def</span> <span class="nf">check_BCs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_BCs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check that the solution satisfies the boundary conditions</span>
 
@@ -1377,7 +1377,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.put_BCs_in_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.put_BCs_in_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">put_BCs_in_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">put_BCs_in_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Put the boundary conditions in a matrix by replacing rows with BCs.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1386,7 +1386,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.put_BCs_in_rhs_hat">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.put_BCs_in_rhs_hat">[docs]</a>
-    <span class="k">def</span> <span class="nf">put_BCs_in_rhs_hat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs_hat</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">put_BCs_in_rhs_hat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs_hat</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Put the BCs in the right hand side in spectral space for solving.</span>
 <span class="sd">        This function needs no transforms and caches a mask for faster subsequent use.</span>
@@ -1424,7 +1424,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.put_BCs_in_rhs">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.put_BCs_in_rhs">[docs]</a>
-    <span class="k">def</span> <span class="nf">put_BCs_in_rhs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">put_BCs_in_rhs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Put the BCs in the right hand side for solving.</span>
 <span class="sd">        This function will transform along each axis individually and add all BCs in that axis.</span>
@@ -1465,7 +1465,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.add_equation_lhs">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.add_equation_lhs">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_equation_lhs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">equation</span><span class="p">,</span> <span class="n">relations</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_equation_lhs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">equation</span><span class="p">,</span> <span class="n">relations</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add the left hand part (that you want to solve implicitly) of an equation to a list of lists of sparse matrices</span>
 <span class="sd">        that you will convert to an operator later.</span>
@@ -1507,7 +1507,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.convert_operator_matrix_to_operator">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.convert_operator_matrix_to_operator">[docs]</a>
-    <span class="k">def</span> <span class="nf">convert_operator_matrix_to_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert_operator_matrix_to_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Promote the list of lists of sparse matrices to a single sparse matrix that can be used as linear operator.</span>
 <span class="sd">        See documentation of `SpectralHelper.add_equation_lhs` for an example.</span>
@@ -1526,7 +1526,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.get_wavenumbers">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_wavenumbers">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_wavenumbers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_wavenumbers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get grid in spectral space</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1536,7 +1536,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.get_grid">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_grid">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get grid in physical space</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1546,7 +1546,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.get_fft">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_fft">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_fft</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_fft</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        When using MPI, we use `PFFT` objects generated by mpi4py-fft</span>
 
@@ -1583,7 +1583,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">fft_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;object&#39;</span><span class="p">:</span>
-                    <span class="kn">from</span> <span class="nn">mpi4py_fft</span> <span class="kn">import</span> <span class="n">PFFT</span>
+                    <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py_fft</span><span class="w"> </span><span class="kn">import</span> <span class="n">PFFT</span>
 
                     <span class="n">_fft</span> <span class="o">=</span> <span class="n">PFFT</span><span class="p">(</span>
                         <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">,</span>
@@ -1610,7 +1610,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.setup_fft">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.setup_fft">[docs]</a>
-    <span class="k">def</span> <span class="nf">setup_fft</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">real_spectral_coefficients</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_fft</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">real_spectral_coefficients</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function must be called after all axes have been setup in order to prepare the local shapes of the data.</span>
 <span class="sd">        This must also be called before setting up any BCs.</span>
@@ -1657,7 +1657,7 @@
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_transform_fft</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_transform_fft</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        FFT along `axes`</span>
 
@@ -1672,7 +1672,7 @@
         <span class="n">fft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fft</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="s1">&#39;forward&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">fft</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_transform_dct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_transform_dct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        DCT along `axes`.</span>
 <span class="sd">        This will only return real values!</span>
@@ -1734,7 +1734,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.transform_single_component">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.transform_single_component">[docs]</a>
-    <span class="k">def</span> <span class="nf">transform_single_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transform_single_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Transform a single component of the solution</span>
 
@@ -1809,7 +1809,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.transform">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.transform">[docs]</a>
-    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Transform all components from physical space to spectral space</span>
 
@@ -1842,12 +1842,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_transform_ifft</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_transform_ifft</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># TODO: clean up and try putting more of this in the 1D bases</span>
         <span class="n">ifft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fft</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="s1">&#39;backward&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ifft</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_transform_idct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_transform_idct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        This will only ever return real values!</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -1904,7 +1904,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.itransform_single_component">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.itransform_single_component">[docs]</a>
-    <span class="k">def</span> <span class="nf">itransform_single_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">itransform_single_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Inverse transform over single component of the solution</span>
 
@@ -1977,7 +1977,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.get_aligned">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_aligned">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_aligned</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axis_in</span><span class="p">,</span> <span class="n">axis_out</span><span class="p">,</span> <span class="n">fft</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">forward</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_aligned</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axis_in</span><span class="p">,</span> <span class="n">axis_out</span><span class="p">,</span> <span class="n">fft</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">forward</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Realign the data along the axis when using distributed FFTs. `kwargs` will be used to get the correct PFFT</span>
 <span class="sd">        object from `mpi4py-fft`, which has suitable transfer classes for the shape of data. Hence, they should include</span>
@@ -2035,7 +2035,7 @@
 
             <span class="k">return</span> <span class="n">u</span>
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># go the potentially slower route of not reusing transfer classes</span>
-            <span class="kn">from</span> <span class="nn">mpi4py_fft</span> <span class="kn">import</span> <span class="n">newDistArray</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py_fft</span><span class="w"> </span><span class="kn">import</span> <span class="n">newDistArray</span>
 
             <span class="n">_in</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="n">fft</span><span class="p">,</span> <span class="n">forward</span><span class="p">)</span><span class="o">.</span><span class="n">redistribute</span><span class="p">(</span><span class="n">axis_in</span><span class="p">)</span>
             <span class="n">_in</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span>
@@ -2045,7 +2045,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.itransform">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.itransform">[docs]</a>
-    <span class="k">def</span> <span class="nf">itransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">itransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Inverse transform over all components of the solution</span>
 
@@ -2080,7 +2080,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.get_local_slice_of_1D_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_local_slice_of_1D_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the local version of a 1D matrix. When using distributed FFTs, each rank will carry only a subset of modes,</span>
 <span class="sd">        which you can sort out via the `SpectralHelper.local_slice` attribute. When constructing a 1D matrix, you can</span>
@@ -2098,7 +2098,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.get_filter_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_filter_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_filter_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_filter_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get bandpass filter along `axis`. See the documentation `get_filter_matrix` in the 1D bases for what kwargs are</span>
 <span class="sd">        admissible.</span>
@@ -2116,7 +2116,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.get_differentiation_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_differentiation_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_differentiation_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_differentiation_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get differentiation matrix along specified axis. `kwargs` are forwarded to the 1D base implementation.</span>
 
@@ -2157,7 +2157,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.get_integration_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_integration_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_integration_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_integration_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get integration matrix to integrate along specified axis.</span>
 
@@ -2198,7 +2198,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.get_Id">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_Id">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_Id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_Id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get identity matrix</span>
 
@@ -2231,7 +2231,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.get_Dirichlet_recombination_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_Dirichlet_recombination_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_Dirichlet_recombination_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_Dirichlet_recombination_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get Dirichlet recombination matrix along axis. Not that it only makes sense in directions discretized with variations of Chebychev bases.</span>
 
@@ -2265,7 +2265,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.get_basis_change_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_basis_change_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_basis_change_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_basis_change_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Some spectral bases do a change between bases while differentiating. This method returns matrices that changes the basis to whatever you want.</span>
 <span class="sd">        Refer to the methods of the same name of the 1D bases to learn what parameters you need to pass here as `kwargs`.</span>

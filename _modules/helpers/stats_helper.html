@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>helpers.stats_helper &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
     
@@ -37,12 +37,12 @@
           <div class="body" role="main">
             
   <h1>Source code for helpers.stats_helper</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 
 <div class="viewcode-block" id="filter_stats">
 <a class="viewcode-back" href="../../pySDC/helpers.stats_helper.html#helpers.stats_helper.filter_stats">[docs]</a>
-<span class="k">def</span> <span class="nf">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">recomputed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">recomputed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function to extract data from the dictionary of statistics. Please supply metadata as keyword arguments.</span>
 
@@ -94,7 +94,7 @@
 
 <div class="viewcode-block" id="sort_stats">
 <a class="viewcode-back" href="../../pySDC/helpers.stats_helper.html#helpers.stats_helper.sort_stats">[docs]</a>
-<span class="k">def</span> <span class="nf">sort_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">sortby</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sort_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">sortby</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function to transform stats dictionary to sorted list of tuples</span>
 
@@ -121,7 +121,7 @@
 
 <div class="viewcode-block" id="get_list_of_types">
 <a class="viewcode-back" href="../../pySDC/helpers.stats_helper.html#helpers.stats_helper.get_list_of_types">[docs]</a>
-<span class="k">def</span> <span class="nf">get_list_of_types</span><span class="p">(</span><span class="n">stats</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_list_of_types</span><span class="p">(</span><span class="n">stats</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function to get list of types registered in stats</span>
 
@@ -143,7 +143,7 @@
 
 <div class="viewcode-block" id="get_sorted">
 <a class="viewcode-back" href="../../pySDC/helpers.stats_helper.html#helpers.stats_helper.get_sorted">[docs]</a>
-<span class="k">def</span> <span class="nf">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Utility for filtering and sorting stats in a single call. Pass a communicator if using MPI.</span>
 <span class="sd">    Keyword arguments are passed to `filter_stats` for filtering.</span>

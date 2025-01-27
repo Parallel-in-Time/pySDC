@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.controller_classes.controller_nonMPI &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
@@ -37,27 +37,27 @@
           <div class="body" role="main">
             
   <h1>Source code for implementations.controller_classes.controller_nonMPI</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">itertools</span>
-<span class="kn">import</span> <span class="nn">copy</span> <span class="k">as</span> <span class="nn">cp</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">dill</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dill</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.core.controller</span> <span class="kn">import</span> <span class="n">Controller</span>
-<span class="kn">from</span> <span class="nn">pySDC.core</span> <span class="kn">import</span> <span class="n">step</span> <span class="k">as</span> <span class="n">stepclass</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.errors</span> <span class="kn">import</span> <span class="n">ControllerError</span><span class="p">,</span> <span class="n">CommunicationError</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.basic_restarting</span> <span class="kn">import</span> <span class="n">BasicRestarting</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">Controller</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">step</span> <span class="k">as</span> <span class="n">stepclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ControllerError</span><span class="p">,</span> <span class="n">CommunicationError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.convergence_controller_classes.basic_restarting</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasicRestarting</span>
 
 
 <div class="viewcode-block" id="controller_nonMPI">
 <a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI">[docs]</a>
-<span class="k">class</span> <span class="nc">controller_nonMPI</span><span class="p">(</span><span class="n">Controller</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">controller_nonMPI</span><span class="p">(</span><span class="n">Controller</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    PFASST controller, running serialized version of PFASST in blocks (MG-style)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_procs</span><span class="p">,</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_procs</span><span class="p">,</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine for PFASST controller</span>
 
@@ -125,7 +125,7 @@
 
 <div class="viewcode-block" id="controller_nonMPI.run">
 <a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.run">[docs]</a>
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Main driver for running the serial version of SDC, MSSDC, MLSDC and PFASST (virtual parallelism)</span>
 
@@ -223,7 +223,7 @@
 
 <div class="viewcode-block" id="controller_nonMPI.restart_block">
 <a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.restart_block">[docs]</a>
-    <span class="k">def</span> <span class="nf">restart_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">active_slots</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">u0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restart_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">active_slots</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">u0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper routine to reset/restart block of (active) steps</span>
 
@@ -272,7 +272,7 @@
 
 <div class="viewcode-block" id="controller_nonMPI.send_full">
 <a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.send_full">[docs]</a>
-    <span class="k">def</span> <span class="nf">send_full</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_to_stats</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">send_full</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_to_stats</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Function to perform the send, including bookkeeping and logging</span>
 
@@ -282,7 +282,7 @@
 <span class="sd">            add_to_stats: a flag to end recording data in the hooks (defaults to False)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">send</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Send function</span>
 
@@ -308,7 +308,7 @@
 
 <div class="viewcode-block" id="controller_nonMPI.recv_full">
 <a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.recv_full">[docs]</a>
-    <span class="k">def</span> <span class="nf">recv_full</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_to_stats</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">recv_full</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_to_stats</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Function to perform the recv, including bookkeeping and logging</span>
 
@@ -318,7 +318,7 @@
 <span class="sd">            add_to_stats: a flag to end recording data in the hooks (defaults to False)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">recv</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Receive function</span>
 
@@ -349,7 +349,7 @@
 
 <div class="viewcode-block" id="controller_nonMPI.pfasst">
 <a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.pfasst">[docs]</a>
-    <span class="k">def</span> <span class="nf">pfasst</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_active</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pfasst</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_active</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Main function including the stages of SDC, MLSDC and PFASST (the &quot;controller&quot;)</span>
 
@@ -389,7 +389,7 @@
 
 <div class="viewcode-block" id="controller_nonMPI.spread">
 <a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.spread">[docs]</a>
-    <span class="k">def</span> <span class="nf">spread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">spread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Spreading phase</span>
 
@@ -417,7 +417,7 @@
 
 <div class="viewcode-block" id="controller_nonMPI.predict">
 <a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.predict">[docs]</a>
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Predictor phase</span>
 
@@ -540,7 +540,7 @@
 
 <div class="viewcode-block" id="controller_nonMPI.it_check">
 <a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_check">[docs]</a>
-    <span class="k">def</span> <span class="nf">it_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">it_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Key routine to check for convergence/termination</span>
 
@@ -609,7 +609,7 @@
 
 <div class="viewcode-block" id="controller_nonMPI.it_fine">
 <a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_fine">[docs]</a>
-    <span class="k">def</span> <span class="nf">it_fine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">it_fine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fine sweeps</span>
 
@@ -646,7 +646,7 @@
 
 <div class="viewcode-block" id="controller_nonMPI.it_down">
 <a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_down">[docs]</a>
-    <span class="k">def</span> <span class="nf">it_down</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">it_down</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Go down the hierarchy from finest to coarsest level</span>
 
@@ -686,7 +686,7 @@
 
 <div class="viewcode-block" id="controller_nonMPI.it_coarse">
 <a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_coarse">[docs]</a>
-    <span class="k">def</span> <span class="nf">it_coarse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">it_coarse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Coarse sweep</span>
 
@@ -718,7 +718,7 @@
 
 <div class="viewcode-block" id="controller_nonMPI.it_up">
 <a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_up">[docs]</a>
-    <span class="k">def</span> <span class="nf">it_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">it_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Prolong corrections up to finest level (parallel)</span>
 
@@ -755,7 +755,7 @@
 
 <div class="viewcode-block" id="controller_nonMPI.default">
 <a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.default">[docs]</a>
-    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Default routine to catch wrong status</span>
 

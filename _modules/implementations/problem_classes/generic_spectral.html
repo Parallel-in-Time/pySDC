@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.generic_spectral &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
@@ -37,15 +37,15 @@
           <div class="body" role="main">
             
   <h1>Source code for implementations.problem_classes.generic_spectral</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pySDC.core.problem</span> <span class="kn">import</span> <span class="n">Problem</span><span class="p">,</span> <span class="n">WorkCounter</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.spectral_helper</span> <span class="kn">import</span> <span class="n">SpectralHelper</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.errors</span> <span class="kn">import</span> <span class="n">ParameterError</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.problem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Problem</span><span class="p">,</span> <span class="n">WorkCounter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.spectral_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpectralHelper</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParameterError</span>
 
 
 <div class="viewcode-block" id="GenericSpectralLinear">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear">[docs]</a>
-<span class="k">class</span> <span class="nc">GenericSpectralLinear</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GenericSpectralLinear</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generic class to solve problems of the form M u_t + L u = y, with mass matrix M, linear operator L and some right</span>
 <span class="sd">    hand side y using spectral methods.</span>
@@ -72,11 +72,11 @@
 <div class="viewcode-block" id="GenericSpectralLinear.setup_GPU">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_GPU">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;switch to GPU modules&quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">cupy</span> <span class="k">as</span> <span class="nn">cp</span>
-        <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span> <span class="kn">import</span> <span class="n">cupy_mesh</span><span class="p">,</span> <span class="n">imex_cupy_mesh</span>
-        <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">cupy_mesh</span><span class="p">,</span> <span class="n">imex_cupy_mesh</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
 
         <span class="bp">cls</span><span class="o">.</span><span class="n">dtype_u</span> <span class="o">=</span> <span class="n">cupy_mesh</span>
 
@@ -88,7 +88,7 @@
         <span class="bp">cls</span><span class="o">.</span><span class="n">dtype_f</span> <span class="o">=</span> <span class="n">GPU_versions</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">]</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">bases</span><span class="p">,</span>
         <span class="n">components</span><span class="p">,</span>
@@ -154,7 +154,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">cached_factorizations</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pass requests on to the helper if they are not directly attributes of this class for convenience.</span>
 
@@ -166,7 +166,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_setup_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LHS</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LHS</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Setup a sparse linear operator by adding relationships. See documentation for ``GenericSpectralLinear.setup_L`` to learn more.</span>
 
@@ -183,7 +183,7 @@
 
 <div class="viewcode-block" id="GenericSpectralLinear.setup_L">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_L">[docs]</a>
-    <span class="k">def</span> <span class="nf">setup_L</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LHS</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_L</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LHS</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Setup the left hand side of the linear operator L and store it in ``self.L``.</span>
 
@@ -206,7 +206,7 @@
 
 <div class="viewcode-block" id="GenericSpectralLinear.setup_M">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_M">[docs]</a>
-    <span class="k">def</span> <span class="nf">setup_M</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LHS</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_M</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LHS</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Setup mass matrix, see documentation of ``GenericSpectralLinear.setup_L``.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -217,7 +217,7 @@
 
 <div class="viewcode-block" id="GenericSpectralLinear.setup_preconditioner">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_preconditioner">[docs]</a>
-    <span class="k">def</span> <span class="nf">setup_preconditioner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Dirichlet_recombination</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">left_preconditioner</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_preconditioner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Dirichlet_recombination</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">left_preconditioner</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get left and right preconditioners.</span>
 
@@ -257,7 +257,7 @@
 
 <div class="viewcode-block" id="GenericSpectralLinear.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.solve_system">[docs]</a>
-    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">skip_itransform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">skip_itransform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Do an implicit Euler step to solve M u_t + Lu = rhs, with M the mass matrix and L the linear operator as setup by</span>
 <span class="sd">        ``GenericSpectralLinear.setup_L`` and ``GenericSpectralLinear.setup_M``.</span>
@@ -345,7 +345,7 @@
 
 <div class="viewcode-block" id="compute_residual_DAE">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.compute_residual_DAE">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_residual_DAE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_residual_DAE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computation of the residual that does not add u_0 - u_m in algebraic equations.</span>
 
@@ -404,14 +404,14 @@
 
 <div class="viewcode-block" id="compute_residual_DAE_MPI">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.compute_residual_DAE_MPI">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_residual_DAE_MPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_residual_DAE_MPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computation of the residual using the collocation matrix Q</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        stage (str): The current stage of the step the level belongs to</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
 
     <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
 
@@ -454,7 +454,7 @@
 
 <div class="viewcode-block" id="get_extrapolated_error_DAE">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.get_extrapolated_error_DAE">[docs]</a>
-<span class="k">def</span> <span class="nf">get_extrapolated_error_DAE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_extrapolated_error_DAE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the</span>
 <span class="sd">    solution obtained by the time marching scheme. This function can be used in `EstimateExtrapolationError`.</span>

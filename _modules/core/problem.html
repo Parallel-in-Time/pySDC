@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>core.problem &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
     
@@ -46,14 +46,14 @@
 <span class="sd">Module containing the base Problem class for pySDC</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.core.common</span> <span class="kn">import</span> <span class="n">RegisterParams</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">RegisterParams</span>
 
 
 <div class="viewcode-block" id="WorkCounter">
 <a class="viewcode-back" href="../../pySDC/core.problem.html#core.problem.WorkCounter">[docs]</a>
-<span class="k">class</span> <span class="nc">WorkCounter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">WorkCounter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Utility class for counting iterations.</span>
 
@@ -66,27 +66,27 @@
 <span class="sd">    &gt;&gt;&gt; count()                # =&gt; niter = 2</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">niter</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># *args and **kwargs are necessary for gmres</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">niter</span> <span class="o">+=</span> <span class="mi">1</span>
 
 <div class="viewcode-block" id="WorkCounter.decrement">
 <a class="viewcode-back" href="../../pySDC/core.problem.html#core.problem.WorkCounter.decrement">[docs]</a>
-    <span class="k">def</span> <span class="nf">decrement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decrement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">niter</span> <span class="o">-=</span> <span class="mi">1</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">niter</span><span class="si">}</span><span class="s1">&#39;</span></div>
 
 
 
 <div class="viewcode-block" id="Problem">
 <a class="viewcode-back" href="../../pySDC/core.problem.html#core.problem.Problem">[docs]</a>
-<span class="k">class</span> <span class="nc">Problem</span><span class="p">(</span><span class="n">RegisterParams</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Problem</span><span class="p">(</span><span class="n">RegisterParams</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prototype class for problems, just defines the attributes essential to get started.</span>
 
@@ -109,30 +109,30 @@
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Dictionary to store WorkCounter objects</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="n">init</span>  <span class="c1"># Initialization parameter to instantiate data types</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">u_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a data variable for u&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">f_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">f_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a data variable for RHS&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Problem.get_default_sweeper_class">
 <a class="viewcode-back" href="../../pySDC/core.problem.html#core.problem.Problem.get_default_sweeper_class">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_default_sweeper_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_sweeper_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No default sweeper class implemented for </span><span class="si">{</span><span class="bp">cls</span><span class="si">}</span><span class="s1"> problem!&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Problem.eval_f">
 <a class="viewcode-back" href="../../pySDC/core.problem.html#core.problem.Problem.eval_f">[docs]</a>
-    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Abstract interface to RHS computation of the ODE</span>
 
@@ -153,14 +153,14 @@
 
 <div class="viewcode-block" id="Problem.apply_mass_matrix">
 <a class="viewcode-back" href="../../pySDC/core.problem.html#core.problem.Problem.apply_mass_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">apply_mass_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_mass_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Default mass matrix : identity&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">u</span></div>
 
 
 <div class="viewcode-block" id="Problem.generate_scipy_reference_solution">
 <a class="viewcode-back" href="../../pySDC/core.problem.html#core.problem.Problem.generate_scipy_reference_solution">[docs]</a>
-    <span class="k">def</span> <span class="nf">generate_scipy_reference_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eval_rhs</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_scipy_reference_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eval_rhs</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute a reference solution using `scipy.solve_ivp` with very small tolerances.</span>
 <span class="sd">        Keep in mind that scipy needs the solution to be a one dimensional array. If you are solving something higher</span>
@@ -180,8 +180,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            numpy.ndarray: Reference solution</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-        <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">solve_ivp</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.integrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">solve_ivp</span>
 
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;atol&#39;</span><span class="p">:</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span>
@@ -197,7 +197,7 @@
 
 <div class="viewcode-block" id="Problem.get_fig">
 <a class="viewcode-back" href="../../pySDC/core.problem.html#core.problem.Problem.get_fig">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_fig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_fig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a figure suitable to plot the solution of this problem</span>
 
@@ -210,7 +210,7 @@
 
 <div class="viewcode-block" id="Problem.plot">
 <a class="viewcode-back" href="../../pySDC/core.problem.html#core.problem.Problem.plot">[docs]</a>
-    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot the solution. Please supply a figure with the same structure as returned by ``self.get_fig``.</span>
 

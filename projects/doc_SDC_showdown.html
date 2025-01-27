@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>&lt;no title&gt; &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
@@ -37,26 +37,26 @@
           <div class="body" role="main">
             
   <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/SDC_showdown/SDC_timing_Fisher.py">pySDC/projects/SDC_showdown/SDC_timing_Fisher.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pySDC.helpers.plot_helper</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt_helper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">petsc_fisher_multiimplicit</span><span class="p">,</span>
     <span class="n">petsc_fisher_fullyimplicit</span><span class="p">,</span>
     <span class="n">petsc_fisher_semiimplicit</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span> <span class="kn">import</span> <span class="n">imex_1st_order</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.multi_implicit</span> <span class="kn">import</span> <span class="n">multi_implicit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span><span class="w"> </span><span class="kn">import</span> <span class="n">imex_1st_order</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.multi_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">multi_implicit</span>
 
 
-<span class="k">def</span> <span class="nf">setup_parameters</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_parameters</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper routine to fill in all relevant parameters</span>
 
@@ -119,7 +119,7 @@
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
-<span class="k">def</span> <span class="nf">run_SDC_variant</span><span class="p">(</span><span class="n">variant</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inexact</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_SDC_variant</span><span class="p">(</span><span class="n">variant</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inexact</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Routine to run particular SDC variant</span>
 
@@ -205,7 +205,7 @@
     <span class="k">return</span> <span class="n">timing</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">show_results</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">show_results</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plotting routine</span>
 
@@ -242,7 +242,7 @@
     <span class="k">return</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main driver</span>
 
@@ -275,27 +275,27 @@
 <a class="reference internal image-reference" href="../_images/timings_SDC_variants_Fisher.png"><img alt="../_images/timings_SDC_variants_Fisher.png" src="../_images/timings_SDC_variants_Fisher.png" style="width: 298.0px; height: 248.0px;" />
 </a>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/SDC_showdown/SDC_timing_GrayScott.py">pySDC/projects/SDC_showdown/SDC_timing_GrayScott.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">petsc4py</span> <span class="kn">import</span> <span class="n">PETSc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">petsc4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">PETSc</span>
 
-<span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pySDC.helpers.plot_helper</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt_helper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">petsc_grayscott_multiimplicit</span><span class="p">,</span>
     <span class="n">petsc_grayscott_fullyimplicit</span><span class="p">,</span>
     <span class="n">petsc_grayscott_semiimplicit</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span> <span class="kn">import</span> <span class="n">imex_1st_order</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.multi_implicit</span> <span class="kn">import</span> <span class="n">multi_implicit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span><span class="w"> </span><span class="kn">import</span> <span class="n">imex_1st_order</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.multi_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">multi_implicit</span>
 
 
-<span class="k">def</span> <span class="nf">setup_parameters</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_parameters</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper routine to fill in all relevant parameters</span>
 
@@ -359,7 +359,7 @@
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
-<span class="k">def</span> <span class="nf">run_SDC_variant</span><span class="p">(</span><span class="n">variant</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inexact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_SDC_variant</span><span class="p">(</span><span class="n">variant</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inexact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Routine to run particular SDC variant</span>
 
@@ -450,7 +450,7 @@
     <span class="k">return</span> <span class="n">timing</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">show_results</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">show_results</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plotting routine</span>
 
@@ -487,7 +487,7 @@
     <span class="k">return</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">run_reference</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_reference</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper routine to create a reference solution using very high order SDC and small time-steps</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -546,7 +546,7 @@
     <span class="k">return</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main driver</span>
 

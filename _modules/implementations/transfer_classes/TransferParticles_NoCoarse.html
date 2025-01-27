@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.transfer_classes.TransferParticles_NoCoarse &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
@@ -37,36 +37,24 @@
           <div class="body" role="main">
             
   <h1>Source code for implementations.transfer_classes.TransferParticles_NoCoarse</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pySDC.core.errors</span> <span class="kn">import</span> <span class="n">TransferError</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.space_transfer</span> <span class="kn">import</span> <span class="n">SpaceTransfer</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.particles</span> <span class="kn">import</span> <span class="n">particles</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">acceleration</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransferError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.space_transfer</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpaceTransfer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.particles</span><span class="w"> </span><span class="kn">import</span> <span class="n">particles</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">acceleration</span>
 
 
 <div class="viewcode-block" id="particles_to_particles">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferParticles_NoCoarse.html#implementations.transfer_classes.TransferParticles_NoCoarse.particles_to_particles">[docs]</a>
-<span class="k">class</span> <span class="nc">particles_to_particles</span><span class="p">(</span><span class="n">SpaceTransfer</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">particles_to_particles</span><span class="p">(</span><span class="n">SpaceTransfer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Custon transfer class, implements SpaceTransfer.py</span>
+<span class="sd">    Custom transfer class, implements SpaceTransfer.py</span>
 
 <span class="sd">    This implementation is just a dummy for particles with no direct functionality, i.e. the number of particles is not</span>
 <span class="sd">    reduced on the coarse problem</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fine_prob</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialization routine</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            fine_prob: fine problem</span>
-<span class="sd">            coarse_prob: coarse problem</span>
-<span class="sd">            params: parameters for the transfer operators</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">particles_to_particles</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">fine_prob</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
-        <span class="k">pass</span>
-
 <div class="viewcode-block" id="particles_to_particles.restrict">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferParticles_NoCoarse.html#implementations.transfer_classes.TransferParticles_NoCoarse.particles_to_particles.restrict">[docs]</a>
-    <span class="k">def</span> <span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Dummy restriction routine</span>
 
@@ -87,7 +75,7 @@
 
 <div class="viewcode-block" id="particles_to_particles.prolong">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferParticles_NoCoarse.html#implementations.transfer_classes.TransferParticles_NoCoarse.particles_to_particles.prolong">[docs]</a>
-    <span class="k">def</span> <span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">G</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">G</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Dummy prolongation routine</span>
 

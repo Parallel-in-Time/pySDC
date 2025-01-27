@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.RayleighBenard &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
@@ -37,19 +37,19 @@
           <div class="body" role="main">
             
   <h1>Source code for implementations.problem_classes.RayleighBenard</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.generic_spectral</span> <span class="kn">import</span> <span class="n">GenericSpectralLinear</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.convergence_controller</span> <span class="kn">import</span> <span class="n">ConvergenceController</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.hooks</span> <span class="kn">import</span> <span class="n">Hooks</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.check_convergence</span> <span class="kn">import</span> <span class="n">CheckConvergence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.generic_spectral</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenericSpectralLinear</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.convergence_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConvergenceController</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.hooks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hooks</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.convergence_controller_classes.check_convergence</span><span class="w"> </span><span class="kn">import</span> <span class="n">CheckConvergence</span>
 
 
 <div class="viewcode-block" id="RayleighBenard">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard">[docs]</a>
-<span class="k">class</span> <span class="nc">RayleighBenard</span><span class="p">(</span><span class="n">GenericSpectralLinear</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayleighBenard</span><span class="p">(</span><span class="n">GenericSpectralLinear</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Rayleigh-Benard Convection is a variation of incompressible Navier-Stokes.</span>
 
@@ -89,7 +89,7 @@
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">Prandl</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">Rayleigh</span><span class="o">=</span><span class="mf">2e6</span><span class="p">,</span>
@@ -125,7 +125,7 @@
         <span class="p">}</span>
         <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
 
                 <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
             <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
@@ -218,7 +218,7 @@
 
 <div class="viewcode-block" id="RayleighBenard.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.eval_f">[docs]</a>
-    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_init</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
@@ -273,7 +273,7 @@
 
 <div class="viewcode-block" id="RayleighBenard.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.u_exact">[docs]</a>
-    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">noise_level</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">99</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">noise_level</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">99</span><span class="p">):</span>
         <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span>
         <span class="k">assert</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="s1">&#39;v_top&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="s1">&#39;v_bottom&#39;</span><span class="p">]</span>
@@ -306,7 +306,7 @@
 
 <div class="viewcode-block" id="RayleighBenard.apply_BCs">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.apply_BCs">[docs]</a>
-    <span class="k">def</span> <span class="nf">apply_BCs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sol</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_BCs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sol</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Enforce the Dirichlet BCs at the top and bottom for arbitrary solution.</span>
 <span class="sd">        The function modifies the last two modes of u, v, and T in order to achieve this.</span>
@@ -348,7 +348,7 @@
 
 <div class="viewcode-block" id="RayleighBenard.get_fig">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.get_fig">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_fig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_fig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a figure suitable to plot the solution of this problem</span>
 
@@ -356,8 +356,8 @@
 <span class="sd">        -------</span>
 <span class="sd">        self.fig : matplotlib.pyplot.figure.Figure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-        <span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="kn">import</span> <span class="n">make_axes_locatable</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mpl_toolkits.axes_grid1</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_axes_locatable</span>
 
         <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.constrained_layout.use&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)))</span>
@@ -371,7 +371,7 @@
 
 <div class="viewcode-block" id="RayleighBenard.plot">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.plot">[docs]</a>
-    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quantity</span><span class="o">=</span><span class="s1">&#39;T&#39;</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quantity</span><span class="o">=</span><span class="s1">&#39;T&#39;</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot the solution.</span>
 
@@ -414,7 +414,7 @@
 
 <div class="viewcode-block" id="RayleighBenard.compute_vorticity">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_vorticity">[docs]</a>
-    <span class="k">def</span> <span class="nf">compute_vorticity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_vorticity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
             <span class="n">u_hat</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
@@ -430,7 +430,7 @@
 
 <div class="viewcode-block" id="RayleighBenard.compute_Nusselt_numbers">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_Nusselt_numbers">[docs]</a>
-    <span class="k">def</span> <span class="nf">compute_Nusselt_numbers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_Nusselt_numbers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the various versions of the Nusselt number. This reflects the type of heat transport.</span>
 <span class="sd">        If the Nusselt number is equal to one, it indicates heat transport due to conduction. If it is larger,</span>
@@ -495,7 +495,7 @@
 
 <div class="viewcode-block" id="RayleighBenard.compute_viscous_dissipation">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_viscous_dissipation">[docs]</a>
-    <span class="k">def</span> <span class="nf">compute_viscous_dissipation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_viscous_dissipation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
         <span class="n">iu</span><span class="p">,</span> <span class="n">iv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">([</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">])</span>
 
         <span class="n">Lap_u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">u_init_forward</span>
@@ -513,7 +513,7 @@
 
 <div class="viewcode-block" id="RayleighBenard.compute_buoyancy_generation">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_buoyancy_generation">[docs]</a>
-    <span class="k">def</span> <span class="nf">compute_buoyancy_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_buoyancy_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
             <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
         <span class="n">iv</span><span class="p">,</span> <span class="n">iT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">([</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">])</span>
@@ -524,12 +524,12 @@
 
 <div class="viewcode-block" id="CFLLimit">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit">[docs]</a>
-<span class="k">class</span> <span class="nc">CFLLimit</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CFLLimit</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
 
 <div class="viewcode-block" id="CFLLimit.dependencies">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit.dependencies">[docs]</a>
-    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">pySDC.implementations.hooks.log_step_size</span> <span class="kn">import</span> <span class="n">LogStepSize</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.hooks.log_step_size</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogStepSize</span>
 
         <span class="n">controller</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">LogCFL</span><span class="p">)</span>
         <span class="n">controller</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">LogStepSize</span><span class="p">)</span></div>
@@ -537,7 +537,7 @@
 
 <div class="viewcode-block" id="CFLLimit.setup_status_variables">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit.setup_status_variables">[docs]</a>
-    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add the embedded error variable to the error function.</span>
 
@@ -549,7 +549,7 @@
 
 <div class="viewcode-block" id="CFLLimit.setup">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit.setup">[docs]</a>
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Define default parameters here.</span>
 
@@ -578,7 +578,7 @@
 <div class="viewcode-block" id="CFLLimit.compute_max_step_size">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit.compute_max_step_size">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">compute_max_step_size</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_max_step_size</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
         <span class="n">grid_spacing_x</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">P</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 
         <span class="n">cell_wallz</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">nz</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
@@ -603,7 +603,7 @@
 
 <div class="viewcode-block" id="CFLLimit.get_new_step_size">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit.get_new_step_size">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">CheckConvergence</span><span class="o">.</span><span class="n">check_convergence</span><span class="p">(</span><span class="n">step</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">None</span>
 
@@ -626,11 +626,11 @@
 
 <div class="viewcode-block" id="LogCFL">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.LogCFL">[docs]</a>
-<span class="k">class</span> <span class="nc">LogCFL</span><span class="p">(</span><span class="n">Hooks</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LogCFL</span><span class="p">(</span><span class="n">Hooks</span><span class="p">):</span>
 
 <div class="viewcode-block" id="LogCFL.post_step">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.LogCFL.post_step">[docs]</a>
-    <span class="k">def</span> <span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Record CFL limit.</span>
 
@@ -660,11 +660,11 @@
 
 <div class="viewcode-block" id="LogAnalysisVariables">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.LogAnalysisVariables">[docs]</a>
-<span class="k">class</span> <span class="nc">LogAnalysisVariables</span><span class="p">(</span><span class="n">Hooks</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LogAnalysisVariables</span><span class="p">(</span><span class="n">Hooks</span><span class="p">):</span>
 
 <div class="viewcode-block" id="LogAnalysisVariables.post_step">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.LogAnalysisVariables.post_step">[docs]</a>
-    <span class="k">def</span> <span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Record Nusselt numbers.</span>
 

@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.polynomial_test_problem &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
@@ -37,15 +37,15 @@
           <div class="body" role="main">
             
   <h1>Source code for implementations.problem_classes.polynomial_test_problem</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.core.problem</span> <span class="kn">import</span> <span class="n">Problem</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.problem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Problem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
 
 
 <div class="viewcode-block" id="polynomial_testequation">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.polynomial_test_problem.html#implementations.problem_classes.polynomial_test_problem.polynomial_testequation">[docs]</a>
-<span class="k">class</span> <span class="nc">polynomial_testequation</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">polynomial_testequation</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Dummy problem for tests only! In particular, the `solve_system` function just returns the exact solution instead of</span>
 <span class="sd">    solving an appropriate system. This class is indented to be used for tests of operations that are exact on polynomials.</span>
@@ -55,12 +55,12 @@
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">xp</span> <span class="o">=</span> <span class="n">np</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">26266</span><span class="p">,</span> <span class="n">useGPU</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">26266</span><span class="p">,</span> <span class="n">useGPU</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">useGPU</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">cupy</span> <span class="k">as</span> <span class="nn">cp</span>
-            <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span> <span class="kn">import</span> <span class="n">cupy_mesh</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">cupy_mesh</span>
 
             <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">xp</span> <span class="o">=</span> <span class="n">cp</span>
             <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">dtype_u</span> <span class="o">=</span> <span class="n">cupy_mesh</span>
@@ -75,7 +75,7 @@
 
 <div class="viewcode-block" id="polynomial_testequation.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.polynomial_test_problem.html#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.eval_f">[docs]</a>
-    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Derivative of the polynomial.</span>
 
@@ -99,7 +99,7 @@
 
 <div class="viewcode-block" id="polynomial_testequation.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.polynomial_test_problem.html#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.solve_system">[docs]</a>
-    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Just return the exact solution...</span>
 
@@ -125,7 +125,7 @@
 
 <div class="viewcode-block" id="polynomial_testequation.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.polynomial_test_problem.html#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.u_exact">[docs]</a>
-    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate the polynomial.</span>
 
@@ -152,7 +152,7 @@
 
 <div class="viewcode-block" id="polynomial_testequation_IMEX">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.polynomial_test_problem.html#implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX">[docs]</a>
-<span class="k">class</span> <span class="nc">polynomial_testequation_IMEX</span><span class="p">(</span><span class="n">polynomial_testequation</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">polynomial_testequation_IMEX</span><span class="p">(</span><span class="n">polynomial_testequation</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    IMEX version of the polynomial test problem that assigns half the derivative to the implicit part and the other half to the explicit part.</span>
 <span class="sd">    Keep in mind that you still cannot Really perform any solves.</span>
@@ -162,7 +162,7 @@
 
 <div class="viewcode-block" id="polynomial_testequation_IMEX.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.polynomial_test_problem.html#implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX.eval_f">[docs]</a>
-    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Derivative of the polynomial.</span>
 

@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.sweeper_classes.imex_1st_order_mass &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
@@ -37,12 +37,12 @@
           <div class="body" role="main">
             
   <h1>Source code for implementations.sweeper_classes.imex_1st_order_mass</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span> <span class="kn">import</span> <span class="n">imex_1st_order</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span><span class="w"> </span><span class="kn">import</span> <span class="n">imex_1st_order</span>
 
 
 <div class="viewcode-block" id="imex_1st_order_mass">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order_mass.html#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass">[docs]</a>
-<span class="k">class</span> <span class="nc">imex_1st_order_mass</span><span class="p">(</span><span class="n">imex_1st_order</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">imex_1st_order_mass</span><span class="p">(</span><span class="n">imex_1st_order</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Custom sweeper class, implements Sweeper.py</span>
 
@@ -51,7 +51,7 @@
 
 <div class="viewcode-block" id="imex_1st_order_mass.update_nodes">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order_mass.html#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.update_nodes">[docs]</a>
-    <span class="k">def</span> <span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</span>
 
@@ -113,7 +113,7 @@
 
 <div class="viewcode-block" id="imex_1st_order_mass.compute_end_point">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order_mass.html#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_end_point">[docs]</a>
-    <span class="k">def</span> <span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute u at the right point of the interval</span>
 
@@ -139,7 +139,7 @@
 
 <div class="viewcode-block" id="imex_1st_order_mass.compute_residual">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order_mass.html#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_residual">[docs]</a>
-    <span class="k">def</span> <span class="nf">compute_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computation of the residual using the collocation matrix Q</span>
 

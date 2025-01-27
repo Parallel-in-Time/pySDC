@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.odeSystem &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
@@ -49,16 +49,16 @@
 <span class="sd">on parallel computers. SIAM journal on scientific and statistical computing,</span>
 <span class="sd">12(5), 1000-1028.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.core.errors</span> <span class="kn">import</span> <span class="n">ProblemError</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.problem</span> <span class="kn">import</span> <span class="n">Problem</span><span class="p">,</span> <span class="n">WorkCounter</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProblemError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.problem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Problem</span><span class="p">,</span> <span class="n">WorkCounter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh</span>
 
 
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous">[docs]</a>
-<span class="k">class</span> <span class="nc">ProtheroRobinsonAutonomous</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProtheroRobinsonAutonomous</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Implement the Prothero-Robinson problem into autonomous form:</span>
 
@@ -116,7 +116,7 @@
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">nonLinear</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">5e-11</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">nonLinear</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">5e-11</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">nvars</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
 
@@ -133,19 +133,19 @@
     <span class="c1"># -------------------------------------------------------------------------</span>
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.g">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.g">[docs]</a>
-    <span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.dg">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dg">[docs]</a>
-    <span class="k">def</span> <span class="nf">dg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
         <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.dg2">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dg2">[docs]</a>
-    <span class="k">def</span> <span class="nf">dg2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dg2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
         <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
 
 
@@ -154,31 +154,31 @@
     <span class="c1"># -------------------------------------------------------------------------</span>
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.f">[docs]</a>
-    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.f_LIN">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.f_LIN">[docs]</a>
-    <span class="k">def</span> <span class="nf">f_LIN</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">f_LIN</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
         <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">u</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dg</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.f_NONLIN">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.f_NONLIN">[docs]</a>
-    <span class="k">def</span> <span class="nf">f_NONLIN</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">f_NONLIN</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
         <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">u</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dg</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.dgInv">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dgInv">[docs]</a>
-    <span class="k">def</span> <span class="nf">dgInv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dgInv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.dgInv_LIN">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dgInv_LIN">[docs]</a>
-    <span class="k">def</span> <span class="nf">dgInv_LIN</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dgInv_LIN</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span>
         <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dg</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dg2</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">dt</span> <span class="o">/</span> <span class="n">e</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="n">dt</span> <span class="o">*</span> <span class="n">g2</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">g1</span> <span class="o">/</span> <span class="n">e</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">dt</span> <span class="o">/</span> <span class="n">e</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span></div>
@@ -186,7 +186,7 @@
 
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.dgInv_NONLIN">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dgInv_NONLIN">[docs]</a>
-    <span class="k">def</span> <span class="nf">dgInv_NONLIN</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dgInv_NONLIN</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span>
         <span class="n">g</span><span class="p">,</span> <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dg</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dg2</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
@@ -199,7 +199,7 @@
     <span class="c1"># -------------------------------------------------------------------------</span>
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.u_exact">[docs]</a>
-    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to return initial conditions or exact solutions.</span>
 
@@ -225,7 +225,7 @@
 
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.eval_f">[docs]</a>
-    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -252,7 +252,7 @@
 
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.solve_system">[docs]</a>
-    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple Newton solver for the nonlinear equation</span>
 
@@ -315,7 +315,7 @@
 
 <div class="viewcode-block" id="Kaps">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.Kaps">[docs]</a>
-<span class="k">class</span> <span class="nc">Kaps</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Kaps</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Implement the Kaps problem:</span>
 
@@ -350,7 +350,7 @@
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">5e-11</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">5e-11</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">nvars</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
 
@@ -362,7 +362,7 @@
 
 <div class="viewcode-block" id="Kaps.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.Kaps.u_exact">[docs]</a>
-    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to return initial conditions or exact solutions.</span>
 
@@ -387,7 +387,7 @@
 
 <div class="viewcode-block" id="Kaps.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.Kaps.eval_f">[docs]</a>
-    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -414,7 +414,7 @@
 
 <div class="viewcode-block" id="Kaps.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.Kaps.solve_system">[docs]</a>
-    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple Newton solver for the nonlinear equation</span>
 
@@ -482,7 +482,7 @@
 
 <div class="viewcode-block" id="ChemicalReaction3Var">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ChemicalReaction3Var">[docs]</a>
-<span class="k">class</span> <span class="nc">ChemicalReaction3Var</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChemicalReaction3Var</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Chemical reaction with three components, modeled by the non-linear system:</span>
 
@@ -516,7 +516,7 @@
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">5e-11</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">5e-11</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">nvars</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="n">u0</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.990731920827</span><span class="p">,</span> <span class="mf">1.009264413846</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.366532612659e-5</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
@@ -529,7 +529,7 @@
 
 <div class="viewcode-block" id="ChemicalReaction3Var.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ChemicalReaction3Var.u_exact">[docs]</a>
-    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to return initial conditions or to approximate exact solution using ``SciPy``.</span>
 
@@ -552,7 +552,7 @@
 
         <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
 
-            <span class="k">def</span> <span class="nf">eval_rhs</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">eval_rhs</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
 <span class="w">                </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">                Evaluate the right hand side, but switch the arguments for ``SciPy``.</span>
 
@@ -573,7 +573,7 @@
 
 <div class="viewcode-block" id="ChemicalReaction3Var.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ChemicalReaction3Var.eval_f">[docs]</a>
-    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -599,7 +599,7 @@
 
 <div class="viewcode-block" id="ChemicalReaction3Var.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ChemicalReaction3Var.solve_system">[docs]</a>
-    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple Newton solver for the nonlinear equation</span>
 
@@ -845,7 +845,7 @@
 
 <div class="viewcode-block" id="JacobiElliptic">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.JacobiElliptic">[docs]</a>
-<span class="k">class</span> <span class="nc">JacobiElliptic</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">JacobiElliptic</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Implement the Jacobi Elliptic non-linear problem:</span>
 
@@ -876,7 +876,7 @@
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">5e-11</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">5e-11</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">nvars</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="n">u0</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
@@ -889,7 +889,7 @@
 
 <div class="viewcode-block" id="JacobiElliptic.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.JacobiElliptic.u_exact">[docs]</a>
-    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to return initial conditions or to approximate exact solution using ``SciPy``.</span>
 
@@ -912,7 +912,7 @@
 
         <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
 
-            <span class="k">def</span> <span class="nf">eval_rhs</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">eval_rhs</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
 <span class="w">                </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">                Evaluate the right hand side, but switch the arguments for ``SciPy``.</span>
 
@@ -933,7 +933,7 @@
 
 <div class="viewcode-block" id="JacobiElliptic.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.JacobiElliptic.eval_f">[docs]</a>
-    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -959,7 +959,7 @@
 
 <div class="viewcode-block" id="JacobiElliptic.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.JacobiElliptic.solve_system">[docs]</a>
-    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple Newton solver for the nonlinear equation</span>
 

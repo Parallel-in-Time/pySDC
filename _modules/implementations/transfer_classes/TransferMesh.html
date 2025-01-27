@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.transfer_classes.TransferMesh &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
@@ -37,17 +37,17 @@
           <div class="body" role="main">
             
   <h1>Source code for implementations.transfer_classes.TransferMesh</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
 
-<span class="kn">import</span> <span class="nn">pySDC.helpers.transfer_helper</span> <span class="k">as</span> <span class="nn">th</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.errors</span> <span class="kn">import</span> <span class="n">TransferError</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.space_transfer</span> <span class="kn">import</span> <span class="n">SpaceTransfer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pySDC.helpers.transfer_helper</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">th</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransferError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.space_transfer</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpaceTransfer</span>
 
 
 <div class="viewcode-block" id="mesh_to_mesh">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferMesh.html#implementations.transfer_classes.TransferMesh.mesh_to_mesh">[docs]</a>
-<span class="k">class</span> <span class="nc">mesh_to_mesh</span><span class="p">(</span><span class="n">SpaceTransfer</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">mesh_to_mesh</span><span class="p">(</span><span class="n">SpaceTransfer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Custom base_transfer class, implements Transfer.py</span>
 
@@ -59,7 +59,7 @@
 <span class="sd">        Pspace: spatial prolongation matrix, dim. Nc x Nf</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fine_prob</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fine_prob</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
@@ -189,7 +189,7 @@
 
 <div class="viewcode-block" id="mesh_to_mesh.restrict">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferMesh.html#implementations.transfer_classes.TransferMesh.mesh_to_mesh.restrict">[docs]</a>
-    <span class="k">def</span> <span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Restriction implementation</span>
 <span class="sd">        Args:</span>
@@ -197,7 +197,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">G</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_restrict</span><span class="p">(</span><span class="n">fine</span><span class="p">,</span> <span class="n">coarse</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_restrict</span><span class="p">(</span><span class="n">fine</span><span class="p">,</span> <span class="n">coarse</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="p">,</span> <span class="s1">&#39;ncomp&#39;</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">ncomp</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">fine</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">ncomp</span><span class="p">:</span>
@@ -227,7 +227,7 @@
 
 <div class="viewcode-block" id="mesh_to_mesh.prolong">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferMesh.html#implementations.transfer_classes.TransferMesh.mesh_to_mesh.prolong">[docs]</a>
-    <span class="k">def</span> <span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">G</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">G</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Prolongation implementation</span>
 <span class="sd">        Args:</span>
@@ -235,7 +235,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">F</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_prolong</span><span class="p">(</span><span class="n">coarse</span><span class="p">,</span> <span class="n">fine</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_prolong</span><span class="p">(</span><span class="n">coarse</span><span class="p">,</span> <span class="n">fine</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="p">,</span> <span class="s1">&#39;ncomp&#39;</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">ncomp</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">coarse</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">ncomp</span><span class="p">:</span>

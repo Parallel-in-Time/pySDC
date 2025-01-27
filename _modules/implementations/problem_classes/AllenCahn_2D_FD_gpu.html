@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.AllenCahn_2D_FD_gpu &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
@@ -37,21 +37,21 @@
           <div class="body" role="main">
             
   <h1>Source code for implementations.problem_classes.AllenCahn_2D_FD_gpu</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">cupy</span> <span class="k">as</span> <span class="nn">cp</span>
-<span class="kn">import</span> <span class="nn">cupyx.scipy.sparse</span> <span class="k">as</span> <span class="nn">csp</span>
-<span class="kn">from</span> <span class="nn">cupyx.scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">cg</span>  <span class="c1"># , spsolve, gmres, minres</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cupyx.scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">csp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cupyx.scipy.sparse.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">cg</span>  <span class="c1"># , spsolve, gmres, minres</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.core.errors</span> <span class="kn">import</span> <span class="n">ProblemError</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.problem</span> <span class="kn">import</span> <span class="n">Problem</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span> <span class="kn">import</span> <span class="n">cupy_mesh</span><span class="p">,</span> <span class="n">imex_cupy_mesh</span><span class="p">,</span> <span class="n">comp2_cupy_mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProblemError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.problem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Problem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">cupy_mesh</span><span class="p">,</span> <span class="n">imex_cupy_mesh</span><span class="p">,</span> <span class="n">comp2_cupy_mesh</span>
 
 <span class="c1"># http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf</span>
 
 
 <div class="viewcode-block" id="allencahn_fullyimplicit">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_fullyimplicit">[docs]</a>
-<span class="k">class</span> <span class="nc">allencahn_fullyimplicit</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">allencahn_fullyimplicit</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`</span>
 
@@ -108,7 +108,7 @@
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">cupy_mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">cupy_mesh</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">nvars</span><span class="o">=</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">),</span>
         <span class="n">nu</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
@@ -154,7 +154,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">lin_ncalls</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__get_A</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__get_A</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function to assemble FD matrix A in sparse format.</span>
 
@@ -185,7 +185,7 @@
     <span class="c1"># noinspection PyTypeChecker</span>
 <div class="viewcode-block" id="allencahn_fullyimplicit.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_fullyimplicit.solve_system">[docs]</a>
-    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple Newton solver.</span>
 
@@ -250,7 +250,7 @@
 
 <div class="viewcode-block" id="allencahn_fullyimplicit.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_fullyimplicit.eval_f">[docs]</a>
-    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -275,7 +275,7 @@
 
 <div class="viewcode-block" id="allencahn_fullyimplicit.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_fullyimplicit.u_exact">[docs]</a>
-    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
@@ -303,7 +303,7 @@
 <span class="c1"># noinspection PyUnusedLocal</span>
 <div class="viewcode-block" id="allencahn_semiimplicit">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_semiimplicit">[docs]</a>
-<span class="k">class</span> <span class="nc">allencahn_semiimplicit</span><span class="p">(</span><span class="n">allencahn_fullyimplicit</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">allencahn_semiimplicit</span><span class="p">(</span><span class="n">allencahn_fullyimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`</span>
 
@@ -326,7 +326,7 @@
 
 <div class="viewcode-block" id="allencahn_semiimplicit.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_semiimplicit.eval_f">[docs]</a>
-    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -352,7 +352,7 @@
 
 <div class="viewcode-block" id="allencahn_semiimplicit.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_semiimplicit.solve_system">[docs]</a>
-    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
 
@@ -373,10 +373,10 @@
 <span class="sd">            The solution as mesh.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">class</span> <span class="nc">context</span><span class="p">:</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">context</span><span class="p">:</span>
             <span class="n">num_iter</span> <span class="o">=</span> <span class="mi">0</span>
 
-        <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">xk</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">callback</span><span class="p">(</span><span class="n">xk</span><span class="p">):</span>
             <span class="n">context</span><span class="o">.</span><span class="n">num_iter</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="n">num_iter</span>
 
@@ -404,7 +404,7 @@
 <span class="c1"># noinspection PyUnusedLocal</span>
 <div class="viewcode-block" id="allencahn_semiimplicit_v2">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_semiimplicit_v2">[docs]</a>
-<span class="k">class</span> <span class="nc">allencahn_semiimplicit_v2</span><span class="p">(</span><span class="n">allencahn_fullyimplicit</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">allencahn_semiimplicit_v2</span><span class="p">(</span><span class="n">allencahn_fullyimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions :math:`u \in [-1, 1]^2`</span>
 
@@ -428,7 +428,7 @@
 
 <div class="viewcode-block" id="allencahn_semiimplicit_v2.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_semiimplicit_v2.eval_f">[docs]</a>
-    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -454,7 +454,7 @@
 
 <div class="viewcode-block" id="allencahn_semiimplicit_v2.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_semiimplicit_v2.solve_system">[docs]</a>
-    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple Newton solver.</span>
 
@@ -522,7 +522,7 @@
 <span class="c1"># noinspection PyUnusedLocal</span>
 <div class="viewcode-block" id="allencahn_multiimplicit">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_multiimplicit">[docs]</a>
-<span class="k">class</span> <span class="nc">allencahn_multiimplicit</span><span class="p">(</span><span class="n">allencahn_fullyimplicit</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">allencahn_multiimplicit</span><span class="p">(</span><span class="n">allencahn_fullyimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`</span>
 
@@ -545,7 +545,7 @@
 
 <div class="viewcode-block" id="allencahn_multiimplicit.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_multiimplicit.eval_f">[docs]</a>
-    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -571,7 +571,7 @@
 
 <div class="viewcode-block" id="allencahn_multiimplicit.solve_system_1">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_multiimplicit.solve_system_1">[docs]</a>
-    <span class="k">def</span> <span class="nf">solve_system_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
 
@@ -592,10 +592,10 @@
 <span class="sd">            The solution as mesh.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">class</span> <span class="nc">context</span><span class="p">:</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">context</span><span class="p">:</span>
             <span class="n">num_iter</span> <span class="o">=</span> <span class="mi">0</span>
 
-        <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">xk</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">callback</span><span class="p">(</span><span class="n">xk</span><span class="p">):</span>
             <span class="n">context</span><span class="o">.</span><span class="n">num_iter</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="n">num_iter</span>
 
@@ -620,7 +620,7 @@
 
 <div class="viewcode-block" id="allencahn_multiimplicit.solve_system_2">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_multiimplicit.solve_system_2">[docs]</a>
-    <span class="k">def</span> <span class="nf">solve_system_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple Newton solver.</span>
 
@@ -688,7 +688,7 @@
 <span class="c1"># noinspection PyUnusedLocal</span>
 <div class="viewcode-block" id="allencahn_multiimplicit_v2">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_multiimplicit_v2">[docs]</a>
-<span class="k">class</span> <span class="nc">allencahn_multiimplicit_v2</span><span class="p">(</span><span class="n">allencahn_fullyimplicit</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">allencahn_multiimplicit_v2</span><span class="p">(</span><span class="n">allencahn_fullyimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions :math:`u \in [-1, 1]^2`</span>
 
@@ -712,7 +712,7 @@
 
 <div class="viewcode-block" id="allencahn_multiimplicit_v2.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_multiimplicit_v2.eval_f">[docs]</a>
-    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -738,7 +738,7 @@
 
 <div class="viewcode-block" id="allencahn_multiimplicit_v2.solve_system_1">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_multiimplicit_v2.solve_system_1">[docs]</a>
-    <span class="k">def</span> <span class="nf">solve_system_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple Newton solver.</span>
 
@@ -803,7 +803,7 @@
 
 <div class="viewcode-block" id="allencahn_multiimplicit_v2.solve_system_2">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_multiimplicit_v2.solve_system_2">[docs]</a>
-    <span class="k">def</span> <span class="nf">solve_system_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
 

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>implementations.convergence_controller_classes.estimate_polynomial_error module &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
@@ -79,6 +79,20 @@ str: The error message</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.get_interpolated_solution">
+<span class="sig-name descname"><span class="pre">get_interpolated_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_polynomial_error.html#EstimatePolynomialError.get_interpolated_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.get_interpolated_solution" title="Link to this definition">¶</a></dt>
+<dd><p>Get the interpolated solution for numpy or cupy data types</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u_vec</strong> (<em>array</em>) – Vector of solutions</p></li>
+<li><p><strong>prob</strong> (<em>pySDC.problem</em>) – Problem</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -157,6 +171,50 @@ on any specific rank.</p>
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialErrorFiredrake">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EstimatePolynomialErrorFiredrake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_polynomial_error.html#EstimatePolynomialErrorFiredrake"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialErrorFiredrake" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError" title="implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError"><code class="xref py py-class docutils literal notranslate"><span class="pre">EstimatePolynomialError</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialErrorFiredrake.get_interpolated_solution">
+<span class="sig-name descname"><span class="pre">get_interpolated_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_polynomial_error.html#EstimatePolynomialErrorFiredrake.get_interpolated_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialErrorFiredrake.get_interpolated_solution" title="Link to this definition">¶</a></dt>
+<dd><p>Get the interpolated solution for Firedrake data types
+We are not 100% sure that you don’t need to invert the mass matrix here, but should be fine.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u_vec</strong> (<em>array</em>) – Vector of solutions</p></li>
+<li><p><strong>prob</strong> (<em>pySDC.problem</em>) – Problem</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialErrorFiredrake.matmul">
+<span class="sig-name descname"><span class="pre">matmul</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_polynomial_error.html#EstimatePolynomialErrorFiredrake.matmul"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialErrorFiredrake.matmul" title="Link to this definition">¶</a></dt>
+<dd><p>Matrix vector multiplication, possibly MPI parallel.
+The parallel implementation performs a reduce operation in every row of the matrix. While communicating the
+entire vector once could reduce the number of communications, this way we never need to store the entire vector
+on any specific rank.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<em>2d np.ndarray</em>) – Matrix</p></li>
+<li><p><strong>b</strong> (<em>list</em>) – Vector</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Axb</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 
@@ -172,10 +230,16 @@ on any specific rank.</p>
 <li><a class="reference internal" href="#">implementations.convergence_controller_classes.estimate_polynomial_error module</a><ul>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError"><code class="docutils literal notranslate"><span class="pre">EstimatePolynomialError</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.check_parameters"><code class="docutils literal notranslate"><span class="pre">check_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.get_interpolated_solution"><code class="docutils literal notranslate"><span class="pre">get_interpolated_solution()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.matmul"><code class="docutils literal notranslate"><span class="pre">matmul()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.reset_status_variables"><code class="docutils literal notranslate"><span class="pre">reset_status_variables()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialErrorFiredrake"><code class="docutils literal notranslate"><span class="pre">EstimatePolynomialErrorFiredrake</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialErrorFiredrake.get_interpolated_solution"><code class="docutils literal notranslate"><span class="pre">get_interpolated_solution()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialErrorFiredrake.matmul"><code class="docutils literal notranslate"><span class="pre">matmul()</span></code></a></li>
 </ul>
 </li>
 </ul>

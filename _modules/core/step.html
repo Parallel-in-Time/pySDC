@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>core.step &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
     
@@ -37,17 +37,17 @@
           <div class="body" role="main">
             
   <h1>Source code for core.step</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.core</span> <span class="kn">import</span> <span class="n">level</span> <span class="k">as</span> <span class="n">levclass</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.base_transfer</span> <span class="kn">import</span> <span class="n">BaseTransfer</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.errors</span> <span class="kn">import</span> <span class="n">ParameterError</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.pysdc_helper</span> <span class="kn">import</span> <span class="n">FrozenClass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">level</span> <span class="k">as</span> <span class="n">levclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.base_transfer</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseTransfer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParameterError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.pysdc_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrozenClass</span>
 
 
 <span class="c1"># short helper class to add params as attributes</span>
-<span class="k">class</span> <span class="nc">_Pars</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Pars</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maxiter</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
@@ -56,13 +56,13 @@
 
 
 <span class="c1"># short helper class to bundle all status variables</span>
-<span class="k">class</span> <span class="nc">_Status</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Status</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class carries the status of the step. All variables that the core SDC / PFASST functionality depend on are</span>
 <span class="sd">    initialized here.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">iter</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">slot</span> <span class="o">=</span> <span class="kc">None</span>
@@ -82,7 +82,7 @@
 
 <div class="viewcode-block" id="Step">
 <a class="viewcode-back" href="../../pySDC/core.step.html#core.step.Step">[docs]</a>
-<span class="k">class</span> <span class="nc">Step</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Step</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Step class, referencing most of the structure needed for the time-stepping</span>
 
@@ -96,7 +96,7 @@
 <span class="sd">        levels (list): list of levels</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
@@ -124,7 +124,7 @@
         <span class="c1"># create hierarchy of levels</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__generate_hierarchy</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__generate_hierarchy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descr</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__generate_hierarchy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descr</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to generate the level hierarchy for a single step</span>
 
@@ -212,7 +212,7 @@
                 <span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__dict_to_list</span><span class="p">(</span><span class="n">in_dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__dict_to_list</span><span class="p">(</span><span class="n">in_dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Straightforward helper function to convert dictionary of list to list of dictionaries</span>
 
@@ -240,7 +240,7 @@
 
 <div class="viewcode-block" id="Step.connect_levels">
 <a class="viewcode-back" href="../../pySDC/core.step.html#core.step.Step.connect_levels">[docs]</a>
-    <span class="k">def</span> <span class="nf">connect_levels</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">connect_levels</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">base_transfer_class</span><span class="p">,</span>
         <span class="n">base_transfer_params</span><span class="p">,</span>
@@ -276,7 +276,7 @@
 
 <div class="viewcode-block" id="Step.transfer">
 <a class="viewcode-back" href="../../pySDC/core.step.html#core.step.Step.transfer">[docs]</a>
-    <span class="k">def</span> <span class="nf">transfer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transfer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Wrapper routine to ease the call of the transfer functions</span>
 
@@ -293,7 +293,7 @@
 
 <div class="viewcode-block" id="Step.reset_step">
 <a class="viewcode-back" href="../../pySDC/core.step.html#core.step.Step.reset_step">[docs]</a>
-    <span class="k">def</span> <span class="nf">reset_step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine so clean-up step structure and the corresp. levels for further uses</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -304,7 +304,7 @@
 
 <div class="viewcode-block" id="Step.init_step">
 <a class="viewcode-back" href="../../pySDC/core.step.html#core.step.Step.init_step">[docs]</a>
-    <span class="k">def</span> <span class="nf">init_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine for a new step.</span>
 
@@ -323,7 +323,7 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">prev</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prev</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter for previous step</span>
 
@@ -333,7 +333,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__prev</span>
 
     <span class="nd">@prev</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">prev</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prev</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Setter for previous step</span>
 
@@ -343,7 +343,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__prev</span> <span class="o">=</span> <span class="n">p</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter for next step</span>
 
@@ -353,7 +353,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__next</span>
 
     <span class="nd">@next</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Setter for next step</span>
 
@@ -363,7 +363,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__next</span> <span class="o">=</span> <span class="n">p</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">dt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter for current time-step size</span>
 
@@ -373,7 +373,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter for current time</span>
 

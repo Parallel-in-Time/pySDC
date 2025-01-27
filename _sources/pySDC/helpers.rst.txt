@@ -8,8 +8,12 @@ Submodules
    :maxdepth: 2
 
    helpers.NCCL_communicator
+   helpers.blocks
+   helpers.fieldsIO
+   helpers.firedrake_ensemble_communicator
    helpers.plot_helper
    helpers.problem_helper
+   helpers.pySDC_as_gusto_time_discretization
    helpers.pysdc_helper
    helpers.setup_helper
    helpers.spectral_helper

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Step-3: Statistics and a new sweeper &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
@@ -80,16 +80,16 @@ values are registered in the statistics. This can be helpful, if
 users register their own types, see below.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_3/A_getting_statistics.py">pySDC/tutorial/step_3/A_getting_statistics.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_list_of_types</span><span class="p">,</span> <span class="n">get_sorted</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_list_of_types</span><span class="p">,</span> <span class="n">get_sorted</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_forced</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span> <span class="kn">import</span> <span class="n">imex_1st_order</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">heatNd_forced</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span><span class="w"> </span><span class="kn">import</span> <span class="n">imex_1st_order</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple test program to describe how to get statistics of a run</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -127,7 +127,7 @@ users register their own types, see below.</p></li>
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">run_simulation</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_simulation</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple test program to run IMEX SDC for a single time step</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -236,18 +236,18 @@ iterations in the spatial solver) and access it during the hook call
 using the level.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_3/B_adding_statistics.py">pySDC/tutorial/step_3/B_adding_statistics.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.PenningTrap_3D</span> <span class="kn">import</span> <span class="n">penningtrap</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.boris_2nd_order</span> <span class="kn">import</span> <span class="n">boris_2nd_order</span>
-<span class="kn">from</span> <span class="nn">pySDC.tutorial.step_3.HookClass_Particles</span> <span class="kn">import</span> <span class="n">particle_hook</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.PenningTrap_3D</span><span class="w"> </span><span class="kn">import</span> <span class="n">penningtrap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.boris_2nd_order</span><span class="w"> </span><span class="kn">import</span> <span class="n">boris_2nd_order</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.tutorial.step_3.HookClass_Particles</span><span class="w"> </span><span class="kn">import</span> <span class="n">particle_hook</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple test program to retrieve user-defined statistics from a run</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -277,7 +277,7 @@ using the level.</p></li>
     <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;</span> <span class="mf">5e-04</span><span class="p">,</span> <span class="s2">&quot;ERROR: solution is not as exact as expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span>
 
 
-<span class="k">def</span> <span class="nf">run_penning_trap_simulation</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_penning_trap_simulation</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple test program to run IMEX SDC for a single time step of the penning trap example</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -344,7 +344,7 @@ using the level.</p></li>
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2024-12-20 14:25:22,294 - controller - controller - welcome_message - 147 - INFO: Welcome to the one and only, really very astonishing and 87.3% bug free
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2025-01-27 09:32:43,028 - controller - controller - welcome_message - 147 - INFO: Welcome to the one and only, really very astonishing and 87.3% bug free
                                  _____ _____   _____ 
                                 / ____|  __ \ / ____|
                     _ __  _   _| (___ | |  | | |     
@@ -354,8 +354,8 @@ using the level.</p></li>
                    | |     __/ |                     
                    |_|    |___/                      
                                                      
-2024-12-20 14:25:22,294 - controller - controller - dump_setup - 161 - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- BEGIN
-2024-12-20 14:25:22,294 - controller - controller - dump_setup - 228 - INFO: ----------------------------------------------------------------------------------------------------
+2025-01-27 09:32:43,028 - controller - controller - dump_setup - 161 - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- BEGIN
+2025-01-27 09:32:43,029 - controller - controller - dump_setup - 228 - INFO: ----------------------------------------------------------------------------------------------------
 
 Controller: &lt;class &#39;pySDC.implementations.controller_classes.controller_nonMPI.controller_nonMPI&#39;&gt;
     all_to_done = False
@@ -403,21 +403,21 @@ Active convergence controllers:
  -&gt; |  1 |   100 | SpreadStepSizesBlockwiseNonMPI
     |  2 |   200 | CheckConvergence
 
-2024-12-20 14:25:22,294 - controller - controller - dump_setup - 231 - INFO: ----------------------------------------------------------------------------------------------------
-2024-12-20 14:25:22,294 - controller - controller - dump_setup - 233 - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- END
+2025-01-27 09:32:43,029 - controller - controller - dump_setup - 231 - INFO: ----------------------------------------------------------------------------------------------------
+2025-01-27 09:32:43,029 - controller - controller - dump_setup - 233 - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- END
 
-2024-12-20 14:25:23,810 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 3.53203678e+00
-2024-12-20 14:25:23,817 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 2.09852117e-01
-2024-12-20 14:25:23,824 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 3.50301513e-02
-2024-12-20 14:25:23,831 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 4.67724741e-03
-2024-12-20 14:25:23,838 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 7.95583202e-04
-2024-12-20 14:25:23,845 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.11405073e-04
-2024-12-20 14:25:23,852 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.26902403e-05
-2024-12-20 14:25:23,859 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 1.16534547e-06
-2024-12-20 14:25:23,866 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 1.66968022e-07
-2024-12-20 14:25:23,873 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 2.09408171e-08
-2024-12-20 14:25:23,880 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 2.17123386e-09
-2024-12-20 14:25:23,883 - hooks - log_timings - post_run - 290 - INFO: Finished run after 1.59e+00s
+2025-01-27 09:32:44,366 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 3.53203678e+00
+2025-01-27 09:32:44,373 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 2.09852117e-01
+2025-01-27 09:32:44,379 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 3.50301513e-02
+2025-01-27 09:32:44,386 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 4.67724741e-03
+2025-01-27 09:32:44,393 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 7.95583202e-04
+2025-01-27 09:32:44,400 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.11405073e-04
+2025-01-27 09:32:44,406 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.26902403e-05
+2025-01-27 09:32:44,413 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 1.16534547e-06
+2025-01-27 09:32:44,420 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 1.66968022e-07
+2025-01-27 09:32:44,427 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 2.09408171e-08
+2025-01-27 09:32:44,434 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 2.17123386e-09
+2025-01-27 09:32:44,436 - hooks - log_timings - post_run - 290 - INFO: Finished run after 1.41e+00s
 Total energy and deviation in iteration  0: 8799.5000000000 -- 0.00000000e+00
 Total energy and deviation in iteration 11: 8785.0038936088 -- 1.44961064e+01
 </pre></div>
@@ -447,17 +447,17 @@ Alternatively, each <code class="docutils literal notranslate"><span class="pre"
 the relevant information can be stored.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_3/C_study_collocations.py">pySDC/tutorial/step_3/C_study_collocations.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.PenningTrap_3D</span> <span class="kn">import</span> <span class="n">penningtrap</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.boris_2nd_order</span> <span class="kn">import</span> <span class="n">boris_2nd_order</span>
-<span class="kn">from</span> <span class="nn">pySDC.tutorial.step_3.HookClass_Particles</span> <span class="kn">import</span> <span class="n">particle_hook</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.PenningTrap_3D</span><span class="w"> </span><span class="kn">import</span> <span class="n">penningtrap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.boris_2nd_order</span><span class="w"> </span><span class="kn">import</span> <span class="n">boris_2nd_order</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.tutorial.step_3.HookClass_Particles</span><span class="w"> </span><span class="kn">import</span> <span class="n">particle_hook</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple test program to show the energy deviation for different quadrature nodes</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -487,7 +487,7 @@ the relevant information can be stored.</p></li>
         <span class="k">assert</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="n">ediff_expect</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="s2">&quot;ERROR: energy deviated too much, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">ediff</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">run_simulation</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_simulation</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple test program to run IMEX SDC for a single time step</span>
 <span class="sd">    &quot;&quot;&quot;</span>

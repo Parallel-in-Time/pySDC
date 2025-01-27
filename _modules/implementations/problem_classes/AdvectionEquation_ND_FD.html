@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.AdvectionEquation_ND_FD &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
@@ -37,15 +37,15 @@
           <div class="body" role="main">
             
   <h1>Source code for implementations.problem_classes.AdvectionEquation_ND_FD</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.generic_ND_FD</span> <span class="kn">import</span> <span class="n">GenericNDimFinDiff</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.generic_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenericNDimFinDiff</span>
 
 
 <span class="c1"># noinspection PyUnusedLocal</span>
 <div class="viewcode-block" id="advectionNd">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AdvectionEquation_ND_FD.html#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd">[docs]</a>
-<span class="k">class</span> <span class="nc">advectionNd</span><span class="p">(</span><span class="n">GenericNDimFinDiff</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">advectionNd</span><span class="p">(</span><span class="n">GenericNDimFinDiff</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the unforced ND advection equation with periodic</span>
 <span class="sd">    or Dirichlet boundary conditions in :math:`[0,1]^N`</span>
@@ -106,7 +106,7 @@
 <span class="sd">    Do, however, take care that all spatial parameters have the same dimension.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">nvars</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
         <span class="n">c</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
@@ -128,7 +128,7 @@
 
 <div class="viewcode-block" id="advectionNd.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AdvectionEquation_ND_FD.html#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.u_exact">[docs]</a>
-    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 

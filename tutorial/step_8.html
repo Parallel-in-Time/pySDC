@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Step-8: Advanced topics &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
@@ -58,16 +58,16 @@ The application is (supposed) to be simple: merely put the <code class="docutils
 <li><p>The function itself is pretty straightforward and does not require passing the number of processes or iterations.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_8/A_visualize_residuals.py">pySDC/tutorial/step_8/A_visualize_residuals.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.visualization_tools</span> <span class="kn">import</span> <span class="n">show_residual_across_simulation</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.tutorial.step_6.A_run_non_MPI_controller</span> <span class="kn">import</span> <span class="n">set_parameters_ml</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.visualization_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">show_residual_across_simulation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.tutorial.step_6.A_run_non_MPI_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_parameters_ml</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple test program to demonstrate residual visualization</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -153,20 +153,20 @@ To prevent this, information can be sent forward immediately, but then this is n
 <li><p>We increased the logging value here again, (safely) ignoring the warnings for multi-step SDC.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_8/B_multistep_SDC.py">pySDC/tutorial/step_8/B_multistep_SDC.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.visualization_tools</span> <span class="kn">import</span> <span class="n">show_residual_across_simulation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.visualization_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">show_residual_across_simulation</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span> <span class="kn">import</span> <span class="n">mesh_to_mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">heatNd_unforced</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh_to_mesh</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple test program to do compare PFASST with multi-step SDC</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -360,24 +360,24 @@ This example takes three different test cases and checks how well the iteration 
 <li><p>The method also works for the parallel <cite>controller_MPI</cite> controller by using interrupts for checking when to stop (not tested here).</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_8/C_iteration_estimator.py">pySDC/tutorial/step_8/C_iteration_estimator.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_forced</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span> <span class="kn">import</span> <span class="n">advectionNd</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.Auzinger_implicit</span> <span class="kn">import</span> <span class="n">auzinger</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span> <span class="kn">import</span> <span class="n">imex_1st_order</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span> <span class="kn">import</span> <span class="n">mesh_to_mesh</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferMesh_NoCoarse</span> <span class="kn">import</span> <span class="n">mesh_to_mesh</span> <span class="k">as</span> <span class="n">mesh_to_mesh_nc</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.check_iteration_estimator</span> <span class="kn">import</span> <span class="n">CheckIterationEstimatorNonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.tutorial.step_8.HookClass_error_output</span> <span class="kn">import</span> <span class="n">error_output</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">heatNd_forced</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">advectionNd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.Auzinger_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">auzinger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span><span class="w"> </span><span class="kn">import</span> <span class="n">imex_1st_order</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh_to_mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.transfer_classes.TransferMesh_NoCoarse</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh_to_mesh</span> <span class="k">as</span> <span class="n">mesh_to_mesh_nc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.convergence_controller_classes.check_iteration_estimator</span><span class="w"> </span><span class="kn">import</span> <span class="n">CheckIterationEstimatorNonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.tutorial.step_8.HookClass_error_output</span><span class="w"> </span><span class="kn">import</span> <span class="n">error_output</span>
 
 
-<span class="k">def</span> <span class="nf">setup_diffusion</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ml</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_diffusion</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ml</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
@@ -440,7 +440,7 @@ This example takes three different test cases and checks how well the iteration 
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
-<span class="k">def</span> <span class="nf">setup_advection</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ml</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_advection</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ml</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
@@ -504,7 +504,7 @@ This example takes three different test cases and checks how well the iteration 
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
-<span class="k">def</span> <span class="nf">setup_auzinger</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ml</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_auzinger</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ml</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
@@ -555,7 +555,7 @@ This example takes three different test cases and checks how well the iteration 
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
-<span class="k">def</span> <span class="nf">run_simulations</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ndim_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nsteps_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ml</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nprocs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_simulations</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ndim_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nsteps_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ml</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nprocs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple test program to do SDC runs for the heat equation in various dimensions</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -650,7 +650,7 @@ This example takes three different test cases and checks how well the iteration 
 <span class="si">{</span><span class="n">mean_number_of_iterations</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> mean iterations, but got </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">run_simulations</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;diffusion&#39;</span><span class="p">,</span> <span class="n">ndim_list</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Tend</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">nsteps_list</span><span class="o">=</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="n">ml</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nprocs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">run_simulations</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;diffusion&#39;</span><span class="p">,</span> <span class="n">ndim_list</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Tend</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">nsteps_list</span><span class="o">=</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="n">ml</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nprocs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
@@ -678,7 +678,7 @@ This example takes three different test cases and checks how well the iteration 
    Errors after step   0.8750 with 6 iterations: 3.6530e-08 / 2.0645e-13
    Errors after step   1.0000 with 6 iterations: 3.6478e-08 / 1.2759e-13
 
-...done, took 0.32406111500000634 seconds!
+...done, took 0.3302725940000073 seconds!
 -----------------------------------------------------------------------------
 Running diffusion in 1 dimensions with time-step size 0.125...
 
@@ -692,7 +692,7 @@ Running diffusion in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 3 iterations: 3.5501e-08 / 3.9957e-13
    Errors after step   1.0000 with 3 iterations: 3.6813e-08 / 1.6975e-13
 
-...done, took 0.7386653199999955 seconds!
+...done, took 0.7456421469999839 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
@@ -706,7 +706,7 @@ Running advection in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 4 iterations: 2.5517e-08 / 3.3307e-16
    Errors after step   1.0000 with 4 iterations: 2.9147e-08 / 4.4409e-16
 
-...done, took 0.2204543889999968 seconds!
+...done, took 0.21993833199999813 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
@@ -720,7 +720,7 @@ Running advection in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 2 iterations: 2.5987e-08 / 3.1841e-13
    Errors after step   1.0000 with 2 iterations: 2.9666e-08 / 3.1819e-13
 
-...done, took 0.6322716610000043 seconds!
+...done, took 0.6062793000000113 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -734,7 +734,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 6 iterations: 2.8266e-08 / 0.0000e+00
    Errors after step   1.0000 with 6 iterations: 2.8338e-08 / 0.0000e+00
 
-...done, took 0.1430062499999849 seconds!
+...done, took 0.14209446699999262 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -748,7 +748,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 4 iterations: 3.1486e-08 / 0.0000e+00
    Errors after step   1.0000 with 4 iterations: 3.3802e-08 / 0.0000e+00
 
-...done, took 0.17191371100000197 seconds!
+...done, took 0.17547833300000093 seconds!
 -----------------------------------------------------------------------------
 </pre></div>
 </div>

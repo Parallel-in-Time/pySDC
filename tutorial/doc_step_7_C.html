@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>&lt;no title&gt; &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
@@ -37,21 +37,21 @@
           <div class="body" role="main">
             
   <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_7/C_pySDC_with_PETSc.py">pySDC/tutorial/step_7/C_pySDC_with_PETSc.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_MPI</span> <span class="kn">import</span> <span class="n">controller_MPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced</span> <span class="kn">import</span> <span class="n">heat2d_petsc_forced</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span> <span class="kn">import</span> <span class="n">imex_1st_order</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferPETScDMDA</span> <span class="kn">import</span> <span class="n">mesh_to_mesh_petsc_dmda</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_MPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_MPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced</span><span class="w"> </span><span class="kn">import</span> <span class="n">heat2d_petsc_forced</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span><span class="w"> </span><span class="kn">import</span> <span class="n">imex_1st_order</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.transfer_classes.TransferPETScDMDA</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh_to_mesh_petsc_dmda</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Program to demonstrate usage of PETSc data structures and spatial parallelization,</span>
 <span class="sd">    combined with parallelization in time.</span>
@@ -215,7 +215,7 @@
    <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> 
    <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">0</span>
    <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.00</span> <span class="o">--</span> <span class="mf">0.00</span>
-<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">1.4077</span> <span class="n">sec</span><span class="o">.</span>
+<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">1.3309</span> <span class="n">sec</span><span class="o">.</span>
 <span class="n">Error</span> <span class="n">vs</span><span class="o">.</span> <span class="n">PDE</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">1.9479e-04</span>
 </pre></div>
 </div>
@@ -227,7 +227,7 @@
    <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> 
    <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">0</span>
    <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.00</span> <span class="o">--</span> <span class="mf">0.00</span>
-<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">0.8366</span> <span class="n">sec</span><span class="o">.</span>
+<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">1.0238</span> <span class="n">sec</span><span class="o">.</span>
 <span class="n">Error</span> <span class="n">vs</span><span class="o">.</span> <span class="n">PDE</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">1.9479e-04</span>
 </pre></div>
 </div>
@@ -238,7 +238,7 @@
    <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> 
    <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">0</span>
    <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.00</span> <span class="o">--</span> <span class="mf">0.00</span>
-<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">0.7351</span> <span class="n">sec</span><span class="o">.</span>
+<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">0.7645</span> <span class="n">sec</span><span class="o">.</span>
 <span class="n">Error</span> <span class="n">vs</span><span class="o">.</span> <span class="n">PDE</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">1.9479e-04</span>
 <span class="n">This</span> <span class="ow">is</span> <span class="n">time</span><span class="o">-</span><span class="n">rank</span> <span class="mf">1.</span><span class="o">..</span>
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.12</span><span class="p">:</span> <span class="mi">12</span>
@@ -246,7 +246,7 @@
    <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> 
    <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">0</span>
    <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.00</span> <span class="o">--</span> <span class="mf">0.00</span>
-<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">0.7351</span> <span class="n">sec</span><span class="o">.</span>
+<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">0.7645</span> <span class="n">sec</span><span class="o">.</span>
 <span class="n">Error</span> <span class="n">vs</span><span class="o">.</span> <span class="n">PDE</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">1.9479e-04</span>
 </pre></div>
 </div>

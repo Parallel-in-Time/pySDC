@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>helpers.fieldsIO module &#8212; pySDC 5.5.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=3005adad"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="helpers.firedrake_ensemble_communicator module" href="helpers.firedrake_ensemble_communicator.html" />
+    <link rel="prev" title="helpers.blocks module" href="helpers.blocks.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="helpers.firedrake_ensemble_communicator.html" title="helpers.firedrake_ensemble_communicator module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="helpers.blocks.html" title="helpers.blocks module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="helpers.html" accesskey="U">helpers package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">helpers.fieldsIO module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-helpers.fieldsIO">
+<span id="helpers-fieldsio-module"></span><h1>helpers.fieldsIO module<a class="headerlink" href="#module-helpers.fieldsIO" title="Link to this heading">¶</a></h1>
+<p>Generic utility class to write and read cartesian grid field solutions into binary files.
+It implements the base file handler class <a class="reference internal" href="#helpers.fieldsIO.FieldsIO" title="helpers.fieldsIO.FieldsIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">FieldsIO</span></code></a>, that is specialized into :</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#helpers.fieldsIO.Scal0D" title="helpers.fieldsIO.Scal0D"><code class="xref py py-class docutils literal notranslate"><span class="pre">Scal0D</span></code></a> : for 0D fields (scalar) with a given number of variables</p></li>
+<li><p><a class="reference internal" href="#helpers.fieldsIO.Cart1D" title="helpers.fieldsIO.Cart1D"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cart1D</span></code></a> : for 1D fields with a given number of variables</p></li>
+<li><p><a class="reference internal" href="#helpers.fieldsIO.Cart2D" title="helpers.fieldsIO.Cart2D"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cart2D</span></code></a> : for 2D fields on a cartesian grid with a given number of variables</p></li>
+</ul>
+<p>While each file handler need to be setup with specific parameters (grid, …),
+each written file can be read using the same interface implemented in the
+base abstract class.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.fieldsIO</span><span class="w"> </span><span class="kn">import</span> <span class="n">Cart1D</span><span class="p">,</span> <span class="n">FieldsIO</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Write some fields in files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">101</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fOut</span> <span class="o">=</span> <span class="n">Cart2D</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="s2">&quot;file.pysdc&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fOut</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="n">nVar</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">coordX</span><span class="o">=</span><span class="n">x</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fOut</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">times</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])[:,</span> <span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>   <span class="n">fOut</span><span class="o">.</span><span class="n">addField</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t</span><span class="o">*</span><span class="n">u0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Read the file using a the generic interface</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fIn</span> <span class="o">=</span> <span class="n">FieldsIO</span><span class="o">.</span><span class="n">fromFile</span><span class="p">(</span><span class="s2">&quot;file.pysdc&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">times</span> <span class="o">=</span> <span class="n">fIn</span><span class="o">.</span><span class="n">times</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span> <span class="o">==</span> <span class="n">fIn</span><span class="o">.</span><span class="n">nFields</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tEnd</span><span class="p">,</span> <span class="n">uEnd</span> <span class="o">=</span> <span class="n">fIn</span><span class="o">.</span><span class="n">readField</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">tEnd</span> <span class="o">==</span> <span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>🚀 <a class="reference internal" href="#helpers.fieldsIO.Cart1D" title="helpers.fieldsIO.Cart1D"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cart1D</span></code></a> and <a class="reference internal" href="#helpers.fieldsIO.Cart2D" title="helpers.fieldsIO.Cart2D"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cart2D</span></code></a> are compatible with a MPI-based cartesian decomposition.
+See <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.tests.test_helpers.test_fieldsIO.writeFields_MPI</span></code> for an illustrative example.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>To use MPI collective writing, you need to call first the class methods <code class="xref py py-class docutils literal notranslate"><span class="pre">Cart1D.initMPI</span></code>
+or <code class="xref py py-class docutils literal notranslate"><span class="pre">Cart2D.initMPI</span></code> from the associated class (cf their docstring).
+Also, their associated <cite>setHeader</cite> methods <strong>must be given the global grids coordinates</strong>,
+wether code is run in parallel or not.</p>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Cart1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart1D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart1D" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#helpers.fieldsIO.Scal0D" title="helpers.fieldsIO.Scal0D"><code class="xref py py-class docutils literal notranslate"><span class="pre">Scal0D</span></code></a></p>
+<p>FieldsIO handler storing a given number of 2D scalar variables</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.MPI_FILE_CLOSE">
+<span class="sig-name descname"><span class="pre">MPI_FILE_CLOSE</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart1D.MPI_FILE_CLOSE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart1D.MPI_FILE_CLOSE" title="Link to this definition">¶</a></dt>
+<dd><p>Close the binary file in MPI mode</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.MPI_FILE_OPEN">
+<span class="sig-name descname"><span class="pre">MPI_FILE_OPEN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart1D.MPI_FILE_OPEN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart1D.MPI_FILE_OPEN" title="Link to this definition">¶</a></dt>
+<dd><p>Open the binary file in MPI mode</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.MPI_ON">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MPI_ON</span></span><a class="headerlink" href="#helpers.fieldsIO.Cart1D.MPI_ON" title="Link to this definition">¶</a></dt>
+<dd><p>Wether or not MPI is activated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.MPI_READ_AT">
+<span class="sig-name descname"><span class="pre">MPI_READ_AT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart1D.MPI_READ_AT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart1D.MPI_READ_AT" title="Link to this definition">¶</a></dt>
+<dd><p>Read data from the binary file in MPI mode, with a given offset
+<strong>relative to the beginning of the file</strong>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>offset</strong> (<em>int</em>) – Offset to read at, relative to the beginning of the file, in bytes.</p></li>
+<li><p><strong>data</strong> (<em>np.ndarray</em>) – Array on which to read the data from the binary file.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.MPI_ROOT">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MPI_ROOT</span></span><a class="headerlink" href="#helpers.fieldsIO.Cart1D.MPI_ROOT" title="Link to this definition">¶</a></dt>
+<dd><p>Wether or not the process is MPI Root</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.MPI_WRITE">
+<span class="sig-name descname"><span class="pre">MPI_WRITE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart1D.MPI_WRITE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart1D.MPI_WRITE" title="Link to this definition">¶</a></dt>
+<dd><p>Write data (np.ndarray) in the binary file in MPI mode, at the current file cursor position.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.MPI_WRITE_AT">
+<span class="sig-name descname"><span class="pre">MPI_WRITE_AT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart1D.MPI_WRITE_AT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart1D.MPI_WRITE_AT" title="Link to this definition">¶</a></dt>
+<dd><p>Write data in the binary file in MPI mode, with a given offset
+<strong>relative to the beginning of the file</strong>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>offset</strong> (<em>int</em>) – Offset to write at, relative to the beginning of the file, in bytes.</p></li>
+<li><p><strong>data</strong> (<em>np.ndarray</em>) – Data to be written in the binary file.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.addField">
+<span class="sig-name descname"><span class="pre">addField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart1D.addField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart1D.addField" title="Link to this definition">¶</a></dt>
+<dd><p>Append one field solution at the end of the file with one given time,
+possibly using MPI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time</strong> (<em>float-like</em>) – The associated time of the field solution.</p></li>
+<li><p><strong>field</strong> (<em>np.ndarray</em>) – The (local) field values.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If a MPI decomposition is used, field <strong>must be</strong> the local field values.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.comm">
+<span class="sig-name descname"><span class="pre">comm</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">mpi4py.MPI.Intracomm</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helpers.fieldsIO.Cart1D.comm" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.hInfos">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hInfos</span></span><a class="headerlink" href="#helpers.fieldsIO.Cart1D.hInfos" title="Link to this definition">¶</a></dt>
+<dd><p>Array representing the grid structure to be written in the binary file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart1D.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart1D.initialize" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize the binary file (write header) in MPI mode</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.nX">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nX</span></span><a class="headerlink" href="#helpers.fieldsIO.Cart1D.nX" title="Link to this definition">¶</a></dt>
+<dd><p>Number of points in x direction</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.readField">
+<span class="sig-name descname"><span class="pre">readField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart1D.readField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart1D.readField" title="Link to this definition">¶</a></dt>
+<dd><p>Read one field stored in the binary file, corresponding to the given
+time index, possibly in MPI mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>idx</strong> (<em>int</em>) – Positional index of the field.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>t</strong> (<em>float</em>) – Stored time for this field.</p></li>
+<li><p><strong>field</strong> (<em>np.ndarray</em>) – Read (local) fields in a numpy array.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If a MPI decomposition is used, it reads and returns the local fields values only.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.readHeader">
+<span class="sig-name descname"><span class="pre">readHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart1D.readHeader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart1D.readHeader" title="Link to this definition">¶</a></dt>
+<dd><p>Read the header from the binary file storing the fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> (<cite>_io.TextIOWrapper</cite>) – File to read the header from.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.reshape">
+<span class="sig-name descname"><span class="pre">reshape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart1D.reshape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart1D.reshape" title="Link to this definition">¶</a></dt>
+<dd><p>Eventually reshape the field to correspond to the grid structure</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.sID">
+<span class="sig-name descname"><span class="pre">sID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#helpers.fieldsIO.Cart1D.sID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.setHeader">
+<span class="sig-name descname"><span class="pre">setHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nVar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordX</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart1D.setHeader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart1D.setHeader" title="Link to this definition">¶</a></dt>
+<dd><p>Set the descriptive grid structure to be stored in the file header.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nVar</strong> (<em>int</em>) – Number of 1D variables stored.</p></li>
+<li><p><strong>coordX</strong> (<em>np.1darray</em>) – The grid coordinates in X direction.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When used in MPI decomposition mode, <cite>coordX</cite> <strong>must</strong> be the global grid.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.setupCoords">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setupCoords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">coords</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart1D.setupCoords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart1D.setupCoords" title="Link to this definition">¶</a></dt>
+<dd><p>Utility function to setup grids in multuple dimensions, given the keyword arguments</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart1D.setupMPI">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setupMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">mpi4py.MPI.Intracomm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iLocX</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nLocX</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart1D.setupMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart1D.setupMPI" title="Link to this definition">¶</a></dt>
+<dd><p>Setup the MPI mode for the files IO, considering a decomposition
+of the 1D grid into contiuous subintervals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comm</strong> (<em>MPI.Intracomm</em>) – The space decomposition communicator.</p></li>
+<li><p><strong>iLocX</strong> (<em>int</em>) – Starting index of the local sub-domain in the global <cite>coordX</cite>.</p></li>
+<li><p><strong>nLocX</strong> (<em>int</em>) – Number of points in the local sub-domain.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart2D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Cart2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart2D" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#helpers.fieldsIO.Cart1D" title="helpers.fieldsIO.Cart1D"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cart1D</span></code></a></p>
+<p>FieldsIO handler storing a given number of 2D scalar variables</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart2D.addField">
+<span class="sig-name descname"><span class="pre">addField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart2D.addField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart2D.addField" title="Link to this definition">¶</a></dt>
+<dd><p>Append one field solution at the end of the file with one given time,
+possibly using MPI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time</strong> (<em>float-like</em>) – The associated time of the field solution.</p></li>
+<li><p><strong>field</strong> (<em>np.ndarray</em>) – The (local) field values.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If a MPI decomposition is used, field <strong>must be</strong> the local field values.</p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart2D.hInfos">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hInfos</span></span><a class="headerlink" href="#helpers.fieldsIO.Cart2D.hInfos" title="Link to this definition">¶</a></dt>
+<dd><p>Array representing the grid structure to be written in the binary file.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart2D.nY">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nY</span></span><a class="headerlink" href="#helpers.fieldsIO.Cart2D.nY" title="Link to this definition">¶</a></dt>
+<dd><p>Number of points in y direction</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart2D.readField">
+<span class="sig-name descname"><span class="pre">readField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart2D.readField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart2D.readField" title="Link to this definition">¶</a></dt>
+<dd><p>Read one field stored in the binary file, corresponding to the given
+time index, eventually in MPI mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>idx</strong> (<em>int</em>) – Positional index of the field.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>t</strong> (<em>float</em>) – Stored time for this field.</p></li>
+<li><p><strong>field</strong> (<em>np.ndarray</em>) – Read (local) fields in a numpy array.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If a MPI decomposition is used, it reads and returns the local fields values only.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart2D.readHeader">
+<span class="sig-name descname"><span class="pre">readHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart2D.readHeader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart2D.readHeader" title="Link to this definition">¶</a></dt>
+<dd><p>Read the header from the binary file storing the fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> (<cite>_io.TextIOWrapper</cite>) – File to read the header from.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart2D.reshape">
+<span class="sig-name descname"><span class="pre">reshape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart2D.reshape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart2D.reshape" title="Link to this definition">¶</a></dt>
+<dd><p>Reshape the fields to a [nVar, nX, nY] array (inplace operation)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart2D.sID">
+<span class="sig-name descname"><span class="pre">sID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#helpers.fieldsIO.Cart2D.sID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart2D.setHeader">
+<span class="sig-name descname"><span class="pre">setHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nVar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordX</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordY</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart2D.setHeader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart2D.setHeader" title="Link to this definition">¶</a></dt>
+<dd><p>Set the descriptive grid structure to be stored in the file header.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nVar</strong> (<em>int</em>) – Number of 1D variables stored.</p></li>
+<li><p><strong>coordX</strong> (<em>np.1darray</em>) – The grid coordinates in x direction.</p></li>
+<li><p><strong>coordY</strong> (<em>np.1darray</em>) – The grid coordinates in y direction.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When used in MPI decomposition mode, <cite>coordX</cite> and <cite>coordX</cite> <strong>must</strong> be the global grid.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Cart2D.setupMPI">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setupMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">mpi4py.MPI.Intracomm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iLocX</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nLocX</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iLocY</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nLocY</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Cart2D.setupMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Cart2D.setupMPI" title="Link to this definition">¶</a></dt>
+<dd><p>Setup the MPI mode for the files IO, considering a decomposition
+of the 1D grid into contiuous subintervals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comm</strong> (<em>MPI.Intracomm</em>) – The space decomposition communicator.</p></li>
+<li><p><strong>iLocX</strong> (<em>int</em>) – Starting index of the local sub-domain in the global <cite>coordX</cite>.</p></li>
+<li><p><strong>nLocX</strong> (<em>int</em>) – Number of points in the local sub-domain.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FieldsIO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#FieldsIO"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.FieldsIO" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstract IO file handler</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.ALLOW_OVERWRITE">
+<span class="sig-name descname"><span class="pre">ALLOW_OVERWRITE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.ALLOW_OVERWRITE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.STRUCTS">
+<span class="sig-name descname"><span class="pre">STRUCTS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{0:</span> <span class="pre">&lt;class</span> <span class="pre">'helpers.fieldsIO.Scal0D'&gt;,</span> <span class="pre">1:</span> <span class="pre">&lt;class</span> <span class="pre">'helpers.fieldsIO.Cart1D'&gt;,</span> <span class="pre">2:</span> <span class="pre">&lt;class</span> <span class="pre">'helpers.fieldsIO.Cart2D'&gt;}</span></em><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.STRUCTS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.addField">
+<span class="sig-name descname"><span class="pre">addField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#FieldsIO.addField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.addField" title="Link to this definition">¶</a></dt>
+<dd><p>Append one field solution at the end of the file with one given time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time</strong> (<em>float-like</em>) – The associated time of the field solution.</p></li>
+<li><p><strong>field</strong> (<em>np.ndarray</em>) – The field values.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.fSize">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fSize</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.fSize" title="Link to this definition">¶</a></dt>
+<dd><p>Full size of a field (in bytes)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.fileSize">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fileSize</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.fileSize" title="Link to this definition">¶</a></dt>
+<dd><p>Current size of the file (in bytes)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.formatIndex">
+<span class="sig-name descname"><span class="pre">formatIndex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#FieldsIO.formatIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.formatIndex" title="Link to this definition">¶</a></dt>
+<dd><p>Utility method to format a fields index to a positional integer (negative starts from last field index, like python lists)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.fromFile">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fromFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#FieldsIO.fromFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.fromFile" title="Link to this definition">¶</a></dt>
+<dd><p>Read a file storing fields, and return the <cite>FieldsIO</cite> of the appropriate
+field type (structure).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fileName</strong> (<em>str</em>) – Name of the binary file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>fieldsIO</strong> – The specialized <cite>FieldsIO</cite> adapted to the file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helpers.fieldsIO.FieldsIO" title="helpers.fieldsIO.FieldsIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">FieldsIO</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.hBase">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hBase</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.hBase" title="Link to this definition">¶</a></dt>
+<dd><p>Base header into numpy array format</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.hInfos">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hInfos</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.hInfos" title="Link to this definition">¶</a></dt>
+<dd><p>(Abstract) Array representing the grid structure to be written in the binary file.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.hSize">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hSize</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.hSize" title="Link to this definition">¶</a></dt>
+<dd><p>Size of the full header (in bytes)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#FieldsIO.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.initialize" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize the file handler : create the file with header, removing any existing file with the same name</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.itemSize">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">itemSize</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.itemSize" title="Link to this definition">¶</a></dt>
+<dd><p>Size of one field value (in bytes)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.nFields">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nFields</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.nFields" title="Link to this definition">¶</a></dt>
+<dd><p>Number of fields currently stored in the binary file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.readField">
+<span class="sig-name descname"><span class="pre">readField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#FieldsIO.readField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.readField" title="Link to this definition">¶</a></dt>
+<dd><p>Read one field stored in the binary file, corresponding to the given
+time index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>idx</strong> (<em>int</em>) – Positional index of the field.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>t</strong> (<em>float</em>) – Stored time for this field.</p></li>
+<li><p><strong>field</strong> (<em>np.ndarray</em>) – Read fields in a numpy array.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.readHeader">
+<span class="sig-name descname"><span class="pre">readHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#FieldsIO.readHeader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.readHeader" title="Link to this definition">¶</a></dt>
+<dd><p>(Abstract) Read the header from the file storing the fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> (<cite>_io.TextIOWrapper</cite>) – File to read the header from.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.register">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#FieldsIO.register"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.register" title="Link to this definition">¶</a></dt>
+<dd><p>Decorator used to register a new class FieldsIO specialized class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sID</strong> (<em>int</em>) – Unique identifyer for the file, used in the binary file.
+Since it’s encoded on a 8-bytes signed integer,
+it must be between -128 and 127</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># New specialized FieldsIO class</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nd">@FieldsIO</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">sID</span><span class="o">=</span><span class="mi">31</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">HexaMesh2D</span><span class="p">(</span><span class="n">FieldsIO</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">pass</span> <span class="c1"># ... implementation</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.reshape">
+<span class="sig-name descname"><span class="pre">reshape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#FieldsIO.reshape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.reshape" title="Link to this definition">¶</a></dt>
+<dd><p>Eventually reshape the field to correspond to the grid structure</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.sID">
+<span class="sig-name descname"><span class="pre">sID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.sID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.setHeader">
+<span class="sig-name descname"><span class="pre">setHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#FieldsIO.setHeader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.setHeader" title="Link to this definition">¶</a></dt>
+<dd><p>(Abstract) Set the header before creating a new file to store the fields</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.tSize">
+<span class="sig-name descname"><span class="pre">tSize</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.tSize" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.time">
+<span class="sig-name descname"><span class="pre">time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#FieldsIO.time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.time" title="Link to this definition">¶</a></dt>
+<dd><p>Time stored at a given field index</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.times">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">times</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.times" title="Link to this definition">¶</a></dt>
+<dd><p>Vector of all times stored in the binary file</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Scal0D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Scal0D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Scal0D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Scal0D" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#helpers.fieldsIO.FieldsIO" title="helpers.fieldsIO.FieldsIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">FieldsIO</span></code></a></p>
+<p>FieldsIO handler storing a given number of scalar</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Scal0D.hInfos">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hInfos</span></span><a class="headerlink" href="#helpers.fieldsIO.Scal0D.hInfos" title="Link to this definition">¶</a></dt>
+<dd><p>Array representing the grid structure to be written in the binary file.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Scal0D.nVar">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nVar</span></span><a class="headerlink" href="#helpers.fieldsIO.Scal0D.nVar" title="Link to this definition">¶</a></dt>
+<dd><p>Number of variables in a fields, as described in the header</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Scal0D.readHeader">
+<span class="sig-name descname"><span class="pre">readHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Scal0D.readHeader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Scal0D.readHeader" title="Link to this definition">¶</a></dt>
+<dd><p>Read the header from the binary file storing the fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> (<cite>_io.TextIOWrapper</cite>) – File to read the header from.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Scal0D.sID">
+<span class="sig-name descname"><span class="pre">sID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#helpers.fieldsIO.Scal0D.sID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Scal0D.setHeader">
+<span class="sig-name descname"><span class="pre">setHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nVar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Scal0D.setHeader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Scal0D.setHeader" title="Link to this definition">¶</a></dt>
+<dd><p>Set the descriptive grid structure to be stored in the file header.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nVar</strong> (<em>int</em>) – Number of scalar variable stored.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">helpers.fieldsIO module</a><ul>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D"><code class="docutils literal notranslate"><span class="pre">Cart1D</span></code></a><ul>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.MPI_FILE_CLOSE"><code class="docutils literal notranslate"><span class="pre">MPI_FILE_CLOSE()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.MPI_FILE_OPEN"><code class="docutils literal notranslate"><span class="pre">MPI_FILE_OPEN()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.MPI_ON"><code class="docutils literal notranslate"><span class="pre">MPI_ON</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.MPI_READ_AT"><code class="docutils literal notranslate"><span class="pre">MPI_READ_AT()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.MPI_ROOT"><code class="docutils literal notranslate"><span class="pre">MPI_ROOT</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.MPI_WRITE"><code class="docutils literal notranslate"><span class="pre">MPI_WRITE()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.MPI_WRITE_AT"><code class="docutils literal notranslate"><span class="pre">MPI_WRITE_AT()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.addField"><code class="docutils literal notranslate"><span class="pre">addField()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.comm"><code class="docutils literal notranslate"><span class="pre">comm</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.hInfos"><code class="docutils literal notranslate"><span class="pre">hInfos</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.initialize"><code class="docutils literal notranslate"><span class="pre">initialize()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.nX"><code class="docutils literal notranslate"><span class="pre">nX</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.readField"><code class="docutils literal notranslate"><span class="pre">readField()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.readHeader"><code class="docutils literal notranslate"><span class="pre">readHeader()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.reshape"><code class="docutils literal notranslate"><span class="pre">reshape()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.sID"><code class="docutils literal notranslate"><span class="pre">sID</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.setHeader"><code class="docutils literal notranslate"><span class="pre">setHeader()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.setupCoords"><code class="docutils literal notranslate"><span class="pre">setupCoords()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart1D.setupMPI"><code class="docutils literal notranslate"><span class="pre">setupMPI()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart2D"><code class="docutils literal notranslate"><span class="pre">Cart2D</span></code></a><ul>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart2D.addField"><code class="docutils literal notranslate"><span class="pre">addField()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart2D.hInfos"><code class="docutils literal notranslate"><span class="pre">hInfos</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart2D.nY"><code class="docutils literal notranslate"><span class="pre">nY</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart2D.readField"><code class="docutils literal notranslate"><span class="pre">readField()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart2D.readHeader"><code class="docutils literal notranslate"><span class="pre">readHeader()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart2D.reshape"><code class="docutils literal notranslate"><span class="pre">reshape()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart2D.sID"><code class="docutils literal notranslate"><span class="pre">sID</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart2D.setHeader"><code class="docutils literal notranslate"><span class="pre">setHeader()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Cart2D.setupMPI"><code class="docutils literal notranslate"><span class="pre">setupMPI()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO"><code class="docutils literal notranslate"><span class="pre">FieldsIO</span></code></a><ul>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.ALLOW_OVERWRITE"><code class="docutils literal notranslate"><span class="pre">ALLOW_OVERWRITE</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.STRUCTS"><code class="docutils literal notranslate"><span class="pre">STRUCTS</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.addField"><code class="docutils literal notranslate"><span class="pre">addField()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.fSize"><code class="docutils literal notranslate"><span class="pre">fSize</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.fileSize"><code class="docutils literal notranslate"><span class="pre">fileSize</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.formatIndex"><code class="docutils literal notranslate"><span class="pre">formatIndex()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.fromFile"><code class="docutils literal notranslate"><span class="pre">fromFile()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.hBase"><code class="docutils literal notranslate"><span class="pre">hBase</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.hInfos"><code class="docutils literal notranslate"><span class="pre">hInfos</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.hSize"><code class="docutils literal notranslate"><span class="pre">hSize</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.initialize"><code class="docutils literal notranslate"><span class="pre">initialize()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.itemSize"><code class="docutils literal notranslate"><span class="pre">itemSize</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.nFields"><code class="docutils literal notranslate"><span class="pre">nFields</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.readField"><code class="docutils literal notranslate"><span class="pre">readField()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.readHeader"><code class="docutils literal notranslate"><span class="pre">readHeader()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.register"><code class="docutils literal notranslate"><span class="pre">register()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.reshape"><code class="docutils literal notranslate"><span class="pre">reshape()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.sID"><code class="docutils literal notranslate"><span class="pre">sID</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.setHeader"><code class="docutils literal notranslate"><span class="pre">setHeader()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.tSize"><code class="docutils literal notranslate"><span class="pre">tSize</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.time"><code class="docutils literal notranslate"><span class="pre">time()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.FieldsIO.times"><code class="docutils literal notranslate"><span class="pre">times</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Scal0D"><code class="docutils literal notranslate"><span class="pre">Scal0D</span></code></a><ul>
+<li><a class="reference internal" href="#helpers.fieldsIO.Scal0D.hInfos"><code class="docutils literal notranslate"><span class="pre">hInfos</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Scal0D.nVar"><code class="docutils literal notranslate"><span class="pre">nVar</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Scal0D.readHeader"><code class="docutils literal notranslate"><span class="pre">readHeader()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Scal0D.sID"><code class="docutils literal notranslate"><span class="pre">sID</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Scal0D.setHeader"><code class="docutils literal notranslate"><span class="pre">setHeader()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="helpers.blocks.html"
+                          title="previous chapter">helpers.blocks module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="helpers.firedrake_ensemble_communicator.html"
+                          title="next chapter">helpers.firedrake_ensemble_communicator module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/helpers.fieldsIO.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="helpers.firedrake_ensemble_communicator.html" title="helpers.firedrake_ensemble_communicator module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="helpers.blocks.html" title="helpers.blocks module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="helpers.html" >helpers package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">helpers.fieldsIO module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>

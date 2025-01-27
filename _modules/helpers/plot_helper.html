@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>helpers.plot_helper &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
     
@@ -37,16 +37,16 @@
           <div class="body" role="main">
             
   <h1>Source code for helpers.plot_helper</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">distutils.spawn</span> <span class="kn">import</span> <span class="n">find_executable</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpl</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">distutils.spawn</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_executable</span>
 
 <span class="n">default_mpl_params</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="figsize">
 <a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.figsize">[docs]</a>
-<span class="k">def</span> <span class="nf">figsize</span><span class="p">(</span><span class="n">textwidth</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">figsize</span><span class="p">(</span><span class="n">textwidth</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get figsize.</span>
 
@@ -69,7 +69,7 @@
 
 <div class="viewcode-block" id="figsize_by_journal">
 <a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.figsize_by_journal">[docs]</a>
-<span class="k">def</span> <span class="nf">figsize_by_journal</span><span class="p">(</span><span class="n">journal</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">figsize_by_journal</span><span class="p">(</span><span class="n">journal</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get figsize for specific journal. If you supply a text height, we will rescale the figure to fit on the page instead</span>
 <span class="sd">    of the parameters supplied.</span>
@@ -113,7 +113,7 @@
 
 <div class="viewcode-block" id="setup_mpl">
 <a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.setup_mpl">[docs]</a>
-<span class="k">def</span> <span class="nf">setup_mpl</span><span class="p">(</span><span class="n">font_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_mpl</span><span class="p">(</span><span class="n">font_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">reset</span><span class="p">:</span>
         <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">default_mpl_params</span><span class="p">)</span>
 
@@ -166,7 +166,7 @@
 
 <div class="viewcode-block" id="newfig">
 <a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.newfig">[docs]</a>
-<span class="k">def</span> <span class="nf">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="mf">0.6180339887</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="mf">0.6180339887</span><span class="p">):</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">(</span><span class="n">textwidth</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
@@ -175,7 +175,7 @@
 
 <div class="viewcode-block" id="savefig">
 <a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.savefig">[docs]</a>
-<span class="k">def</span> <span class="nf">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">save_pdf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_pgf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_png</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">save_pdf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_pgf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_png</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">save_pgf</span> <span class="ow">and</span> <span class="n">find_executable</span><span class="p">(</span><span class="s1">&#39;latex&#39;</span><span class="p">):</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.pgf&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">save_pdf</span><span class="p">:</span>

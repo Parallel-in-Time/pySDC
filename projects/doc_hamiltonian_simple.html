@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>&lt;no title&gt; &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
@@ -37,24 +37,24 @@
           <div class="body" role="main">
             
   <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/Hamiltonian/simple_problems.py">pySDC/projects/Hamiltonian/simple_problems.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
 
-<span class="kn">import</span> <span class="nn">dill</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dill</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span><span class="p">,</span> <span class="n">filter_stats</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pySDC.helpers.plot_helper</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt_helper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span><span class="p">,</span> <span class="n">filter_stats</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HarmonicOscillator</span> <span class="kn">import</span> <span class="n">harmonic_oscillator</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HenonHeiles</span> <span class="kn">import</span> <span class="n">henon_heiles</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.verlet</span> <span class="kn">import</span> <span class="n">verlet</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferParticles_NoCoarse</span> <span class="kn">import</span> <span class="n">particles_to_particles</span>
-<span class="kn">from</span> <span class="nn">pySDC.projects.Hamiltonian.hamiltonian_output</span> <span class="kn">import</span> <span class="n">hamiltonian_output</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HarmonicOscillator</span><span class="w"> </span><span class="kn">import</span> <span class="n">harmonic_oscillator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HenonHeiles</span><span class="w"> </span><span class="kn">import</span> <span class="n">henon_heiles</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.verlet</span><span class="w"> </span><span class="kn">import</span> <span class="n">verlet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.transfer_classes.TransferParticles_NoCoarse</span><span class="w"> </span><span class="kn">import</span> <span class="n">particles_to_particles</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.projects.Hamiltonian.hamiltonian_output</span><span class="w"> </span><span class="kn">import</span> <span class="n">hamiltonian_output</span>
 
 
-<span class="k">def</span> <span class="nf">setup_harmonic</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_harmonic</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper routine for setting up everything for the harmonic oscillator</span>
 
@@ -102,7 +102,7 @@
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
-<span class="k">def</span> <span class="nf">setup_henonheiles</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_henonheiles</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper routine for setting up everything for the Henon Heiles problem</span>
 
@@ -147,7 +147,7 @@
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
-<span class="k">def</span> <span class="nf">run_simulation</span><span class="p">(</span><span class="n">prob</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_simulation</span><span class="p">(</span><span class="n">prob</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Routine to run the simulation of a second order problem</span>
 
@@ -212,7 +212,7 @@
     <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">),</span> <span class="s1">&#39;Run for </span><span class="si">%s</span><span class="s1"> did not create stats file&#39;</span> <span class="o">%</span> <span class="n">prob</span>
 
 
-<span class="k">def</span> <span class="nf">show_results</span><span class="p">(</span><span class="n">prob</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">show_results</span><span class="p">(</span><span class="n">prob</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function to plot the error of the Hamiltonian</span>
 
@@ -260,7 +260,7 @@
     <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create PNG file&#39;</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">prob</span> <span class="o">=</span> <span class="s1">&#39;harmonic&#39;</span>
     <span class="n">run_simulation</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
     <span class="n">show_results</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>

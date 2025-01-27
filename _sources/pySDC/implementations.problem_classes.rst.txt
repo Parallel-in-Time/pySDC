@@ -38,6 +38,7 @@ Submodules
    implementations.problem_classes.FullSolarSystem
    implementations.problem_classes.GeneralizedFisher_1D_FD_implicit
    implementations.problem_classes.GeneralizedFisher_1D_PETSc
+   implementations.problem_classes.GenericGusto
    implementations.problem_classes.GrayScott_1D_FEniCS_implicit
    implementations.problem_classes.GrayScott_2D_PETSc_periodic
    implementations.problem_classes.GrayScott_MPIFFT
@@ -47,6 +48,7 @@ Submodules
    implementations.problem_classes.HeatEquation_Chebychev
    implementations.problem_classes.HeatEquation_ND_FD
    implementations.problem_classes.HeatEquation_ND_FD_CuPy
+   implementations.problem_classes.HeatFiredrake
    implementations.problem_classes.HenonHeiles
    implementations.problem_classes.LogisticEquation
    implementations.problem_classes.Lorenz

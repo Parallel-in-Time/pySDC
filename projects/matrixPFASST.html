@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Matrix-based versions of PFASST &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
@@ -58,22 +58,22 @@ controller <code class="docutils literal notranslate"><span class="pre">allinclu
 controller closely resembling this idea and notation. In <code class="docutils literal notranslate"><span class="pre">compare_to_matrixbased.py</span></code>, this controller is tested
 against the standard PFASST implementation.</p>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/matrixPFASST/compare_to_matrixbased.py">pySDC/projects/matrixPFASST/compare_to_matrixbased.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span> <span class="kn">import</span> <span class="n">advectionNd</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.TestEquation_0D</span> <span class="kn">import</span> <span class="n">testequation0d</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span> <span class="kn">import</span> <span class="n">mesh_to_mesh</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferMesh_NoCoarse</span> <span class="kn">import</span> <span class="n">mesh_to_mesh</span> <span class="k">as</span> <span class="n">mesh_to_mesh_nocoarse</span>
-<span class="kn">from</span> <span class="nn">pySDC.projects.matrixPFASST.controller_matrix_nonMPI</span> <span class="kn">import</span> <span class="n">controller_matrix_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">advectionNd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">heatNd_unforced</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.TestEquation_0D</span><span class="w"> </span><span class="kn">import</span> <span class="n">testequation0d</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh_to_mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.transfer_classes.TransferMesh_NoCoarse</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh_to_mesh</span> <span class="k">as</span> <span class="n">mesh_to_mesh_nocoarse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.projects.matrixPFASST.controller_matrix_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_matrix_nonMPI</span>
 
 
-<span class="k">def</span> <span class="nf">diffusion_setup</span><span class="p">(</span><span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">diffusion_setup</span><span class="p">(</span><span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Setup routine for advection test</span>
 
@@ -128,7 +128,7 @@ against the standard PFASST implementation.</p>
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
-<span class="k">def</span> <span class="nf">advection_setup</span><span class="p">(</span><span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">advection_setup</span><span class="p">(</span><span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Setup routine for advection test</span>
 
@@ -186,7 +186,7 @@ against the standard PFASST implementation.</p>
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
-<span class="k">def</span> <span class="nf">testequation_setup</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">testequation_setup</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Setup routine for the test equation</span>
 
@@ -251,7 +251,7 @@ against the standard PFASST implementation.</p>
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
-<span class="k">def</span> <span class="nf">compare_controllers</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compare_controllers</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple test program to compare PFASST runs with matrix-based and matrix-free controllers</span>
 
@@ -322,7 +322,7 @@ against the standard PFASST implementation.</p>
     <span class="p">),</span> <span class="s1">&#39;ERROR: number of iterations differ between matrix-based and matrix-free controller&#39;</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">par_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1e-02</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1e02</span><span class="p">]</span>
 
     <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -390,21 +390,21 @@ against the standard PFASST implementation.</p>
 we now derive the full propagation matrix, which takes the initial value u0 and produces the final value uend,
 over all steps, iterations and sweeps. This matrix can be used to analyze PFASST in yet another exciting way.</p>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/matrixPFASST/compare_to_propagator.py">pySDC/projects/matrixPFASST/compare_to_propagator.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span> <span class="kn">import</span> <span class="n">advectionNd</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.TestEquation_0D</span> <span class="kn">import</span> <span class="n">testequation0d</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span> <span class="kn">import</span> <span class="n">mesh_to_mesh</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferMesh_NoCoarse</span> <span class="kn">import</span> <span class="n">mesh_to_mesh</span> <span class="k">as</span> <span class="n">mesh_to_mesh_nocoarse</span>
-<span class="kn">from</span> <span class="nn">pySDC.projects.matrixPFASST.controller_matrix_nonMPI</span> <span class="kn">import</span> <span class="n">controller_matrix_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">advectionNd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">heatNd_unforced</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.TestEquation_0D</span><span class="w"> </span><span class="kn">import</span> <span class="n">testequation0d</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh_to_mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.transfer_classes.TransferMesh_NoCoarse</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh_to_mesh</span> <span class="k">as</span> <span class="n">mesh_to_mesh_nocoarse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.projects.matrixPFASST.controller_matrix_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_matrix_nonMPI</span>
 
 
-<span class="k">def</span> <span class="nf">diffusion_setup</span><span class="p">(</span><span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">diffusion_setup</span><span class="p">(</span><span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Setup routine for advection test</span>
 
@@ -458,7 +458,7 @@ over all steps, iterations and sweeps. This matrix can be used to analyze PFASST
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
-<span class="k">def</span> <span class="nf">advection_setup</span><span class="p">(</span><span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">advection_setup</span><span class="p">(</span><span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Setup routine for advection test</span>
 
@@ -515,7 +515,7 @@ over all steps, iterations and sweeps. This matrix can be used to analyze PFASST
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
-<span class="k">def</span> <span class="nf">scalar_equation_setup</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">scalar_equation_setup</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Setup routine for the test equation</span>
 
@@ -579,7 +579,7 @@ over all steps, iterations and sweeps. This matrix can be used to analyze PFASST
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
-<span class="k">def</span> <span class="nf">compare_controllers</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compare_controllers</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple test program to compare PFASST runs with matrix-based and matrix-free controllers</span>
 
@@ -646,7 +646,7 @@ over all steps, iterations and sweeps. This matrix can be used to analyze PFASST
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">par_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1e-02</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1e02</span><span class="p">]</span>
 
     <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

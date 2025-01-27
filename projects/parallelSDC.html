@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Attempts to parallelize SDC &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
@@ -62,26 +62,26 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
 </ul>
 <p>This part also contains <code class="docutils literal notranslate"><span class="pre">minimization.py</span></code>, producing the heat maps for the spectral radius of the stiff limit matrix.</p>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/parallelSDC/preconditioner_playground.py">pySDC/projects/parallelSDC/preconditioner_playground.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pySDC.helpers.plot_helper</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt_helper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span> <span class="kn">import</span> <span class="n">advectionNd</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit</span> <span class="kn">import</span> <span class="n">generalized_fisher</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.Van_der_Pol_implicit</span> <span class="kn">import</span> <span class="n">vanderpol</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">advectionNd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generalized_fisher</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">heatNd_unforced</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.Van_der_Pol_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">vanderpol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit</span>
 
 <span class="n">ID</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span> <span class="s1">&#39;qd_type&#39;</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">])</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="c1"># initialize level parameters (part I)</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
@@ -219,7 +219,7 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
     <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;data/parallelSDC_iterations_precond.pkl&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: pickle did not create file&#39;</span>
 
 
-<span class="k">def</span> <span class="nf">plot_iterations</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_iterations</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper routine to plot iteration counts</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -328,31 +328,31 @@ We test again the aforementioned ideas, but now add the <code class="docutils li
 a commercial solver for black-box optimization which aggregates several state-of-the-art optimization methods (free academic subscription plan).
 The objective function in this case is the sum over 17^2 values of lamdt, real and imaginary. This works surprisingly well!</p>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/parallelSDC/preconditioner_playground_MPI.py">pySDC/projects/parallelSDC/preconditioner_playground_MPI.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
-<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
 
-<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpl</span>
 
 <span class="n">mpl</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;Agg&quot;</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pySDC.helpers.plot_helper</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt_helper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span> <span class="kn">import</span> <span class="n">advectionNd</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit</span> <span class="kn">import</span> <span class="n">generalized_fisher</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.Van_der_Pol_implicit</span> <span class="kn">import</span> <span class="n">vanderpol</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit_MPI</span> <span class="kn">import</span> <span class="n">generic_implicit_MPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">advectionNd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generalized_fisher</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">heatNd_unforced</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.Van_der_Pol_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">vanderpol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit_MPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit_MPI</span>
 
 <span class="n">ID</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span> <span class="s1">&#39;qd_type&#39;</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">])</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="c1"># initialize level parameters (part I)</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
@@ -494,7 +494,7 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 
 
 <span class="c1"># pragma: no cover</span>
-<span class="k">def</span> <span class="nf">plot_iterations</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_iterations</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper routine to plot iteration counts</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -527,7 +527,7 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
     <span class="k">return</span> <span class="mi">0</span>
 
 
-<span class="k">def</span> <span class="nf">plot_setup</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">setup</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_setup</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">setup</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;setup of </span><span class="si">{</span><span class="n">setup</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="n">qd_type_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;IEpar&#39;</span><span class="p">,</span> <span class="s1">&#39;Qpar&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN3&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN_GT&#39;</span><span class="p">]</span>
@@ -625,23 +625,23 @@ This example compares the iteration counts and errors for this idea (incl. a mod
 Three new sweepers are used here: <code class="docutils literal notranslate"><span class="pre">linearized_implicit_parallel</span></code>, <code class="docutils literal notranslate"><span class="pre">linearized_implicit_fixed_parallel</span></code> and <code class="docutils literal notranslate"><span class="pre">linearized_implicit_fixed_parallel_prec</span></code>.
 This part also contains the code <code class="docutils literal notranslate"><span class="pre">newton_vs_sdc.py</span></code> where simplified and inexact Newton are compared to standard SDC for the generalized Fisher’s equation.</p>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/parallelSDC/nonlinear_playground.py">pySDC/projects/parallelSDC/nonlinear_playground.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pySDC.helpers.plot_helper</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt_helper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
-<span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.GeneralizedFisher_1D_FD_implicit_Jac</span> <span class="kn">import</span> <span class="n">generalized_fisher_jac</span>
-<span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel</span> <span class="kn">import</span> <span class="n">linearized_implicit_fixed_parallel</span>
-<span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel_prec</span> <span class="kn">import</span> <span class="n">linearized_implicit_fixed_parallel_prec</span>
-<span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.linearized_implicit_parallel</span> <span class="kn">import</span> <span class="n">linearized_implicit_parallel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.projects.parallelSDC.GeneralizedFisher_1D_FD_implicit_Jac</span><span class="w"> </span><span class="kn">import</span> <span class="n">generalized_fisher_jac</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel</span><span class="w"> </span><span class="kn">import</span> <span class="n">linearized_implicit_fixed_parallel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel_prec</span><span class="w"> </span><span class="kn">import</span> <span class="n">linearized_implicit_fixed_parallel_prec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.projects.parallelSDC.linearized_implicit_parallel</span><span class="w"> </span><span class="kn">import</span> <span class="n">linearized_implicit_parallel</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
@@ -762,7 +762,7 @@ This part also contains the code <code class="docutils literal notranslate"><spa
     <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;data/parallelSDC_results_graphs.pkl&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: pickle did not create file&#39;</span>
 
 
-<span class="k">def</span> <span class="nf">plot_graphs</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_graphs</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function to plot graphs of initial and final values</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -839,21 +839,21 @@ This part also contains the code <code class="docutils literal notranslate"><spa
 <a class="reference internal image-reference" href="../_images/parallelSDC_fisher.png"><img alt="../_images/parallelSDC_fisher.png" src="../_images/parallelSDC_fisher.png" style="width: 407.0px; height: 259.0px;" />
 </a>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/parallelSDC/newton_vs_sdc.py">pySDC/projects/parallelSDC/newton_vs_sdc.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
 
-<span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pySDC.helpers.plot_helper</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt_helper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
-<span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.ErrReductionHook</span> <span class="kn">import</span> <span class="n">err_reduction_hook</span>
-<span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.GeneralizedFisher_1D_FD_implicit_Jac</span> <span class="kn">import</span> <span class="n">generalized_fisher_jac</span>
-<span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel</span> <span class="kn">import</span> <span class="n">linearized_implicit_fixed_parallel</span>
-<span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel_prec</span> <span class="kn">import</span> <span class="n">linearized_implicit_fixed_parallel_prec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.projects.parallelSDC.ErrReductionHook</span><span class="w"> </span><span class="kn">import</span> <span class="n">err_reduction_hook</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.projects.parallelSDC.GeneralizedFisher_1D_FD_implicit_Jac</span><span class="w"> </span><span class="kn">import</span> <span class="n">generalized_fisher_jac</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel</span><span class="w"> </span><span class="kn">import</span> <span class="n">linearized_implicit_fixed_parallel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel_prec</span><span class="w"> </span><span class="kn">import</span> <span class="n">linearized_implicit_fixed_parallel_prec</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-12</span>
@@ -938,7 +938,7 @@ This part also contains the code <code class="docutils literal notranslate"><spa
     <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">plot_graphs</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_graphs</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function to plot graphs of initial and final values</span>
 
@@ -1018,31 +1018,31 @@ We test again the aforementioned ideas, but now add the <code class="docutils li
 a commercial solver for black-box optimization which aggregates several state-of-the-art optimization methods (free academic subscription plan).
 The objective function in this case is the sum over 17^2 values of lamdt, real and imaginary. This works surprisingly well!</p>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/parallelSDC/preconditioner_playground_MPI.py">pySDC/projects/parallelSDC/preconditioner_playground_MPI.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
-<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
 
-<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpl</span>
 
 <span class="n">mpl</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;Agg&quot;</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pySDC.helpers.plot_helper</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt_helper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span> <span class="kn">import</span> <span class="n">advectionNd</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit</span> <span class="kn">import</span> <span class="n">generalized_fisher</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.Van_der_Pol_implicit</span> <span class="kn">import</span> <span class="n">vanderpol</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit_MPI</span> <span class="kn">import</span> <span class="n">generic_implicit_MPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">advectionNd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generalized_fisher</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">heatNd_unforced</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.Van_der_Pol_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">vanderpol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit_MPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit_MPI</span>
 
 <span class="n">ID</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span> <span class="s1">&#39;qd_type&#39;</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">])</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="c1"># initialize level parameters (part I)</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
@@ -1184,7 +1184,7 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 
 
 <span class="c1"># pragma: no cover</span>
-<span class="k">def</span> <span class="nf">plot_iterations</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_iterations</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper routine to plot iteration counts</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1217,7 +1217,7 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
     <span class="k">return</span> <span class="mi">0</span>
 
 
-<span class="k">def</span> <span class="nf">plot_setup</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">setup</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_setup</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">setup</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;setup of </span><span class="si">{</span><span class="n">setup</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="n">qd_type_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;IEpar&#39;</span><span class="p">,</span> <span class="s1">&#39;Qpar&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN3&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN_GT&#39;</span><span class="p">]</span>

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>&lt;no title&gt; &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
@@ -37,22 +37,22 @@
           <div class="body" role="main">
             
   <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_4/D_MLSDC_with_particles.py">pySDC/tutorial/step_4/D_MLSDC_with_particles.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.PenningTrap_3D</span> <span class="kn">import</span> <span class="n">penningtrap</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.boris_2nd_order</span> <span class="kn">import</span> <span class="n">boris_2nd_order</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferParticles_NoCoarse</span> <span class="kn">import</span> <span class="n">particles_to_particles</span>
-<span class="kn">from</span> <span class="nn">pySDC.tutorial.step_3.HookClass_Particles</span> <span class="kn">import</span> <span class="n">particle_hook</span>
-<span class="kn">from</span> <span class="nn">pySDC.tutorial.step_4.PenningTrap_3D_coarse</span> <span class="kn">import</span> <span class="n">penningtrap_coarse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.PenningTrap_3D</span><span class="w"> </span><span class="kn">import</span> <span class="n">penningtrap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.boris_2nd_order</span><span class="w"> </span><span class="kn">import</span> <span class="n">boris_2nd_order</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.transfer_classes.TransferParticles_NoCoarse</span><span class="w"> </span><span class="kn">import</span> <span class="n">particles_to_particles</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.tutorial.step_3.HookClass_Particles</span><span class="w"> </span><span class="kn">import</span> <span class="n">particle_hook</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.tutorial.step_4.PenningTrap_3D_coarse</span><span class="w"> </span><span class="kn">import</span> <span class="n">penningtrap_coarse</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple test program to compare SDC with two flavors of MLSDC for particle dynamics</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -117,7 +117,7 @@
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">run_penning_trap_simulation</span><span class="p">(</span><span class="n">mlsdc</span><span class="p">,</span> <span class="n">finter</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_penning_trap_simulation</span><span class="p">(</span><span class="n">mlsdc</span><span class="p">,</span> <span class="n">finter</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple test program to run IMEX SDC for a single time step</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -191,7 +191,7 @@
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Timings</span> <span class="k">for</span> <span class="n">SDC</span><span class="p">,</span> <span class="n">MLSDC</span> <span class="ow">and</span> <span class="n">MLSDC</span><span class="o">+</span><span class="n">finter</span><span class="p">:</span>   <span class="mf">5.85697201</span> <span class="o">--</span>   <span class="mf">6.52999748</span> <span class="o">--</span>   <span class="mf">7.55137275</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Timings</span> <span class="k">for</span> <span class="n">SDC</span><span class="p">,</span> <span class="n">MLSDC</span> <span class="ow">and</span> <span class="n">MLSDC</span><span class="o">+</span><span class="n">finter</span><span class="p">:</span>   <span class="mf">5.88776441</span> <span class="o">--</span>   <span class="mf">6.51106648</span> <span class="o">--</span>   <span class="mf">7.57436820</span>
 <span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">0</span><span class="p">:</span> <span class="mf">407936.7556966486</span> <span class="o">--</span> <span class="mf">0.00000000e+00</span>
 <span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span> <span class="mi">12</span><span class="p">:</span> <span class="mf">406977.9425667246</span> <span class="o">--</span> <span class="mf">2.35039652e-03</span>
 <span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">0</span><span class="p">:</span> <span class="mf">407936.7556966486</span> <span class="o">--</span> <span class="mf">0.00000000e+00</span>

@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.Piline &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
@@ -37,17 +37,17 @@
           <div class="body" role="main">
             
   <h1>Source code for implementations.problem_classes.Piline</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">solve_ivp</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.integrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">solve_ivp</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.core.problem</span> <span class="kn">import</span> <span class="n">Problem</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.problem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Problem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
 
 
 <span class="c1"># noinspection PyUnusedLocal</span>
 <div class="viewcode-block" id="piline">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Piline.html#implementations.problem_classes.Piline.piline">[docs]</a>
-<span class="k">class</span> <span class="nc">piline</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">piline</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the model of the piline. It serves as a transmission line in an energy grid. The problem of simulating the</span>
 <span class="sd">    piline consists of three ordinary differential equations (ODEs) with nonhomogeneous part:</span>
@@ -93,7 +93,7 @@
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Vs</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">Rs</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">C1</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Rpi</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">Lpi</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">C2</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Rl</span><span class="o">=</span><span class="mf">5.0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Vs</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">Rs</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">C1</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Rpi</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">Lpi</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">C2</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Rl</span><span class="o">=</span><span class="mf">5.0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
 
         <span class="n">nvars</span> <span class="o">=</span> <span class="mi">3</span>
@@ -115,7 +115,7 @@
 
 <div class="viewcode-block" id="piline.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Piline.html#implementations.problem_classes.Piline.piline.eval_f">[docs]</a>
-    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -140,7 +140,7 @@
 
 <div class="viewcode-block" id="piline.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Piline.html#implementations.problem_classes.Piline.piline.solve_system">[docs]</a>
-    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
 
@@ -168,7 +168,7 @@
 
 <div class="viewcode-block" id="piline.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Piline.html#implementations.problem_classes.Piline.piline.u_exact">[docs]</a>
-    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to approximate the exact solution at time :math:`t` by ``SciPy`` as a reference.</span>
 
@@ -205,7 +205,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">t_init</span> <span class="o">=</span> <span class="mf">0.0</span>
 
-            <span class="k">def</span> <span class="nf">rhs</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">rhs</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
                 <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">expl</span>  <span class="c1"># evaluate only explicitly rather than IMEX</span>
 

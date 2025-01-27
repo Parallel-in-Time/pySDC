@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.convergence_controller_classes.interpolate_between_restarts &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
@@ -37,14 +37,14 @@
           <div class="body" role="main">
             
   <h1>Source code for implementations.convergence_controller_classes.interpolate_between_restarts</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.convergence_controller</span> <span class="kn">import</span> <span class="n">ConvergenceController</span><span class="p">,</span> <span class="n">Status</span>
-<span class="kn">from</span> <span class="nn">qmat.lagrange</span> <span class="kn">import</span> <span class="n">LagrangeApproximation</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.convergence_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConvergenceController</span><span class="p">,</span> <span class="n">Status</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qmat.lagrange</span><span class="w"> </span><span class="kn">import</span> <span class="n">LagrangeApproximation</span>
 
 
 <div class="viewcode-block" id="InterpolateBetweenRestarts">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts">[docs]</a>
-<span class="k">class</span> <span class="nc">InterpolateBetweenRestarts</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">InterpolateBetweenRestarts</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Interpolate the solution and right hand side to the new set of collocation nodes after a restart.</span>
 <span class="sd">    The idea is that when you adjust the step size between restarts, you already know what the new quadrature method</span>
@@ -54,7 +54,7 @@
 
 <div class="viewcode-block" id="InterpolateBetweenRestarts.setup">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.setup">[docs]</a>
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Store the initial guess used in the sweeper when no restart has happened</span>
 
@@ -71,7 +71,7 @@
 
 <div class="viewcode-block" id="InterpolateBetweenRestarts.setup_status_variables">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.setup_status_variables">[docs]</a>
-    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add variables to the sweeper containing the interpolated solution and right hand side.</span>
 
@@ -88,7 +88,7 @@
 
 <div class="viewcode-block" id="InterpolateBetweenRestarts.post_spread_processing">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.post_spread_processing">[docs]</a>
-    <span class="k">def</span> <span class="nf">post_spread_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_spread_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Spread the interpolated values to the collocation nodes. This overrides whatever the sweeper uses for prediction.</span>
 
@@ -117,7 +117,7 @@
 
 <div class="viewcode-block" id="InterpolateBetweenRestarts.post_iteration_processing">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.post_iteration_processing">[docs]</a>
-    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Interpolate the solution and right hand sides and store them in the sweeper, where they will be distributed</span>
 <span class="sd">        accordingly in the prediction step.</span>

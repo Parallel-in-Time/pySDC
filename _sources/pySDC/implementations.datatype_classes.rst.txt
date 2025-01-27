@@ -9,6 +9,7 @@ Submodules
 
    implementations.datatype_classes.cupy_mesh
    implementations.datatype_classes.fenics_mesh
+   implementations.datatype_classes.firedrake_mesh
    implementations.datatype_classes.mesh
    implementations.datatype_classes.particles
    implementations.datatype_classes.petsc_vec

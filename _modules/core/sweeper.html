@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>core.sweeper &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
     
@@ -37,19 +37,19 @@
           <div class="body" role="main">
             
   <h1>Source code for core.sweeper</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">qmat</span> <span class="kn">import</span> <span class="n">QDELTA_GENERATORS</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qmat</span><span class="w"> </span><span class="kn">import</span> <span class="n">QDELTA_GENERATORS</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.core.errors</span> <span class="kn">import</span> <span class="n">ParameterError</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.level</span> <span class="kn">import</span> <span class="n">Level</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.collocation</span> <span class="kn">import</span> <span class="n">CollBase</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.pysdc_helper</span> <span class="kn">import</span> <span class="n">FrozenClass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParameterError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.level</span><span class="w"> </span><span class="kn">import</span> <span class="n">Level</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.collocation</span><span class="w"> </span><span class="kn">import</span> <span class="n">CollBase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.pysdc_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrozenClass</span>
 
 
 <span class="c1"># short helper class to add params as attributes</span>
-<span class="k">class</span> <span class="nc">_Pars</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pars</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Pars</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pars</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">do_coll_update</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initial_guess</span> <span class="o">=</span> <span class="s1">&#39;spread&#39;</span>  <span class="c1"># default value (see also below)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">skip_residual_computation</span> <span class="o">=</span> <span class="p">()</span>  <span class="c1"># gain performance at the cost of correct residual output</span>
@@ -63,7 +63,7 @@
 
 <div class="viewcode-block" id="Sweeper">
 <a class="viewcode-back" href="../../pySDC/core.sweeper.html#core.sweeper.Sweeper">[docs]</a>
-<span class="k">class</span> <span class="nc">Sweeper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Sweeper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base abstract sweeper class, provides two base methods to generate QDelta matrices:</span>
 
@@ -85,7 +85,7 @@
 <span class="sd">        coll (pySDC.Collocation.CollBase): collocation object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine for the base sweeper</span>
 
@@ -129,7 +129,7 @@
 
 <div class="viewcode-block" id="Sweeper.setupGenerator">
 <a class="viewcode-back" href="../../pySDC/core.sweeper.html#core.sweeper.Sweeper.setupGenerator">[docs]</a>
-    <span class="k">def</span> <span class="nf">setupGenerator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qd_type</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setupGenerator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qd_type</span><span class="p">):</span>
         <span class="n">coll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">QDELTA_GENERATORS</span><span class="p">[</span><span class="n">qd_type</span><span class="p">]</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generator</span><span class="p">)</span>
@@ -147,12 +147,12 @@
                 <span class="n">tLeft</span><span class="o">=</span><span class="n">coll</span><span class="o">.</span><span class="n">tleft</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;could not generate </span><span class="si">{</span><span class="n">qd_type</span><span class="si">=!r}</span><span class="s2"> with qmat, got error : </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;could not generate </span><span class="si">{</span><span class="n">qd_type</span><span class="si">=!r}</span><span class="s2"> with qmat, got error : </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
 
 
 <div class="viewcode-block" id="Sweeper.get_Qdelta_implicit">
 <a class="viewcode-back" href="../../pySDC/core.sweeper.html#core.sweeper.Sweeper.get_Qdelta_implicit">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_Qdelta_implicit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qd_type</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_Qdelta_implicit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qd_type</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">QDmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setupGenerator</span><span class="p">(</span><span class="n">qd_type</span><span class="p">)</span>
         <span class="n">QDmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
@@ -166,7 +166,7 @@
 
 <div class="viewcode-block" id="Sweeper.get_Qdelta_explicit">
 <a class="viewcode-back" href="../../pySDC/core.sweeper.html#core.sweeper.Sweeper.get_Qdelta_explicit">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_Qdelta_explicit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qd_type</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_Qdelta_explicit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qd_type</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">coll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span>
         <span class="n">QDmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setupGenerator</span><span class="p">(</span><span class="n">qd_type</span><span class="p">)</span>
@@ -181,7 +181,7 @@
 
 <div class="viewcode-block" id="Sweeper.predict">
 <a class="viewcode-back" href="../../pySDC/core.sweeper.html#core.sweeper.Sweeper.predict">[docs]</a>
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Predictor to fill values at nodes before first sweep</span>
 
@@ -223,7 +223,7 @@
 
 <div class="viewcode-block" id="Sweeper.compute_residual">
 <a class="viewcode-back" href="../../pySDC/core.sweeper.html#core.sweeper.Sweeper.compute_residual">[docs]</a>
-    <span class="k">def</span> <span class="nf">compute_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computation of the residual using the collocation matrix Q</span>
 
@@ -279,7 +279,7 @@
 
 <div class="viewcode-block" id="Sweeper.compute_end_point">
 <a class="viewcode-back" href="../../pySDC/core.sweeper.html#core.sweeper.Sweeper.compute_end_point">[docs]</a>
-    <span class="k">def</span> <span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Abstract interface to end-node computation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -288,7 +288,7 @@
 
 <div class="viewcode-block" id="Sweeper.integrate">
 <a class="viewcode-back" href="../../pySDC/core.sweeper.html#core.sweeper.Sweeper.integrate">[docs]</a>
-    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Abstract interface to right-hand side integration</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -297,7 +297,7 @@
 
 <div class="viewcode-block" id="Sweeper.update_nodes">
 <a class="viewcode-back" href="../../pySDC/core.sweeper.html#core.sweeper.Sweeper.update_nodes">[docs]</a>
-    <span class="k">def</span> <span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Abstract interface to node update</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -305,7 +305,7 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">level</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">level</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the current level</span>
 
@@ -315,7 +315,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__level</span>
 
     <span class="nd">@level</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets a reference to the current level (done in the initialization of the level)</span>
 
@@ -326,12 +326,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__level</span> <span class="o">=</span> <span class="n">L</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">rank</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rank</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="mi">0</span>
 
 <div class="viewcode-block" id="Sweeper.updateVariableCoeffs">
 <a class="viewcode-back" href="../../pySDC/core.sweeper.html#core.sweeper.Sweeper.updateVariableCoeffs">[docs]</a>
-    <span class="k">def</span> <span class="nf">updateVariableCoeffs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">updateVariableCoeffs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Potentially update QDelta implicit coefficients if variable ...</span>
 

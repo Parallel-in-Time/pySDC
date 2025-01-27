@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Step-2: Data structures and my first sweeper &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
@@ -69,16 +69,16 @@ have to deal with the internal data structures, see Part C below.</p></li>
 easier, although it is not the best way in terms of programming…</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_2/A_step_data_structure.py">pySDC/tutorial/step_2/A_step_data_structure.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.core.step</span> <span class="kn">import</span> <span class="n">Step</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.step</span><span class="w"> </span><span class="kn">import</span> <span class="n">Step</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
-<span class="kn">from</span> <span class="nn">pySDC.tutorial.step_1.A_spatial_problem_setup</span> <span class="kn">import</span> <span class="n">run_accuracy_check</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">heatNd_unforced</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.tutorial.step_1.A_spatial_problem_setup</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_accuracy_check</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple test program to setup a full step instance</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -176,15 +176,15 @@ than one step or, behold, multiple parallel steps each with a
 space-time hierarchy. Therefore, please proceed quickly to part C!</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_2/B_my_first_sweeper.py">pySDC/tutorial/step_2/B_my_first_sweeper.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.core.step</span> <span class="kn">import</span> <span class="n">Step</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.step</span><span class="w"> </span><span class="kn">import</span> <span class="n">Step</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_forced</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span> <span class="kn">import</span> <span class="n">imex_1st_order</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">heatNd_forced</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span><span class="w"> </span><span class="kn">import</span> <span class="n">imex_1st_order</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple test program to run IMEX SDC for a single time step</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -230,7 +230,7 @@ space-time hierarchy. Therefore, please proceed quickly to part C!</p></li>
     <span class="k">assert</span> <span class="n">niter</span> <span class="o">&lt;=</span> <span class="mi">12</span><span class="p">,</span> <span class="s2">&quot;ERROR: IMEX SDC took too many iterations, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">niter</span>
 
 
-<span class="k">def</span> <span class="nf">run_imex_sdc</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_imex_sdc</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Routine to run IMEX SDC on a single time step</span>
 
@@ -336,15 +336,15 @@ the logic and most of the data structures are hidden, but all
 relevant parameters are accessible using the <code class="docutils literal notranslate"><span class="pre">description</span></code>.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_2/C_using_pySDCs_frontend.py">pySDC/tutorial/step_2/C_using_pySDCs_frontend.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_forced</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span> <span class="kn">import</span> <span class="n">imex_1st_order</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">heatNd_forced</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span><span class="w"> </span><span class="kn">import</span> <span class="n">imex_1st_order</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple test program to run IMEX SDC for a single time step</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -417,7 +417,7 @@ relevant parameters are accessible using the <code class="docutils literal notra
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2024-12-20 14:25:21,690 - controller - controller - welcome_message - 147 - INFO: Welcome to the one and only, really very astonishing and 87.3% bug free
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2025-01-27 09:32:42,439 - controller - controller - welcome_message - 147 - INFO: Welcome to the one and only, really very astonishing and 87.3% bug free
                                  _____ _____   _____ 
                                 / ____|  __ \ / ____|
                     _ __  _   _| (___ | |  | | |     
@@ -427,8 +427,8 @@ relevant parameters are accessible using the <code class="docutils literal notra
                    | |     __/ |                     
                    |_|    |___/                      
                                                      
-2024-12-20 14:25:21,690 - controller - controller - dump_setup - 161 - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- BEGIN
-2024-12-20 14:25:21,690 - controller - controller - dump_setup - 228 - INFO: ----------------------------------------------------------------------------------------------------
+2025-01-27 09:32:42,439 - controller - controller - dump_setup - 161 - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- BEGIN
+2025-01-27 09:32:42,439 - controller - controller - dump_setup - 228 - INFO: ----------------------------------------------------------------------------------------------------
 
 Controller: &lt;class &#39;pySDC.implementations.controller_classes.controller_nonMPI.controller_nonMPI&#39;&gt;
     all_to_done = False
@@ -481,34 +481,34 @@ Active convergence controllers:
  -&gt; |  1 |   100 | SpreadStepSizesBlockwiseNonMPI
     |  2 |   200 | CheckConvergence
 
-2024-12-20 14:25:21,690 - controller - controller - dump_setup - 231 - INFO: ----------------------------------------------------------------------------------------------------
-2024-12-20 14:25:21,691 - controller - controller - dump_setup - 233 - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- END
+2025-01-27 09:32:42,439 - controller - controller - dump_setup - 231 - INFO: ----------------------------------------------------------------------------------------------------
+2025-01-27 09:32:42,439 - controller - controller - dump_setup - 233 - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- END
 
-2024-12-20 14:25:21,694 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 4.11190756e-03
-2024-12-20 14:25:21,698 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 6.68442667e-04
-2024-12-20 14:25:21,701 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 8.80377591e-05
-2024-12-20 14:25:21,704 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 1.21707909e-05
-2024-12-20 14:25:21,708 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 1.38272147e-06
-2024-12-20 14:25:21,711 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 6.36445413e-07
-2024-12-20 14:25:21,714 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.68953216e-07
-2024-12-20 14:25:21,717 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 3.52601840e-08
-2024-12-20 14:25:21,721 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 6.07249025e-09
-2024-12-20 14:25:21,724 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 8.27343378e-10
-2024-12-20 14:25:21,727 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 1.18931339e-10
-2024-12-20 14:25:21,730 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 12 -- Sweep:  1 -- residual: 1.48499772e-11
-2024-12-20 14:25:21,734 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 6.69984764e-03
-2024-12-20 14:25:21,738 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 1.05518433e-03
-2024-12-20 14:25:21,741 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 1.40642621e-04
-2024-12-20 14:25:21,744 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 1.85982063e-05
-2024-12-20 14:25:21,747 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 2.79216702e-06
-2024-12-20 14:25:21,751 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.12278839e-06
-2024-12-20 14:25:21,754 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 2.85495353e-07
-2024-12-20 14:25:21,757 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 5.78947003e-08
-2024-12-20 14:25:21,760 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 9.68230621e-09
-2024-12-20 14:25:21,763 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 1.26313315e-09
-2024-12-20 14:25:21,767 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 1.82951499e-10
-2024-12-20 14:25:21,770 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 12 -- Sweep:  1 -- residual: 1.99691114e-11
-2024-12-20 14:25:21,770 - hooks - log_timings - post_run - 290 - INFO: Finished run after 7.97e-02s
+2025-01-27 09:32:42,443 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 4.11190756e-03
+2025-01-27 09:32:42,446 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 6.68442667e-04
+2025-01-27 09:32:42,449 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 8.80377591e-05
+2025-01-27 09:32:42,453 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 1.21707909e-05
+2025-01-27 09:32:42,456 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 1.38272147e-06
+2025-01-27 09:32:42,459 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 6.36445413e-07
+2025-01-27 09:32:42,462 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.68953216e-07
+2025-01-27 09:32:42,466 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 3.52601840e-08
+2025-01-27 09:32:42,469 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 6.07249025e-09
+2025-01-27 09:32:42,472 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 8.27343378e-10
+2025-01-27 09:32:42,475 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 1.18931339e-10
+2025-01-27 09:32:42,478 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 12 -- Sweep:  1 -- residual: 1.48499772e-11
+2025-01-27 09:32:42,483 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 6.69984764e-03
+2025-01-27 09:32:42,486 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 1.05518433e-03
+2025-01-27 09:32:42,489 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 1.40642621e-04
+2025-01-27 09:32:42,492 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 1.85982063e-05
+2025-01-27 09:32:42,496 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 2.79216702e-06
+2025-01-27 09:32:42,499 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.12278839e-06
+2025-01-27 09:32:42,502 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 2.85495353e-07
+2025-01-27 09:32:42,505 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 5.78947003e-08
+2025-01-27 09:32:42,509 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 9.68230621e-09
+2025-01-27 09:32:42,512 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 1.26313315e-09
+2025-01-27 09:32:42,515 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 1.82951499e-10
+2025-01-27 09:32:42,518 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 12 -- Sweep:  1 -- residual: 1.99691114e-11
+2025-01-27 09:32:42,519 - hooks - log_timings - post_run - 290 - INFO: Finished run after 7.97e-02s
 Error after SDC iterations: 1.166689e-05
 </pre></div>
 </div>

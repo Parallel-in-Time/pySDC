@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.boussinesq_helpers.build2DFDMatrix &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c40552b6" />
     
@@ -37,10 +37,10 @@
           <div class="body" role="main">
             
   <h1>Source code for implementations.problem_classes.boussinesq_helpers.build2DFDMatrix</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.boussinesq_helpers.buildFDMatrix</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.boussinesq_helpers.buildFDMatrix</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">getMatrix</span><span class="p">,</span>
     <span class="n">getUpwindMatrix</span><span class="p">,</span>
     <span class="n">getBCLeft</span><span class="p">,</span>
@@ -53,7 +53,7 @@
 <span class="c1">#</span>
 <div class="viewcode-block" id="get2DUpwindMatrix">
 <a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.html#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.get2DUpwindMatrix">[docs]</a>
-<span class="k">def</span> <span class="nf">get2DUpwindMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get2DUpwindMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
     <span class="n">Dx</span> <span class="o">=</span> <span class="n">getUpwindMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dx</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">Dx</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span></div>
 
@@ -64,7 +64,7 @@
 <span class="c1">#</span>
 <div class="viewcode-block" id="get2DMesh">
 <a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.html#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.get2DMesh">[docs]</a>
-<span class="k">def</span> <span class="nf">get2DMesh</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">x_b</span><span class="p">,</span> <span class="n">z_b</span><span class="p">,</span> <span class="n">bc_hor</span><span class="p">,</span> <span class="n">bc_ver</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get2DMesh</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">x_b</span><span class="p">,</span> <span class="n">z_b</span><span class="p">,</span> <span class="n">bc_hor</span><span class="p">,</span> <span class="n">bc_ver</span><span class="p">):</span>
     <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;N needs to be an array with two entries: N[0]=Nx and N[1]=Nz&#39;</span>
     <span class="k">assert</span> <span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">x_b</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
@@ -107,7 +107,7 @@
 <span class="c1">#</span>
 <div class="viewcode-block" id="get2DMatrix">
 <a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.html#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.get2DMatrix">[docs]</a>
-<span class="k">def</span> <span class="nf">get2DMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">bc_hor</span><span class="p">,</span> <span class="n">bc_ver</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get2DMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">bc_hor</span><span class="p">,</span> <span class="n">bc_ver</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
     <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;N needs to be an array with two entries: N[0]=Nx and N[1]=Nz&#39;</span>
     <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;h needs to be an array with two entries: h[0]=dx and h[1]=dz&#39;</span>
 
@@ -128,7 +128,7 @@
 
 <div class="viewcode-block" id="getBCHorizontal">
 <a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.html#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.getBCHorizontal">[docs]</a>
-<span class="k">def</span> <span class="nf">getBCHorizontal</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_hor</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">getBCHorizontal</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_hor</span><span class="p">):</span>
     <span class="k">assert</span> <span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
     <span class="p">),</span> <span class="s1">&#39;Value needs to be an array with two entries: value[0] for the left and value[1] for the right boundary&#39;</span>
@@ -150,7 +150,7 @@
 
 <div class="viewcode-block" id="getBCVertical">
 <a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.html#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.getBCVertical">[docs]</a>
-<span class="k">def</span> <span class="nf">getBCVertical</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">dz</span><span class="p">,</span> <span class="n">bc_ver</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">getBCVertical</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">dz</span><span class="p">,</span> <span class="n">bc_ver</span><span class="p">):</span>
     <span class="k">assert</span> <span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
     <span class="p">),</span> <span class="s1">&#39;Value needs to be an array with two entries: value[0] for the left and value[1] for the right boundary&#39;</span>

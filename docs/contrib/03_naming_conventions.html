@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Naming conventions in pySDC &#8212; pySDC 5.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
     
@@ -72,12 +72,12 @@ Python packages should also have short, all-lowercase names, although the use of
 <section id="class-names">
 <span id="docs-contrib-03-naming-conventions-class-names"></span><h2>Class names<a class="headerlink" href="#class-names" title="Link to this heading">¶</a></h2>
 <p>Class names should use PascalCase formatting, for instance :</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">AdvectionDiffusion</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">AdvectionDiffusion</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
     <span class="k">pass</span>
 </pre></div>
 </div>
 <p>The shorter, the better. Also, exception class names should end with the suffix <code class="docutils literal notranslate"><span class="pre">Error</span></code>, for instance</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ParameterError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ParameterError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">pass</span>
 </pre></div>
 </div>
@@ -88,11 +88,11 @@ Python packages should also have short, all-lowercase names, although the use of
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tLeft</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">quadType</span> <span class="o">=</span> <span class="s1">&#39;LEGENDRE&#39;</span>
 
-<span class="k">def</span> <span class="nf">computeFejerRule</span><span class="p">(</span><span class="n">nNodes</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">computeFejerRule</span><span class="p">(</span><span class="n">nNodes</span><span class="p">):</span>
     <span class="c1"># ...</span>
 
-<span class="k">class</span> <span class="nc">NodeGenerator</span><span class="p">():</span>
-    <span class="k">def</span> <span class="nf">getOrthogPolyCoeffs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nCoeffs</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NodeGenerator</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getOrthogPolyCoeffs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nCoeffs</span><span class="p">):</span>
         <span class="c1"># ...</span>
 </pre></div>
 </div>
@@ -103,18 +103,18 @@ Python packages should also have short, all-lowercase names, although the use of
 <li><p>Acronyms can be used to simplify variable names, but <strong>try not to start with it</strong>. For instance, favor <code class="docutils literal notranslate"><span class="pre">jacobiMSSDC</span></code> or <code class="docutils literal notranslate"><span class="pre">multiStepSDCJacobi</span></code> rather than <code class="docutils literal notranslate"><span class="pre">MSSDCJacobi</span></code>. In general, acronyms should be put at the end of variable names.</p></li>
 <li><p>Underscore can exceptionally be used at the end of variable names when it make readability better and ease further developments. In that case, the characters after the underscore <strong>should be all-uppercase with underscore</strong> (minus is not allowed by Python syntax). For instance when defining the same method with different specializations :</p></li>
 </ol>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MySweeper</span><span class="p">(</span><span class="n">Sweeper</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MySweeper</span><span class="p">(</span><span class="n">Sweeper</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initSweep</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initSweep</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">initSweep</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_initSweep_</span><span class="si">{</span><span class="n">initSweep</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;initSweep=</span><span class="si">{</span><span class="n">initSweep</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_initSweep_COPY</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initSweep_COPY</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">_initSweep_SPREAD</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initSweep_SPREAD</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
     <span class="c1"># ... other implementations for initSweep</span>
@@ -124,15 +124,15 @@ Python packages should also have short, all-lowercase names, although the use of
 <section id="private-and-public-attributes">
 <span id="docs-contrib-03-naming-conventions-private-and-public-attributes"></span><h2>Private and public attributes<a class="headerlink" href="#private-and-public-attributes" title="Link to this heading">¶</a></h2>
 <p>There is no such thing as private or public attributes in Python. But some attributes, if uses only within the object methods, can be indicated as private using the <code class="docutils literal notranslate"><span class="pre">_</span></code> prefix. For instance :</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ChuckNorris</span><span class="p">():</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ChuckNorris</span><span class="p">():</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">param</span> <span class="o">=</span> <span class="n">param</span>
 
-    <span class="k">def</span> <span class="nf">_think</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_think</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">act</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">act</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">param</span> <span class="o">==</span> <span class="s1">&#39;doubt&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_think</span><span class="p">()</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;*?%&amp;$?*§&quot;$*$*§#{*&#39;</span><span class="p">)</span>
@@ -149,18 +149,18 @@ Python packages should also have short, all-lowercase names, although the use of
 </div>
 <p>For <em>constant string values</em>, however, favor the use of all uppercase with minus, <em>e.g</em> <code class="docutils literal notranslate"><span class="pre">RADAU-RIGHT</span></code>, <code class="docutils literal notranslate"><span class="pre">LEGENDRE-NUMPY</span></code> to distinguish those from constants names.</p>
 <p>🔔 When constants are used, for instance, to select method specializations (with suffix using all-uppercase with underscore), it is probably better to keep all-uppercase with minus for constant string values and add a character replacement in between, for instance :</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MySweeper</span><span class="p">(</span><span class="n">Sweeper</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MySweeper</span><span class="p">(</span><span class="n">Sweeper</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initSweep</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initSweep</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">initSweep</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_initSweep_</span><span class="si">{</span><span class="n">initSweep</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="s1">&#39;_&#39;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;initSweep=</span><span class="si">{</span><span class="n">initSweep</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_initSweep_COPY_PASTE</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initSweep_COPY_PASTE</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">_initSweep_SPREAD_OUT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initSweep_SPREAD_OUT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
     <span class="c1"># ... other implementations for initSweep</span>
