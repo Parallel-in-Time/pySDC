@@ -4,9 +4,13 @@ from gusto.time_discretisation.time_discretisation import TimeDiscretisation, wr
 from gusto.core.labels import explicit
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.problem_classes.GenericGusto import GenericGusto, GenericGustoImex
 from pySDC.core.hooks import Hooks
 from pySDC.helpers.stats_helper import get_sorted
+
+import logging
+import numpy as np
 
 
 class LogTime(Hooks):
@@ -34,25 +38,29 @@ class pySDC_integrator(TimeDiscretisation):
     It will construct a pySDC controller which can be used by itself and will be used within the time step when called
     from Gusto. Access the controller via `pySDC_integrator.controller`. This class also has `pySDC_integrator.stats`,
     which gathers all of the pySDC stats recorded in the hooks during every time step when used within Gusto.
+
+    This class supports subcycling with multi-step SDC. You can use pseudo-parallelism by simply giving `n_steps` > 1 or
+    do proper parallelism by giving a `controller_communicator` of kind `pySDC.FiredrakeEnsembleCommunicator` with the
+    appropriate size. You also have to toggle between pseudo and proper parallelism with `useMPIController`.
     """
 
     def __init__(
         self,
-        equation,
         description,
         controller_params,
         domain,
         field_name=None,
         solver_parameters=None,
         options=None,
-        t0=0,
         imex=False,
+        useMPIController=False,
+        n_steps=1,
+        controller_communicator=None,
     ):
         """
         Initialization
 
         Args:
-            equation (:class:`PrognosticEquation`): the prognostic equation.
             description (dict): pySDC description
             controller_params (dict): pySDC controller params
             domain (:class:`Domain`): the model's domain object, containing the
@@ -65,6 +73,10 @@ class pySDC_integrator(TimeDiscretisation):
                 options to either be passed to the spatial discretisation, or
                 to control the "wrapper" methods, such as Embedded DG or a
                 recovery method. Defaults to None.
+            imex (bool): Whether to use IMEX splitting
+            useMPIController (bool): Whether to use the pseudo-parallel or proper parallel pySDC controller
+            n_steps (int): Number of steps done in parallel when using pseudo-parallel pySDC controller
+            controller_communicator (pySDC.FiredrakeEnsembleCommunicator, optional): Communicator for the proper parallel controller
         """
 
         self._residual = None
@@ -81,6 +93,23 @@ class pySDC_integrator(TimeDiscretisation):
         self.timestepper = None
         self.dt_next = None
         self.imex = imex
+        self.useMPIController = useMPIController
+        self.controller_communicator = controller_communicator
+
+        if useMPIController:
+            assert (
+                type(self.controller_communicator).__name__ == 'FiredrakeEnsembleCommunicator'
+            ), f'Need to give a FiredrakeEnsembleCommunicator here, not {type(self.controller_communicator)}'
+            if n_steps > 1:
+                logging.getLogger(type(self).__name__).warning(
+                    f'Warning: You selected {n_steps=}, which will be ignored when using the MPI controller!'
+                )
+            assert (
+                controller_communicator is not None
+            ), 'You need to supply a communicator when using the MPI controller!'
+            self.n_steps = controller_communicator.size
+        else:
+            self.n_steps = n_steps
 
     def setup(self, equation, apply_bcs=True, *active_labels):
         super().setup(equation, apply_bcs, *active_labels)
@@ -96,8 +125,9 @@ class pySDC_integrator(TimeDiscretisation):
             'equation': equation,
             'solver_parameters': self.solver_parameters,
             'residual': self._residual,
+            **self.description['problem_params'],
         }
-        self.description['level_params']['dt'] = float(self.domain.dt)
+        self.description['level_params']['dt'] = float(self.domain.dt) / self.n_steps
 
         # add utility hook required for step size adaptivity
         hook_class = self.controller_params.get('hook_class', [])
@@ -107,7 +137,17 @@ class pySDC_integrator(TimeDiscretisation):
         self.controller_params['hook_class'] = hook_class
 
         # prepare controller and variables
-        self.controller = controller_nonMPI(1, description=self.description, controller_params=self.controller_params)
+        if self.useMPIController:
+            self.controller = controller_MPI(
+                comm=self.controller_communicator,
+                description=self.description,
+                controller_params=self.controller_params,
+            )
+        else:
+            self.controller = controller_nonMPI(
+                self.n_steps, description=self.description, controller_params=self.controller_params
+            )
+
         self.prob = self.level.prob
         self.sweeper = self.level.sweep
         self.x0_pySDC = self.prob.dtype_u(self.prob.init)
@@ -126,14 +166,26 @@ class pySDC_integrator(TimeDiscretisation):
     def residual(self, value):
         """Make sure the pySDC problem residual and this residual are the same"""
         if hasattr(self, 'prob'):
-            self.prob.residual = value
+            if self.useMPIController:
+                self.controller.S.levels[0].prob.residual = value
+            else:
+                for S in self.controller.MS:
+                    S.levels[0].prob.residual = value
         else:
             self._residual = value
 
     @property
+    def step(self):
+        """Get the first step on the controller"""
+        if self.useMPIController:
+            return self.controller.S
+        else:
+            return self.controller.MS[0]
+
+    @property
     def level(self):
         """Get the finest pySDC level"""
-        return self.controller.MS[0].levels[0]
+        return self.step.levels[0]
 
     @wrapper_apply
     def apply(self, x_out, x_in):
@@ -145,29 +197,31 @@ class pySDC_integrator(TimeDiscretisation):
             x_in (:class:`Function`): the input field.
         """
         self.x0_pySDC.functionspace.assign(x_in)
-        assert self.level.params.dt == float(self.dt), 'Step sizes have diverged between pySDC and Gusto'
+        assert np.isclose(
+            self.level.params.dt * self.n_steps, float(self.dt)
+        ), 'Step sizes have diverged between pySDC and Gusto'
 
         if self.dt_next is not None:
             assert (
                 self.timestepper is not None
             ), 'You need to set self.timestepper to the timestepper in order to facilitate adaptive step size selection here!'
-            self.timestepper.dt = fd.Constant(self.dt_next)
+            self.timestepper.dt = fd.Constant(self.dt_next * self.n_steps)
             self.t = self.timestepper.t
 
         uend, _stats = self.controller.run(u0=self.x0_pySDC, t0=float(self.t), Tend=float(self.t + self.dt))
 
         # update time variables
-        if self.level.params.dt != float(self.dt):
+        if not np.isclose(self.level.params.dt * self.n_steps, float(self.dt)):
             self.dt_next = self.level.params.dt
 
-        self.t = get_sorted(_stats, type='_time', recomputed=False)[-1][1]
+        self.t = get_sorted(_stats, type='_time', recomputed=False, comm=self.controller_communicator)[-1][1]
 
         # update time of the Gusto stepper.
         # After this step, the Gusto stepper updates its time again to arrive at the correct time
         if self.timestepper is not None:
             self.timestepper.t = fd.Constant(self.t - self.dt)
 
-        self.dt = self.level.params.dt
+        self.dt = fd.Constant(self.level.params.dt * self.n_steps)
 
         # update stats and output
         self.stats = {**self.stats, **_stats}

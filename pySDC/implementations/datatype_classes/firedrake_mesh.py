@@ -1,6 +1,7 @@
 import firedrake as fd
 
 from pySDC.core.errors import DataError
+from pySDC.helpers.firedrake_ensemble_communicator import FiredrakeEnsembleCommunicator
 
 
 class firedrake_mesh(object):
@@ -76,6 +77,57 @@ class firedrake_mesh(object):
         """
 
         return fd.norm(self.functionspace, 'L2')
+
+    def isend(self, dest=None, tag=None, comm=None):
+        """
+        Routine for sending data forward in time (non-blocking)
+
+        Args:
+            dest (int): target rank
+            tag (int): communication tag
+            comm: communicator
+
+        Returns:
+            request handle
+        """
+        assert (
+            type(comm) == FiredrakeEnsembleCommunicator
+        ), f'Need to give a FiredrakeEnsembleCommunicator here, not {type(comm)}'
+        return comm.Isend(self.functionspace, dest=dest, tag=tag)
+
+    def irecv(self, source=None, tag=None, comm=None):
+        """
+        Routine for receiving in time
+
+        Args:
+            source (int): source rank
+            tag (int): communication tag
+            comm: communicator
+
+        Returns:
+            None
+        """
+        assert (
+            type(comm) == FiredrakeEnsembleCommunicator
+        ), f'Need to give a FiredrakeEnsembleCommunicator here, not {type(comm)}'
+        return comm.Irecv(self.functionspace, source=source, tag=tag)
+
+    def bcast(self, root=None, comm=None):
+        """
+        Routine for broadcasting values
+
+        Args:
+            root (int): process with value to broadcast
+            comm: communicator
+
+        Returns:
+            broadcasted values
+        """
+        assert (
+            type(comm) == FiredrakeEnsembleCommunicator
+        ), f'Need to give a FiredrakeEnsembleCommunicator here, not {type(comm)}'
+        comm.Bcast(self.functionspace, root=root)
+        return self
 
 
 class IMEX_firedrake_mesh(object):

@@ -1,19 +1,19 @@
 import pytest
 
 
-def get_gusto_stepper(eqns, method, spatial_methods):
+def get_gusto_stepper(eqns, method, spatial_methods, dirname='./tmp'):
     from gusto import IO, OutputParameters, PrescribedTransport
     import sys
 
     if '--running-tests' not in sys.argv:
         sys.argv.append('--running-tests')
 
-    output = OutputParameters(dirname='./tmp', dumpfreq=15)
+    output = OutputParameters(dirname=dirname, dumpfreq=15)
     io = IO(method.domain, output)
     return PrescribedTransport(eqns, method, io, False, transport_method=spatial_methods)
 
 
-def tracer_setup(tmpdir='./tmp', degree=1, small_dt=False):
+def tracer_setup(tmpdir='./tmp', degree=1, small_dt=False, comm=None):
     from firedrake import (
         IcosahedralSphereMesh,
         PeriodicIntervalMesh,
@@ -23,6 +23,7 @@ def tracer_setup(tmpdir='./tmp', degree=1, small_dt=False):
         sqrt,
         exp,
         pi,
+        COMM_WORLD,
     )
     from gusto import OutputParameters, Domain, IO
     from collections import namedtuple
@@ -32,7 +33,8 @@ def tracer_setup(tmpdir='./tmp', degree=1, small_dt=False):
     TracerSetup.__new__.__defaults__ = (None,) * len(opts)
 
     radius = 1
-    mesh = IcosahedralSphereMesh(radius=radius, refinement_level=3, degree=1)
+    comm = COMM_WORLD if comm is None else comm
+    mesh = IcosahedralSphereMesh(radius=radius, refinement_level=3, degree=1, comm=comm)
     x = SpatialCoordinate(mesh)
 
     # Parameters chosen so that dt != 1
@@ -291,7 +293,6 @@ def test_pySDC_integrator_RK(use_transport_scheme, method, setup):
     stepper_pySDC = get_gusto_stepper(
         eqns,
         pySDC_integrator(
-            eqns,
             description,
             controller_params,
             domain,
@@ -415,7 +416,6 @@ def test_pySDC_integrator(use_transport_scheme, imex, setup):
     stepper_pySDC = get_gusto_stepper(
         eqns,
         pySDC_integrator(
-            eqns,
             description,
             controller_params,
             domain,
@@ -550,7 +550,6 @@ def test_pySDC_integrator_with_adaptivity(dt_initial, setup):
     stepper_pySDC = get_gusto_stepper(
         eqns,
         pySDC_integrator(
-            eqns,
             description,
             controller_params,
             domain,
@@ -618,9 +617,173 @@ def test_pySDC_integrator_with_adaptivity(dt_initial, setup):
     ), f'SDC does not match reference implementation with adaptive step size selection! Got relative difference of {error}'
 
 
+@pytest.mark.firedrake
+@pytest.mark.parametrize('n_steps', [1, 2, 4])
+@pytest.mark.parametrize('useMPIController', [True, False])
+def test_pySDC_integrator_MSSDC(n_steps, useMPIController, setup, submit=True):
+    if submit and useMPIController:
+        import os
+        import subprocess
+
+        my_env = os.environ.copy()
+        my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
+        cwd = '.'
+        cmd = f'mpiexec -np {n_steps} python {__file__} --test=MSSDC'.split()
+
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
+        p.wait()
+        for line in p.stdout:
+            print(line)
+        for line in p.stderr:
+            print(line)
+        assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
+            p.returncode,
+            n_steps,
+        )
+        return None
+
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.helpers.pySDC_as_gusto_time_discretization import pySDC_integrator
+    from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit as sweeper_cls
+    from firedrake import norm, Constant, COMM_WORLD
+    import numpy as np
+
+    MSSDC_args = {}
+    dirname = './tmp'
+    if useMPIController:
+        from pySDC.helpers.firedrake_ensemble_communicator import FiredrakeEnsembleCommunicator
+
+        controller_communicator = FiredrakeEnsembleCommunicator(COMM_WORLD, 1)
+        assert controller_communicator.size == n_steps
+        MSSDC_args = {'useMPIController': True, 'controller_communicator': controller_communicator}
+        dirname = f'./tmp_{controller_communicator.rank}'
+        setup = tracer_setup(tmpdir=dirname, comm=controller_communicator.space_comm)
+    else:
+        MSSDC_args = {'useMPIController': False, 'n_steps': n_steps}
+
+    method = BackwardEuler
+    use_transport_scheme = True
+    eqns, domain, spatial_methods, setup = get_gusto_advection_setup(use_transport_scheme, method.imex, setup)
+
+    solver_parameters = {
+        'snes_type': 'newtonls',
+        'ksp_type': 'gmres',
+        'pc_type': 'bjacobi',
+        'sub_pc_type': 'ilu',
+        'ksp_rtol': 1e-12,
+        'snes_rtol': 1e-12,
+        'ksp_atol': 1e-30,
+        'snes_atol': 1e-30,
+        'ksp_divtol': 1e30,
+        'snes_divtol': 1e30,
+        'snes_max_it': 99,
+    }
+
+    # ------------------------------------------------------------------------ #
+    # Setup pySDC
+    # ------------------------------------------------------------------------ #
+
+    level_params = dict()
+    level_params['restol'] = -1
+
+    step_params = dict()
+    step_params['maxiter'] = 1
+
+    sweeper_params = dict()
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
+    sweeper_params['node_type'] = 'LEGENDRE'
+    sweeper_params['num_nodes'] = 1
+    sweeper_params['QI'] = 'IE'
+    sweeper_params['QE'] = 'PIC'
+    sweeper_params['initial_guess'] = 'copy'
+
+    problem_params = dict()
+
+    controller_params = dict()
+    controller_params['logger_level'] = 20
+    controller_params['mssdc_jac'] = False
+
+    description = dict()
+    description['problem_params'] = problem_params
+    description['sweeper_class'] = sweeper_cls
+    description['sweeper_params'] = sweeper_params
+    description['level_params'] = level_params
+    description['step_params'] = step_params
+
+    # ------------------------------------------------------------------------ #
+    # Setup time steppers
+    # ------------------------------------------------------------------------ #
+
+    tmax = float(domain.dt) * 2 * n_steps
+
+    stepper_gusto = get_gusto_stepper(
+        eqns,
+        method.get_Gusto_method()(domain, solver_parameters=solver_parameters),
+        spatial_methods,
+        dirname=dirname,
+    )
+
+    domain.dt = Constant(domain.dt) * n_steps
+
+    stepper_pySDC = get_gusto_stepper(
+        eqns,
+        pySDC_integrator(
+            description,
+            controller_params,
+            domain,
+            solver_parameters=solver_parameters,
+            imex=method.imex,
+            **MSSDC_args,
+        ),
+        spatial_methods,
+        dirname=dirname,
+    )
+
+    # ------------------------------------------------------------------------ #
+    # Get Initial conditions and run
+    # ------------------------------------------------------------------------ #
+
+    for stepper in [stepper_gusto, stepper_pySDC]:
+        get_initial_conditions(stepper, setup)
+        stepper.run(t=0, tmax=tmax)
+
+    # ------------------------------------------------------------------------ #
+    # Check results
+    # ------------------------------------------------------------------------ #
+
+    assert stepper_gusto.t == stepper_pySDC.t
+
+    error = norm(stepper_gusto.fields('f') - stepper_pySDC.fields('f')) / norm(stepper_gusto.fields('f'))
+    print(error)
+
+    assert (
+        error < solver_parameters['snes_rtol'] * 1e3
+    ), f'pySDC and Gusto differ in method {method}! Got relative difference of {error}'
+
+
 if __name__ == '__main__':
-    setup = tracer_setup()
-    # test_generic_gusto_problem(setup)
-    # test_pySDC_integrator_RK(False, RK4, setup)
-    # test_pySDC_integrator(False, False, setup)
-    test_pySDC_integrator_with_adaptivity(1e-3, setup)
+    from mpi4py import MPI
+    from argparse import ArgumentParser
+
+    if MPI.COMM_WORLD.size == 1:
+        setup = tracer_setup()
+    else:
+        setup = None
+
+    parser = ArgumentParser()
+    parser.add_argument(
+        '--test',
+        help="which kind of test you want to run",
+        type=str,
+        default=None,
+    )
+    args = parser.parse_args()
+
+    if args.test == 'MSSDC':
+        test_pySDC_integrator_MSSDC(n_steps=MPI.COMM_WORLD.size, useMPIController=True, setup=setup, submit=False)
+    else:
+        # test_generic_gusto_problem(setup)
+        # test_pySDC_integrator_RK(False, RK4, setup)
+        # test_pySDC_integrator(False, False, setup)
+        test_pySDC_integrator_with_adaptivity(1e-3, setup)
+        # test_pySDC_integrator_MSSDC(2, False, setup)
