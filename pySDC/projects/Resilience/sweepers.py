@@ -26,6 +26,10 @@ class efficient_sweeper:
             if self.params.initial_guess == 'spread':
                 L.u[m] = P.dtype_u(L.u[0])
                 L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
+            elif self.params.initial_guess == 'copy':
+                L.f[0] = P.eval_f(L.u[0], L.time)
+                L.u[m] = P.dtype_u(L.u[0])
+                L.f[m] = P.dtype_f(L.f[0])
             # start with zero everywhere
             elif self.params.initial_guess == 'zero':
                 L.u[m] = P.dtype_u(init=P.init, val=0.0)
