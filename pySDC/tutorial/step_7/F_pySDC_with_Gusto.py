@@ -272,9 +272,7 @@ def williamson_5(
     # ------------------------------------------------------------------------ #
 
     if use_pySDC:
-        method = pySDC_integrator(
-            eqns, description, controller_params, domain=domain, solver_parameters=solver_parameters
-        )
+        method = pySDC_integrator(description, controller_params, domain=domain, solver_parameters=solver_parameters)
     else:
         method = SDC(**SDC_params, domain=domain)
 
@@ -317,9 +315,7 @@ def williamson_5(
         # update description and setup pySDC again with the discretizations from different steppers
         description['problem_params']['residual'] = [me.scheme.residual for me in steppers]
         description['problem_params']['equation'] = [me.scheme.equation for me in steppers]
-        method = pySDC_integrator(
-            eqns, description, controller_params, domain=domain, solver_parameters=solver_parameters
-        )
+        method = pySDC_integrator(description, controller_params, domain=domain, solver_parameters=solver_parameters)
         stepper = Timestepper(eqns, method, io, spatial_methods=transport_methods)
 
     # ------------------------------------------------------------------------ #
