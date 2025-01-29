@@ -21,6 +21,10 @@ class FiredrakeEnsembleCommunicator:
             ensemble (firedrake.Ensemble): Ensemble communicator
         """
         self.ensemble = fd.Ensemble(comm, space_size)
+        self.comm_wold = comm
+
+    def Split(self, *args, **kwargs):
+        return FiredrakeEnsembleCommunicator(self.comm_wold.Split(*args, **kwargs), space_size=self.space_comm.size)
 
     @property
     def space_comm(self):
@@ -52,6 +56,16 @@ class FiredrakeEnsembleCommunicator:
             self.ensemble.ensemble_comm.Bcast(buf, root)
         else:
             self.ensemble.bcast(buf, root=root)
+
+    def Irecv(self, buf, source, tag=MPI.ANY_TAG):
+        if type(buf) in [np.ndarray, list]:
+            return self.ensemble.ensemble_comm.Irecv(buf=buf, source=source, tag=tag)
+        return self.ensemble.irecv(buf, source, tag=tag)[0]
+
+    def Isend(self, buf, dest, tag=MPI.ANY_TAG):
+        if type(buf) in [np.ndarray, list]:
+            return self.ensemble.ensemble_comm.Isend(buf=buf, dest=dest, tag=tag)
+        return self.ensemble.isend(buf, dest, tag=tag)[0]
 
 
 def get_ensemble(comm, space_size):
