@@ -44,7 +44,15 @@
 <span class="sd">This proceeds very similar to earlier tutorials. The interesting part of this tutorial is rather in the problem class.</span>
 <span class="sd">See `pySDC/implementations/problem_classes/HeatFiredrake` for an easy example of how to use Firedrake within pySDC.</span>
 
-<span class="sd">Run in serial using simply `python E_pySDC_with_Firedrake.py` or with parallel diagonal SDC with `mpiexec -np 3 python E_pySDC_with_Firedrake.py`.</span>
+<span class="sd">The script allows to run in three different ways. Use</span>
+<span class="sd"> - `python E_pySDC_with_Firedrake.py` for single-level serial SDC</span>
+<span class="sd"> - `mpiexec -np 3 E_pySDC_with_Firedrake --useMPIsweeper` for single-level MPI-parallel diagonal SDC</span>
+<span class="sd"> - `python E_pySDC_with_Firedrake --ML` for three-level serial SDC</span>
+
+<span class="sd">You should notice that speedup of MPI parallelisation is quite good and that, while multi-level SDC reduces the number</span>
+<span class="sd">of SDC iterations quite a bit, it does not reduce time to solution in this case. This is partly due to more solvers being</span>
+<span class="sd">constructed when using coarse levels. Also, we do not claim to have found the best parameters, though. This is just an</span>
+<span class="sd">example to demonstrate how to use it.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -104,7 +112,60 @@
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">runHeatFiredrake</span><span class="p">(</span><span class="n">useMPIsweeper</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_ML</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper routine to set up parameters</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        description and controller_params parameter dictionaries</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HeatFiredrake</span><span class="w"> </span><span class="kn">import</span> <span class="n">Heat1DForcedFiredrake</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span><span class="w"> </span><span class="kn">import</span> <span class="n">imex_1st_order</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order_MPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">imex_1st_order_MPI</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.transfer_classes.TransferFiredrakeMesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshToMeshFiredrake</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.hooks.log_errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogGlobalErrorPostRun</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.hooks.log_work</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogWork</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.firedrake_ensemble_communicator</span><span class="w"> </span><span class="kn">import</span> <span class="n">FiredrakeEnsembleCommunicator</span>
+
+    <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5e-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+
+    <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;MIN-SR-S&#39;</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;PIC&#39;</span>
+
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+    <span class="n">base_transfer_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">base_transfer_params</span><span class="p">[</span><span class="s1">&#39;finter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">15</span> <span class="k">if</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">30</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;hook_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">LogGlobalErrorPostRun</span><span class="p">,</span> <span class="n">LogWork</span><span class="p">]</span>
+
+    <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Heat1DForcedFiredrake</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imex_1st_order</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">MeshToMeshFiredrake</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;base_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">base_transfer_params</span>
+
+    <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">runHeatFiredrake</span><span class="p">(</span><span class="n">useMPIsweeper</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ML</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Run the example defined by the above parameters</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -114,7 +175,11 @@
     <span class="n">Tend</span> <span class="o">=</span> <span class="mf">1.0</span>
     <span class="n">t0</span> <span class="o">=</span> <span class="mf">0.0</span>
 
-    <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span> <span class="o">=</span> <span class="n">setup</span><span class="p">(</span><span class="n">useMPIsweeper</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ML</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">useMPIsweeper</span><span class="p">,</span> <span class="s1">&#39;MPI parallel diagonal SDC and ML SDC are not compatible at the moment&#39;</span>
+        <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span> <span class="o">=</span> <span class="n">setup_ML</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span> <span class="o">=</span> <span class="n">setup</span><span class="p">(</span><span class="n">useMPIsweeper</span><span class="p">)</span>
 
     <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
 
@@ -137,21 +202,44 @@
     <span class="n">tot_solves</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">work_solves</span><span class="p">])</span>
     <span class="n">tot_rhs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">work_rhs</span><span class="p">])</span>
 
+    <span class="n">time_rank</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s2">&quot;sweeper_params&quot;</span><span class="p">][</span><span class="s2">&quot;comm&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rank</span> <span class="k">if</span> <span class="n">useMPIsweeper</span> <span class="k">else</span> <span class="mi">0</span>
     <span class="nb">print</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s1">&#39;Finished with error </span><span class="si">{</span><span class="n">error</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">. Used </span><span class="si">{</span><span class="n">tot_iter</span><span class="si">}</span><span class="s1"> SDC iterations, with </span><span class="si">{</span><span class="n">tot_solver_setup</span><span class="si">}</span><span class="s1"> solver setups, </span><span class="si">{</span><span class="n">tot_solves</span><span class="si">}</span><span class="s1"> solves and </span><span class="si">{</span><span class="n">tot_rhs</span><span class="si">}</span><span class="s1"> right hand side evaluations on time task </span><span class="si">{</span><span class="n">description</span><span class="p">[</span><span class="s2">&quot;sweeper_params&quot;</span><span class="p">][</span><span class="s2">&quot;comm&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rank</span><span class="si">}</span><span class="s1">.&#39;</span>
+        <span class="sa">f</span><span class="s1">&#39;Finished with error </span><span class="si">{</span><span class="n">error</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">. Used </span><span class="si">{</span><span class="n">tot_iter</span><span class="si">}</span><span class="s1"> SDC iterations, with </span><span class="si">{</span><span class="n">tot_solver_setup</span><span class="si">}</span><span class="s1"> solver setups, </span><span class="si">{</span><span class="n">tot_solves</span><span class="si">}</span><span class="s1"> solves and </span><span class="si">{</span><span class="n">tot_rhs</span><span class="si">}</span><span class="s1"> right hand side evaluations on the finest level of time task </span><span class="si">{</span><span class="n">time_rank</span><span class="si">}</span><span class="s1">.&#39;</span>
     <span class="p">)</span>
 
     <span class="c1"># do tests that we got the same as last time</span>
     <span class="n">n_nodes</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">useMPIsweeper</span> <span class="k">else</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">][</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span>
     <span class="k">assert</span> <span class="n">error</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">2e-8</span>
-    <span class="k">assert</span> <span class="n">tot_iter</span> <span class="o">==</span> <span class="mi">29</span>
+    <span class="k">assert</span> <span class="n">tot_iter</span> <span class="o">==</span> <span class="mi">10</span> <span class="k">if</span> <span class="n">ML</span> <span class="k">else</span> <span class="mi">29</span>
     <span class="k">assert</span> <span class="n">tot_solver_setup</span> <span class="o">==</span> <span class="n">n_nodes</span>
     <span class="k">assert</span> <span class="n">tot_solves</span> <span class="o">==</span> <span class="n">n_nodes</span> <span class="o">*</span> <span class="n">tot_iter</span>
     <span class="k">assert</span> <span class="n">tot_rhs</span> <span class="o">==</span> <span class="n">n_nodes</span> <span class="o">*</span> <span class="n">tot_iter</span> <span class="o">+</span> <span class="p">(</span><span class="n">n_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">niter</span><span class="p">)</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">runHeatFiredrake</span><span class="p">(</span><span class="n">useMPIsweeper</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">argparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArgumentParser</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;--ML&#39;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Whether you want to run multi-level&#39;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_const&#39;</span><span class="p">,</span>
+        <span class="n">const</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;--useMPIsweeper&#39;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Whether you want to use MPI parallel diagonal SDC&#39;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_const&#39;</span><span class="p">,</span>
+        <span class="n">const</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">runHeatFiredrake</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
 </pre></div>
 </div>
 

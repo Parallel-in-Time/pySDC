@@ -101,6 +101,8 @@ Find a suitable plotting script here: <a class="reference external" href="https:
     <span class="s1">&#39;kmax&#39;</span><span class="p">:</span> <span class="s1">&#39;5&#39;</span><span class="p">,</span>  <span class="c1"># use fixed number of iteration up to this value</span>
     <span class="s1">&#39;use_pySDC&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># whether to use pySDC for time integration</span>
     <span class="s1">&#39;use_adaptivity&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># whether to use adaptive step size selection</span>
+    <span class="s1">&#39;Nlevels&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>  <span class="c1"># number of levels in SDC</span>
+    <span class="s1">&#39;logger_level&#39;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>  <span class="c1"># pySDC logger level</span>
 <span class="p">}</span>
 
 
@@ -116,7 +118,10 @@ Find a suitable plotting script here: <a class="reference external" href="https:
     <span class="n">kmax</span><span class="o">=</span><span class="n">williamson_5_defaults</span><span class="p">[</span><span class="s1">&#39;kmax&#39;</span><span class="p">],</span>
     <span class="n">use_pySDC</span><span class="o">=</span><span class="n">williamson_5_defaults</span><span class="p">[</span><span class="s1">&#39;use_pySDC&#39;</span><span class="p">],</span>
     <span class="n">use_adaptivity</span><span class="o">=</span><span class="n">williamson_5_defaults</span><span class="p">[</span><span class="s1">&#39;use_adaptivity&#39;</span><span class="p">],</span>
+    <span class="n">Nlevels</span><span class="o">=</span><span class="n">williamson_5_defaults</span><span class="p">[</span><span class="s1">&#39;Nlevels&#39;</span><span class="p">],</span>
+    <span class="n">logger_level</span><span class="o">=</span><span class="n">williamson_5_defaults</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">],</span>
     <span class="n">mesh</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">_ML_is_setup</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Run the Williamson 5 test case.</span>
@@ -131,9 +136,15 @@ Find a suitable plotting script here: <a class="reference external" href="https:
 <span class="sd">        M (int): Number of collocation nodes</span>
 <span class="sd">        kmax (int): Max number of SDC iterations</span>
 <span class="sd">        use_pySDC (bool): Use pySDC as Gusto time integrator or Gusto SDC implementation</span>
+<span class="sd">        Nlevels (int): Number of SDC levels</span>
+<span class="sd">        logger_level (int): Logger level</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">use_pySDC</span> <span class="ow">and</span> <span class="n">use_adaptivity</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Adaptive step size selection not yet implemented in Gusto&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">use_pySDC</span> <span class="ow">and</span> <span class="n">Nlevels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Multi-level SDC not yet implemented in Gusto&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">time_parallelism</span> <span class="ow">and</span> <span class="n">Nlevels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Multi-level SDC does not work with MPI parallel sweeper yet&#39;</span><span class="p">)</span>
 
     <span class="c1"># ------------------------------------------------------------------------ #</span>
     <span class="c1"># Parameters for test case</span>
@@ -173,6 +184,9 @@ Find a suitable plotting script here: <a class="reference external" href="https:
 
     <span class="c1"># Domain</span>
     <span class="n">mesh</span> <span class="o">=</span> <span class="n">GeneralIcosahedralSphereMesh</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">ncells_per_edge</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">space_comm</span><span class="p">)</span> <span class="k">if</span> <span class="n">mesh</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">mesh</span>
+    <span class="k">if</span> <span class="n">Nlevels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">hierarchy</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">MeshHierarchy</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">Nlevels</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">mesh</span> <span class="o">=</span> <span class="n">hierarchy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">domain</span> <span class="o">=</span> <span class="n">Domain</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="s1">&#39;BDM&#39;</span><span class="p">,</span> <span class="n">element_order</span><span class="p">)</span>
     <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
     <span class="n">lamda</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lonlatr_from_xyz</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
@@ -240,7 +254,7 @@ Find a suitable plotting script here: <a class="reference external" href="https:
         <span class="n">convergence_controllers</span><span class="p">[</span><span class="n">SpreadStepSizesBlockwiseNonMPI</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;overwrite_to_reach_Tend&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 
     <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">15</span> <span class="k">if</span> <span class="n">fd</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">30</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">logger_level</span> <span class="k">if</span> <span class="n">fd</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">30</span>
     <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;mssdc_jac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -250,6 +264,10 @@ Find a suitable plotting script here: <a class="reference external" href="https:
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;convergence_controllers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convergence_controllers</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.transfer_classes.TransferFiredrakeMesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshToMeshFiredrakeHierarchy</span>
+
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">MeshToMeshFiredrakeHierarchy</span>
 
     <span class="c1"># ------------------------------------------------------------------------ #</span>
     <span class="c1"># petsc solver parameters</span>
@@ -294,17 +312,51 @@ Find a suitable plotting script here: <a class="reference external" href="https:
     <span class="c1"># ------------------------------------------------------------------------ #</span>
 
     <span class="k">if</span> <span class="n">use_pySDC</span><span class="p">:</span>
-        <span class="n">method</span> <span class="o">=</span> <span class="n">pySDC_integrator</span><span class="p">(</span>
-            <span class="n">eqns</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span> <span class="n">solver_parameters</span><span class="o">=</span><span class="n">solver_parameters</span>
-        <span class="p">)</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">pySDC_integrator</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span> <span class="n">solver_parameters</span><span class="o">=</span><span class="n">solver_parameters</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">method</span> <span class="o">=</span> <span class="n">SDC</span><span class="p">(</span><span class="o">**</span><span class="n">SDC_params</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">)</span>
 
     <span class="n">stepper</span> <span class="o">=</span> <span class="n">Timestepper</span><span class="p">(</span><span class="n">eqns</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">io</span><span class="p">,</span> <span class="n">spatial_methods</span><span class="o">=</span><span class="n">transport_methods</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">use_pySDC</span> <span class="ow">and</span> <span class="n">use_adaptivity</span><span class="p">:</span>
-        <span class="c1"># we have to do this for adaptive time stepping, because it is a bit of a mess</span>
-        <span class="n">method</span><span class="o">.</span><span class="n">timestepper</span> <span class="o">=</span> <span class="n">stepper</span>
+    <span class="c1"># ------------------------------------------------------------------------ #</span>
+    <span class="c1"># Setup multi-level SDC</span>
+    <span class="c1"># ------------------------------------------------------------------------ #</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_ML_is_setup</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">stepper</span>
+
+    <span class="k">if</span> <span class="n">Nlevels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">steppers</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="kc">None</span><span class="p">,</span>
+        <span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">Nlevels</span><span class="p">)</span>
+        <span class="n">steppers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">stepper</span>
+
+        <span class="c1"># get different steppers on the different levels</span>
+        <span class="c1"># recall that the setup of the problems is only finished when the stepper is setup</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">Nlevels</span><span class="p">):</span>
+            <span class="n">steppers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">williamson_5</span><span class="p">(</span>
+                <span class="n">ncells_per_edge</span><span class="o">=</span><span class="n">ncells_per_edge</span><span class="p">,</span>
+                <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
+                <span class="n">tmax</span><span class="o">=</span><span class="n">tmax</span><span class="p">,</span>
+                <span class="n">dumpfreq</span><span class="o">=</span><span class="n">dumpfreq</span><span class="p">,</span>
+                <span class="n">dirname</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">dirname</span><span class="si">}</span><span class="s1">_unused_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="n">time_parallelism</span><span class="o">=</span><span class="n">time_parallelism</span><span class="p">,</span>
+                <span class="n">QI</span><span class="o">=</span><span class="n">QI</span><span class="p">,</span>
+                <span class="n">M</span><span class="o">=</span><span class="n">M</span><span class="p">,</span>
+                <span class="n">kmax</span><span class="o">=</span><span class="n">kmax</span><span class="p">,</span>
+                <span class="n">use_pySDC</span><span class="o">=</span><span class="n">use_pySDC</span><span class="p">,</span>
+                <span class="n">use_adaptivity</span><span class="o">=</span><span class="n">use_adaptivity</span><span class="p">,</span>
+                <span class="n">Nlevels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">mesh</span><span class="o">=</span><span class="n">hierarchy</span><span class="p">[</span><span class="o">-</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span>  <span class="c1"># mind that the finest level in pySDC is 0, but -1 in hierarchy</span>
+                <span class="n">logger_level</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                <span class="n">_ML_is_setup</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># update description and setup pySDC again with the discretizations from different steppers</span>
+        <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">][</span><span class="s1">&#39;residual&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span><span class="o">.</span><span class="n">scheme</span><span class="o">.</span><span class="n">residual</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">steppers</span><span class="p">]</span>
+        <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">][</span><span class="s1">&#39;equation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span><span class="o">.</span><span class="n">scheme</span><span class="o">.</span><span class="n">equation</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">steppers</span><span class="p">]</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">pySDC_integrator</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span> <span class="n">solver_parameters</span><span class="o">=</span><span class="n">solver_parameters</span><span class="p">)</span>
+        <span class="n">stepper</span> <span class="o">=</span> <span class="n">Timestepper</span><span class="p">(</span><span class="n">eqns</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">io</span><span class="p">,</span> <span class="n">spatial_methods</span><span class="o">=</span><span class="n">transport_methods</span><span class="p">)</span>
 
     <span class="c1"># ------------------------------------------------------------------------ #</span>
     <span class="c1"># Initial conditions</span>
@@ -324,6 +376,10 @@ Find a suitable plotting script here: <a class="reference external" href="https:
     <span class="c1"># ------------------------------------------------------------------------ #</span>
     <span class="c1"># Run</span>
     <span class="c1"># ------------------------------------------------------------------------ #</span>
+
+    <span class="k">if</span> <span class="n">use_pySDC</span> <span class="ow">and</span> <span class="n">use_adaptivity</span><span class="p">:</span>
+        <span class="c1"># we have to do this for adaptive time stepping, because it is a bit of a mess</span>
+        <span class="n">method</span><span class="o">.</span><span class="n">timestepper</span> <span class="o">=</span> <span class="n">stepper</span>
 
     <span class="n">stepper</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="n">tmax</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">stepper</span><span class="p">,</span> <span class="n">mesh</span>
@@ -377,6 +433,12 @@ Find a suitable plotting script here: <a class="reference external" href="https:
         <span class="n">default</span><span class="o">=</span><span class="n">williamson_5_defaults</span><span class="p">[</span><span class="s1">&#39;use_adaptivity&#39;</span><span class="p">],</span>
     <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--QI&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Implicit preconditioner&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">williamson_5_defaults</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">])</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;--Nlevels&#39;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Number of SDC levels.&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">williamson_5_defaults</span><span class="p">[</span><span class="s1">&#39;Nlevels&#39;</span><span class="p">],</span>
+    <span class="p">)</span>
     <span class="n">args</span><span class="p">,</span> <span class="n">unknown</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">()</span>
 
     <span class="n">options</span> <span class="o">=</span> <span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>

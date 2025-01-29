@@ -45,6 +45,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.convergence_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConvergenceController</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.hooks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hooks</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.convergence_controller_classes.check_convergence</span><span class="w"> </span><span class="kn">import</span> <span class="n">CheckConvergence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.problem</span><span class="w"> </span><span class="kn">import</span> <span class="n">WorkCounter</span>
 
 
 <div class="viewcode-block" id="RayleighBenard">
@@ -61,7 +62,7 @@
 <span class="sd">        v_t - nu (v_xx + v_zz) + p_z - T = -uv_x - vv_z</span>
 
 <span class="sd">    with u the horizontal velocity, v the vertical velocity (in z-direction), T the temperature, p the pressure, indices</span>
-<span class="sd">    denoting derivatives, kappa=(Rayleigh * Prandl)**(-1/2) and nu = (Rayleigh / Prandl)**(-1/2). Everything on the left</span>
+<span class="sd">    denoting derivatives, kappa=(Rayleigh * Prandtl)**(-1/2) and nu = (Rayleigh / Prandtl)**(-1/2). Everything on the left</span>
 <span class="sd">    hand side, that is the viscous part, the pressure gradient and the buoyancy due to temperature are treated</span>
 <span class="sd">    implicitly, while the non-linear convection part on the right hand side is integrated explicitly.</span>
 
@@ -77,7 +78,7 @@
 <span class="sd">    facilitate the Dirichlet BCs.</span>
 
 <span class="sd">    Parameters:</span>
-<span class="sd">        Prandl (float): Prandl number</span>
+<span class="sd">        Prandtl (float): Prandtl number</span>
 <span class="sd">        Rayleigh (float): Rayleigh number</span>
 <span class="sd">        nx (int): Horizontal resolution</span>
 <span class="sd">        nz (int): Vertical resolution</span>
@@ -91,26 +92,28 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">Prandl</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">Prandtl</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">Rayleigh</span><span class="o">=</span><span class="mf">2e6</span><span class="p">,</span>
         <span class="n">nx</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
         <span class="n">nz</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
         <span class="n">BCs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">dealiasing</span><span class="o">=</span><span class="mi">3</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
         <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">Lx</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor. `kwargs` are forwarded to parent class constructor.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            Prandl (float): Prandtl number</span>
+<span class="sd">            Prandtl (float): Prandtl number</span>
 <span class="sd">            Rayleigh (float): Rayleigh number</span>
 <span class="sd">            nx (int): Resolution in x-direction</span>
 <span class="sd">            nz (int): Resolution in z direction</span>
 <span class="sd">            BCs (dict): Vertical boundary conditions</span>
 <span class="sd">            dealiasing (float): Dealiasing for evaluating the non-linear part in real space</span>
 <span class="sd">            comm (mpi4py.Intracomm): Space communicator</span>
+<span class="sd">            Lx (float): Horizontal length of the domain</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">BCs</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">BCs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">BCs</span>
         <span class="n">BCs</span> <span class="o">=</span> <span class="p">{</span>
@@ -131,18 +134,19 @@
             <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
                 <span class="k">pass</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
-            <span class="s1">&#39;Prandl&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Prandtl&#39;</span><span class="p">,</span>
             <span class="s1">&#39;Rayleigh&#39;</span><span class="p">,</span>
             <span class="s1">&#39;nx&#39;</span><span class="p">,</span>
             <span class="s1">&#39;nz&#39;</span><span class="p">,</span>
             <span class="s1">&#39;BCs&#39;</span><span class="p">,</span>
             <span class="s1">&#39;dealiasing&#39;</span><span class="p">,</span>
             <span class="s1">&#39;comm&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Lx&#39;</span><span class="p">,</span>
             <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span>
             <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="n">bases</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="s1">&#39;fft&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="p">,</span> <span class="s1">&#39;x0&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;x1&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="s1">&#39;ultraspherical&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">nz</span><span class="p">}]</span>
+        <span class="n">bases</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="s1">&#39;fft&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="p">,</span> <span class="s1">&#39;x0&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;x1&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Lx</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="s1">&#39;ultraspherical&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">nz</span><span class="p">}]</span>
         <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">]</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">bases</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -168,15 +172,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">Dz</span> <span class="o">=</span> <span class="n">S1</span> <span class="o">@</span> <span class="n">Dz</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Dzz</span> <span class="o">=</span> <span class="n">S2</span> <span class="o">@</span> <span class="n">Dzz</span>
 
-        <span class="n">kappa</span> <span class="o">=</span> <span class="p">(</span><span class="n">Rayleigh</span> <span class="o">*</span> <span class="n">Prandl</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
-        <span class="n">nu</span> <span class="o">=</span> <span class="p">(</span><span class="n">Rayleigh</span> <span class="o">/</span> <span class="n">Prandl</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+        <span class="c1"># compute rescaled Rayleigh number to extract viscosity and thermal diffusivity</span>
+        <span class="n">Ra</span> <span class="o">=</span> <span class="n">Rayleigh</span> <span class="o">/</span> <span class="p">(</span><span class="nb">max</span><span class="p">([</span><span class="nb">abs</span><span class="p">(</span><span class="n">BCs</span><span class="p">[</span><span class="s1">&#39;T_top&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">BCs</span><span class="p">[</span><span class="s1">&#39;T_bottom&#39;</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">L</span> <span class="o">**</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kappa</span> <span class="o">=</span> <span class="p">(</span><span class="n">Ra</span> <span class="o">*</span> <span class="n">Prandtl</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">=</span> <span class="p">(</span><span class="n">Ra</span> <span class="o">/</span> <span class="n">Prandtl</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
 
         <span class="c1"># construct operators</span>
         <span class="n">L_lhs</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="n">U01</span> <span class="o">@</span> <span class="n">Dx</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="n">Dz</span><span class="p">},</span>  <span class="c1"># divergence free constraint</span>
-            <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">U02</span> <span class="o">@</span> <span class="n">Dx</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">nu</span> <span class="o">*</span> <span class="p">(</span><span class="n">U02</span> <span class="o">@</span> <span class="n">Dxx</span> <span class="o">+</span> <span class="n">Dzz</span><span class="p">)},</span>
-            <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">U12</span> <span class="o">@</span> <span class="n">Dz</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">nu</span> <span class="o">*</span> <span class="p">(</span><span class="n">U02</span> <span class="o">@</span> <span class="n">Dxx</span> <span class="o">+</span> <span class="n">Dzz</span><span class="p">),</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">U02</span> <span class="o">@</span> <span class="n">Id</span><span class="p">},</span>
-            <span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">kappa</span> <span class="o">*</span> <span class="p">(</span><span class="n">U02</span> <span class="o">@</span> <span class="n">Dxx</span> <span class="o">+</span> <span class="n">Dzz</span><span class="p">)},</span>
+            <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">U02</span> <span class="o">@</span> <span class="n">Dx</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="p">(</span><span class="n">U02</span> <span class="o">@</span> <span class="n">Dxx</span> <span class="o">+</span> <span class="n">Dzz</span><span class="p">)},</span>
+            <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">U12</span> <span class="o">@</span> <span class="n">Dz</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="p">(</span><span class="n">U02</span> <span class="o">@</span> <span class="n">Dxx</span> <span class="o">+</span> <span class="n">Dzz</span><span class="p">),</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">U02</span> <span class="o">@</span> <span class="n">Id</span><span class="p">},</span>
+            <span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">kappa</span> <span class="o">*</span> <span class="p">(</span><span class="n">U02</span> <span class="o">@</span> <span class="n">Dxx</span> <span class="o">+</span> <span class="n">Dzz</span><span class="p">)},</span>
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setup_L</span><span class="p">(</span><span class="n">L_lhs</span><span class="p">)</span>
 
@@ -215,6 +221,8 @@
                     <span class="n">component</span><span class="o">=</span><span class="n">component</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="n">component</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Nyquist&#39;</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">Nyquist_mode_index</span><span class="p">),</span> <span class="n">v</span><span class="o">=</span><span class="mi">0</span>
                 <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setup_BCs</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
 
 <div class="viewcode-block" id="RayleighBenard.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.eval_f">[docs]</a>
@@ -268,6 +276,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">fexpl_pad</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">))</span><span class="o">.</span><span class="n">real</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
 

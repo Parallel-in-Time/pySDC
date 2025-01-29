@@ -1061,6 +1061,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">BCs</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">fft_cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fft_dealias_shape_cache</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">u_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1703,7 +1704,9 @@
 
             <span class="k">if</span> <span class="n">padding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;forward&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">padding</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_dealias_shape_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_dealias_shape_cache</span><span class="p">[(</span><span class="s1">&#39;forward&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">padding</span><span class="p">)]</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">:</span>
                     <span class="n">send_buf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                     <span class="n">recv_buf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Allreduce</span><span class="p">(</span><span class="n">send_buf</span><span class="p">,</span> <span class="n">recv_buf</span><span class="p">)</span>
@@ -1884,7 +1887,9 @@
             <span class="k">if</span> <span class="n">padding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">padding</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;backward&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">padding</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_dealias_shape_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_dealias_shape_cache</span><span class="p">[(</span><span class="s1">&#39;backward&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">padding</span><span class="p">)]</span>
+                    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">:</span>
                         <span class="n">send_buf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                         <span class="n">recv_buf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Allreduce</span><span class="p">(</span><span class="n">send_buf</span><span class="p">,</span> <span class="n">recv_buf</span><span class="p">)</span>
@@ -1998,8 +2003,6 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-        <span class="n">fft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fft</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">if</span> <span class="n">fft</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">fft</span>
-
         <span class="n">global_fft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fft</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">axisA</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span><span class="o">.</span><span class="n">axisA</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">global_fft</span><span class="o">.</span><span class="n">transfer</span><span class="p">]</span>
         <span class="n">axisB</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span><span class="o">.</span><span class="n">axisB</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">global_fft</span><span class="o">.</span><span class="n">transfer</span><span class="p">]</span>
@@ -2036,6 +2039,8 @@
             <span class="k">return</span> <span class="n">u</span>
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># go the potentially slower route of not reusing transfer classes</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py_fft</span><span class="w"> </span><span class="kn">import</span> <span class="n">newDistArray</span>
+
+            <span class="n">fft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fft</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">if</span> <span class="n">fft</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">fft</span>
 
             <span class="n">_in</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="n">fft</span><span class="p">,</span> <span class="n">forward</span><span class="p">)</span><span class="o">.</span><span class="n">redistribute</span><span class="p">(</span><span class="n">axis_in</span><span class="p">)</span>
             <span class="n">_in</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span>

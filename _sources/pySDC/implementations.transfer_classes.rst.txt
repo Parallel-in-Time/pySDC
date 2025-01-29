@@ -10,6 +10,7 @@ Submodules
    implementations.transfer_classes.BaseTransferMPI
    implementations.transfer_classes.BaseTransfer_mass
    implementations.transfer_classes.TransferFenicsMesh
+   implementations.transfer_classes.TransferFiredrakeMesh
    implementations.transfer_classes.TransferMesh
    implementations.transfer_classes.TransferMesh_FFT
    implementations.transfer_classes.TransferMesh_FFT2D
