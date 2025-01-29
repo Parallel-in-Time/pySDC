@@ -1,5 +1,5 @@
 module --force purge
-module load Stages/2024
+module load Stages/2025
 module load GCC
 module load ParaStationMPI
 module load NCCL

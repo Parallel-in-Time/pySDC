@@ -28,7 +28,7 @@ prepare_JUWELS:
   script:
     - mkdir -p benchmarks
     - module --force purge
-    - module load Stages/2024
+    - module load Stages/2025
     - module load GCC
     - module load OpenMPI
     - module load FFTW
@@ -43,7 +43,7 @@ prepare_JUWELS:
     - git submodule add -f https://github.com/brownbaerchen/mpi4py-fft.git
     - cd mpi4py-fft
     - git checkout cupy_implementation
-    - FFTW_LIBRARY_DIR="/p/software/juwels/stages/2024/software/FFTW/3.3.10-GCC-12.3.0/lib64" pip install --force-reinstall .
+    - FFTW_LIBRARY_DIR="/p/software/juwels/stages/2025/software/FFTW/3.3.10-GCC-13.3.0/lib64" pip install --force-reinstall .
     - cd ../
 
 
@@ -78,7 +78,7 @@ test_JUWELS:
   before_script:
     - mkdir -p benchmarks
     - module --force purge
-    - module load Stages/2024
+    - module load Stages/2025
     - module load GCC
     - module load OpenMPI
     - module load FFTW
