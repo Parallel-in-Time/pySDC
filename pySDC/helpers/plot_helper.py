@@ -42,6 +42,7 @@ def figsize_by_journal(journal, scale, ratio):  # pragma: no cover
     textwidths = {
         'JSC_beamer': 426.79135,
         'Springer_Numerical_Algorithms': 338.58778,
+        'Springer_proceedings': 347.12354,
         'JSC_thesis': 434.26027,
         'TUHH_thesis': 426.79135,
     }
@@ -50,6 +51,7 @@ def figsize_by_journal(journal, scale, ratio):  # pragma: no cover
         'JSC_beamer': 214.43411,
         'JSC_thesis': 635.5,
         'TUHH_thesis': 631.65118,
+        'Springer_proceedings': 549.13828,
     }
     assert (
         journal in textwidths.keys()
