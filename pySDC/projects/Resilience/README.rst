@@ -43,13 +43,26 @@ You can see the results below, except for the solution, which looks the same as 
 
 Reproduction of the plots in the adaptive SDC paper
 ---------------------------------------------------
-To reproduce the plots you need to install pySDC with all packages in the mpi4py environment.
-Then, navigate to this directory, `pySDC/projects/Resilience/` and run the following commands:
-
+To reproduce the plots you need to install pySDC using this project's `environment.yml` file, which is in the same directory as this README.
+Then, run the following commands in the same directory:
  
 .. code-block:: bash
  
-    mpirun -np 4 python work_precision.py
+    mpirun -np 4 python work_precision.py --mode=compare_strategies --problem=vdp
+    mpirun -np 4 python work_precision.py --mode=compare_strategies --problem=quench
+    mpirun -np 4 python work_precision.py --mode=compare_strategies --problem=Schroedinger
+    mpirun -np 4 python work_precision.py --mode=compare_strategies --problem=AC
+
+    mpirun -np 12 python work_precision.py --mode=parallel_efficiency --problem=vdp
+    mpirun -np 12 python work_precision.py --mode=parallel_efficiency --problem=quench
+    mpirun -np 12 python work_precision.py --mode=parallel_efficiency --problem=Schroedinger
+    mpirun -np 12 python work_precision.py --mode=parallel_efficiency --problem=AC
+
+    mpirun -np 4 python work_precision.py --mode=RK_comp --problem=vdp
+    mpirun -np 4 python work_precision.py --mode=RK_comp --problem=quench
+    mpirun -np 4 python work_precision.py --mode=RK_comp --problem=Schroedinger
+    mpirun -np 4 python work_precision.py --mode=RK_comp --problem=AC
+
     python paper_plots.py --target=adaptivity
 
 Possibly, you need to create some directories in this one to store and load things, if path errors occur.
@@ -57,10 +70,10 @@ Possibly, you need to create some directories in this one to store and load thin
 Reproduction of the plots in the resilience paper
 -------------------------------------------------
 To reproduce the plots you need to install pySDC using this project's `environment.yml` file, which is in the same directory as this README.
+Then, run the following commands in the same directory:
 
 .. code-block:: bash
  
-    mpirun -np 4 python work_precision.py
     mpirun -np 4 python fault_stats.py prob run_Lorenz
     mpirun -np 4 python fault_stats.py prob run_Schroedinger
     mpirun -np 4 python fault_stats.py prob run_AC
@@ -68,3 +81,34 @@ To reproduce the plots you need to install pySDC using this project's `environme
     python paper_plots.py --target=resilience
 
 Please be aware that generating the fault data for Rayleigh-Benard requires generating reference solutions, which may take several hours.
+
+Reproduction of the plots in Thomas Baumann's thesis
+----------------------------------------------------
+To reproduce the plots you need to install pySDC using this project's `environment.yml` file, which is in the same directory as this README.
+
+To run the resilience experiments, run
+
+.. code-block:: bash
+ 
+    mpirun -np 4 python fault_stats.py prob run_Lorenz
+    mpirun -np 4 python fault_stats.py prob run_vdp
+    mpirun -np 4 python fault_stats.py prob run_GS
+    mpirun -np 4 python fault_stats.py prob run_RBC
+
+Please be aware that generating the fault data for Rayleigh-Benard requires generating reference solutions, which may take several hours.
+To run the experiments on computational efficiency, run for the choices of problems `vdp`, `Lorenz``, `GS`, `RBC` the following commands
+
+.. code-block:: bash
+
+   mpirun -np 4 python work_precision.py --mode=compare_strategies --problem=<problem>
+   mpirun -np 12 python work_precision.py --mode=parallel_efficiency_dt_k --problem=<problem>
+   mpirun -np 12 python work_precision.py --mode=parallel_efficiency_dt --problem=<problem>
+   mpirun -np 12 python work_precision.py --mode=RK_comp --problem=<problem>
+
+After you ran all experiments, you can generate the plots with the following command:
+
+.. code-block:: bash
+
+   python paper_plots.py --target=thesis
+
+As this plotting script also runs a few additional smaller experiments, do not be surprised if it takes a while.
