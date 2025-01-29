@@ -79,9 +79,23 @@ You can see the results below, except for the solution, which looks the same as 
 </section>
 <section id="reproduction-of-the-plots-in-the-adaptive-sdc-paper">
 <h2>Reproduction of the plots in the adaptive SDC paper<a class="headerlink" href="#reproduction-of-the-plots-in-the-adaptive-sdc-paper" title="Link to this heading">¶</a></h2>
-<p>To reproduce the plots you need to install pySDC with all packages in the mpi4py environment.
-Then, navigate to this directory, <cite>pySDC/projects/Resilience/</cite> and run the following commands:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>work_precision.py
+<p>To reproduce the plots you need to install pySDC using this project’s <cite>environment.yml</cite> file, which is in the same directory as this README.
+Then, run the following commands in the same directory:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>work_precision.py<span class="w"> </span>--mode<span class="o">=</span>compare_strategies<span class="w"> </span>--problem<span class="o">=</span>vdp
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>work_precision.py<span class="w"> </span>--mode<span class="o">=</span>compare_strategies<span class="w"> </span>--problem<span class="o">=</span>quench
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>work_precision.py<span class="w"> </span>--mode<span class="o">=</span>compare_strategies<span class="w"> </span>--problem<span class="o">=</span>Schroedinger
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>work_precision.py<span class="w"> </span>--mode<span class="o">=</span>compare_strategies<span class="w"> </span>--problem<span class="o">=</span>AC
+
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">12</span><span class="w"> </span>python<span class="w"> </span>work_precision.py<span class="w"> </span>--mode<span class="o">=</span>parallel_efficiency<span class="w"> </span>--problem<span class="o">=</span>vdp
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">12</span><span class="w"> </span>python<span class="w"> </span>work_precision.py<span class="w"> </span>--mode<span class="o">=</span>parallel_efficiency<span class="w"> </span>--problem<span class="o">=</span>quench
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">12</span><span class="w"> </span>python<span class="w"> </span>work_precision.py<span class="w"> </span>--mode<span class="o">=</span>parallel_efficiency<span class="w"> </span>--problem<span class="o">=</span>Schroedinger
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">12</span><span class="w"> </span>python<span class="w"> </span>work_precision.py<span class="w"> </span>--mode<span class="o">=</span>parallel_efficiency<span class="w"> </span>--problem<span class="o">=</span>AC
+
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>work_precision.py<span class="w"> </span>--mode<span class="o">=</span>RK_comp<span class="w"> </span>--problem<span class="o">=</span>vdp
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>work_precision.py<span class="w"> </span>--mode<span class="o">=</span>RK_comp<span class="w"> </span>--problem<span class="o">=</span>quench
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>work_precision.py<span class="w"> </span>--mode<span class="o">=</span>RK_comp<span class="w"> </span>--problem<span class="o">=</span>Schroedinger
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>work_precision.py<span class="w"> </span>--mode<span class="o">=</span>RK_comp<span class="w"> </span>--problem<span class="o">=</span>AC
+
 python<span class="w"> </span>paper_plots.py<span class="w"> </span>--target<span class="o">=</span>adaptivity
 </pre></div>
 </div>
@@ -89,9 +103,9 @@ python<span class="w"> </span>paper_plots.py<span class="w"> </span>--target<spa
 </section>
 <section id="reproduction-of-the-plots-in-the-resilience-paper">
 <h2>Reproduction of the plots in the resilience paper<a class="headerlink" href="#reproduction-of-the-plots-in-the-resilience-paper" title="Link to this heading">¶</a></h2>
-<p>To reproduce the plots you need to install pySDC using this project’s <cite>environment.yml</cite> file, which is in the same directory as this README.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>work_precision.py
-mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>fault_stats.py<span class="w"> </span>prob<span class="w"> </span>run_Lorenz
+<p>To reproduce the plots you need to install pySDC using this project’s <cite>environment.yml</cite> file, which is in the same directory as this README.
+Then, run the following commands in the same directory:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>fault_stats.py<span class="w"> </span>prob<span class="w"> </span>run_Lorenz
 mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>fault_stats.py<span class="w"> </span>prob<span class="w"> </span>run_Schroedinger
 mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>fault_stats.py<span class="w"> </span>prob<span class="w"> </span>run_AC
 mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>fault_stats.py<span class="w"> </span>prob<span class="w"> </span>run_RBC
@@ -99,6 +113,30 @@ python<span class="w"> </span>paper_plots.py<span class="w"> </span>--target<spa
 </pre></div>
 </div>
 <p>Please be aware that generating the fault data for Rayleigh-Benard requires generating reference solutions, which may take several hours.</p>
+</section>
+<section id="reproduction-of-the-plots-in-thomas-baumann-s-thesis">
+<h2>Reproduction of the plots in Thomas Baumann’s thesis<a class="headerlink" href="#reproduction-of-the-plots-in-thomas-baumann-s-thesis" title="Link to this heading">¶</a></h2>
+<p>To reproduce the plots you need to install pySDC using this project’s <cite>environment.yml</cite> file, which is in the same directory as this README.</p>
+<p>To run the resilience experiments, run</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>fault_stats.py<span class="w"> </span>prob<span class="w"> </span>run_Lorenz
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>fault_stats.py<span class="w"> </span>prob<span class="w"> </span>run_vdp
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>fault_stats.py<span class="w"> </span>prob<span class="w"> </span>run_GS
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>fault_stats.py<span class="w"> </span>prob<span class="w"> </span>run_RBC
+</pre></div>
+</div>
+<p>Please be aware that generating the fault data for Rayleigh-Benard requires generating reference solutions, which may take several hours.
+To run the experiments on computational efficiency, run for the choices of problems <cite>vdp</cite>, <cite>Lorenz`</cite>, <cite>GS</cite>, <cite>RBC</cite> the following commands</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>work_precision.py<span class="w"> </span>--mode<span class="o">=</span>compare_strategies<span class="w"> </span>--problem<span class="o">=</span>&lt;problem&gt;
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">12</span><span class="w"> </span>python<span class="w"> </span>work_precision.py<span class="w"> </span>--mode<span class="o">=</span>parallel_efficiency_dt_k<span class="w"> </span>--problem<span class="o">=</span>&lt;problem&gt;
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">12</span><span class="w"> </span>python<span class="w"> </span>work_precision.py<span class="w"> </span>--mode<span class="o">=</span>parallel_efficiency_dt<span class="w"> </span>--problem<span class="o">=</span>&lt;problem&gt;
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">12</span><span class="w"> </span>python<span class="w"> </span>work_precision.py<span class="w"> </span>--mode<span class="o">=</span>RK_comp<span class="w"> </span>--problem<span class="o">=</span>&lt;problem&gt;
+</pre></div>
+</div>
+<p>After you ran all experiments, you can generate the plots with the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>paper_plots.py<span class="w"> </span>--target<span class="o">=</span>thesis
+</pre></div>
+</div>
+<p>As this plotting script also runs a few additional smaller experiments, do not be surprised if it takes a while.</p>
 </section>
 </section>
 
@@ -116,6 +154,7 @@ python<span class="w"> </span>paper_plots.py<span class="w"> </span>--target<spa
 <li><a class="reference internal" href="#tests">Tests</a></li>
 <li><a class="reference internal" href="#reproduction-of-the-plots-in-the-adaptive-sdc-paper">Reproduction of the plots in the adaptive SDC paper</a></li>
 <li><a class="reference internal" href="#reproduction-of-the-plots-in-the-resilience-paper">Reproduction of the plots in the resilience paper</a></li>
+<li><a class="reference internal" href="#reproduction-of-the-plots-in-thomas-baumann-s-thesis">Reproduction of the plots in Thomas Baumann’s thesis</a></li>
 </ul>
 </li>
 </ul>

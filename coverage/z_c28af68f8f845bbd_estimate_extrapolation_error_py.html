@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">157 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">153<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">4<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">152<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">5<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">8<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_c28af68f8f845bbd_estimate_polynomial_error_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.10">coverage.py v7.6.10</a>,
-            created at 2025-01-29 09:58 +0000
+            created at 2025-01-29 13:32 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -556,7 +556,7 @@
     <p class="pln"><span class="n"><a id="t474" href="#t474">474</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t475" href="#t475">475</a></span><span class="t">        <span class="com"># compute the extrapolated solution</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t476" href="#t476">476</a></span><span class="t">        <span class="key">if</span> <span class="nam">lvl</span><span class="op">.</span><span class="nam">f</span><span class="op">[</span><span class="num">0</span><span class="op">]</span> <span class="key">is</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t477" href="#t477">477</a></span><span class="t">            <span class="nam">lvl</span><span class="op">.</span><span class="nam">f</span><span class="op">[</span><span class="num">0</span><span class="op">]</span> <span class="op">=</span> <span class="nam">lvl</span><span class="op">.</span><span class="nam">prob</span><span class="op">.</span><span class="nam">eval_f</span><span class="op">(</span><span class="nam">lvl</span><span class="op">.</span><span class="nam">u</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">,</span> <span class="nam">lvl</span><span class="op">.</span><span class="nam">time</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t477" href="#t477">477</a></span><span class="t">            <span class="nam">lvl</span><span class="op">.</span><span class="nam">f</span><span class="op">[</span><span class="num">0</span><span class="op">]</span> <span class="op">=</span> <span class="nam">lvl</span><span class="op">.</span><span class="nam">prob</span><span class="op">.</span><span class="nam">eval_f</span><span class="op">(</span><span class="nam">lvl</span><span class="op">.</span><span class="nam">u</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">,</span> <span class="nam">lvl</span><span class="op">.</span><span class="nam">time</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t478" href="#t478">478</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t479" href="#t479">479</a></span><span class="t">        <span class="key">if</span> <span class="nam">type</span><span class="op">(</span><span class="nam">lvl</span><span class="op">.</span><span class="nam">f</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">)</span> <span class="op">==</span> <span class="nam">imex_mesh</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t480" href="#t480">480</a></span><span class="t">            <span class="nam">f</span> <span class="op">=</span> <span class="op">[</span><span class="nam">lvl</span><span class="op">.</span><span class="nam">f</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">.</span><span class="nam">impl</span> <span class="op">+</span> <span class="nam">lvl</span><span class="op">.</span><span class="nam">f</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">.</span><span class="nam">expl</span> <span class="key">if</span> <span class="nam">self</span><span class="op">.</span><span class="nam">coeff</span><span class="op">.</span><span class="nam">f</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span> <span class="key">and</span> <span class="nam">lvl</span><span class="op">.</span><span class="nam">f</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span> <span class="key">else</span> <span class="num">0.0</span> <span class="key">for</span> <span class="nam">i</span> <span class="key">in</span> <span class="nam">range</span><span class="op">(</span><span class="nam">len</span><span class="op">(</span><span class="nam">lvl</span><span class="op">.</span><span class="nam">f</span><span class="op">)</span> <span class="op">-</span> <span class="num">1</span><span class="op">)</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
@@ -599,7 +599,7 @@
             <a class="nav" href="z_c28af68f8f845bbd_estimate_polynomial_error_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.10">coverage.py v7.6.10</a>,
-            created at 2025-01-29 09:58 +0000
+            created at 2025-01-29 13:32 +0000
         </p>
     </div>
 </footer>
