@@ -291,7 +291,6 @@ def test_pySDC_integrator_RK(use_transport_scheme, method, setup):
     stepper_pySDC = get_gusto_stepper(
         eqns,
         pySDC_integrator(
-            eqns,
             description,
             controller_params,
             domain,
@@ -415,7 +414,6 @@ def test_pySDC_integrator(use_transport_scheme, imex, setup):
     stepper_pySDC = get_gusto_stepper(
         eqns,
         pySDC_integrator(
-            eqns,
             description,
             controller_params,
             domain,
@@ -550,7 +548,6 @@ def test_pySDC_integrator_with_adaptivity(dt_initial, setup):
     stepper_pySDC = get_gusto_stepper(
         eqns,
         pySDC_integrator(
-            eqns,
             description,
             controller_params,
             domain,

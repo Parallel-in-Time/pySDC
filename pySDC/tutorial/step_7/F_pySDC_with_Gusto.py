@@ -61,6 +61,8 @@ williamson_5_defaults = {
     'kmax': '5',  # use fixed number of iteration up to this value
     'use_pySDC': True,  # whether to use pySDC for time integration
     'use_adaptivity': True,  # whether to use adaptive step size selection
+    'Nlevels': 1,  # number of levels in SDC
+    'logger_level': 15,  # pySDC logger level
 }
 
 
@@ -76,7 +78,10 @@ def williamson_5(
     kmax=williamson_5_defaults['kmax'],
     use_pySDC=williamson_5_defaults['use_pySDC'],
     use_adaptivity=williamson_5_defaults['use_adaptivity'],
+    Nlevels=williamson_5_defaults['Nlevels'],
+    logger_level=williamson_5_defaults['logger_level'],
     mesh=None,
+    _ML_is_setup=True,
 ):
     """
     Run the Williamson 5 test case.
@@ -91,9 +96,15 @@ def williamson_5(
         M (int): Number of collocation nodes
         kmax (int): Max number of SDC iterations
         use_pySDC (bool): Use pySDC as Gusto time integrator or Gusto SDC implementation
+        Nlevels (int): Number of SDC levels
+        logger_level (int): Logger level
     """
     if not use_pySDC and use_adaptivity:
         raise NotImplementedError('Adaptive step size selection not yet implemented in Gusto')
+    if not use_pySDC and Nlevels > 1:
+        raise NotImplementedError('Multi-level SDC not yet implemented in Gusto')
+    if time_parallelism and Nlevels > 1:
+        raise NotImplementedError('Multi-level SDC does not work with MPI parallel sweeper yet')
 
     # ------------------------------------------------------------------------ #
     # Parameters for test case
@@ -133,6 +144,9 @@ def williamson_5(
 
     # Domain
     mesh = GeneralIcosahedralSphereMesh(radius, ncells_per_edge, degree=2, comm=space_comm) if mesh is None else mesh
+    if Nlevels > 1:
+        hierarchy = fd.MeshHierarchy(mesh, Nlevels - 1)
+        mesh = hierarchy[-1]
     domain = Domain(mesh, dt, 'BDM', element_order)
     x, y, z = SpatialCoordinate(mesh)
     lamda, phi, _ = lonlatr_from_xyz(x, y, z)
@@ -200,7 +214,7 @@ def williamson_5(
         convergence_controllers[SpreadStepSizesBlockwiseNonMPI] = {'overwrite_to_reach_Tend': False}
 
     controller_params = dict()
-    controller_params['logger_level'] = 15 if fd.COMM_WORLD.rank == 0 else 30
+    controller_params['logger_level'] = logger_level if fd.COMM_WORLD.rank == 0 else 30
     controller_params['mssdc_jac'] = False
 
     description = dict()
@@ -210,6 +224,10 @@ def williamson_5(
     description['level_params'] = level_params
     description['step_params'] = step_params
     description['convergence_controllers'] = convergence_controllers
+
+    from pySDC.implementations.transfer_classes.TransferFiredrakeMesh import MeshToMeshFiredrakeHierarchy
+
+    description['space_transfer_class'] = MeshToMeshFiredrakeHierarchy
 
     # ------------------------------------------------------------------------ #
     # petsc solver parameters
@@ -254,17 +272,51 @@ def williamson_5(
     # ------------------------------------------------------------------------ #
 
     if use_pySDC:
-        method = pySDC_integrator(
-            eqns, description, controller_params, domain=domain, solver_parameters=solver_parameters
-        )
+        method = pySDC_integrator(description, controller_params, domain=domain, solver_parameters=solver_parameters)
     else:
         method = SDC(**SDC_params, domain=domain)
 
     stepper = Timestepper(eqns, method, io, spatial_methods=transport_methods)
 
-    if use_pySDC and use_adaptivity:
-        # we have to do this for adaptive time stepping, because it is a bit of a mess
-        method.timestepper = stepper
+    # ------------------------------------------------------------------------ #
+    # Setup multi-level SDC
+    # ------------------------------------------------------------------------ #
+
+    if not _ML_is_setup:
+        return stepper
+
+    if Nlevels > 1:
+        steppers = [
+            None,
+        ] * (Nlevels)
+        steppers[0] = stepper
+
+        # get different steppers on the different levels
+        # recall that the setup of the problems is only finished when the stepper is setup
+        for i in range(1, Nlevels):
+            steppers[i] = williamson_5(
+                ncells_per_edge=ncells_per_edge,
+                dt=dt,
+                tmax=tmax,
+                dumpfreq=dumpfreq,
+                dirname=f'{dirname}_unused_{i}',
+                time_parallelism=time_parallelism,
+                QI=QI,
+                M=M,
+                kmax=kmax,
+                use_pySDC=use_pySDC,
+                use_adaptivity=use_adaptivity,
+                Nlevels=1,
+                mesh=hierarchy[-i - 1],  # mind that the finest level in pySDC is 0, but -1 in hierarchy
+                logger_level=50,
+                _ML_is_setup=False,
+            )
+
+        # update description and setup pySDC again with the discretizations from different steppers
+        description['problem_params']['residual'] = [me.scheme.residual for me in steppers]
+        description['problem_params']['equation'] = [me.scheme.equation for me in steppers]
+        method = pySDC_integrator(description, controller_params, domain=domain, solver_parameters=solver_parameters)
+        stepper = Timestepper(eqns, method, io, spatial_methods=transport_methods)
 
     # ------------------------------------------------------------------------ #
     # Initial conditions
@@ -284,6 +336,10 @@ def williamson_5(
     # ------------------------------------------------------------------------ #
     # Run
     # ------------------------------------------------------------------------ #
+
+    if use_pySDC and use_adaptivity:
+        # we have to do this for adaptive time stepping, because it is a bit of a mess
+        method.timestepper = stepper
 
     stepper.run(t=0, tmax=tmax)
     return stepper, mesh
@@ -337,6 +393,12 @@ if __name__ == "__main__":
         default=williamson_5_defaults['use_adaptivity'],
     )
     parser.add_argument('--QI', help='Implicit preconditioner', type=str, default=williamson_5_defaults['QI'])
+    parser.add_argument(
+        '--Nlevels',
+        help="Number of SDC levels.",
+        type=int,
+        default=williamson_5_defaults['Nlevels'],
+    )
     args, unknown = parser.parse_known_args()
 
     options = vars(args)

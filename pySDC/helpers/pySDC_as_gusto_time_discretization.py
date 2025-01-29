@@ -38,7 +38,6 @@ class pySDC_integrator(TimeDiscretisation):
 
     def __init__(
         self,
-        equation,
         description,
         controller_params,
         domain,
@@ -52,7 +51,6 @@ class pySDC_integrator(TimeDiscretisation):
         Initialization
 
         Args:
-            equation (:class:`PrognosticEquation`): the prognostic equation.
             description (dict): pySDC description
             controller_params (dict): pySDC controller params
             domain (:class:`Domain`): the model's domain object, containing the
@@ -96,6 +94,7 @@ class pySDC_integrator(TimeDiscretisation):
             'equation': equation,
             'solver_parameters': self.solver_parameters,
             'residual': self._residual,
+            **self.description['problem_params'],
         }
         self.description['level_params']['dt'] = float(self.domain.dt)
 
