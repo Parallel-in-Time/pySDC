@@ -33,7 +33,6 @@ prepare_JUWELS:
     - module load OpenMPI
     - module load FFTW
     - module load mpi4py
-    - module load SciPy-Stack
     - module load CuPy
     - jutil env activate -p ${JUWELS_PROJECT}
     - python -m venv --clear $SCRATCH/.venv/pySDC
