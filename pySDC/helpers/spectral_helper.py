@@ -882,6 +882,7 @@ class SpectralHelper:
         self.BCs = None
 
         self.fft_cache = {}
+        self.fft_dealias_shape_cache = {}
 
     @property
     def u_init(self):
@@ -1470,7 +1471,9 @@ class SpectralHelper:
 
             if padding is not None:
                 shape = list(v.shape)
-                if self.comm:
+                if ('forward', *padding) in self.fft_dealias_shape_cache.keys():
+                    shape[0] = self.fft_dealias_shape_cache[('forward', *padding)]
+                elif self.comm:
                     send_buf = np.array(v.shape[0])
                     recv_buf = np.array(v.shape[0])
                     self.comm.Allreduce(send_buf, recv_buf)
@@ -1645,7 +1648,9 @@ class SpectralHelper:
             if padding is not None:
                 if padding[axis] != 1:
                     shape = list(v.shape)
-                    if self.comm:
+                    if ('backward', *padding) in self.fft_dealias_shape_cache.keys():
+                        shape[0] = self.fft_dealias_shape_cache[('backward', *padding)]
+                    elif self.comm:
                         send_buf = np.array(v.shape[0])
                         recv_buf = np.array(v.shape[0])
                         self.comm.Allreduce(send_buf, recv_buf)
@@ -1754,8 +1759,6 @@ class SpectralHelper:
         if self.comm.size == 1:
             return u.copy()
 
-        fft = self.get_fft(**kwargs) if fft is None else fft
-
         global_fft = self.get_fft(**kwargs)
         axisA = [me.axisA for me in global_fft.transfer]
         axisB = [me.axisB for me in global_fft.transfer]
@@ -1792,6 +1795,8 @@ class SpectralHelper:
             return u
         else:  # go the potentially slower route of not reusing transfer classes
             from mpi4py_fft import newDistArray
+
+            fft = self.get_fft(**kwargs) if fft is None else fft
 
             _in = newDistArray(fft, forward).redistribute(axis_in)
             _in[...] = u
