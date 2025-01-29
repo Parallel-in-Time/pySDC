@@ -13,6 +13,7 @@ from pySDC.projects.Resilience.Schroedinger import run_Schroedinger
 from pySDC.projects.Resilience.quench import run_quench
 from pySDC.projects.Resilience.AC import run_AC
 from pySDC.projects.Resilience.RBC import run_RBC
+from pySDC.projects.Resilience.GS import run_GS
 
 from pySDC.helpers.stats_helper import get_sorted, filter_stats
 from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
@@ -22,6 +23,11 @@ LOGGER_LEVEL = 25
 LOG_TO_FILE = False
 
 logging.getLogger('matplotlib.texmanager').setLevel(90)
+
+Tends = {'run_RBC': 16.0, 'run_Lorenz': 2.0}
+t0s = {
+    'run_RBC': 10.0,
+}
 
 
 def std_log(x):
@@ -70,14 +76,6 @@ def get_forbidden_combinations(problem, strategy, **kwargs):
             return True
 
     return False
-
-
-Tends = {
-    'run_RBC': 16,
-}
-t0s = {
-    'run_RBC': 0.2,
-}
 
 
 def single_run(
@@ -161,7 +159,16 @@ def single_run(
     t_last = perf_counter()
 
     # record all the metrics
-    stats_all = filter_stats(stats, comm=comm_sweep)
+    if comm_sweep.size > 1:
+        try:
+            stats_all = filter_stats(stats, comm=comm_sweep)
+        except MPI.Exception:
+            for key in MAPPINGS.keys():
+                data[key] += [np.nan]
+            return stats
+
+    else:
+        stats_all = stats
     comm_sweep.Free()
 
     for key, mapping in MAPPINGS.items():
@@ -289,7 +296,13 @@ def record_work_precision(
             else:
                 exponents = [-3, -2, -1, 0, 0.2, 0.8, 1][::-1]
         if problem.__name__ == 'run_RBC':
-            exponents = [1, 0, -1, -2, -3, -4]
+            exponents = [1, 0, -0.5, -1, -2]
+        if problem.__name__ == 'run_GS':
+            exponents = [-2, -1, 0, 1, 2, 3][::-1]
+        if problem.__name__ == 'run_Lorenz':
+            exponents = [0, 1, 2, 3][::-1]
+            if type(strategy).__name__ in ["AdaptivityStrategy"]:
+                exponents = [0, 1, 2, 3, 4, 5][::-1]
     elif param == 'dt':
         power = 2.0
         exponents = [-1, 0, 1, 2, 3][::-1]
@@ -298,6 +311,9 @@ def record_work_precision(
         exponents = [-2, -1, 0, 1, 2, 3]
         if problem.__name__ == 'run_vdp':
             exponents = [-4, -3, -2, -1, 0, 1]
+    elif param == 'cfl':
+        power = 2
+        exponents = [-3, -2, -1, 0, 1]
     else:
         raise NotImplementedError(f"I don't know how to get default value for parameter \"{param}\"")
 
@@ -312,7 +328,13 @@ def record_work_precision(
             param_range = [1.25, 2.5, 5.0, 10.0, 20.0][::-1]
     if problem.__name__ == 'run_RBC':
         if param == 'dt':
-            param_range = [2e-1, 1e-1, 8e-2, 6e-2]
+            param_range = [8e-2, 6e-2, 4e-2, 3e-2, 2e-2]
+    if problem.__name__ == 'run_GS':
+        if param == 'dt':
+            param_range = [2, 1, 0.5, 0.1]
+    if problem.__name__ == 'run_Lorenz':
+        if param == 'dt':
+            param_range = [5e-2, 2e-2, 1e-2, 5e-3]
 
     # run multiple times with different parameters
     for i in range(len(param_range)):
@@ -495,6 +517,69 @@ def plot_work_precision(
         if meta.get('runs', None) == 1:
             ax.text(0.1, 0.2, "No sampling!", transform=ax.transAxes)
 
+    if problem.__name__ == 'run_vdp':
+        if mode == 'parallel_efficiency':
+            # ax.set_xticks([6e-1, 2e0])
+            ax.set_xticks(
+                ticks=[
+                    0.4,
+                    5e-1,
+                    6e-1,
+                    7e-1,
+                    8e-1,
+                    9e-1,
+                    2e0,
+                ],
+                labels=['']
+                + [r'$5\times 10^{-1}$']
+                + [
+                    '',
+                ]
+                * 4
+                + [r'$2\times 10^0$'],
+                minor=True,
+            )
+        elif mode == 'RK_comp':
+            ax.set_xticks(
+                ticks=[
+                    5e-1,
+                    6e-1,
+                    7e-1,
+                    8e-1,
+                    9e-1,
+                    2e0,
+                ],
+                labels=[r'$5\times 10^{-1}$']
+                + [
+                    '',
+                ]
+                * 4
+                + [r'$2\times 10^0$'],
+                minor=True,
+            )
+    elif problem.__name__ == 'run_quench':
+        if mode == 'RK_comp':
+            ax.set_xticks(
+                ticks=[
+                    0.2,
+                    0.3,
+                    0.4,
+                    5e-1,
+                    6e-1,
+                    7e-1,
+                    8e-1,
+                    9e-1,
+                    2e0,
+                ],
+                labels=['']
+                + [r'$3\times 10^{-1}$']
+                + [
+                    '',
+                ]
+                * 7,
+                minor=True,
+            )
+
 
 def plot_parallel_efficiency_diagonalSDC(
     ax, work_key, precision_key, num_procs_sweeper, num_procs=1, **kwargs
@@ -589,6 +674,8 @@ def decorate_panel(ax, problem, work_key, precision_key, num_procs=1, title_only
         'run_Schroedinger': r'Schr\"odinger',
         'run_quench': 'Quench',
         'run_AC': 'Allen-Cahn',
+        'run_RBC': 'Rayleigh-Benard',
+        'run_GS': 'Gray-Scott',
     }
     ax.set_title(titles.get(problem.__name__, ''))
 
@@ -788,8 +875,8 @@ def get_configs(mode, problem):
                 'sweeper_params': {'num_nodes': 3, 'quad_type': 'RADAU-RIGHT'},
             },
             'strategies': [
-                AdaptivityStrategy(useMPI=True),
                 BaseStrategy(useMPI=True),
+                AdaptivityStrategy(useMPI=True),
             ],
         }
 
@@ -803,55 +890,166 @@ def get_configs(mode, problem):
             ESDIRKStrategy,
             ARKStrategy,
             AdaptivityPolynomialError,
+            ARK3_CFL_Strategy,
         )
 
-        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC']:
+        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC', 'run_GS']:
             from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as parallel_sweeper
         else:
             from pySDC.implementations.sweeper_classes.generic_implicit_MPI import (
                 generic_implicit_MPI as parallel_sweeper,
             )
 
-        newton_inexactness = False if problem.__name__ in ['run_vdp', 'run_RBC'] else True
+        newton_inexactness = False if problem.__name__ in ['run_vdp', 'run_RBC', 'run_GS'] else True
 
         desc = {}
         desc['sweeper_params'] = {'num_nodes': 3, 'QI': 'IE', 'QE': "EE"}
         desc['step_params'] = {'maxiter': 5}
+        num_procs_dt = {
+            'run_RBC': 1,
+        }.get(problem.__name__, 4)
 
         desc_poly = {}
         desc_poly['sweeper_class'] = parallel_sweeper
+        num_procs_dt_k = 3
 
         ls = {
-            1: '-',
+            1: '--',
             2: '--',
-            3: '-.',
-            4: ':',
-            5: ':',
+            3: '-',
+            4: '-',
+            5: '-',
+            12: ':',
         }
         RK_strategies = []
         if problem.__name__ in ['run_Lorenz']:
             RK_strategies.append(ERKStrategy(useMPI=True))
-        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_RBC']:
+            desc_poly['sweeper_params'] = {'QI': 'MIN-SR-S', 'QE': 'PIC'}
+            desc['sweeper_params']['QI'] = 'MIN-SR-S'
+            desc['sweeper_params']['QE'] = 'PIC'
+        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_GS']:
             RK_strategies.append(ARKStrategy(useMPI=True))
+        elif problem.__name__ == 'run_RBC':
+            RK_strategies.append(ARK3_CFL_Strategy(useMPI=True))
+            desc['sweeper_params']['num_nodes'] = 2
+            desc['sweeper_params']['QI'] = 'LU'
+            desc['sweeper_params']['QE'] = 'PIC'
+            desc['step_params']['maxiter'] = 3
+
+            desc_poly['sweeper_params'] = {'num_nodes': 2, 'QI': 'MIN-SR-S'}
+            num_procs_dt_k = 2
         else:
             RK_strategies.append(ESDIRKStrategy(useMPI=True))
 
-        configurations[3] = {
-            'custom_description': desc_poly,
-            'strategies': [AdaptivityPolynomialError(useMPI=True, newton_inexactness=newton_inexactness)],
-            'num_procs': 1,
-            'num_procs_sweeper': 3,
-            'plotting_params': {'label': r'$\Delta t$-$k$-adaptivity $N$=1x3'},
-        }
         configurations[-1] = {
             'strategies': RK_strategies,
             'num_procs': 1,
         }
+        if problem.__name__ == 'run_Lorenz':
+            configurations[3] = {
+                'custom_description': desc_poly,
+                'strategies': [AdaptivityPolynomialError(useMPI=True, newton_inexactness=newton_inexactness)],
+                'num_procs': 4,
+                'num_procs_sweeper': num_procs_dt_k,
+                'plotting_params': {
+                    'label': rf'$\Delta t$-$k$-adaptivity $N$=4x{num_procs_dt_k}',
+                    'ls': ls[num_procs_dt_k * 4],
+                },
+            }
+        else:
+            configurations[3] = {
+                'custom_description': desc_poly,
+                'strategies': [AdaptivityPolynomialError(useMPI=True, newton_inexactness=newton_inexactness)],
+                'num_procs': 1,
+                'num_procs_sweeper': num_procs_dt_k,
+                'plotting_params': {
+                    'label': rf'$\Delta t$-$k$-adaptivity $N$=1x{num_procs_dt_k}',
+                    'ls': ls[num_procs_dt_k],
+                },
+            }
+        if problem.__name__ in ['run_Lorenz']:
+            configurations[2] = {
+                'strategies': [AdaptivityStrategy(useMPI=True)],
+                'custom_description': {**desc, 'sweeper_class': parallel_sweeper},
+                'num_procs': num_procs_dt,
+                'num_procs_sweeper': num_procs_dt_k,
+                'plotting_params': {
+                    'label': rf'$\Delta t$-adaptivity $N$={num_procs_dt}x3',
+                    'ls': ls[num_procs_dt * num_procs_dt_k],
+                },
+            }
+        else:
+            configurations[2] = {
+                'strategies': [AdaptivityStrategy(useMPI=True)],
+                'custom_description': desc,
+                'num_procs': num_procs_dt,
+                'plotting_params': {'label': rf'$\Delta t$-adaptivity $N$={num_procs_dt}x1', 'ls': ls[num_procs_dt]},
+            }
+
+    elif mode == 'RK_comp_high_order_RBC':
+        """
+        Compare parallel adaptive SDC to Runge-Kutta at order five for RBC problem
+        """
+        from pySDC.projects.Resilience.strategies import (
+            AdaptivityStrategy,
+            ERKStrategy,
+            ESDIRKStrategy,
+            ARKStrategy,
+            AdaptivityPolynomialError,
+            ARK3_CFL_Strategy,
+        )
+
+        assert problem.__name__ == 'run_RBC'
+
+        from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as parallel_sweeper
+
+        newton_inexactness = False
+
+        desc = {}
+        desc['sweeper_params'] = {'num_nodes': 3, 'QI': 'IE', 'QE': "EE"}
+        desc['step_params'] = {'maxiter': 5}
+        num_procs_dt = 1
+
+        desc_poly = {}
+        desc_poly['sweeper_class'] = parallel_sweeper
+        num_procs_dt_k = 3
+
+        ls = {
+            1: '--',
+            2: '--',
+            3: '-',
+            4: '-',
+            5: '-',
+            12: ':',
+        }
+        RK_strategies = [ARK3_CFL_Strategy(useMPI=True)]
+        desc['sweeper_params']['num_nodes'] = 3
+        desc['sweeper_params']['QI'] = 'LU'
+        desc['sweeper_params']['QE'] = 'PIC'
+        desc['step_params']['maxiter'] = 5
+
+        desc_poly['sweeper_params'] = {'num_nodes': 3, 'QI': 'MIN-SR-S'}
+        num_procs_dt_k = 3
+
+        configurations[-1] = {
+            'strategies': RK_strategies,
+            'num_procs': 1,
+        }
+        configurations[3] = {
+            'custom_description': desc_poly,
+            'strategies': [AdaptivityPolynomialError(useMPI=True, newton_inexactness=newton_inexactness)],
+            'num_procs': 1,
+            'num_procs_sweeper': num_procs_dt_k,
+            'plotting_params': {
+                'label': rf'$\Delta t$-$k$-adaptivity $N$=1x{num_procs_dt_k}',
+                'ls': ls[num_procs_dt_k],
+            },
+        }
         configurations[2] = {
             'strategies': [AdaptivityStrategy(useMPI=True)],
             'custom_description': desc,
-            'num_procs': 4,
-            'plotting_params': {'label': r'$\Delta t$-adaptivity $N$=4x1'},
+            'num_procs': num_procs_dt,
+            'plotting_params': {'label': rf'$\Delta t$-adaptivity $N$={num_procs_dt}x1', 'ls': ls[num_procs_dt]},
         }
 
     elif mode == 'parallel_efficiency':
@@ -860,7 +1058,7 @@ def get_configs(mode, problem):
         """
         from pySDC.projects.Resilience.strategies import AdaptivityStrategy, AdaptivityPolynomialError
 
-        if problem.__name__ in ['run_Schroedinger', 'run_AC']:
+        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_GS', 'run_RBC']:
             from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as parallel_sweeper
         else:
             from pySDC.implementations.sweeper_classes.generic_implicit_MPI import (
@@ -870,6 +1068,10 @@ def get_configs(mode, problem):
         desc = {}
         desc['sweeper_params'] = {'num_nodes': 3, 'QI': 'IE', 'QE': 'EE'}
         desc['step_params'] = {'maxiter': 5}
+
+        if problem.__name__ in ['run_RBC']:
+            desc['sweeper_params']['QE'] = 'PIC'
+            desc['sweeper_params']['QI'] = 'LU'
 
         ls = {
             1: '-',
@@ -907,13 +1109,137 @@ def get_configs(mode, problem):
                 },
             }
 
-        configurations[num_procs * 200 + 79] = {
+        configurations[200 + 79] = {
             'strategies': [
                 AdaptivityPolynomialError(useMPI=True, newton_inexactness=newton_inexactness, linear_inexactness=True)
             ],
             'num_procs': 1,
         }
+    elif mode == 'parallel_efficiency_dt':
+        """
+        Compare parallel runs of the step size adaptive SDC
+        """
+        from pySDC.projects.Resilience.strategies import AdaptivityStrategy
 
+        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_GS', 'run_RBC']:
+            from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as parallel_sweeper
+        else:
+            from pySDC.implementations.sweeper_classes.generic_implicit_MPI import (
+                generic_implicit_MPI as parallel_sweeper,
+            )
+
+        desc = {}
+        desc['sweeper_params'] = {'num_nodes': 3, 'QI': 'IE', 'QE': 'EE'}
+        desc['step_params'] = {'maxiter': 5}
+
+        if problem.__name__ in ['run_RBC']:
+            desc['sweeper_params']['QE'] = 'PIC'
+            desc['sweeper_params']['QI'] = 'LU'
+
+        desc_serial = {
+            'step_params': {'maxiter': 5},
+            'sweeper_params': {'num_nodes': 3, 'quad_type': 'RADAU-RIGHT'},
+        }
+
+        ls = {
+            1: '-',
+            2: '--',
+            3: '-.',
+            4: '--',
+            5: ':',
+            12: ':',
+        }
+
+        newton_inexactness = False if problem.__name__ in ['run_vdp'] else True
+
+        for num_procs in [4, 1]:
+            configurations[num_procs] = {
+                'strategies': [AdaptivityStrategy(useMPI=True)],
+                'custom_description': desc.copy() if num_procs > 1 else desc_serial,
+                'num_procs': num_procs,
+                'plotting_params': {
+                    'ls': ls.get(num_procs, '-'),
+                    'label': rf'$\Delta t$-adaptivity $N$={num_procs}x1',
+                },
+            }
+            configurations[num_procs * 200 + 79] = {
+                'custom_description': {
+                    'sweeper_class': parallel_sweeper,
+                    'sweeper_params': {'QI': 'MIN-SR-S', 'QE': 'PIC'},
+                    'step_params': {'maxiter': 5},
+                },
+                'strategies': [AdaptivityStrategy(useMPI=True)],
+                'num_procs_sweeper': 3,
+                'num_procs': num_procs,
+                'plotting_params': {
+                    'ls': ls.get(num_procs * 3, '-'),
+                    'label': rf'$\Delta t$-adaptivity $N$={num_procs}x3',
+                },
+            }
+    elif mode == 'parallel_efficiency_dt_k':
+        """
+        Compare parallel runs of the step size adaptive SDC
+        """
+        from pySDC.projects.Resilience.strategies import AdaptivityPolynomialError
+
+        if problem.__name__ in ['run_Schroedinger', 'run_AC', 'run_GS', 'run_RBC']:
+            from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as parallel_sweeper
+        else:
+            from pySDC.implementations.sweeper_classes.generic_implicit_MPI import (
+                generic_implicit_MPI as parallel_sweeper,
+            )
+
+        ls = {
+            1: '-',
+            2: '--',
+            3: '-.',
+            4: '--',
+            5: ':',
+            12: ':',
+        }
+
+        QI = {
+            (1, 3, 'run_Lorenz'): 'MIN-SR-NS',
+            (1, 1, 'run_Lorenz'): 'MIN-SR-NS',
+            (4, 1, 'run_Lorenz'): 'IE',
+        }
+
+        newton_inexactness = False if problem.__name__ in ['run_vdp'] else True
+
+        for num_procs in [4, 1]:
+            configurations[num_procs * 100 + 79] = {
+                'custom_description': {
+                    'sweeper_class': parallel_sweeper,
+                    'sweeper_params': {'QI': QI.get((num_procs, 3, problem.__name__), 'MIN-SR-S'), 'QE': 'PIC'},
+                },
+                'strategies': [
+                    AdaptivityPolynomialError(
+                        useMPI=True, newton_inexactness=newton_inexactness, linear_inexactness=True
+                    )
+                ],
+                'num_procs_sweeper': 3,
+                'num_procs': num_procs,
+                'plotting_params': {
+                    'ls': ls.get(num_procs * 3, '-'),
+                    'label': rf'$\Delta t$-$k$-adaptivity $N$={num_procs}x3',
+                },
+            }
+            configurations[num_procs * 200 + 79] = {
+                'custom_description': {
+                    'sweeper_params': {'QI': QI.get((num_procs, 1, problem.__name__), 'MIN-SR-S'), 'QE': 'PIC'},
+                },
+                'strategies': [
+                    AdaptivityPolynomialError(
+                        useMPI=True, newton_inexactness=newton_inexactness, linear_inexactness=True
+                    )
+                ],
+                'num_procs_sweeper': 1,
+                'num_procs': num_procs,
+                'plotting_params': {
+                    'ls': ls.get(num_procs, '-'),
+                    'label': rf'$\Delta t$-$k$-adaptivity $N$={num_procs}x1',
+                },
+            }
     elif mode == 'interpolate_between_restarts':
         """
         Compare adaptivity with interpolation between restarts and without
@@ -1298,21 +1624,31 @@ def get_configs(mode, problem):
     return configurations
 
 
-def get_fig(x=1, y=1, **kwargs):  # pragma: no cover
+def get_fig(x=1, y=1, target='adaptivity', **kwargs):  # pragma: no cover
     """
     Get a figure to plot in.
 
     Args:
         x (int): How many panels in horizontal direction you want
         y (int): How many panels in vertical direction you want
+        target (str): Where the plot is supposed to end up
 
     Returns:
         matplotlib.pyplot.Figure
     """
     width = 1.0
     ratio = 1.0 if y == 2 else 0.5
+    if target == 'adaptivity':
+        journal = 'Springer_Numerical_Algorithms'
+    elif target == 'thesis':
+        journal = 'TUHH_thesis'
+    elif target == 'talk':
+        journal = 'JSC_beamer'
+    else:
+        raise NotImplementedError
+
     keyword_arguments = {
-        'figsize': figsize_by_journal('Springer_Numerical_Algorithms', width, ratio),
+        'figsize': figsize_by_journal(journal, width, ratio),
         'layout': 'constrained',
         **kwargs,
     }
@@ -1363,7 +1699,9 @@ def save_fig(
     print(f'Stored figure \"{path}\"')
 
 
-def all_problems(mode='compare_strategies', plotting=True, base_path='data', **kwargs):  # pragma: no cover
+def all_problems(
+    mode='compare_strategies', plotting=True, base_path='data', target='adaptivity', **kwargs
+):  # pragma: no cover
     """
     Make a plot comparing various strategies for all problems.
 
@@ -1375,7 +1713,10 @@ def all_problems(mode='compare_strategies', plotting=True, base_path='data', **k
         None
     """
 
-    fig, axs = get_fig(2, 2)
+    if target == 'talk':
+        fig, axs = get_fig(4, 1, target=target)
+    else:
+        fig, axs = get_fig(2, 2, target=target)
 
     shared_params = {
         'work_key': 'k_SDC',
@@ -1388,7 +1729,12 @@ def all_problems(mode='compare_strategies', plotting=True, base_path='data', **k
         **kwargs,
     }
 
-    problems = [run_vdp, run_quench, run_Schroedinger, run_AC]
+    if target == 'adaptivity':
+        problems = [run_vdp, run_quench, run_Schroedinger, run_AC]
+    elif target in ['thesis', 'talk']:
+        problems = [run_vdp, run_Lorenz, run_GS, run_RBC]
+    else:
+        raise NotImplementedError
 
     logger.log(26, f"Doing for all problems {mode}")
     for i in range(len(problems)):
@@ -1404,17 +1750,18 @@ def all_problems(mode='compare_strategies', plotting=True, base_path='data', **k
     if plotting and shared_params['comm_world'].rank == 0:
         ncols = {
             'parallel_efficiency': 2,
+            'parallel_efficiency_dt': 2,
+            'parallel_efficiency_dt_k': 2,
             'RK_comp': 2,
         }
-        y_right_dt_fixed = [1e18, 4e1, 5, 1e8]
-        y_right_dt = [1e-1, 1e4, 1, 2e-2]
-        y_right_dtk = [1e-4, 1e4, 1e-2, 1e-3]
+        if target == 'talk':
+            _ncols = 4
+        else:
+            _ncols = ncols.get(mode, None)
 
         if shared_params['work_key'] == 'param':
-            for ax, yRfixed, yRdt, yRdtk in zip(fig.get_axes(), y_right_dt_fixed, y_right_dt, y_right_dtk):
-                add_order_line(ax, 1, '--', yRdt, marker=None)
-                add_order_line(ax, 5 / 4, ':', yRdtk, marker=None)
-                add_order_line(ax, 5, '-.', yRfixed, marker=None)
+            for ax, prob in zip(fig.get_axes(), problems):
+                add_param_order_lines(ax, prob)
         save_fig(
             fig=fig,
             name=mode,
@@ -1422,8 +1769,44 @@ def all_problems(mode='compare_strategies', plotting=True, base_path='data', **k
             precision_key=shared_params['precision_key'],
             legend=True,
             base_path=base_path,
-            ncols=ncols.get(mode, None),
+            ncols=_ncols,
         )
+
+
+def add_param_order_lines(ax, problem):
+    if problem.__name__ == 'run_vdp':
+        yRfixed = 1e18
+        yRdt = 1e-1
+        yRdtk = 1e-4
+    elif problem.__name__ == 'run_quench':
+        yRfixed = 4e1
+        yRdt = 1e4
+        yRdtk = 1e4
+    elif problem.__name__ == 'run_Schroedinger':
+        yRfixed = 5
+        yRdt = 1
+        yRdtk = 1e-2
+    elif problem.__name__ == 'run_AC':
+        yRfixed = 1e8
+        yRdt = 2e-2
+        yRdtk = 1e-3
+    elif problem.__name__ == 'run_Lorenz':
+        yRfixed = 1e1
+        yRdt = 2e-2
+        yRdtk = 7e-4
+    elif problem.__name__ == 'run_RBC':
+        yRfixed = 1e-6
+        yRdt = 4e-5
+        yRdtk = 8e-6
+    elif problem.__name__ == 'run_GS':
+        yRfixed = 4e-3
+        yRdt = 5e0
+        yRdtk = 8e-1
+    else:
+        return None
+    add_order_line(ax, 1, '--', yRdt, marker=None)
+    add_order_line(ax, 5 / 4, ':', yRdtk, marker=None)
+    add_order_line(ax, 5, '-.', yRfixed, marker=None)
 
 
 def ODEs(mode='compare_strategies', plotting=True, base_path='data', **kwargs):  # pragma: no cover
@@ -1473,7 +1856,7 @@ def ODEs(mode='compare_strategies', plotting=True, base_path='data', **kwargs): 
         )
 
 
-def single_problem(mode, problem, plotting=True, base_path='data', **kwargs):  # pragma: no cover
+def single_problem(mode, problem, plotting=True, base_path='data', target='thesis', **kwargs):  # pragma: no cover
     """
     Make a plot for a single problem
 
@@ -1481,7 +1864,10 @@ def single_problem(mode, problem, plotting=True, base_path='data', **kwargs):  #
         mode (str): What you want to look at
         problem (function): A problem to run
     """
-    fig, ax = get_fig(1, 1, figsize=figsize_by_journal('Springer_Numerical_Algorithms', 1, 0.8))
+    if target == 'thesis':
+        fig, ax = get_fig(1, 1, figsize=figsize_by_journal('TUHH_thesis', 0.7, 0.6))
+    else:
+        fig, ax = get_fig(1, 1, figsize=figsize_by_journal('Springer_Numerical_Algorithms', 1, 0.8))
 
     params = {
         'work_key': 'k_SDC',
@@ -1507,6 +1893,7 @@ def single_problem(mode, problem, plotting=True, base_path='data', **kwargs):  #
             precision_key=params['precision_key'],
             legend=False,
             base_path=base_path,
+            squares=target != 'thesis',
         )
 
 
@@ -1603,38 +1990,42 @@ def aggregate_parallel_efficiency_plot():  # pragma: no cover
 if __name__ == "__main__":
     comm_world = MPI.COMM_WORLD
 
-    record = comm_world.size > 1
-    for mode in [
-        # 'compare_strategies',
-        # 'RK_comp',
-        # 'parallel_efficiency',
-    ]:
-        params = {
-            'mode': mode,
-            'runs': 1,
-            'plotting': comm_world.rank == 0,
-        }
-        params_single = {
-            **params,
-            'problem': run_RBC,
-        }
-        single_problem(**params_single, work_key='t', precision_key='e_global_rel', record=record)
+    import argparse
 
-    all_params = {
-        'record': True,
-        'runs': 5,
-        'work_key': 't',
-        'precision_key': 'e_global_rel',
-        'plotting': comm_world.rank == 0,
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--mode', type=str, default='compare_strategies')
+    parser.add_argument('--record', type=str, choices=['True', 'False'], default='True')
+    parser.add_argument('--plotting', type=str, choices=['True', 'False'], default='True')
+    parser.add_argument('--runs', type=int, default=5)
+    parser.add_argument(
+        '--problem', type=str, choices=['vdp', 'RBC', 'AC', 'quench', 'Lorenz', 'Schroedinger', 'GS'], default='vdp'
+    )
+    parser.add_argument('--work_key', type=str, default='t')
+    parser.add_argument('--precision_key', type=str, default='e_global_rel')
+    parser.add_argument('--logger_level', type=int, default='25')
+
+    args = parser.parse_args()
+
+    problems = {
+        'Lorenz': run_Lorenz,
+        'vdp': run_vdp,
+        'Schroedinger': run_Schroedinger,
+        'quench': run_quench,
+        'AC': run_AC,
+        'RBC': run_RBC,
+        'GS': run_GS,
     }
 
-    for mode in [
-        'RK_comp',
-        'parallel_efficiency',
-        'compare_strategies',
-    ]:
-        all_problems(**all_params, mode=mode)
-        comm_world.Barrier()
+    params = {
+        **vars(args),
+        'record': args.record == 'True',
+        'plotting': args.plotting == 'True' and comm_world.rank == 0,
+        'problem': problems[args.problem],
+    }
+
+    LOGGER_LEVEL = params.pop('logger_level')
+
+    single_problem(**params)
 
     if comm_world.rank == 0:
         plt.show()
