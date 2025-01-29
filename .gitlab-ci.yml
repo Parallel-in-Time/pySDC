@@ -43,7 +43,7 @@ prepare_JUWELS:
     - git submodule add -f https://github.com/brownbaerchen/mpi4py-fft.git
     - cd mpi4py-fft
     - git checkout cupy_implementation
-    - FFTW_LIBRARY_DIR="/p/software/juwels/stages/2025/software/FFTW/3.3.10-GCC-13.3.0/lib64" pip install --force-reinstall --no-deps .
+    - FFTW_LIBRARY_DIR="/p/software/juwels/stages/2025/software/FFTW/3.3.10-GCC-13.3.0/lib64" python -m pip install --force-reinstall --no-deps .
     - cd ../
 
 
