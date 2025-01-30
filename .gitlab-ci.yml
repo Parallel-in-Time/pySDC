@@ -27,15 +27,15 @@ prepare_JUWELS:
     - shell
   script:
     - mkdir -p benchmarks
-    - module --force purge
-    - module load Stages/2025
+    - module purge
     - module load GCC
     - module load OpenMPI
     - module load FFTW
     - module load mpi4py
     - module load CuPy
     - jutil env activate -p ${JUWELS_PROJECT}
-    - python -m venv --clear $SCRATCH/.venv/pySDC
+    - rm -r $SCRATCH/.venv/pySDC || echo "venv did not exist"
+    - python -m venv $SCRATCH/.venv/pySDC
     - source $SCRATCH/.venv/pySDC/bin/activate
     - pip install -e .
     - pip install pytest-benchmark coverage
@@ -76,8 +76,7 @@ test_JUWELS:
       - sbatch.out
   before_script:
     - mkdir -p benchmarks
-    - module --force purge
-    - module load Stages/2025
+    - module purge
     - module load GCC
     - module load OpenMPI
     - module load FFTW
