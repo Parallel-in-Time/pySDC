@@ -91,15 +91,73 @@ same for GPU and CPU. Only the import for the problem_class changed.</p>
 <p>This project contains some infrastructure for running and plotting specific problems.
 The main file is <cite>run_experiment</cite> and can be configured using command line arguments.
 For instance, use</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>srun<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>work_precision.py<span class="w"> </span>--config<span class="o">=</span>GS_USkate<span class="w"> </span>--procs<span class="o">=</span><span class="m">1</span>/1/4<span class="w"> </span>--useGPU<span class="o">=</span>True<span class="w"> </span>--mode<span class="o">=</span>run
-mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">8</span><span class="w"> </span>python<span class="w"> </span>work_precision.py<span class="w"> </span>--config<span class="o">=</span>GS_USkate<span class="w"> </span>--procs<span class="o">=</span><span class="m">1</span>/1/4<span class="w"> </span>--useGPU<span class="o">=</span>True<span class="w"> </span>--mode<span class="o">=</span>plot
-python<span class="w"> </span>work_precision.py<span class="w"> </span>--config<span class="o">=</span>GS_USkate<span class="w"> </span>--procs<span class="o">=</span><span class="m">1</span>/1/4<span class="w"> </span>--useGPU<span class="o">=</span>True<span class="w"> </span>--mode<span class="o">=</span>video
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>srun<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span><span class="w"> </span>python<span class="w"> </span>run_experiment.pyy<span class="w"> </span>--config<span class="o">=</span>GS_USkate<span class="w"> </span>--procs<span class="o">=</span><span class="m">1</span>/1/4<span class="w"> </span>--useGPU<span class="o">=</span>True<span class="w"> </span>--mode<span class="o">=</span>run
+mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">8</span><span class="w"> </span>python<span class="w"> </span>run_experiment.py<span class="w"> </span>--config<span class="o">=</span>GS_USkate<span class="w"> </span>--procs<span class="o">=</span><span class="m">1</span>/1/4<span class="w"> </span>--useGPU<span class="o">=</span>True<span class="w"> </span>--mode<span class="o">=</span>plot
+python<span class="w"> </span>run_experiment.py<span class="w"> </span>--config<span class="o">=</span>GS_USkate<span class="w"> </span>--procs<span class="o">=</span><span class="m">1</span>/1/4<span class="w"> </span>--useGPU<span class="o">=</span>True<span class="w"> </span>--mode<span class="o">=</span>video
 </pre></div>
 </div>
 <p>to first run the problem, then make plots and then make a video for Gray-Scott with the U-Skate configuration (see arXiv:1501.01990).</p>
 <p>To do a parallel scaling test, you can go to JUWELS Booster and use, for instance,</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>analysis_scripts/parallel_scaling.py<span class="w"> </span>--mode<span class="o">=</span>run<span class="w"> </span>--space_time<span class="o">=</span>True<span class="w"> </span>--XPU<span class="o">=</span>GPU<span class="w"> </span>--problem<span class="o">=</span>GS3D
+python<span class="w"> </span>analysis_scripts/parallel_scaling.py<span class="w"> </span>--mode<span class="o">=</span>plot<span class="w"> </span>--space_time<span class="o">=</span>True<span class="w"> </span>--XPU<span class="o">=</span>GPU<span class="w"> </span>--problem<span class="o">=</span>GS3D
+</pre></div>
+</div>
 <p>This will generate jobscripts and submit the jobs. Notice that you have to wait for the jobs to complete before you can plot them.</p>
 <p>To learn more about the options for the scripts, run them with <cite>–help</cite>.</p>
+</section>
+<section id="reproducing-plots-in-thomas-baumann-s-thesis">
+<h2>Reproducing plots in Thomas Baumann’s thesis<a class="headerlink" href="#reproducing-plots-in-thomas-baumann-s-thesis" title="Link to this heading">¶</a></h2>
+<p>Keep in mind that the results of the experiments are specific to the hardware that was used in the experiments.
+To record the data for space-time parallel scaling experiments with Gray-Scott and RBC, run the following commands on the specified machines within the directory that contains this README.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># run on JUWELS</span>
+python<span class="w"> </span>analysis_scripts/parallel_scaling.py<span class="w"> </span>--mode<span class="o">=</span>run<span class="w"> </span>--problem<span class="o">=</span>GS3D<span class="w"> </span>--XPU<span class="o">=</span>CPU<span class="w"> </span>--space_time<span class="o">=</span>False
+python<span class="w"> </span>analysis_scripts/parallel_scaling.py<span class="w"> </span>--mode<span class="o">=</span>run<span class="w"> </span>--problem<span class="o">=</span>GS3D<span class="w"> </span>--XPU<span class="o">=</span>CPU<span class="w"> </span>--space_time<span class="o">=</span>True
+
+<span class="c1"># run on JUWELS booster</span>
+python<span class="w"> </span>analysis_scripts/parallel_scaling.py<span class="w"> </span>--mode<span class="o">=</span>run<span class="w"> </span>--problem<span class="o">=</span>GS3D<span class="w"> </span>--XPU<span class="o">=</span>GPU<span class="w"> </span>--space_time<span class="o">=</span>False
+python<span class="w"> </span>analysis_scripts/parallel_scaling.py<span class="w"> </span>--mode<span class="o">=</span>run<span class="w"> </span>--problem<span class="o">=</span>GS3D<span class="w"> </span>--XPU<span class="o">=</span>GPU<span class="w"> </span>--space_time<span class="o">=</span>True
+
+<span class="c1"># run on JURECA DC</span>
+python<span class="w"> </span>analysis_scripts/parallel_scaling.py<span class="w"> </span>--mode<span class="o">=</span>run<span class="w"> </span>--problem<span class="o">=</span>RBC<span class="w"> </span>--XPU<span class="o">=</span>CPU<span class="w"> </span>--space_time<span class="o">=</span>False
+python<span class="w"> </span>analysis_scripts/parallel_scaling.py<span class="w"> </span>--mode<span class="o">=</span>run<span class="w"> </span>--problem<span class="o">=</span>RBC<span class="w"> </span>--XPU<span class="o">=</span>CPU<span class="w"> </span>--space_time<span class="o">=</span>True
+
+<span class="c1"># run on JUWELS booster</span>
+python<span class="w"> </span>analysis_scripts/parallel_scaling.py<span class="w"> </span>--mode<span class="o">=</span>run<span class="w"> </span>--problem<span class="o">=</span>RBC<span class="w"> </span>--XPU<span class="o">=</span>GPU<span class="w"> </span>--space_time<span class="o">=</span>False
+python<span class="w"> </span>analysis_scripts/parallel_scaling.py<span class="w"> </span>--mode<span class="o">=</span>run<span class="w"> </span>--problem<span class="o">=</span>RBC<span class="w"> </span>--XPU<span class="o">=</span>GPU<span class="w"> </span>--space_time<span class="o">=</span>True
+</pre></div>
+</div>
+<p>These commands will submit a bunch of jobscripts with the individual runs.
+Keep in mind that these are specific to a compute project and some paths are account-specific.
+Most likely, you will have to change options at the top of the file <cite>./etc/generate_jobscript.py</cite> before you can run anything.
+Also, notice that you may not be allowed to request all resources needed for the largest Gray-Scott GPU run during normal operation of JUWELS booster.</p>
+<p>After all jobs have run to completion, you have recorded all scaling data and may plot the results with the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>paper_plots.py<span class="w"> </span>--target<span class="o">=</span>thesis
+</pre></div>
+</div>
+<p>In order to run the production runs, modify the <cite>path</cite> class attribute of <cite>LargeSim</cite> in <cite>analysis_scripts/large_simulations.py</cite>.
+Then use the following commands on the specified machines:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># run on JUWELS booster</span>
+python<span class="w"> </span>analysis_scripts/large_simulations.py<span class="w"> </span>--mode<span class="o">=</span>run<span class="w"> </span>--problem<span class="o">=</span>GS<span class="w"> </span>--XPU<span class="o">=</span>GPU
+
+<span class="c1"># run on JURECA DC</span>
+python<span class="w"> </span>analysis_scripts/large_simulations.py<span class="w"> </span>--mode<span class="o">=</span>run<span class="w"> </span>--problem<span class="o">=</span>RBC<span class="w"> </span>--XPU<span class="o">=</span>CPU
+</pre></div>
+</div>
+<p>Plotting the results of the Gray-Scott simulation requires a lot of memory and will take very long.
+Modify the paths in <cite>analysis_scripts/plot_large_simulations.py</cite> and then run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>analysis_scripts/3d_plot_GS_large.py<span class="w"> </span>--base_path<span class="o">=</span>&lt;path&gt;
+python<span class="w"> </span>analysis_scripts/plot_large_simulations.py<span class="w"> </span>--problem<span class="o">=</span>GS
+</pre></div>
+</div>
+<p>Plotting the results of the Rayleigh-Benard production run is more easy.
+After modifying the paths as earlier, run the following commands:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>analysis_scripts/large_simulations.py<span class="w"> </span>--mode<span class="o">=</span>plot<span class="w"> </span>--problem<span class="o">=</span>RBC<span class="w"> </span>--XPU<span class="o">=</span>CPU
+python<span class="w"> </span>analysis_scripts/large_simulations.py<span class="w"> </span>--mode<span class="o">=</span>video<span class="w"> </span>--problem<span class="o">=</span>RBC<span class="w"> </span>--XPU<span class="o">=</span>CPU
+python<span class="w"> </span>analysis_scripts/plot_large_simulations.py<span class="w"> </span>--problem<span class="o">=</span>RBC
+</pre></div>
+</div>
+<p>Run scripts with <cite>–help</cite> to learn more about parameters.
+Keep in mind that not all features are supported with all problems.</p>
 </section>
 </section>
 
@@ -119,6 +177,7 @@ python<span class="w"> </span>work_precision.py<span class="w"> </span>--config<
 <li><a class="reference internal" href="#run-pysdc-on-the-gpu">Run pySDC on the GPU</a></li>
 <li><a class="reference internal" href="#more-examples">More examples</a></li>
 <li><a class="reference internal" href="#running-large-problems-on-gpu">Running large problems on GPU</a></li>
+<li><a class="reference internal" href="#reproducing-plots-in-thomas-baumann-s-thesis">Reproducing plots in Thomas Baumann’s thesis</a></li>
 </ul>
 </li>
 </ul>

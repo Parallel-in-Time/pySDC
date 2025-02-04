@@ -68,8 +68,8 @@ implemented.</p>
 <ul class="simple">
 <li><p>Variants of SDC: explicit, implicit, IMEX, multi-implicit, Verlet,
 multi-level, diagonal, multi-step</p></li>
-<li><p>Variants of PFASST: virtual parallel or MPI-based parallel,
-classical of multigrid perspective</p></li>
+<li><p>Variants of PFASST: virtually parallel or MPI-based parallel,
+classical or multigrid perspective</p></li>
 <li><p>8 tutorials: from setting up a first collocation problem to SDC,
 PFASST and advanced topics</p></li>
 <li><p>Projects: many documented projects with defined and tested outcomes</p></li>
@@ -93,10 +93,9 @@ Actions</a> and
 will give you a core version of <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> to work with,
 working with the developer version is most often the better choice. We
 thus recommend to checkout the code from GitHub and install the
-dependencies e.g. by using a <a class="reference external" href="https://conda.io/en/latest/">conda</a>
-environment. For this, <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> ships with environment files
-which can be found in the folder <code class="docutils literal notranslate"><span class="pre">etc/</span></code>. Use these as e.g.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>etc/environment-base.yml
+dependencies e.g. by using <a class="reference external" href="https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html">micromamba</a>. For this, <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> ships with environment files
+which can be found in the folder <code class="docutils literal notranslate"><span class="pre">etc/</span></code> or within the projects. Use these as e.g.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>micromamba<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>etc/environment-base.yml
 </pre></div>
 </div>
 <p>If you want to install the developer version using <code class="docutils literal notranslate"><span class="pre">pip</span></code> directly from the GitHub repository, use this:</p>
