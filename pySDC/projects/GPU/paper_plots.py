@@ -1,4 +1,4 @@
-""" Make plots for publications """
+"""Make plots for publications"""
 
 import matplotlib.pyplot as plt
 from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
