@@ -658,7 +658,7 @@ def test_pySDC_integrator_MSSDC(n_steps, useMPIController, setup, submit=True, n
     if useMPIController:
         from pySDC.helpers.firedrake_ensemble_communicator import FiredrakeEnsembleCommunicator
 
-        controller_communicator = FiredrakeEnsembleCommunicator(COMM_WORLD, COMM_WORLD.size//n_steps)
+        controller_communicator = FiredrakeEnsembleCommunicator(COMM_WORLD, COMM_WORLD.size // n_steps)
         assert controller_communicator.size == n_steps
         MSSDC_args = {'useMPIController': True, 'controller_communicator': controller_communicator}
         dirname = f'./tmp_{controller_communicator.rank}'
