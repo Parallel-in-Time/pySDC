@@ -26,7 +26,10 @@ def tracer_setup(tmpdir='./tmp', degree=1, small_dt=False, comm=None):
         COMM_WORLD,
     )
     from gusto import OutputParameters, Domain, IO
+    from gusto.core.logging import logger, INFO
     from collections import namedtuple
+
+    logger.setLevel(INFO)
 
     opts = ('domain', 'tmax', 'io', 'f_init', 'f_end', 'degree', 'uexpr', 'umax', 'radius', 'tol')
     TracerSetup = namedtuple('TracerSetup', opts)
@@ -785,5 +788,5 @@ if __name__ == '__main__':
         # test_generic_gusto_problem(setup)
         # test_pySDC_integrator_RK(False, RK4, setup)
         # test_pySDC_integrator(False, False, setup)
-        test_pySDC_integrator_with_adaptivity(1e-3, setup)
-        # test_pySDC_integrator_MSSDC(2, False, setup)
+        # test_pySDC_integrator_with_adaptivity(1e-3, setup)
+        test_pySDC_integrator_MSSDC(4, True, setup)
