@@ -29,6 +29,9 @@ from pySDC.helpers.pySDC_as_gusto_time_discretization import pySDC_integrator
 from pySDC.helpers.firedrake_ensemble_communicator import FiredrakeEnsembleCommunicator
 from gusto import SDC, BackwardEuler
 from gusto.core.labels import implicit, time_derivative
+from gusto.core.logging import logger, INFO
+
+logger.setLevel(INFO)
 
 
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
