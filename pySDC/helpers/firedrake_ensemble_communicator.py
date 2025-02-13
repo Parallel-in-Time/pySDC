@@ -67,6 +67,9 @@ class FiredrakeEnsembleCommunicator:
             return self.ensemble.ensemble_comm.Isend(buf=buf, dest=dest, tag=tag)
         return self.ensemble.isend(buf, dest, tag=tag)[0]
 
+    def Free(self):
+        del self
+
 
 def get_ensemble(comm, space_size):
     return fd.Ensemble(comm, space_size)

@@ -26,7 +26,10 @@ def tracer_setup(tmpdir='./tmp', degree=1, small_dt=False, comm=None):
         COMM_WORLD,
     )
     from gusto import OutputParameters, Domain, IO
+    from gusto.core.logging import logger, INFO
     from collections import namedtuple
+
+    logger.setLevel(INFO)
 
     opts = ('domain', 'tmax', 'io', 'f_init', 'f_end', 'degree', 'uexpr', 'umax', 'radius', 'tol')
     TracerSetup = namedtuple('TracerSetup', opts)
@@ -620,15 +623,17 @@ def test_pySDC_integrator_with_adaptivity(dt_initial, setup):
 @pytest.mark.firedrake
 @pytest.mark.parametrize('n_steps', [1, 2, 4])
 @pytest.mark.parametrize('useMPIController', [True, False])
-def test_pySDC_integrator_MSSDC(n_steps, useMPIController, setup, submit=True):
+def test_pySDC_integrator_MSSDC(n_steps, useMPIController, setup, submit=True, n_tasks=4):
     if submit and useMPIController:
         import os
         import subprocess
 
+        assert n_steps <= n_tasks
+
         my_env = os.environ.copy()
         my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
         cwd = '.'
-        cmd = f'mpiexec -np {n_steps} python {__file__} --test=MSSDC'.split()
+        cmd = f'mpiexec -np {n_tasks} python {__file__} --test=MSSDC --n_steps={n_steps}'.split()
 
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
         p.wait()
@@ -653,7 +658,7 @@ def test_pySDC_integrator_MSSDC(n_steps, useMPIController, setup, submit=True):
     if useMPIController:
         from pySDC.helpers.firedrake_ensemble_communicator import FiredrakeEnsembleCommunicator
 
-        controller_communicator = FiredrakeEnsembleCommunicator(COMM_WORLD, 1)
+        controller_communicator = FiredrakeEnsembleCommunicator(COMM_WORLD, COMM_WORLD.size // n_steps)
         assert controller_communicator.size == n_steps
         MSSDC_args = {'useMPIController': True, 'controller_communicator': controller_communicator}
         dirname = f'./tmp_{controller_communicator.rank}'
@@ -777,13 +782,19 @@ if __name__ == '__main__':
         type=str,
         default=None,
     )
+    parser.add_argument(
+        '--n_steps',
+        help="number of steps",
+        type=int,
+        default=None,
+    )
     args = parser.parse_args()
 
     if args.test == 'MSSDC':
-        test_pySDC_integrator_MSSDC(n_steps=MPI.COMM_WORLD.size, useMPIController=True, setup=setup, submit=False)
+        test_pySDC_integrator_MSSDC(n_steps=args.n_steps, useMPIController=True, setup=setup, submit=False)
     else:
         # test_generic_gusto_problem(setup)
         # test_pySDC_integrator_RK(False, RK4, setup)
         # test_pySDC_integrator(False, False, setup)
-        test_pySDC_integrator_with_adaptivity(1e-3, setup)
-        # test_pySDC_integrator_MSSDC(2, False, setup)
+        # test_pySDC_integrator_with_adaptivity(1e-3, setup)
+        test_pySDC_integrator_MSSDC(4, True, setup)
