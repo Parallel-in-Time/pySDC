@@ -6,6 +6,7 @@ import numpy as np
 from pySDC.core.base_transfer import BaseTransfer
 from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+from pySDC.implementations.convergence_controller_classes.store_uold import StoreUOld
 from pySDC.implementations.hooks.default_hook import DefaultHooks
 from pySDC.implementations.hooks.log_timings import CPUTimings
 
@@ -41,6 +42,7 @@ class Controller(object):
             controller_params (dict): parameter set for the controller and the steps
         """
         self.useMPI = useMPI
+        self.description = description
 
         # check if we have a hook on this list. If not, use default class.
         self.__hooks = []
@@ -341,3 +343,68 @@ class Controller(object):
         for hook in self.hooks:
             stats = {**stats, **hook.return_stats()}
         return stats
+
+
+class ParaDiagController(Controller):
+
+    def __init__(self, controller_params, description, n_steps, useMPI=None):
+        """
+        Initialization routine for ParaDiag controllers
+
+        Args:
+           num_procs: number of parallel time steps (still serial, though), can be 1
+           controller_params: parameter set for the controller and the steps
+           description: all the parameters to set up the rest (levels, problems, transfer, ...)
+           n_steps (int): Number of parallel steps
+           alpha (float): alpha parameter for ParaDiag
+        """
+        # TODO: where should I put alpha? When I want to adapt it, maybe it shouldn't be in the controller?
+        from pySDC.implementations.sweeper_classes.ParaDiagSweepers import QDiagonalization
+
+        if QDiagonalization in description['sweeper_class'].__mro__:
+            description['sweeper_params']['ignore_ic'] = True
+            description['sweeper_params']['update_f_evals'] = False
+        else:
+            logging.getLogger('controller').warning(
+                f'Warning: Your sweeper class {description["sweeper_class"]} is not derived from {QDiagonalization}. You probably want to use another sweeper class.'
+            )
+
+        if controller_params.get('all_to_done', False):
+            raise NotImplementedError('ParaDiag only implemented with option `all_to_done=True`')
+        if 'alpha' not in controller_params.keys():
+            from pySDC.core.errors import ParameterError
+
+            raise ParameterError('Please supply alpha as a parameter to the ParaDiag controller!')
+        controller_params['average_jacobian'] = controller_params.get('average_jacobian', True)
+
+        controller_params['all_to_done'] = True
+        super().__init__(controller_params=controller_params, description=description, useMPI=useMPI)
+        self.base_convergence_controllers += [StoreUOld]
+
+        self.ParaDiag_block_u0 = None
+        self.n_steps = n_steps
+
+    def FFT_in_time(self):
+        """
+        Compute weighted forward FFT in time. The weighting is determined by the alpha parameter in ParaDiag
+
+        Note: The implementation via matrix-vector multiplication may be inefficient and less stable compared to an FFT
+              with transposes!
+        """
+        if not hasattr(self, '__FFT_matrix'):
+            from pySDC.helpers.ParaDiagHelper import get_weighted_FFT_matrix
+
+            self.__FFT_matrix = get_weighted_FFT_matrix(self.n_steps, self.params.alpha)
+
+        self.apply_matrix(self.__FFT_matrix)
+
+    def iFFT_in_time(self):
+        """
+        Compute weighted backward FFT in time. The weighting is determined by the alpha parameter in ParaDiag
+        """
+        if not hasattr(self, '__iFFT_matrix'):
+            from pySDC.helpers.ParaDiagHelper import get_weighted_iFFT_matrix
+
+            self.__iFFT_matrix = get_weighted_iFFT_matrix(self.n_steps, self.params.alpha)
+
+        self.apply_matrix(self.__iFFT_matrix)
