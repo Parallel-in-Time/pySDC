@@ -358,7 +358,6 @@ class ParaDiagController(Controller):
            n_steps (int): Number of parallel steps
            alpha (float): alpha parameter for ParaDiag
         """
-        # TODO: where should I put alpha? When I want to adapt it, maybe it shouldn't be in the controller?
         from pySDC.implementations.sweeper_classes.ParaDiagSweepers import QDiagonalization
 
         if QDiagonalization in description['sweeper_class'].__mro__:

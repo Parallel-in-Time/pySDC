@@ -107,7 +107,6 @@ class QDiagonalization(generic_implicit):
             x1 = self.mat_vec(self.S_inv, [self.level.u[0] for _ in range(M)])
         x2 = []
         for m in range(M):
-            # TODO: need to put averaged x1 in u0 here for nonlinear problems
             u0 = L.u_avg[m] if L.u_avg[m] is not None else x1[m]
             x2.append(P.solve_system(x1[m], self.w[m] * L.dt, u0=u0, t=L.time + L.dt * self.coll.nodes[m]))
         z = self.mat_vec(self.S, x2)
