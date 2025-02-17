@@ -6,6 +6,7 @@ def get_composite_collocation_problem(L, M, N, alpha=0, dt=1e-1, problem='Dahlqu
     from pySDC.implementations.hooks.log_errors import (
         LogGlobalErrorPostRun,
         LogGlobalErrorPostStep,
+        LogGlobalErrorPostIter,
     )
 
     if ParaDiag:
@@ -74,7 +75,7 @@ def get_composite_collocation_problem(L, M, N, alpha=0, dt=1e-1, problem='Dahlqu
 
     controller_params = {}
     controller_params['logger_level'] = 15
-    controller_params['hook_class'] = [LogGlobalErrorPostRun, LogGlobalErrorPostStep]
+    controller_params['hook_class'] = [LogGlobalErrorPostRun, LogGlobalErrorPostStep, LogGlobalErrorPostIter]
     controller_params['mssdc_jac'] = False
     controller_params['alpha'] = alpha
     controller_params['average_jacobian'] = average_jacobian
@@ -223,8 +224,45 @@ def test_ParaDiag_order(L, M, N, alpha):
     ), f'Got unexpected numerical order {num_order} instead of {expected_order} in ParaDiag'
 
 
+@pytest.mark.base
+@pytest.mark.parametrize('L', [4, 12])
+@pytest.mark.parametrize('M', [2, 3])
+@pytest.mark.parametrize('N', [1])
+@pytest.mark.parametrize('alpha', [1e-4, 1e-2])
+def test_ParaDiag_convergence_rate(L, M, N, alpha):
+    r"""
+    Test that the error in ParaDiag contracts as fast as expected.
+
+    The upper bound is \|u^{k+1} - u^*\| / \|u^k - u^*\| < \alpha / (1-\alpha).
+    Here, we compare to the exact solution to the continuous problem rather than the exact solution of the collocation
+    problem, which means the error stalls at time-discretization level. Therefore, we only check the contraction in the
+    first ParaDiag iteration.
+    """
+    import numpy as np
+    from pySDC.helpers.stats_helper import get_sorted
+
+    dt = 1e-2
+    controller, prob = get_composite_collocation_problem(L, M, N, alpha, dt=dt, problem='Dahlquist')
+
+    # setup initial conditions
+    u0 = prob.u_exact(0)
+
+    uend, stats = controller.run(u0=u0, t0=0, Tend=L * dt)
+
+    # test that the convergence rate in the first iteration is sufficiently small.
+    errors = get_sorted(stats, type='e_global_post_iteration', sortby='iter', time=(L - 1) * dt)
+    convergence_rates = [errors[i + 1][1] / errors[i][1] for i in range(len(errors) - 1)]
+    convergence_rate = convergence_rates[0]
+    convergence_bound = alpha / (1 - alpha)
+
+    assert (
+        convergence_rate < convergence_bound
+    ), f'Convergence rate {convergence_rate} exceeds upper bound of {convergence_bound}!'
+
+
 if __name__ == '__main__':
-    test_ParaDiag_vs_PFASST(4, 3, 2, 'Dahlquist')
+    test_ParaDiag_convergence_rate(4, 3, 1, 1e-4)
+    # test_ParaDiag_vs_PFASST(4, 3, 2, 'Dahlquist')
     # test_ParaDiag_convergence(4, 3, 1, 1e-4, 'vdp')
     # test_IMEX_ParaDiag_convergence(4, 3, 64, 1e-4)
     # test_ParaDiag_order(3, 3, 1, 1e-4)
