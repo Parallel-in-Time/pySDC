@@ -151,7 +151,8 @@ def testRectilinear(dim, nVar, nSteps, dtypeIdx):
 def initGrid(nVar, gridSizes):
     dim = len(gridSizes)
     coords = [np.linspace(0, 1, num=n, endpoint=False) for n in gridSizes]
-    u0 = np.array(np.arange(nVar) + 1)[:, *[None] * dim]
+    s = [None] * dim
+    u0 = np.array(np.arange(nVar) + 1)[:, *s]
     for x in np.meshgrid(*coords, indexing="ij"):
         u0 = u0 * x
     return coords, u0
