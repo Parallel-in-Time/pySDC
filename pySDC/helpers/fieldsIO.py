@@ -4,9 +4,8 @@
 Generic utility class to write and read cartesian grid field solutions into binary files.
 It implements the base file handler class :class:`FieldsIO`, that is specialized into :
 
-- :class:`Scal0D` : for 0D fields (scalar) with a given number of variables
-- :class:`Cart1D` : for 1D fields with a given number of variables
-- :class:`Cart2D` : for 2D fields on a cartesian grid with a given number of variables
+- :class:`Scalar` : for 0D fields (scalar) with a given number of variables
+- :class:`Rectilinear` : for fields on N-dimensional rectilinear grids
 
 While each file handler need to be setup with specific parameters (grid, ...),
 each written file can be read using the same interface implemented in the
@@ -15,12 +14,12 @@ base abstract class.
 Example
 -------
 >>> import numpy as np
->>> from pySDC.helpers.fieldsIO import Cart1D, FieldsIO
+>>> from pySDC.helpers.fieldsIO import Rectilinear, FieldsIO
 >>>
 >>> # Write some fields in files
 >>> x = np.linspace(0, 1, 101)
->>> fOut = Cart2D(np.float64, "file.pysdc")
->>> fOut.setHeader(nVar=2, coordX=x)
+>>> fOut = Rectilinear(np.float64, "file.pysdc")
+>>> fOut.setHeader(nVar=2, coords=x)
 >>> fOut.initialize()
 >>> times = [0, 1, 2]
 >>> u0 = np.array([-1, 1])[:, None]*x[None, :]
@@ -36,20 +35,19 @@ Example
 
 Notes
 -----
-🚀 :class:`Cart1D` and :class:`Cart2D` are compatible with a MPI-based cartesian decomposition.
+🚀 :class:`Rectilinear` is compatible with a MPI-based cartesian decomposition.
 See :class:`pySDC.tests.test_helpers.test_fieldsIO.writeFields_MPI` for an illustrative example.
 
 Warning
 -------
-To use MPI collective writing, you need to call first the class methods :class:`Cart1D.initMPI`
-or :class:`Cart2D.initMPI` from the associated class (cf their docstring).
-Also, their associated `setHeader` methods **must be given the global grids coordinates**,
-wether code is run in parallel or not.
+To use MPI collective writing, you need to call first the class methods :class:`Rectilinear.initMPI` (cf their docstring).
+Also, `Rectilinear.setHeader` **must be given the global grids coordinates**, wether the code is run in parallel or not.
 """
 import os
 import numpy as np
 from typing import Type, TypeVar
 import logging
+import itertools
 
 T = TypeVar("T")
 
@@ -330,11 +328,11 @@ class FieldsIO:
 
 
 @FieldsIO.register(sID=0)
-class Scal0D(FieldsIO):
+class Scalar(FieldsIO):
     """FieldsIO handler storing a given number of scalar"""
 
     # -------------------------------------------------------------------------
-    # Overriden methods
+    # Overridden methods
     # -------------------------------------------------------------------------
     def setHeader(self, nVar):
         """
@@ -375,13 +373,21 @@ class Scal0D(FieldsIO):
 
 
 @FieldsIO.register(sID=1)
-class Cart1D(Scal0D):
-    """FieldsIO handler storing a given number of 2D scalar variables"""
+class Rectilinear(Scalar):
+    """FieldsIO handler storing a given number of scalar variables on a N-dimensional rectilinear grid"""
+
+    @staticmethod
+    def setupCoords(*coords):
+        """Utility function to setup grids in multiple dimensions, given the keyword arguments"""
+        coords = [np.asarray(coord, dtype=np.float64) for coord in coords]
+        for axis, coord in enumerate(coords):
+            assert coord.ndim == 1, f"coord for {axis=} must be one dimensional"
+        return coords
 
     # -------------------------------------------------------------------------
-    # Overriden methods
+    # Overridden methods
     # -------------------------------------------------------------------------
-    def setHeader(self, nVar, coordX):
+    def setHeader(self, nVar, coords):
         """
         Set the descriptive grid structure to be stored in the file header.
 
@@ -389,21 +395,25 @@ class Cart1D(Scal0D):
         ----------
         nVar : int
             Number of 1D variables stored.
-        coordX : np.1darray
-            The grid coordinates in X direction.
+        coords : np.1darray or list[np.1darray]
+            The grid coordinates in each dimensions.
 
         Note
         ----
-        When used in MPI decomposition mode, `coordX` **must** be the global grid.
+        When used in MPI decomposition mode, all coordinate **must** be the global grid.
         """
-        coords = self.setupCoords(coordX=coordX)
-        self.header = {"nVar": int(nVar), **coords}
-        self.nItems = nVar * self.nX
+        if not isinstance(coords, (tuple, list)):
+            coords = [coords]
+        coords = self.setupCoords(*coords)
+        self.header = {"nVar": int(nVar), "coords": coords}
+        self.nItems = nVar * self.nDoF
 
     @property
     def hInfos(self):
         """Array representing the grid structure to be written in the binary file."""
-        return [np.array([self.nVar, self.nX], dtype=np.int64), np.array(self.header["coordX"], dtype=np.float64)]
+        return [np.array([self.nVar, self.dim, *self.nX], dtype=np.int32)] + [
+            np.array(coord, dtype=np.float64) for coord in self.header["coords"]
+        ]
 
     def readHeader(self, f):
         """
@@ -414,28 +424,32 @@ class Cart1D(Scal0D):
         f : `_io.TextIOWrapper`
             File to read the header from.
         """
-        nVar, nX = np.fromfile(f, dtype=np.int64, count=2)
-        coordX = np.fromfile(f, dtype=np.float64, count=nX)
-        self.setHeader(nVar, coordX)
+        nVar, dim = np.fromfile(f, dtype=np.int32, count=2)
+        nX = np.fromfile(f, dtype=np.int32, count=dim)
+        coords = [np.fromfile(f, dtype=np.float64, count=n) for n in nX]
+        self.setHeader(nVar, coords)
 
     def reshape(self, fields: np.ndarray):
-        fields.shape = (self.nVar, self.nX)
+        """Reshape the fields to a N-d array (inplace operation)"""
+        fields.shape = (self.nVar, *self.nX)
 
     # -------------------------------------------------------------------------
     # Class specifics
     # -------------------------------------------------------------------------
     @property
     def nX(self):
-        """Number of points in x direction"""
-        return self.header["coordX"].size
+        """Number of points in y direction"""
+        return [coord.size for coord in self.header["coords"]]
 
-    @staticmethod
-    def setupCoords(**coords):
-        """Utility function to setup grids in multuple dimensions, given the keyword arguments"""
-        coords = {name: np.asarray(coord, dtype=np.float64) for name, coord in coords.items()}
-        for name, coord in coords.items():
-            assert coord.ndim == 1, f"{name} must be one dimensional"
-        return coords
+    @property
+    def dim(self):
+        """Number of grid dimensions"""
+        return len(self.nX)
+
+    @property
+    def nDoF(self):
+        """Number of degrees of freedom for one variable"""
+        return np.prod(self.nX)
 
     # -------------------------------------------------------------------------
     # MPI-parallel implementation
@@ -443,7 +457,7 @@ class Cart1D(Scal0D):
     comm: MPI.Intracomm = None
 
     @classmethod
-    def setupMPI(cls, comm: MPI.Intracomm, iLocX, nLocX):
+    def setupMPI(cls, comm: MPI.Intracomm, iLoc, nLoc):
         """
         Setup the MPI mode for the files IO, considering a decomposition
         of the 1D grid into contiuous subintervals.
@@ -452,14 +466,14 @@ class Cart1D(Scal0D):
         ----------
         comm : MPI.Intracomm
             The space decomposition communicator.
-        iLocX : int
+        iLoc : list[int]
             Starting index of the local sub-domain in the global `coordX`.
-        nLocX : int
+        nLoc : list[int]
             Number of points in the local sub-domain.
         """
         cls.comm = comm
-        cls.iLocX = iLocX
-        cls.nLocX = nLocX
+        cls.iLoc = iLoc
+        cls.nLoc = nLoc
         cls.mpiFile = None
 
     @property
@@ -560,160 +574,10 @@ class Cart1D(Scal0D):
 
         field = np.asarray(field)
         assert field.dtype == self.dtype, f"expected {self.dtype} dtype, got {field.dtype}"
-        assert field.shape == (self.nVar, self.nLocX), f"expected {(self.nVar, self.nLocX)} shape, got {field.shape}"
-
-        offset0 = self.fileSize
-        self.MPI_FILE_OPEN(mode="a")
-        if self.MPI_ROOT:
-            self.MPI_WRITE(np.array(time, dtype=T_DTYPE))
-        offset0 += self.tSize
-
-        for iVar in range(self.nVar):
-            offset = offset0 + (iVar * self.nX + self.iLocX) * self.itemSize
-            self.MPI_WRITE_AT(offset, field[iVar])
-        self.MPI_FILE_CLOSE()
-
-    def readField(self, idx):
-        """
-        Read one field stored in the binary file, corresponding to the given
-        time index, possibly in MPI mode.
-
-        Parameters
-        ----------
-        idx : int
-            Positional index of the field.
-
-        Returns
-        -------
-        t : float
-            Stored time for this field.
-        field : np.ndarray
-            Read (local) fields in a numpy array.
-
-        Note
-        ----
-        If a MPI decomposition is used, it reads and returns the local fields values only.
-        """
-        if not self.MPI_ON:
-            return super().readField(idx)
-        idx = self.formatIndex(idx)
-
-        offset0 = self.hSize + idx * (self.fSize + self.tSize)
-        with open(self.fileName, "rb") as f:
-            t = float(np.fromfile(f, dtype=T_DTYPE, count=1, offset=offset0)[0])
-        offset0 += self.tSize
-
-        field = np.empty((self.nVar, self.nLocX), dtype=self.dtype)
-
-        self.MPI_FILE_OPEN(mode="r")
-        for iVar in range(self.nVar):
-            offset = offset0 + (iVar * self.nX + self.iLocX) * self.itemSize
-            self.MPI_READ_AT(offset, field[iVar])
-        self.MPI_FILE_CLOSE()
-
-        return t, field
-
-
-@FieldsIO.register(sID=2)
-class Cart2D(Cart1D):
-    """FieldsIO handler storing a given number of 2D scalar variables"""
-
-    # -------------------------------------------------------------------------
-    # Overriden methods
-    # -------------------------------------------------------------------------
-    def setHeader(self, nVar, coordX, coordY):
-        """
-        Set the descriptive grid structure to be stored in the file header.
-
-        Parameters
-        ----------
-        nVar : int
-            Number of 1D variables stored.
-        coordX : np.1darray
-            The grid coordinates in x direction.
-        coordY : np.1darray
-            The grid coordinates in y direction.
-
-        Note
-        ----
-        When used in MPI decomposition mode, `coordX` and `coordX` **must** be the global grid.
-        """
-        coords = self.setupCoords(coordX=coordX, coordY=coordY)
-        self.header = {"nVar": int(nVar), **coords}
-        self.nItems = nVar * self.nX * self.nY
-
-    @property
-    def hInfos(self):
-        """Array representing the grid structure to be written in the binary file."""
-        return [
-            np.array([self.nVar, self.nX, self.nY], dtype=np.int64),
-            np.array(self.header["coordX"], dtype=np.float64),
-            np.array(self.header["coordY"], dtype=np.float64),
-        ]
-
-    def readHeader(self, f):
-        """
-        Read the header from the binary file storing the fields.
-
-        Parameters
-        ----------
-        f : `_io.TextIOWrapper`
-            File to read the header from.
-        """
-        nVar, nX, nY = np.fromfile(f, dtype=np.int64, count=3)
-        coordX = np.fromfile(f, dtype=np.float64, count=nX)
-        coordY = np.fromfile(f, dtype=np.float64, count=nY)
-        self.setHeader(nVar, coordX, coordY)
-
-    def reshape(self, fields: np.ndarray):
-        """Reshape the fields to a [nVar, nX, nY] array (inplace operation)"""
-        fields.shape = (self.nVar, self.nX, self.nY)
-
-    # -------------------------------------------------------------------------
-    # Class specifics
-    # -------------------------------------------------------------------------
-    @property
-    def nY(self):
-        """Number of points in y direction"""
-        return self.header["coordY"].size
-
-    # -------------------------------------------------------------------------
-    # MPI-parallel implementation
-    # -------------------------------------------------------------------------
-    @classmethod
-    def setupMPI(cls, comm: MPI.Intracomm, iLocX, nLocX, iLocY, nLocY):
-        super().setupMPI(comm, iLocX, nLocX)
-        cls.iLocY = iLocY
-        cls.nLocY = nLocY
-
-    def addField(self, time, field):
-        """
-        Append one field solution at the end of the file with one given time,
-        possibly using MPI.
-
-        Parameters
-        ----------
-        time : float-like
-            The associated time of the field solution.
-        field : np.ndarray
-            The (local) field values.
-
-        Note
-        ----
-        If a MPI decomposition is used, field **must be** the local field values.
-        """
-        if not self.MPI_ON:
-            return super().addField(time, field)
-
-        assert self.initialized, "cannot add field to a non initialized FieldsIO"
-
-        field = np.asarray(field)
-        assert field.dtype == self.dtype, f"expected {self.dtype} dtype, got {field.dtype}"
         assert field.shape == (
             self.nVar,
-            self.nLocX,
-            self.nLocY,
-        ), f"expected {(self.nVar, self.nLocX, self.nLocY)} shape, got {field.shape}"
+            *self.nLoc,
+        ), f"expected {(self.nVar, *self.nLoc)} shape, got {field.shape}"
 
         offset0 = self.fileSize
         self.MPI_FILE_OPEN(mode="a")
@@ -721,11 +585,17 @@ class Cart2D(Cart1D):
             self.MPI_WRITE(np.array(time, dtype=T_DTYPE))
         offset0 += self.tSize
 
-        for iVar in range(self.nVar):
-            for iX in range(self.nLocX):
-                offset = offset0 + (iVar * self.nX * self.nY + (self.iLocX + iX) * self.nY + self.iLocY) * self.itemSize
-                self.MPI_WRITE_AT(offset, field[iVar, iX])
+        for (iVar, *iX) in itertools.product(range(self.nVar), *[range(nX) for nX in self.nLoc[:-1]]):
+            offset = offset0 + self.iPos(iVar, iX) * self.itemSize
+            self.MPI_WRITE_AT(offset, field[iVar, *iX])
         self.MPI_FILE_CLOSE()
+
+    def iPos(self, iVar, iX):
+        iPos = iVar * self.nDoF
+        for axis in range(self.dim - 1):
+            iPos += (self.iLoc[axis] + iX[axis]) * np.prod(self.nX[axis + 1 :])
+        iPos += self.iLoc[-1]
+        return iPos
 
     def readField(self, idx):
         """
@@ -750,20 +620,19 @@ class Cart2D(Cart1D):
         """
         if not self.MPI_ON:
             return super().readField(idx)
-        idx = self.formatIndex(idx)
 
+        idx = self.formatIndex(idx)
         offset0 = self.hSize + idx * (self.tSize + self.fSize)
         with open(self.fileName, "rb") as f:
             t = float(np.fromfile(f, dtype=T_DTYPE, count=1, offset=offset0)[0])
         offset0 += self.tSize
 
-        field = np.empty((self.nVar, self.nLocX, self.nLocY), dtype=self.dtype)
+        field = np.empty((self.nVar, *self.nLoc), dtype=self.dtype)
 
         self.MPI_FILE_OPEN(mode="r")
-        for iVar in range(self.nVar):
-            for iX in range(self.nLocX):
-                offset = offset0 + (iVar * self.nX * self.nY + (self.iLocX + iX) * self.nY + self.iLocY) * self.itemSize
-                self.MPI_READ_AT(offset, field[iVar, iX])
+        for (iVar, *iX) in itertools.product(range(self.nVar), *[range(nX) for nX in self.nLoc[:-1]]):
+            offset = offset0 + self.iPos(iVar, iX) * self.itemSize
+            self.MPI_READ_AT(offset, field[iVar, *iX])
         self.MPI_FILE_CLOSE()
 
         return t, field
