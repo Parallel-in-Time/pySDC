@@ -310,68 +310,6 @@ class GrayScottLarge(GrayScott):
         desc['convergence_controllers'][Adaptivity] = {'e_tol': 1e-3}
         return desc
 
-    # def plot(self, P, idx, n_procs_list, ax=None):  # pragma: no cover
-    #     import numpy as np
-    #     from matplotlib import ticker as tkr
-    #     from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
-    #     from mpl_toolkits.axes_grid1.inset_locator import mark_inset
-
-    #     fig = P.get_fig(n_comps=1)
-    #     cax = P.cax
-    #     ax = fig.get_axes()[0] if ax is None else ax
-
-    #     zoom = 8
-    #     ax_ins = zoomed_inset_axes(ax, zoom, loc=1)
-
-    #     buffer = {}
-    #     vmin = {'u': np.inf, 'v': np.inf}
-    #     vmax = {'u': -np.inf, 'v': -np.inf}
-
-    #     for rank in range(n_procs_list[2]):
-    #         ranks = [0, 0] + [rank]
-    #         LogToFile = self.get_LogToFile(ranks=ranks)
-
-    #         buffer[f'u-{rank}'] = LogToFile.load(idx)
-
-    #         vmin['v'] = 0
-    #         vmax['v'] = 0.5
-    #         vmin['u'] = 0
-    #         vmax['u'] = 0.5
-
-    #     for rank in range(n_procs_list[2]):
-    #         im = ax.pcolormesh(
-    #             buffer[f'u-{rank}']['X'],
-    #             buffer[f'u-{rank}']['Y'],
-    #             buffer[f'u-{rank}']['v'].real,
-    #             vmin=vmin['v'],
-    #             vmax=vmax['v'],
-    #             cmap='binary',
-    #             rasterized=True,
-    #         )
-    #         ax_ins.pcolormesh(
-    #             buffer[f'u-{rank}']['X'],
-    #             buffer[f'u-{rank}']['Y'],
-    #             buffer[f'u-{rank}']['v'].real,
-    #             vmin=vmin['v'],
-    #             vmax=vmax['v'],
-    #             cmap='binary',
-    #             rasterized=True,
-    #         )
-
-    #     box_size = ax.get_xlim()[1] - ax.get_xlim()[0]
-    #     ax_ins.set_xlim(0, box_size / zoom / 3)
-    #     ax_ins.set_ylim(0, box_size / zoom / 3)
-    #     ax_ins.set_xticks([])
-    #     ax_ins.set_yticks([])
-    #     mark_inset(ax, ax_ins, loc1=2, loc2=4, fc="none", ec="0.5")
-    #     fig.colorbar(im, cax, format=tkr.FormatStrFormatter('%.1f'))
-    #     ax.set_title(f't={buffer[f"u-{rank}"]["t"]:.2f}')
-    #     ax.set_xlabel('$x$')
-    #     ax.set_ylabel('$y$')
-    #     ax.set_aspect(1.0)
-    #     ax.set_aspect(1.0)
-
-    #     return fig
     def plot(self, P, idx, n_procs_list, projection=2, projection_type='flat'):  # pragma: no cover
         import numpy as np
         from matplotlib import ticker as tkr

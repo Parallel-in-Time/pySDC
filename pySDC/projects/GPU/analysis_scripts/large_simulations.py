@@ -176,7 +176,7 @@ class RBCLarge(LargeSim):
 
     def setup_CPU_params(self):
         """
-        Test params with a small run.
+        Params for the large run
         """
         self.params = {
             'procs': [1, 4, 1024],

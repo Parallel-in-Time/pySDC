@@ -180,7 +180,7 @@ def generate_data_for_fault_stats(Tend):
         prob.u_exact(_ts[i + 1], _t0=_ts[i], recompute=False)
 
 
-def plot_order(t, dt, steps, num_nodes, e_tol=1e-9, restol=1e-9, ax=None, recompute=False):
+def plot_order(t, dt, steps, num_nodes, e_tol=1e-9, restol=1e-9, ax=None, recompute=False):  # pragma: no cover
     from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRun
     from pySDC.implementations.hooks.log_work import LogSDCIterations, LogWork
     from pySDC.implementations.convergence_controller_classes.crash import StopAtNan
@@ -263,7 +263,7 @@ def check_order(t=14, dt=1e-1, steps=6):
     plt.show()
 
 
-def plot_step_size(t0=0, Tend=30, e_tol=1e-3, recompute=False):
+def plot_step_size(t0=0, Tend=30, e_tol=1e-3, recompute=False):  # pragma: no cover
     import matplotlib.pyplot as plt
     import pickle
     import os
@@ -296,7 +296,11 @@ def plot_step_size(t0=0, Tend=30, e_tol=1e-3, recompute=False):
     plt.show()
 
 
+<<<<<<< HEAD
 def plot_factorizations_over_time(t0=0, Tend=50, e_tol=1e-3, recompute=False, adaptivity_mode='dt'):
+=======
+def plot_factorizations_over_time(t0=0, Tend=50, e_tol=1e-3, recompute=False, adaptivity_mode='dt'):  # pragma: no cover
+>>>>>>> master
     import matplotlib.pyplot as plt
     import pickle
     import os

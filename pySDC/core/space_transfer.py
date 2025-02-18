@@ -27,17 +27,17 @@ class SpaceTransfer(object):
         coarse_prob (pySDC.Problem.ptype): reference to the coarse problem
     """
 
-    def __init__(self, fine_prob, coarse_prob, space_transfer_params):
+    def __init__(self, fine_prob, coarse_prob, params):
         """
         Initialization routine
 
         Args:
             fine_prob (pySDC.Problem.ptype): reference to the fine problem
             coarse_prob (pySDC.Problem.ptype): reference to the coarse problem
-            space_transfer_params (dict): user-defined parameters
+            params (dict): user-defined parameters
         """
 
-        self.params = _Pars(space_transfer_params)
+        self.params = _Pars(params)
 
         # set up logger
         self.logger = logging.getLogger('space-transfer')

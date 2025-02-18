@@ -906,6 +906,7 @@ def make_plots_for_thesis():  # pragma: no cover
         plot_RBC_solution(setup)
 
     from pySDC.projects.Resilience.RBC import plot_factorizations_over_time
+<<<<<<< HEAD
 
     plot_factorizations_over_time(t0=0, Tend=50)
 
@@ -971,6 +972,72 @@ def make_plots_for_TUHH_seminar():  # pragma: no cover
     # plot_adaptivity_stuff()
 
     # plot_fault_Lorenz(20, target='talk')
+=======
+
+    plot_factorizations_over_time(t0=0, Tend=50)
+
+    from pySDC.projects.Resilience.work_precision import all_problems, single_problem
+
+    all_params = {
+        'record': False,
+        'work_key': 't',
+        'precision_key': 'e_global_rel',
+        'plotting': True,
+        'base_path': 'data/paper',
+        'target': 'thesis',
+    }
+
+    for mode in ['compare_strategies', 'parallel_efficiency_dt_k', 'parallel_efficiency_dt', 'RK_comp']:
+        all_problems(**all_params, mode=mode)
+    all_problems(**{**all_params, 'work_key': 'param'}, mode='compare_strategies')
+    single_problem(**all_params, mode='RK_comp_high_order_RBC', problem=run_RBC)
+
+    for tend in [500, 2000]:
+        plot_GS_solution(tend=tend)
+    for setup in ['resilience', 'adaptivity']:
+        plot_vdp_solution(setup=setup)
+
+    plot_adaptivity_stuff()
+
+    plot_fault_Lorenz(0)
+    plot_fault_Lorenz(20)
+    compare_recovery_rate_problems(target='thesis', num_procs=1, strategy_type='SDC')
+    plot_recovery_rate_per_acceptance_threshold(run_Lorenz)
+    plot_recovery_rate(get_stats(run_Lorenz))
+    plot_recovery_rate_detailed_Lorenz()
+
+
+def make_plots_for_TUHH_seminar():  # pragma: no cover
+    global JOURNAL
+    JOURNAL = 'JSC_beamer'
+
+    from pySDC.projects.Resilience.work_precision import (
+        all_problems,
+    )
+
+    all_params = {
+        'record': False,
+        'work_key': 't',
+        'precision_key': 'e_global_rel',
+        'plotting': True,
+        'base_path': 'data/paper',
+        'target': 'talk',
+    }
+
+    for mode in ['compare_strategies', 'parallel_efficiency_dt_k', 'parallel_efficiency_dt', 'RK_comp']:
+        all_problems(**all_params, mode=mode)
+    all_problems(**{**all_params, 'work_key': 'param'}, mode='compare_strategies')
+
+    plot_GS_solution()
+    for setup in ['resilience_thesis', 'work_precision']:
+        plot_RBC_solution(setup)
+    for setup in ['resilience', 'adaptivity']:
+        plot_vdp_solution(setup=setup)
+
+    plot_adaptivity_stuff()
+
+    plot_fault_Lorenz(20, target='talk')
+>>>>>>> master
     compare_recovery_rate_problems(target='talk', num_procs=1, strategy_type='SDC')
     plot_recovery_rate_per_acceptance_threshold(run_Lorenz, target='talk')
     plot_recovery_rate_detailed_Lorenz(target='talk')

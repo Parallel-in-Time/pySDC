@@ -198,7 +198,7 @@ class GPUConfig(ScalingConfig):
     OMP_NUM_THREADS = 12
 
 
-class GrayScottSpaceScalingCPU3D(JurecaCPU, ScalingConfig):
+class GrayScottSpaceScalingCPU3D(CPUConfig, ScalingConfig):
     ndim = 3
     config = 'GS_scaling3D'
     tasks_time = 4
@@ -332,11 +332,6 @@ class RayleighBenardDedalusComparisonGPU(GPUConfig, ScalingConfig):
 
 
 def plot_scalings(problem, **kwargs):  # pragma: no cover
-    # if problem == 'GS':
-    #     configs = [
-    #         GrayScottSpaceScalingCPU(),
-    #         GrayScottSpaceScalingGPU(),
-    #     ]
     if problem == 'GS3D':
         configs = [
             GrayScottSpaceScalingCPU3D(),

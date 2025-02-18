@@ -189,9 +189,9 @@ class RungeKutta(Sweeper):
         Returns:
             mesh: Full right hand side as a mesh
         """
-        if type(f).__name__ in ['mesh', 'cupy_mesh']:
+        if type(f).__name__ in ['mesh', 'cupy_mesh', 'firedrake_mesh']:
             return f
-        elif type(f).__name__ in ['imex_mesh', 'imex_cupy_mesh']:
+        elif type(f).__name__.lower() in ['imex_mesh', 'imex_cupy_mesh', 'imex_firedrake_mesh']:
             return f.impl + f.expl
         elif f is None:
             prob = self.level.prob
@@ -249,11 +249,11 @@ class RungeKutta(Sweeper):
 
             # implicit solve with prefactor stemming from the diagonal of Qd, use previous stage as initial guess
             if self.QI[m + 1, m + 1] != 0:
-                lvl.u[m + 1][:] = prob.solve_system(
+                lvl.u[m + 1] = prob.solve_system(
                     rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m], lvl.time + lvl.dt * self.coll.nodes[m + 1]
                 )
             else:
-                lvl.u[m + 1][:] = rhs[:]
+                lvl.u[m + 1] = rhs
 
             # update function values (we don't usually need to evaluate the RHS at the solution of the step)
             lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m + 1])
@@ -428,11 +428,11 @@ class RungeKuttaIMEX(RungeKutta):
 
             # implicit solve with prefactor stemming from the diagonal of Qd, use previous stage as initial guess
             if self.QI[m + 1, m + 1] != 0:
-                lvl.u[m + 1][:] = prob.solve_system(
+                lvl.u[m + 1] = prob.solve_system(
                     rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m], lvl.time + lvl.dt * self.coll.nodes[m + 1]
                 )
             else:
-                lvl.u[m + 1][:] = rhs[:]
+                lvl.u[m + 1] = rhs[:]
 
             # update function values
             lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m + 1])

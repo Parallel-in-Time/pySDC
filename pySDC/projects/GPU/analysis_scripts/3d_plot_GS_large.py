@@ -43,7 +43,7 @@ def plot(
     plot_resolution=2048,
     n_samples=1024,
     zoom=1e-2,
-):
+):  # pragma: no cover
     comm = MPI.COMM_WORLD
 
     space_range = tqdm(space_range)
@@ -69,7 +69,7 @@ def plot(
             local_slice_flat = slice(np.prod(_data['v'].shape) * procs, np.prod(_data['v'].shape) * (procs + 1))
             v['values'][local_slice_flat] = _data['v'].flatten()
 
-        sampled = Grid(pv.ImageData(dimensions=(n_samples,) * 3, spacing=(1 / n_samples,) * 3), '', [1.0, 1.0])
+        # sampled = Grid(pv.ImageData(dimensions=(n_samples,) * 3, spacing=(1 / n_samples,) * 3), '', [1.0, 1.0])
         zoomed = Grid(
             pv.ImageData(dimensions=(n_samples,) * 3, spacing=(zoom / n_samples,) * 3, origin=[0.8, 0.47, 0.03]),
             '_zoomed',
@@ -101,7 +101,7 @@ def plot(
             print(f'Saved {path}', flush=True)
 
 
-def video(view=None):
+def video(view=None):  # pragma: no cover
     path = f'simulation_plots/GS_large_%06d{view}.png'
     path_target = f'videos/GS_large{view}.mp4'
 

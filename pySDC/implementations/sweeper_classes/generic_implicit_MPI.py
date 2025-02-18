@@ -55,14 +55,15 @@ class SweeperMPI(Sweeper):
 
         L = self.level
         P = L.prob
-        L.uend = P.dtype_u(P.init, val=0.0)
 
         # check if Mth node is equal to right point and do_coll_update is false, perform a simple copy
         if self.coll.right_is_node and not self.params.do_coll_update:
             # a copy is sufficient
             root = self.comm.Get_size() - 1
             if self.comm.rank == root:
-                L.uend[:] = L.u[-1]
+                L.uend = P.dtype_u(L.u[-1])
+            else:
+                L.uend = P.dtype_u(L.u[0])
             self.comm.Bcast(L.uend, root=root)
         else:
             raise NotImplementedError('require last node to be identical with right interval boundary')
@@ -221,7 +222,7 @@ class generic_implicit_MPI(SweeperMPI, generic_implicit):
         # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
 
         # implicit solve with prefactor stemming from the diagonal of Qd
-        L.u[self.rank + 1][:] = P.solve_system(
+        L.u[self.rank + 1] = P.solve_system(
             rhs,
             L.dt * self.QI[self.rank + 1, self.rank + 1],
             L.u[self.rank + 1],

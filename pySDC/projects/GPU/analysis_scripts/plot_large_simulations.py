@@ -63,7 +63,7 @@ class PlotLargeRun:  # pragma: no cover
             self._prob = self.get_problem()
         return self._prob
 
-    def plot_work(self):
+    def plot_work(self):  # pragma: no cover
         fig, ax = self.get_fig()
         for key, label in zip(['factorizations', 'rhs'], ['LU decompositions', 'rhs evaluations']):
             work = get_sorted(self.stats, type=f'work_{key}')
@@ -73,7 +73,7 @@ class PlotLargeRun:  # pragma: no cover
         ax.legend(frameon=False)
         self.save_fig(fig, 'work')
 
-    def plot_residual(self):
+    def plot_residual(self):  # pragma: no cover
         fig, ax = self.get_fig()
         residual = get_sorted(self.stats, type='residual_post_step', recomputed=False)
         increment = get_sorted(self.stats, type='error_embedded_estimate', recomputed=False)
@@ -95,7 +95,7 @@ class PlotRBC(PlotLargeRun):  # pragma: no cover
         _name = '-stats' if stats else ''
         return f'{self.base_path}/data/RayleighBenard_large-res_{self.res}-useGPU_{self.useGPU}-procs_{self.procs[0]}_{self.procs[1]}_{self.procs[2]}-{n_time}-{n_space}-solution_{idx:06d}{_name}.pickle'
 
-    def plot_verification(self):
+    def plot_verification(self):  # pragma: no cover
         fig, ax = self.get_fig()
 
         nu = get_sorted(self.stats, type='Nusselt', recomputed=False)
@@ -105,7 +105,7 @@ class PlotRBC(PlotLargeRun):  # pragma: no cover
         ax.set_xlabel('$t$')
         self.save_fig(fig, 'verification')
 
-    def plot_step_size(self):
+    def plot_step_size(self):  # pragma: no cover
         fig, ax = self.get_fig()
         dt = get_sorted(self.stats, type='dt', recomputed=False)
         CFL = self.get_CFL_limit()
@@ -189,7 +189,7 @@ class PlotRBC(PlotLargeRun):  # pragma: no cover
             print(f'Stored {path!r}')
         return CFL
 
-    def plot_work(self):
+    def plot_work(self):  # pragma: no cover
         fig, ax = self.get_fig()
         for key, label in zip(['factorizations', 'rhs'], ['LU decompositions', 'rhs evaluations']):
             work = get_sorted(self.stats, type=f'work_{key}')
@@ -199,7 +199,7 @@ class PlotRBC(PlotLargeRun):  # pragma: no cover
         ax.legend(frameon=False)
         self.save_fig(fig, 'work')
 
-    def plot_residual(self):
+    def plot_residual(self):  # pragma: no cover
         fig, ax = self.get_fig()
         residual = get_sorted(self.stats, type='residual_post_step', recomputed=False)
         increment = get_sorted(self.stats, type='error_embedded_estimate', recomputed=False)
@@ -210,7 +210,7 @@ class PlotRBC(PlotLargeRun):  # pragma: no cover
         ax.legend(frameon=False)
         self.save_fig(fig, 'residual')
 
-    def plot_series(self):
+    def plot_series(self):  # pragma: no cover
         indices = [0, 56, 82, 100, 162, 186]
 
         from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -243,7 +243,7 @@ class PlotRBC(PlotLargeRun):  # pragma: no cover
         if tqdm:
             frame_range.set_description('Plotting slice')
 
-        def plot_single(idx, ax):
+        def plot_single(idx, ax):  # pragma: no cover
             for r in frame_range:
                 path = self.get_path(idx=idx, n_space=r)
                 with open(path, 'rb') as file:
@@ -267,7 +267,7 @@ class PlotGS(PlotLargeRun):  # pragma: no cover
         _name = '-stats' if stats else ''
         return f'{self.base_path}/data/GrayScottLarge-res_{self.res}-useGPU_{self.useGPU}-procs_{self.procs[0]}_{self.procs[1]}_{self.procs[2]}-{n_time}-{n_space}-solution_{idx:06d}{_name}.pickle'
 
-    def plot_step_size(self):
+    def plot_step_size(self):  # pragma: no cover
         fig, ax = self.get_fig()
         dt = get_sorted(self.stats, type='dt', recomputed=False)
 
@@ -277,7 +277,7 @@ class PlotGS(PlotLargeRun):  # pragma: no cover
         ax.legend(frameon=False)
         self.save_fig(fig, 'dt')
 
-    def plot_series(self, test=False):
+    def plot_series(self, test=False):  # pragma: no cover
         if test:
             indices = [0, 1, 2, 3, 4, 5]
             process = 0

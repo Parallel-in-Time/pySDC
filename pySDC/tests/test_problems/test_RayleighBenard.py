@@ -15,8 +15,8 @@ def test_eval_f(nx, nz, direction, spectral_space):
     X, Z = P.X, P.Z
     cos, sin = np.cos, np.sin
 
-    kappa = (P.Rayleigh * P.Prandtl) ** (-1 / 2)
-    nu = (P.Rayleigh / P.Prandtl) ** (-1 / 2)
+    kappa = P.kappa
+    nu = P.nu
 
     if direction == 'x':
         y = sin(X * np.pi)
@@ -181,7 +181,9 @@ def test_Poisson_problems(nx, component):
         'T_top': 0,
         'T_bottom': 0,
     }
-    P = RayleighBenard(nx=nx, nz=6, BCs=BCs, Rayleigh=1.0)
+    P = RayleighBenard(
+        nx=nx, nz=6, BCs=BCs, Rayleigh=(max([abs(BCs['T_top'] - BCs['T_bottom']), np.finfo(float).eps]) * 2**3)
+    )
     rhs = P.u_init
 
     idx = P.index(f'{component}')

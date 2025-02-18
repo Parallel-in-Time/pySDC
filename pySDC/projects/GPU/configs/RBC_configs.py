@@ -13,8 +13,8 @@ def get_config(args):
         return RayleighBenard_dt_k_adaptivity(args)
     elif name == 'RBC_RK':
         return RayleighBenardRK(args)
-    # elif name == 'RBC_dedalus':
-    #     return RayleighBenardDedalusComp(args)
+    elif name == 'RBC_dedalus':
+        return RayleighBenardDedalusComp(args)
     elif name == 'RBC_Tibo':
         return RayleighBenard_Thibaut(args)
     elif name == 'RBC_scaling':
@@ -312,7 +312,6 @@ class RayleighBenardRK(RayleighBenardRegular):
         desc['sweeper_class'] = ARK3
 
         desc['step_params']['maxiter'] = 1
-        # desc['level_params']['dt'] = 0.1
 
         desc['convergence_controllers'][CFLLimit] = {'dt_max': 0.1, 'dt_min': 1e-6, 'cfl': 0.5}
         desc['convergence_controllers'][StepSizeSlopeLimiter] = {'dt_rel_min_slope': 0.1}
@@ -330,23 +329,23 @@ class RayleighBenardRK(RayleighBenardRegular):
         return controller_params
 
 
-# class RayleighBenardDedalusComp(RayleighBenardRK):
-#     Tend = 150
-#
-#     def get_description(self, *args, **kwargs):
-#         from pySDC.implementations.sweeper_classes.Runge_Kutta import ARK222
-#
-#         desc = super().get_description(*args, **kwargs)
-#
-#         desc['sweeper_class'] = ARK222
-#
-#         desc['step_params']['maxiter'] = 1
-#         desc['level_params']['dt'] = 5e-3
-#
-#         from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
-#
-#         desc['convergence_controllers'].pop(CFLLimit)
-#         return desc
+class RayleighBenardDedalusComp(RayleighBenardRK):
+    Tend = 150
+
+    def get_description(self, *args, **kwargs):
+        from pySDC.implementations.sweeper_classes.Runge_Kutta import ARK222
+
+        desc = super().get_description(*args, **kwargs)
+
+        desc['sweeper_class'] = ARK222
+
+        desc['step_params']['maxiter'] = 1
+        desc['level_params']['dt'] = 5e-3
+
+        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
+
+        desc['convergence_controllers'].pop(CFLLimit)
+        return desc
 
 
 class RayleighBenard_scaling(RayleighBenardRegular):
@@ -369,7 +368,6 @@ class RayleighBenard_scaling(RayleighBenardRegular):
         desc['level_params']['restol'] = -1
         desc['level_params']['dt'] = 8e-2
         desc['sweeper_params']['num_nodes'] = 4
-        # desc['sweeper_params']['skip_residual_computation'] = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
         desc['step_params']['maxiter'] = 4
         desc['problem_params']['max_cached_factorizations'] = 4
         return desc
@@ -383,8 +381,6 @@ class RayleighBenard_scaling(RayleighBenardRegular):
 
 
 class RayleighBenard_large(RayleighBenardRegular):
-    # res_per_plume = 256
-    # vertical_res = 1024
     Ra = 3.2e8
     relaxation_steps = 5
 
@@ -415,7 +411,6 @@ class RayleighBenard_large(RayleighBenardRegular):
 
         desc['problem_params']['Rayleigh'] = self.Ra
         desc['problem_params']['max_cached_factorizations'] = 4
-        # desc['problem_params']['Lx'] = desc['problem_params']['nx'] // self.res_per_plume * 2
 
         return desc
 

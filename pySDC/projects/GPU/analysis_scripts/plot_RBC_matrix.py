@@ -25,7 +25,7 @@ def plot_preconditioners():  # pragma: no cover
     plt.show()
 
 
-def plot_ultraspherical():
+def plot_ultraspherical():  # pragma: no cover
     from pySDC.helpers.spectral_helper import ChebychevHelper, UltrasphericalHelper
 
     N = 16
@@ -61,7 +61,7 @@ def plot_ultraspherical():
     plt.show()
 
 
-def plot_DCT():
+def plot_DCT():  # pragma: no cover
     fig, axs = plt.subplots(1, 3, figsize=figsize_by_journal('TUHH_thesis', 1, 0.28), sharey=True)
 
     N = 8

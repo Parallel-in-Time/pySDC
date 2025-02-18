@@ -132,16 +132,16 @@ class RayleighBenard(GenericSpectralLinear):
         self.Dzz = S2 @ Dzz
 
         # compute rescaled Rayleigh number to extract viscosity and thermal diffusivity
-        Ra = Rayleigh / (abs(BCs['T_top'] - BCs['T_bottom']) * self.axes[1].L ** 3)
-        kappa = (Ra * Prandtl) ** (-1 / 2.0)
-        nu = (Ra / Prandtl) ** (-1 / 2.0)
+        Ra = Rayleigh / (max([abs(BCs['T_top'] - BCs['T_bottom']), np.finfo(float).eps]) * self.axes[1].L ** 3)
+        self.kappa = (Ra * Prandtl) ** (-1 / 2.0)
+        self.nu = (Ra / Prandtl) ** (-1 / 2.0)
 
         # construct operators
         L_lhs = {
             'p': {'u': U01 @ Dx, 'v': Dz},  # divergence free constraint
-            'u': {'p': U02 @ Dx, 'u': -nu * (U02 @ Dxx + Dzz)},
-            'v': {'p': U12 @ Dz, 'v': -nu * (U02 @ Dxx + Dzz), 'T': -U02 @ Id},
-            'T': {'T': -kappa * (U02 @ Dxx + Dzz)},
+            'u': {'p': U02 @ Dx, 'u': -self.nu * (U02 @ Dxx + Dzz)},
+            'v': {'p': U12 @ Dz, 'v': -self.nu * (U02 @ Dxx + Dzz), 'T': -U02 @ Id},
+            'T': {'T': -self.kappa * (U02 @ Dxx + Dzz)},
         }
         self.setup_L(L_lhs)
 

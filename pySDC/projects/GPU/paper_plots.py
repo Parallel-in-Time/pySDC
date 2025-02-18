@@ -1,10 +1,10 @@
-""" Make plots for publications """
+"""Make plots for publications"""
 
 import matplotlib.pyplot as plt
 from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
 
 
-def plot_scalings_seperately(problem, journal='TUHH_thesis', **kwargs):  # pragma: no cover
+def plot_scalings_separately(problem, journal='TUHH_thesis', **kwargs):  # pragma: no cover
     from pySDC.projects.GPU.analysis_scripts.parallel_scaling import (
         plot_scalings,
         GrayScottSpaceScalingGPU3D,
@@ -53,7 +53,16 @@ def plot_scalings_seperately(problem, journal='TUHH_thesis', **kwargs):  # pragm
 
 
 def make_plots_for_thesis():  # pragma: no cover
-    plot_scalings_seperately('GS3D')
+    from pySDC.projects.GPU.analysis_scripts.plot_RBC_matrix import plot_DCT, plot_preconditioners, plot_ultraspherical
+
+    # small plots with no simulations
+    plot_DCT()
+    plot_preconditioners()
+    plot_ultraspherical()
+
+    # plot space-time parallel scaling
+    for problem in ['GS3D', 'RBC']:
+        plot_scalings_separately(problem=problem)
 
 
 if __name__ == '__main__':

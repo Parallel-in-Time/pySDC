@@ -10,21 +10,6 @@ class mesh_to_mesh_fenics(SpaceTransfer):
     This implementation can restrict and prolong between fenics meshes
     """
 
-    def __init__(self, fine_prob, coarse_prob, params):
-        """
-        Initialization routine
-
-        Args:
-            fine_prob: fine problem
-            coarse_prob: coarse problem
-            params: parameters for the transfer operators
-        """
-
-        # invoke super initialization
-        super(mesh_to_mesh_fenics, self).__init__(fine_prob, coarse_prob, params)
-
-        pass
-
     def project(self, F):
         """
         Restriction implementation via projection

@@ -297,7 +297,10 @@ def record_work_precision(
                 exponents = [-3, -2, -1, 0, 0.2, 0.8, 1][::-1]
         if problem.__name__ == 'run_RBC':
             exponents = [1, 0, -0.5, -1, -2]
+<<<<<<< HEAD
             # exponents = [3, 2, 1, 0]
+=======
+>>>>>>> master
         if problem.__name__ == 'run_GS':
             exponents = [-2, -1, 0, 1, 2, 3][::-1]
         if problem.__name__ == 'run_Lorenz':
@@ -986,6 +989,75 @@ def get_configs(mode, problem):
                 'num_procs': num_procs_dt,
                 'plotting_params': {'label': rf'$\Delta t$-adaptivity $N$={num_procs_dt}x1', 'ls': ls[num_procs_dt]},
             }
+<<<<<<< HEAD
+=======
+
+    elif mode == 'RK_comp_high_order_RBC':
+        """
+        Compare parallel adaptive SDC to Runge-Kutta at order five for RBC problem
+        """
+        from pySDC.projects.Resilience.strategies import (
+            AdaptivityStrategy,
+            ERKStrategy,
+            ESDIRKStrategy,
+            ARKStrategy,
+            AdaptivityPolynomialError,
+            ARK3_CFL_Strategy,
+        )
+
+        assert problem.__name__ == 'run_RBC'
+
+        from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as parallel_sweeper
+
+        newton_inexactness = False
+
+        desc = {}
+        desc['sweeper_params'] = {'num_nodes': 3, 'QI': 'IE', 'QE': "EE"}
+        desc['step_params'] = {'maxiter': 5}
+        num_procs_dt = 1
+
+        desc_poly = {}
+        desc_poly['sweeper_class'] = parallel_sweeper
+        num_procs_dt_k = 3
+
+        ls = {
+            1: '--',
+            2: '--',
+            3: '-',
+            4: '-',
+            5: '-',
+            12: ':',
+        }
+        RK_strategies = [ARK3_CFL_Strategy(useMPI=True)]
+        desc['sweeper_params']['num_nodes'] = 3
+        desc['sweeper_params']['QI'] = 'LU'
+        desc['sweeper_params']['QE'] = 'PIC'
+        desc['step_params']['maxiter'] = 5
+
+        desc_poly['sweeper_params'] = {'num_nodes': 3, 'QI': 'MIN-SR-S'}
+        num_procs_dt_k = 3
+
+        configurations[-1] = {
+            'strategies': RK_strategies,
+            'num_procs': 1,
+        }
+        configurations[3] = {
+            'custom_description': desc_poly,
+            'strategies': [AdaptivityPolynomialError(useMPI=True, newton_inexactness=newton_inexactness)],
+            'num_procs': 1,
+            'num_procs_sweeper': num_procs_dt_k,
+            'plotting_params': {
+                'label': rf'$\Delta t$-$k$-adaptivity $N$=1x{num_procs_dt_k}',
+                'ls': ls[num_procs_dt_k],
+            },
+        }
+        configurations[2] = {
+            'strategies': [AdaptivityStrategy(useMPI=True)],
+            'custom_description': desc,
+            'num_procs': num_procs_dt,
+            'plotting_params': {'label': rf'$\Delta t$-adaptivity $N$={num_procs_dt}x1', 'ls': ls[num_procs_dt]},
+        }
+>>>>>>> master
 
     elif mode == 'parallel_efficiency':
         """
@@ -1791,7 +1863,7 @@ def ODEs(mode='compare_strategies', plotting=True, base_path='data', **kwargs): 
         )
 
 
-def single_problem(mode, problem, plotting=True, base_path='data', **kwargs):  # pragma: no cover
+def single_problem(mode, problem, plotting=True, base_path='data', target='thesis', **kwargs):  # pragma: no cover
     """
     Make a plot for a single problem
 
@@ -1799,7 +1871,10 @@ def single_problem(mode, problem, plotting=True, base_path='data', **kwargs):  #
         mode (str): What you want to look at
         problem (function): A problem to run
     """
-    fig, ax = get_fig(1, 1, figsize=figsize_by_journal('Springer_Numerical_Algorithms', 1, 0.8))
+    if target == 'thesis':
+        fig, ax = get_fig(1, 1, figsize=figsize_by_journal('TUHH_thesis', 0.7, 0.6))
+    else:
+        fig, ax = get_fig(1, 1, figsize=figsize_by_journal('Springer_Numerical_Algorithms', 1, 0.8))
 
     params = {
         'work_key': 'k_SDC',
@@ -1825,6 +1900,7 @@ def single_problem(mode, problem, plotting=True, base_path='data', **kwargs):  #
             precision_key=params['precision_key'],
             legend=False,
             base_path=base_path,
+            squares=target != 'thesis',
         )
 
 
