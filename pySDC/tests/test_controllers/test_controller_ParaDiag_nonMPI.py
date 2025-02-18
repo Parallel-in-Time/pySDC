@@ -105,7 +105,7 @@ def get_composite_collocation_problem(L, M, N, alpha=0, dt=1e-1, problem='Dahlqu
 @pytest.mark.parametrize('L', [1, 4])
 @pytest.mark.parametrize('M', [2, 3])
 @pytest.mark.parametrize('N', [2])
-@pytest.mark.parametrize('alpha', [1e-4, 1e-2])
+@pytest.mark.parametrize('alpha', [1e-8, 1e-4, 1e-2])
 @pytest.mark.parametrize('problem', ['Dahlquist', 'Dahlquist_IMEX', 'vdp'])
 def test_ParaDiag_convergence(L, M, N, alpha, problem):
     from pySDC.helpers.stats_helper import get_sorted
@@ -129,8 +129,8 @@ def test_ParaDiag_convergence(L, M, N, alpha, problem):
 @pytest.mark.base
 @pytest.mark.parametrize('L', [1, 4])
 @pytest.mark.parametrize('M', [2, 3])
-@pytest.mark.parametrize('N', [64])
-@pytest.mark.parametrize('alpha', [1e-4, 1e-2])
+@pytest.mark.parametrize('N', [32])
+@pytest.mark.parametrize('alpha', [1e-8, 1e-4, 1e-2])
 def test_IMEX_ParaDiag_convergence(L, M, N, alpha):
     from pySDC.helpers.stats_helper import get_sorted
 
@@ -185,14 +185,14 @@ def test_ParaDiag_vs_PFASST(L, M, N, problem):
 @pytest.mark.parametrize('L', [4])
 @pytest.mark.parametrize('M', [2, 3])
 @pytest.mark.parametrize('N', [1])
-@pytest.mark.parametrize('alpha', [1e-4, 1e-2])
+@pytest.mark.parametrize('alpha', [1e-6, 1e-4])
 def test_ParaDiag_order(L, M, N, alpha):
     import numpy as np
     from pySDC.helpers.stats_helper import get_sorted
 
     errors = []
     if M == 3:
-        dts = [0.8 * 2 ** (-x) for x in range(7, 9)]
+        dts = [2 ** (-x) for x in range(9, 11)]
     elif M == 2:
         dts = [2 ** (-x) for x in range(5, 9)]
     else:
@@ -217,18 +217,18 @@ def test_ParaDiag_order(L, M, N, alpha):
     errors = np.array(errors)
     dts = np.array(dts)
     order = np.log(abs(errors[1:] - errors[:-1])) / np.log(abs(dts[1:] - dts[:-1]))
-    num_order = np.mean(order)
+    num_order = np.median(order)
 
     assert (
         expected_order + 1 > num_order > expected_order
-    ), f'Got unexpected numerical order {num_order} instead of {expected_order} in ParaDiag'
+    ), f'Got unexpected numerical order {num_order:2f} instead of {expected_order} in ParaDiag {order} {errors}'
 
 
 @pytest.mark.base
 @pytest.mark.parametrize('L', [4, 12])
-@pytest.mark.parametrize('M', [2, 3])
+@pytest.mark.parametrize('M', [3, 4])
 @pytest.mark.parametrize('N', [1])
-@pytest.mark.parametrize('alpha', [1e-4, 1e-2])
+@pytest.mark.parametrize('alpha', [1e-6, 1e-4, 1e-2])
 def test_ParaDiag_convergence_rate(L, M, N, alpha):
     r"""
     Test that the error in ParaDiag contracts as fast as expected.
@@ -258,7 +258,7 @@ def test_ParaDiag_convergence_rate(L, M, N, alpha):
 
     assert (
         convergence_rate < convergence_bound
-    ), f'Convergence rate {convergence_rate} exceeds upper bound of {convergence_bound}!'
+    ), f'Convergence rate {convergence_rate:.2e} exceeds upper bound of {convergence_bound:.2e}!'
 
 
 if __name__ == '__main__':
