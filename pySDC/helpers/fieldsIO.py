@@ -507,7 +507,7 @@ class Rectilinear(Scalar):
         comm : MPI.Intracomm
             The space decomposition communicator.
         iLoc : list[int]
-            Starting index of the local sub-domain in the global `coordX`.
+            Starting index of the local sub-domain in the global coordinates.
         nLoc : list[int]
             Number of points in the local sub-domain.
         """
