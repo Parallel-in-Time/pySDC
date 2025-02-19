@@ -1,4 +1,6 @@
+import os
 import sys
+import glob
 import pytest
 
 if sys.version_info < (3, 11):
@@ -153,6 +155,46 @@ def testRectilinear(dim, nVar, nSteps, dtypeIdx):
             assert np.allclose(u2, u1), f"{idx}'s fields in {f1} has incorrect values"
 
 
+@pytest.mark.parametrize("nSteps", [1, 10])
+@pytest.mark.parametrize("nZ", [1, 5, 16])
+@pytest.mark.parametrize("nY", [1, 5, 16])
+@pytest.mark.parametrize("nX", [1, 5, 16])
+@pytest.mark.parametrize("nVar", [1, 2, 3])
+def testToVTR(nVar, nX, nY, nZ, nSteps):
+
+    from pySDC.helpers.fieldsIO import Rectilinear
+    from pySDC.helpers.vtkIO import readFromVTR
+
+    coords = [np.linspace(0, 1, num=n, endpoint=False) for n in [nX, nY, nZ]]
+    file = Rectilinear(np.float64, "testToVTR.pysdc")
+    file.setHeader(nVar=nVar, coords=coords)
+    file.initialize()
+    u0 = np.random.rand(nVar, nX, nY, nZ).astype(file.dtype)
+    times = np.arange(nSteps) / nSteps
+    for t in times:
+        ut = (u0 * t).astype(file.dtype)
+        file.addField(t, ut)
+
+    # Cleaning after eventuall other tests ...
+    for f in glob.glob("testToVTR*.vtr"):
+        os.remove(f)
+
+    file.toVTR("testToVTR", varNames=[f"var{i}" for i in range(nVar)])
+
+    vtrFiles = glob.glob("testToVTR*.vtr")
+    assert len(vtrFiles) == file.nFields
+
+    vtrFiles.sort(key=lambda name: int(name.split("_")[1]))
+    for i, vFile in enumerate(vtrFiles):
+        uVTR, coords, _ = readFromVTR(vFile)
+        tVTR = float(vFile.split("_t=")[-1].split("s.vtr")[0])
+        tFile, uFile = file.readField(i)
+        assert np.allclose(tFile, tVTR), "mismatch between field times"
+        assert np.allclose(uFile, uVTR), "mismatch between data"
+    for i, (xVTR, xFile) in enumerate(zip(coords, file.header["coords"])):
+        assert np.allclose(xVTR, xFile), f"coordinate mismatch in dir. {i}"
+
+
 @pytest.mark.mpi4py
 @pytest.mark.parametrize("nVar", [1, 4])
 @pytest.mark.parametrize("nSteps", [1, 10])
@@ -175,7 +217,7 @@ def testRectilinear_MPI(dim, nProcs, dtypeIdx, algo, nSteps, nVar):
         p.wait()
         assert p.returncode == 0, f"MPI write with {nProcs} proc(s) did not return code 0, but {p.returncode}"
 
-        from pySDC.helpers.fieldsIO import FieldsIO, Rectilinear, initGrid
+        from pySDC.helpers.fieldsIO import Rectilinear, initGrid
 
         f2: Rectilinear = FieldsIO.fromFile(fileName)
 

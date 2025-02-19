@@ -453,6 +453,15 @@ class Rectilinear(Scalar):
         """Number of degrees of freedom for one variable"""
         return np.prod(self.nX)
 
+    def toVTR(self, baseName, varNames, suffix="{:06d}_t={:1.2f}s"):
+        assert self.dim == 3, "can only be used with 3D fields"
+        from pySDC.helpers.vtkIO import writeToVTR
+
+        template = f"{baseName}_{suffix}"
+        for i in range(self.nFields):
+            t, u = self.readField(i)
+            writeToVTR(template.format(i, t), u, self.header["coords"], varNames)
+
     # -------------------------------------------------------------------------
     # MPI-parallel implementation
     # -------------------------------------------------------------------------
