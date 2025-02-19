@@ -417,7 +417,7 @@ class Rectilinear(Scalar):
     @property
     def hInfos(self):
         """Array representing the grid structure to be written in the binary file."""
-        return [np.array([self.nVar, self.dim, *self.nX], dtype=np.int32)] + [
+        return [np.array([self.nVar, self.dim, *self.gridSizes], dtype=np.int32)] + [
             np.array(coord, dtype=np.float64) for coord in self.header["coords"]
         ]
 
@@ -431,31 +431,31 @@ class Rectilinear(Scalar):
             File to read the header from.
         """
         nVar, dim = np.fromfile(f, dtype=np.int32, count=2)
-        nX = np.fromfile(f, dtype=np.int32, count=dim)
-        coords = [np.fromfile(f, dtype=np.float64, count=n) for n in nX]
+        gridSizes = np.fromfile(f, dtype=np.int32, count=dim)
+        coords = [np.fromfile(f, dtype=np.float64, count=n) for n in gridSizes]
         self.setHeader(nVar, coords)
 
     def reshape(self, fields: np.ndarray):
         """Reshape the fields to a N-d array (inplace operation)"""
-        fields.shape = (self.nVar, *self.nX)
+        fields.shape = (self.nVar, *self.gridSizes)
 
     # -------------------------------------------------------------------------
     # Class specifics
     # -------------------------------------------------------------------------
     @property
-    def nX(self):
+    def gridSizes(self):
         """Number of points in y direction"""
         return [coord.size for coord in self.header["coords"]]
 
     @property
     def dim(self):
         """Number of grid dimensions"""
-        return len(self.nX)
+        return len(self.gridSizes)
 
     @property
     def nDoF(self):
         """Number of degrees of freedom for one variable"""
-        return np.prod(self.nX)
+        return np.prod(self.gridSizes)
 
     def toVTR(self, baseName, varNames, suffix="{:06d}_t={:1.2f}s"):
         """
@@ -625,22 +625,22 @@ class Rectilinear(Scalar):
             self.MPI_WRITE(np.array(time, dtype=T_DTYPE))
         offset0 += self.tSize
 
-        for (iVar, *iX) in itertools.product(range(self.nVar), *[range(nX) for nX in self.nLoc[:-1]]):
-            offset = offset0 + self.iPos(iVar, iX) * self.itemSize
-            self.MPI_WRITE_AT(offset, field[iVar, *iX])
+        for (iVar, *iBeg) in itertools.product(range(self.nVar), *[range(n) for n in self.nLoc[:-1]]):
+            offset = offset0 + self.iPos(iVar, iBeg) * self.itemSize
+            self.MPI_WRITE_AT(offset, field[iVar, *iBeg])
         self.MPI_FILE_CLOSE()
 
     def iPos(self, iVar, iX):
         iPos = iVar * self.nDoF
         for axis in range(self.dim - 1):
-            iPos += (self.iLoc[axis] + iX[axis]) * np.prod(self.nX[axis + 1 :])
+            iPos += (self.iLoc[axis] + iX[axis]) * np.prod(self.gridSizes[axis + 1 :])
         iPos += self.iLoc[-1]
         return iPos
 
     def readField(self, idx):
         """
         Read one field stored in the binary file, corresponding to the given
-        time index, eventually in MPI mode.
+        time index, using MPI in the eventuality of space parallel decomposition.
 
         Parameters
         ----------
@@ -670,9 +670,9 @@ class Rectilinear(Scalar):
         field = np.empty((self.nVar, *self.nLoc), dtype=self.dtype)
 
         self.MPI_FILE_OPEN(mode="r")
-        for (iVar, *iX) in itertools.product(range(self.nVar), *[range(nX) for nX in self.nLoc[:-1]]):
-            offset = offset0 + self.iPos(iVar, iX) * self.itemSize
-            self.MPI_READ_AT(offset, field[iVar, *iX])
+        for (iVar, *iBeg) in itertools.product(range(self.nVar), *[range(n) for n in self.nLoc[:-1]]):
+            offset = offset0 + self.iPos(iVar, iBeg) * self.itemSize
+            self.MPI_READ_AT(offset, field[iVar, *iBeg])
         self.MPI_FILE_CLOSE()
 
         return t, field
@@ -691,8 +691,8 @@ def initGrid(nVar, gridSizes):
     return coords, u0
 
 
-def writeFields_MPI(fileName, dtypeIdx, algo, nSteps, nVar, nX):
-    coords, u0 = initGrid(nVar, nX)
+def writeFields_MPI(fileName, dtypeIdx, algo, nSteps, nVar, gridSizes):
+    coords, u0 = initGrid(nVar, gridSizes)
 
     from mpi4py import MPI
     from pySDC.helpers.blocks import BlockDecomposition
@@ -702,7 +702,7 @@ def writeFields_MPI(fileName, dtypeIdx, algo, nSteps, nVar, nX):
     MPI_SIZE = comm.Get_size()
     MPI_RANK = comm.Get_rank()
 
-    blocks = BlockDecomposition(MPI_SIZE, nX, algo, MPI_RANK)
+    blocks = BlockDecomposition(MPI_SIZE, gridSizes, algo, MPI_RANK)
 
     iLoc, nLoc = blocks.localBounds
     Rectilinear.setupMPI(comm, iLoc, nLoc)

@@ -116,20 +116,20 @@ def testRectilinear(dim, nVar, nSteps, dtypeIdx):
     fileName = f"testRectilinear{dim}D.pysdc"
     dtype = DTYPES[dtypeIdx]
 
-    for nX in itertools.product(*[[5, 10, 16]] * dim):
+    for gridSizes in itertools.product(*[[5, 10, 16]] * dim):
 
-        coords = [np.linspace(0, 1, num=n, endpoint=False) for n in nX]
+        coords = [np.linspace(0, 1, num=n, endpoint=False) for n in gridSizes]
 
         f1 = Rectilinear(dtype, fileName)
         f1.setHeader(nVar=nVar, coords=coords)
 
         assert f1.dim == dim, f"{f1} has incorrect dimension"
-        assert f1.nX == list(nX), f"{f1} has incorrect nX"
-        assert f1.nDoF == np.prod(nX), f"{f1} has incorrect nDOF"
-        assert f1.nItems == nVar * np.prod(nX), f"{f1} do not have nItems == nVar*nX**dim"
+        assert f1.gridSizes == list(gridSizes), f"{f1} has incorrect gridSizes"
+        assert f1.nDoF == np.prod(gridSizes), f"{f1} has incorrect nDOF"
+        assert f1.nItems == nVar * np.prod(gridSizes), f"{f1} do not have nItems == nVar*product(gridSizes)"
 
         f1.initialize()
-        u0 = np.random.rand(nVar, *nX).astype(f1.dtype)
+        u0 = np.random.rand(nVar, *gridSizes).astype(f1.dtype)
         times = np.arange(nSteps) / nSteps
 
         for t in times:
@@ -208,10 +208,10 @@ def testRectilinear_MPI(dim, nProcs, dtypeIdx, algo, nSteps, nVar):
 
     fileName = f"testRectilinear{dim}D_MPI.pysdc"
 
-    for nX in itertools.product(*[[61, 16]] * dim):
+    for gridSizes in itertools.product(*[[61, 16]] * dim):
 
         cmd = f"mpirun -np {nProcs} python {__file__} --fileName {fileName}"
-        cmd += f" --dtypeIdx {dtypeIdx} --algo {algo} --nSteps {nSteps} --nVar {nVar} --nX {' '.join([str(n) for n in nX])}"
+        cmd += f" --dtypeIdx {dtypeIdx} --algo {algo} --nSteps {nSteps} --nVar {nVar} --gridSizes {' '.join([str(n) for n in gridSizes])}"
 
         p = subprocess.Popen(cmd.split(), cwd=".")
         p.wait()
@@ -224,9 +224,9 @@ def testRectilinear_MPI(dim, nProcs, dtypeIdx, algo, nSteps, nVar):
         assert type(f2) == Rectilinear, f"incorrect type in MPI written fields {f2}"
         assert f2.nFields == nSteps, f"incorrect nFields in MPI written fields {f2} ({f2.nFields} instead of {nSteps})"
         assert f2.nVar == nVar, f"incorrect nVar in MPI written fields {f2}"
-        assert f2.nX == list(nX), f"incorrect nX in MPI written fields {f2}"
+        assert f2.gridSizes == list(gridSizes), f"incorrect gridSizes in MPI written fields {f2}"
 
-        coords, u0 = initGrid(nVar, nX)
+        coords, u0 = initGrid(nVar, gridSizes)
         for i, (cFile, cRef) in enumerate(zip(f2.header['coords'], coords)):
             assert np.allclose(cFile, cRef), f"incorrect coords[{i}] in MPI written fields {f2}"
 
@@ -248,7 +248,7 @@ if __name__ == "__main__":
     parser.add_argument('--algo', type=str, help="algorithm used for block decomposition")
     parser.add_argument('--nSteps', type=int, help="number of time-steps")
     parser.add_argument('--nVar', type=int, help="number of field variables")
-    parser.add_argument('--nX', type=int, nargs='+', help="number of grid points in each dimensions")
+    parser.add_argument('--gridSizes', type=int, nargs='+', help="number of grid points in each dimensions")
     args = parser.parse_args()
 
     if sys.version_info >= (3, 11):

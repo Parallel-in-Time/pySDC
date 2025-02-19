@@ -94,8 +94,8 @@ def readFromVTR(fileName: str):
     reader.Update()
 
     vtr = reader.GetOutput()
-    dims = vtr.GetDimensions()
-    assert len(dims) == 3, "can only read 3D data"
+    gridSizes = vtr.GetDimensions()
+    assert len(gridSizes) == 3, "can only read 3D data"
 
     def vect(x):
         return numpy_support.vtk_to_numpy(x)
@@ -103,7 +103,7 @@ def readFromVTR(fileName: str):
     coords = [vect(vtr.GetXCoordinates()), vect(vtr.GetYCoordinates()), vect(vtr.GetZCoordinates())]
     pointData = vtr.GetPointData()
     varNames = [pointData.GetArrayName(i) for i in range(pointData.GetNumberOfArrays())]
-    data = [numpy_support.vtk_to_numpy(pointData.GetArray(name)).reshape(dims, order="F") for name in varNames]
+    data = [numpy_support.vtk_to_numpy(pointData.GetArray(name)).reshape(gridSizes, order="F") for name in varNames]
     data = np.array(data)
 
     return data, coords, varNames
