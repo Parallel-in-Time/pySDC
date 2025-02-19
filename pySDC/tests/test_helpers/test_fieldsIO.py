@@ -184,12 +184,10 @@ def testToVTR(nVar, nX, nY, nZ, nSteps):
     vtrFiles = glob.glob("testToVTR*.vtr")
     assert len(vtrFiles) == file.nFields
 
-    vtrFiles.sort(key=lambda name: int(name.split("_")[1]))
+    vtrFiles.sort(key=lambda name: int(name.split("_")[-1][:-4]))
     for i, vFile in enumerate(vtrFiles):
         uVTR, coords, _ = readFromVTR(vFile)
-        tVTR = float(vFile.split("_t=")[-1].split("s.vtr")[0])
-        tFile, uFile = file.readField(i)
-        assert np.allclose(tFile, tVTR), "mismatch between field times"
+        _, uFile = file.readField(i)
         assert np.allclose(uFile, uVTR), "mismatch between data"
     for i, (xVTR, xFile) in enumerate(zip(coords, file.header["coords"])):
         assert np.allclose(xVTR, xFile), f"coordinate mismatch in dir. {i}"

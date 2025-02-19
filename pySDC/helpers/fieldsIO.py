@@ -457,7 +457,7 @@ class Rectilinear(Scalar):
         """Number of degrees of freedom for one variable"""
         return np.prod(self.gridSizes)
 
-    def toVTR(self, baseName, varNames, suffix="{:06d}_t={:1.2f}s"):
+    def toVTR(self, baseName, varNames, idxFormat="{:06d}"):
         """
         Convert all 3D fields stored in binary format (FieldsIO) into a list
         of VTR files, that can be read later with Paraview or equivalent to
@@ -469,10 +469,9 @@ class Rectilinear(Scalar):
             Base name of the VTR file.
         varNames : list[str]
             Variable names of the fields.
-        suffix : str, optional
-            Formating string for the suffix of the VTR file, containing the
-            index in first position, and the time in second position.
-            The default is "{:06d}_t={:1.2f}s".
+        idxFormat : str, optional
+            Formatting string for the index of the VTR file.
+            The default is "{:06d}".
 
         Example
         -------
@@ -486,10 +485,10 @@ class Rectilinear(Scalar):
         assert self.dim == 3, "can only be used with 3D fields"
         from pySDC.helpers.vtkIO import writeToVTR
 
-        template = f"{baseName}_{suffix}"
+        template = f"{baseName}_{idxFormat}"
         for i in range(self.nFields):
-            t, u = self.readField(i)
-            writeToVTR(template.format(i, t), u, self.header["coords"], varNames)
+            _, u = self.readField(i)
+            writeToVTR(template.format(i), u, self.header["coords"], varNames)
 
     # -------------------------------------------------------------------------
     # MPI-parallel implementation
