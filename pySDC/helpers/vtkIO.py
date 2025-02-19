@@ -40,13 +40,17 @@ def writeToVTR(fileName: str, data, coords, varNames):
     vtr = vtk.vtkRectilinearGrid()
     vtr.SetDimensions(nX, nY, nZ)
 
-    vect = lambda x: numpy_support.numpy_to_vtk(num_array=x, deep=True, array_type=vtk.VTK_FLOAT)
+    def vect(x):
+        return numpy_support.numpy_to_vtk(num_array=x, deep=True, array_type=vtk.VTK_FLOAT)
+
     x, y, z = coords
     vtr.SetXCoordinates(vect(x))
     vtr.SetYCoordinates(vect(y))
     vtr.SetZCoordinates(vect(z))
 
-    field = lambda u: numpy_support.numpy_to_vtk(num_array=u.ravel(order='F'), deep=True, array_type=vtk.VTK_FLOAT)
+    def field(u):
+        return numpy_support.numpy_to_vtk(num_array=u.ravel(order='F'), deep=True, array_type=vtk.VTK_FLOAT)
+
     pointData = vtr.GetPointData()
     for name, u in zip(varNames, data):
         uVTK = field(u)
@@ -93,7 +97,9 @@ def readFromVTR(fileName: str):
     dims = vtr.GetDimensions()
     assert len(dims) == 3, "can only read 3D data"
 
-    vect = lambda x: numpy_support.vtk_to_numpy(x)
+    def vect(x):
+        return numpy_support.vtk_to_numpy(x)
+
     coords = [vect(vtr.GetXCoordinates()), vect(vtr.GetYCoordinates()), vect(vtr.GetZCoordinates())]
     pointData = vtr.GetPointData()
     varNames = [pointData.GetArrayName(i) for i in range(pointData.GetNumberOfArrays())]
