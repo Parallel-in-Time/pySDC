@@ -153,63 +153,6 @@ def testRectilinear(dim, nVar, nSteps, dtypeIdx):
             assert np.allclose(u2, u1), f"{idx}'s fields in {f1} has incorrect values"
 
 
-def initGrid(nVar, gridSizes):
-    dim = len(gridSizes)
-    coords = [np.linspace(0, 1, num=n, endpoint=False) for n in gridSizes]
-    s = [None] * dim
-    u0 = np.array(np.arange(nVar) + 1)[:, *s]
-    for x in np.meshgrid(*coords, indexing="ij"):
-        u0 = u0 * x
-    return coords, u0
-
-
-def writeFields_MPI(fileName, dtypeIdx, algo, nSteps, nVar, nX):
-    coords, u0 = initGrid(nVar, nX)
-
-    from mpi4py import MPI
-    from pySDC.helpers.blocks import BlockDecomposition
-    from pySDC.helpers.fieldsIO import Rectilinear
-
-    comm = MPI.COMM_WORLD
-    MPI_SIZE = comm.Get_size()
-    MPI_RANK = comm.Get_rank()
-
-    blocks = BlockDecomposition(MPI_SIZE, nX, algo, MPI_RANK)
-
-    iLoc, nLoc = blocks.localBounds
-    Rectilinear.setupMPI(comm, iLoc, nLoc)
-    s = [slice(i, i + n) for i, n in zip(iLoc, nLoc)]
-    u0 = u0[:, *s]
-    print(MPI_RANK, u0.shape)
-
-    f1 = Rectilinear(DTYPES[dtypeIdx], fileName)
-    f1.setHeader(nVar=nVar, coords=coords)
-
-    u0 = np.asarray(u0, dtype=f1.dtype)
-    f1.initialize()
-
-    times = np.arange(nSteps) / nSteps
-    for t in times:
-        ut = (u0 * t).astype(f1.dtype)
-        f1.addField(t, ut)
-
-    return u0
-
-
-def compareFields_MPI(fileName, u0, nSteps):
-    from pySDC.helpers.fieldsIO import FieldsIO
-
-    f2 = FieldsIO.fromFile(fileName)
-
-    times = np.arange(nSteps) / nSteps
-    for idx, t in enumerate(times):
-        u1 = u0 * t
-        t2, u2 = f2.readField(idx)
-        assert t2 == t, f"fields[{idx}] in {f2} has incorrect time ({t2} instead of {t})"
-        assert u2.shape == u1.shape, f"{idx}'s fields in {f2} has incorrect shape"
-        assert np.allclose(u2, u1), f"{idx}'s fields in {f2} has incorrect values"
-
-
 @pytest.mark.mpi4py
 @pytest.mark.parametrize("nVar", [1, 4])
 @pytest.mark.parametrize("nSteps", [1, 10])
@@ -232,7 +175,7 @@ def testRectilinear_MPI(dim, nProcs, dtypeIdx, algo, nSteps, nVar):
         p.wait()
         assert p.returncode == 0, f"MPI write with {nProcs} proc(s) did not return code 0, but {p.returncode}"
 
-        from pySDC.helpers.fieldsIO import FieldsIO, Rectilinear
+        from pySDC.helpers.fieldsIO import FieldsIO, Rectilinear, initGrid
 
         f2: Rectilinear = FieldsIO.fromFile(fileName)
 
@@ -266,5 +209,8 @@ if __name__ == "__main__":
     parser.add_argument('--nX', type=int, nargs='+', help="number of grid points in each dimensions")
     args = parser.parse_args()
 
-    u0 = writeFields_MPI(**args.__dict__)
-    compareFields_MPI(args.fileName, u0, args.nSteps)
+    if sys.version_info >= (3, 11):
+        from pySDC.helpers.fieldsIO import writeFields_MPI, compareFields_MPI
+
+        u0 = writeFields_MPI(**args.__dict__)
+        compareFields_MPI(args.fileName, u0, args.nSteps)
