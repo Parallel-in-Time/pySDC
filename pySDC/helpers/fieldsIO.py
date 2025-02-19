@@ -454,6 +454,31 @@ class Rectilinear(Scalar):
         return np.prod(self.nX)
 
     def toVTR(self, baseName, varNames, suffix="{:06d}_t={:1.2f}s"):
+        """
+        Convert all 3D fields stored in binary format (FieldsIO) into a list
+        of VTR files, that can be read later with Paraview or equivalent to
+        make videos.
+
+        Parameters
+        ----------
+        baseName : str
+            Base name of the VTR file.
+        varNames : list[str]
+            Variable names of the fields.
+        suffix : str, optional
+            Formating string for the suffix of the VTR file, containing the
+            index in first position, and the time in second position.
+            The default is "{:06d}_t={:1.2f}s".
+
+        Example
+        -------
+        >>> # Suppose the FieldsIO object is already writen into outputs.pysdc
+        >>> import os
+        >>> from pySDC.utils.fieldsIO import Rectilinear
+        >>> os.makedirs("vtrFiles")  # to store all VTR files into a subfolder
+        >>> Rectilinear.fromFile("outputs.pysdc").toVTR(
+        >>>    baseName="field", varNames=["u", "v", "w", "T", "p"])
+        """
         assert self.dim == 3, "can only be used with 3D fields"
         from pySDC.helpers.vtkIO import writeToVTR
 
