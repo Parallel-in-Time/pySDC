@@ -1,7 +1,7 @@
 import sys
 import pytest
 
-if sys.version_info >= (3, 11):
+if sys.version_info < (3, 11):
     pytest.skip("skipping fieldsIO tests on python lower than 3.11", allow_module_level=True)
 
 import itertools
