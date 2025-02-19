@@ -481,7 +481,7 @@ class Rectilinear(Scalar):
         >>> from pySDC.utils.fieldsIO import Rectilinear
         >>> os.makedirs("vtrFiles")  # to store all VTR files into a subfolder
         >>> Rectilinear.fromFile("outputs.pysdc").toVTR(
-        >>>    baseName="field", varNames=["u", "v", "w", "T", "p"])
+        >>>    baseName="vtrFiles/field", varNames=["u", "v", "w", "T", "p"])
         """
         assert self.dim == 3, "can only be used with 3D fields"
         from pySDC.helpers.vtkIO import writeToVTR
