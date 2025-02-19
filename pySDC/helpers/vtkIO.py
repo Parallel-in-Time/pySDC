@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Helper functions to write and read fields from VTK files (to be used with Paraview or PyVista)
+Helper functions for VTK files IO (to be used with Paraview or PyVista)
 """
 import os
 import vtk

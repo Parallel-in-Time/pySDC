@@ -7,7 +7,7 @@ import numpy as np
 @pytest.mark.parametrize("nX", [1, 5, 16])
 @pytest.mark.parametrize("nVar", [1, 2, 3])
 def testVTR(nVar, nX, nY, nZ):
-    from pySDC.helpers.vtk import writeToVTR, readFromVTR
+    from pySDC.helpers.vtkIO import writeToVTR, readFromVTR
 
     data1 = np.random.rand(nVar, nX, nY, nZ)
     coords1 = [np.sort(np.random.rand(n)) for n in [nX, nY, nZ]]
