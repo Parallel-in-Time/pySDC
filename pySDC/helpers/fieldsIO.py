@@ -43,7 +43,7 @@ Warning
 To use MPI collective writing, you need to call first the class methods :class:`Rectilinear.initMPI` (cf their docstring).
 Also, `Rectilinear.setHeader` **must be given the global grids coordinates**, wether the code is run in parallel or not.
 
-Also : this feature is only available with Python 3.11 or higher ...
+> ⚠️ Also : this module can only be imported with **Python 3.11 or higher** !
 """
 import os
 import numpy as np
@@ -640,7 +640,9 @@ class Rectilinear(Scalar):
         return t, field
 
 
-# Utility function used for testing
+# -----------------------------------------------------------------------------------------------
+# Utility functions used for testing
+# -----------------------------------------------------------------------------------------------
 def initGrid(nVar, gridSizes):
     dim = len(gridSizes)
     coords = [np.linspace(0, 1, num=n, endpoint=False) for n in gridSizes]
