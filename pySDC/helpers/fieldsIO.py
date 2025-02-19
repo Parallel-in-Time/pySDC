@@ -14,19 +14,23 @@ base abstract class.
 Example
 -------
 >>> import numpy as np
->>> from pySDC.helpers.fieldsIO import Rectilinear, FieldsIO
+>>> from pySDC.helpers.fieldsIO import Rectilinear
 >>>
 >>> # Write some fields in files
->>> x = np.linspace(0, 1, 101)
+>>> x = np.linspace(0, 1, 128)
+>>> y = np.linspace(0, 1, 64)
 >>> fOut = Rectilinear(np.float64, "file.pysdc")
->>> fOut.setHeader(nVar=2, coords=x)
+>>> fOut.setHeader(nVar=2, coords=[x, y])
 >>> fOut.initialize()
 >>> times = [0, 1, 2]
->>> u0 = np.array([-1, 1])[:, None]*x[None, :]
+>>> xGrid, yGrid = np.meshgrid(x, y, indexing="ij")
+>>> u0 = np.array([-1, 1]).reshape((-1, 1, 1))*xGrid*yGrid
+>>> # u0 has shape [2, nX, nY]
 >>> for t in times:
 >>>    fOut.addField(t, t*u0)
 >>>
->>> # Read the file using a the generic interface
+>>> # Read the file using the generic interface
+>>> from pySDC.helpers.fieldsIO import FieldsIO
 >>> fIn = FieldsIO.fromFile("file.pysdc")
 >>> times = fIn.times
 >>> assert len(times) == fIn.nFields
@@ -36,7 +40,7 @@ Example
 Notes
 -----
 🚀 :class:`Rectilinear` is compatible with a MPI-based cartesian decomposition.
-See :class:`pySDC.tests.test_helpers.test_fieldsIO.writeFields_MPI` for an illustrative example.
+See :class:`pySDC.helpers.fieldsIO.writeFields_MPI` for an illustrative example.
 
 Warning
 -------
