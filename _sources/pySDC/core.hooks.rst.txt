@@ -3,5 +3,5 @@ core.hooks module
 
 .. automodule:: core.hooks
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

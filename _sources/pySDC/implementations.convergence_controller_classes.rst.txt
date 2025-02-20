@@ -29,5 +29,5 @@ Module contents
 
 .. automodule:: implementations.convergence_controller_classes
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

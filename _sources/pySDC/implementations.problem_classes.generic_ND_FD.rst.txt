@@ -3,5 +3,5 @@ implementations.problem\_classes.generic\_ND\_FD module
 
 .. automodule:: implementations.problem_classes.generic_ND_FD
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

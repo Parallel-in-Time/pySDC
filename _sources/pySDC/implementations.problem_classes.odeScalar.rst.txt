@@ -3,5 +3,5 @@ implementations.problem\_classes.odeScalar module
 
 .. automodule:: implementations.problem_classes.odeScalar
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

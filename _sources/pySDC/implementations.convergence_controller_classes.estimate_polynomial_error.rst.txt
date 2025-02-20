@@ -3,5 +3,5 @@ implementations.convergence\_controller\_classes.estimate\_polynomial\_error mod
 
 .. automodule:: implementations.convergence_controller_classes.estimate_polynomial_error
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

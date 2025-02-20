@@ -3,5 +3,5 @@ core.space\_transfer module
 
 .. automodule:: core.space_transfer
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

@@ -3,5 +3,5 @@ core.problem module
 
 .. automodule:: core.problem
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

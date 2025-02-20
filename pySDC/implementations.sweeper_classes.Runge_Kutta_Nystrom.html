@@ -50,14 +50,14 @@
 <span id="implementations-sweeper-classes-runge-kutta-nystrom-module"></span><h1>implementations.sweeper_classes.Runge_Kutta_Nystrom module<a class="headerlink" href="#module-implementations.sweeper_classes.Runge_Kutta_Nystrom" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.ButcherTableauNoCollUpdate">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ButcherTableauNoCollUpdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#ButcherTableauNoCollUpdate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.ButcherTableauNoCollUpdate" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ButcherTableauNoCollUpdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#ButcherTableauNoCollUpdate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.ButcherTableauNoCollUpdate" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Version of Butcher Tableau that does not need a collocation update because the weights are put in the last line of Q</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RKN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RKN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RKN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RKN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom" title="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKuttaNystrom</span></code></a></p>
 <p>Runge-Kutta-Nystrom method
 <a class="reference external" href="https://link.springer.com/book/10.1007/978-3-540-78862-1">https://link.springer.com/book/10.1007/978-3-540-78862-1</a>
@@ -92,7 +92,7 @@ Chapter: II.14 Numerical methods for Second order differential equations</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RungeKuttaNystrom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RungeKuttaNystrom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></p>
 <p>Runge-Kutta scheme that fits the interface of a sweeper.
 Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions
@@ -132,7 +132,7 @@ method, which does not require us to solve a system of equations to compute the 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.get_Butcher_tableau_bar">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_Butcher_tableau_bar</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom.get_Butcher_tableau_bar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.get_Butcher_tableau_bar" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_Butcher_tableau_bar</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom.get_Butcher_tableau_bar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.get_Butcher_tableau_bar" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -177,7 +177,7 @@ method, which does not require us to solve a system of equations to compute the 
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Velocity_Verlet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#Velocity_Verlet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Velocity_Verlet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#Velocity_Verlet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom" title="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKuttaNystrom</span></code></a></p>
 <p>Velocity-Verlet scheme
 <a class="reference external" href="https://de.wikipedia.org/wiki/Verlet-Algorithmus">https://de.wikipedia.org/wiki/Verlet-Algorithmus</a></p>
@@ -307,7 +307,7 @@ method, which does not require us to solve a system of equations to compute the 
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.0.
     </div>
   </body>
 </html>

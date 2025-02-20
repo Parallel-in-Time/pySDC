@@ -3,5 +3,5 @@ implementations.transfer\_classes.BaseTransfer\_mass module
 
 .. automodule:: implementations.transfer_classes.BaseTransfer_mass
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

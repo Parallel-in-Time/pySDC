@@ -74,5 +74,5 @@ Module contents
 
 .. automodule:: implementations.problem_classes
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

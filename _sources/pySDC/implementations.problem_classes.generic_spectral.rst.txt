@@ -3,5 +3,5 @@ implementations.problem\_classes.generic\_spectral module
 
 .. automodule:: implementations.problem_classes.generic_spectral
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

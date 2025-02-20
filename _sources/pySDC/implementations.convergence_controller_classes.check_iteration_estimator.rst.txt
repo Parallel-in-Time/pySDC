@@ -3,5 +3,5 @@ implementations.convergence\_controller\_classes.check\_iteration\_estimator mod
 
 .. automodule:: implementations.convergence_controller_classes.check_iteration_estimator
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

@@ -19,5 +19,5 @@ Module contents
 
 .. automodule:: implementations.datatype_classes
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

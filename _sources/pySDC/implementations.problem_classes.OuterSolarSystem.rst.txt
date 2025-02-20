@@ -3,5 +3,5 @@ implementations.problem\_classes.OuterSolarSystem module
 
 .. automodule:: implementations.problem_classes.OuterSolarSystem
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

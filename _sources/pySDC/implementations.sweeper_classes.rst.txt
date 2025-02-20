@@ -25,5 +25,5 @@ Module contents
 
 .. automodule:: implementations.sweeper_classes
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

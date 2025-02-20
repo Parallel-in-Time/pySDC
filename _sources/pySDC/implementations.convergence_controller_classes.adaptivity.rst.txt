@@ -3,5 +3,5 @@ implementations.convergence\_controller\_classes.adaptivity module
 
 .. automodule:: implementations.convergence_controller_classes.adaptivity
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

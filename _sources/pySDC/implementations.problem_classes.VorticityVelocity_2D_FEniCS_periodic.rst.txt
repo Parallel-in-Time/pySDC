@@ -3,5 +3,5 @@ implementations.problem\_classes.VorticityVelocity\_2D\_FEniCS\_periodic module
 
 .. automodule:: implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

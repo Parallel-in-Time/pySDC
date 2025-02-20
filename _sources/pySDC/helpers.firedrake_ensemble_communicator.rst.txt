@@ -3,5 +3,5 @@ helpers.firedrake\_ensemble\_communicator module
 
 .. automodule:: helpers.firedrake_ensemble_communicator
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

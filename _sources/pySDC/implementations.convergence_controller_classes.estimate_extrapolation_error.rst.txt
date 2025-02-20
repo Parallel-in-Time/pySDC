@@ -3,5 +3,5 @@ implementations.convergence\_controller\_classes.estimate\_extrapolation\_error 
 
 .. automodule:: implementations.convergence_controller_classes.estimate_extrapolation_error
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

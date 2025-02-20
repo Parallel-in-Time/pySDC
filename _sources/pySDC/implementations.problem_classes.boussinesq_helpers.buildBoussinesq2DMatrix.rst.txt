@@ -3,5 +3,5 @@ implementations.problem\_classes.boussinesq\_helpers.buildBoussinesq2DMatrix mod
 
 .. automodule:: implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

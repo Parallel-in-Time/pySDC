@@ -3,5 +3,5 @@ implementations.problem\_classes.AdvectionEquation\_ND\_FD module
 
 .. automodule:: implementations.problem_classes.AdvectionEquation_ND_FD
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

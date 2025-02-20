@@ -3,5 +3,5 @@ implementations.convergence\_controller\_classes.estimate\_contraction\_factor m
 
 .. automodule:: implementations.convergence_controller_classes.estimate_contraction_factor
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

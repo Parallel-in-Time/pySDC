@@ -3,5 +3,5 @@ implementations.sweeper\_classes.imex\_1st\_order module
 
 .. automodule:: implementations.sweeper_classes.imex_1st_order
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

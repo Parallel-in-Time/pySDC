@@ -3,5 +3,5 @@ implementations.sweeper\_classes.verlet module
 
 .. automodule:: implementations.sweeper_classes.verlet
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

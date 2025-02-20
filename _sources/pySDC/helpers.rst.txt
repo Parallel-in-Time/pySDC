@@ -21,11 +21,12 @@ Submodules
    helpers.testing
    helpers.transfer_helper
    helpers.visualization_tools
+   helpers.vtkIO
 
 Module contents
 ---------------
 
 .. automodule:: helpers
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

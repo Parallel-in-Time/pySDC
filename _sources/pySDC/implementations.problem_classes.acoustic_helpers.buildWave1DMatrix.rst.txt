@@ -3,5 +3,5 @@ implementations.problem\_classes.acoustic\_helpers.buildWave1DMatrix module
 
 .. automodule:: implementations.problem_classes.acoustic_helpers.buildWave1DMatrix
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

@@ -3,5 +3,5 @@ implementations.sweeper\_classes.Runge\_Kutta\_Nystrom module
 
 .. automodule:: implementations.sweeper_classes.Runge_Kutta_Nystrom
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

@@ -170,12 +170,10 @@
 </li>
       <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.add_to_stats">add_to_stats() (Hooks method)</a>
 </li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.addField">addField() (Cart1D method)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.addField">addField() (FieldsIO method)</a>
 
       <ul>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart2D.addField">(Cart2D method)</a>
-</li>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.addField">(FieldsIO method)</a>
+        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.addField">(Rectilinear method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.html#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex">advectiondiffusion1d_imex (class in implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT)</a>
@@ -470,10 +468,6 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.helper_classes.html#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback">Callback (class in implementations.problem_classes.boussinesq_helpers.helper_classes)</a>
 </li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D">Cart1D (class in helpers.fieldsIO)</a>
-</li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart2D">Cart2D (class in helpers.fieldsIO)</a>
-</li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Cash_Karp">Cash_Karp (class in implementations.sweeper_classes.Runge_Kutta)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit">CFLLimit (class in implementations.problem_classes.RayleighBenard)</a>
@@ -549,11 +543,11 @@
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.comm">comm (allencahn_temp_imex attribute)</a>
 
       <ul>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.comm">(Cart1D attribute)</a>
-</li>
         <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.cupy_mesh.comm">(cupy_mesh attribute)</a>
 </li>
         <li><a href="pySDC/implementations.datatype_classes.mesh.html#id0">(mesh attribute)</a>, <a href="pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.mesh.comm">[1]</a>
+</li>
+        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.comm">(Rectilinear attribute)</a>
 </li>
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.comm">(SpectralHelper attribute)</a>
 </li>
@@ -571,6 +565,8 @@
       <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.comp2_cupy_mesh">comp2_cupy_mesh (class in implementations.datatype_classes.cupy_mesh)</a>
 </li>
       <li><a href="pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.comp2_mesh">comp2_mesh (class in implementations.datatype_classes.mesh)</a>
+</li>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.compareFields_MPI">compareFields_MPI() (in module helpers.fieldsIO)</a>
 </li>
       <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.comp2_cupy_mesh.components">components (comp2_cupy_mesh attribute)</a>
 
@@ -877,6 +873,8 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.diff_mask">diff_mask (GenericSpectralLinear attribute)</a>
 </li>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.dim">dim (Rectilinear property)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk">dirk (class in implementations.problem_classes.acoustic_helpers.standard_integrators)</a>
 
       <ul>
@@ -1034,6 +1032,8 @@
 </li>
         <li><a href="pySDC/implementations.problem_classes.FastWaveSlowWave_0D.html#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.dtype_f">(swfw_scalar attribute)</a>
 </li>
+        <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.dtype_f">(test_equation_IMEX attribute)</a>
+</li>
         <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.dtype_f">(testequation0d attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.Van_der_Pol_implicit.html#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.dtype_f">(vanderpol attribute)</a>
@@ -1141,6 +1141,8 @@
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u">(RayleighBenard attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.FastWaveSlowWave_0D.html#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.dtype_u">(swfw_scalar attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.dtype_u">(test_equation_IMEX attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.dtype_u">(testequation0d attribute)</a>
 </li>
@@ -1391,6 +1393,8 @@
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.eval_f">(RayleighBenard method)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.FastWaveSlowWave_0D.html#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.eval_f">(swfw_scalar method)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.eval_f">(test_equation_IMEX method)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.eval_f">(testequation0d method)</a>
 </li>
@@ -1889,14 +1893,14 @@
         <li><a href="pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise.get_implementation">(SpreadStepSizesBlockwise class method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_integ_BC_row">get_integ_BC_row() (ChebychevHelper method)</a>
 
       <ul>
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper.get_integ_BC_row">(FFTHelper method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.UltrasphericalHelper.get_integration_constant">get_integration_constant() (UltrasphericalHelper method)</a>
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_integration_matrix">get_integration_matrix() (ChebychevHelper method)</a>
@@ -2129,6 +2133,8 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.generic_ND_FD.html#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.grids">grids (GenericNDimFinDiff property)</a>
 </li>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.gridSizes">gridSizes (Rectilinear property)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full">GS_full (class in implementations.problem_classes.GrayScott_2D_PETSc_periodic)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction">GS_reaction (class in implementations.problem_classes.GrayScott_2D_PETSc_periodic)</a>
@@ -2264,14 +2270,12 @@
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler">Heun_Euler (class in implementations.sweeper_classes.Runge_Kutta)</a>
 </li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.hInfos">hInfos (Cart1D property)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.hInfos">hInfos (FieldsIO property)</a>
 
       <ul>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart2D.hInfos">(Cart2D property)</a>
+        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.hInfos">(Rectilinear property)</a>
 </li>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.hInfos">(FieldsIO property)</a>
-</li>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Scal0D.hInfos">(Scal0D property)</a>
+        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Scalar.hInfos">(Scalar property)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/core.hooks.html#core.hooks.Hooks">Hooks (class in core.hooks)</a>
@@ -2771,8 +2775,6 @@
         <li><a href="pySDC/implementations.problem_classes.generic_ND_FD.html#module-implementations.problem_classes.generic_ND_FD">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.generic_spectral
 
@@ -2780,6 +2782,8 @@
         <li><a href="pySDC/implementations.problem_classes.generic_spectral.html#module-implementations.problem_classes.generic_spectral">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.GrayScott_1D_FEniCS_implicit
 
@@ -3137,10 +3141,12 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.init_type">init_type (allencahn_temp_imex attribute)</a>
 </li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.initialize">initialize() (Cart1D method)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.initGrid">initGrid() (in module helpers.fieldsIO)</a>
+</li>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.initialize">initialize() (FieldsIO method)</a>
 
       <ul>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.initialize">(FieldsIO method)</a>
+        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.initialize">(Rectilinear method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.integrate">integrate() (boris_2nd_order method)</a>
@@ -3170,6 +3176,8 @@
       <li><a href="pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts">InterpolateBetweenRestarts (class in implementations.convergence_controller_classes.interpolate_between_restarts)</a>
 </li>
       <li><a href="pySDC/helpers.transfer_helper.html#helpers.transfer_helper.interpolation_matrix_1d">interpolation_matrix_1d() (in module helpers.transfer_helper)</a>
+</li>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.iPos">iPos() (Rectilinear method)</a>
 </li>
       <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.cupy_mesh.irecv">irecv() (cupy_mesh method)</a>
 
@@ -3832,19 +3840,19 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.MPI_FILE_CLOSE">MPI_FILE_CLOSE() (Cart1D method)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.MPI_FILE_CLOSE">MPI_FILE_CLOSE() (Rectilinear method)</a>
 </li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.MPI_FILE_OPEN">MPI_FILE_OPEN() (Cart1D method)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.MPI_FILE_OPEN">MPI_FILE_OPEN() (Rectilinear method)</a>
 </li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.MPI_ON">MPI_ON (Cart1D property)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.MPI_ON">MPI_ON (Rectilinear property)</a>
 </li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.MPI_READ_AT">MPI_READ_AT() (Cart1D method)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.MPI_READ_AT">MPI_READ_AT() (Rectilinear method)</a>
 </li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.MPI_ROOT">MPI_ROOT (Cart1D property)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.MPI_ROOT">MPI_ROOT (Rectilinear property)</a>
 </li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.MPI_WRITE">MPI_WRITE() (Cart1D method)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.MPI_WRITE">MPI_WRITE() (Rectilinear method)</a>
 </li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.MPI_WRITE_AT">MPI_WRITE_AT() (Cart1D method)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.MPI_WRITE_AT">MPI_WRITE_AT() (Rectilinear method)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.multi_implicit.html#implementations.sweeper_classes.multi_implicit.multi_implicit">multi_implicit (class in implementations.sweeper_classes.multi_implicit)</a>
 </li>
@@ -3882,6 +3890,8 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.ndim">(SpectralHelper property)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.nDoF">nDoF (Rectilinear property)</a>
+</li>
       <li><a href="pySDC/helpers.plot_helper.html#helpers.plot_helper.newfig">newfig() (in module helpers.plot_helper)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.newton_itercount">newton_itercount (allencahn_fullyimplicit attribute)</a>, <a href="pySDC/implementations.problem_classes.AllenCahn_2D_FD_gpu.html#implementations.problem_classes.AllenCahn_2D_FD_gpu.allencahn_fullyimplicit.newton_itercount">[1]</a>
@@ -3984,13 +3994,9 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.standard_integrators.html#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.NumSmallTimeSteps">NumSmallTimeSteps() (SplitExplicit method)</a>
 </li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Scal0D.nVar">nVar (Scal0D property)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Scalar.nVar">nVar (Scalar property)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.nvars">nvars (allencahn_temp_imex attribute)</a>
-</li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.nX">nX (Cart1D property)</a>
-</li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart2D.nY">nY (Cart2D property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -4340,25 +4346,23 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard">RayleighBenard (class in implementations.problem_classes.RayleighBenard)</a>
 </li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.readField">readField() (Cart1D method)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.readField">readField() (FieldsIO method)</a>
 
       <ul>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart2D.readField">(Cart2D method)</a>
-</li>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.readField">(FieldsIO method)</a>
+        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.readField">(Rectilinear method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.readHeader">readHeader() (Cart1D method)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.readHeader">readHeader() (FieldsIO method)</a>
 
       <ul>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart2D.readHeader">(Cart2D method)</a>
+        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.readHeader">(Rectilinear method)</a>
 </li>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.readHeader">(FieldsIO method)</a>
-</li>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Scal0D.readHeader">(Scal0D method)</a>
+        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Scalar.readHeader">(Scalar method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/core.errors.html#core.errors.ReadOnlyError">ReadOnlyError</a>
+</li>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear">Rectilinear (class in helpers.fieldsIO)</a>
 </li>
       <li><a href="pySDC/implementations.controller_classes.controller_MPI.html#implementations.controller_classes.controller_MPI.controller_MPI.recv">recv() (controller_MPI method)</a>
 </li>
@@ -4416,12 +4420,10 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.reshape">reshape() (Cart1D method)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.reshape">reshape() (FieldsIO method)</a>
 
       <ul>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart2D.reshape">(Cart2D method)</a>
-</li>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.reshape">(FieldsIO method)</a>
+        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.reshape">(Rectilinear method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.controller_classes.controller_MPI.html#implementations.controller_classes.controller_MPI.controller_MPI.restart_block">restart_block() (controller_MPI method)</a>
@@ -4514,7 +4516,7 @@
 </li>
       <li><a href="pySDC/helpers.plot_helper.html#helpers.plot_helper.savefig">savefig() (in module helpers.plot_helper)</a>
 </li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Scal0D">Scal0D (class in helpers.fieldsIO)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Scalar">Scalar (class in helpers.fieldsIO)</a>
 </li>
       <li><a href="pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.Send">Send() (ConvergenceController method)</a>
 </li>
@@ -4538,14 +4540,12 @@
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.inexactness.html#implementations.convergence_controller_classes.inexactness.NewtonInexactness.set_tolerance">set_tolerance() (NewtonInexactness method)</a>
 </li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.setHeader">setHeader() (Cart1D method)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.setHeader">setHeader() (FieldsIO method)</a>
 
       <ul>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart2D.setHeader">(Cart2D method)</a>
+        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.setHeader">(Rectilinear method)</a>
 </li>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.setHeader">(FieldsIO method)</a>
-</li>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Scal0D.setHeader">(Scal0D method)</a>
+        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Scalar.setHeader">(Scalar method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptive_collocation.html#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.setup">setup() (AdaptiveCollocation method)</a>
@@ -4668,28 +4668,22 @@
         <li><a href="pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.setup_status_variables">(InterpolateBetweenRestarts method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.setupCoords">setupCoords() (Cart1D static method)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.setupCoords">setupCoords() (Rectilinear static method)</a>
 </li>
       <li><a href="pySDC/core.sweeper.html#core.sweeper.Sweeper.setupGenerator">setupGenerator() (Sweeper method)</a>
 </li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.setupMPI">setupMPI() (Cart1D class method)</a>
-
-      <ul>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart2D.setupMPI">(Cart2D class method)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.setupMPI">setupMPI() (Rectilinear class method)</a>
 </li>
-      </ul></li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.shape">shape (SpectralHelper property)</a>
 </li>
       <li><a href="pySDC/helpers.visualization_tools.html#helpers.visualization_tools.show_residual_across_simulation">show_residual_across_simulation() (in module helpers.visualization_tools)</a>
 </li>
-      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart1D.sID">sID (Cart1D attribute)</a>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.sID">sID (FieldsIO attribute)</a>
 
       <ul>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Cart2D.sID">(Cart2D attribute)</a>
+        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.sID">(Rectilinear attribute)</a>
 </li>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.sID">(FieldsIO attribute)</a>
-</li>
-        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Scal0D.sID">(Scal0D attribute)</a>
+        <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Scalar.sID">(Scalar attribute)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/core.collocation.html#core.collocation.CollBase.Smat">Smat (CollBase attribute)</a>
@@ -4812,6 +4806,8 @@
         <li><a href="pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.QuenchIMEX.solve_system">(QuenchIMEX method)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.FastWaveSlowWave_0D.html#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.solve_system">(swfw_scalar method)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.solve_system">(test_equation_IMEX method)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.solve_system">(testequation0d method)</a>
 </li>
@@ -4956,6 +4952,8 @@
 </li>
       <li><a href="pySDC/core.level.html#core.level.Level.tau">tau (Level attribute)</a>
 </li>
+      <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.test_equation_IMEX">test_equation_IMEX (class in implementations.problem_classes.TestEquation_0D)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d">testequation0d (class in implementations.problem_classes.TestEquation_0D)</a>
 </li>
       <li><a href="pySDC/core.hooks.html#core.hooks.Entry.time">time (Entry attribute)</a>
@@ -4987,6 +4985,8 @@
       <li><a href="pySDC/core.collocation.html#core.collocation.CollBase.tleft">tleft (CollBase attribute)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.TM">TM (allencahn_temp_imex attribute)</a>
+</li>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.toVTR">toVTR() (Rectilinear method)</a>
 </li>
       <li><a href="pySDC/core.step.html#core.step.Step.transfer">transfer() (Step method)</a>
 </li>
@@ -5134,6 +5134,8 @@
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.u_exact">(RayleighBenard method)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.FastWaveSlowWave_0D.html#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.u_exact">(swfw_scalar method)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.u_exact">(test_equation_IMEX method)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.u_exact">(testequation0d method)</a>
 </li>
@@ -5354,6 +5356,8 @@
       </ul></li>
       <li><a href="pySDC/core.problem.html#core.problem.WorkCounter">WorkCounter (class in core.problem)</a>
 </li>
+      <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.writeFields_MPI">writeFields_MPI() (in module helpers.fieldsIO)</a>
+</li>
       <li><a href="pySDC/helpers.testing.html#helpers.testing.DataChecker.writeToJSON">writeToJSON() (DataChecker method)</a>
 </li>
   </ul></td>
@@ -5391,13 +5395,19 @@
 </li>
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.xp">(SpectralHelper1D attribute)</a>
 </li>
+        <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.xp">(test_equation_IMEX attribute)</a>
+</li>
         <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.xp">(testequation0d attribute)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.xsp">xsp (testequation0d attribute)</a>
+      <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.xsp">xsp (test_equation_IMEX attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.xsp">(testequation0d attribute)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench.xv">xv (Quench attribute)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.html#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.xvalues">xvalues (advectiondiffusion1d_imex attribute)</a>
@@ -5468,7 +5478,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.0.
     </div>
   </body>
 </html>

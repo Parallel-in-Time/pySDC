@@ -3,5 +3,5 @@ implementations.convergence\_controller\_classes.inexactness module
 
 .. automodule:: implementations.convergence_controller_classes.inexactness
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

@@ -3,5 +3,5 @@ implementations.problem\_classes.boussinesq\_helpers.standard\_integrators modul
 
 .. automodule:: implementations.problem_classes.boussinesq_helpers.standard_integrators
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

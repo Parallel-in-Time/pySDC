@@ -3,5 +3,5 @@ implementations.problem\_classes.odeSystem module
 
 .. automodule:: implementations.problem_classes.odeSystem
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

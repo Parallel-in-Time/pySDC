@@ -3,5 +3,5 @@ implementations.problem\_classes.DiscontinuousTestODE module
 
 .. automodule:: implementations.problem_classes.DiscontinuousTestODE
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

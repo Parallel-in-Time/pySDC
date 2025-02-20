@@ -3,5 +3,5 @@ implementations.transfer\_classes.TransferMesh\_FFT2D module
 
 .. automodule:: implementations.transfer_classes.TransferMesh_FFT2D
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

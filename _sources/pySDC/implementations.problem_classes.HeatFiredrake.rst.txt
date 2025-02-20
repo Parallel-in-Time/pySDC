@@ -3,5 +3,5 @@ implementations.problem\_classes.HeatFiredrake module
 
 .. automodule:: implementations.problem_classes.HeatFiredrake
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

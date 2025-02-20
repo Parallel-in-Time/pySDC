@@ -3,5 +3,5 @@ implementations.convergence\_controller\_classes.check\_convergence module
 
 .. automodule:: implementations.convergence_controller_classes.check_convergence
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

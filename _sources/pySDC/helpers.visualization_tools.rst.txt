@@ -3,5 +3,5 @@ helpers.visualization\_tools module
 
 .. automodule:: helpers.visualization_tools
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

@@ -19,5 +19,5 @@ Module contents
 
 .. automodule:: implementations.problem_classes.boussinesq_helpers
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

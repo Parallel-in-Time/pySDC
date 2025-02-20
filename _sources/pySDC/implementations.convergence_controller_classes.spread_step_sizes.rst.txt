@@ -3,5 +3,5 @@ implementations.convergence\_controller\_classes.spread\_step\_sizes module
 
 .. automodule:: implementations.convergence_controller_classes.spread_step_sizes
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

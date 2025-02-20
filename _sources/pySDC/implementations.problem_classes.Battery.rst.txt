@@ -3,5 +3,5 @@ implementations.problem\_classes.Battery module
 
 .. automodule:: implementations.problem_classes.Battery
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

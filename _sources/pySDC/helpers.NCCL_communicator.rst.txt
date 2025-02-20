@@ -3,5 +3,5 @@ helpers.NCCL\_communicator module
 
 .. automodule:: helpers.NCCL_communicator
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

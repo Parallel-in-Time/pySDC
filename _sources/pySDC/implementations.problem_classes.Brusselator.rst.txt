@@ -3,5 +3,5 @@ implementations.problem\_classes.Brusselator module
 
 .. automodule:: implementations.problem_classes.Brusselator
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

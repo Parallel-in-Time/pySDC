@@ -3,5 +3,5 @@ implementations.problem\_classes.FastWaveSlowWave\_0D module
 
 .. automodule:: implementations.problem_classes.FastWaveSlowWave_0D
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

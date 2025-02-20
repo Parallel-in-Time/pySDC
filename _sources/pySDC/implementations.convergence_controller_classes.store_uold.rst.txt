@@ -3,5 +3,5 @@ implementations.convergence\_controller\_classes.store\_uold module
 
 .. automodule:: implementations.convergence_controller_classes.store_uold
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
