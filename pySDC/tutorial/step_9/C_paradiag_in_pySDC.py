@@ -47,11 +47,9 @@ def get_description(problem='advection', mode='ParaDiag'):
         from pySDC.implementations.sweeper_classes.ParaDiagSweepers import QDiagonalization as sweeper_class
 
         # we only want to use the averaged Jacobian and do only one Newton iteration per ParaDiag iteration!
-        newton_maxiter = 1
     else:
         from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit as sweeper_class
 
-        newton_maxiter = 99
         # need diagonal preconditioner for same concurrency as ParaDiag
         sweeper_params['QI'] = 'MIN-SR-S'
 
@@ -63,7 +61,7 @@ def get_description(problem='advection', mode='ParaDiag'):
         from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol as problem_class
 
         # need to not raise an error when Newton has not converged because we do only one iteration
-        problem_params = {'newton_maxiter': newton_maxiter, 'crash_at_maxiter': False, 'mu': 1, 'newton_tol': 1e-9}
+        problem_params = {'newton_maxiter': 99, 'crash_at_maxiter': False, 'mu': 1, 'newton_tol': 1e-9}
 
     step_params = {}
     step_params['maxiter'] = 99
@@ -164,11 +162,11 @@ def compare_ParaDiag_and_PFASST(n_steps, problem):
             f'Maximum GMRES iterations on each step: {max(me[1] for me in k_GMRES_PD)} in ParaDiag, {max(me[1] for me in k_GMRES_PF)} in single-level PFASST and {sum(me[1] for me in k_GMRES_S)} total GMRES iterations in serial'
         )
     elif problem == 'vdp':
-        k_Newton_PD = get_sorted(stats_PD, type='work_newton')
-        k_Newton_PF = get_sorted(stats_PF, type='work_newton')
-        k_Newton_S = get_sorted(stats_S, type='work_newton')
+        k_Jac_PD = get_sorted(stats_PD, type='work_jacobian_solves')
+        k_Jac_PF = get_sorted(stats_PF, type='work_jacobian_solves')
+        k_Jac_S = get_sorted(stats_S, type='work_jacobian_solves')
         my_print(
-            f'Maximum Newton iterations on each step: {max(me[1] for me in k_Newton_PD)} in ParaDiag, {max(me[1] for me in k_Newton_PF)} in single-level PFASST and {sum(me[1] for me in k_Newton_S)} total Newton iterations in serial'
+            f'Maximum Jacabian solves on each step: {max(me[1] for me in k_Jac_PD)} in ParaDiag, {max(me[1] for me in k_Jac_PF)} in single-level PFASST and {sum(me[1] for me in k_Jac_S)} total Jacobian solves in serial'
         )
     my_print()
 

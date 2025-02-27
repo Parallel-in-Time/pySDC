@@ -15,11 +15,10 @@ ParaDiag preconditioner as a matrix with Kronecker products and then only diagon
 have the same Jacobian on all steps.
 The ParaDiag iteration then proceeds as follows:
     - (1) Compute residual of composite collocation problem
-    - (2) Average the residual across the steps as preparation for computing the average Jacobian
-          Note that we still have values for each collocation node and space position.
+    - (2) Average the solution across the steps and nodes as preparation for computing the average Jacobian
     - (3) Weighted FFT in time to diagonalize E_alpha
-    - (4) Solve for the increment by perform a single Newton iterations on the subproblems on the different steps and
-          nodes. The Jacobian is based on the averaged residual from (2)
+    - (4) Solve for the increment by inverting the averaged Jacobian from (2) on the subproblems on the different steps
+          and nodes.
     - (5) Weighted iFFT in time
     - (6) Increment solution
 As IMEX ParaDiag is a trivial extension of ParaDiag for linear problems, we focus on the second approach here.
@@ -170,15 +169,15 @@ def residual(_u, u0):
 sol_paradiag = u.copy() * 0j
 u0 = u.copy()
 
-buf = prob.u_init
 niter = 0
 res = residual(sol_paradiag, u0)
 while np.max(np.abs(res)) > restol:
     # compute all-at-once residual
     res = residual(sol_paradiag, u0)
 
-    # compute residual averaged across the L steps. This is the difference to ParaDiag for linear problems.
-    res_avg = np.mean(res, axis=0)
+    # compute residual averaged across the L steps and M nodes. This is the difference to ParaDiag for linear problems.
+    u_avg = prob.u_init
+    u_avg[:] = np.mean(sol_paradiag, axis=(0, 1))
 
     # weighted FFT in time
     x = np.fft.fft(mat_vec(J_inv.toarray(), res), axis=0)
@@ -191,8 +190,7 @@ while np.max(np.abs(res)) > restol:
         x1 = S_inv[l] @ x[l]
         x2 = np.empty_like(x1)
         for m in range(M):
-            buf[:] = res_avg[m]  # set up averaged Jacobian by using averaged residual as initial guess
-            x2[m, :] = prob.solve_system(x1[m], w[l][m] * dt, u0=buf, t=l * dt)
+            x2[m, :] = prob.solve_jacobian(x1[m], w[l][m] * dt, u=u_avg, t=l * dt)
         z = S[l] @ x2
         y[l, ...] = sp.linalg.spsolve(G[l], z)
 

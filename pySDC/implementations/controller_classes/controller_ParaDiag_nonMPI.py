@@ -213,11 +213,11 @@ class controller_ParaDiag_nonMPI(ParaDiagController):
             for hook in self.hooks:
                 hook.pre_sweep(step=S, level_number=0)
 
-        # replace the values stored in the steps with the residuals in order to compute the increment
-        self.swap_solution_for_all_at_once_residual(local_MS_running)
-
         # communicate average residual for setting up Jacobians for non-linear problems
         self.prepare_Jacobians(local_MS_running)
+
+        # replace the values stored in the steps with the residuals in order to compute the increment
+        self.swap_solution_for_all_at_once_residual(local_MS_running)
 
         # weighted FFT in time
         self.FFT_in_time()

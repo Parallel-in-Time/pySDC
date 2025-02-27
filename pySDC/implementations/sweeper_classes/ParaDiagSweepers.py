@@ -105,10 +105,16 @@ class QDiagonalization(generic_implicit):
             x1 = self.mat_vec(self.S_inv, [self.level.u[m + 1] for m in range(M)])
         else:
             x1 = self.mat_vec(self.S_inv, [self.level.u[0] for _ in range(M)])
+
+        # get averaged state over all nodes for constructing the Jacobian
+        u_avg = P.u_init
+        if not any(me is None for me in L.u_avg):
+            for m in range(M):
+                u_avg += L.u_avg[m] / M
+
         x2 = []
         for m in range(M):
-            u0 = L.u_avg[m] if L.u_avg[m] is not None else x1[m]
-            x2.append(P.solve_system(x1[m], self.w[m] * L.dt, u0=u0, t=L.time + L.dt * self.coll.nodes[m]))
+            x2.append(P.solve_jacobian(x1[m], self.w[m] * L.dt, u=u_avg, t=L.time + L.dt * self.coll.nodes[m]))
         z = self.mat_vec(self.S, x2)
         y = self.mat_vec(self.params.G_inv, z)
 
