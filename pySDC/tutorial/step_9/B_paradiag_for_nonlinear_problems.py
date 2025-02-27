@@ -175,7 +175,7 @@ while np.max(np.abs(res)) > restol:
     # compute all-at-once residual
     res = residual(sol_paradiag, u0)
 
-    # compute residual averaged across the L steps and M nodes. This is the difference to ParaDiag for linear problems.
+    # compute solution averaged across the L steps and M nodes. This is the difference to ParaDiag for linear problems.
     u_avg = prob.u_init
     u_avg[:] = np.mean(sol_paradiag, axis=(0, 1))
 
