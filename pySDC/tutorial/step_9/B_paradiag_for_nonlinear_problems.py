@@ -168,7 +168,6 @@ def residual(_u, u0):
 # do ParaDiag
 sol_paradiag = u.copy() * 0j
 u0 = u.copy()
-
 niter = 0
 res = residual(sol_paradiag, u0)
 while np.max(np.abs(res)) > restol:

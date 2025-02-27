@@ -122,7 +122,6 @@ class QDiagonalization(generic_implicit):
         for m in range(M):
             L.u[m + 1] = y[m]
             if self.params.update_f_evals:
-                raise
                 L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
         L.status.updated = True
@@ -153,6 +152,10 @@ class QDiagonalization(generic_implicit):
             residual[m] += self.level.u[0]
 
         return residual
+
+    def compute_residual(self, *args, **kwargs):
+        self.eval_f_at_all_nodes()
+        return super().compute_residual(*args, **kwargs)
 
 
 class QDiagonalizationIMEX(QDiagonalization):

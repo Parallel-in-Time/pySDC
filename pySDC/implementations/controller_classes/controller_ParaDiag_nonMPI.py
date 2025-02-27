@@ -152,12 +152,11 @@ class controller_ParaDiag_nonMPI(ParaDiagController):
                 hook.post_comm(step=S, level_number=0, add_to_stats=True)
 
             # compute residuals locally
-            residual = S.levels[0].sweep.get_residual()
-            S.levels[0].status.residual = max(abs(me) for me in residual)
+            S.levels[0].sweep.compute_residual()
 
             # put residual in the solution variables
             for m in range(S.levels[0].sweep.coll.num_nodes):
-                S.levels[0].u[m + 1] = residual[m]
+                S.levels[0].u[m + 1] = S.levels[0].residual[m]
 
     def swap_increment_for_solution(self, local_MS_running):
         """

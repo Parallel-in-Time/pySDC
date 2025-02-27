@@ -83,6 +83,7 @@ class Level(FrozenClass):
         self.u = [None] * (self.sweep.coll.num_nodes + 1)
         self.uold = [None] * (self.sweep.coll.num_nodes + 1)
         self.u_avg = [None] * self.sweep.coll.num_nodes
+        self.residual = [None] * self.sweep.coll.num_nodes
         self.f = [None] * (self.sweep.coll.num_nodes + 1)
         self.fold = [None] * (self.sweep.coll.num_nodes + 1)
 
