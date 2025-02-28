@@ -75,6 +75,8 @@ def test_direct_solve(M, N, ignore_ic):
         level.u[m] = prob.u_exact(0)
         level.f[m] = prob.eval_f(level.u[m], 0)
 
+    level.sweep.compute_residual()
+
     if ignore_ic:
         level.u[0][:] = None
 
@@ -92,6 +94,8 @@ def test_direct_solve(M, N, ignore_ic):
     u = sp.linalg.spsolve(C_coll, u0.flatten()).reshape(u0.shape)
 
     for m in range(M):
+        if ignore_ic:
+            level.u[m + 1] = level.u[m + 1] + level.increment[m]
         assert np.allclose(u[m], level.u[m + 1])
 
     if not ignore_ic:
@@ -100,4 +104,4 @@ def test_direct_solve(M, N, ignore_ic):
 
 
 if __name__ == '__main__':
-    test_direct_solve(2, 1, False)
+    test_direct_solve(2, 1, True)

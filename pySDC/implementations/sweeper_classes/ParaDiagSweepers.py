@@ -102,7 +102,7 @@ class QDiagonalization(generic_implicit):
 
         # perform local solves on the collocation nodes, can be parallelized!
         if self.params.ignore_ic:
-            x1 = self.mat_vec(self.S_inv, [self.level.u[m + 1] for m in range(M)])
+            x1 = self.mat_vec(self.S_inv, [self.level.residual[m] for m in range(M)])
         else:
             x1 = self.mat_vec(self.S_inv, [self.level.u[0] for _ in range(M)])
 
@@ -120,7 +120,10 @@ class QDiagonalization(generic_implicit):
 
         # update solution and evaluate right hand side
         for m in range(M):
-            L.u[m + 1] = y[m]
+            if self.params.ignore_ic:
+                L.increment[m] = y[m]
+            else:
+                L.u[m + 1] = y[m]
             if self.params.update_f_evals:
                 L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 

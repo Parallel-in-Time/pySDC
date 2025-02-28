@@ -6,7 +6,6 @@ import numpy as np
 from pySDC.core.base_transfer import BaseTransfer
 from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
-from pySDC.implementations.convergence_controller_classes.store_uold import StoreUOld
 from pySDC.implementations.hooks.default_hook import DefaultHooks
 from pySDC.implementations.hooks.log_timings import CPUTimings
 
@@ -378,12 +377,10 @@ class ParaDiagController(Controller):
 
         controller_params['all_to_done'] = True
         super().__init__(controller_params=controller_params, description=description, useMPI=useMPI)
-        self.base_convergence_controllers += [StoreUOld]
 
-        self.ParaDiag_block_u0 = None
         self.n_steps = n_steps
 
-    def FFT_in_time(self):
+    def FFT_in_time(self, quantity):
         """
         Compute weighted forward FFT in time. The weighting is determined by the alpha parameter in ParaDiag
 
@@ -395,9 +392,9 @@ class ParaDiagController(Controller):
 
             self.__FFT_matrix = get_weighted_FFT_matrix(self.n_steps, self.params.alpha)
 
-        self.apply_matrix(self.__FFT_matrix)
+        self.apply_matrix(self.__FFT_matrix, quantity)
 
-    def iFFT_in_time(self):
+    def iFFT_in_time(self, quantity):
         """
         Compute weighted backward FFT in time. The weighting is determined by the alpha parameter in ParaDiag
         """
@@ -406,4 +403,4 @@ class ParaDiagController(Controller):
 
             self.__iFFT_matrix = get_weighted_iFFT_matrix(self.n_steps, self.params.alpha)
 
-        self.apply_matrix(self.__iFFT_matrix)
+        self.apply_matrix(self.__iFFT_matrix, quantity)

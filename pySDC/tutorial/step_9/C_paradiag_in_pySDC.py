@@ -176,5 +176,5 @@ if __name__ == '__main__':
     params = {
         'n_steps': 16,
     }
-    compare_ParaDiag_and_PFASST(**params, problem='advection')
+    # compare_ParaDiag_and_PFASST(**params, problem='advection')
     compare_ParaDiag_and_PFASST(**params, problem='vdp')

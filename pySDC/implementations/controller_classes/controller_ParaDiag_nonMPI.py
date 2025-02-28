@@ -1,11 +1,9 @@
 import itertools
-import copy as cp
 import numpy as np
-import dill
 
 from pySDC.core.controller import ParaDiagController
 from pySDC.core import step as stepclass
-from pySDC.core.errors import ControllerError, CommunicationError
+from pySDC.core.errors import ControllerError
 from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
 from pySDC.helpers.ParaDiagHelper import get_G_inv_matrix
 
@@ -92,7 +90,7 @@ class controller_ParaDiag_nonMPI(ParaDiagController):
 
         return all(S.status.done for S in local_MS_active)
 
-    def apply_matrix(self, mat):
+    def apply_matrix(self, mat, quantity):
         """
         Apply a matrix on the step level. Needs to be square. Puts the result back into the controller.
 
@@ -112,29 +110,33 @@ class controller_ParaDiag_nonMPI(ParaDiagController):
             None,
         ] * L
 
+        if quantity == 'residual':
+            me = [S.levels[0].residual for S in self.MS]
+        elif quantity == 'increment':
+            me = [S.levels[0].increment for S in self.MS]
+        else:
+            raise NotImplementedError
+
         # compute matrix-vector product
         for i in range(mat.shape[0]):
-            res[i] = [prob.u_init for _ in range(M + 1)]
+            res[i] = [prob.u_init for _ in range(M)]
             for j in range(mat.shape[1]):
-                for m in range(M + 1):
-                    res[i][m] += mat[i, j] * self.MS[j].levels[0].u[m]
+                for m in range(M):
+                    res[i][m] += mat[i, j] * me[j][m]
 
         # put the result in the "output"
         for i in range(mat.shape[0]):
-            for m in range(M + 1):
-                self.MS[i].levels[0].u[m] = res[i][m]
+            for m in range(M):
+                me[i][m] = res[i][m]
 
-    def swap_solution_for_all_at_once_residual(self, local_MS_running):
+    def compute_all_at_once_residual(self, local_MS_running):
         """
-        Replace the solution values in the steps with the all-at-once residual.
-
         This requires to communicate the solutions at the end of the steps to be the initial conditions for the next
         steps. Afterwards, the residual can be computed locally on the steps.
 
         Args:
             local_MS_running (list): list of currently running steps
         """
-        prob = self.MS[0].levels[0].prob
 
         for S in local_MS_running:
             # communicate initial conditions
@@ -143,9 +145,7 @@ class controller_ParaDiag_nonMPI(ParaDiagController):
             for hook in self.hooks:
                 hook.pre_comm(step=S, level_number=0)
 
-            if S.status.first:
-                S.levels[0].u[0] = prob.dtype_u(self.ParaDiag_block_u0)
-            else:
+            if not S.status.first:
                 S.levels[0].u[0] = S.prev.levels[0].uend
 
             for hook in self.hooks:
@@ -154,25 +154,16 @@ class controller_ParaDiag_nonMPI(ParaDiagController):
             # compute residuals locally
             S.levels[0].sweep.compute_residual()
 
-            # put residual in the solution variables
-            for m in range(S.levels[0].sweep.coll.num_nodes):
-                S.levels[0].u[m + 1] = S.levels[0].residual[m]
-
-    def swap_increment_for_solution(self, local_MS_running):
+    def update_solution(self, local_MS_running):
         """
-        After inversion of the preconditioner, the values stored in the steps are the increment. This function adds the
-        solution after the previous iteration to arrive at the solution after the current iteration.
-        Note that we also need to put in the initial conditions back in the first step because they will be perturbed by
-        the circular preconditioner.
+        Since we solve for the increment, we need to update the solution between iterations by adding the increment.
 
         Args:
             local_MS_running (list): list of currently running steps
         """
         for S in local_MS_running:
-            for m in range(S.levels[0].sweep.coll.num_nodes + 1):
-                S.levels[0].u[m] = S.levels[0].uold[m] + S.levels[0].u[m]
-            if S.status.first:
-                S.levels[0].u[0] = self.ParaDiag_block_u0
+            for m in range(S.levels[0].sweep.coll.num_nodes):
+                S.levels[0].u[m + 1] += S.levels[0].increment[m]
 
     def prepare_Jacobians(self, local_MS_running):
         # get solutions for constructing average Jacobians
@@ -215,22 +206,22 @@ class controller_ParaDiag_nonMPI(ParaDiagController):
         # communicate average residual for setting up Jacobians for non-linear problems
         self.prepare_Jacobians(local_MS_running)
 
-        # replace the values stored in the steps with the residuals in order to compute the increment
-        self.swap_solution_for_all_at_once_residual(local_MS_running)
+        # compute the all-at-once residual to use as right hand side
+        self.compute_all_at_once_residual(local_MS_running)
 
-        # weighted FFT in time
-        self.FFT_in_time()
+        # weighted FFT of the residual in time
+        self.FFT_in_time(quantity='residual')
 
         # perform local solves of "collocation problems" on the steps (can be done in parallel)
         for S in local_MS_running:
             assert len(S.levels) == 1, 'Multi-level SDC not implemented in ParaDiag'
             S.levels[0].sweep.update_nodes()
 
-        # inverse FFT in time
-        self.iFFT_in_time()
+        # inverse FFT of the increment in time
+        self.iFFT_in_time(quantity='increment')
 
-        # replace the values stored in the steps with the previous solution plus the increment
-        self.swap_increment_for_solution(local_MS_running)
+        # get the next iterate by adding increment to previous iterate
+        self.update_solution(local_MS_running)
 
         for S in local_MS_running:
             for hook in self.hooks:
@@ -438,7 +429,6 @@ class controller_ParaDiag_nonMPI(ParaDiagController):
             u0: initial value to distribute across the steps
 
         """
-        self.ParaDiag_block_u0 = u0  # need this for computing residual
 
         for j in range(len(active_slots)):
             # get slot number

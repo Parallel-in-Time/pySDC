@@ -261,9 +261,44 @@ def test_ParaDiag_convergence_rate(L, M, N, alpha):
     ), f'Convergence rate {convergence_rate:.2e} exceeds upper bound of {convergence_bound:.2e}!'
 
 
+@pytest.mark.base
+@pytest.mark.parametrize('L', [4, 12])
+@pytest.mark.parametrize('M', [3, 4])
+@pytest.mark.parametrize('N', [1, 2])
+def test_fft(L, M, N):
+    import numpy as np
+    from pySDC.helpers.ParaDiagHelper import get_FFT_matrix
+
+    dt = 1e-2
+    controller, prob = get_composite_collocation_problem(L, M, N, alpha=1e-1, dt=dt, problem='Dahlquist')
+    # generate random data
+    data = np.random.random((L, M, N))
+    data = np.ones((L, M, N))
+
+    for l in range(L):
+        for m in range(M):
+            controller.MS[l].levels[0].residual[m] = prob.u_init
+            controller.MS[l].levels[0].residual[m][:] = data[l, m]
+
+    fft_matrix = get_FFT_matrix(L)
+    controller.apply_matrix(fft_matrix, 'residual')
+    data_fft = np.fft.fft(data, axis=0, norm='ortho')
+
+    for l in range(L):
+        for m in range(M):
+            assert np.allclose(controller.MS[l].levels[0].residual[m], data_fft[l, m])
+
+    controller.apply_matrix(np.conjugate(fft_matrix), 'residual')
+    for l in range(L):
+        for m in range(M):
+            assert np.allclose(controller.MS[l].levels[0].residual[m], data[l, m])
+
+
 if __name__ == '__main__':
-    test_ParaDiag_convergence_rate(4, 3, 1, 1e-4)
+    test_fft(3, 2, 2)
+    # test_ParaDiag_convergence_rate(4, 3, 1, 1e-4)
     # test_ParaDiag_vs_PFASST(4, 3, 2, 'Dahlquist')
     # test_ParaDiag_convergence(4, 3, 1, 1e-4, 'vdp')
     # test_IMEX_ParaDiag_convergence(4, 3, 64, 1e-4)
     # test_ParaDiag_order(3, 3, 1, 1e-4)
+    print('done')
