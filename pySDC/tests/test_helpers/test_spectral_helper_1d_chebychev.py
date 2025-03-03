@@ -153,7 +153,6 @@ def test_transform(N, d, transform_type):
     norm = cheby.get_norm()
     x = (cheby.get_1dgrid() * cheby.lin_trf_fac + cheby.lin_trf_off) * cheby.lin_trf_fac + cheby.lin_trf_off
     x = (cheby.get_1dgrid() - cheby.lin_trf_off) / cheby.lin_trf_fac
-    print(x)
 
     itransform = cheby.itransform(u, axis=-1).real
 
@@ -402,17 +401,3 @@ def test_tau_method2D_diffusion(nz, nx, bc_val, plotting=False):
         assert np.allclose(
             polys[i](z), sol[0, i, :]
         ), f'Solution is incorrectly transformed back to real space at x={x[i]}'
-
-
-if __name__ == '__main__':
-    test_differentiation_non_standard_domain_size(16, -2, 2, 1)
-    # test_differentiation_matrix(4, 0, 1)
-    # test_transform(6, 1, 0, 'fft')
-    # test_tau_method('T2U', -1.0, N=4, bc_val=3.0)
-    # test_tau_method2D('T2T', -1, nx=2**7, nz=2**6, bc_val=4.0, plotting=True)
-    # test_integration_matrix(5, 'T2U')
-    # test_integration_matrix2D(2**0, 2**2, 'T2U', 'z')
-    # test_differentiation_matrix2D(2**7, 2**7, 'T2U', 'mixed')
-    # test_integration_BC(6)
-    # test_filter(12, 2, 5, 'T2U')
-    print('done')

@@ -125,10 +125,3 @@ def test_poisson_problem(N, deg, Dirichlet_recombination):
 
     assert np.allclose(u_hat[deg + 3 :], 0)
     assert np.allclose(u_exact, u)
-
-
-if __name__ == '__main__':
-    test_differentiation_non_standard_domain_size(4, 0, 1, 1)
-    # test_differentiation_matrix(6, 2)
-    # test_poisson_problem(6, 1, True)
-    # test_integration()
