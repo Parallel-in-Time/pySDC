@@ -49,54 +49,54 @@
 <span id="helpers-nccl-communicator-module"></span><h1>helpers.NCCL_communicator module<a class="headerlink" href="#module-helpers.NCCL_communicator" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NCCLComm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NCCLComm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Wraps an MPI communicator and performs some calls to NCCL functions instead.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.Allreduce">
-<span class="sig-name descname"><span class="pre">Allreduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sendbuf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recvbuf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.SUM</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Allreduce" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Allreduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sendbuf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recvbuf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.SUM</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.Allreduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Allreduce" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.Barrier">
-<span class="sig-name descname"><span class="pre">Barrier</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Barrier" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Barrier</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.Barrier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Barrier" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.Bcast">
-<span class="sig-name descname"><span class="pre">Bcast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Bcast" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Bcast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.Bcast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Bcast" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.Reduce">
-<span class="sig-name descname"><span class="pre">Reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sendbuf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recvbuf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.SUM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Reduce" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sendbuf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recvbuf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.SUM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.Reduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Reduce" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.allreduce">
-<span class="sig-name descname"><span class="pre">allreduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sendobj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.SUM</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.allreduce" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">allreduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sendobj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.SUM</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.allreduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.allreduce" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.get_count">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.get_count" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.get_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.get_count" title="Link to this definition">¶</a></dt>
 <dd><p>As NCCL doesn’t support complex numbers, we have to act as if we’re sending two real numbers if using complex.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.get_dtype">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.get_dtype" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.get_dtype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.get_dtype" title="Link to this definition">¶</a></dt>
 <dd><p>As NCCL doesn’t support complex numbers, we have to act as if we’re sending two real numbers if using complex.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.get_op">
-<span class="sig-name descname"><span class="pre">get_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MPI_op</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.get_op" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MPI_op</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.get_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.get_op" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.reduce">
-<span class="sig-name descname"><span class="pre">reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sendobj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.SUM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.reduce" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sendobj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.SUM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.reduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.reduce" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -184,7 +184,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>
 </html>

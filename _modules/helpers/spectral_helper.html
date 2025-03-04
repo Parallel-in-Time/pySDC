@@ -271,8 +271,9 @@
 <span class="sd">            x0 (float): Coordinate of left boundary. Note that only -1 is currently implented</span>
 <span class="sd">            x1 (float): Coordinate of right boundary. Note that only +1 is currently implented</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="n">x0</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="k">assert</span> <span class="n">x1</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="c1"># need linear transformation y = ax + b with a = (x1-x0)/2 and b = (x1+x0)/2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lin_trf_fac</span> <span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lin_trf_off</span> <span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">+</span> <span class="n">x0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="n">x1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transform_type</span> <span class="o">=</span> <span class="n">transform_type</span>
 
@@ -293,7 +294,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            numpy.ndarray: 1D grid</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin_trf_fac</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">))</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin_trf_off</span></div>
 
 
 <div class="viewcode-block" id="ChebychevHelper.get_wavenumbers">
@@ -397,7 +398,7 @@
                 <span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span>
                 <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
                 <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
-            <span class="p">)</span>
+            <span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin_trf_fac</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;This function allows to integrate only from x=0, you attempted from x=</span><span class="si">{</span><span class="n">lbnd</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">S</span></div>
@@ -421,7 +422,7 @@
                 <span class="n">D</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">j</span> <span class="o">*</span> <span class="p">((</span><span class="n">j</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span>
 
         <span class="n">D</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">/=</span> <span class="mi">2</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_power</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_power</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin_trf_fac</span><span class="o">**</span><span class="n">p</span></div>
 
 
 <div class="viewcode-block" id="ChebychevHelper.get_norm">
@@ -695,7 +696,7 @@
         <span class="n">xp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span>
         <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span>
         <span class="n">l</span> <span class="o">=</span> <span class="n">p</span>
-        <span class="k">return</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">factorial</span><span class="p">(</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="n">l</span><span class="p">)</span> <span class="o">+</span> <span class="n">l</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="n">l</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">factorial</span><span class="p">(</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="n">l</span><span class="p">)</span> <span class="o">+</span> <span class="n">l</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="n">l</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin_trf_fac</span><span class="o">**</span><span class="n">p</span></div>
 
 
 <div class="viewcode-block" id="UltrasphericalHelper.get_S">
@@ -786,13 +787,15 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            sparse integration matrix</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">offsets</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basis_change_matrix</span><span class="p">(</span>
-            <span class="n">p_out</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">p_in</span><span class="o">=</span><span class="mi">0</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">offsets</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<div class="viewcode-block" id="UltrasphericalHelper.get_integration_constant">
+<a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.UltrasphericalHelper.get_integration_constant">[docs]</a>
+            <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basis_change_matrix</span><span class="p">(</span><span class="n">p_out</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">p_in</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin_trf_fac</span>
         <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="UltrasphericalHelper.get_integration_constant">
-<a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.UltrasphericalHelper.get_integration_constant">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_integration_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u_hat</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get integration constant for lower bound of -1. See documentation of `UltrasphericalHelper.get_integration_matrix` for details.</span>
@@ -2350,7 +2353,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>
 </html>
