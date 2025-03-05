@@ -763,8 +763,9 @@ def initSpaceTimeMPI(nProcSpace=None, nProcTime=None, groupTime=False):
         if gRank == 0:
             print(' -- finished MPI initialization')
 
-        # MPI decomposition -- space are close
+        # MPI space-time decomposition
         if groupTime:
+            # time-ranks are consecutive global ranks
             sColor = gRank % nProcTime
             sComm = gComm.Split(sColor, gRank)
             gComm.Barrier()
@@ -772,6 +773,7 @@ def initSpaceTimeMPI(nProcSpace=None, nProcTime=None, groupTime=False):
             tComm = gComm.Split(tColor, gRank)
             gComm.Barrier()
         else:
+            # space-ranks are consecutive global ranks
             tColor = gRank % nProcSpace
             tComm = gComm.Split(tColor, gRank)
             gComm.Barrier()

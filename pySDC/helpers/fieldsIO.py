@@ -518,7 +518,7 @@ class Rectilinear(Scalar):
         cls.comm = comm
         cls.iLoc = iLoc
         cls.nLoc = nLoc
-        cls.mpiFile = None
+        cls.mpiFile:MPI.File = None
 
     @property
     def MPI_ON(self):
