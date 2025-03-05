@@ -79,7 +79,7 @@ def test_differentiation_matrix(N):
     from pySDC.helpers.spectral_helper import ChebychevHelper
 
     cheby = ChebychevHelper(N)
-    x = np.cos(np.pi / N * (np.arange(N) + 0.5))
+    x = cheby.get_1dgrid()
     coeffs = np.random.random(N)
     norm = cheby.get_norm()
 
@@ -89,6 +89,36 @@ def test_differentiation_matrix(N):
     exact = np.polynomial.Chebyshev(coeffs).deriv(1)(x)
 
     assert np.allclose(exact, du)
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('N', [4, 7, 32])
+@pytest.mark.parametrize('x0', [-1, 0])
+@pytest.mark.parametrize('x1', [0.789, 1])
+@pytest.mark.parametrize('p', [1, 2])
+def test_differentiation_non_standard_domain_size(N, x0, x1, p):
+    import numpy as np
+    import scipy
+    from pySDC.helpers.spectral_helper import ChebychevHelper
+
+    cheby = ChebychevHelper(N, x0=x0, x1=x1)
+    x = cheby.get_1dgrid()
+    assert all(x > x0)
+    assert all(x < x1)
+
+    coeffs = np.random.random(N)
+    u = np.polynomial.Chebyshev(coeffs)(x)
+    u_hat = cheby.transform(u)
+    du_exact = np.polynomial.Chebyshev(coeffs).deriv(p)(x)
+    du_hat_exact = cheby.transform(du_exact)
+
+    D = cheby.get_differentiation_matrix(p)
+
+    du_hat = D @ u_hat
+    du = cheby.itransform(du_hat)
+
+    assert np.allclose(du_hat_exact, du_hat), np.linalg.norm(du_hat_exact - du_hat)
+    assert np.allclose(du, du_exact), np.linalg.norm(du_exact - du)
 
 
 @pytest.mark.base
@@ -121,7 +151,8 @@ def test_transform(N, d, transform_type):
     cheby = ChebychevHelper(N, transform_type=transform_type)
     u = np.random.random((d, N))
     norm = cheby.get_norm()
-    x = cheby.get_1dgrid()
+    x = (cheby.get_1dgrid() * cheby.lin_trf_fac + cheby.lin_trf_off) * cheby.lin_trf_fac + cheby.lin_trf_off
+    x = (cheby.get_1dgrid() - cheby.lin_trf_off) / cheby.lin_trf_fac
 
     itransform = cheby.itransform(u, axis=-1).real
 
@@ -370,15 +401,3 @@ def test_tau_method2D_diffusion(nz, nx, bc_val, plotting=False):
         assert np.allclose(
             polys[i](z), sol[0, i, :]
         ), f'Solution is incorrectly transformed back to real space at x={x[i]}'
-
-
-if __name__ == '__main__':
-    test_differentiation_matrix(4, 'T2U')
-    # test_transform(6, 1, 'fft')
-    # test_tau_method('T2U', -1.0, N=4, bc_val=3.0)
-    # test_tau_method2D('T2T', -1, nx=2**7, nz=2**6, bc_val=4.0, plotting=True)
-    # test_integration_matrix(5, 'T2U')
-    # test_integration_matrix2D(2**0, 2**2, 'T2U', 'z')
-    # test_differentiation_matrix2D(2**7, 2**7, 'T2U', 'mixed')
-    # test_integration_BC(6)
-    # test_filter(12, 2, 5, 'T2U')

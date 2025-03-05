@@ -23,6 +23,37 @@ def test_differentiation_matrix(N, p):
 
 @pytest.mark.base
 @pytest.mark.parametrize('N', [4, 7, 32])
+@pytest.mark.parametrize('x0', [-1, 0])
+@pytest.mark.parametrize('x1', [0.789, 1])
+@pytest.mark.parametrize('p', [1, 2])
+def test_differentiation_non_standard_domain_size(N, x0, x1, p):
+    import numpy as np
+    import scipy
+    from pySDC.helpers.spectral_helper import UltrasphericalHelper
+
+    helper = UltrasphericalHelper(N, x0=x0, x1=x1)
+    x = helper.get_1dgrid()
+    assert all(x > x0)
+    assert all(x < x1)
+
+    coeffs = np.random.random(N)
+    u = np.polynomial.Chebyshev(coeffs)(x)
+    u_hat = helper.transform(u)
+    du_exact = np.polynomial.Chebyshev(coeffs).deriv(p)(x)
+    du_hat_exact = helper.transform(du_exact)
+
+    D = helper.get_differentiation_matrix(p)
+    Q = helper.get_basis_change_matrix(p_in=p, p_out=0)
+
+    du_hat = Q @ D @ u_hat
+    du = helper.itransform(du_hat)
+
+    assert np.allclose(du_hat_exact, du_hat), np.linalg.norm(du_hat_exact - du_hat)
+    assert np.allclose(du, du_exact), np.linalg.norm(du_exact - du)
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('N', [4, 7, 32])
 def test_integration(N):
     import numpy as np
     from pySDC.helpers.spectral_helper import UltrasphericalHelper
@@ -94,9 +125,3 @@ def test_poisson_problem(N, deg, Dirichlet_recombination):
 
     assert np.allclose(u_hat[deg + 3 :], 0)
     assert np.allclose(u_exact, u)
-
-
-if __name__ == '__main__':
-    # test_differentiation_matrix(6, 2)
-    test_poisson_problem(6, 1, True)
-    # test_integration()

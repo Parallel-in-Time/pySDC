@@ -194,8 +194,9 @@ class ChebychevHelper(SpectralHelper1D):
             x0 (float): Coordinate of left boundary. Note that only -1 is currently implented
             x1 (float): Coordinate of right boundary. Note that only +1 is currently implented
         """
-        assert x0 == -1
-        assert x1 == 1
+        # need linear transformation y = ax + b with a = (x1-x0)/2 and b = (x1+x0)/2
+        self.lin_trf_fac = (x1 - x0) / 2
+        self.lin_trf_off = (x1 + x0) / 2
         super().__init__(*args, x0=x0, x1=x1, **kwargs)
         self.transform_type = transform_type
 
@@ -214,7 +215,7 @@ class ChebychevHelper(SpectralHelper1D):
         Returns:
             numpy.ndarray: 1D grid
         '''
-        return self.xp.cos(np.pi / self.N * (self.xp.arange(self.N) + 0.5))
+        return self.lin_trf_fac * self.xp.cos(np.pi / self.N * (self.xp.arange(self.N) + 0.5)) + self.lin_trf_off
 
     def get_wavenumbers(self):
         """Get the domain in spectral space"""
@@ -306,7 +307,7 @@ class ChebychevHelper(SpectralHelper1D):
                 (n / (2 * (self.xp.arange(self.N) + 1)))[1::2]
                 * (-1) ** (self.xp.arange(self.N // 2))
                 / (np.append([1], self.xp.arange(self.N // 2 - 1) + 1))
-            )
+            ) * self.lin_trf_fac
         else:
             raise NotImplementedError(f'This function allows to integrate only from x=0, you attempted from x={lbnd}.')
         return S
@@ -327,7 +328,7 @@ class ChebychevHelper(SpectralHelper1D):
                 D[k, j] = 2 * j * ((j - k) % 2)
 
         D[0, :] /= 2
-        return self.sparse_lib.csc_matrix(self.xp.linalg.matrix_power(D, p))
+        return self.sparse_lib.csc_matrix(self.xp.linalg.matrix_power(D, p)) / self.lin_trf_fac**p
 
     def get_norm(self, N=None):
         '''
@@ -565,7 +566,7 @@ class UltrasphericalHelper(ChebychevHelper):
         xp = self.xp
         N = self.N
         l = p
-        return 2 ** (l - 1) * factorial(l - 1) * sp.diags(xp.arange(N - l) + l, offsets=l)
+        return 2 ** (l - 1) * factorial(l - 1) * sp.diags(xp.arange(N - l) + l, offsets=l) / self.lin_trf_fac**p
 
     def get_S(self, lmbda):
         """
@@ -647,8 +648,10 @@ class UltrasphericalHelper(ChebychevHelper):
         Returns:
             sparse integration matrix
         """
-        return self.sparse_lib.diags(1 / (self.xp.arange(self.N - 1) + 1), offsets=-1) @ self.get_basis_change_matrix(
-            p_out=1, p_in=0
+        return (
+            self.sparse_lib.diags(1 / (self.xp.arange(self.N - 1) + 1), offsets=-1)
+            @ self.get_basis_change_matrix(p_out=1, p_in=0)
+            * self.lin_trf_fac
         )
 
     def get_integration_constant(self, u_hat, axis):
