@@ -558,7 +558,7 @@ class Rectilinear(Scalar):
         data : np.ndarray
             Data to be written in the binary file.
         """
-        self.mpiFile.Write_at(offset, data)
+        self.mpiFile.Write_at_all(offset, data)
 
     def MPI_READ_AT(self, offset, data):
         """
@@ -572,7 +572,7 @@ class Rectilinear(Scalar):
         data : np.ndarray
             Array on which to read the data from the binary file.
         """
-        self.mpiFile.Read_at(offset, data)
+        self.mpiFile.Read_at_all(offset, data)
 
     def MPI_FILE_CLOSE(self):
         """Close the binary file in MPI mode"""
