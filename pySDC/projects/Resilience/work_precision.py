@@ -297,10 +297,6 @@ def record_work_precision(
                 exponents = [-3, -2, -1, 0, 0.2, 0.8, 1][::-1]
         if problem.__name__ == 'run_RBC':
             exponents = [1, 0, -0.5, -1, -2]
-<<<<<<< HEAD
-            # exponents = [3, 2, 1, 0]
-=======
->>>>>>> master
         if problem.__name__ == 'run_GS':
             exponents = [-2, -1, 0, 1, 2, 3][::-1]
         if problem.__name__ == 'run_Lorenz':
@@ -989,8 +985,6 @@ def get_configs(mode, problem):
                 'num_procs': num_procs_dt,
                 'plotting_params': {'label': rf'$\Delta t$-adaptivity $N$={num_procs_dt}x1', 'ls': ls[num_procs_dt]},
             }
-<<<<<<< HEAD
-=======
 
     elif mode == 'RK_comp_high_order_RBC':
         """
@@ -1057,7 +1051,6 @@ def get_configs(mode, problem):
             'num_procs': num_procs_dt,
             'plotting_params': {'label': rf'$\Delta t$-adaptivity $N$={num_procs_dt}x1', 'ls': ls[num_procs_dt]},
         }
->>>>>>> master
 
     elif mode == 'parallel_efficiency':
         """

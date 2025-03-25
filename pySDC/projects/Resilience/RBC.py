@@ -296,11 +296,7 @@ def plot_step_size(t0=0, Tend=30, e_tol=1e-3, recompute=False):  # pragma: no co
     plt.show()
 
 
-<<<<<<< HEAD
-def plot_factorizations_over_time(t0=0, Tend=50, e_tol=1e-3, recompute=False, adaptivity_mode='dt'):
-=======
 def plot_factorizations_over_time(t0=0, Tend=50, e_tol=1e-3, recompute=False, adaptivity_mode='dt'):  # pragma: no cover
->>>>>>> master
     import matplotlib.pyplot as plt
     import pickle
     import os
