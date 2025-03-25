@@ -1,4 +1,4 @@
-# Playground to use Dedalus with pySDC
+# Playground to use Dedalus with pySDC, and coupling with a Fourier Neural Operator (FNO)
 
 :scroll: Interface for [Dedalus code](https://dedalus-project.readthedocs.io/en/latest/) so it can be used within the pySDC framework.
 
@@ -132,6 +132,28 @@ while solver.proceed:
 ```
 
 A full example script for the 2D Rayleigh-Benard Convection problem can be found [here](./rayleighBenardSDC.py).
+
+## SDC coupled with FNO for initial guess
+
+FNO model trained using Dedalus (or pySDC) generated data can be used to compute the initial guess for SDC sweep. 
+
+This requires the installation of the [`cfno`](https://github.com/Parallel-in-Time/cfno/tree/tibo) package,
+and here is a template example for its usage :
+
+```python
+from pySDC.playgrounds.dedalus.sdc import SpectralDeferredCorrectionIMEX
+
+checkpoint = "path/to/checkpoint.pt"
+SpectralDeferredCorrectionIMEX.setupNN(
+    "FNOP-2", checkpoint=checkpoint, initSweep="NN")
+
+# Build Dedalus problem and give additional SDC settings ...
+```
+
+Some FNO-based sweepers are also available for `pySDC` and currently stored in the `cfno` package, 
+see [cfno.simulation.sweeper](https://github.com/Parallel-in-Time/cfno/blob/tibo/cfno/simulation/sweeper.py). 
+Those consists on two classes, `FNO_IMEX` and `FNO_IMEX_PINT`, 
+allowing to run IMEX-SDC with any kind of problem implemented in `pySDC` and adapted to those type of sweeper. 
 
 ## Time-parallel SDC time-integrator for Dedalus
 
