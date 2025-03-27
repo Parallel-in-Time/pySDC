@@ -219,7 +219,7 @@ jobs:
           cd ./pySDC
           which pytest
           which python
-          coverage run -m pytest --continue-on-collection-errors -v --durations=0 /repositories/pySDC/pySDC/tests -m firedrake
+          python -m coverage run -m pytest --continue-on-collection-errors -v --durations=0 /repositories/pySDC/pySDC/tests -m firedrake
         timeout-minutes: 45
       - name: Make coverage report
         run: |
