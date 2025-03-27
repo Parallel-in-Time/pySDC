@@ -181,6 +181,11 @@ jobs:
       run:
         shell: bash -l {0}
     steps:
+      - name: Fix HOME
+        # For unknown reasons GitHub actions overwrite HOME to /github/home
+        # which will break everything unless fixed
+        # (https://github.com/actions/runner/issues/863)
+        run: echo "HOME=/home/firedrake" >> "$GITHUB_ENV"
       - name: Checkout pySDC
         uses: actions/checkout@v4
         with: 
@@ -190,15 +195,22 @@ jobs:
         with:
           repository: firedrakeproject/gusto
           path: ./gusto_repo
+      - name: Create virtual environment
+        # pass '--system-site-packages' so Firedrake can be found
+        run: python3 -m venv --system-site-packages venv-pySDC
+
       - name: Install pySDC
         run: |
+          . venv-pySDC/bin/activate
           python -m pip install --no-deps -e /repositories/pySDC
           python -m pip install qmat
       - name: Install gusto
         run: |
+          . venv-pySDC/bin/activate
           python -m pip install -e /repositories/gusto_repo
       - name: run pytest
         run: |
+          . venv-pySDC/bin/activate
           firedrake-clean
           cd ./pySDC
           coverage run -m pytest --continue-on-collection-errors -v --durations=0 /repositories/pySDC/pySDC/tests -m firedrake
