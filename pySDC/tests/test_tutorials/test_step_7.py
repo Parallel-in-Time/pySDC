@@ -143,7 +143,7 @@ def test_E_MPI():
     my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
     cwd = '.'
     num_procs = 3
-    cmd = f'mpiexec -np {num_procs} python pySDC/tutorial/step_7/E_pySDC_with_Firedrake.py --useMPIsweeper'.split()
+    cmd = f'mpiexec -np {num_procs} --oversubscribe python pySDC/tutorial/step_7/E_pySDC_with_Firedrake.py --useMPIsweeper'.split()
 
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
     p.wait()

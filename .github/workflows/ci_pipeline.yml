@@ -214,6 +214,7 @@ jobs:
           python -c "import gusto; print(f'gusto module: {gusto}')"
       - name: run pytest
         run: |
+          export OMPI_UNIVERSE_SIZE=64
           . venv-pySDC/bin/activate
           firedrake-clean
           cd ./pySDC
