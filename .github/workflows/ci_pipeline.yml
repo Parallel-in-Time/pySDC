@@ -202,16 +202,16 @@ jobs:
       - name: Install pySDC
         run: |
           . venv-pySDC/bin/activate
-          python3 -m pip install --no-deps -e /repositories/pySDC
-          python3 -m pip install qmat
+          pip install --no-deps -e /repositories/pySDC
+          pip install qmat
           # test installation
-          python3 -c "import pySDC; print(f'pySDC module: {pySDC}')"
+          python -c "import pySDC; print(f'pySDC module: {pySDC}')"
       - name: Install gusto
         run: |
           . venv-pySDC/bin/activate
-          python3 -m pip install -e /repositories/gusto_repo
+          pip install -e /repositories/gusto_repo
           # test installation
-          python3 -c "import gusto; print(f'gusto module: {gusto}')"
+          python -c "import gusto; print(f'gusto module: {gusto}')"
       - name: run pytest
         run: |
           . venv-pySDC/bin/activate
