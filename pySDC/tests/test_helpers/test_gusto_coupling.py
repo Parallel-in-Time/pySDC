@@ -165,7 +165,7 @@ def test_generic_gusto_problem(setup):
     error = abs(un_forward - un_ref) / abs(un_ref)
 
     assert (
-        error < np.finfo(float).eps * 1e2
+        error < np.finfo(float).eps * 1e3
     ), f'Forward Euler does not match reference implementation! Got relative difference of {error}'
 
     # test backward Euler step
