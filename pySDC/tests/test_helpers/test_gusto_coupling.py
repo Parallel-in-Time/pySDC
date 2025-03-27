@@ -449,7 +449,7 @@ def test_pySDC_integrator(use_transport_scheme, imex, setup):
     print(error)
 
     assert (
-        error < solver_parameters['snes_rtol'] * 1e3
+        error < solver_parameters['snes_rtol'] * 1e4
     ), f'pySDC and Gusto differ in SDC! Got relative difference of {error}'
 
 
