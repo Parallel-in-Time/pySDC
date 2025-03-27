@@ -192,23 +192,19 @@ jobs:
           path: ./gusto_repo
       - name: Install pySDC
         run: |
-          . /home/firedrake/firedrake/bin/activate
           python -m pip install --no-deps -e /repositories/pySDC
           python -m pip install qmat
       - name: Install gusto
         run: |
-          . /home/firedrake/firedrake/bin/activate
           python -m pip install -e /repositories/gusto_repo
       - name: run pytest
         run: |
-          . /home/firedrake/firedrake/bin/activate
           firedrake-clean
           cd ./pySDC
           coverage run -m pytest --continue-on-collection-errors -v --durations=0 /repositories/pySDC/pySDC/tests -m firedrake
         timeout-minutes: 45
       - name: Make coverage report
         run: |
-          . /home/firedrake/firedrake/bin/activate
 
           cd ./pySDC
           mv data ../data_firedrake
