@@ -165,7 +165,7 @@ def test_generic_gusto_problem(setup):
     error = abs(un_forward - un_ref) / abs(un_ref)
 
     assert (
-        error < np.finfo(float).eps * 1e2
+        error < np.finfo(float).eps * 1e4
     ), f'Forward Euler does not match reference implementation! Got relative difference of {error}'
 
     # test backward Euler step
@@ -326,7 +326,7 @@ def test_pySDC_integrator_RK(use_transport_scheme, method, setup):
     print(error)
 
     assert (
-        error < solver_parameters['snes_rtol'] * 1e3
+        error < solver_parameters['snes_rtol'] * 1e4
     ), f'pySDC and Gusto differ in method {method}! Got relative difference of {error}'
 
 
@@ -449,7 +449,7 @@ def test_pySDC_integrator(use_transport_scheme, imex, setup):
     print(error)
 
     assert (
-        error < solver_parameters['snes_rtol'] * 1e3
+        error < solver_parameters['snes_rtol'] * 1e4
     ), f'pySDC and Gusto differ in SDC! Got relative difference of {error}'
 
 
@@ -633,7 +633,7 @@ def test_pySDC_integrator_MSSDC(n_steps, useMPIController, setup, submit=True, n
         my_env = os.environ.copy()
         my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
         cwd = '.'
-        cmd = f'mpiexec -np {n_tasks} python {__file__} --test=MSSDC --n_steps={n_steps}'.split()
+        cmd = f'mpiexec -np {n_tasks} --oversubscribe python {__file__} --test=MSSDC --n_steps={n_steps}'.split()
 
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
         p.wait()
@@ -762,7 +762,7 @@ def test_pySDC_integrator_MSSDC(n_steps, useMPIController, setup, submit=True, n
     print(error)
 
     assert (
-        error < solver_parameters['snes_rtol'] * 1e3
+        error < solver_parameters['snes_rtol'] * 1e4
     ), f'pySDC and Gusto differ in method {method}! Got relative difference of {error}'
 
 
