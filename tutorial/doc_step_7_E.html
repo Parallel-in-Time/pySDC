@@ -209,7 +209,7 @@
 
     <span class="c1"># do tests that we got the same as last time</span>
     <span class="n">n_nodes</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">useMPIsweeper</span> <span class="k">else</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">][</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span>
-    <span class="k">assert</span> <span class="n">error</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">2e-8</span>
+    <span class="k">assert</span> <span class="n">error</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">2e-7</span>
     <span class="k">assert</span> <span class="n">tot_iter</span> <span class="o">==</span> <span class="mi">10</span> <span class="k">if</span> <span class="n">ML</span> <span class="k">else</span> <span class="mi">29</span>
     <span class="k">assert</span> <span class="n">tot_solver_setup</span> <span class="o">==</span> <span class="n">n_nodes</span>
     <span class="k">assert</span> <span class="n">tot_solves</span> <span class="o">==</span> <span class="n">n_nodes</span> <span class="o">*</span> <span class="n">tot_iter</span>

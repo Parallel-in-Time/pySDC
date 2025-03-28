@@ -195,7 +195,7 @@ Find a suitable plotting script here: <a class="reference external" href="https:
     <span class="n">lamda</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lonlatr_from_xyz</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
 
     <span class="c1"># Equation: coriolis</span>
-    <span class="n">parameters</span> <span class="o">=</span> <span class="n">ShallowWaterParameters</span><span class="p">(</span><span class="n">H</span><span class="o">=</span><span class="n">mean_depth</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">g</span><span class="p">)</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="n">ShallowWaterParameters</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">H</span><span class="o">=</span><span class="n">mean_depth</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">g</span><span class="p">)</span>
     <span class="n">Omega</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">Omega</span>
     <span class="n">fexpr</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">Omega</span> <span class="o">*</span> <span class="n">z</span> <span class="o">/</span> <span class="n">radius</span>
 
