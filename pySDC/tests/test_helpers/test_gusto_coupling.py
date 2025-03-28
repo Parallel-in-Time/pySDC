@@ -633,7 +633,7 @@ def test_pySDC_integrator_MSSDC(n_steps, useMPIController, setup, submit=True, n
         my_env = os.environ.copy()
         my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
         cwd = '.'
-        cmd = f'mpiexec -np {n_tasks} python {__file__} --test=MSSDC --n_steps={n_steps}'.split()
+        cmd = f'mpiexec -np {n_tasks} python {__file__} --oversubscribe --test=MSSDC --n_steps={n_steps}'.split()
 
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
         p.wait()
