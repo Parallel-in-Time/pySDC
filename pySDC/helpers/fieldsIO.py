@@ -54,6 +54,7 @@ import numpy as np
 from typing import Type, TypeVar
 import logging
 import itertools
+import warnings
 
 T = TypeVar("T")
 
@@ -494,6 +495,7 @@ class Rectilinear(Scalar):
     # MPI-parallel implementation
     # -------------------------------------------------------------------------
     comm: MPI.Intracomm = None
+    balanced_distribution = None
 
     @classmethod
     def setupMPI(cls, comm: MPI.Intracomm, iLoc, nLoc):
@@ -514,6 +516,11 @@ class Rectilinear(Scalar):
         cls.iLoc = iLoc
         cls.nLoc = nLoc
         cls.mpiFile = None
+        cls.balanced_distribution = all(cls.nLoc == me for me in comm.allgather(nLoc))
+        if not cls.balanced_distribution:
+            warnings.warn(
+                f'You requested an unbalanced block decomposition, in {cls.__name__!r} which will result in far slower IO! Please consider changing the resolution or number of tasks.'
+            )
 
     @property
     def MPI_ON(self):
@@ -553,7 +560,10 @@ class Rectilinear(Scalar):
         data : np.ndarray
             Data to be written in the binary file.
         """
-        self.mpiFile.Write_at_all(offset, data)
+        if self.balanced_distribution:
+            self.mpiFile.Write_at_all(offset, data)
+        else:
+            self.mpiFile.Write_at(offset, data)
 
     def MPI_READ_AT(self, offset, data):
         """
@@ -567,7 +577,10 @@ class Rectilinear(Scalar):
         data : np.ndarray
             Array on which to read the data from the binary file.
         """
-        self.mpiFile.Read_at_all(offset, data)
+        if self.balanced_distribution:
+            self.mpiFile.Read_at_all(offset, data)
+        else:
+            self.mpiFile.Read_at(offset, data)
 
     def MPI_FILE_CLOSE(self):
         """Close the binary file in MPI mode"""
