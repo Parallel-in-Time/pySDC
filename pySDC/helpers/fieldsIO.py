@@ -46,15 +46,12 @@ Warning
 -------
 To use MPI collective writing, you need to call first the class methods :class:`Rectilinear.initMPI` (cf their docstring).
 Also, `Rectilinear.setHeader` **must be given the global grids coordinates**, whether the code is run in parallel or not.
-
-> ⚠️ Also : this module can only be imported with **Python 3.11 or higher** !
 """
 import os
 import numpy as np
 from typing import Type, TypeVar
 import logging
 import itertools
-import warnings
 
 T = TypeVar("T")
 
@@ -516,6 +513,7 @@ class Rectilinear(Scalar):
         cls.iLoc = iLoc
         cls.nLoc = nLoc
         cls.mpiFile = None
+        cls._num_collective_IO = None
 
     @property
     def num_collective_IO(self):
