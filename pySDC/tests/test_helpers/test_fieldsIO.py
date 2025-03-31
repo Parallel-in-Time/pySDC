@@ -14,6 +14,7 @@ from pySDC.helpers.fieldsIO import DTYPES, FieldsIO
 FieldsIO.ALLOW_OVERWRITE = True
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("dtypeIdx", DTYPES.keys())
 @pytest.mark.parametrize("dim", range(4))
 def testHeader(dim, dtypeIdx):
@@ -65,6 +66,7 @@ def testHeader(dim, dtypeIdx):
         assert np.allclose(val, f2.header[key]), f"header's discrepancy for {key} in written {f2}"
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("dtypeIdx", DTYPES.keys())
 @pytest.mark.parametrize("nSteps", [1, 2, 10, 100])
 @pytest.mark.parametrize("nVar", [1, 2, 5])
@@ -106,6 +108,7 @@ def testScalar(nVar, nSteps, dtypeIdx):
         assert np.allclose(u2, u1), f"{idx}'s fields in {f1} has incorrect values"
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("dtypeIdx", DTYPES.keys())
 @pytest.mark.parametrize("nSteps", [1, 2, 5, 10])
 @pytest.mark.parametrize("nVar", [1, 2, 5])
@@ -155,6 +158,7 @@ def testRectilinear(dim, nVar, nSteps, dtypeIdx):
             assert np.allclose(u2, u1), f"{idx}'s fields in {f1} has incorrect values"
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("nSteps", [1, 10])
 @pytest.mark.parametrize("nZ", [1, 5, 16])
 @pytest.mark.parametrize("nY", [1, 5, 16])
