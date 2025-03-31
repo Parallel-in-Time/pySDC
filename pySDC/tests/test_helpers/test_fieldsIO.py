@@ -3,9 +3,6 @@ import sys
 import glob
 import pytest
 
-if sys.version_info < (3, 11):
-    pytest.skip("skipping fieldsIO tests on python lower than 3.11", allow_module_level=True)
-
 import itertools
 import numpy as np
 
@@ -253,8 +250,7 @@ if __name__ == "__main__":
     parser.add_argument('--gridSizes', type=int, nargs='+', help="number of grid points in each dimensions")
     args = parser.parse_args()
 
-    if sys.version_info >= (3, 11):
-        from pySDC.helpers.fieldsIO import writeFields_MPI, compareFields_MPI
+    from pySDC.helpers.fieldsIO import writeFields_MPI, compareFields_MPI
 
-        u0 = writeFields_MPI(**args.__dict__)
-        compareFields_MPI(args.fileName, u0, args.nSteps)
+    u0 = writeFields_MPI(**args.__dict__)
+    compareFields_MPI(args.fileName, u0, args.nSteps)

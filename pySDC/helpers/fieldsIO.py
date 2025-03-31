@@ -45,7 +45,7 @@ See :class:`pySDC.helpers.fieldsIO.writeFields_MPI` for an illustrative example.
 Warning
 -------
 To use MPI collective writing, you need to call first the class methods :class:`Rectilinear.initMPI` (cf their docstring).
-Also, `Rectilinear.setHeader` **must be given the global grids coordinates**, wether the code is run in parallel or not.
+Also, `Rectilinear.setHeader` **must be given the global grids coordinates**, whether the code is run in parallel or not.
 
 > ⚠️ Also : this module can only be imported with **Python 3.11 or higher** !
 """
@@ -495,13 +495,13 @@ class Rectilinear(Scalar):
     # MPI-parallel implementation
     # -------------------------------------------------------------------------
     comm: MPI.Intracomm = None
-    balanced_distribution = None
+    _num_collective_IO = None
 
     @classmethod
     def setupMPI(cls, comm: MPI.Intracomm, iLoc, nLoc):
         """
         Setup the MPI mode for the files IO, considering a decomposition
-        of the 1D grid into contiuous subintervals.
+        of the 1D grid into contiguous subintervals.
 
         Parameters
         ----------
@@ -516,11 +516,21 @@ class Rectilinear(Scalar):
         cls.iLoc = iLoc
         cls.nLoc = nLoc
         cls.mpiFile = None
-        cls.balanced_distribution = all(cls.nLoc == me for me in comm.allgather(nLoc))
-        if not cls.balanced_distribution:
-            warnings.warn(
-                f'You requested an unbalanced block decomposition, in {cls.__name__!r} which will result in far slower IO! Please consider changing the resolution or number of tasks.'
-            )
+
+    @property
+    def num_collective_IO(self):
+        """
+        Number of collective IO operations.
+        If the distribution is unbalanced, some tasks read/write more data than others, implying that some accesses
+        cannot be collective, but need to be of the slower individual kind.
+
+        Returns:
+        --------
+        int: Number of collective IO accesses
+        """
+        if self._num_collective_IO is None:
+            self._num_collective_IO = self.comm.allreduce(self.nVar * np.prod(self.nLoc[:-1]), op=MPI.MIN)
+        return self._num_collective_IO
 
     @property
     def MPI_ON(self):
@@ -548,7 +558,7 @@ class Rectilinear(Scalar):
         """Write data (np.ndarray) in the binary file in MPI mode, at the current file cursor position."""
         self.mpiFile.Write(data)
 
-    def MPI_WRITE_AT(self, offset, data: np.ndarray):
+    def MPI_WRITE_AT(self, offset, data: np.ndarray, collective=True):
         """
         Write data in the binary file in MPI mode, with a given offset
         **relative to the beginning of the file**.
@@ -559,13 +569,15 @@ class Rectilinear(Scalar):
             Offset to write at, relative to the beginning of the file, in bytes.
         data : np.ndarray
             Data to be written in the binary file.
+        collective : bool
+            Use `MPI.Write_at_all` if true and `MPI.Write_at` if false
         """
-        if self.balanced_distribution:
+        if collective:
             self.mpiFile.Write_at_all(offset, data)
         else:
             self.mpiFile.Write_at(offset, data)
 
-    def MPI_READ_AT(self, offset, data):
+    def MPI_READ_AT(self, offset, data, collective=True):
         """
         Read data from the binary file in MPI mode, with a given offset
         **relative to the beginning of the file**.
@@ -576,8 +588,10 @@ class Rectilinear(Scalar):
             Offset to read at, relative to the beginning of the file, in bytes.
         data : np.ndarray
             Array on which to read the data from the binary file.
+        collective : bool
+            Use `MPI.Read_at_all` if true and `MPI.Read_at` if false
         """
-        if self.balanced_distribution:
+        if collective:
             self.mpiFile.Read_at_all(offset, data)
         else:
             self.mpiFile.Read_at(offset, data)
@@ -637,9 +651,11 @@ class Rectilinear(Scalar):
             self.MPI_WRITE(np.array(time, dtype=T_DTYPE))
         offset0 += self.tSize
 
+        _num_writes = 0
         for (iVar, *iBeg) in itertools.product(range(self.nVar), *[range(n) for n in self.nLoc[:-1]]):
             offset = offset0 + self.iPos(iVar, iBeg) * self.itemSize
-            self.MPI_WRITE_AT(offset, field[iVar, *iBeg])
+            self.MPI_WRITE_AT(offset, field[(iVar, *iBeg)], collective=_num_writes < self.num_collective_IO)
+            _num_writes += 1
         self.MPI_FILE_CLOSE()
 
     def iPos(self, iVar, iX):
@@ -682,9 +698,11 @@ class Rectilinear(Scalar):
         field = np.empty((self.nVar, *self.nLoc), dtype=self.dtype)
 
         self.MPI_FILE_OPEN(mode="r")
+        _num_reads = 0
         for (iVar, *iBeg) in itertools.product(range(self.nVar), *[range(n) for n in self.nLoc[:-1]]):
             offset = offset0 + self.iPos(iVar, iBeg) * self.itemSize
-            self.MPI_READ_AT(offset, field[iVar, *iBeg])
+            self.MPI_READ_AT(offset, field[(iVar, *iBeg)], collective=_num_reads < self.num_collective_IO)
+            _num_reads += 1
         self.MPI_FILE_CLOSE()
 
         return t, field
@@ -697,7 +715,7 @@ def initGrid(nVar, gridSizes):
     dim = len(gridSizes)
     coords = [np.linspace(0, 1, num=n, endpoint=False) for n in gridSizes]
     s = [None] * dim
-    u0 = np.array(np.arange(nVar) + 1)[:, *s]
+    u0 = np.array(np.arange(nVar) + 1)[(slice(None), *s)]
     for x in np.meshgrid(*coords, indexing="ij"):
         u0 = u0 * x
     return coords, u0
@@ -719,7 +737,7 @@ def writeFields_MPI(fileName, dtypeIdx, algo, nSteps, nVar, gridSizes):
     iLoc, nLoc = blocks.localBounds
     Rectilinear.setupMPI(comm, iLoc, nLoc)
     s = [slice(i, i + n) for i, n in zip(iLoc, nLoc)]
-    u0 = u0[:, *s]
+    u0 = u0[(slice(None), *s)]
 
     f1 = Rectilinear(DTYPES[dtypeIdx], fileName)
     f1.setHeader(nVar=nVar, coords=coords)
