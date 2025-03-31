@@ -202,7 +202,7 @@ class FieldsIO:
         if not self.ALLOW_OVERWRITE:
             assert not os.path.isfile(
                 self.fileName
-            ), "file already exists, use FieldsIO.ALLOW_OVERWRITE = True to allow overwriting"
+            ), f"file {self.fileName!r} already exists, use FieldsIO.ALLOW_OVERWRITE = True to allow overwriting"
 
         with open(self.fileName, "w+b") as f:
             self.hBase.tofile(f)
@@ -475,7 +475,7 @@ class Rectilinear(Scalar):
 
         Example
         -------
-        >>> # Suppose the FieldsIO object is already writen into outputs.pysdc
+        >>> # Suppose the FieldsIO object is already written into outputs.pysdc
         >>> import os
         >>> from pySDC.utils.fieldsIO import Rectilinear
         >>> os.makedirs("vtrFiles")  # to store all VTR files into a subfolder
@@ -553,7 +553,7 @@ class Rectilinear(Scalar):
         data : np.ndarray
             Data to be written in the binary file.
         """
-        self.mpiFile.Write_at(offset, data)
+        self.mpiFile.Write_at_all(offset, data)
 
     def MPI_READ_AT(self, offset, data):
         """
@@ -567,7 +567,7 @@ class Rectilinear(Scalar):
         data : np.ndarray
             Array on which to read the data from the binary file.
         """
-        self.mpiFile.Read_at(offset, data)
+        self.mpiFile.Read_at_all(offset, data)
 
     def MPI_FILE_CLOSE(self):
         """Close the binary file in MPI mode"""
@@ -707,7 +707,6 @@ def writeFields_MPI(fileName, dtypeIdx, algo, nSteps, nVar, gridSizes):
     Rectilinear.setupMPI(comm, iLoc, nLoc)
     s = [slice(i, i + n) for i, n in zip(iLoc, nLoc)]
     u0 = u0[:, *s]
-    print(MPI_RANK, u0.shape)
 
     f1 = Rectilinear(DTYPES[dtypeIdx], fileName)
     f1.setHeader(nVar=nVar, coords=coords)
