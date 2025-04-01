@@ -492,7 +492,7 @@ class Rectilinear(Scalar):
     # MPI-parallel implementation
     # -------------------------------------------------------------------------
     comm: MPI.Intracomm = None
-    _num_collective_IO = None
+    _nCollectiveIO = None
 
     @classmethod
     def setupMPI(cls, comm: MPI.Intracomm, iLoc, nLoc):
@@ -513,22 +513,20 @@ class Rectilinear(Scalar):
         cls.iLoc = iLoc
         cls.nLoc = nLoc
         cls.mpiFile = None
-        cls._num_collective_IO = None
+        cls._nCollectiveIO = None
 
     @property
-    def num_collective_IO(self):
+    def nCollectiveIO(self):
         """
-        Number of collective IO operations.
-        If the distribution is unbalanced, some tasks read/write more data than others, implying that some accesses
-        cannot be collective, but need to be of the slower individual kind.
+        Number of collective IO operations over all processes, when reading or writing a field.
 
         Returns:
         --------
         int: Number of collective IO accesses
         """
-        if self._num_collective_IO is None:
-            self._num_collective_IO = self.comm.allreduce(self.nVar * np.prod(self.nLoc[:-1]), op=MPI.MIN)
-        return self._num_collective_IO
+        if self._nCollectiveIO is None:
+            self._nCollectiveIO = self.comm.allreduce(self.nVar * np.prod(self.nLoc[:-1]), op=MPI.MAX)
+        return self._nCollectiveIO
 
     @property
     def MPI_ON(self):
@@ -556,7 +554,7 @@ class Rectilinear(Scalar):
         """Write data (np.ndarray) in the binary file in MPI mode, at the current file cursor position."""
         self.mpiFile.Write(data)
 
-    def MPI_WRITE_AT(self, offset, data: np.ndarray, collective=True):
+    def MPI_WRITE_AT_ALL(self, offset, data: np.ndarray):
         """
         Write data in the binary file in MPI mode, with a given offset
         **relative to the beginning of the file**.
@@ -567,15 +565,10 @@ class Rectilinear(Scalar):
             Offset to write at, relative to the beginning of the file, in bytes.
         data : np.ndarray
             Data to be written in the binary file.
-        collective : bool
-            Use `MPI.Write_at_all` if true and `MPI.Write_at` if false
         """
-        if collective:
-            self.mpiFile.Write_at_all(offset, data)
-        else:
-            self.mpiFile.Write_at(offset, data)
+        self.mpiFile.Write_at_all(offset, data)
 
-    def MPI_READ_AT(self, offset, data, collective=True):
+    def MPI_READ_AT_ALL(self, offset, data: np.ndarray):
         """
         Read data from the binary file in MPI mode, with a given offset
         **relative to the beginning of the file**.
@@ -586,13 +579,8 @@ class Rectilinear(Scalar):
             Offset to read at, relative to the beginning of the file, in bytes.
         data : np.ndarray
             Array on which to read the data from the binary file.
-        collective : bool
-            Use `MPI.Read_at_all` if true and `MPI.Read_at` if false
         """
-        if collective:
-            self.mpiFile.Read_at_all(offset, data)
-        else:
-            self.mpiFile.Read_at(offset, data)
+        self.mpiFile.Read_at_all(offset, data)
 
     def MPI_FILE_CLOSE(self):
         """Close the binary file in MPI mode"""
@@ -645,15 +633,22 @@ class Rectilinear(Scalar):
 
         offset0 = self.fileSize
         self.MPI_FILE_OPEN(mode="a")
+        nWrites = 0
+        nCollectiveIO = self.nCollectiveIO
+
         if self.MPI_ROOT:
             self.MPI_WRITE(np.array(time, dtype=T_DTYPE))
         offset0 += self.tSize
 
-        _num_writes = 0
         for (iVar, *iBeg) in itertools.product(range(self.nVar), *[range(n) for n in self.nLoc[:-1]]):
             offset = offset0 + self.iPos(iVar, iBeg) * self.itemSize
-            self.MPI_WRITE_AT(offset, field[(iVar, *iBeg)], collective=_num_writes < self.num_collective_IO)
-            _num_writes += 1
+            self.MPI_WRITE_AT_ALL(offset, field[(iVar, *iBeg)])
+            nWrites += 1
+
+        for _ in range(nCollectiveIO - nWrites):
+            # Additional collective write to catch up with other processes
+            self.MPI_WRITE_AT_ALL(offset0, field[:0])
+
         self.MPI_FILE_CLOSE()
 
     def iPos(self, iVar, iX):
@@ -696,11 +691,18 @@ class Rectilinear(Scalar):
         field = np.empty((self.nVar, *self.nLoc), dtype=self.dtype)
 
         self.MPI_FILE_OPEN(mode="r")
-        _num_reads = 0
+        nReads = 0
+        nCollectiveIO = self.nCollectiveIO
+
         for (iVar, *iBeg) in itertools.product(range(self.nVar), *[range(n) for n in self.nLoc[:-1]]):
             offset = offset0 + self.iPos(iVar, iBeg) * self.itemSize
-            self.MPI_READ_AT(offset, field[(iVar, *iBeg)], collective=_num_reads < self.num_collective_IO)
-            _num_reads += 1
+            self.MPI_READ_AT_ALL(offset, field[(iVar, *iBeg)])
+            nReads += 1
+
+        for _ in range(nCollectiveIO - nReads):
+            # Additional collective read to catch up with other processes
+            self.MPI_READ_AT_ALL(offset0, field[:0])
+
         self.MPI_FILE_CLOSE()
 
         return t, field
@@ -753,6 +755,11 @@ def writeFields_MPI(fileName, dtypeIdx, algo, nSteps, nVar, gridSizes):
 
 def compareFields_MPI(fileName, u0, nSteps):
     from pySDC.helpers.fieldsIO import FieldsIO
+
+    comm = MPI.COMM_WORLD
+    MPI_RANK = comm.Get_rank()
+    if MPI_RANK == 0:
+        print("Comparing fields with MPI")
 
     f2 = FieldsIO.fromFile(fileName)
 
