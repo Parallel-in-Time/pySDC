@@ -173,7 +173,7 @@ jobs:
   user_firedrake_tests:
     runs-on: ubuntu-latest
     container:
-      image: firedrakeproject/firedrake-vanilla:latest
+      image: firedrakeproject/firedrake-vanilla-default:latest
       options: --user root
       volumes:
         - ${{ github.workspace }}:/repositories
@@ -181,6 +181,11 @@ jobs:
       run:
         shell: bash -l {0}
     steps:
+      - name: Fix HOME
+        # For unknown reasons GitHub actions overwrite HOME to /github/home
+        # which will break everything unless fixed
+        # (https://github.com/actions/runner/issues/863)
+        run: echo "HOME=/home/firedrake" >> "$GITHUB_ENV"
       - name: Checkout pySDC
         uses: actions/checkout@v4
         with: 
@@ -190,25 +195,32 @@ jobs:
         with:
           repository: firedrakeproject/gusto
           path: ./gusto_repo
+      - name: Create virtual environment
+        # pass '--system-site-packages' so Firedrake can be found
+        run: python3 -m venv --system-site-packages venv-pySDC
+
       - name: Install pySDC
         run: |
-          . /home/firedrake/firedrake/bin/activate
-          python -m pip install --no-deps -e /repositories/pySDC
-          python -m pip install qmat
+          . venv-pySDC/bin/activate
+          pip install -e /repositories/pySDC
+          pip install qmat
+          # test installation
+          python -c "import pySDC; print(f'pySDC module: {pySDC}')"
       - name: Install gusto
         run: |
-          . /home/firedrake/firedrake/bin/activate
-          python -m pip install -e /repositories/gusto_repo
+          . venv-pySDC/bin/activate
+          pip install -e /repositories/gusto_repo
+          # test installation
+          python -c "import gusto; print(f'gusto module: {gusto}')"
       - name: run pytest
         run: |
-          . /home/firedrake/firedrake/bin/activate
+          . venv-pySDC/bin/activate
           firedrake-clean
           cd ./pySDC
-          coverage run -m pytest --continue-on-collection-errors -v --durations=0 /repositories/pySDC/pySDC/tests -m firedrake
+          python -m coverage run -m pytest --continue-on-collection-errors -v --durations=0 /repositories/pySDC/pySDC/tests -m firedrake
         timeout-minutes: 45
       - name: Make coverage report
         run: |
-          . /home/firedrake/firedrake/bin/activate
 
           cd ./pySDC
           mv data ../data_firedrake
