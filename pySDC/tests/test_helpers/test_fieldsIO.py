@@ -3,9 +3,6 @@ import sys
 import glob
 import pytest
 
-if sys.version_info < (3, 11):
-    pytest.skip("skipping fieldsIO tests on python lower than 3.11", allow_module_level=True)
-
 import itertools
 import numpy as np
 
@@ -14,6 +11,7 @@ from pySDC.helpers.fieldsIO import DTYPES, FieldsIO
 FieldsIO.ALLOW_OVERWRITE = True
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("dtypeIdx", DTYPES.keys())
 @pytest.mark.parametrize("dim", range(4))
 def testHeader(dim, dtypeIdx):
@@ -65,6 +63,7 @@ def testHeader(dim, dtypeIdx):
         assert np.allclose(val, f2.header[key]), f"header's discrepancy for {key} in written {f2}"
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("dtypeIdx", DTYPES.keys())
 @pytest.mark.parametrize("nSteps", [1, 2, 10, 100])
 @pytest.mark.parametrize("nVar", [1, 2, 5])
@@ -106,6 +105,7 @@ def testScalar(nVar, nSteps, dtypeIdx):
         assert np.allclose(u2, u1), f"{idx}'s fields in {f1} has incorrect values"
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("dtypeIdx", DTYPES.keys())
 @pytest.mark.parametrize("nSteps", [1, 2, 5, 10])
 @pytest.mark.parametrize("nVar", [1, 2, 5])
@@ -155,6 +155,7 @@ def testRectilinear(dim, nVar, nSteps, dtypeIdx):
             assert np.allclose(u2, u1), f"{idx}'s fields in {f1} has incorrect values"
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("nSteps", [1, 10])
 @pytest.mark.parametrize("nZ", [1, 5, 16])
 @pytest.mark.parametrize("nY", [1, 5, 16])
@@ -249,8 +250,7 @@ if __name__ == "__main__":
     parser.add_argument('--gridSizes', type=int, nargs='+', help="number of grid points in each dimensions")
     args = parser.parse_args()
 
-    if sys.version_info >= (3, 11):
-        from pySDC.helpers.fieldsIO import writeFields_MPI, compareFields_MPI
+    from pySDC.helpers.fieldsIO import writeFields_MPI, compareFields_MPI
 
-        u0 = writeFields_MPI(**args.__dict__)
-        compareFields_MPI(args.fileName, u0, args.nSteps)
+    u0 = writeFields_MPI(**args.__dict__)
+    compareFields_MPI(args.fileName, u0, args.nSteps)
