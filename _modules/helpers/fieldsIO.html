@@ -84,9 +84,7 @@
 <span class="sd">Warning</span>
 <span class="sd">-------</span>
 <span class="sd">To use MPI collective writing, you need to call first the class methods :class:`Rectilinear.initMPI` (cf their docstring).</span>
-<span class="sd">Also, `Rectilinear.setHeader` **must be given the global grids coordinates**, wether the code is run in parallel or not.</span>
-
-<span class="sd">&gt; ⚠️ Also : this module can only be imported with **Python 3.11 or higher** !</span>
+<span class="sd">Also, `Rectilinear.setHeader` **must be given the global grids coordinates**, whether the code is run in parallel or not.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -251,7 +249,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ALLOW_OVERWRITE</span><span class="p">:</span>
             <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span>
-            <span class="p">),</span> <span class="s2">&quot;file already exists, use FieldsIO.ALLOW_OVERWRITE = True to allow overwriting&quot;</span>
+            <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="si">!r}</span><span class="s2"> already exists, use FieldsIO.ALLOW_OVERWRITE = True to allow overwriting&quot;</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">,</span> <span class="s2">&quot;w+b&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">hBase</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
@@ -572,7 +570,7 @@
 
 <span class="sd">        Example</span>
 <span class="sd">        -------</span>
-<span class="sd">        &gt;&gt;&gt; # Suppose the FieldsIO object is already writen into outputs.pysdc</span>
+<span class="sd">        &gt;&gt;&gt; # Suppose the FieldsIO object is already written into outputs.pysdc</span>
 <span class="sd">        &gt;&gt;&gt; import os</span>
 <span class="sd">        &gt;&gt;&gt; from pySDC.utils.fieldsIO import Rectilinear</span>
 <span class="sd">        &gt;&gt;&gt; os.makedirs(&quot;vtrFiles&quot;)  # to store all VTR files into a subfolder</span>
@@ -592,6 +590,7 @@
     <span class="c1"># MPI-parallel implementation</span>
     <span class="c1"># -------------------------------------------------------------------------</span>
     <span class="n">comm</span><span class="p">:</span> <span class="n">MPI</span><span class="o">.</span><span class="n">Intracomm</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_nCollectiveIO</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="Rectilinear.setupMPI">
 <a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.setupMPI">[docs]</a>
@@ -599,7 +598,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">setupMPI</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">comm</span><span class="p">:</span> <span class="n">MPI</span><span class="o">.</span><span class="n">Intracomm</span><span class="p">,</span> <span class="n">iLoc</span><span class="p">,</span> <span class="n">nLoc</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Setup the MPI mode for the files IO, considering a decomposition</span>
-<span class="sd">        of the 1D grid into contiuous subintervals.</span>
+<span class="sd">        of the 1D grid into contiguous subintervals.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -613,8 +612,22 @@
         <span class="bp">cls</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">comm</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">iLoc</span> <span class="o">=</span> <span class="n">iLoc</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">nLoc</span> <span class="o">=</span> <span class="n">nLoc</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">mpiFile</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">mpiFile</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_nCollectiveIO</span> <span class="o">=</span> <span class="kc">None</span></div>
 
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nCollectiveIO</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Number of collective IO operations over all processes, when reading or writing a field.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        --------</span>
+<span class="sd">        int: Number of collective IO accesses</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nCollectiveIO</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nCollectiveIO</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nVar</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nLoc</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">MAX</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nCollectiveIO</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">MPI_ON</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -648,9 +661,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mpiFile</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Rectilinear.MPI_WRITE_AT">
-<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.MPI_WRITE_AT">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">MPI_WRITE_AT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<div class="viewcode-block" id="Rectilinear.MPI_WRITE_AT_ALL">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.MPI_WRITE_AT_ALL">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">MPI_WRITE_AT_ALL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write data in the binary file in MPI mode, with a given offset</span>
 <span class="sd">        **relative to the beginning of the file**.</span>
@@ -662,12 +675,12 @@
 <span class="sd">        data : np.ndarray</span>
 <span class="sd">            Data to be written in the binary file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mpiFile</span><span class="o">.</span><span class="n">Write_at</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpiFile</span><span class="o">.</span><span class="n">Write_at_all</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Rectilinear.MPI_READ_AT">
-<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.MPI_READ_AT">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">MPI_READ_AT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="Rectilinear.MPI_READ_AT_ALL">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.MPI_READ_AT_ALL">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">MPI_READ_AT_ALL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read data from the binary file in MPI mode, with a given offset</span>
 <span class="sd">        **relative to the beginning of the file**.</span>
@@ -679,7 +692,7 @@
 <span class="sd">        data : np.ndarray</span>
 <span class="sd">            Array on which to read the data from the binary file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mpiFile</span><span class="o">.</span><span class="n">Read_at</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpiFile</span><span class="o">.</span><span class="n">Read_at_all</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Rectilinear.MPI_FILE_CLOSE">
@@ -741,13 +754,22 @@
 
         <span class="n">offset0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileSize</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">MPI_FILE_OPEN</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>
+        <span class="n">nWrites</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">nCollectiveIO</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nCollectiveIO</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPI_ROOT</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">MPI_WRITE</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">T_DTYPE</span><span class="p">))</span>
         <span class="n">offset0</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tSize</span>
 
         <span class="k">for</span> <span class="p">(</span><span class="n">iVar</span><span class="p">,</span> <span class="o">*</span><span class="n">iBeg</span><span class="p">)</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nVar</span><span class="p">),</span> <span class="o">*</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nLoc</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]):</span>
             <span class="n">offset</span> <span class="o">=</span> <span class="n">offset0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">iPos</span><span class="p">(</span><span class="n">iVar</span><span class="p">,</span> <span class="n">iBeg</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">itemSize</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">MPI_WRITE_AT</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">field</span><span class="p">[</span><span class="n">iVar</span><span class="p">,</span> <span class="o">*</span><span class="n">iBeg</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MPI_WRITE_AT_ALL</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">field</span><span class="p">[(</span><span class="n">iVar</span><span class="p">,</span> <span class="o">*</span><span class="n">iBeg</span><span class="p">)])</span>
+            <span class="n">nWrites</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nCollectiveIO</span> <span class="o">-</span> <span class="n">nWrites</span><span class="p">):</span>
+            <span class="c1"># Additional collective write to catch up with other processes</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MPI_WRITE_AT_ALL</span><span class="p">(</span><span class="n">offset0</span><span class="p">,</span> <span class="n">field</span><span class="p">[:</span><span class="mi">0</span><span class="p">])</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">MPI_FILE_CLOSE</span><span class="p">()</span></div>
 
 
@@ -796,9 +818,18 @@
         <span class="n">field</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nVar</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">nLoc</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">MPI_FILE_OPEN</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+        <span class="n">nReads</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">nCollectiveIO</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nCollectiveIO</span>
+
         <span class="k">for</span> <span class="p">(</span><span class="n">iVar</span><span class="p">,</span> <span class="o">*</span><span class="n">iBeg</span><span class="p">)</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nVar</span><span class="p">),</span> <span class="o">*</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nLoc</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]):</span>
             <span class="n">offset</span> <span class="o">=</span> <span class="n">offset0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">iPos</span><span class="p">(</span><span class="n">iVar</span><span class="p">,</span> <span class="n">iBeg</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">itemSize</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">MPI_READ_AT</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">field</span><span class="p">[</span><span class="n">iVar</span><span class="p">,</span> <span class="o">*</span><span class="n">iBeg</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MPI_READ_AT_ALL</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">field</span><span class="p">[(</span><span class="n">iVar</span><span class="p">,</span> <span class="o">*</span><span class="n">iBeg</span><span class="p">)])</span>
+            <span class="n">nReads</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nCollectiveIO</span> <span class="o">-</span> <span class="n">nReads</span><span class="p">):</span>
+            <span class="c1"># Additional collective read to catch up with other processes</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MPI_READ_AT_ALL</span><span class="p">(</span><span class="n">offset0</span><span class="p">,</span> <span class="n">field</span><span class="p">[:</span><span class="mi">0</span><span class="p">])</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">MPI_FILE_CLOSE</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">field</span></div>
@@ -815,7 +846,7 @@
     <span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gridSizes</span><span class="p">)</span>
     <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">gridSizes</span><span class="p">]</span>
     <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">dim</span>
-    <span class="n">u0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nVar</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[:,</span> <span class="o">*</span><span class="n">s</span><span class="p">]</span>
+    <span class="n">u0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nVar</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="o">*</span><span class="n">s</span><span class="p">)]</span>
     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="o">*</span><span class="n">coords</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;ij&quot;</span><span class="p">):</span>
         <span class="n">u0</span> <span class="o">=</span> <span class="n">u0</span> <span class="o">*</span> <span class="n">x</span>
     <span class="k">return</span> <span class="n">coords</span><span class="p">,</span> <span class="n">u0</span></div>
@@ -840,8 +871,7 @@
     <span class="n">iLoc</span><span class="p">,</span> <span class="n">nLoc</span> <span class="o">=</span> <span class="n">blocks</span><span class="o">.</span><span class="n">localBounds</span>
     <span class="n">Rectilinear</span><span class="o">.</span><span class="n">setupMPI</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">iLoc</span><span class="p">,</span> <span class="n">nLoc</span><span class="p">)</span>
     <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">iLoc</span><span class="p">,</span> <span class="n">nLoc</span><span class="p">)]</span>
-    <span class="n">u0</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[:,</span> <span class="o">*</span><span class="n">s</span><span class="p">]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">MPI_RANK</span><span class="p">,</span> <span class="n">u0</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">u0</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="o">*</span><span class="n">s</span><span class="p">)]</span>
 
     <span class="n">f1</span> <span class="o">=</span> <span class="n">Rectilinear</span><span class="p">(</span><span class="n">DTYPES</span><span class="p">[</span><span class="n">dtypeIdx</span><span class="p">],</span> <span class="n">fileName</span><span class="p">)</span>
     <span class="n">f1</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="n">nVar</span><span class="o">=</span><span class="n">nVar</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span>
@@ -862,6 +892,11 @@
 <a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.compareFields_MPI">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">compareFields_MPI</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">nSteps</span><span class="p">):</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.fieldsIO</span><span class="w"> </span><span class="kn">import</span> <span class="n">FieldsIO</span>
+
+    <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+    <span class="n">MPI_RANK</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">MPI_RANK</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Comparing fields with MPI&quot;</span><span class="p">)</span>
 
     <span class="n">f2</span> <span class="o">=</span> <span class="n">FieldsIO</span><span class="o">.</span><span class="n">fromFile</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
 

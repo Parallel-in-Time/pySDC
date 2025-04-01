@@ -88,8 +88,7 @@ See <code class="xref py py-class docutils literal notranslate"><span class="pre
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>To use MPI collective writing, you need to call first the class methods <code class="xref py py-class docutils literal notranslate"><span class="pre">Rectilinear.initMPI</span></code> (cf their docstring).
-Also, <cite>Rectilinear.setHeader</cite> <strong>must be given the global grids coordinates</strong>, wether the code is run in parallel or not.</p>
-<p>&gt; ⚠️ Also : this module can only be imported with <strong>Python 3.11 or higher</strong> !</p>
+Also, <cite>Rectilinear.setHeader</cite> <strong>must be given the global grids coordinates</strong>, whether the code is run in parallel or not.</p>
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO">
@@ -302,8 +301,8 @@ it must be between -128 and 127</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="helpers.fieldsIO.Rectilinear.MPI_READ_AT">
-<span class="sig-name descname"><span class="pre">MPI_READ_AT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Rectilinear.MPI_READ_AT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.MPI_READ_AT" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="helpers.fieldsIO.Rectilinear.MPI_READ_AT_ALL">
+<span class="sig-name descname"><span class="pre">MPI_READ_AT_ALL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Rectilinear.MPI_READ_AT_ALL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.MPI_READ_AT_ALL" title="Link to this definition">¶</a></dt>
 <dd><p>Read data from the binary file in MPI mode, with a given offset
 <strong>relative to the beginning of the file</strong>.</p>
 <dl class="field-list simple">
@@ -329,8 +328,8 @@ it must be between -128 and 127</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="helpers.fieldsIO.Rectilinear.MPI_WRITE_AT">
-<span class="sig-name descname"><span class="pre">MPI_WRITE_AT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Rectilinear.MPI_WRITE_AT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.MPI_WRITE_AT" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="helpers.fieldsIO.Rectilinear.MPI_WRITE_AT_ALL">
+<span class="sig-name descname"><span class="pre">MPI_WRITE_AT_ALL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Rectilinear.MPI_WRITE_AT_ALL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.MPI_WRITE_AT_ALL" title="Link to this definition">¶</a></dt>
 <dd><p>Write data in the binary file in MPI mode, with a given offset
 <strong>relative to the beginning of the file</strong>.</p>
 <dl class="field-list simple">
@@ -394,6 +393,16 @@ possibly using MPI.</p>
 <dt class="sig sig-object py" id="helpers.fieldsIO.Rectilinear.initialize">
 <span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Rectilinear.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.initialize" title="Link to this definition">¶</a></dt>
 <dd><p>Initialize the binary file (write header) in MPI mode</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.fieldsIO.Rectilinear.nCollectiveIO">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nCollectiveIO</span></span><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.nCollectiveIO" title="Link to this definition">¶</a></dt>
+<dd><p>Number of collective IO operations over all processes, when reading or writing a field.</p>
+<section id="returns">
+<h2>Returns:<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h2>
+<p>int: Number of collective IO accesses</p>
+</section>
 </dd></dl>
 
 <dl class="py property">
@@ -475,7 +484,7 @@ time index, using MPI in the eventuality of space parallel decomposition.</p>
 <dt class="sig sig-object py" id="helpers.fieldsIO.Rectilinear.setupMPI">
 <em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setupMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">mpi4py.MPI.Intracomm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iLoc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nLoc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Rectilinear.setupMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.setupMPI" title="Link to this definition">¶</a></dt>
 <dd><p>Setup the MPI mode for the files IO, considering a decomposition
-of the 1D grid into contiuous subintervals.</p>
+of the 1D grid into contiguous subintervals.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -504,7 +513,7 @@ The default is “{:06d}”.</p></li>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Suppose the FieldsIO object is already writen into outputs.pysdc</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Suppose the FieldsIO object is already written into outputs.pysdc</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.utils.fieldsIO</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rectilinear</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s2">&quot;vtrFiles&quot;</span><span class="p">)</span>  <span class="c1"># to store all VTR files into a subfolder</span>
@@ -619,10 +628,10 @@ The default is “{:06d}”.</p></li>
 <li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.MPI_FILE_CLOSE"><code class="docutils literal notranslate"><span class="pre">MPI_FILE_CLOSE()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.MPI_FILE_OPEN"><code class="docutils literal notranslate"><span class="pre">MPI_FILE_OPEN()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.MPI_ON"><code class="docutils literal notranslate"><span class="pre">MPI_ON</span></code></a></li>
-<li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.MPI_READ_AT"><code class="docutils literal notranslate"><span class="pre">MPI_READ_AT()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.MPI_READ_AT_ALL"><code class="docutils literal notranslate"><span class="pre">MPI_READ_AT_ALL()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.MPI_ROOT"><code class="docutils literal notranslate"><span class="pre">MPI_ROOT</span></code></a></li>
 <li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.MPI_WRITE"><code class="docutils literal notranslate"><span class="pre">MPI_WRITE()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.MPI_WRITE_AT"><code class="docutils literal notranslate"><span class="pre">MPI_WRITE_AT()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.MPI_WRITE_AT_ALL"><code class="docutils literal notranslate"><span class="pre">MPI_WRITE_AT_ALL()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.addField"><code class="docutils literal notranslate"><span class="pre">addField()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.comm"><code class="docutils literal notranslate"><span class="pre">comm</span></code></a></li>
 <li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.dim"><code class="docutils literal notranslate"><span class="pre">dim</span></code></a></li>
@@ -630,6 +639,7 @@ The default is “{:06d}”.</p></li>
 <li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.hInfos"><code class="docutils literal notranslate"><span class="pre">hInfos</span></code></a></li>
 <li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.iPos"><code class="docutils literal notranslate"><span class="pre">iPos()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.initialize"><code class="docutils literal notranslate"><span class="pre">initialize()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.nCollectiveIO"><code class="docutils literal notranslate"><span class="pre">nCollectiveIO</span></code></a></li>
 <li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.nDoF"><code class="docutils literal notranslate"><span class="pre">nDoF</span></code></a></li>
 <li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.readField"><code class="docutils literal notranslate"><span class="pre">readField()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.fieldsIO.Rectilinear.readHeader"><code class="docutils literal notranslate"><span class="pre">readHeader()</span></code></a></li>
