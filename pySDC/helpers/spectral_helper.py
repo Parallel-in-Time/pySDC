@@ -1044,7 +1044,7 @@ class SpectralHelper:
         """
         Remove a BC from the matrix. This is useful e.g. when you add a non-scalar BC and then need to selectively
         remove single BCs again, as in incompressible Navier-Stokes, for instance.
-        Forward arguments for the boundary conditions using `kwargs`. Refer to documentation of 1D bases for details.
+        Forwards arguments for the boundary conditions using `kwargs`. Refer to documentation of 1D bases for details.
 
         Args:
             component (str): Name of the component the BC should act on
@@ -1311,15 +1311,15 @@ class SpectralHelper:
         """
         Get grid in spectral space
         """
-        grids = [self.axes[i].get_wavenumbers()[self.local_slice[i]] for i in range(len(self.axes))][::-1]
-        return self.xp.meshgrid(*grids)
+        grids = [self.axes[i].get_wavenumbers()[self.local_slice[i]] for i in range(len(self.axes))]
+        return self.xp.meshgrid(*grids, indexing='ij')
 
     def get_grid(self):
         """
         Get grid in physical space
         """
-        grids = [self.axes[i].get_1dgrid()[self.local_slice[i]] for i in range(len(self.axes))][::-1]
-        return self.xp.meshgrid(*grids)
+        grids = [self.axes[i].get_1dgrid()[self.local_slice[i]] for i in range(len(self.axes))]
+        return self.xp.meshgrid(*grids, indexing='ij')
 
     def get_fft(self, axes=None, direction='object', padding=None, shape=None):
         """
