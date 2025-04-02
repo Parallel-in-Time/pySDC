@@ -748,6 +748,11 @@ See documentation of <cite>SpectralHelper.add_equation_lhs</cite> for an example
 <dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.expand_matrix_ND">
+<span class="sig-name descname"><span class="pre">expand_matrix_ND</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aligned</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.expand_matrix_ND"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.expand_matrix_ND" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.fft_backend">
 <span class="sig-name descname"><span class="pre">fft_backend</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'fftw'</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.fft_backend" title="Link to this definition">¶</a></dt>
@@ -1058,7 +1063,7 @@ This function needs no transforms and caches a mask for faster subsequent use.</
 <span class="sig-name descname"><span class="pre">remove_BC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">component</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.remove_BC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.remove_BC" title="Link to this definition">¶</a></dt>
 <dd><p>Remove a BC from the matrix. This is useful e.g. when you add a non-scalar BC and then need to selectively
 remove single BCs again, as in incompressible Navier-Stokes, for instance.
-Forward arguments for the boundary conditions using <cite>kwargs</cite>. Refer to documentation of 1D bases for details.</p>
+Forwards arguments for the boundary conditions using <cite>kwargs</cite>. Refer to documentation of 1D bases for details.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1560,6 +1565,7 @@ integration constant such that integration starts from x=-1.</p>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.check_BCs"><code class="docutils literal notranslate"><span class="pre">check_BCs()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.convert_operator_matrix_to_operator"><code class="docutils literal notranslate"><span class="pre">convert_operator_matrix_to_operator()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.dtype"><code class="docutils literal notranslate"><span class="pre">dtype</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.expand_matrix_ND"><code class="docutils literal notranslate"><span class="pre">expand_matrix_ND()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.fft_backend"><code class="docutils literal notranslate"><span class="pre">fft_backend</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.fft_comm_backend"><code class="docutils literal notranslate"><span class="pre">fft_comm_backend</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.fft_lib"><code class="docutils literal notranslate"><span class="pre">fft_lib</span></code></a></li>

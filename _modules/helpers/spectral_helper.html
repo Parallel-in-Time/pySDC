@@ -1240,7 +1240,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove a BC from the matrix. This is useful e.g. when you add a non-scalar BC and then need to selectively</span>
 <span class="sd">        remove single BCs again, as in incompressible Navier-Stokes, for instance.</span>
-<span class="sd">        Forward arguments for the boundary conditions using `kwargs`. Refer to documentation of 1D bases for details.</span>
+<span class="sd">        Forwards arguments for the boundary conditions using `kwargs`. Refer to documentation of 1D bases for details.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            component (str): Name of the component the BC should act on</span>
@@ -1534,8 +1534,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get grid in spectral space</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">grids</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get_wavenumbers</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">local_slice</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">))][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="o">*</span><span class="n">grids</span><span class="p">)</span></div>
+        <span class="n">grids</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get_wavenumbers</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">local_slice</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">))]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="o">*</span><span class="n">grids</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s1">&#39;ij&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SpectralHelper.get_grid">
@@ -1544,8 +1544,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get grid in physical space</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">grids</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get_1dgrid</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">local_slice</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">))][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="o">*</span><span class="n">grids</span><span class="p">)</span></div>
+        <span class="n">grids</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get_1dgrid</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">local_slice</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">))]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="o">*</span><span class="n">grids</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s1">&#39;ij&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SpectralHelper.get_fft">
@@ -2104,6 +2104,29 @@
         <span class="k">return</span> <span class="n">M</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">local_slice</span><span class="p">[</span><span class="n">axis</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_slice</span><span class="p">[</span><span class="n">axis</span><span class="p">]]</span></div>
 
 
+<div class="viewcode-block" id="SpectralHelper.expand_matrix_ND">
+<a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.expand_matrix_ND">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">expand_matrix_ND</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">aligned</span><span class="p">):</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">),</span> <span class="n">aligned</span><span class="p">)</span>
+        <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">matrix</span>
+        <span class="k">elif</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">axis</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">I1D</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
+
+            <span class="n">mats</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">ndim</span>
+            <span class="n">mats</span><span class="p">[</span><span class="n">aligned</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">aligned</span><span class="p">)</span>
+            <span class="n">mats</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="n">I1D</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="o">*</span><span class="n">mats</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Matrix expansion not implemented for </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> dimensions!&#39;</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="SpectralHelper.get_filter_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_filter_matrix">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_filter_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -2134,31 +2157,10 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            sparse differentiation matrix</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span>
-        <span class="n">ndim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span>
-
-        <span class="k">if</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_differentiation_matrix</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
-                <span class="n">axis2</span> <span class="o">=</span> <span class="p">(</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">ndim</span>
-                <span class="n">D1D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">get_differentiation_matrix</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">I1D</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis2</span><span class="p">]</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">I1D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis2</span><span class="p">]</span><span class="o">.</span><span class="n">get_Id</span><span class="p">()</span>
-
-                <span class="n">mats</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">ndim</span>
-                <span class="n">mats</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="n">D1D</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
-                <span class="n">mats</span><span class="p">[</span><span class="n">axis2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="n">I1D</span><span class="p">,</span> <span class="n">axis2</span><span class="p">)</span>
-
-                <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-                    <span class="n">D</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="o">*</span><span class="n">mats</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">D</span> <span class="o">=</span> <span class="n">D</span> <span class="o">@</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="o">*</span><span class="n">mats</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Differentiation matrix not implemented for </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> dimension!&#39;</span><span class="p">)</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_matrix_ND</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">get_differentiation_matrix</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">_D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">get_differentiation_matrix</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">D</span> <span class="o">=</span> <span class="n">D</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_matrix_ND</span><span class="p">(</span><span class="n">_D</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">D</span></div>
 
@@ -2175,31 +2177,10 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            sparse integration matrix</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span>
-        <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">S</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_integration_matrix</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
-                <span class="n">axis2</span> <span class="o">=</span> <span class="p">(</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">ndim</span>
-                <span class="n">S1D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">get_integration_matrix</span><span class="p">()</span>
-
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">I1D</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis2</span><span class="p">]</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">I1D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis2</span><span class="p">]</span><span class="o">.</span><span class="n">get_Id</span><span class="p">()</span>
-
-                <span class="n">mats</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">ndim</span>
-                <span class="n">mats</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="n">S1D</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
-                <span class="n">mats</span><span class="p">[</span><span class="n">axis2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="n">I1D</span><span class="p">,</span> <span class="n">axis2</span><span class="p">)</span>
-
-                <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-                    <span class="n">S</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="o">*</span><span class="n">mats</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">S</span> <span class="o">=</span> <span class="n">S</span> <span class="o">@</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="o">*</span><span class="n">mats</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Integration matrix not implemented for </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> dimension!&#39;</span><span class="p">)</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_matrix_ND</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">get_integration_matrix</span><span class="p">(),</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">_S</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">get_integration_matrix</span><span class="p">()</span>
+            <span class="n">S</span> <span class="o">=</span> <span class="n">S</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_matrix_ND</span><span class="p">(</span><span class="n">_S</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">S</span></div>
 
@@ -2213,27 +2194,10 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            sparse identity matrix</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span>
-        <span class="n">ndim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span>
-        <span class="n">I</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">I</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_Id</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">):</span>
-                <span class="n">axis2</span> <span class="o">=</span> <span class="p">(</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">ndim</span>
-                <span class="n">I1D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">get_Id</span><span class="p">()</span>
-
-                <span class="n">I1D2</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis2</span><span class="p">]</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
-
-                <span class="n">mats</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">ndim</span>
-                <span class="n">mats</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="n">I1D</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
-                <span class="n">mats</span><span class="p">[</span><span class="n">axis2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="n">I1D2</span><span class="p">,</span> <span class="n">axis2</span><span class="p">)</span>
-
-                <span class="n">I</span> <span class="o">=</span> <span class="n">I</span> <span class="o">@</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="o">*</span><span class="n">mats</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Identity matrix not implemented for </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> dimension!&#39;</span><span class="p">)</span>
-
+        <span class="n">I</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_matrix_ND</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_Id</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">):</span>
+            <span class="n">_I</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">get_Id</span><span class="p">()</span>
+            <span class="n">I</span> <span class="o">=</span> <span class="n">I</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_matrix_ND</span><span class="p">(</span><span class="n">_I</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">I</span></div>
 
 
@@ -2249,26 +2213,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            sparse matrix</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span>
-        <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_Dirichlet_recombination_matrix</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">axis2</span> <span class="o">=</span> <span class="p">(</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">ndim</span>
-            <span class="n">C1D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">get_Dirichlet_recombination_matrix</span><span class="p">()</span>
-
-            <span class="n">I1D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis2</span><span class="p">]</span><span class="o">.</span><span class="n">get_Id</span><span class="p">()</span>
-
-            <span class="n">mats</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">ndim</span>
-            <span class="n">mats</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="n">C1D</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
-            <span class="n">mats</span><span class="p">[</span><span class="n">axis2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="n">I1D</span><span class="p">,</span> <span class="n">axis2</span><span class="p">)</span>
-
-            <span class="n">C</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="o">*</span><span class="n">mats</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Basis change matrix not implemented for </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> dimension!&#39;</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">C</span></div>
+        <span class="n">C1D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">get_Dirichlet_recombination_matrix</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_matrix_ND</span><span class="p">(</span><span class="n">C1D</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SpectralHelper.get_basis_change_matrix">
@@ -2286,31 +2232,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">axes</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="o">-</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">))</span> <span class="k">if</span> <span class="n">axes</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">axes</span>
 
-        <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span>
-        <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_basis_change_matrix</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
-                <span class="n">axis2</span> <span class="o">=</span> <span class="p">(</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">ndim</span>
-                <span class="n">C1D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">get_basis_change_matrix</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">I1D</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis2</span><span class="p">]</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">I1D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis2</span><span class="p">]</span><span class="o">.</span><span class="n">get_Id</span><span class="p">()</span>
-
-                <span class="n">mats</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">ndim</span>
-                <span class="n">mats</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="n">C1D</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
-                <span class="n">mats</span><span class="p">[</span><span class="n">axis2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="n">I1D</span><span class="p">,</span> <span class="n">axis2</span><span class="p">)</span>
-
-                <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-                    <span class="n">C</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="o">*</span><span class="n">mats</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">C</span> <span class="o">=</span> <span class="n">C</span> <span class="o">@</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="o">*</span><span class="n">mats</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Basis change matrix not implemented for </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> dimension!&#39;</span><span class="p">)</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_matrix_ND</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">get_basis_change_matrix</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">_C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">get_basis_change_matrix</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">C</span> <span class="o">=</span> <span class="n">C</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">expand_matrix_ND</span><span class="p">(</span><span class="n">_C</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">C</span></div>
 </div>
