@@ -188,7 +188,7 @@ class Burgers2D(GenericSpectralLinear):
         components = ['u', 'v', 'ux', 'uz', 'vx', 'vz']
         super().__init__(bases=bases, components=components, spectral_space=False, **kwargs)
 
-        self.Z, self.X = self.get_grid()
+        self.X, self.Z = self.get_grid()
 
         # prepare matrices
         Dx = self.get_differentiation_matrix(axes=(0,))

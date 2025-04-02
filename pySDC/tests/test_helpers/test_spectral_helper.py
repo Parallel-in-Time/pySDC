@@ -22,7 +22,7 @@ def test_integration_matrix2D(nx, nz, variant, axes, useMPI=False, **kwargs):
     helper.add_axis(base='cheby', N=nz)
     helper.setup_fft()
 
-    Z, X = helper.get_grid()
+    X, Z = helper.get_grid()
 
     conv = helper.get_basis_change_matrix()
     S = helper.get_integration_matrix(axes=axes)
@@ -68,7 +68,7 @@ def test_differentiation_matrix2D(nx, nz, variant, axes, bx, bz, useMPI=False, *
     helper.add_axis(base=bz, N=nz)
     helper.setup_fft()
 
-    Z, X = helper.get_grid()
+    X, Z = helper.get_grid()
     conv = helper.get_basis_change_matrix()
     D = helper.get_differentiation_matrix(axes)
 
@@ -123,7 +123,7 @@ def test_identity_matrix2D(nx, nz, variant, bx, useMPI=False, **kwargs):
     helper.add_axis(base='cheby', N=nz)
     helper.setup_fft()
 
-    Z, X = helper.get_grid()
+    X, Z = helper.get_grid()
     conv = helper.get_basis_change_matrix()
     I = helper.get_Id()
 
@@ -215,9 +215,9 @@ def _test_transform_dealias(
     u2_hat_expect = helper.u_init_forward
     u_expect = helper.u_init
     u_expect_pad = helper_pad.u_init
-    Kz, Kx = helper.get_wavenumbers()
-    Z, X = helper.get_grid()
-    Z_pad, X_pad = helper_pad.get_grid()
+    Kx, Kz = helper.get_wavenumbers()
+    X, Z = helper.get_grid()
+    X_pad, Z_pad = helper_pad.get_grid()
 
     if axis == -2:
         f = nx // 3
@@ -476,7 +476,7 @@ def test_tau_method2D(variant, nz, nx, bc_val, bc=-1, useMPI=False, plotting=Fal
     helper.add_component(['u'])
     helper.setup_fft()
 
-    Z, X = helper.get_grid()
+    X, Z = helper.get_grid()
     x = X[:, 0]
     z = Z[0, :]
     shape = helper.init[0][1:]

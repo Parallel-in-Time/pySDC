@@ -109,8 +109,8 @@ class RayleighBenard(GenericSpectralLinear):
         components = ['u', 'v', 'T', 'p']
         super().__init__(bases, components, comm=comm, **kwargs)
 
-        self.Z, self.X = self.get_grid()
-        self.Kz, self.Kx = self.get_wavenumbers()
+        self.X, self.Z = self.get_grid()
+        self.Kx, self.Kz = self.get_wavenumbers()
 
         # construct 2D matrices
         Dzz = self.get_differentiation_matrix(axes=(1,), p=2)
