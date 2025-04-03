@@ -64,7 +64,7 @@ def test_run_experiment(restart_idx=0):
             return desc
 
         def get_LogToFile(self, ranks=None):
-            from pySDC.implementations.hooks.log_solution import LogToFileAfterXs as LogToFile
+            from pySDC.implementations.hooks.log_solution import LogToPickleFileAfterXS as LogToFile
 
             LogToFile.path = './data/'
             LogToFile.file_name = f'{self.get_path(ranks=ranks)}-solution'

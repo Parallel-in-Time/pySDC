@@ -2,6 +2,7 @@ from pySDC.core.problem import Problem, WorkCounter
 from pySDC.helpers.spectral_helper import SpectralHelper
 import numpy as np
 from pySDC.core.errors import ParameterError
+from pySDC.helpers.fieldsIO import Rectilinear
 
 
 class GenericSpectralLinear(Problem):
@@ -332,6 +333,30 @@ class GenericSpectralLinear(Problem):
                 self.spectral.check_BCs(sol)
 
             return sol
+
+    def setUpFieldsIO(self):
+        Rectilinear.setupMPI(
+            comm=self.comm,
+            iLoc=[me.start for me in self.local_slice],
+            nLoc=[me.stop - me.start for me in self.local_slice],
+        )
+
+    def getOutputFile(self, fileName):
+        self.setUpFieldsIO()
+
+        coords = [me.get_1dgrid() for me in self.spectral.axes]
+        assert np.allclose([len(me) for me in coords], self.spectral.global_shape[1:])
+
+        fOut = Rectilinear(np.float64, fileName=fileName)
+        fOut.setHeader(nVar=len(self.components), coords=coords)
+        fOut.initialize()
+        return fOut
+
+    def processSolutionForOutput(self, u):
+        if self.spectral_space:
+            return np.array(self.itransform(u).real)
+        else:
+            return np.array(u.real)
 
 
 def compute_residual_DAE(self, stage=''):
