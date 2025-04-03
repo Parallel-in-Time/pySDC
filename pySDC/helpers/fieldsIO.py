@@ -198,9 +198,10 @@ class FieldsIO:
         assert not self.initialized, "FieldsIO already initialized"
 
         if not self.ALLOW_OVERWRITE:
-            assert not os.path.isfile(
-                self.fileName
-            ), f"file {self.fileName!r} already exists, use FieldsIO.ALLOW_OVERWRITE = True to allow overwriting"
+            if os.path.isfile(self.fileName):
+                raise FileExistsError(
+                    f"file {self.fileName!r} already exists, use FieldsIO.ALLOW_OVERWRITE = True to allow overwriting"
+                )
 
         with open(self.fileName, "w+b") as f:
             self.hBase.tofile(f)
