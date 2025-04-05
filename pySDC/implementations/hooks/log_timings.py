@@ -287,7 +287,8 @@ class Timings(Hooks):
             type=f'{self.prefix}timing_run',
             value=t_run,
         )
-        self.logger.info(f'Finished run after {t_run:.2e}s')
+        if step.status.first:
+            self.logger.info(f'Finished run after {t_run:.2e}s')
 
     def post_setup(self, step, level_number):
         """
