@@ -1,7 +1,0 @@
-helpers.transfer\_helper module
-===============================
-
-.. automodule:: helpers.transfer_helper
-   :members:
-   :show-inheritance:
-   :undoc-members:

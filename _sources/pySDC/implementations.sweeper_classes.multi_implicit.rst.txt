@@ -1,7 +1,0 @@
-implementations.sweeper\_classes.multi\_implicit module
-=======================================================
-
-.. automodule:: implementations.sweeper_classes.multi_implicit
-   :members:
-   :show-inheritance:
-   :undoc-members:

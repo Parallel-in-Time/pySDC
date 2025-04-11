@@ -1,7 +1,0 @@
-implementations.transfer\_classes.TransferMesh module
-=====================================================
-
-.. automodule:: implementations.transfer_classes.TransferMesh
-   :members:
-   :show-inheritance:
-   :undoc-members:

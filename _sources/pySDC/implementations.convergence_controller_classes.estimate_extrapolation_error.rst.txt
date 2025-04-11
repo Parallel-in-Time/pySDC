@@ -1,7 +1,0 @@
-implementations.convergence\_controller\_classes.estimate\_extrapolation\_error module
-======================================================================================
-
-.. automodule:: implementations.convergence_controller_classes.estimate_extrapolation_error
-   :members:
-   :show-inheritance:
-   :undoc-members:

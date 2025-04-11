@@ -1,7 +1,0 @@
-implementations.convergence\_controller\_classes.crash module
-=============================================================
-
-.. automodule:: implementations.convergence_controller_classes.crash
-   :members:
-   :show-inheritance:
-   :undoc-members:

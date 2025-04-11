@@ -1,7 +1,0 @@
-core.step module
-================
-
-.. automodule:: core.step
-   :members:
-   :show-inheritance:
-   :undoc-members:

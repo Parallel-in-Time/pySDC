@@ -1,7 +1,0 @@
-implementations.transfer\_classes.TransferPETScDMDA module
-==========================================================
-
-.. automodule:: implementations.transfer_classes.TransferPETScDMDA
-   :members:
-   :show-inheritance:
-   :undoc-members:

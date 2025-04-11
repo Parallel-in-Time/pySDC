@@ -1,7 +1,0 @@
-implementations.problem\_classes.nonlinear\_ODE\_1 module
-=========================================================
-
-.. automodule:: implementations.problem_classes.nonlinear_ODE_1
-   :members:
-   :show-inheritance:
-   :undoc-members:

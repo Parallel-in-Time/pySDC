@@ -1,7 +1,0 @@
-helpers.pySDC\_as\_gusto\_time\_discretization module
-=====================================================
-
-.. automodule:: helpers.pySDC_as_gusto_time_discretization
-   :members:
-   :show-inheritance:
-   :undoc-members:

@@ -1,7 +1,0 @@
-implementations.transfer\_classes.TransferMesh\_FFT module
-==========================================================
-
-.. automodule:: implementations.transfer_classes.TransferMesh_FFT
-   :members:
-   :show-inheritance:
-   :undoc-members:

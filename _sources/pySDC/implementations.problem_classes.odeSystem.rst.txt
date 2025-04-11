@@ -1,7 +1,0 @@
-implementations.problem\_classes.odeSystem module
-=================================================
-
-.. automodule:: implementations.problem_classes.odeSystem
-   :members:
-   :show-inheritance:
-   :undoc-members:

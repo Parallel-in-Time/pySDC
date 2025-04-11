@@ -1,7 +1,0 @@
-implementations.transfer\_classes.TransferFenicsMesh module
-===========================================================
-
-.. automodule:: implementations.transfer_classes.TransferFenicsMesh
-   :members:
-   :show-inheritance:
-   :undoc-members:

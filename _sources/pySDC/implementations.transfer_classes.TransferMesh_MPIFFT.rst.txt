@@ -1,7 +1,0 @@
-implementations.transfer\_classes.TransferMesh\_MPIFFT module
-=============================================================
-
-.. automodule:: implementations.transfer_classes.TransferMesh_MPIFFT
-   :members:
-   :show-inheritance:
-   :undoc-members:

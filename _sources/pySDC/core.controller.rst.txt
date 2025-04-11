@@ -1,7 +1,0 @@
-core.controller module
-======================
-
-.. automodule:: core.controller
-   :members:
-   :show-inheritance:
-   :undoc-members:

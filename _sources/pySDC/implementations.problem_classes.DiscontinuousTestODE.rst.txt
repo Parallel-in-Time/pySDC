@@ -1,7 +1,0 @@
-implementations.problem\_classes.DiscontinuousTestODE module
-============================================================
-
-.. automodule:: implementations.problem_classes.DiscontinuousTestODE
-   :members:
-   :show-inheritance:
-   :undoc-members:

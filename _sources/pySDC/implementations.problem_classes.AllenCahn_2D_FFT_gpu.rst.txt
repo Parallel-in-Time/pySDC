@@ -1,7 +1,0 @@
-implementations.problem\_classes.AllenCahn\_2D\_FFT\_gpu module
-===============================================================
-
-.. automodule:: implementations.problem_classes.AllenCahn_2D_FFT_gpu
-   :members:
-   :show-inheritance:
-   :undoc-members:

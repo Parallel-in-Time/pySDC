@@ -1,7 +1,0 @@
-implementations.problem\_classes.Van\_der\_Pol\_implicit module
-===============================================================
-
-.. automodule:: implementations.problem_classes.Van_der_Pol_implicit
-   :members:
-   :show-inheritance:
-   :undoc-members:

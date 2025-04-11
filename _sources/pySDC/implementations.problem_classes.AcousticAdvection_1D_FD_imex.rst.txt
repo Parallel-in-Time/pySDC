@@ -1,7 +1,0 @@
-implementations.problem\_classes.AcousticAdvection\_1D\_FD\_imex module
-=======================================================================
-
-.. automodule:: implementations.problem_classes.AcousticAdvection_1D_FD_imex
-   :members:
-   :show-inheritance:
-   :undoc-members:

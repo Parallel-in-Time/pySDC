@@ -1,7 +1,0 @@
-implementations.problem\_classes.boussinesq\_helpers.helper\_classes module
-===========================================================================
-
-.. automodule:: implementations.problem_classes.boussinesq_helpers.helper_classes
-   :members:
-   :show-inheritance:
-   :undoc-members:

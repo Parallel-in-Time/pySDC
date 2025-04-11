@@ -1,7 +1,0 @@
-implementations.sweeper\_classes.explicit module
-================================================
-
-.. automodule:: implementations.sweeper_classes.explicit
-   :members:
-   :show-inheritance:
-   :undoc-members:

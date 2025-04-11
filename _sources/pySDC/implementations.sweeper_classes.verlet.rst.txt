@@ -1,7 +1,0 @@
-implementations.sweeper\_classes.verlet module
-==============================================
-
-.. automodule:: implementations.sweeper_classes.verlet
-   :members:
-   :show-inheritance:
-   :undoc-members:

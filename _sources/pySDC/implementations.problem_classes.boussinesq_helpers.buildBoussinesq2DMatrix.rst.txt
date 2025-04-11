@@ -1,7 +1,0 @@
-implementations.problem\_classes.boussinesq\_helpers.buildBoussinesq2DMatrix module
-===================================================================================
-
-.. automodule:: implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix
-   :members:
-   :show-inheritance:
-   :undoc-members:

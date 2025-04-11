@@ -1,7 +1,0 @@
-helpers.fieldsIO module
-=======================
-
-.. automodule:: helpers.fieldsIO
-   :members:
-   :show-inheritance:
-   :undoc-members:

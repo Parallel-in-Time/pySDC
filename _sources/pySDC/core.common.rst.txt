@@ -1,7 +1,0 @@
-core.common module
-==================
-
-.. automodule:: core.common
-   :members:
-   :show-inheritance:
-   :undoc-members:

@@ -1,7 +1,0 @@
-helpers.pysdc\_helper module
-============================
-
-.. automodule:: helpers.pysdc_helper
-   :members:
-   :show-inheritance:
-   :undoc-members:

@@ -1,7 +1,0 @@
-implementations.sweeper\_classes.Multistep module
-=================================================
-
-.. automodule:: implementations.sweeper_classes.Multistep
-   :members:
-   :show-inheritance:
-   :undoc-members:

@@ -1,7 +1,0 @@
-implementations.transfer\_classes.BaseTransferMPI module
-========================================================
-
-.. automodule:: implementations.transfer_classes.BaseTransferMPI
-   :members:
-   :show-inheritance:
-   :undoc-members:

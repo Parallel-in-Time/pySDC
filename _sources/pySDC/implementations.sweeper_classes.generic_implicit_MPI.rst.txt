@@ -1,7 +1,0 @@
-implementations.sweeper\_classes.generic\_implicit\_MPI module
-==============================================================
-
-.. automodule:: implementations.sweeper_classes.generic_implicit_MPI
-   :members:
-   :show-inheritance:
-   :undoc-members:

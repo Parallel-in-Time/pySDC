@@ -1,7 +1,0 @@
-implementations.convergence\_controller\_classes.basic\_restarting module
-=========================================================================
-
-.. automodule:: implementations.convergence_controller_classes.basic_restarting
-   :members:
-   :show-inheritance:
-   :undoc-members:
