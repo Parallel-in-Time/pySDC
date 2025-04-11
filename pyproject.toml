@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = 'pySDC'
-version = '5.5.2'
+version = '5.6'
 description = 'A Python implementation of spectral deferred correction methods and the likes'
 license = {text = "BSD-2-Clause"}
 readme = 'README.md'
@@ -16,6 +16,7 @@ authors=[
     {name='Ikrom Akramov', email='ikrom.akramov@tuhh.de'},
     {name='Giacomo Rosilho De Souza', email='giacomo.rosilhodesouza@usi.ch'},
     {name='Jakob Fritz', email='j.fritz@fz-juelich.de'},
+    {name='Jemma Shipton', email='j.shipton@exeter.ac.uk'},
     ]
 
 
