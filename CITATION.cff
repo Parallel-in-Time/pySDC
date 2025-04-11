@@ -28,11 +28,15 @@ authors:
     given-names: Jakob
     orcid: https://orcid.org/0000-0001-6280-8396
     affiliation: "Jülich Supercomputing Centre, Forschungszentrum Jülich GmbH, 52425 Jülich, Germany"
+  - family-names: Shipton
+    given-names: Jemma
+    orcid: https://orcid.org/0000-0002-8635-0831
+    affiliation: "Department of Mathematics and Statistics, University of Exeter, Exeter, UK"
 
 
-version: 5.5.2
+version: 5.6
 doi: 10.5281/zenodo.594191
-date-released: 2024-09-23
+date-released: 2025-04-11
 keywords: 
   - "parallel-in-time"
   - "spectral deferred corrections"
