@@ -36,7 +36,7 @@ class GrayScott(Config):
 
     def get_LogToFile(self, ranks=None):
         import numpy as np
-        from pySDC.implementations.hooks.log_solution import LogToFileAfterXs as LogToFile
+        from pySDC.implementations.hooks.log_solution import LogToPickleFileAfterXS as LogToFile
 
         LogToFile.path = f'{self.base_path}/data/'
         LogToFile.file_name = f'{self.get_path(ranks=ranks)}-solution'

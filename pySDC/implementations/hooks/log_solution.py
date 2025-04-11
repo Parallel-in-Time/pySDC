@@ -2,6 +2,8 @@ from pySDC.core.hooks import Hooks
 import pickle
 import os
 import numpy as np
+from pySDC.helpers.fieldsIO import FieldsIO
+from pySDC.core.errors import DataError
 
 
 class LogSolution(Hooks):
@@ -68,7 +70,7 @@ class LogSolutionAfterIteration(Hooks):
         )
 
 
-class LogToFile(Hooks):
+class LogToPickleFile(Hooks):
     r"""
     Hook for logging the solution to file after the step using pickle.
 
@@ -171,7 +173,7 @@ class LogToFile(Hooks):
             return pickle.load(file)
 
 
-class LogToFileAfterXs(LogToFile):
+class LogToPickleFileAfterXS(LogToPickleFile):
     r'''
     Log to file after certain amount of time has passed instead of after every step
     '''
@@ -200,3 +202,62 @@ class LogToFileAfterXs(LogToFile):
             }
 
         self.log_to_file(step, level_number, type(self).logging_condition(L), process_solution=process_solution)
+
+
+class LogToFile(Hooks):
+    filename = 'myRun.pySDC'
+    time_increment = 0
+    allow_overwriting = False
+
+    def __init__(self):
+        super().__init__()
+        self.outfile = None
+        self.t_next_log = 0
+        FieldsIO.ALLOW_OVERWRITE = self.allow_overwriting
+
+    def pre_run(self, step, level_number):
+        if level_number > 0:
+            return None
+        L = step.levels[level_number]
+
+        # setup outfile
+        if os.path.isfile(self.filename) and L.time > 0:
+            L.prob.setUpFieldsIO()
+            self.outfile = FieldsIO.fromFile(self.filename)
+            self.logger.info(
+                f'Set up file {self.filename!r} for writing output. This file already contains solutions up to t={self.outfile.times[-1]:.4f}.'
+            )
+        else:
+            self.outfile = L.prob.getOutputFile(self.filename)
+            self.logger.info(f'Set up file {self.filename!r} for writing output.')
+
+            # write initial conditions
+            if L.time not in self.outfile.times:
+                self.outfile.addField(time=L.time, field=L.prob.processSolutionForOutput(L.u[0]))
+                self.logger.info(f'Written initial conditions at t={L.time:4f} to file')
+
+    def post_step(self, step, level_number):
+        if level_number > 0:
+            return None
+
+        L = step.levels[level_number]
+
+        if self.t_next_log == 0:
+            self.t_next_log = L.time + self.time_increment
+
+        if L.time + L.dt >= self.t_next_log and not step.status.restart:
+            value_exists = True in [abs(me - (L.time + L.dt)) < np.finfo(float).eps * 1000 for me in self.outfile.times]
+            if value_exists and not self.allow_overwriting:
+                raise DataError(f'Already have recorded data for time {L.time + L.dt} in this file!')
+            self.outfile.addField(time=L.time + L.dt, field=L.prob.processSolutionForOutput(L.uend))
+            self.logger.info(f'Written solution at t={L.time+L.dt:.4f} to file')
+            self.t_next_log = max([L.time + L.dt, self.t_next_log]) + self.time_increment
+
+    @classmethod
+    def load(cls, index):
+        data = {}
+        file = FieldsIO.fromFile(cls.filename)
+        file_entry = file.readField(idx=index)
+        data['u'] = file_entry[1]
+        data['t'] = file_entry[0]
+        return data
