@@ -81,13 +81,17 @@ class ScalingConfig(object):
                     **kwargs,
                 )
 
-    def plot_scaling_test(self, ax, quantity='time', **plotting_params):  # pragma: no cover
+    def plot_scaling_test(self, ax, quantity='time', space_time=None, **plotting_params):  # pragma: no cover
         from matplotlib.colors import TABLEAU_COLORS
 
         cmap = TABLEAU_COLORS
         colors = list(cmap.values())
 
         for experiment in self.experiments:
+            if space_time is not None:
+                if not experiment.PinT == space_time:
+                    continue
+
             tasks_time = self.tasks_time if experiment.PinT else 1
             timings = {}
 
@@ -141,8 +145,12 @@ class ScalingConfig(object):
                     elif quantity == 'throughput_per_task':
                         timings[np.prod(procs)] = experiment.res**self.ndim / t_mean
                     elif quantity == 'efficiency':
+                        if type(config).__name__ == 'GrayScottScaling3D':
+                            norm = 13216322.909
+                        else:
+                            norm = 1
                         timings[np.prod(procs) / self.tasks_per_node] = (
-                            experiment.res**self.ndim / t_mean / np.prod(procs)
+                            experiment.res**self.ndim / t_mean / np.prod(procs) / norm
                         )
                     elif quantity == 'time':
                         timings[np.prod(procs) / self.tasks_per_node] = t_mean
@@ -150,10 +158,16 @@ class ScalingConfig(object):
                         timings[np.prod(procs)] = t_mean
                     elif quantity == 'min_time_per_task':
                         timings[np.prod(procs)] = t_min
+                    elif quantity == 'min_time':
+                        timings[np.prod(procs) / self.tasks_per_node] = t_min
                     else:
                         raise NotImplementedError
                 except (FileNotFoundError, ValueError):
                     pass
+
+            if quantity == 'efficiency' and type(config).__name__ == 'RayleighBenard_scaling':
+                norm = max(timings.values())
+                timings = {key: value / norm for key, value in timings.items()}
 
             ax.loglog(
                 timings.keys(),
@@ -171,7 +185,8 @@ class ScalingConfig(object):
             'time': r'$t_\mathrm{step}$ / s',
             'time_per_task': r'$t_\mathrm{step}$ / s',
             'min_time_per_task': r'minimal $t_\mathrm{step}$ / s',
-            'efficiency': 'efficiency / DoF/s/task',
+            'min_time': r'minimal $t_\mathrm{step}$ / s',
+            'efficiency': r'parallel efficiency / \%',
         }
         ax.set_ylabel(labels[quantity])
 
@@ -331,17 +346,28 @@ class RayleighBenardDedalusComparisonGPU(GPUConfig, ScalingConfig):
     ]
 
 
-def plot_scalings(problem, **kwargs):  # pragma: no cover
+def plot_scalings(problem, XPU=None, space_time=None, **kwargs):  # pragma: no cover
     if problem == 'GS3D':
-        configs = [
-            GrayScottSpaceScalingCPU3D(),
-            GrayScottSpaceScalingGPU3D(),
-        ]
+        if XPU == 'CPU':
+            configs = [GrayScottSpaceScalingCPU3D()]
+        elif XPU == 'GPU':
+            configs = [GrayScottSpaceScalingGPU3D()]
+        else:
+            configs = [GrayScottSpaceScalingCPU3D(), GrayScottSpaceScalingGPU3D()]
     elif problem == 'RBC':
-        configs = [
-            RayleighBenardSpaceScalingGPU(),
-            RayleighBenardSpaceScalingCPU(),
-        ]
+        if XPU == 'CPU':
+            configs = [
+                RayleighBenardSpaceScalingCPU(),
+            ]
+        elif XPU == 'GPU':
+            configs = [
+                RayleighBenardSpaceScalingGPU(),
+            ]
+        else:
+            configs = [
+                RayleighBenardSpaceScalingGPU(),
+                RayleighBenardSpaceScalingCPU(),
+            ]
     elif problem == 'RBC_dedalus':
         configs = [
             RayleighBenardDedalusComparison(),
@@ -358,31 +384,26 @@ def plot_scalings(problem, **kwargs):  # pragma: no cover
         ('RBC', 'time'): {'x': [1 / 10, 64], 'y': [60, 60 / 640]},
         ('RBC', 'time_per_task'): {'x': [1, 640], 'y': [60, 60 / 640]},
         ('RBC', 'min_time_per_task'): {'x': [1, 640], 'y': [60, 60 / 640]},
+        ('RBC', 'min_time'): {'x': [1, 640], 'y': [60, 60 / 640]},
         ('RBC', 'throughput_per_task'): {'x': [1 / 1, 640], 'y': [2e4, 2e4 * 640]},
     }
 
-    fig, ax = plt.subplots(figsize=figsize_by_journal('TUHH_thesis', 1, 0.6))
-    configs[1].plot_scaling_test(ax=ax, quantity='efficiency')
-    # ax.legend(frameon=False)
-    box = ax.get_position()
-    ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
-    ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-
-    ax.set_yscale('linear')
-    path = f'{PROJECT_PATH}/plots/scaling_{problem}_efficiency.pdf'
-    fig.savefig(path, bbox_inches='tight')
-    print(f'Saved {path!r}', flush=True)
-
-    for quantity in ['time', 'throughput', 'time_per_task', 'throughput_per_task', 'min_time_per_task'][::-1]:
+    for quantity in ['time', 'throughput', 'time_per_task', 'throughput_per_task', 'min_time_per_task', 'efficiency'][
+        ::-1
+    ]:
         fig, ax = plt.subplots(figsize=figsize_by_journal('TUHH_thesis', 1, 0.6))
         for config in configs:
-            config.plot_scaling_test(ax=ax, quantity=quantity)
+            config.plot_scaling_test(ax=ax, quantity=quantity, space_time=space_time)
         if (problem, quantity) in ideal_lines.keys():
             ax.loglog(*ideal_lines[(problem, quantity)].values(), color='black', ls=':', label='ideal')
+        elif quantity == 'efficiency':
+            ax.axhline(1, color='black', ls=':', label='ideal')
+            ax.set_yscale('linear')
+            ax.set_ylim(0, 1.1)
         box = ax.get_position()
         ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
         ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-        path = f'{PROJECT_PATH}/plots/scaling_{problem}_{quantity}.pdf'
+        path = f'{PROJECT_PATH}/plots/scaling_{problem}_{quantity}_{XPU}_{space_time}.pdf'
         fig.savefig(path, bbox_inches='tight')
         print(f'Saved {path!r}', flush=True)
 
@@ -393,8 +414,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--mode', type=str, choices=['run', 'plot'], default='run')
     parser.add_argument('--problem', type=str, default='GS')
-    parser.add_argument('--XPU', type=str, choices=['CPU', 'GPU'], default='CPU')
-    parser.add_argument('--space_time', type=str, choices=['True', 'False'], default='False')
+    parser.add_argument('--XPU', type=str, choices=['CPU', 'GPU', 'both'], default='CPU')
+    parser.add_argument('--space_time', type=str, choices=['True', 'False', 'None'], default='False')
     parser.add_argument('--submit', type=str, choices=['True', 'False'], default='True')
     parser.add_argument('--nsys_profiling', type=str, choices=['True', 'False'], default='False')
 
@@ -402,6 +423,13 @@ if __name__ == '__main__':
 
     submit = args.submit == 'True'
     nsys_profiling = args.nsys_profiling == 'True'
+
+    if args.space_time == 'True':
+        space_time = True
+    elif args.space_time == 'False':
+        space_time = False
+    else:
+        space_time = None
 
     config_classes = []
 
@@ -429,6 +457,6 @@ if __name__ == '__main__':
         if args.mode == 'run':
             config.run_scaling_test(submit=submit, nsys_profiling=nsys_profiling)
         elif args.mode == 'plot':
-            plot_scalings(problem=args.problem)
+            plot_scalings(problem=args.problem, XPU=args.XPU, space_time=space_time)
         else:
             raise NotImplementedError(f'Don\'t know mode {args.mode!r}')
