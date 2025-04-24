@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.problem_classes.OuterSolarSystem module &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=81710850"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.problem_classes.PenningTrap_3D module" href="implementations.problem_classes.PenningTrap_3D.html" />
+    <link rel="prev" title="implementations.problem_classes.NonlinearSchroedinger_MPIFFT module" href="implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.PenningTrap_3D.html" title="implementations.problem_classes.PenningTrap_3D module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html" title="implementations.problem_classes.NonlinearSchroedinger_MPIFFT module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.OuterSolarSystem module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.problem_classes.OuterSolarSystem">
+<span id="implementations-problem-classes-outersolarsystem-module"></span><h1>implementations.problem_classes.OuterSolarSystem module<a class="headerlink" href="#module-implementations.problem_classes.OuterSolarSystem" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.OuterSolarSystem.outer_solar_system">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">outer_solar_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sun_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/OuterSolarSystem.html#outer_solar_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
+<p>The <span class="math notranslate nohighlight">\(N\)</span>-body problem describes the mutual influence of the motion of <span class="math notranslate nohighlight">\(N\)</span> bodies. Formulation of the problem is
+based on Newton’s second law. Therefore, the <span class="math notranslate nohighlight">\(N\)</span>-body problem is formulated as</p>
+<div class="math notranslate nohighlight">
+\[m_i \frac{d^2 {\bf r}_i}{d t^2} = \sum_{j=1, i\neq j}^N G \frac{m_i m_j}{|{\bf r}_i - {\bf r}_j|^3}({\bf r}_i - {\bf r}_j),\]</div>
+<p>where <span class="math notranslate nohighlight">\(m_i\)</span> is the <span class="math notranslate nohighlight">\(i\)</span>-th mass point with position described by the vector <span class="math notranslate nohighlight">\({\bf r}_i\)</span>, and <span class="math notranslate nohighlight">\(G\)</span>
+is the gravitational constant. If only the sun influences the motion of the bodies gravitationally, the equations become</p>
+<div class="math notranslate nohighlight">
+\[m_i \frac{d^2 {\bf r}_i}{d t^2} = G \frac{m_1}{|{\bf r}_i - {\bf r}_1|^3}({\bf r}_i - {\bf r}_1).\]</div>
+<p>This class implements the outer solar system consisting of the six outer planets: the sun, Jupiter, Saturn, Uranus,
+Neptune, and Pluto, i.e., <span class="math notranslate nohighlight">\(N=6\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sun_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – If False, only the sun is taken into account for the influence of the motion.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.OuterSolarSystem.outer_solar_system.G">
+<span class="sig-name descname"><span class="pre">G</span></span><a class="headerlink" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.G" title="Link to this definition">¶</a></dt>
+<dd><p>Gravitational constant.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">G</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.000295912208286</span></em><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.OuterSolarSystem.outer_solar_system.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.dtype_f" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">acceleration</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.OuterSolarSystem.outer_solar_system.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.dtype_u" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">particles</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.OuterSolarSystem.outer_solar_system.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/OuterSolarSystem.html#outer_solar_system.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.eval_f" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to compute the right-hand side of the problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – The particles.</p></li>
+<li><p><strong>(</strong><strong>float</strong><strong>)</strong> (<em>t</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>me</strong> – The right-hand side of the problem.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.OuterSolarSystem.outer_solar_system.eval_hamiltonian">
+<span class="sig-name descname"><span class="pre">eval_hamiltonian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/OuterSolarSystem.html#outer_solar_system.eval_hamiltonian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.eval_hamiltonian" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to compute the Hamiltonian.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>u</strong> (<em>dtype_u</em>) – The particles.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ham</strong> – The Hamiltonian.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.OuterSolarSystem.outer_solar_system.u_exact">
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/OuterSolarSystem.html#outer_solar_system.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.u_exact" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact/initial trajectory at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact/initial trajectory.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>me</strong> – The exact/initial position and velocity.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.problem_classes.OuterSolarSystem module</a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system"><code class="docutils literal notranslate"><span class="pre">outer_solar_system</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.G"><code class="docutils literal notranslate"><span class="pre">G</span></code></a></li>
+<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">G</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.eval_hamiltonian"><code class="docutils literal notranslate"><span class="pre">eval_hamiltonian()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html"
+                          title="previous chapter">implementations.problem_classes.NonlinearSchroedinger_MPIFFT module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.PenningTrap_3D.html"
+                          title="next chapter">implementations.problem_classes.PenningTrap_3D module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.problem_classes.OuterSolarSystem.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.PenningTrap_3D.html" title="implementations.problem_classes.PenningTrap_3D module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html" title="implementations.problem_classes.NonlinearSchroedinger_MPIFFT module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.OuterSolarSystem module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

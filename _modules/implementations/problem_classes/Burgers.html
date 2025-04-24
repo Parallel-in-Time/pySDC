@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>implementations.problem_classes.Burgers &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../../_static/documentation_options.js?v=81710850"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.Burgers</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.problem_classes.Burgers</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.generic_spectral</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenericSpectralLinear</span>
+
+
+<div class="viewcode-block" id="Burgers1D">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Burgers.html#implementations.problem_classes.Burgers.Burgers1D">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Burgers1D</span><span class="p">(</span><span class="n">GenericSpectralLinear</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    See https://en.wikipedia.org/wiki/Burgers&#39;_equation for the equation that is solved.</span>
+<span class="sd">    Discretization is done with a Chebychev method, which requires a first order derivative formulation.</span>
+<span class="sd">    Feel free to do a more efficient implementation using an ultraspherical method to avoid the first order business.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">       N (int): Spatial resolution</span>
+<span class="sd">       epsilon (float): viscosity</span>
+<span class="sd">       BCl (float): Value at left boundary</span>
+<span class="sd">       BCr (float): Value at right boundary</span>
+<span class="sd">       f (int): Frequency of the initial conditions</span>
+<span class="sd">       mode (str): &#39;T2U&#39; or &#39;T2T&#39;. Use &#39;T2U&#39; to get sparse differentiation matrices</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">BCl</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">BCr</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;T2U&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor. `kwargs` are forwarded to parent class constructor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            N (int): Spatial resolution</span>
+<span class="sd">            epsilon (float): viscosity</span>
+<span class="sd">            BCl (float): Value at left boundary</span>
+<span class="sd">            BCr (float): Value at right boundary</span>
+<span class="sd">            f (int): Frequency of the initial conditions</span>
+<span class="sd">            mode (str): &#39;T2U&#39; or &#39;T2T&#39;. Use &#39;T2U&#39; to get sparse differentiation matrices</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;epsilon&#39;</span><span class="p">,</span> <span class="s1">&#39;BCl&#39;</span><span class="p">,</span> <span class="s1">&#39;BCr&#39;</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="s1">&#39;mode&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">bases</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="s1">&#39;cheby&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">N</span><span class="p">}]</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;ux&#39;</span><span class="p">]</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">bases</span><span class="o">=</span><span class="n">bases</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="n">components</span><span class="p">,</span> <span class="n">spectral_space</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># prepare matrices</span>
+        <span class="n">Dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_differentiation_matrix</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,))</span>
+        <span class="n">I</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Id</span><span class="p">()</span>
+
+        <span class="n">T2U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basis_change_matrix</span><span class="p">(</span><span class="n">conv</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Dx</span> <span class="o">=</span> <span class="n">Dx</span>
+
+        <span class="c1"># construct linear operator</span>
+        <span class="n">L_lhs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;ux&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">epsilon</span> <span class="o">*</span> <span class="p">(</span><span class="n">T2U</span> <span class="o">@</span> <span class="n">Dx</span><span class="p">)},</span> <span class="s1">&#39;ux&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">T2U</span> <span class="o">@</span> <span class="n">Dx</span><span class="p">,</span> <span class="s1">&#39;ux&#39;</span><span class="p">:</span> <span class="n">T2U</span> <span class="o">@</span> <span class="n">I</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_L</span><span class="p">(</span><span class="n">L_lhs</span><span class="p">)</span>
+
+        <span class="c1"># construct mass matrix</span>
+        <span class="n">M_lhs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="n">T2U</span> <span class="o">@</span> <span class="n">I</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_M</span><span class="p">(</span><span class="n">M_lhs</span><span class="p">)</span>
+
+        <span class="c1"># boundary conditions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">BCr</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;ux&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">BCl</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_BCs</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Burgers1D.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Burgers.html#implementations.problem_classes.Burgers.Burgers1D.u_exact">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init</span>
+
+        <span class="c1"># x = (self.x + 1) / 2</span>
+        <span class="c1"># g = 4 * (1 + np.exp(-(4 * x + t)/self.epsilon/32))</span>
+        <span class="c1"># g_x = 4 * np.exp(-(4 * x + t)/self.epsilon/32) * (-4/self.epsilon/32)</span>
+
+        <span class="c1"># me[0] = 3./4. - 1./g</span>
+        <span class="c1"># me[1] = 1/g**2 * g_x</span>
+
+        <span class="c1"># return me</span>
+
+        <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">me</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)][:]</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">BCr</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCl</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BCr</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCl</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span>
+            <span class="p">)</span>
+            <span class="n">me</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;ux&#39;</span><span class="p">)][:]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BCr</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCl</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BCr</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCl</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BCr</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCl</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+            <span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCl</span> <span class="o">==</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">BCr</span><span class="p">:</span>
+            <span class="n">me</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BCl</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">BCr</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCl</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCr</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">BCr</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCl</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+
+
+<div class="viewcode-block" id="Burgers1D.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Burgers.html#implementations.problem_classes.Burgers.Burgers1D.eval_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_init</span>
+        <span class="n">iu</span><span class="p">,</span> <span class="n">iux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;ux&#39;</span><span class="p">)</span>
+
+        <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+        <span class="n">Dx_u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init_forward</span>
+        <span class="n">Dx_u_hat</span><span class="p">[</span><span class="n">iux</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Dx</span> <span class="o">@</span> <span class="n">u_hat</span><span class="p">[</span><span class="n">iux</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">u_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">Dx_u_hat</span><span class="p">)[</span><span class="n">iux</span><span class="p">]</span><span class="o">.</span><span class="n">real</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">u</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="n">iux</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="Burgers1D.get_fig">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Burgers.html#implementations.problem_classes.Burgers.Burgers1D.get_fig">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_fig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a figure suitable to plot the solution of this problem.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self.fig : matplotlib.pyplot.figure.Figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.constrained_layout.use&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="Burgers1D.plot">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Burgers.html#implementations.problem_classes.Burgers.Burgers1D.plot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the solution.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Solution to be plotted</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time to display at the top of the figure</span>
+<span class="sd">        fig : matplotlib.pyplot.figure.Figure, optional</span>
+<span class="sd">            Figure with the same structure as a figure generated by `self.get_fig`. If none is supplied, a new figure will be generated.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fig</span><span class="p">()</span> <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">fig</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">comp</span><span class="p">)])</span>
+
+        <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;t = </span><span class="si">{</span><span class="n">t</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$x$&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$u$&#39;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Burgers2D">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Burgers.html#implementations.problem_classes.Burgers.Burgers2D">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Burgers2D</span><span class="p">(</span><span class="n">GenericSpectralLinear</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    See https://en.wikipedia.org/wiki/Burgers&#39;_equation for the equation that is solved.</span>
+<span class="sd">    This implementation is discretized with FFTs in x and Chebychev in z.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">       nx (int): Spatial resolution in x direction</span>
+<span class="sd">       nz (int): Spatial resolution in z direction</span>
+<span class="sd">       epsilon (float): viscosity</span>
+<span class="sd">       BCl (float): Value at left boundary</span>
+<span class="sd">       BCr (float): Value at right boundary</span>
+<span class="sd">       fux (int): Frequency of the initial conditions in x-direction</span>
+<span class="sd">       fuz (int): Frequency of the initial conditions in z-direction</span>
+<span class="sd">       mode (str): &#39;T2U&#39; or &#39;T2T&#39;. Use &#39;T2U&#39; to get sparse differentiation matrices</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">nz</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">fux</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fuz</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;T2U&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         Constructor. `kwargs` are forwarded to parent class constructor.</span>
+
+<span class="sd">         Args:</span>
+<span class="sd">        nx (int): Spatial resolution in x direction</span>
+<span class="sd">        nz (int): Spatial resolution in z direction</span>
+<span class="sd">        epsilon (float): viscosity</span>
+<span class="sd">        fux (int): Frequency of the initial conditions in x-direction</span>
+<span class="sd">        fuz (int): Frequency of the initial conditions in z-direction</span>
+<span class="sd">        mode (str): &#39;T2U&#39; or &#39;T2T&#39;. Use &#39;T2U&#39; to get sparse differentiation matrices</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;nx&#39;</span><span class="p">,</span> <span class="s1">&#39;nz&#39;</span><span class="p">,</span> <span class="s1">&#39;epsilon&#39;</span><span class="p">,</span> <span class="s1">&#39;fux&#39;</span><span class="p">,</span> <span class="s1">&#39;fuz&#39;</span><span class="p">,</span> <span class="s1">&#39;mode&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">bases</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="s1">&#39;fft&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="p">},</span>
+            <span class="p">{</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="s1">&#39;cheby&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">nz</span><span class="p">},</span>
+        <span class="p">]</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;ux&#39;</span><span class="p">,</span> <span class="s1">&#39;uz&#39;</span><span class="p">,</span> <span class="s1">&#39;vx&#39;</span><span class="p">,</span> <span class="s1">&#39;vz&#39;</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">bases</span><span class="o">=</span><span class="n">bases</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="n">components</span><span class="p">,</span> <span class="n">spectral_space</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span>
+
+        <span class="c1"># prepare matrices</span>
+        <span class="n">Dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_differentiation_matrix</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,))</span>
+        <span class="n">Dz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_differentiation_matrix</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))</span>
+        <span class="n">I</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Id</span><span class="p">()</span>
+
+        <span class="n">T2U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basis_change_matrix</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">conv</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Dx</span> <span class="o">=</span> <span class="n">Dx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Dz</span> <span class="o">=</span> <span class="n">Dz</span>
+
+        <span class="c1"># construct linear operator</span>
+        <span class="n">L_lhs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;ux&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">epsilon</span> <span class="o">*</span> <span class="n">T2U</span> <span class="o">@</span> <span class="n">Dx</span><span class="p">,</span> <span class="s1">&#39;uz&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">epsilon</span> <span class="o">*</span> <span class="n">T2U</span> <span class="o">@</span> <span class="n">Dz</span><span class="p">},</span>
+            <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;vx&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">epsilon</span> <span class="o">*</span> <span class="n">T2U</span> <span class="o">@</span> <span class="n">Dx</span><span class="p">,</span> <span class="s1">&#39;vz&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">epsilon</span> <span class="o">*</span> <span class="n">T2U</span> <span class="o">@</span> <span class="n">Dz</span><span class="p">},</span>
+            <span class="s1">&#39;ux&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">T2U</span> <span class="o">@</span> <span class="n">Dx</span><span class="p">,</span> <span class="s1">&#39;ux&#39;</span><span class="p">:</span> <span class="n">T2U</span> <span class="o">@</span> <span class="n">I</span><span class="p">},</span>
+            <span class="s1">&#39;uz&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">T2U</span> <span class="o">@</span> <span class="n">Dz</span><span class="p">,</span> <span class="s1">&#39;uz&#39;</span><span class="p">:</span> <span class="n">T2U</span> <span class="o">@</span> <span class="n">I</span><span class="p">},</span>
+            <span class="s1">&#39;vx&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">T2U</span> <span class="o">@</span> <span class="n">Dx</span><span class="p">,</span> <span class="s1">&#39;vx&#39;</span><span class="p">:</span> <span class="n">T2U</span> <span class="o">@</span> <span class="n">I</span><span class="p">},</span>
+            <span class="s1">&#39;vz&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">T2U</span> <span class="o">@</span> <span class="n">Dz</span><span class="p">,</span> <span class="s1">&#39;vz&#39;</span><span class="p">:</span> <span class="n">T2U</span> <span class="o">@</span> <span class="n">I</span><span class="p">},</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_L</span><span class="p">(</span><span class="n">L_lhs</span><span class="p">)</span>
+
+        <span class="c1"># construct mass matrix</span>
+        <span class="n">M_lhs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="n">T2U</span> <span class="o">@</span> <span class="n">I</span><span class="p">},</span>
+            <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="n">T2U</span> <span class="o">@</span> <span class="n">I</span><span class="p">},</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_M</span><span class="p">(</span><span class="n">M_lhs</span><span class="p">)</span>
+
+        <span class="c1"># boundary conditions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">BCtop</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">BCbottom</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">BCtop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">BCtopu</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">BCtop</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;vz&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">BCbottom</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;uz&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">BCtopu</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">BCtopu</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_BCs</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Burgers2D.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Burgers.html#implementations.problem_classes.Burgers.Burgers2D.u_exact">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">noise_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init</span>
+
+        <span class="n">iu</span><span class="p">,</span> <span class="n">iv</span><span class="p">,</span> <span class="n">iux</span><span class="p">,</span> <span class="n">iuz</span><span class="p">,</span> <span class="n">ivx</span><span class="p">,</span> <span class="n">ivz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">me</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fux</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuz</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCtopu</span>
+            <span class="n">me</span><span class="p">[</span><span class="n">iux</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fux</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fux</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuz</span><span class="p">)</span>
+            <span class="n">me</span><span class="p">[</span><span class="n">iuz</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fux</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuz</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuz</span>
+
+            <span class="n">me</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BCtop</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCbottom</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BCtop</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCbottom</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span>
+            <span class="n">me</span><span class="p">[</span><span class="n">ivz</span><span class="p">][:]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BCtop</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCbottom</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+            <span class="c1"># add noise</span>
+            <span class="n">rng</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">99</span><span class="p">)</span>
+            <span class="n">me</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span><span class="o">.</span><span class="n">real</span> <span class="o">+=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">me</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">noise_level</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+
+
+<div class="viewcode-block" id="Burgers2D.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Burgers.html#implementations.problem_classes.Burgers.Burgers2D.eval_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_init</span>
+        <span class="n">iu</span><span class="p">,</span> <span class="n">iv</span><span class="p">,</span> <span class="n">iux</span><span class="p">,</span> <span class="n">iuz</span><span class="p">,</span> <span class="n">ivx</span><span class="p">,</span> <span class="n">ivz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
+
+        <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="n">f_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init_forward</span>
+        <span class="n">f_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">*</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">Dx</span> <span class="o">@</span> <span class="n">u_hat</span><span class="p">[</span><span class="n">iux</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dz</span> <span class="o">@</span> <span class="n">u_hat</span><span class="p">[</span><span class="n">iuz</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+            <span class="n">u_hat</span><span class="p">[</span><span class="n">iux</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+        <span class="p">)</span>
+        <span class="n">f_hat</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">*</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">Dx</span> <span class="o">@</span> <span class="n">u_hat</span><span class="p">[</span><span class="n">ivx</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dz</span> <span class="o">@</span> <span class="n">u_hat</span><span class="p">[</span><span class="n">ivz</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+            <span class="n">u_hat</span><span class="p">[</span><span class="n">iux</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+        <span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">f_hat</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+
+        <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="n">iux</span><span class="p">]</span> <span class="o">+</span> <span class="n">u</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="n">iuz</span><span class="p">])</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="n">ivx</span><span class="p">]</span> <span class="o">+</span> <span class="n">u</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="n">ivz</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="Burgers2D.compute_vorticity">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Burgers.html#implementations.problem_classes.Burgers.Burgers2D.compute_vorticity">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_vorticity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init_forward</span>
+
+        <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="n">iu</span><span class="p">,</span> <span class="n">iv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">([</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">])</span>
+
+        <span class="n">me</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Dx</span> <span class="o">@</span> <span class="n">u_hat</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dz</span> <span class="o">@</span> <span class="n">u_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">me</span><span class="p">)[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">real</span></div>
+
+
+<div class="viewcode-block" id="Burgers2D.get_fig">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Burgers.html#implementations.problem_classes.Burgers.Burgers2D.get_fig">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_fig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a figure suitable to plot the solution of this problem</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self.fig : matplotlib.pyplot.figure.Figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mpl_toolkits.axes_grid1</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_axes_locatable</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.constrained_layout.use&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">((</span><span class="mi">8</span><span class="p">,</span> <span class="mi">7</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cax</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">divider</span> <span class="o">=</span> <span class="n">make_axes_locatable</span><span class="p">(</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cax</span> <span class="o">+=</span> <span class="p">[</span><span class="n">divider</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;3%&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.03</span><span class="p">)]</span>
+        <span class="n">divider2</span> <span class="o">=</span> <span class="n">make_axes_locatable</span><span class="p">(</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cax</span> <span class="o">+=</span> <span class="p">[</span><span class="n">divider2</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;3%&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.03</span><span class="p">)]</span>
+        <span class="n">divider3</span> <span class="o">=</span> <span class="n">make_axes_locatable</span><span class="p">(</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cax</span> <span class="o">+=</span> <span class="p">[</span><span class="n">divider3</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;3%&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.03</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="Burgers2D.plot">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Burgers.html#implementations.problem_classes.Burgers.Burgers2D.plot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the solution. Please supply a figure with the same structure as returned by ``self.get_fig``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Solution to be plotted</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time to display at the top of the figure</span>
+<span class="sd">        fig : matplotlib.pyplot.figure.Figure</span>
+<span class="sd">            Figure with the correct structure</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fig</span><span class="p">()</span> <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">fig</span>
+        <span class="n">axs</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">axes</span>
+
+        <span class="n">iu</span><span class="p">,</span> <span class="n">iv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">([</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">])</span>
+
+        <span class="n">imU</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="n">u</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+        <span class="n">imV</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="n">u</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+        <span class="n">imVort</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_vorticity</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;$u$&#39;</span><span class="p">,</span> <span class="s1">&#39;$v$&#39;</span><span class="p">,</span> <span class="s1">&#39;vorticity&#39;</span><span class="p">]):</span>
+            <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;t = </span><span class="si">{</span><span class="n">t</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">axs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$x$&#39;</span><span class="p">)</span>
+        <span class="n">axs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$z$&#39;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">imU</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cax</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">imV</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cax</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">imVort</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cax</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.Burgers</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>helpers.NCCL_communicator module &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=81710850"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="helpers.blocks module" href="helpers.blocks.html" />
+    <link rel="prev" title="helpers package" href="helpers.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="helpers.blocks.html" title="helpers.blocks module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="helpers.html" title="helpers package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="helpers.html" accesskey="U">helpers package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">helpers.NCCL_communicator module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-helpers.NCCL_communicator">
+<span id="helpers-nccl-communicator-module"></span><h1>helpers.NCCL_communicator module<a class="headerlink" href="#module-helpers.NCCL_communicator" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NCCLComm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Wraps an MPI communicator and performs some calls to NCCL functions instead.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.Allreduce">
+<span class="sig-name descname"><span class="pre">Allreduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sendbuf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recvbuf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.SUM</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.Allreduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Allreduce" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.Barrier">
+<span class="sig-name descname"><span class="pre">Barrier</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.Barrier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Barrier" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.Bcast">
+<span class="sig-name descname"><span class="pre">Bcast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.Bcast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Bcast" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.Reduce">
+<span class="sig-name descname"><span class="pre">Reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sendbuf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recvbuf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.SUM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.Reduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Reduce" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.allreduce">
+<span class="sig-name descname"><span class="pre">allreduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sendobj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.SUM</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.allreduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.allreduce" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.get_count">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.get_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.get_count" title="Link to this definition">¶</a></dt>
+<dd><p>As NCCL doesn’t support complex numbers, we have to act as if we’re sending two real numbers if using complex.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.get_dtype">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.get_dtype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.get_dtype" title="Link to this definition">¶</a></dt>
+<dd><p>As NCCL doesn’t support complex numbers, we have to act as if we’re sending two real numbers if using complex.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.get_op">
+<span class="sig-name descname"><span class="pre">get_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MPI_op</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.get_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.get_op" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.reduce">
+<span class="sig-name descname"><span class="pre">reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sendobj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.SUM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.reduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.reduce" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">helpers.NCCL_communicator module</a><ul>
+<li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm"><code class="docutils literal notranslate"><span class="pre">NCCLComm</span></code></a><ul>
+<li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm.Allreduce"><code class="docutils literal notranslate"><span class="pre">Allreduce()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm.Barrier"><code class="docutils literal notranslate"><span class="pre">Barrier()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm.Bcast"><code class="docutils literal notranslate"><span class="pre">Bcast()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm.Reduce"><code class="docutils literal notranslate"><span class="pre">Reduce()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm.allreduce"><code class="docutils literal notranslate"><span class="pre">allreduce()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm.get_count"><code class="docutils literal notranslate"><span class="pre">get_count()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm.get_dtype"><code class="docutils literal notranslate"><span class="pre">get_dtype()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm.get_op"><code class="docutils literal notranslate"><span class="pre">get_op()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm.reduce"><code class="docutils literal notranslate"><span class="pre">reduce()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="helpers.html"
+                          title="previous chapter">helpers package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="helpers.blocks.html"
+                          title="next chapter">helpers.blocks module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/helpers.NCCL_communicator.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="helpers.blocks.html" title="helpers.blocks module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="helpers.html" title="helpers package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="helpers.html" >helpers package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">helpers.NCCL_communicator module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

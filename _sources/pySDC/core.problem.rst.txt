@@ -1,0 +1,7 @@
+core.problem module
+===================
+
+.. automodule:: core.problem
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,1 @@
+.. include:: /../../pySDC/projects/AsympConv/README.rst

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>helpers.blocks module &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=81710850"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="helpers.fieldsIO module" href="helpers.fieldsIO.html" />
+    <link rel="prev" title="helpers.NCCL_communicator module" href="helpers.NCCL_communicator.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="helpers.fieldsIO.html" title="helpers.fieldsIO module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="helpers.NCCL_communicator.html" title="helpers.NCCL_communicator module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="helpers.html" accesskey="U">helpers package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">helpers.blocks module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-helpers.blocks">
+<span id="helpers-blocks-module"></span><h1>helpers.blocks module<a class="headerlink" href="#module-helpers.blocks" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="helpers.blocks.BlockDecomposition">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BlockDecomposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nProcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gridSizes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Hybrid'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gRank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'C'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/blocks.html#BlockDecomposition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.blocks.BlockDecomposition" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class decomposing a cartesian space domain (1D to 3D) into a given number of processors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nProcs</strong> (<em>int</em>) – Total number of processors for space block decomposition.</p></li>
+<li><p><strong>gridSizes</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – Number of grid points in each dimension</p></li>
+<li><p><strong>algo</strong> (<em>str</em><em>, </em><em>optional</em>) – <p>Algorithm used for the block decomposition :</p>
+<ul>
+<li><p>Hybrid : approach minimizing interface communication, inspired from
+the <a class="reference external" href="https://web.stanford.edu/group/ctr/ResBriefs07/5_larsson1_pp47_58.pdf">[Hybrid CFD solver]</a>.</p></li>
+<li><p>ChatGPT : quickly generated using <a class="reference external" href="https://chatgpt.com">[ChatGPT]</a>.</p></li>
+</ul>
+<p>The default is “Hybrid”.</p>
+</p></li>
+<li><p><strong>gRank</strong> (<em>int</em><em>, </em><em>optional</em>) – If provided, the global rank that will determine the local block distribution. Default is None.</p></li>
+<li><p><strong>order</strong> (<em>str</em><em>, </em><em>optional</em>) – The order used when computing the rank block distribution. Default is <cite>C</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.blocks.BlockDecomposition.localBounds">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">localBounds</span></span><a class="headerlink" href="#helpers.blocks.BlockDecomposition.localBounds" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.blocks.BlockDecomposition.ranks">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ranks</span></span><a class="headerlink" href="#helpers.blocks.BlockDecomposition.ranks" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">helpers.blocks module</a><ul>
+<li><a class="reference internal" href="#helpers.blocks.BlockDecomposition"><code class="docutils literal notranslate"><span class="pre">BlockDecomposition</span></code></a><ul>
+<li><a class="reference internal" href="#helpers.blocks.BlockDecomposition.localBounds"><code class="docutils literal notranslate"><span class="pre">localBounds</span></code></a></li>
+<li><a class="reference internal" href="#helpers.blocks.BlockDecomposition.ranks"><code class="docutils literal notranslate"><span class="pre">ranks</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="helpers.NCCL_communicator.html"
+                          title="previous chapter">helpers.NCCL_communicator module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="helpers.fieldsIO.html"
+                          title="next chapter">helpers.fieldsIO module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/helpers.blocks.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="helpers.fieldsIO.html" title="helpers.fieldsIO module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="helpers.NCCL_communicator.html" title="helpers.NCCL_communicator module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="helpers.html" >helpers package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">helpers.blocks module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

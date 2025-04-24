@@ -1,0 +1,7 @@
+helpers.setup\_helper module
+============================
+
+.. automodule:: helpers.setup_helper
+   :members:
+   :show-inheritance:
+   :undoc-members:

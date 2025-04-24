@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>helpers.problem_helper &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../_static/documentation_options.js?v=81710850"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">helpers.problem_helper</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for helpers.problem_helper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.special</span><span class="w"> </span><span class="kn">import</span> <span class="n">factorial</span>
+
+
+<div class="viewcode-block" id="get_steps">
+<a class="viewcode-back" href="../../pySDC/helpers.problem_helper.html#helpers.problem_helper.get_steps">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_steps</span><span class="p">(</span><span class="n">derivative</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">stencil_type</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the offsets for the FD stencil.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        derivative (int): Order of the derivative</span>
+<span class="sd">        order (int): Order of accuracy</span>
+<span class="sd">        stencil_type (str): Type of the stencil</span>
+<span class="sd">        steps (list): Provide specific steps, overrides `stencil_type`</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: The number of elements in the stencil</span>
+<span class="sd">        numpy.ndarray: The offsets for the stencil</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">stencil_type</span> <span class="o">==</span> <span class="s1">&#39;center&#39;</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">order</span> <span class="o">+</span> <span class="n">derivative</span> <span class="o">-</span> <span class="p">(</span><span class="n">derivative</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">//</span> <span class="mi">1</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">-</span> <span class="n">n</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="k">elif</span> <span class="n">stencil_type</span> <span class="o">==</span> <span class="s1">&#39;forward&#39;</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">order</span> <span class="o">+</span> <span class="n">derivative</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">stencil_type</span> <span class="o">==</span> <span class="s1">&#39;backward&#39;</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">order</span> <span class="o">+</span> <span class="n">derivative</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">stencil_type</span> <span class="o">==</span> <span class="s1">&#39;upwind&#39;</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">order</span> <span class="o">+</span> <span class="n">derivative</span>
+
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">n</span><span class="p">,</span> <span class="n">steps</span> <span class="o">=</span> <span class="n">get_steps</span><span class="p">(</span><span class="n">derivative</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="s1">&#39;backward&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;Stencil must be of type &quot;center&quot;, &quot;forward&quot;, &quot;backward&quot; or &quot;upwind&quot;, not </span><span class="si">{</span><span class="n">stencil_type</span><span class="si">}</span><span class="s1">. If you want something else you can also give specific steps.&#39;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">n</span><span class="p">,</span> <span class="n">steps</span></div>
+
+
+
+<div class="viewcode-block" id="get_finite_difference_stencil">
+<a class="viewcode-back" href="../../pySDC/helpers.problem_helper.html#helpers.problem_helper.get_finite_difference_stencil">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_finite_difference_stencil</span><span class="p">(</span><span class="n">derivative</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stencil_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Derive general finite difference stencils from Taylor expansions</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        derivative (int): Order of the derivative</span>
+<span class="sd">        order (int): Order of accuracy</span>
+<span class="sd">        stencil_type (str): Type of the stencil</span>
+<span class="sd">        steps (list): Provide specific steps, overrides `stencil_type`</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: The weights of the stencil</span>
+<span class="sd">        numpy.ndarray: The offsets for the stencil</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">steps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n</span><span class="p">,</span> <span class="n">steps</span> <span class="o">=</span> <span class="n">get_steps</span><span class="p">(</span><span class="n">derivative</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">stencil_type</span><span class="p">)</span>
+
+    <span class="c1"># make a matrix that contains the Taylor coefficients</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">inv_facs</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">factorial</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">steps</span> <span class="o">**</span> <span class="n">idx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">inv_facs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+    <span class="c1"># make a right hand side vector that is zero everywhere except at the position of the desired derivative</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">sol</span><span class="p">[</span><span class="n">derivative</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+    <span class="c1"># solve the linear system for the finite difference coefficients</span>
+    <span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">sol</span><span class="p">)</span>
+
+    <span class="c1"># sort coefficients and steps</span>
+    <span class="n">coeff</span> <span class="o">=</span> <span class="n">coeff</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">steps</span><span class="p">)]</span>
+    <span class="n">steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">coeff</span><span class="p">,</span> <span class="n">steps</span></div>
+
+
+
+<div class="viewcode-block" id="get_finite_difference_matrix">
+<a class="viewcode-back" href="../../pySDC/helpers.problem_helper.html#helpers.problem_helper.get_finite_difference_matrix">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_finite_difference_matrix</span><span class="p">(</span>
+    <span class="n">derivative</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">,</span>
+    <span class="n">stencil_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">steps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">dx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">bc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cupy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">bc_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build FD matrix from stencils, with boundary conditions.</span>
+<span class="sd">    Keep in mind that the boundary conditions may require further modification of the right hand side.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        derivative (int): Order of the spatial derivative</span>
+<span class="sd">        order (int): Order of accuracy</span>
+<span class="sd">        stencil_type (str): Type of stencil</span>
+<span class="sd">        steps (list): Provide specific steps, overrides `stencil_type`</span>
+<span class="sd">        dx (float): Mesh width</span>
+<span class="sd">        size (int): Number of degrees of freedom per dimension</span>
+<span class="sd">        dim (int): Number of dimensions</span>
+<span class="sd">        bc (str): Boundary conditions for both sides</span>
+<span class="sd">        cupy (bool): Construct a GPU ready matrix if yes</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Sparse matrix: Finite difference matrix</span>
+<span class="sd">        numpy.ndarray: Vector containing information about the boundary conditions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">cupy</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">cupyx.scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+
+    <span class="c1"># get stencil</span>
+    <span class="n">coeff</span><span class="p">,</span> <span class="n">steps</span> <span class="o">=</span> <span class="n">get_finite_difference_stencil</span><span class="p">(</span>
+        <span class="n">derivative</span><span class="o">=</span><span class="n">derivative</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">stencil_type</span><span class="o">=</span><span class="n">stencil_type</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="n">steps</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">bc</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">tuple</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">bc</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Please pass BCs as string or tuple of strings&#39;</span>
+        <span class="n">bc</span> <span class="o">=</span> <span class="p">(</span><span class="n">bc</span><span class="p">,</span> <span class="n">bc</span><span class="p">)</span>
+    <span class="n">bc_params</span> <span class="o">=</span> <span class="n">bc_params</span> <span class="k">if</span> <span class="n">bc_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">bc_params</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="n">bc_params</span> <span class="o">=</span> <span class="p">[</span><span class="n">bc_params</span><span class="p">,</span> <span class="n">bc_params</span><span class="p">]</span>
+
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">size</span><span class="o">**</span><span class="n">dim</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">bc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;periodic&#39;</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">bc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;periodic&#39;</span>
+        <span class="n">A_1d</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>
+            <span class="n">A_1d</span> <span class="o">+=</span> <span class="n">coeff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">steps</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">steps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">A_1d</span> <span class="o">+=</span> <span class="n">coeff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">k</span><span class="o">=-</span><span class="n">size</span> <span class="o">+</span> <span class="n">steps</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">steps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">A_1d</span> <span class="o">+=</span> <span class="n">coeff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">size</span> <span class="o">+</span> <span class="n">steps</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">A_1d</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">coeff</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">size</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;lil&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Default parameters for Dirichlet and Neumann BCs</span>
+        <span class="n">bc_params_defaults</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s1">&#39;neumann_bc_order&#39;</span><span class="p">:</span> <span class="n">order</span><span class="p">,</span>
+            <span class="s1">&#39;reduce&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Loop over each side (0 for left, 1 for right)</span>
+        <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="c1"># -- check Boundary condition types</span>
+            <span class="k">assert</span> <span class="s2">&quot;neumann&quot;</span> <span class="ow">in</span> <span class="n">bc</span><span class="p">[</span><span class="n">iS</span><span class="p">]</span> <span class="ow">or</span> <span class="s2">&quot;dirichlet&quot;</span> <span class="ow">in</span> <span class="n">bc</span><span class="p">[</span><span class="n">iS</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;unknown BC type : </span><span class="si">{</span><span class="n">bc</span><span class="p">[</span><span class="n">iS</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="c1"># -- boundary condition parameters</span>
+            <span class="n">bc_params</span><span class="p">[</span><span class="n">iS</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">bc_params_defaults</span><span class="p">,</span> <span class="o">**</span><span class="n">bc_params</span><span class="p">[</span><span class="n">iS</span><span class="p">]}</span>
+            <span class="n">par</span> <span class="o">=</span> <span class="n">bc_params</span><span class="p">[</span><span class="n">iS</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+            <span class="c1"># -- extract parameters and raise an error if additionals</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;val&#39;</span><span class="p">)</span>
+            <span class="n">reduce</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;reduce&#39;</span><span class="p">)</span>
+            <span class="n">neumann_bc_order</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;neumann_bc_order&#39;</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">par</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;unused BCs parameters : </span><span class="si">{</span><span class="n">par</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="c1"># -- half stencil width</span>
+            <span class="n">sWidth</span> <span class="o">=</span> <span class="o">-</span><span class="nb">min</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span> <span class="k">if</span> <span class="n">iS</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">max</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span>
+
+            <span class="c1"># -- loop over lines of A that have to be modified</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sWidth</span><span class="p">):</span>
+                <span class="c1"># -- index of the line</span>
+                <span class="n">iLine</span> <span class="o">=</span> <span class="n">i</span> <span class="k">if</span> <span class="n">iS</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="c1"># -- slice for coefficients used in the A matrix</span>
+                <span class="n">sCoeff</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">if</span> <span class="n">iS</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="c1"># -- index of coefficient used in the b vector</span>
+                <span class="n">iCoeff</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">iS</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+
+                <span class="k">if</span> <span class="n">reduce</span><span class="p">:</span>
+                    <span class="c1"># -- reduce order close to boundary</span>
+                    <span class="n">b_coeff</span><span class="p">,</span> <span class="n">b_steps</span> <span class="o">=</span> <span class="n">get_finite_difference_stencil</span><span class="p">(</span>
+                        <span class="n">derivative</span><span class="o">=</span><span class="n">derivative</span><span class="p">,</span>
+                        <span class="n">order</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="n">stencil_type</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># -- shift stencil close to boundary</span>
+                    <span class="n">b_steps</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">order</span> <span class="o">+</span> <span class="n">derivative</span> <span class="o">-</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="n">iS</span> <span class="o">==</span> <span class="mi">0</span>
+                        <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">order</span> <span class="o">+</span> <span class="n">derivative</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">))</span>
+                    <span class="p">)</span>
+
+                    <span class="n">b_coeff</span><span class="p">,</span> <span class="n">b_steps</span> <span class="o">=</span> <span class="n">get_finite_difference_stencil</span><span class="p">(</span><span class="n">derivative</span><span class="o">=</span><span class="n">derivative</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="n">b_steps</span><span class="p">)</span>
+
+                <span class="c1"># -- column slice where to put coefficients in the A matrix</span>
+                <span class="n">colSlice</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">b_coeff</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">iS</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">b_coeff</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+                <span class="c1"># -- modify A</span>
+                <span class="n">A_1d</span><span class="p">[</span><span class="n">iLine</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">A_1d</span><span class="p">[</span><span class="n">iLine</span><span class="p">,</span> <span class="n">colSlice</span><span class="p">]</span> <span class="o">=</span> <span class="n">b_coeff</span><span class="p">[</span><span class="n">sCoeff</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="s2">&quot;dirichlet&quot;</span> <span class="ow">in</span> <span class="n">bc</span><span class="p">[</span><span class="n">iS</span><span class="p">]:</span>
+                    <span class="c1"># -- modify b</span>
+                    <span class="n">b</span><span class="p">[</span><span class="n">iLine</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span> <span class="o">*</span> <span class="n">b_coeff</span><span class="p">[</span><span class="n">iCoeff</span><span class="p">]</span>
+
+                <span class="k">elif</span> <span class="s2">&quot;neumann&quot;</span> <span class="ow">in</span> <span class="n">bc</span><span class="p">[</span><span class="n">iS</span><span class="p">]:</span>
+                    <span class="n">nOrder</span> <span class="o">=</span> <span class="n">neumann_bc_order</span>
+
+                    <span class="c1"># -- generate the first derivative stencil</span>
+                    <span class="n">n_coeff</span><span class="p">,</span> <span class="n">n_steps</span> <span class="o">=</span> <span class="n">get_finite_difference_stencil</span><span class="p">(</span>
+                        <span class="n">derivative</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">nOrder</span><span class="p">,</span> <span class="n">stencil_type</span><span class="o">=</span><span class="s2">&quot;forward&quot;</span> <span class="k">if</span> <span class="n">iS</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;backward&quot;</span>
+                    <span class="p">)</span>
+
+                    <span class="c1"># -- column slice where to put coefficients in the A matrix</span>
+                    <span class="n">colSlice</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">n_coeff</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">iS</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">n_coeff</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+                    <span class="c1"># -- additional modification to A</span>
+                    <span class="n">A_1d</span><span class="p">[</span><span class="n">iLine</span><span class="p">,</span> <span class="n">colSlice</span><span class="p">]</span> <span class="o">-=</span> <span class="n">b_coeff</span><span class="p">[</span><span class="n">iCoeff</span><span class="p">]</span> <span class="o">/</span> <span class="n">n_coeff</span><span class="p">[</span><span class="n">iCoeff</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_coeff</span><span class="p">[</span><span class="n">sCoeff</span><span class="p">]</span>
+
+                    <span class="c1"># -- modify B</span>
+                    <span class="n">b</span><span class="p">[</span><span class="n">iLine</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span> <span class="o">*</span> <span class="n">b_coeff</span><span class="p">[</span><span class="n">iCoeff</span><span class="p">]</span> <span class="o">/</span> <span class="n">n_coeff</span><span class="p">[</span><span class="n">iCoeff</span><span class="p">]</span> <span class="o">*</span> <span class="n">dx</span>
+
+    <span class="c1"># TODO: extend the BCs to higher dimensions</span>
+    <span class="n">A_1d</span> <span class="o">=</span> <span class="n">A_1d</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">A_1d</span>
+    <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">A_1d</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">size</span><span class="p">))</span> <span class="o">+</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">size</span><span class="p">),</span> <span class="n">A_1d</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">A_1d</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">size</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+            <span class="o">+</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">size</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="n">A_1d</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">size</span><span class="p">),</span> <span class="n">A_1d</span><span class="p">),</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Dimension </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s1"> not implemented.&#39;</span><span class="p">)</span>
+
+    <span class="n">A</span> <span class="o">/=</span> <span class="n">dx</span><span class="o">**</span><span class="n">derivative</span>
+    <span class="n">b</span> <span class="o">/=</span> <span class="n">dx</span><span class="o">**</span><span class="n">derivative</span>
+
+    <span class="k">return</span> <span class="n">A</span><span class="p">,</span> <span class="n">b</span></div>
+
+
+
+<div class="viewcode-block" id="get_1d_grid">
+<a class="viewcode-back" href="../../pySDC/helpers.problem_helper.html#helpers.problem_helper.get_1d_grid">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_1d_grid</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">bc</span><span class="p">,</span> <span class="n">left_boundary</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">right_boundary</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a grid in one dimension and obtain mesh spacing for finite difference discretization.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        size (int): Number of degrees of freedom per dimension</span>
+<span class="sd">        bc (str): Boundary conditions for both sides</span>
+<span class="sd">        left_boundary (float): x value at the left boundary</span>
+<span class="sd">        right_boundary (float): x value at the right boundary</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: mesh spacing</span>
+<span class="sd">        numpy.ndarray: 1d mesh</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">right_boundary</span> <span class="o">-</span> <span class="n">left_boundary</span>
+    <span class="k">if</span> <span class="n">bc</span> <span class="o">==</span> <span class="s1">&#39;periodic&#39;</span><span class="p">:</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">L</span> <span class="o">/</span> <span class="n">size</span>
+        <span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">left_boundary</span> <span class="o">+</span> <span class="n">dx</span> <span class="o">*</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">)])</span>
+    <span class="k">elif</span> <span class="s2">&quot;dirichlet&quot;</span> <span class="ow">in</span> <span class="n">bc</span> <span class="ow">or</span> <span class="s2">&quot;neumann&quot;</span> <span class="ow">in</span> <span class="n">bc</span><span class="p">:</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">L</span> <span class="o">/</span> <span class="p">(</span><span class="n">size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">left_boundary</span> <span class="o">+</span> <span class="n">dx</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">)])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Boundary conditions </span><span class="se">\&quot;</span><span class="si">{</span><span class="n">bc</span><span class="si">}</span><span class="se">\&quot;</span><span class="s1"> not implemented.&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dx</span><span class="p">,</span> <span class="n">xvalues</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">helpers.problem_helper</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

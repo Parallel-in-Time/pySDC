@@ -1,0 +1,7 @@
+helpers.firedrake\_ensemble\_communicator module
+================================================
+
+.. automodule:: helpers.firedrake_ensemble_communicator
+   :members:
+   :show-inheritance:
+   :undoc-members:

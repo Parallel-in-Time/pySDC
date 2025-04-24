@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.problem_classes.TestEquation_0D module &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=81710850"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.problem_classes.Van_der_Pol_implicit module" href="implementations.problem_classes.Van_der_Pol_implicit.html" />
+    <link rel="prev" title="implementations.problem_classes.RayleighBenard module" href="implementations.problem_classes.RayleighBenard.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.Van_der_Pol_implicit.html" title="implementations.problem_classes.Van_der_Pol_implicit module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.RayleighBenard.html" title="implementations.problem_classes.RayleighBenard module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.TestEquation_0D module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.problem_classes.TestEquation_0D">
+<span id="implementations-problem-classes-testequation-0d-module"></span><h1>implementations.problem_classes.TestEquation_0D module<a class="headerlink" href="#module-implementations.problem_classes.TestEquation_0D" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.test_equation_IMEX">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">test_equation_IMEX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lambdas_implicit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambdas_explicit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/TestEquation_0D.html#test_equation_IMEX"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.test_equation_IMEX.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.dtype_f" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.test_equation_IMEX.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.dtype_u" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.test_equation_IMEX.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/TestEquation_0D.html#test_equation_IMEX.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.eval_f" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.test_equation_IMEX.solve_system">
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/TestEquation_0D.html#test_equation_IMEX.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.solve_system" title="Link to this definition">¶</a></dt>
+<dd><p>Simple linear solver for <span class="math notranslate nohighlight">\((I-factor\cdot A)\vec{u}=\vec{rhs}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.test_equation_IMEX.u_exact">
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/TestEquation_0D.html#test_equation_IMEX.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.u_exact" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact solution at time t.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p></li>
+<li><p><strong>u_init</strong> (<em>pySDC.problem.testequation0d.dtype_u</em>) – Initial solution.</p></li>
+<li><p><strong>t_init</strong> (<em>float</em>) – The initial time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>me</strong> – The exact solution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.test_equation_IMEX.xp">
+<span class="sig-name descname"><span class="pre">xp</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'numpy'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.13/site-packages/numpy/__init__.py'&gt;</span></em><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.xp" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.test_equation_IMEX.xsp">
+<span class="sig-name descname"><span class="pre">xsp</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.sparse'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.13/site-packages/scipy/sparse/__init__.py'&gt;</span></em><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.xsp" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.testequation0d">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">testequation0d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lambdas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useGPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/TestEquation_0D.html#testequation0d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.testequation0d" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
+<p>This class implements the simple test equation of the form</p>
+<div class="math notranslate nohighlight">
+\[\frac{d u(t)}{dt} = A u(t)\]</div>
+<p>for <span class="math notranslate nohighlight">\(A = diag(\lambda_1, .. ,\lambda_n)\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lambdas</strong> (<em>sequence</em><em> of </em><em>array_like</em><em>, </em><em>optional</em>) – List of lambda parameters.</p></li>
+<li><p><strong>u0</strong> (<em>sequence</em><em> of </em><em>array_like</em><em>, </em><em>optional</em>) – Initial condition.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.testequation0d.A">
+<span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.testequation0d.A" title="Link to this definition">¶</a></dt>
+<dd><p>Diagonal matrix containing <span class="math notranslate nohighlight">\(\lambda_1,..,\lambda_n\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>scipy.sparse.csc_matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.testequation0d.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.testequation0d.dtype_f" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.testequation0d.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.testequation0d.dtype_u" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.testequation0d.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/TestEquation_0D.html#testequation0d.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.testequation0d.eval_f" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.testequation0d.getOutputFile">
+<span class="sig-name descname"><span class="pre">getOutputFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/TestEquation_0D.html#testequation0d.getOutputFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.testequation0d.getOutputFile" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.testequation0d.processSolutionForOutput">
+<span class="sig-name descname"><span class="pre">processSolutionForOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/TestEquation_0D.html#testequation0d.processSolutionForOutput"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.testequation0d.processSolutionForOutput" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.testequation0d.setup_GPU">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setup_GPU</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/TestEquation_0D.html#testequation0d.setup_GPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.testequation0d.setup_GPU" title="Link to this definition">¶</a></dt>
+<dd><p>Switch to GPU modules</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.testequation0d.solve_system">
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/TestEquation_0D.html#testequation0d.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.testequation0d.solve_system" title="Link to this definition">¶</a></dt>
+<dd><p>Simple linear solver for <span class="math notranslate nohighlight">\((I-factor\cdot A)\vec{u}=\vec{rhs}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.testequation0d.u_exact">
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/TestEquation_0D.html#testequation0d.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.testequation0d.u_exact" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact solution at time t.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p></li>
+<li><p><strong>u_init</strong> (<em>pySDC.problem.testequation0d.dtype_u</em>) – Initial solution.</p></li>
+<li><p><strong>t_init</strong> (<em>float</em>) – The initial time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>me</strong> – The exact solution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.testequation0d.xp">
+<span class="sig-name descname"><span class="pre">xp</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'numpy'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.13/site-packages/numpy/__init__.py'&gt;</span></em><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.testequation0d.xp" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.testequation0d.xsp">
+<span class="sig-name descname"><span class="pre">xsp</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.sparse'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.13/site-packages/scipy/sparse/__init__.py'&gt;</span></em><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.testequation0d.xsp" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.problem_classes.TestEquation_0D module</a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX"><code class="docutils literal notranslate"><span class="pre">test_equation_IMEX</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.xp"><code class="docutils literal notranslate"><span class="pre">xp</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.xsp"><code class="docutils literal notranslate"><span class="pre">xsp</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.testequation0d"><code class="docutils literal notranslate"><span class="pre">testequation0d</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.testequation0d.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.testequation0d.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.testequation0d.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.testequation0d.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.testequation0d.getOutputFile"><code class="docutils literal notranslate"><span class="pre">getOutputFile()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.testequation0d.processSolutionForOutput"><code class="docutils literal notranslate"><span class="pre">processSolutionForOutput()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.testequation0d.setup_GPU"><code class="docutils literal notranslate"><span class="pre">setup_GPU()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.testequation0d.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.testequation0d.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.testequation0d.xp"><code class="docutils literal notranslate"><span class="pre">xp</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.testequation0d.xsp"><code class="docutils literal notranslate"><span class="pre">xsp</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.RayleighBenard.html"
+                          title="previous chapter">implementations.problem_classes.RayleighBenard module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.Van_der_Pol_implicit.html"
+                          title="next chapter">implementations.problem_classes.Van_der_Pol_implicit module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.problem_classes.TestEquation_0D.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.Van_der_Pol_implicit.html" title="implementations.problem_classes.Van_der_Pol_implicit module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.RayleighBenard.html" title="implementations.problem_classes.RayleighBenard module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.TestEquation_0D module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

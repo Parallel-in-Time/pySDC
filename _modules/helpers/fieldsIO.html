@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>helpers.fieldsIO &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../_static/documentation_options.js?v=81710850"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">helpers.fieldsIO</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for helpers.fieldsIO</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Generic utility class to write and read cartesian grid field solutions into binary files.</span>
+<span class="sd">It implements the base file handler class :class:`FieldsIO`, that is specialized into :</span>
+
+<span class="sd">- :class:`Scalar` : for 0D fields (scalar) with a given number of variables</span>
+<span class="sd">- :class:`Rectilinear` : for fields on N-dimensional rectilinear grids</span>
+
+<span class="sd">While each file handler need to be setup with specific parameters (grid, ...),</span>
+<span class="sd">each written file can be read using the same interface implemented in the</span>
+<span class="sd">base abstract class.</span>
+
+<span class="sd">Example</span>
+<span class="sd">-------</span>
+<span class="sd">&gt;&gt;&gt; import numpy as np</span>
+<span class="sd">&gt;&gt;&gt; from pySDC.helpers.fieldsIO import Rectilinear</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # Write some fields in files</span>
+<span class="sd">&gt;&gt;&gt; x = np.linspace(0, 1, 128)</span>
+<span class="sd">&gt;&gt;&gt; y = np.linspace(0, 1, 64)</span>
+<span class="sd">&gt;&gt;&gt; fOut = Rectilinear(np.float64, &quot;file.pysdc&quot;)</span>
+<span class="sd">&gt;&gt;&gt; fOut.setHeader(nVar=2, coords=[x, y])</span>
+<span class="sd">&gt;&gt;&gt; fOut.initialize()</span>
+<span class="sd">&gt;&gt;&gt; times = [0, 1, 2]</span>
+<span class="sd">&gt;&gt;&gt; xGrid, yGrid = np.meshgrid(x, y, indexing=&quot;ij&quot;)</span>
+<span class="sd">&gt;&gt;&gt; u0 = np.array([-1, 1]).reshape((-1, 1, 1))*xGrid*yGrid</span>
+<span class="sd">&gt;&gt;&gt; # u0 has shape [2, nX, nY]</span>
+<span class="sd">&gt;&gt;&gt; for t in times:</span>
+<span class="sd">&gt;&gt;&gt;    fOut.addField(t, t*u0)</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; # Read the file using the generic interface</span>
+<span class="sd">&gt;&gt;&gt; from pySDC.helpers.fieldsIO import FieldsIO</span>
+<span class="sd">&gt;&gt;&gt; fIn = FieldsIO.fromFile(&quot;file.pysdc&quot;)</span>
+<span class="sd">&gt;&gt;&gt; times = fIn.times</span>
+<span class="sd">&gt;&gt;&gt; assert len(times) == fIn.nFields</span>
+<span class="sd">&gt;&gt;&gt; tEnd, uEnd = fIn.readField(-1)</span>
+<span class="sd">&gt;&gt;&gt; assert tEnd == times[-1]</span>
+
+<span class="sd">Notes</span>
+<span class="sd">-----</span>
+<span class="sd">🚀 :class:`Rectilinear` is compatible with a MPI-based cartesian decomposition.</span>
+<span class="sd">See :class:`pySDC.helpers.fieldsIO.writeFields_MPI` for an illustrative example.</span>
+
+<span class="sd">Warning</span>
+<span class="sd">-------</span>
+<span class="sd">To use MPI collective writing, you need to call first the class methods :class:`Rectilinear.initMPI` (cf their docstring).</span>
+<span class="sd">Also, `Rectilinear.setHeader` **must be given the global grids coordinates**, whether the code is run in parallel or not.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">dolfin</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">df</span>  <span class="c1"># noqa: F841 (for some reason, dolfin always needs to be imported before mpi4py)</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">MPI</span><span class="p">:</span>
+        <span class="n">COMM_WORLD</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">Intracomm</span> <span class="o">=</span> <span class="n">T</span>
+
+
+<span class="c1"># Supported data types</span>
+<span class="n">DTYPES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">0</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>  <span class="c1"># double precision</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">DTYPES</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float128</span><span class="p">,</span>  <span class="c1"># quadruple precision</span>
+            <span class="mi">3</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">complex256</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+<span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;FieldsIO&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Warning: Quadruple precision not available on this machine&#39;</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">DTYPES</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="mi">4</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>  <span class="c1"># single precision</span>
+            <span class="mi">5</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+<span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;FieldsIO&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Warning: Single precision not available on this machine&#39;</span><span class="p">)</span>
+
+<span class="n">DTYPES_AVAIL</span> <span class="o">=</span> <span class="p">{</span><span class="n">val</span><span class="p">:</span> <span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">DTYPES</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+<span class="c1"># Header dtype</span>
+<span class="n">H_DTYPE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int8</span>
+<span class="n">T_DTYPE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+
+
+<div class="viewcode-block" id="FieldsIO">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FieldsIO</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract IO file handler&quot;&quot;&quot;</span>
+
+    <span class="n">STRUCTS</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># supported structures, modified dynamically</span>
+    <span class="n">sID</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># structure ID of the FieldsIO class, modified dynamically</span>
+
+    <span class="n">tSize</span> <span class="o">=</span> <span class="n">T_DTYPE</span><span class="p">()</span><span class="o">.</span><span class="n">itemsize</span>
+
+    <span class="n">ALLOW_OVERWRITE</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">fileName</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dtype : np.dtype</span>
+<span class="sd">            The data type of the fields values.</span>
+<span class="sd">        fileName : str</span>
+<span class="sd">            File.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="n">DTYPES_AVAIL</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dtype</span><span class="si">=}</span><span class="s2"> not available. Supported on this machine: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">DTYPES_AVAIL</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">dtype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span> <span class="o">=</span> <span class="n">fileName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Initialized by the setHeader abstract method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nItems</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># number of values (dof) stored into one field</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;FieldsIO[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">|file:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="si">}</span><span class="s2">]&lt;</span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="FieldsIO.fromFile">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.fromFile">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fromFile</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fileName</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read a file storing fields, and return the `FieldsIO` of the appropriate</span>
+<span class="sd">        field type (structure).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fileName : str</span>
+<span class="sd">            Name of the binary file.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fieldsIO : :class:`FieldsIO`</span>
+<span class="sd">            The specialized `FieldsIO` adapted to the file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fileName</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;not a file (</span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">STRUCT</span><span class="p">,</span> <span class="n">DTYPE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">H_DTYPE</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">fieldsIO</span><span class="p">:</span> <span class="n">FieldsIO</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">STRUCTS</span><span class="p">[</span><span class="n">STRUCT</span><span class="p">](</span><span class="n">DTYPES</span><span class="p">[</span><span class="n">DTYPE</span><span class="p">],</span> <span class="n">fileName</span><span class="p">)</span>
+            <span class="n">fieldsIO</span><span class="o">.</span><span class="n">readHeader</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">fieldsIO</span><span class="o">.</span><span class="n">initialized</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">fieldsIO</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hBase</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Base header into numpy array format&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">sID</span><span class="p">,</span> <span class="n">DTYPES_AVAIL</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">H_DTYPE</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FieldsIO.register">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.register">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sID</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decorator used to register a new class FieldsIO specialized class</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sID : int</span>
+<span class="sd">            Unique identifyer for the file, used in the binary file.</span>
+<span class="sd">            Since it&#39;s encoded on a 8-bytes signed integer,</span>
+<span class="sd">            it must be between -128 and 127</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; # New specialized FieldsIO class</span>
+<span class="sd">        &gt;&gt;&gt; @FieldsIO.register(sID=31)</span>
+<span class="sd">        &gt;&gt;&gt; class HexaMesh2D(FieldsIO):</span>
+<span class="sd">        &gt;&gt;&gt;     pass # ... implementation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="n">registered</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
+            <span class="k">assert</span> <span class="p">(</span>
+                <span class="n">sID</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">STRUCTS</span>
+            <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;struct ID already taken by </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">STRUCTS</span><span class="p">[</span><span class="n">sID</span><span class="p">]</span><span class="si">}</span><span class="s2">, cannot use it for </span><span class="si">{</span><span class="n">registered</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">STRUCTS</span><span class="p">[</span><span class="n">sID</span><span class="p">]</span> <span class="o">=</span> <span class="n">registered</span>
+            <span class="n">registered</span><span class="o">.</span><span class="n">sID</span> <span class="o">=</span> <span class="n">sID</span>
+            <span class="k">return</span> <span class="n">registered</span>
+
+        <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+<div class="viewcode-block" id="FieldsIO.initialize">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.initialize">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the file handler : create the file with header, removing any existing file with the same name&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;header must be set before initializing FieldsIO&quot;</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span><span class="p">,</span> <span class="s2">&quot;FieldsIO already initialized&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ALLOW_OVERWRITE</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="si">!r}</span><span class="s2"> already exists, use FieldsIO.ALLOW_OVERWRITE = True to allow overwriting&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">,</span> <span class="s2">&quot;w+b&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hBase</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hInfos</span><span class="p">:</span>
+                <span class="n">array</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="FieldsIO.setHeader">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.setHeader">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setHeader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(Abstract) Set the header before creating a new file to store the fields&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hInfos</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(Abstract) Array representing the grid structure to be written in the binary file.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+<div class="viewcode-block" id="FieldsIO.readHeader">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.readHeader">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">readHeader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        (Abstract) Read the header from the file storing the fields.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        f : `_io.TextIOWrapper`</span>
+<span class="sd">            File to read the header from.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hSize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Size of the full header (in bytes)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hBase</span><span class="o">.</span><span class="n">nbytes</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">hInfo</span><span class="o">.</span><span class="n">nbytes</span> <span class="k">for</span> <span class="n">hInfo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hInfos</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">itemSize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Size of one field value (in bytes)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">()</span><span class="o">.</span><span class="n">itemsize</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fSize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Full size of a field (in bytes)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nItems</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">itemSize</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fileSize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Current size of the file (in bytes)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FieldsIO.addField">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.addField">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">addField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Append one field solution at the end of the file with one given time.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        time : float-like</span>
+<span class="sd">            The associated time of the field solution.</span>
+<span class="sd">        field : np.ndarray</span>
+<span class="sd">            The field values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span><span class="p">,</span> <span class="s2">&quot;cannot add field to a non initialized FieldsIO&quot;</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">field</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">field</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> dtype, got </span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">assert</span> <span class="n">field</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">nItems</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nItems</span><span class="si">}</span><span class="s2"> values, got </span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">,</span> <span class="s2">&quot;ab&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">T_DTYPE</span><span class="p">)</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">field</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nFields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of fields currently stored in the binary file&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">fileSize</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">hSize</span><span class="p">)</span> <span class="o">//</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tSize</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fSize</span><span class="p">))</span>
+
+<div class="viewcode-block" id="FieldsIO.formatIndex">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.formatIndex">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">formatIndex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Utility method to format a fields index to a positional integer (negative starts from last field index, like python lists)&quot;&quot;&quot;</span>
+        <span class="n">nFields</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nFields</span>
+        <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">nFields</span> <span class="o">+</span> <span class="n">idx</span>
+        <span class="k">assert</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="n">nFields</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;cannot read index </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">nFields</span><span class="si">}</span><span class="s2"> fields&quot;</span>
+        <span class="k">assert</span> <span class="n">idx</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;cannot read index </span><span class="si">{</span><span class="n">idx</span><span class="o">-</span><span class="n">nFields</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">nFields</span><span class="si">}</span><span class="s2"> fields&quot;</span>
+        <span class="k">return</span> <span class="n">idx</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Vector of all times stored in the binary file&quot;&quot;&quot;</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hSize</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nFields</span><span class="p">):</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">T_DTYPE</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">fSize</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">times</span>
+
+<div class="viewcode-block" id="FieldsIO.time">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.time">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Time stored at a given field index&quot;&quot;&quot;</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatIndex</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hSize</span> <span class="o">+</span> <span class="n">idx</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tSize</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fSize</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">T_DTYPE</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FieldsIO.readField">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.readField">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">readField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read one field stored in the binary file, corresponding to the given</span>
+<span class="sd">        time index.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        idx : int</span>
+<span class="sd">            Positional index of the field.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Stored time for this field.</span>
+<span class="sd">        field : np.ndarray</span>
+<span class="sd">            Read fields in a numpy array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatIndex</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hSize</span> <span class="o">+</span> <span class="n">idx</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tSize</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fSize</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">T_DTYPE</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">field</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nItems</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">field</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">field</span></div>
+
+
+<div class="viewcode-block" id="FieldsIO.reshape">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.reshape">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reshape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Eventually reshape the field to correspond to the grid structure&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Scalar">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Scalar">[docs]</a>
+<span class="nd">@FieldsIO</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">sID</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Scalar</span><span class="p">(</span><span class="n">FieldsIO</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;FieldsIO handler storing a given number of scalar&quot;&quot;&quot;</span>
+
+    <span class="c1"># -------------------------------------------------------------------------</span>
+    <span class="c1"># Overridden methods</span>
+    <span class="c1"># -------------------------------------------------------------------------</span>
+<div class="viewcode-block" id="Scalar.setHeader">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Scalar.setHeader">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setHeader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nVar</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the descriptive grid structure to be stored in the file header.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nVar : int</span>
+<span class="sd">            Number of scalar variable stored.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;nVar&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">nVar</span><span class="p">)}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nItems</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nVar</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hInfos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Array representing the grid structure to be written in the binary file.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">nVar</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)]</span>
+
+<div class="viewcode-block" id="Scalar.readHeader">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Scalar.readHeader">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">readHeader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read the header from the binary file storing the fields.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        f : `_io.TextIOWrapper`</span>
+<span class="sd">            File to read the header from.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span><span class="n">nVar</span><span class="p">,)</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="n">nVar</span><span class="p">)</span></div>
+
+
+    <span class="c1"># -------------------------------------------------------------------------</span>
+    <span class="c1"># Class specifics</span>
+    <span class="c1"># -------------------------------------------------------------------------</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nVar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of variables in a fields, as described in the header&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;nVar&quot;</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="Rectilinear">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear">[docs]</a>
+<span class="nd">@FieldsIO</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">sID</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Rectilinear</span><span class="p">(</span><span class="n">Scalar</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;FieldsIO handler storing a given number of scalar variables on a N-dimensional rectilinear grid&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Rectilinear.setupCoords">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.setupCoords">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setupCoords</span><span class="p">(</span><span class="o">*</span><span class="n">coords</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Utility function to setup grids in multiple dimensions, given the keyword arguments&quot;&quot;&quot;</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">coord</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="k">for</span> <span class="n">coord</span> <span class="ow">in</span> <span class="n">coords</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">axis</span><span class="p">,</span> <span class="n">coord</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">coords</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">coord</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;coord for </span><span class="si">{</span><span class="n">axis</span><span class="si">=}</span><span class="s2"> must be one dimensional&quot;</span>
+        <span class="k">return</span> <span class="n">coords</span></div>
+
+
+    <span class="c1"># -------------------------------------------------------------------------</span>
+    <span class="c1"># Overridden methods</span>
+    <span class="c1"># -------------------------------------------------------------------------</span>
+<div class="viewcode-block" id="Rectilinear.setHeader">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.setHeader">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setHeader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nVar</span><span class="p">,</span> <span class="n">coords</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the descriptive grid structure to be stored in the file header.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nVar : int</span>
+<span class="sd">            Number of 1D variables stored.</span>
+<span class="sd">        coords : np.1darray or list[np.1darray]</span>
+<span class="sd">            The grid coordinates in each dimensions.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        When used in MPI decomposition mode, all coordinate **must** be the global grid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">coords</span><span class="p">]</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setupCoords</span><span class="p">(</span><span class="o">*</span><span class="n">coords</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;nVar&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">nVar</span><span class="p">),</span> <span class="s2">&quot;coords&quot;</span><span class="p">:</span> <span class="n">coords</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nItems</span> <span class="o">=</span> <span class="n">nVar</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nDoF</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hInfos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Array representing the grid structure to be written in the binary file.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">nVar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">gridSizes</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coord</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="k">for</span> <span class="n">coord</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;coords&quot;</span><span class="p">]</span>
+        <span class="p">]</span>
+
+<div class="viewcode-block" id="Rectilinear.readHeader">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.readHeader">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">readHeader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read the header from the binary file storing the fields.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        f : `_io.TextIOWrapper`</span>
+<span class="sd">            File to read the header from.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nVar</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">gridSizes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">dim</span><span class="p">)</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">gridSizes</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="n">nVar</span><span class="p">,</span> <span class="n">coords</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Rectilinear.reshape">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.reshape">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reshape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fields</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reshape the fields to a N-d array (inplace operation)&quot;&quot;&quot;</span>
+        <span class="n">fields</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nVar</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">gridSizes</span><span class="p">)</span></div>
+
+
+    <span class="c1"># -------------------------------------------------------------------------</span>
+    <span class="c1"># Class specifics</span>
+    <span class="c1"># -------------------------------------------------------------------------</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gridSizes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of points in y direction&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">coord</span><span class="o">.</span><span class="n">size</span> <span class="k">for</span> <span class="n">coord</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;coords&quot;</span><span class="p">]]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of grid dimensions&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gridSizes</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nDoF</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of degrees of freedom for one variable&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gridSizes</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Rectilinear.toVTR">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.toVTR">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">toVTR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">baseName</span><span class="p">,</span> <span class="n">varNames</span><span class="p">,</span> <span class="n">idxFormat</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{:06d}</span><span class="s2">&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert all 3D fields stored in binary format (FieldsIO) into a list</span>
+<span class="sd">        of VTR files, that can be read later with Paraview or equivalent to</span>
+<span class="sd">        make videos.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        baseName : str</span>
+<span class="sd">            Base name of the VTR file.</span>
+<span class="sd">        varNames : list[str]</span>
+<span class="sd">            Variable names of the fields.</span>
+<span class="sd">        idxFormat : str, optional</span>
+<span class="sd">            Formatting string for the index of the VTR file.</span>
+<span class="sd">            The default is &quot;{:06d}&quot;.</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; # Suppose the FieldsIO object is already written into outputs.pysdc</span>
+<span class="sd">        &gt;&gt;&gt; import os</span>
+<span class="sd">        &gt;&gt;&gt; from pySDC.utils.fieldsIO import Rectilinear</span>
+<span class="sd">        &gt;&gt;&gt; os.makedirs(&quot;vtrFiles&quot;)  # to store all VTR files into a subfolder</span>
+<span class="sd">        &gt;&gt;&gt; Rectilinear.fromFile(&quot;outputs.pysdc&quot;).toVTR(</span>
+<span class="sd">        &gt;&gt;&gt;    baseName=&quot;vtrFiles/field&quot;, varNames=[&quot;u&quot;, &quot;v&quot;, &quot;w&quot;, &quot;T&quot;, &quot;p&quot;])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;can only be used with 3D fields&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.vtkIO</span><span class="w"> </span><span class="kn">import</span> <span class="n">writeToVTR</span>
+
+        <span class="n">template</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">baseName</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">idxFormat</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nFields</span><span class="p">):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">readField</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">writeToVTR</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;coords&quot;</span><span class="p">],</span> <span class="n">varNames</span><span class="p">)</span></div>
+
+
+    <span class="c1"># -------------------------------------------------------------------------</span>
+    <span class="c1"># MPI-parallel implementation</span>
+    <span class="c1"># -------------------------------------------------------------------------</span>
+    <span class="n">comm</span><span class="p">:</span> <span class="n">MPI</span><span class="o">.</span><span class="n">Intracomm</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_nCollectiveIO</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Rectilinear.setupMPI">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.setupMPI">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setupMPI</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">comm</span><span class="p">:</span> <span class="n">MPI</span><span class="o">.</span><span class="n">Intracomm</span><span class="p">,</span> <span class="n">iLoc</span><span class="p">,</span> <span class="n">nLoc</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setup the MPI mode for the files IO, considering a decomposition</span>
+<span class="sd">        of the 1D grid into contiguous subintervals.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        comm : MPI.Intracomm</span>
+<span class="sd">            The space decomposition communicator.</span>
+<span class="sd">        iLoc : list[int]</span>
+<span class="sd">            Starting index of the local sub-domain in the global coordinates.</span>
+<span class="sd">        nLoc : list[int]</span>
+<span class="sd">            Number of points in the local sub-domain.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">comm</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">iLoc</span> <span class="o">=</span> <span class="n">iLoc</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">nLoc</span> <span class="o">=</span> <span class="n">nLoc</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">mpiFile</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_nCollectiveIO</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nCollectiveIO</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Number of collective IO operations over all processes, when reading or writing a field.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        --------</span>
+<span class="sd">        int: Number of collective IO accesses</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nCollectiveIO</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nCollectiveIO</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nVar</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nLoc</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">MAX</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nCollectiveIO</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">MPI_ON</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Wether or not MPI is activated&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">MPI_ROOT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Wether or not the process is MPI Root&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="Rectilinear.MPI_FILE_OPEN">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.MPI_FILE_OPEN">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">MPI_FILE_OPEN</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Open the binary file in MPI mode&quot;&quot;&quot;</span>
+        <span class="n">amode</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="n">MPI</span><span class="o">.</span><span class="n">MODE_RDONLY</span><span class="p">,</span>
+            <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">MPI</span><span class="o">.</span><span class="n">MODE_WRONLY</span> <span class="o">|</span> <span class="n">MPI</span><span class="o">.</span><span class="n">MODE_APPEND</span><span class="p">,</span>
+        <span class="p">}[</span><span class="n">mode</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpiFile</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">,</span> <span class="n">amode</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Rectilinear.MPI_WRITE">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.MPI_WRITE">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">MPI_WRITE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write data (np.ndarray) in the binary file in MPI mode, at the current file cursor position.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpiFile</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Rectilinear.MPI_WRITE_AT_ALL">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.MPI_WRITE_AT_ALL">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">MPI_WRITE_AT_ALL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write data in the binary file in MPI mode, with a given offset</span>
+<span class="sd">        **relative to the beginning of the file**.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        offset : int</span>
+<span class="sd">            Offset to write at, relative to the beginning of the file, in bytes.</span>
+<span class="sd">        data : np.ndarray</span>
+<span class="sd">            Data to be written in the binary file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpiFile</span><span class="o">.</span><span class="n">Write_at_all</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Rectilinear.MPI_READ_AT_ALL">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.MPI_READ_AT_ALL">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">MPI_READ_AT_ALL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read data from the binary file in MPI mode, with a given offset</span>
+<span class="sd">        **relative to the beginning of the file**.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        offset : int</span>
+<span class="sd">            Offset to read at, relative to the beginning of the file, in bytes.</span>
+<span class="sd">        data : np.ndarray</span>
+<span class="sd">            Array on which to read the data from the binary file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpiFile</span><span class="o">.</span><span class="n">Read_at_all</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Rectilinear.MPI_FILE_CLOSE">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.MPI_FILE_CLOSE">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">MPI_FILE_CLOSE</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Close the binary file in MPI mode&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpiFile</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpiFile</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Rectilinear.initialize">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.initialize">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the binary file (write header) in MPI mode&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPI_ROOT</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPI_ON</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Abort</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">e</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPI_ON</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>  <span class="c1"># Important, should not be removed !</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Rectilinear.addField">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.addField">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">addField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Append one field solution at the end of the file with one given time,</span>
+<span class="sd">        possibly using MPI.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        time : float-like</span>
+<span class="sd">            The associated time of the field solution.</span>
+<span class="sd">        field : np.ndarray</span>
+<span class="sd">            The (local) field values.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        If a MPI decomposition is used, field **must be** the local field values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPI_ON</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">addField</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span><span class="p">,</span> <span class="s2">&quot;cannot add field to a non initialized FieldsIO&quot;</span>
+
+        <span class="n">field</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">field</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">field</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> dtype, got </span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">assert</span> <span class="n">field</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nVar</span><span class="p">,</span>
+            <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">nLoc</span><span class="p">,</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;expected </span><span class="si">{</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nVar</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">nLoc</span><span class="p">)</span><span class="si">}</span><span class="s2"> shape, got </span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">offset0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileSize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MPI_FILE_OPEN</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>
+        <span class="n">nWrites</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">nCollectiveIO</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nCollectiveIO</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPI_ROOT</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MPI_WRITE</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">T_DTYPE</span><span class="p">))</span>
+        <span class="n">offset0</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tSize</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">iVar</span><span class="p">,</span> <span class="o">*</span><span class="n">iBeg</span><span class="p">)</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nVar</span><span class="p">),</span> <span class="o">*</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nLoc</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]):</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="n">offset0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">iPos</span><span class="p">(</span><span class="n">iVar</span><span class="p">,</span> <span class="n">iBeg</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">itemSize</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MPI_WRITE_AT_ALL</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">field</span><span class="p">[(</span><span class="n">iVar</span><span class="p">,</span> <span class="o">*</span><span class="n">iBeg</span><span class="p">)])</span>
+            <span class="n">nWrites</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nCollectiveIO</span> <span class="o">-</span> <span class="n">nWrites</span><span class="p">):</span>
+            <span class="c1"># Additional collective write to catch up with other processes</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MPI_WRITE_AT_ALL</span><span class="p">(</span><span class="n">offset0</span><span class="p">,</span> <span class="n">field</span><span class="p">[:</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">MPI_FILE_CLOSE</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Rectilinear.iPos">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.iPos">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iPos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iVar</span><span class="p">,</span> <span class="n">iX</span><span class="p">):</span>
+        <span class="n">iPos</span> <span class="o">=</span> <span class="n">iVar</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nDoF</span>
+        <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">iPos</span> <span class="o">+=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iLoc</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">+</span> <span class="n">iX</span><span class="p">[</span><span class="n">axis</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gridSizes</span><span class="p">[</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:])</span>
+        <span class="n">iPos</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iLoc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">iPos</span></div>
+
+
+<div class="viewcode-block" id="Rectilinear.readField">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.readField">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">readField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read one field stored in the binary file, corresponding to the given</span>
+<span class="sd">        time index, using MPI in the eventuality of space parallel decomposition.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        idx : int</span>
+<span class="sd">            Positional index of the field.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Stored time for this field.</span>
+<span class="sd">        field : np.ndarray</span>
+<span class="sd">            Read (local) fields in a numpy array.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        If a MPI decomposition is used, it reads and returns the local fields values only.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPI_ON</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">readField</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+
+        <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatIndex</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="n">offset0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hSize</span> <span class="o">+</span> <span class="n">idx</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tSize</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fSize</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">T_DTYPE</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset0</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">offset0</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tSize</span>
+
+        <span class="n">field</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nVar</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">nLoc</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">MPI_FILE_OPEN</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+        <span class="n">nReads</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">nCollectiveIO</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nCollectiveIO</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">iVar</span><span class="p">,</span> <span class="o">*</span><span class="n">iBeg</span><span class="p">)</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nVar</span><span class="p">),</span> <span class="o">*</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nLoc</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]):</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="n">offset0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">iPos</span><span class="p">(</span><span class="n">iVar</span><span class="p">,</span> <span class="n">iBeg</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">itemSize</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MPI_READ_AT_ALL</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">field</span><span class="p">[(</span><span class="n">iVar</span><span class="p">,</span> <span class="o">*</span><span class="n">iBeg</span><span class="p">)])</span>
+            <span class="n">nReads</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nCollectiveIO</span> <span class="o">-</span> <span class="n">nReads</span><span class="p">):</span>
+            <span class="c1"># Additional collective read to catch up with other processes</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MPI_READ_AT_ALL</span><span class="p">(</span><span class="n">offset0</span><span class="p">,</span> <span class="n">field</span><span class="p">[:</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">MPI_FILE_CLOSE</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">field</span></div>
+</div>
+
+
+
+<span class="c1"># -----------------------------------------------------------------------------------------------</span>
+<span class="c1"># Utility functions used for testing</span>
+<span class="c1"># -----------------------------------------------------------------------------------------------</span>
+<div class="viewcode-block" id="initGrid">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.initGrid">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">initGrid</span><span class="p">(</span><span class="n">nVar</span><span class="p">,</span> <span class="n">gridSizes</span><span class="p">):</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gridSizes</span><span class="p">)</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">gridSizes</span><span class="p">]</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">dim</span>
+    <span class="n">u0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nVar</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="o">*</span><span class="n">s</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="o">*</span><span class="n">coords</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;ij&quot;</span><span class="p">):</span>
+        <span class="n">u0</span> <span class="o">=</span> <span class="n">u0</span> <span class="o">*</span> <span class="n">x</span>
+    <span class="k">return</span> <span class="n">coords</span><span class="p">,</span> <span class="n">u0</span></div>
+
+
+
+<div class="viewcode-block" id="writeFields_MPI">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.writeFields_MPI">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">writeFields_MPI</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="n">dtypeIdx</span><span class="p">,</span> <span class="n">algo</span><span class="p">,</span> <span class="n">nSteps</span><span class="p">,</span> <span class="n">nVar</span><span class="p">,</span> <span class="n">gridSizes</span><span class="p">):</span>
+    <span class="n">coords</span><span class="p">,</span> <span class="n">u0</span> <span class="o">=</span> <span class="n">initGrid</span><span class="p">(</span><span class="n">nVar</span><span class="p">,</span> <span class="n">gridSizes</span><span class="p">)</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.blocks</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockDecomposition</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.fieldsIO</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rectilinear</span>
+
+    <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+    <span class="n">MPI_SIZE</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span>
+    <span class="n">MPI_RANK</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span>
+
+    <span class="n">blocks</span> <span class="o">=</span> <span class="n">BlockDecomposition</span><span class="p">(</span><span class="n">MPI_SIZE</span><span class="p">,</span> <span class="n">gridSizes</span><span class="p">,</span> <span class="n">algo</span><span class="p">,</span> <span class="n">MPI_RANK</span><span class="p">)</span>
+
+    <span class="n">iLoc</span><span class="p">,</span> <span class="n">nLoc</span> <span class="o">=</span> <span class="n">blocks</span><span class="o">.</span><span class="n">localBounds</span>
+    <span class="n">Rectilinear</span><span class="o">.</span><span class="n">setupMPI</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">iLoc</span><span class="p">,</span> <span class="n">nLoc</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">iLoc</span><span class="p">,</span> <span class="n">nLoc</span><span class="p">)]</span>
+    <span class="n">u0</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="o">*</span><span class="n">s</span><span class="p">)]</span>
+
+    <span class="n">f1</span> <span class="o">=</span> <span class="n">Rectilinear</span><span class="p">(</span><span class="n">DTYPES</span><span class="p">[</span><span class="n">dtypeIdx</span><span class="p">],</span> <span class="n">fileName</span><span class="p">)</span>
+    <span class="n">f1</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="n">nVar</span><span class="o">=</span><span class="n">nVar</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span>
+
+    <span class="n">u0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">u0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">f1</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">f1</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+
+    <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nSteps</span><span class="p">)</span> <span class="o">/</span> <span class="n">nSteps</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times</span><span class="p">:</span>
+        <span class="n">ut</span> <span class="o">=</span> <span class="p">(</span><span class="n">u0</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">f1</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">f1</span><span class="o">.</span><span class="n">addField</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">ut</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">u0</span></div>
+
+
+
+<div class="viewcode-block" id="compareFields_MPI">
+<a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.compareFields_MPI">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compareFields_MPI</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">nSteps</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.fieldsIO</span><span class="w"> </span><span class="kn">import</span> <span class="n">FieldsIO</span>
+
+    <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+    <span class="n">MPI_RANK</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">MPI_RANK</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Comparing fields with MPI&quot;</span><span class="p">)</span>
+
+    <span class="n">f2</span> <span class="o">=</span> <span class="n">FieldsIO</span><span class="o">.</span><span class="n">fromFile</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
+
+    <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nSteps</span><span class="p">)</span> <span class="o">/</span> <span class="n">nSteps</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">times</span><span class="p">):</span>
+        <span class="n">u1</span> <span class="o">=</span> <span class="n">u0</span> <span class="o">*</span> <span class="n">t</span>
+        <span class="n">t2</span><span class="p">,</span> <span class="n">u2</span> <span class="o">=</span> <span class="n">f2</span><span class="o">.</span><span class="n">readField</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">t2</span> <span class="o">==</span> <span class="n">t</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;fields[</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">] in </span><span class="si">{</span><span class="n">f2</span><span class="si">}</span><span class="s2"> has incorrect time (</span><span class="si">{</span><span class="n">t2</span><span class="si">}</span><span class="s2"> instead of </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">assert</span> <span class="n">u2</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">u1</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">&#39;s fields in </span><span class="si">{</span><span class="n">f2</span><span class="si">}</span><span class="s2"> has incorrect shape&quot;</span>
+        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">u2</span><span class="p">,</span> <span class="n">u1</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">&#39;s fields in </span><span class="si">{</span><span class="n">f2</span><span class="si">}</span><span class="s2"> has incorrect values&quot;</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">helpers.fieldsIO</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+implementations.controller\_classes package
+===========================================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 2
+
+   implementations.controller_classes.controller_MPI
+   implementations.controller_classes.controller_nonMPI
+
+Module contents
+---------------
+
+.. automodule:: implementations.controller_classes
+   :members:
+   :show-inheritance:
+   :undoc-members:

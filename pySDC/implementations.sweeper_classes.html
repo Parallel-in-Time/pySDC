@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.sweeper_classes package &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=81710850"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.sweeper_classes.Multistep module" href="implementations.sweeper_classes.Multistep.html" />
+    <link rel="prev" title="implementations.problem_classes.polynomial_test_problem module" href="implementations.problem_classes.polynomial_test_problem.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.Multistep.html" title="implementations.sweeper_classes.Multistep module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.polynomial_test_problem.html" title="implementations.problem_classes.polynomial_test_problem module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" accesskey="U">implementations package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="implementations-sweeper-classes-package">
+<h1>implementations.sweeper_classes package<a class="headerlink" href="#implementations-sweeper-classes-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.Multistep.html">implementations.sweeper_classes.Multistep module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.AdamsBashforthExplicit1Step"><code class="docutils literal notranslate"><span class="pre">AdamsBashforthExplicit1Step</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit1Step"><code class="docutils literal notranslate"><span class="pre">AdamsMoultonImplicit1Step</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step"><code class="docutils literal notranslate"><span class="pre">AdamsMoultonImplicit2Step</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.BackwardEuler"><code class="docutils literal notranslate"><span class="pre">BackwardEuler</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.Cache"><code class="docutils literal notranslate"><span class="pre">Cache</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.MultiStep"><code class="docutils literal notranslate"><span class="pre">MultiStep</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html">implementations.sweeper_classes.Runge_Kutta module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK2"><code class="docutils literal notranslate"><span class="pre">ARK2</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK3"><code class="docutils literal notranslate"><span class="pre">ARK3</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK32"><code class="docutils literal notranslate"><span class="pre">ARK32</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK324L2SAERK"><code class="docutils literal notranslate"><span class="pre">ARK324L2SAERK</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK324L2SAESDIRK"><code class="docutils literal notranslate"><span class="pre">ARK324L2SAESDIRK</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK54"><code class="docutils literal notranslate"><span class="pre">ARK54</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SA"><code class="docutils literal notranslate"><span class="pre">ARK548L2SA</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK"><code class="docutils literal notranslate"><span class="pre">ARK548L2SAERK</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK2"><code class="docutils literal notranslate"><span class="pre">ARK548L2SAERK2</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK"><code class="docutils literal notranslate"><span class="pre">ARK548L2SAESDIRK</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2"><code class="docutils literal notranslate"><span class="pre">ARK548L2SAESDIRK2</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.BackwardEuler"><code class="docutils literal notranslate"><span class="pre">BackwardEuler</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableau"><code class="docutils literal notranslate"><span class="pre">ButcherTableau</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded"><code class="docutils literal notranslate"><span class="pre">ButcherTableauEmbedded</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Cash_Karp"><code class="docutils literal notranslate"><span class="pre">Cash_Karp</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.CrankNicolson"><code class="docutils literal notranslate"><span class="pre">CrankNicolson</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.DIRK43"><code class="docutils literal notranslate"><span class="pre">DIRK43</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.DIRK43_2"><code class="docutils literal notranslate"><span class="pre">DIRK43_2</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.EDIRK4"><code class="docutils literal notranslate"><span class="pre">EDIRK4</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ESDIRK43"><code class="docutils literal notranslate"><span class="pre">ESDIRK43</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ESDIRK53"><code class="docutils literal notranslate"><span class="pre">ESDIRK53</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod"><code class="docutils literal notranslate"><span class="pre">ExplicitMidpointMethod</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ForwardEuler"><code class="docutils literal notranslate"><span class="pre">ForwardEuler</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler"><code class="docutils literal notranslate"><span class="pre">Heun_Euler</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.IMEXEuler"><code class="docutils literal notranslate"><span class="pre">IMEXEuler</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod"><code class="docutils literal notranslate"><span class="pre">ImplicitMidpointMethod</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RK4"><code class="docutils literal notranslate"><span class="pre">RK4</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX"><code class="docutils literal notranslate"><span class="pre">RungeKuttaIMEX</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta_Nystrom.html">implementations.sweeper_classes.Runge_Kutta_Nystrom module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.ButcherTableauNoCollUpdate"><code class="docutils literal notranslate"><span class="pre">ButcherTableauNoCollUpdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN"><code class="docutils literal notranslate"><span class="pre">RKN</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom"><code class="docutils literal notranslate"><span class="pre">RungeKuttaNystrom</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet"><code class="docutils literal notranslate"><span class="pre">Velocity_Verlet</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.boris_2nd_order.html">implementations.sweeper_classes.boris_2nd_order module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.explicit.html">implementations.sweeper_classes.explicit module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.explicit.html#implementations.sweeper_classes.explicit.explicit"><code class="docutils literal notranslate"><span class="pre">explicit</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.generic_implicit.html">implementations.sweeper_classes.generic_implicit module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.generic_implicit.html#implementations.sweeper_classes.generic_implicit.generic_implicit"><code class="docutils literal notranslate"><span class="pre">generic_implicit</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.generic_implicit_MPI.html">implementations.sweeper_classes.generic_implicit_MPI module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI"><code class="docutils literal notranslate"><span class="pre">SweeperMPI</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI"><code class="docutils literal notranslate"><span class="pre">generic_implicit_MPI</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.imex_1st_order.html">implementations.sweeper_classes.imex_1st_order module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order"><code class="docutils literal notranslate"><span class="pre">imex_1st_order</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.imex_1st_order_MPI.html">implementations.sweeper_classes.imex_1st_order_MPI module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.imex_1st_order_MPI.html#implementations.sweeper_classes.imex_1st_order_MPI.imex_1st_order_MPI"><code class="docutils literal notranslate"><span class="pre">imex_1st_order_MPI</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.imex_1st_order_mass.html">implementations.sweeper_classes.imex_1st_order_mass module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.imex_1st_order_mass.html#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass"><code class="docutils literal notranslate"><span class="pre">imex_1st_order_mass</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.multi_implicit.html">implementations.sweeper_classes.multi_implicit module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.multi_implicit.html#implementations.sweeper_classes.multi_implicit.multi_implicit"><code class="docutils literal notranslate"><span class="pre">multi_implicit</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.verlet.html">implementations.sweeper_classes.verlet module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.verlet.html#implementations.sweeper_classes.verlet.verlet"><code class="docutils literal notranslate"><span class="pre">verlet</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="module-implementations.sweeper_classes">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-implementations.sweeper_classes" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.sweeper_classes package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-implementations.sweeper_classes">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.polynomial_test_problem.html"
+                          title="previous chapter">implementations.problem_classes.polynomial_test_problem module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.sweeper_classes.Multistep.html"
+                          title="next chapter">implementations.sweeper_classes.Multistep module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.sweeper_classes.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.Multistep.html" title="implementations.sweeper_classes.Multistep module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.polynomial_test_problem.html" title="implementations.problem_classes.polynomial_test_problem module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

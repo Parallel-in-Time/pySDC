@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.problem_classes.generic_ND_FD module &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=81710850"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.problem_classes.generic_spectral module" href="implementations.problem_classes.generic_spectral.html" />
+    <link rel="prev" title="implementations.problem_classes.generic_MPIFFT_Laplacian module" href="implementations.problem_classes.generic_MPIFFT_Laplacian.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.generic_spectral.html" title="implementations.problem_classes.generic_spectral module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.generic_MPIFFT_Laplacian.html" title="implementations.problem_classes.generic_MPIFFT_Laplacian module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.generic_ND_FD module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.problem_classes.generic_ND_FD">
+<span id="implementations-problem-classes-generic-nd-fd-module"></span><h1>implementations.problem_classes.generic_ND_FD module<a class="headerlink" href="#module-implementations.problem_classes.generic_ND_FD" title="Link to this heading">¶</a></h1>
+<p>Created on Sat Feb 11 22:39:30 2023</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GenericNDimFinDiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">derivative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'center'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lintol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liniter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'direct'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'periodic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bcParams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_ND_FD.html#GenericNDimFinDiff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
+<p>Base class for finite difference spatial discretisation in <span class="math notranslate nohighlight">\(N\)</span> dimensions</p>
+<div class="math notranslate nohighlight">
+\[\frac{d u}{dt} = A u,\]</div>
+<p>where <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{nN \times nN}\)</span> is a matrix arising from finite difference discretisation of spatial
+derivatives with <span class="math notranslate nohighlight">\(n\)</span> degrees of freedom per dimension and <span class="math notranslate nohighlight">\(N\)</span> dimensions. This generic class follows the MOL
+(method-of-lines) approach and can be used to discretize partial differential equations such as the advection
+equation and the heat equation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nvars</strong> (<em>int</em><em>, </em><em>optional</em>) – Spatial resolution for the ND problem. For <span class="math notranslate nohighlight">\(N = 2\)</span>,
+set <code class="docutils literal notranslate"><span class="pre">nvars=(16,</span> <span class="pre">16)</span></code>.</p></li>
+<li><p><strong>coeff</strong> (<em>float</em><em>, </em><em>optional</em>) – Factor for finite difference matrix <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p><strong>derivative</strong> (<em>int</em><em>, </em><em>optional</em>) – Order of the spatial derivative.</p></li>
+<li><p><strong>freq</strong> (<em>tuple</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Spatial frequency, can be a tuple.</p></li>
+<li><p><strong>stencil_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Stencil type for finite differences.</p></li>
+<li><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – Order of accuracy of the finite difference discretization.</p></li>
+<li><p><strong>lintol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for spatial solver.</p></li>
+<li><p><strong>liniter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for linear solver.</p></li>
+<li><p><strong>solver_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of solver. Can be <code class="docutils literal notranslate"><span class="pre">'direct'</span></code>, <code class="docutils literal notranslate"><span class="pre">'GMRES'</span></code> or <code class="docutils literal notranslate"><span class="pre">'CG'</span></code>.</p></li>
+<li><p><strong>bc</strong> (<em>str</em><em> or </em><em>tuple</em><em> of </em><em>2 string</em><em>, </em><em>optional</em>) – Type of boundary conditions. Default is <code class="docutils literal notranslate"><span class="pre">'periodic'</span></code>.
+To define two different types of boundary condition for each side,
+you can use a tuple, for instance <code class="docutils literal notranslate"><span class="pre">bc=(&quot;dirichlet&quot;,</span> <span class="pre">&quot;neumann&quot;)</span></code>
+uses Dirichlet BC on the left side, and Neumann BC on the right side.</p></li>
+<li><p><strong>bcParams</strong> (<em>dict</em><em>, </em><em>optional</em>) – <p>Parameters for boundary conditions, that can contains those keys :</p>
+<ul>
+<li><p><strong>val</strong> : value for the boundary value (Dirichlet) or derivative
+(Neumann), default to 0</p></li>
+<li><p><strong>reduce</strong> : if true, reduce the order of the A matrix close to the
+boundary. If false (default), use shifted stencils close to the
+boundary.</p></li>
+<li><p><strong>neumann_bc_order</strong> : finite difference order that should be used
+for the neumann BC derivative. If None (default), uses the same
+order as the discretization for A.</p></li>
+</ul>
+<p>Default is None, which takes the default values for each parameters.
+You can also define a tuple to set different parameters for each
+side.</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.A">
+<span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.A" title="Link to this definition">¶</a></dt>
+<dd><p>FD discretization matrix of the ND operator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse matrix (CSC)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.Id">
+<span class="sig-name descname"><span class="pre">Id</span></span><a class="headerlink" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.Id" title="Link to this definition">¶</a></dt>
+<dd><p>Identity matrix of the same dimension as A.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse matrix (CSC)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.xvalues">
+<span class="sig-name descname"><span class="pre">xvalues</span></span><a class="headerlink" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.xvalues" title="Link to this definition">¶</a></dt>
+<dd><p>Values of spatial grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.1darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.dtype_f" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.dtype_u" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.dx">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.dx" title="Link to this definition">¶</a></dt>
+<dd><p>Size of the mesh (in all dimensions)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_ND_FD.html#GenericNDimFinDiff.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.eval_f" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – Values of the right-hand side of the problem.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.get_default_sweeper_class">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_default_sweeper_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_ND_FD.html#GenericNDimFinDiff.get_default_sweeper_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.get_default_sweeper_class" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.grids">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">grids</span></span><a class="headerlink" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.grids" title="Link to this definition">¶</a></dt>
+<dd><p>ND grids associated to the problem</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.ndim">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.ndim" title="Link to this definition">¶</a></dt>
+<dd><p>Number of dimensions of the spatial problem</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.solve_system">
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_ND_FD.html#GenericNDimFinDiff.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.solve_system" title="Link to this definition">¶</a></dt>
+<dd><p>Simple linear solver for <span class="math notranslate nohighlight">\((I-factor\cdot A)\vec{u}=\vec{rhs}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>sol</strong> – The solution of the linear solver.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.problem_classes.generic_ND_FD module</a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff"><code class="docutils literal notranslate"><span class="pre">GenericNDimFinDiff</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.Id"><code class="docutils literal notranslate"><span class="pre">Id</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.xvalues"><code class="docutils literal notranslate"><span class="pre">xvalues</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.get_default_sweeper_class"><code class="docutils literal notranslate"><span class="pre">get_default_sweeper_class()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.grids"><code class="docutils literal notranslate"><span class="pre">grids</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.ndim"><code class="docutils literal notranslate"><span class="pre">ndim</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.generic_MPIFFT_Laplacian.html"
+                          title="previous chapter">implementations.problem_classes.generic_MPIFFT_Laplacian module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.generic_spectral.html"
+                          title="next chapter">implementations.problem_classes.generic_spectral module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.problem_classes.generic_ND_FD.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.generic_spectral.html" title="implementations.problem_classes.generic_spectral module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.generic_MPIFFT_Laplacian.html" title="implementations.problem_classes.generic_MPIFFT_Laplacian module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.generic_ND_FD module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>core.collocation &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../_static/documentation_options.js?v=81710850"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.collocation</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for core.collocation</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qmat</span><span class="w"> </span><span class="kn">import</span> <span class="n">Q_GENERATORS</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CollocationError</span>
+
+
+<div class="viewcode-block" id="CollBase">
+<a class="viewcode-back" href="../../pySDC/core.collocation.html#core.collocation.CollBase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CollBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generic collocation class, that contains everything to do integration over</span>
+<span class="sd">    intervals and between nodes.</span>
+<span class="sd">    It can be used to produce many kind of quadrature nodes from various</span>
+<span class="sd">    distribution (awesome!).</span>
+
+<span class="sd">    It is based on the two main parameters that define the nodes:</span>
+
+<span class="sd">    - node_type: the node distribution used for the collocation method</span>
+<span class="sd">    - quad_type: the type of quadrature used (inclusion of not of boundary)</span>
+
+<span class="sd">    Current implementation provides the following available parameter values</span>
+<span class="sd">    for node_type:</span>
+
+<span class="sd">    - EQUID: equidistant node distribution</span>
+<span class="sd">    - LEGENDRE: distribution from Legendre polynomials</span>
+<span class="sd">    - CHEBY-{1,2,3,4}: distribution from Chebyshev polynomials of a given kind</span>
+
+<span class="sd">    The type of quadrature can be GAUSS (only inner nodes), RADAU-LEFT</span>
+<span class="sd">    (inclusion of the left boundary), RADAU-RIGHT (inclusion of the right</span>
+<span class="sd">    boundary) and LOBATTO (inclusion of left and right boundary).</span>
+
+<span class="sd">    All coefficients are generated using</span>
+<span class="sd">    `qmat &lt;https://qmat.readthedocs.io/en/latest/autoapi/qmat/qcoeff/collocation/index.html&gt;`_.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        num_nodes (int): number of collocation nodes</span>
+<span class="sd">        tleft (float): left interval point</span>
+<span class="sd">        tright (float): right interval point</span>
+<span class="sd">        nodes (numpy.ndarray): array of quadrature nodes</span>
+<span class="sd">        weights (numpy.ndarray): array of quadrature weights for the full interval</span>
+<span class="sd">        Qmat (numpy.ndarray): matrix containing the weights for tleft to node</span>
+<span class="sd">        Smat (numpy.ndarray): matrix containing the weights for node to node</span>
+<span class="sd">        delta_m (numpy.ndarray): array of distances between nodes</span>
+<span class="sd">        right_is_node (bool): flag to indicate whether right point is collocation node</span>
+<span class="sd">        left_is_node (bool): flag to indicate whether left point is collocation node</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_nodes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tleft</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tright</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_type</span><span class="o">=</span><span class="s1">&#39;LEGENDRE&#39;</span><span class="p">,</span> <span class="n">quad_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization routine for a collocation object</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            num_nodes (int): number of collocation nodes</span>
+<span class="sd">            tleft (float): left interval point</span>
+<span class="sd">            tright (float): right interval point</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">num_nodes</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CollocationError</span><span class="p">(</span><span class="s1">&#39;at least one quadrature node required, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">num_nodes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tleft</span> <span class="o">&lt;</span> <span class="n">tright</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CollocationError</span><span class="p">(</span><span class="s1">&#39;interval boundaries are corrupt, got </span><span class="si">%s</span><span class="s1"> and </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tleft</span><span class="p">,</span> <span class="n">tright</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;collocation&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">generator</span> <span class="o">=</span> <span class="n">Q_GENERATORS</span><span class="p">[</span><span class="s2">&quot;Collocation&quot;</span><span class="p">](</span>
+                <span class="n">nNodes</span><span class="o">=</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">nodeType</span><span class="o">=</span><span class="n">node_type</span><span class="p">,</span> <span class="n">quadType</span><span class="o">=</span><span class="n">quad_type</span><span class="p">,</span> <span class="n">tLeft</span><span class="o">=</span><span class="n">tleft</span><span class="p">,</span> <span class="n">tRight</span><span class="o">=</span><span class="n">tright</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CollocationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;could not instantiate qmat generator, got error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+        <span class="c1"># Set base attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">=</span> <span class="n">num_nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tleft</span> <span class="o">=</span> <span class="n">tleft</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tright</span> <span class="o">=</span> <span class="n">tright</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_type</span> <span class="o">=</span> <span class="n">node_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quad_type</span> <span class="o">=</span> <span class="n">quad_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">left_is_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quad_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;LOBATTO&#39;</span><span class="p">,</span> <span class="s1">&#39;RADAU-LEFT&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">right_is_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quad_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;LOBATTO&#39;</span><span class="p">,</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Integration order</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span><span class="o">.</span><span class="n">order</span>
+
+        <span class="c1"># Compute coefficients</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getNodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">Q</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span><span class="o">.</span><span class="n">Q</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Qmat</span> <span class="o">=</span> <span class="n">Q</span>
+
+        <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">S</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generator</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span><span class="p">)</span><span class="o">.</span><span class="n">S</span>
+        <span class="c1"># Note: qmat redefines the S matrix for collocation with integrals,</span>
+        <span class="c1"># instead of differences of the Q matrix coefficients.</span>
+        <span class="c1"># This does not passes the pySDC tests ... however the default S computation</span>
+        <span class="c1"># in qmat uses Q matrix coefficients differences, and that&#39;s what we</span>
+        <span class="c1"># use by using the parent property from the generator object.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Smat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gen_Smatrix</span> <span class="o">=</span> <span class="n">S</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta_m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gen_deltas</span>
+
+<div class="viewcode-block" id="CollBase.evaluate">
+<a class="viewcode-back" href="../../pySDC/core.collocation.html#core.collocation.CollBase.evaluate">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates the quadrature over the full interval</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            weights (numpy.ndarray): array of quadrature weights for the full interval</span>
+<span class="sd">            data (numpy.ndarray): f(x) to be integrated</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: integral over f(x) between tleft and tright</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">CollocationError</span><span class="p">(</span><span class="s2">&quot;Input size does not match number of weights, but is </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_gen_deltas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute distances between the nodes</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: distances between the nodes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+        <span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">tleft</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+            <span class="n">delta</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">delta</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.collocation</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

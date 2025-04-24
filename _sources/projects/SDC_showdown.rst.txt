@@ -1,0 +1,1 @@
+.. include:: /../../pySDC/projects/SDC_showdown/README.rst

@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.problem_classes.AllenCahn_1D_FD module &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=81710850"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.problem_classes.AllenCahn_2D_FD module" href="implementations.problem_classes.AllenCahn_2D_FD.html" />
+    <link rel="prev" title="implementations.problem_classes.AdvectionEquation_ND_FD module" href="implementations.problem_classes.AdvectionEquation_ND_FD.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.AllenCahn_2D_FD.html" title="implementations.problem_classes.AllenCahn_2D_FD module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.AdvectionEquation_ND_FD.html" title="implementations.problem_classes.AdvectionEquation_ND_FD module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.AllenCahn_1D_FD module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.problem_classes.AllenCahn_1D_FD">
+<span id="implementations-problem-classes-allencahn-1d-fd-module"></span><h1>implementations.problem_classes.AllenCahn_1D_FD module<a class="headerlink" href="#module-implementations.problem_classes.AllenCahn_1D_FD" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_front_finel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">127</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-0.5,</span> <span class="pre">0.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_finel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit" title="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn_front_fullyimplicit</span></code></a></p>
+<p>This class implements the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet
+boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+    - 6 d_w u (1 - u)\]</div>
+<p>for <span class="math notranslate nohighlight">\(u \in [0, 1]\)</span>. Centered finite differences are used for discretization of the Laplacian.
+The exact solution is given by</p>
+<div class="math notranslate nohighlight">
+\[u(x, t) = 0.5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)\]</div>
+<p>with <span class="math notranslate nohighlight">\(v = 3 \sqrt{2} \varepsilon d_w\)</span>.</p>
+<p>Let <span class="math notranslate nohighlight">\(A\)</span> denote the finite difference matrix to discretize <span class="math notranslate nohighlight">\(\frac{\partial^2 u}{\partial x^2}\)</span>. Here,
+<em>Finel’s trick</em> is used. Let</p>
+<div class="math notranslate nohighlight">
+\[a = \tanh\left(\frac{\Delta x}{\sqrt{2}\varepsilon}\right)^2,\]</div>
+<p>then, the right-hand side of the problem can be written as</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = A u - \frac{1}{\Delta x^2} \left[
+        \frac{1 - a}{1 - a (2u - 1)^2} - 1
+    \right] (2u - 1).\]</div>
+<p>For time-stepping, this problem will be treated in a <em>fully-implicit</em> way. The nonlinear system is solved using Newton.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_finel.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel.eval_f" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel.solve_system">
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_finel.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel.solve_system" title="Link to this definition">¶</a></dt>
+<dd><p>Simple Newton solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the nonlinear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the node-to-node stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_front_fullyimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">127</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-0.5,</span> <span class="pre">0.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_fullyimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
+<p>Example implementing the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet
+boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+    - 6 d_w u (1 - u)\]</div>
+<p>for <span class="math notranslate nohighlight">\(u \in [0, 1]\)</span>. The second order spatial derivative is approximated using centered finite differences. The
+exact solution is given by</p>
+<div class="math notranslate nohighlight">
+\[u(x, t)= 0.5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)\]</div>
+<p>with <span class="math notranslate nohighlight">\(v = 3 \sqrt{2} \varepsilon d_w\)</span>. For time-stepping, this problem is implemented to be treated
+<em>fully-implicit</em> using Newton to solve the nonlinear system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nvars</strong> (<em>int</em>) – Number of unknowns in the problem.</p></li>
+<li><p><strong>dw</strong> (<em>float</em>) – Driving force.</p></li>
+<li><p><strong>eps</strong> (<em>float</em>) – Scaling parameter <span class="math notranslate nohighlight">\(\varepsilon\)</span>.</p></li>
+<li><p><strong>newton_maxiter</strong> (<em>int</em>) – Maximum number of iterations for Newton’s method.</p></li>
+<li><p><strong>newton_tol</strong> (<em>float</em>) – Tolerance for Newton’s method to terminate.</p></li>
+<li><p><strong>interval</strong> (<em>list</em>) – Interval of spatial domain.</p></li>
+<li><p><strong>stop_at_nan</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates that the Newton solver should stop if <code class="docutils literal notranslate"><span class="pre">nan</span></code> values arise.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.A">
+<span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.A" title="Link to this definition">¶</a></dt>
+<dd><p>Second-order FD discretization of the 1D laplace operator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>scipy.diags</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dx">
+<span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dx" title="Link to this definition">¶</a></dt>
+<dd><p>Distance between two spatial nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.xvalues">
+<span class="sig-name descname"><span class="pre">xvalues</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.xvalues" title="Link to this definition">¶</a></dt>
+<dd><p>Spatial grid values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.1darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.uext">
+<span class="sig-name descname"><span class="pre">uext</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.uext" title="Link to this definition">¶</a></dt>
+<dd><p>Contains additionally the external values of the boundary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.work_counters">
+<span class="sig-name descname"><span class="pre">work_counters</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.work_counters" title="Link to this definition">¶</a></dt>
+<dd><p>Counter for statistics. Here, number of Newton calls and number of evaluations
+of right-hand side are counted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#core.problem.WorkCounter" title="core.problem.WorkCounter">WorkCounter</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dtype_f" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dtype_u" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_fullyimplicit.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.eval_f" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.solve_system">
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_fullyimplicit.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.solve_system" title="Link to this definition">¶</a></dt>
+<dd><p>Simple Newton solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the nonlinear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the node-to-node stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (required here for the BC).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.u_exact">
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_fullyimplicit.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.u_exact" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to return initial condition or the exact solution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time at which the exact solution is computed.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>me</strong> – The exact solution (in space and time).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_front_semiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">127</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-0.5,</span> <span class="pre">0.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_semiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit" title="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn_front_fullyimplicit</span></code></a></p>
+<p>This class implements the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet
+boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+    - 6 d_w u (1 - u)\]</div>
+<p>for <span class="math notranslate nohighlight">\(u \in [0, 1]\)</span>. Centered finite differences are used for discretization of the second order spatial derivative.
+The exact solution is given by</p>
+<div class="math notranslate nohighlight">
+\[u(x, t) = 0.5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)\]</div>
+<p>with <span class="math notranslate nohighlight">\(v = 3 \sqrt{2} \varepsilon d_w\)</span>. For time-stepping, this problem will be treated in a
+<em>semi-implicit</em> way, i.e., the Laplacian is treated implicitly, and the rest of the right-hand side will be handled
+explicitly.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.dtype_f" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_mesh</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_semiimplicit.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.eval_f" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.solve_system">
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_semiimplicit.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.solve_system" title="Link to this definition">¶</a></dt>
+<dd><p>Simple linear solver for <span class="math notranslate nohighlight">\((I-factor\cdot A)\vec{u}=\vec{rhs}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_periodic_fullyimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-0.5,</span> <span class="pre">0.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_fullyimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
+<p>Example implementing the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+    - 6 d_w u (1 - u)\]</div>
+<p>for <span class="math notranslate nohighlight">\(u \in [0, 1]\)</span>. Centered finite differences are used for discretization of the Laplacian.
+The exact solution is</p>
+<div class="math notranslate nohighlight">
+\[u(x, t) = 0.5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)\]</div>
+<p>with <span class="math notranslate nohighlight">\(v = 3 \sqrt{2} \varepsilon d_w\)</span> and radius <span class="math notranslate nohighlight">\(r\)</span> of the circles. For time-stepping, the problem is treated
+<em>fully-implicitly</em>, i.e., the nonlinear system is solved by Newton.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nvars</strong> (<em>int</em>) – Number of unknowns in the problem.</p></li>
+<li><p><strong>dw</strong> (<em>float</em>) – Driving force.</p></li>
+<li><p><strong>eps</strong> (<em>float</em>) – Scaling parameter <span class="math notranslate nohighlight">\(\varepsilon\)</span>.</p></li>
+<li><p><strong>newton_maxiter</strong> (<em>int</em>) – Maximum number of iterations for Newton’s method.</p></li>
+<li><p><strong>newton_tol</strong> (<em>float</em>) – Tolerance for Newton’s method to terminate.</p></li>
+<li><p><strong>interval</strong> (<em>list</em>) – Interval of spatial domain.</p></li>
+<li><p><strong>radius</strong> (<em>float</em>) – Radius of the circles.</p></li>
+<li><p><strong>stop_at_nan</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates that the Newton solver should stop if nan values arise.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.A">
+<span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.A" title="Link to this definition">¶</a></dt>
+<dd><p>Second-order FD discretization of the 1D laplace operator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>scipy.diags</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dx">
+<span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dx" title="Link to this definition">¶</a></dt>
+<dd><p>Distance between two spatial nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.xvalues">
+<span class="sig-name descname"><span class="pre">xvalues</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.xvalues" title="Link to this definition">¶</a></dt>
+<dd><p>Spatial grid points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.1darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.work_counters">
+<span class="sig-name descname"><span class="pre">work_counters</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.work_counters" title="Link to this definition">¶</a></dt>
+<dd><p>Counter for statistics. Here, number of Newton calls and number of evaluations
+of right-hand side are counted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#core.problem.WorkCounter" title="core.problem.WorkCounter">WorkCounter</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dtype_f" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dtype_u" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_fullyimplicit.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.eval_f" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.solve_system">
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_fullyimplicit.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.solve_system" title="Link to this definition">¶</a></dt>
+<dd><p>Simple Newton solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the nonlinear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the node-to-node stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (required here for the BC).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>u</strong> – The solution as mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.u_exact">
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_fullyimplicit.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.u_exact" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to return initial condition or the exact solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time at which the approximated exact solution is computed.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>me</strong> – The approximated exact solution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_periodic_multiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-0.5,</span> <span class="pre">0.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_multiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit" title="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn_periodic_fullyimplicit</span></code></a></p>
+<p>This class implements the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+    - 6 d_w u (1 - u)\]</div>
+<p>for <span class="math notranslate nohighlight">\(u \in [0, 1]\)</span>. For discretization of the second order spatial derivative, centered finite differences are used.
+The exact solution is then given by</p>
+<div class="math notranslate nohighlight">
+\[u(x, t) = 0.5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)\]</div>
+<p>with <span class="math notranslate nohighlight">\(v = 3 \sqrt{2} \varepsilon d_w\)</span> and radius <span class="math notranslate nohighlight">\(r\)</span> of the circles. For time-stepping, the problem is treated
+in a <em>multi-implicit</em> fashion, i.e., the nonlinear system containing the part with the Laplacian is solved with a
+linear solver provided by a <code class="docutils literal notranslate"><span class="pre">SciPy</span></code> routine, and the nonlinear system including the rest of the right-hand side is solved by
+Newton’s method.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.dtype_f" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">comp2_mesh</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_multiimplicit.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.eval_f" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed (not used here).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.solve_system_1">
+<span class="sig-name descname"><span class="pre">solve_system_1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_multiimplicit.solve_system_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.solve_system_1" title="Link to this definition">¶</a></dt>
+<dd><p>Simple linear solver for <span class="math notranslate nohighlight">\((I-factor\cdot A)\vec{u}=\vec{rhs}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.solve_system_2">
+<span class="sig-name descname"><span class="pre">solve_system_2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_multiimplicit.solve_system_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.solve_system_2" title="Link to this definition">¶</a></dt>
+<dd><p>Simple linear solver for <span class="math notranslate nohighlight">\((I-factor\cdot A)\vec{u}=\vec{rhs}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_periodic_semiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-0.5,</span> <span class="pre">0.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_semiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit" title="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn_periodic_fullyimplicit</span></code></a></p>
+<p>This class implements the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+    - 6 d_w u (1 - u)\]</div>
+<p>for <span class="math notranslate nohighlight">\(u \in [0, 1]\)</span>. For discretization of the Laplacian, centered finite differences are used.
+The exact solution is</p>
+<div class="math notranslate nohighlight">
+\[u(x, t) = 0.5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)\]</div>
+<p>with <span class="math notranslate nohighlight">\(v = 3 \sqrt{2} \varepsilon d_w\)</span> and radius <span class="math notranslate nohighlight">\(r\)</span> of the circles. For time-stepping, the problem is treated
+in <em>semi-implicit</em> way, i.e., the part containing the Laplacian is treated implicitly, and the rest of the right-hand
+side is only evaluated at each time.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.dtype_f" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_mesh</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_semiimplicit.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.eval_f" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.solve_system">
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_semiimplicit.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.solve_system" title="Link to this definition">¶</a></dt>
+<dd><p>Simple linear solver for <span class="math notranslate nohighlight">\((I-factor\cdot A)\vec{u}=\vec{rhs}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.problem_classes.AllenCahn_1D_FD module</a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel"><code class="docutils literal notranslate"><span class="pre">allencahn_front_finel</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit"><code class="docutils literal notranslate"><span class="pre">allencahn_front_fullyimplicit</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.xvalues"><code class="docutils literal notranslate"><span class="pre">xvalues</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.uext"><code class="docutils literal notranslate"><span class="pre">uext</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.work_counters"><code class="docutils literal notranslate"><span class="pre">work_counters</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit"><code class="docutils literal notranslate"><span class="pre">allencahn_front_semiimplicit</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit"><code class="docutils literal notranslate"><span class="pre">allencahn_periodic_fullyimplicit</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.xvalues"><code class="docutils literal notranslate"><span class="pre">xvalues</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.work_counters"><code class="docutils literal notranslate"><span class="pre">work_counters</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit"><code class="docutils literal notranslate"><span class="pre">allencahn_periodic_multiimplicit</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.solve_system_1"><code class="docutils literal notranslate"><span class="pre">solve_system_1()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.solve_system_2"><code class="docutils literal notranslate"><span class="pre">solve_system_2()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit"><code class="docutils literal notranslate"><span class="pre">allencahn_periodic_semiimplicit</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.AdvectionEquation_ND_FD.html"
+                          title="previous chapter">implementations.problem_classes.AdvectionEquation_ND_FD module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.AllenCahn_2D_FD.html"
+                          title="next chapter">implementations.problem_classes.AllenCahn_2D_FD module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.problem_classes.AllenCahn_1D_FD.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.AllenCahn_2D_FD.html" title="implementations.problem_classes.AllenCahn_2D_FD module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.AdvectionEquation_ND_FD.html" title="implementations.problem_classes.AdvectionEquation_ND_FD module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.AllenCahn_1D_FD module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

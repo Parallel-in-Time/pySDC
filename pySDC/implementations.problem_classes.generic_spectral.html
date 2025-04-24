@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.problem_classes.generic_spectral module &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=81710850"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.problem_classes.nonlinear_ODE_1 module" href="implementations.problem_classes.nonlinear_ODE_1.html" />
+    <link rel="prev" title="implementations.problem_classes.generic_ND_FD module" href="implementations.problem_classes.generic_ND_FD.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.nonlinear_ODE_1.html" title="implementations.problem_classes.nonlinear_ODE_1 module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.generic_ND_FD.html" title="implementations.problem_classes.generic_ND_FD module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.generic_spectral module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.problem_classes.generic_spectral">
+<span id="implementations-problem-classes-generic-spectral-module"></span><h1>implementations.problem_classes.generic_spectral module<a class="headerlink" href="#module-implementations.problem_classes.generic_spectral" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GenericSpectralLinear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">components</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dirichlet_recombination</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cached_direct'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useGPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_cached_factorizations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectral_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">real_spectral_coefficients</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_spectral.html#GenericSpectralLinear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
+<p>Generic class to solve problems of the form M u_t + L u = y, with mass matrix M, linear operator L and some right
+hand side y using spectral methods.
+L may contain algebraic conditions, as long as (M + dt L) is invertible.</p>
+<p>Note that the <cite>__getattr__</cite> method is overloaded to pass requests on to the spectral helper if they are not
+attributes of this class itself. For instance, you can add a BC by calling <cite>self.spectral.add_BC</cite> or equivalently
+<cite>self.add_BC</cite>.</p>
+<p>You can port problems derived from this more or less seamlessly to GPU by using the numerical libraries that are
+class attributes of the spectral helper. This class will automatically switch the datatype using the <cite>setup_GPU</cite> class method.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.spectral">
+<span class="sig-name descname"><span class="pre">spectral</span></span><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.spectral" title="Link to this definition">¶</a></dt>
+<dd><p>Spectral helper</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pySDC.helpers.spectral_helper.SpectralHelper</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.work_counters">
+<span class="sig-name descname"><span class="pre">work_counters</span></span><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.work_counters" title="Link to this definition">¶</a></dt>
+<dd><p>Dictionary for counting work</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.cached_factorizations">
+<span class="sig-name descname"><span class="pre">cached_factorizations</span></span><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.cached_factorizations" title="Link to this definition">¶</a></dt>
+<dd><p>Dictionary of cached matrix factorizations for solving</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.L">
+<span class="sig-name descname"><span class="pre">L</span></span><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.L" title="Link to this definition">¶</a></dt>
+<dd><p>Linear operator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.M">
+<span class="sig-name descname"><span class="pre">M</span></span><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.M" title="Link to this definition">¶</a></dt>
+<dd><p>Mass matrix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.diff_mask">
+<span class="sig-name descname"><span class="pre">diff_mask</span></span><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.diff_mask" title="Link to this definition">¶</a></dt>
+<dd><p>Mask for separating differential and algebraic terms</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.Pl">
+<span class="sig-name descname"><span class="pre">Pl</span></span><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.Pl" title="Link to this definition">¶</a></dt>
+<dd><p>Left preconditioner</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.Pr">
+<span class="sig-name descname"><span class="pre">Pr</span></span><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.Pr" title="Link to this definition">¶</a></dt>
+<dd><p>Right preconditioner</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.getOutputFile">
+<span class="sig-name descname"><span class="pre">getOutputFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_spectral.html#GenericSpectralLinear.getOutputFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.getOutputFile" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.processSolutionForOutput">
+<span class="sig-name descname"><span class="pre">processSolutionForOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_spectral.html#GenericSpectralLinear.processSolutionForOutput"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.processSolutionForOutput" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.setUpFieldsIO">
+<span class="sig-name descname"><span class="pre">setUpFieldsIO</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_spectral.html#GenericSpectralLinear.setUpFieldsIO"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setUpFieldsIO" title="Link to this definition">¶</a></dt>
+<dd><p>Set up FieldsIO for MPI with the space decomposition of this problem</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_GPU">
+<span class="sig-name descname"><span class="pre">setup_GPU</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_spectral.html#GenericSpectralLinear.setup_GPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_GPU" title="Link to this definition">¶</a></dt>
+<dd><p>switch to GPU modules</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_L">
+<span class="sig-name descname"><span class="pre">setup_L</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">LHS</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_spectral.html#GenericSpectralLinear.setup_L"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_L" title="Link to this definition">¶</a></dt>
+<dd><p>Setup the left hand side of the linear operator L and store it in <code class="docutils literal notranslate"><span class="pre">self.L</span></code>.</p>
+<p>The argument is meant to be a dictionary with the line you want to write the equation in as the key and the relationship between components as another dictionary. For instance, you can add an algebraic condition capturing a first derivative relationship between u and ux as follows:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">Dx</span> <span class="pre">=</span> <span class="pre">self.get_differentiation_matrix(axes=(0,))</span>
+<span class="pre">I</span> <span class="pre">=</span> <span class="pre">self.get_Id()</span>
+<span class="pre">LHS</span> <span class="pre">=</span> <span class="pre">{'ux':</span> <span class="pre">{'u':</span> <span class="pre">Dx,</span> <span class="pre">'ux':</span> <span class="pre">-I}}</span>
+<span class="pre">self.setup_L(LHS)</span>
+<span class="pre">`</span></code></p>
+<p>If you put zero as right hand side for the solver in the line for ux, ux will contain the x-derivative of u afterwards.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>LHS</strong> (<em>dict</em>) – Dictionary containing the equations.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_M">
+<span class="sig-name descname"><span class="pre">setup_M</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">LHS</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_spectral.html#GenericSpectralLinear.setup_M"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_M" title="Link to this definition">¶</a></dt>
+<dd><p>Setup mass matrix, see documentation of <code class="docutils literal notranslate"><span class="pre">GenericSpectralLinear.setup_L</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_preconditioner">
+<span class="sig-name descname"><span class="pre">setup_preconditioner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Dirichlet_recombination</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_spectral.html#GenericSpectralLinear.setup_preconditioner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_preconditioner" title="Link to this definition">¶</a></dt>
+<dd><p>Get left and right preconditioners.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Dirichlet_recombination</strong> (<em>bool</em>) – Basis conversion for right preconditioner. Useful for Chebychev and Ultraspherical methods. 10/10 would recommend.</p></li>
+<li><p><strong>left_preconditioner</strong> (<em>bool</em>) – If True, it will interleave the variables and reverse the Kronecker product</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.solve_system">
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_itransform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_spectral.html#GenericSpectralLinear.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.solve_system" title="Link to this definition">¶</a></dt>
+<dd><p>Do an implicit Euler step to solve M u_t + Lu = rhs, with M the mass matrix and L the linear operator as setup by
+<code class="docutils literal notranslate"><span class="pre">GenericSpectralLinear.setup_L</span></code> and <code class="docutils literal notranslate"><span class="pre">GenericSpectralLinear.setup_M</span></code>.</p>
+<p>The implicit Euler step is (M - dt L) u = M rhs. Note that M need not be invertible as long as (M + dt*L) is.
+This means solving with dt=0 to mimic explicit methods does not work for all problems, in particular simple DAEs.</p>
+<p>Note that by putting M rhs on the right hand side, this function can only solve algebraic conditions equal to
+zero. If you want something else, it should be easy to overload this function.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.compute_residual_DAE">
+<span class="sig-name descname"><span class="pre">compute_residual_DAE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_spectral.html#compute_residual_DAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_spectral.compute_residual_DAE" title="Link to this definition">¶</a></dt>
+<dd><p>Computation of the residual that does not add u_0 - u_m in algebraic equations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stage</strong> (<em>str</em>) – The current stage of the step the level belongs to</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.compute_residual_DAE_MPI">
+<span class="sig-name descname"><span class="pre">compute_residual_DAE_MPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_spectral.html#compute_residual_DAE_MPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_spectral.compute_residual_DAE_MPI" title="Link to this definition">¶</a></dt>
+<dd><p>Computation of the residual using the collocation matrix Q</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stage</strong> (<em>str</em>) – The current stage of the step the level belongs to</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.get_extrapolated_error_DAE">
+<span class="sig-name descname"><span class="pre">get_extrapolated_error_DAE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_spectral.html#get_extrapolated_error_DAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_spectral.get_extrapolated_error_DAE" title="Link to this definition">¶</a></dt>
+<dd><p>The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the
+solution obtained by the time marching scheme. This function can be used in <cite>EstimateExtrapolationError</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.problem_classes.generic_spectral module</a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear"><code class="docutils literal notranslate"><span class="pre">GenericSpectralLinear</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.spectral"><code class="docutils literal notranslate"><span class="pre">spectral</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.work_counters"><code class="docutils literal notranslate"><span class="pre">work_counters</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.cached_factorizations"><code class="docutils literal notranslate"><span class="pre">cached_factorizations</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.L"><code class="docutils literal notranslate"><span class="pre">L</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.M"><code class="docutils literal notranslate"><span class="pre">M</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.diff_mask"><code class="docutils literal notranslate"><span class="pre">diff_mask</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.Pl"><code class="docutils literal notranslate"><span class="pre">Pl</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.Pr"><code class="docutils literal notranslate"><span class="pre">Pr</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.getOutputFile"><code class="docutils literal notranslate"><span class="pre">getOutputFile()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.processSolutionForOutput"><code class="docutils literal notranslate"><span class="pre">processSolutionForOutput()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setUpFieldsIO"><code class="docutils literal notranslate"><span class="pre">setUpFieldsIO()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_GPU"><code class="docutils literal notranslate"><span class="pre">setup_GPU()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_L"><code class="docutils literal notranslate"><span class="pre">setup_L()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_M"><code class="docutils literal notranslate"><span class="pre">setup_M()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_preconditioner"><code class="docutils literal notranslate"><span class="pre">setup_preconditioner()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.compute_residual_DAE"><code class="docutils literal notranslate"><span class="pre">compute_residual_DAE()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.compute_residual_DAE_MPI"><code class="docutils literal notranslate"><span class="pre">compute_residual_DAE_MPI()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_spectral.get_extrapolated_error_DAE"><code class="docutils literal notranslate"><span class="pre">get_extrapolated_error_DAE()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.generic_ND_FD.html"
+                          title="previous chapter">implementations.problem_classes.generic_ND_FD module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.nonlinear_ODE_1.html"
+                          title="next chapter">implementations.problem_classes.nonlinear_ODE_1 module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.problem_classes.generic_spectral.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.nonlinear_ODE_1.html" title="implementations.problem_classes.nonlinear_ODE_1 module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.generic_ND_FD.html" title="implementations.problem_classes.generic_ND_FD module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.generic_spectral module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

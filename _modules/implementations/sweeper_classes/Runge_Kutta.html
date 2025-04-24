@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>implementations.sweeper_classes.Runge_Kutta &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../../_static/documentation_options.js?v=81710850"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.Runge_Kutta</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.sweeper_classes.Runge_Kutta</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qmat.qcoeff.butcher</span><span class="w"> </span><span class="kn">import</span> <span class="n">RK_SCHEMES</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.sweeper</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sweeper</span><span class="p">,</span> <span class="n">_Pars</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParameterError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.level</span><span class="w"> </span><span class="kn">import</span> <span class="n">Level</span>
+
+
+<div class="viewcode-block" id="ButcherTableau">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableau">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ButcherTableau</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization routine to get a quadrature matrix out of a Butcher tableau</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            weights (numpy.ndarray): Butcher tableau weights</span>
+<span class="sd">            nodes (numpy.ndarray): Butcher tableau nodes</span>
+<span class="sd">            matrix (numpy.ndarray): Butcher tableau entries</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_method</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tleft</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tright</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="n">nodes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Qmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">matrix</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">left_is_node</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">right_is_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">tright</span>
+
+        <span class="c1"># compute distances between the nodes</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delta_m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delta_m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta_m</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">tleft</span>
+
+        <span class="c1"># check if the RK scheme is implicit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">implicit</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">))</span>
+
+<div class="viewcode-block" id="ButcherTableau.check_method">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableau.check_method">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that the method is entered in the correct format</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Runge-Kutta matrix needs to be supplied as  a numpy array!&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Runge-Kutta matrix needs to be a square 2D numpy array!&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Nodes need to be supplied as a numpy array!&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Incompatible dimension of nodes! Need 1, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span> <span class="o">!=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Incompatible number of nodes! Need </span><span class="si">{</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_weights</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ButcherTableau.check_weights">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableau.check_weights">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that the weights of the method are entered in the correct format</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Weights need to be supplied as a numpy array!&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Incompatible dimension of weights! Need 1, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">!=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Incompatible number of weights! Need </span><span class="si">{</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">globally_stiffly_accurate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ButcherTableauEmbedded">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ButcherTableauEmbedded</span><span class="p">(</span><span class="n">ButcherTableau</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ButcherTableauEmbedded.check_weights">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded.check_weights">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that the weights of the method are entered in the correct format</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Weights need to be supplied as a numpy array!&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Incompatible dimension of weights! Need 2, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">!=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Incompatible number of weights! Need </span><span class="si">{</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">globally_stiffly_accurate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="RungeKutta">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RungeKutta</span><span class="p">(</span><span class="n">Sweeper</span><span class="p">):</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableau</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Runge-Kutta scheme that fits the interface of a sweeper.</span>
+<span class="sd">    Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions</span>
+<span class="sd">    at the nodes are successively computed from earlier nodes. However, we only perform a single iteration of this.</span>
+
+<span class="sd">    We have two choices to realise a Runge-Kutta sweeper: We can choose Q = Q_Delta = &lt;Butcher tableau&gt;, but in this</span>
+<span class="sd">    implementation, that would lead to a lot of wasted FLOPS from integrating with Q and then with Q_Delta and</span>
+<span class="sd">    subtracting the two. For that reason, we built this new sweeper, which does not have a preconditioner.</span>
+
+<span class="sd">    This class only supports lower triangular Butcher tableaux such that the system can be solved with forward</span>
+<span class="sd">    substitution. In this way, we don&#39;t get the maximum order that we could for the number of stages, but computing the</span>
+<span class="sd">    stages is much cheaper. In particular, if the Butcher tableaux is strictly lower triangular, we get an explicit</span>
+<span class="sd">    method, which does not require us to solve a system of equations to compute the stages.</span>
+
+<span class="sd">    Please be aware that all fundamental parameters of the Sweeper are ignored. These include</span>
+
+<span class="sd">     - num_nodes</span>
+<span class="sd">     - collocation_class</span>
+<span class="sd">     - initial_guess</span>
+<span class="sd">     - QI</span>
+
+<span class="sd">    All of these variables are either determined by the RK rule, or are not part of an RK scheme.</span>
+
+<span class="sd">    The entries of the Butcher tableau are stored as class attributes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization routine for the custom sweeper</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            params: parameters for the sweeper</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># set up logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;sweeper&#39;</span><span class="p">)</span>
+
+        <span class="c1"># check if some parameters are set which only apply to actual sweepers</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;initial_guess&#39;</span><span class="p">,</span> <span class="s1">&#39;collocation_class&#39;</span><span class="p">,</span> <span class="s1">&#39;num_nodes&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">&quot; will be ignored by Runge-Kutta sweeper&#39;</span><span class="p">)</span>
+
+        <span class="c1"># set parameters to their actual values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Butcher_tableau</span><span class="p">()</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;initial_guess&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;zero&#39;</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ButcherTableauClass</span><span class="p">)</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
+
+        <span class="c1"># disable residual computation by default</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;skip_residual_computation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;skip_residual_computation&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;IT_CHECK&#39;</span><span class="p">,</span> <span class="s1">&#39;IT_FINE&#39;</span><span class="p">,</span> <span class="s1">&#39;IT_COARSE&#39;</span><span class="p">,</span> <span class="s1">&#39;IT_UP&#39;</span><span class="p">,</span> <span class="s1">&#39;IT_DOWN&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># check if we can skip some usually unnecessary right hand side evaluations</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;eval_rhs_at_right_boundary&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;eval_rhs_at_right_boundary&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">_Pars</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="c1"># This will be set as soon as the sweeper is instantiated at the level</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__level</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parallelizable</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">QI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span>
+
+<div class="viewcode-block" id="RungeKutta.get_Q_matrix">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_Q_matrix">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_Q_matrix</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_Butcher_tableau</span><span class="p">()</span><span class="o">.</span><span class="n">Qmat</span></div>
+
+
+<div class="viewcode-block" id="RungeKutta.get_Butcher_tableau">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_Butcher_tableau">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_Butcher_tableau</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ButcherTableauClass</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">matrix</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RungeKutta.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;There is not an update order for RK scheme </span><span class="se">\&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2"> implemented. Maybe it is not an embedded scheme?&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RungeKutta.get_full_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_full_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_full_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the full right hand side as a `mesh` from the right hand side</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            f (dtype_f): Right hand side at a single node</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            mesh: Full right hand side as a mesh</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;mesh&#39;</span><span class="p">,</span> <span class="s1">&#39;cupy_mesh&#39;</span><span class="p">,</span> <span class="s1">&#39;firedrake_mesh&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">f</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;imex_mesh&#39;</span><span class="p">,</span> <span class="s1">&#39;imex_cupy_mesh&#39;</span><span class="p">,</span> <span class="s1">&#39;imex_firedrake_mesh&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">expl</span>
+        <span class="k">elif</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">prob</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">prob</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_full_f</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Type </span><span class="se">\&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="si">}</span><span class="se">\&quot;</span><span class="s1"> not implemented in Runge-Kutta sweeper&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RungeKutta.integrate">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.integrate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Integrates the right-hand side</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list of dtype_u: containing the integral as values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># get current level and problem</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># integrate RHS over all collocation nodes</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># new instance of dtype_u, initialize values with 0</span>
+            <span class="n">me</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">me</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_full_f</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+
+
+<div class="viewcode-block" id="RungeKutta.update_nodes">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.update_nodes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the u- and f-values at the collocation nodes</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># get current level and problem</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span>
+
+        <span class="c1"># only if the level has been touched before</span>
+        <span class="k">assert</span> <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">unlocked</span>
+        <span class="k">assert</span> <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;RK schemes are direct solvers. Please perform only 1 iteration!&quot;</span>
+
+        <span class="c1"># get number of collocation nodes for easier access</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
+
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+            <span class="c1"># build rhs, consisting of the known values from above and new values from previous nodes (at k+1)</span>
+            <span class="n">rhs</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">rhs</span> <span class="o">+=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_full_f</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+
+            <span class="c1"># implicit solve with prefactor stemming from the diagonal of Qd, use previous stage as initial guess</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span>
+                    <span class="n">rhs</span><span class="p">,</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">lvl</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">rhs</span>
+
+            <span class="c1"># update function values (we don&#39;t usually need to evaluate the RHS at the solution of the step)</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">lvl</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># indicate presence of new values at this level</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="RungeKutta.compute_end_point">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.compute_end_point">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        In this Runge-Kutta implementation, the solution to the step is always stored in the last node</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+
+        <span class="k">if</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="p">)</span> <span class="o">==</span> <span class="n">ButcherTableauEmbedded</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">u_secondary</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">globally_stiffly_accurate</span><span class="p">:</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="p">)</span> <span class="o">==</span> <span class="n">ButcherTableauEmbedded</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">u_secondary</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">w2</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">u_secondary</span> <span class="o">+=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="n">w2</span> <span class="o">*</span> <span class="n">k</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="p">)</span> <span class="o">==</span> <span class="n">ButcherTableau</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">w</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                    <span class="n">lvl</span><span class="o">.</span><span class="n">uend</span> <span class="o">+=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="n">w</span> <span class="o">*</span> <span class="n">k</span>
+            <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="p">)</span> <span class="o">==</span> <span class="n">ButcherTableauEmbedded</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">u_secondary</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">w1</span><span class="p">,</span> <span class="n">w2</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                    <span class="n">lvl</span><span class="o">.</span><span class="n">uend</span> <span class="o">+=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="n">w1</span> <span class="o">*</span> <span class="n">k</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">u_secondary</span> <span class="o">+=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="n">w2</span> <span class="o">*</span> <span class="n">k</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">level</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the current level</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pySDC.Level.level: Current level</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__level</span>
+
+    <span class="nd">@level</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lvl</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets a reference to the current level (done in the initialization of the level)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lvl (pySDC.Level.level): Current level</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lvl</span><span class="p">,</span> <span class="n">Level</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;You tried to set the sweeper&#39;s level with an instance of </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">lvl</span><span class="p">)</span><span class="si">}</span><span class="s2">!&quot;</span>
+        <span class="k">if</span> <span class="n">lvl</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restol</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restol</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s1">&#39;Overwriting residual tolerance with -1 because RK methods are direct and hence may not compute a residual at all!&#39;</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__level</span> <span class="o">=</span> <span class="n">lvl</span>
+
+<div class="viewcode-block" id="RungeKutta.predict">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.predict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predictor to fill values at nodes before first sweep</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># get current level and problem</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span>
+
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="c1"># indicate that this level is now ready for sweeps</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">unlocked</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="RungeKuttaIMEX">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RungeKuttaIMEX</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implicit-explicit split Runge Kutta base class. Only supports methods that share the nodes and weights.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">matrix_explicit</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">weights_explicit</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ButcherTableauClass_explicit</span> <span class="o">=</span> <span class="n">ButcherTableau</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization routine</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            params: parameters for the sweeper</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">weights_explicit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights_explicit</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights_explicit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coll_explicit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Butcher_tableau_explicit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">QE</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll_explicit</span><span class="o">.</span><span class="n">Qmat</span>
+
+<div class="viewcode-block" id="RungeKuttaIMEX.predict">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX.predict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predictor to fill values at nodes before first sweep</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># get current level and problem</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span>
+
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="c1"># indicate that this level is now ready for sweeps</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">unlocked</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="RungeKuttaIMEX.get_Butcher_tableau_explicit">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX.get_Butcher_tableau_explicit">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_Butcher_tableau_explicit</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ButcherTableauClass_explicit</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">weights_explicit</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">matrix_explicit</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RungeKuttaIMEX.integrate">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX.integrate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Integrates the right-hand side</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list of dtype_u: containing the integral as values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># get current level and problem</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># integrate RHS over all collocation nodes</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># new instance of dtype_u, initialize values with 0</span>
+            <span class="n">me</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">me</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll_explicit</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">expl</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+
+
+<div class="viewcode-block" id="RungeKuttaIMEX.update_nodes">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX.update_nodes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the u- and f-values at the collocation nodes</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># get current level and problem</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span>
+
+        <span class="c1"># only if the level has been touched before</span>
+        <span class="k">assert</span> <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">unlocked</span>
+        <span class="k">assert</span> <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;RK schemes are direct solvers. Please perform only 1 iteration!&quot;</span>
+
+        <span class="c1"># get number of collocation nodes for easier access</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
+
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+            <span class="c1"># build rhs, consisting of the known values from above and new values from previous nodes (at k+1)</span>
+            <span class="n">rhs</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">rhs</span> <span class="o">+=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">QE</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">expl</span><span class="p">)</span>
+
+            <span class="c1"># implicit solve with prefactor stemming from the diagonal of Qd, use previous stage as initial guess</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span>
+                    <span class="n">rhs</span><span class="p">,</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">lvl</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">rhs</span><span class="p">[:]</span>
+
+            <span class="c1"># update function values</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">lvl</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># indicate presence of new values at this level</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="RungeKuttaIMEX.compute_end_point">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX.compute_end_point">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        In this Runge-Kutta implementation, the solution to the step is always stored in the last node</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+
+        <span class="k">if</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="p">)</span> <span class="o">==</span> <span class="n">ButcherTableauEmbedded</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">u_secondary</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">globally_stiffly_accurate</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll_explicit</span><span class="o">.</span><span class="n">globally_stiffly_accurate</span><span class="p">:</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="p">)</span> <span class="o">==</span> <span class="n">ButcherTableauEmbedded</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">u_secondary</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">w2</span><span class="p">,</span> <span class="n">w2E</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll_explicit</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">u_secondary</span> <span class="o">+=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="p">(</span><span class="n">w2</span> <span class="o">*</span> <span class="n">k</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="n">w2E</span> <span class="o">*</span> <span class="n">k</span><span class="o">.</span><span class="n">expl</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="p">)</span> <span class="o">==</span> <span class="n">ButcherTableau</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">w</span><span class="p">,</span> <span class="n">wE</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll_explicit</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                    <span class="n">lvl</span><span class="o">.</span><span class="n">uend</span> <span class="o">+=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="n">k</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="n">wE</span> <span class="o">*</span> <span class="n">k</span><span class="o">.</span><span class="n">expl</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="p">)</span> <span class="o">==</span> <span class="n">ButcherTableauEmbedded</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">u_secondary</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">w1</span><span class="p">,</span> <span class="n">w2</span><span class="p">,</span> <span class="n">w1E</span><span class="p">,</span> <span class="n">w2E</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">coll_explicit</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">coll_explicit</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                <span class="p">):</span>
+                    <span class="n">lvl</span><span class="o">.</span><span class="n">uend</span> <span class="o">+=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="p">(</span><span class="n">w1</span> <span class="o">*</span> <span class="n">k</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="n">w1E</span> <span class="o">*</span> <span class="n">k</span><span class="o">.</span><span class="n">expl</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">u_secondary</span> <span class="o">+=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="p">(</span><span class="n">w2</span> <span class="o">*</span> <span class="n">k</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="n">w2E</span> <span class="o">*</span> <span class="n">k</span><span class="o">.</span><span class="n">expl</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ForwardEuler">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ForwardEuler">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ForwardEuler</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Forward Euler. Still a classic.</span>
+
+<span class="sd">    Not very stable first order method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;FE&quot;</span><span class="p">]()</span>
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="BackwardEuler">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.BackwardEuler">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BackwardEuler</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Backward Euler. A favorite among true connoisseurs of the heat equation.</span>
+
+<span class="sd">    A-stable first order method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;BE&quot;</span><span class="p">]()</span>
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="IMEXEuler">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.IMEXEuler">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">IMEXEuler</span><span class="p">(</span><span class="n">RungeKuttaIMEX</span><span class="p">):</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">BackwardEuler</span><span class="o">.</span><span class="n">nodes</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">BackwardEuler</span><span class="o">.</span><span class="n">weights</span>
+
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">BackwardEuler</span><span class="o">.</span><span class="n">matrix</span>
+    <span class="n">matrix_explicit</span> <span class="o">=</span> <span class="n">ForwardEuler</span><span class="o">.</span><span class="n">matrix</span></div>
+
+
+
+<div class="viewcode-block" id="CrankNicolson">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.CrankNicolson">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CrankNicolson</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implicit Runge-Kutta method of second order, A-stable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;CN&quot;</span><span class="p">]()</span>
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="ExplicitMidpointMethod">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExplicitMidpointMethod</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Explicit Runge-Kutta method of second order.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;RK2&quot;</span><span class="p">]()</span>
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="ImplicitMidpointMethod">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ImplicitMidpointMethod</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implicit Runge-Kutta method of second order.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;IMP&quot;</span><span class="p">]()</span>
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="RK4">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RK4">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RK4</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Explicit Runge-Kutta of fourth order: Everybody&#39;s darling.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;RK4&quot;</span><span class="p">]()</span>
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="Heun_Euler">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Heun_Euler</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Second order explicit embedded Runge-Kutta method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;HEUN&quot;</span><span class="p">]()</span>
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">_weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">()</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">_weights</span><span class="p">)))</span>
+    <span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_weights</span>
+    <span class="n">weights</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Heun_Euler.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">2</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Cash_Karp">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Cash_Karp">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Cash_Karp</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fifth order explicit embedded Runge-Kutta. See [here](https://doi.org/10.1145/79505.79507).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;CashKarp&quot;</span><span class="p">]()</span>
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">(</span><span class="n">embedded</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+
+<div class="viewcode-block" id="Cash_Karp.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">5</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="DIRK43">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.DIRK43">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DIRK43</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Embedded A-stable diagonally implicit RK pair of order 3 and 4.</span>
+
+<span class="sd">    Taken from [here](https://doi.org/10.1007/BF01934920).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;EDIRK43&quot;</span><span class="p">]()</span>
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">(</span><span class="n">embedded</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+
+<div class="viewcode-block" id="DIRK43.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.DIRK43.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">4</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="DIRK43_2">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.DIRK43_2">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DIRK43_2</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    L-stable Diagonally Implicit RK method with four stages of order 3.</span>
+<span class="sd">    Taken from [here](https://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;DIRK43&quot;</span><span class="p">]()</span>
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="EDIRK4">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.EDIRK4">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EDIRK4</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stiffly accurate, fourth-order EDIRK with four stages. Taken from</span>
+<span class="sd">    [here](https://ntrs.nasa.gov/citations/20160005923), second one in eq. (216).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;EDIRK4&quot;</span><span class="p">]()</span>
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="ESDIRK53">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ESDIRK53">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ESDIRK53</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A-stable embedded RK pair of orders 5 and 3, ESDIRK5(3)6L[2]SA.</span>
+<span class="sd">    Taken from [here](https://ntrs.nasa.gov/citations/20160005923)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;ESDIRK53&quot;</span><span class="p">]()</span>
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">(</span><span class="n">embedded</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+
+<div class="viewcode-block" id="ESDIRK53.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ESDIRK53.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">4</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ESDIRK43">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ESDIRK43">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ESDIRK43</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A-stable embedded RK pair of orders 4 and 3, ESDIRK4(3)6L[2]SA.</span>
+<span class="sd">    Taken from [here](https://ntrs.nasa.gov/citations/20160005923)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;ESDIRK43&quot;</span><span class="p">]()</span>
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">(</span><span class="n">embedded</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+
+<div class="viewcode-block" id="ESDIRK43.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ESDIRK43.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">4</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ARK548L2SAERK">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ARK548L2SAERK</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Explicit part of the ARK54 scheme.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;ARK548L2SAERK&quot;</span><span class="p">]()</span>
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">(</span><span class="n">embedded</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+
+<div class="viewcode-block" id="ARK548L2SAERK.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">5</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ARK548L2SAESDIRK">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ARK548L2SAESDIRK</span><span class="p">(</span><span class="n">ARK548L2SAERK</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implicit part of the ARK54 scheme. Be careful with the embedded scheme. It seems that both schemes are order 5 as opposed to 5 and 4 as claimed. This may cause issues when doing adaptive time-stepping.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator_IMP</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;ARK548L2SAESDIRK&quot;</span><span class="p">]()</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator_IMP</span><span class="o">.</span><span class="n">Q</span></div>
+
+
+
+<div class="viewcode-block" id="ARK54">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK54">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ARK54</span><span class="p">(</span><span class="n">RungeKuttaIMEX</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Pair of pairs of ARK5(4)8L[2]SA-ERK and ARK5(4)8L[2]SA-ESDIRK from [here](https://doi.org/10.1016/S0168-9274(02)00138-1).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+    <span class="n">ButcherTableauClass_explicit</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">ARK548L2SAERK</span><span class="o">.</span><span class="n">nodes</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">ARK548L2SAERK</span><span class="o">.</span><span class="n">weights</span>
+
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">ARK548L2SAESDIRK</span><span class="o">.</span><span class="n">matrix</span>
+    <span class="n">matrix_explicit</span> <span class="o">=</span> <span class="n">ARK548L2SAERK</span><span class="o">.</span><span class="n">matrix</span>
+
+<div class="viewcode-block" id="ARK54.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK54.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">5</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ARK548L2SAESDIRK2">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ARK548L2SAESDIRK2</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stiffly accurate singly diagonally L-stable implicit embedded Runge-Kutta pair of orders 5 and 4 with explicit first stage from [here](https://doi.org/10.1016/j.apnum.2018.10.007).</span>
+<span class="sd">    This method is part of the IMEX method ARK548L2SA.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;ARK548L2SAESDIRK2&quot;</span><span class="p">]()</span>
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">(</span><span class="n">embedded</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+
+<div class="viewcode-block" id="ARK548L2SAESDIRK2.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">5</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ARK548L2SAERK2">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK2">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ARK548L2SAERK2</span><span class="p">(</span><span class="n">ARK548L2SAESDIRK2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Explicit embedded pair of Runge-Kutta methods of orders 5 and 4 from [here](https://doi.org/10.1016/j.apnum.2018.10.007).</span>
+<span class="sd">    This method is part of the IMEX method ARK548L2SA.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator_EXP</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;ARK548L2SAERK2&quot;</span><span class="p">]()</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator_EXP</span><span class="o">.</span><span class="n">Q</span></div>
+
+
+
+<div class="viewcode-block" id="ARK548L2SA">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SA">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ARK548L2SA</span><span class="p">(</span><span class="n">RungeKuttaIMEX</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    IMEX Runge-Kutta method of order 5 based on the explicit method ARK548L2SAERK2 and the implicit method</span>
+<span class="sd">    ARK548L2SAESDIRK2 from [here](https://doi.org/10.1016/j.apnum.2018.10.007).</span>
+
+<span class="sd">    According to Kennedy and Carpenter (see reference), the two IMEX RK methods of order 5 are the only ones available</span>
+<span class="sd">    as of now. And we are not aware of higher order ones. This one is newer then the other one and apparently better.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+    <span class="n">ButcherTableauClass_explicit</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">ARK548L2SAERK2</span><span class="o">.</span><span class="n">nodes</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">ARK548L2SAERK2</span><span class="o">.</span><span class="n">weights</span>
+
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">ARK548L2SAESDIRK2</span><span class="o">.</span><span class="n">matrix</span>
+    <span class="n">matrix_explicit</span> <span class="o">=</span> <span class="n">ARK548L2SAERK2</span><span class="o">.</span><span class="n">matrix</span>
+
+<div class="viewcode-block" id="ARK548L2SA.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SA.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">5</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ARK324L2SAERK">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK324L2SAERK">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ARK324L2SAERK</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;ARK324L2SAERK&quot;</span><span class="p">]()</span>
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">(</span><span class="n">embedded</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+
+<div class="viewcode-block" id="ARK324L2SAERK.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK324L2SAERK.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">3</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ARK324L2SAESDIRK">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK324L2SAESDIRK">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ARK324L2SAESDIRK</span><span class="p">(</span><span class="n">ARK324L2SAERK</span><span class="p">):</span>
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;ARK324L2SAESDIRK&quot;</span><span class="p">]()</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">Q</span></div>
+
+
+
+<div class="viewcode-block" id="ARK32">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK32">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ARK32</span><span class="p">(</span><span class="n">RungeKuttaIMEX</span><span class="p">):</span>
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+    <span class="n">ButcherTableauClass_explicit</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">ARK324L2SAESDIRK</span><span class="o">.</span><span class="n">nodes</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">ARK324L2SAESDIRK</span><span class="o">.</span><span class="n">weights</span>
+
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">ARK324L2SAESDIRK</span><span class="o">.</span><span class="n">matrix</span>
+    <span class="n">matrix_explicit</span> <span class="o">=</span> <span class="n">ARK324L2SAERK</span><span class="o">.</span><span class="n">matrix</span>
+
+<div class="viewcode-block" id="ARK32.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK32.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">3</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ARK2">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK2">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ARK2</span><span class="p">(</span><span class="n">RungeKuttaIMEX</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Second order two stage singly diagonally implicit globally stiffly accurate IMEX RK method with explicit first stage.</span>
+<span class="sd">    Can be used to integrate simple DAEs because explicit and implicit part are both stiffly accurate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator_IMP</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;ARK222EDIRK&quot;</span><span class="p">]()</span>
+    <span class="n">generator_EXP</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;ARK222ERK&quot;</span><span class="p">]()</span>
+
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator_IMP</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">()</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">weights_explicit</span><span class="p">,</span> <span class="n">matrix_explicit</span> <span class="o">=</span> <span class="n">generator_EXP</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="ARK3">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK3">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ARK3</span><span class="p">(</span><span class="n">RungeKuttaIMEX</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Third order four stage singly diagonally implicit globally stiffly accurate IMEX RK method with explicit first stage.</span>
+<span class="sd">    Can be used to integrate simple DAEs because explicit and implicit part are both stiffly accurate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">generator_IMP</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;ARK443ESDIRK&quot;</span><span class="p">]()</span>
+    <span class="n">generator_EXP</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">&quot;ARK443ERK&quot;</span><span class="p">]()</span>
+
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator_IMP</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">()</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">weights_explicit</span><span class="p">,</span> <span class="n">matrix_explicit</span> <span class="o">=</span> <span class="n">generator_EXP</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">()</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.Runge_Kutta</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

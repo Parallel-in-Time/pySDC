@@ -1,0 +1,7 @@
+implementations.problem\_classes.HeatFiredrake module
+=====================================================
+
+.. automodule:: implementations.problem_classes.HeatFiredrake
+   :members:
+   :show-inheritance:
+   :undoc-members:

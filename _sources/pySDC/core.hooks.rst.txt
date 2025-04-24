@@ -1,0 +1,7 @@
+core.hooks module
+=================
+
+.. automodule:: core.hooks
+   :members:
+   :show-inheritance:
+   :undoc-members:

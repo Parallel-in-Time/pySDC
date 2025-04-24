@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Performance analysis of pySDC &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=81710850"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Parallel-in-time simulation for multi-modal energy systems" href="PinTSimE.html" />
+    <link rel="prev" title="Allen-Cahn problems from Bayreuth" href="AllenCahn_Bayreuth.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="PinTSimE.html" title="Parallel-in-time simulation for multi-modal energy systems"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="AllenCahn_Bayreuth.html" title="Allen-Cahn problems from Bayreuth"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Performance analysis of pySDC</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="performance-analysis-of-pysdc">
+<h1>Performance analysis of pySDC<a class="headerlink" href="#performance-analysis-of-pysdc" title="Link to this heading">¶</a></h1>
+<p>In this project, benchmark and analyze pySDC using tools like JUBE, Score-P, VAMPIR and CUBE.
+The goal is to verify the controllers and to understand the parallel performance of space-time parallel runs.
+This code is in parts used for the publication “Performance tools for parallel-in-time integration with pySDC”.
+Warning: This project is not tested during CI/CD, since it relies on the HPC system JURECA at JSC.</p>
+<section id="python-codes">
+<h2>Python codes<a class="headerlink" href="#python-codes" title="Link to this heading">¶</a></h2>
+<p>The main code used for the analysis is the script <code class="docutils literal notranslate"><span class="pre">run_simple_forcing_benchmark.py</span></code>, taken from the Allen-Cahn project.
+It can run parallel in space (with FFTs) and parallel in time.
+For tracing with manual instrumentation, we modify the MPI-based controller so that regions of interest are defined (fine sweep, coarse sweep, transfer etc.).
+In addition, the script <code class="docutils literal notranslate"><span class="pre">visualize.py</span></code> helps to show the results of the benchmarks using matplotlib.</p>
+</section>
+<section id="jobscripts">
+<h2>Jobscripts<a class="headerlink" href="#jobscripts" title="Link to this heading">¶</a></h2>
+<p>In order to run the code, JUBE is primarily used.
+For this, xml-files are needed to specify the parameter spaces for JUBE to run (number of processes, type of implementation etc.).
+These are given by <code class="docutils literal notranslate"><span class="pre">jube_run_pySDC_AC_space.xml</span></code> and <code class="docutils literal notranslate"><span class="pre">jube_run_pySDC_AC_spacetime.xml</span></code>.
+In addition, a jobscript template is used which is changed by JUBE for each run, see <code class="docutils literal notranslate"><span class="pre">run_pySDC_AC.tmpl</span></code>.
+There is also a stand-alone jobscript (<code class="docutils literal notranslate"><span class="pre">run_pySDC_AC.exe</span></code>) as well as one for usage with Score-P (<code class="docutils literal notranslate"><span class="pre">run_pySDC_AC_scorep.exe</span></code>).
+The use of Score-P and JUBE on JURECA is described in the two howto-files.</p>
+</section>
+<section id="results">
+<h2>Results<a class="headerlink" href="#results" title="Link to this heading">¶</a></h2>
+<p>The project already contains some output files, where traces have been visualized using VAMPIR.
+For this, there is also a VAMPIR settings file available to help reproducing the pictures.</p>
+<p>Full codes: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/Performance">pySDC/projects/Performance/</a></p>
+<p>Results:</p>
+<a class="reference internal image-reference" href="../_images/vampir_traces_pySDC_AC_4x1_intel_default_v2.png"><img alt="../_images/vampir_traces_pySDC_AC_4x1_intel_default_v2.png" src="../_images/vampir_traces_pySDC_AC_4x1_intel_default_v2.png" style="width: 3102.0px; height: 1190.0px;" />
+</a>
+<a class="reference internal image-reference" href="../_images/vampir_traces_pySDC_AC_4x1_intel_v2.png"><img alt="../_images/vampir_traces_pySDC_AC_4x1_intel_v2.png" src="../_images/vampir_traces_pySDC_AC_4x1_intel_v2.png" style="width: 3102.0px; height: 1190.0px;" />
+</a>
+<a class="reference internal image-reference" href="../_images/vampir_traces_pySDC_AC_4x1_ps_v2.png"><img alt="../_images/vampir_traces_pySDC_AC_4x1_ps_v2.png" src="../_images/vampir_traces_pySDC_AC_4x1_ps_v2.png" style="width: 3102.0px; height: 1190.0px;" />
+</a>
+<a class="reference internal image-reference" href="../_images/vampir_traces_pySDC_AC_4x2_intel_v2.png"><img alt="../_images/vampir_traces_pySDC_AC_4x2_intel_v2.png" src="../_images/vampir_traces_pySDC_AC_4x2_intel_v2.png" style="width: 3102.0px; height: 1190.0px;" />
+</a>
+<a class="reference internal image-reference" href="../_images/vampir_traces_pySDC_AC_4x2_ps_v2.png"><img alt="../_images/vampir_traces_pySDC_AC_4x2_ps_v2.png" src="../_images/vampir_traces_pySDC_AC_4x2_ps_v2.png" style="width: 3102.0px; height: 1190.0px;" />
+</a>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Performance analysis of pySDC</a><ul>
+<li><a class="reference internal" href="#python-codes">Python codes</a></li>
+<li><a class="reference internal" href="#jobscripts">Jobscripts</a></li>
+<li><a class="reference internal" href="#results">Results</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="AllenCahn_Bayreuth.html"
+                          title="previous chapter">Allen-Cahn problems from Bayreuth</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="PinTSimE.html"
+                          title="next chapter">Parallel-in-time simulation for multi-modal energy systems</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/projects/performance.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="PinTSimE.html" title="Parallel-in-time simulation for multi-modal energy systems"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="AllenCahn_Bayreuth.html" title="Allen-Cahn problems from Bayreuth"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Performance analysis of pySDC</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

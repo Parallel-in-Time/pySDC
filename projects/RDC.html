@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>RDC: Rational Deferred Corrections &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=81710850"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Asymptotic convergence of PFASST" href="asymp_conv.html" />
+    <link rel="prev" title="Fast-Wave-Slow-Wave SDC" href="fwsw.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="asymp_conv.html" title="Asymptotic convergence of PFASST"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fwsw.html" title="Fast-Wave-Slow-Wave SDC"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">RDC: Rational Deferred Corrections</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="rdc-rational-deferred-corrections">
+<h1>RDC: Rational Deferred Corrections<a class="headerlink" href="#rdc-rational-deferred-corrections" title="Link to this heading">¶</a></h1>
+<p>In this project, we integrate the rational deferred correction (RDC) method by Guettel &amp; Klein from <a class="reference external" href="http://etna.mcs.kent.edu/volumes/2011-2020/vol41/abstract.php?vol=41&amp;pages=443-464">this paper</a>.
+This is done by deriving from the equidistant collocation class, but replacing Scipy’s standard BarycentricInterpolator with a custom <code class="docutils literal notranslate"><span class="pre">MyBarycentricInterpolator</span></code>, where the blended nodes are used.
+The rest is standard pySDC and all features are available.</p>
+<section id="testing-rdc-convergence">
+<h2>Testing RDC convergence<a class="headerlink" href="#testing-rdc-convergence" title="Link to this heading">¶</a></h2>
+<p>In a first test we try to reproduce parts of Figure 4.5 (left) of the original paper.
+We compute a high-resolution reference for Van der Pol’s oscillator with SDC, see <code class="docutils literal notranslate"><span class="pre">vanderpol_reference.py</span></code>.
+Then, for RDC we use <code class="docutils literal notranslate"><span class="pre">d=15</span></code> for the blending parameter and vary the number of maximum iterations from 1 to 10.
+The results can be found in <code class="docutils literal notranslate"><span class="pre">vanderpol_error_test.py</span></code></p>
+</section>
+<section id="multi-level-rdc-and-pfasst-with-rdc">
+<h2>Multi-level RDC and PFASST with RDC<a class="headerlink" href="#multi-level-rdc-and-pfasst-with-rdc" title="Link to this heading">¶</a></h2>
+<p>The obvious next step is to try the multi-level variant of RDC as well as a PFASST-version of RDC.
+Both are not straightforward and it seems that only for smaller numbers of nodes multi-level RDC does actually converge,
+at least if collocation-based coarsening is used. Yet, in <code class="docutils literal notranslate"><span class="pre">vanderpol_MLSDC_PFASST_test.py</span></code> we show one example where the errors as well as the mean number of iterations look fine.
+Note that we use very aggressive node coarsening here, going from 20 to 2 nodes.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">RDC: Rational Deferred Corrections</a><ul>
+<li><a class="reference internal" href="#testing-rdc-convergence">Testing RDC convergence</a></li>
+<li><a class="reference internal" href="#multi-level-rdc-and-pfasst-with-rdc">Multi-level RDC and PFASST with RDC</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="fwsw.html"
+                          title="previous chapter">Fast-Wave-Slow-Wave SDC</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="asymp_conv.html"
+                          title="next chapter">Asymptotic convergence of PFASST</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/projects/RDC.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="asymp_conv.html" title="Asymptotic convergence of PFASST"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fwsw.html" title="Fast-Wave-Slow-Wave SDC"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">RDC: Rational Deferred Corrections</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

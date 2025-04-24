@@ -1,0 +1,1 @@
+.. include:: /../../pySDC/projects/parallelSDC/README.rst

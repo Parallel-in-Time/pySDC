@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.problem_classes.RayleighBenard module &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=81710850"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.problem_classes.TestEquation_0D module" href="implementations.problem_classes.TestEquation_0D.html" />
+    <link rel="prev" title="implementations.problem_classes.Quench module" href="implementations.problem_classes.Quench.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.TestEquation_0D.html" title="implementations.problem_classes.TestEquation_0D module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.Quench.html" title="implementations.problem_classes.Quench module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.RayleighBenard module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.problem_classes.RayleighBenard">
+<span id="implementations-problem-classes-rayleighbenard-module"></span><h1>implementations.problem_classes.RayleighBenard module<a class="headerlink" href="#module-implementations.problem_classes.RayleighBenard" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.CFLLimit">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CFLLimit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#CFLLimit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.CFLLimit" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ConvergenceController</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.CFLLimit.compute_max_step_size">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compute_max_step_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#CFLLimit.compute_max_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.CFLLimit.compute_max_step_size" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.CFLLimit.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#CFLLimit.dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.CFLLimit.dependencies" title="Link to this definition">¶</a></dt>
+<dd><p>Load dependencies on other convergence controllers here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.CFLLimit.get_new_step_size">
+<span class="sig-name descname"><span class="pre">get_new_step_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#CFLLimit.get_new_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.CFLLimit.get_new_step_size" title="Link to this definition">¶</a></dt>
+<dd><p>This function allows to set a step size with arbitrary criteria.
+Make sure to give an order to the convergence controller by setting the <cite>control_order</cite> variable in the params.
+This variable is an integer and you can see what the current order is by using
+<cite>controller.print_convergence_controllers()</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.CFLLimit.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#CFLLimit.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.CFLLimit.setup" title="Link to this definition">¶</a></dt>
+<dd><p>Define default parameters here.</p>
+<dl class="simple">
+<dt>Default parameters are:</dt><dd><ul class="simple">
+<li><p>control_order (int): The order relative to other convergence controllers</p></li>
+<li><p>dt_max (float): maximal step size</p></li>
+<li><p>dt_min (float): minimal step size</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated params dictionary</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.CFLLimit.setup_status_variables">
+<span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#CFLLimit.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.CFLLimit.setup_status_variables" title="Link to this definition">¶</a></dt>
+<dd><p>Add the embedded error variable to the error function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.LogAnalysisVariables">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LogAnalysisVariables</span></span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#LogAnalysisVariables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.LogAnalysisVariables" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Hooks</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.LogAnalysisVariables.post_step">
+<span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#LogAnalysisVariables.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.LogAnalysisVariables.post_step" title="Link to this definition">¶</a></dt>
+<dd><p>Record Nusselt numbers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.LogCFL">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LogCFL</span></span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#LogCFL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.LogCFL" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Hooks</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.LogCFL.post_step">
+<span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#LogCFL.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.LogCFL.post_step" title="Link to this definition">¶</a></dt>
+<dd><p>Record CFL limit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RayleighBenard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Prandtl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rayleigh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BCs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dealiasing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericSpectralLinear</span></code></p>
+<p>Rayleigh-Benard Convection is a variation of incompressible Navier-Stokes.</p>
+<p>The equations we solve are</p>
+<blockquote>
+<div><p>u_x + v_z = 0
+T_t - kappa (T_xx + T_zz) = -uT_x - vT_z
+u_t - nu (u_xx + u_zz) + p_x = -uu_x - vu_z
+v_t - nu (v_xx + v_zz) + p_z - T = -uv_x - vv_z</p>
+</div></blockquote>
+<p>with u the horizontal velocity, v the vertical velocity (in z-direction), T the temperature, p the pressure, indices
+denoting derivatives, kappa=(Rayleigh * Prandtl)**(-1/2) and nu = (Rayleigh / Prandtl)**(-1/2). Everything on the left
+hand side, that is the viscous part, the pressure gradient and the buoyancy due to temperature are treated
+implicitly, while the non-linear convection part on the right hand side is integrated explicitly.</p>
+<p>The domain, vertical boundary conditions and pressure gauge are</p>
+<blockquote>
+<div><p>Omega = [0, 8) x (-1, 1)
+T(z=+1) = 0
+T(z=-1) = 2
+u(z=+-1) = v(z=+-1) = 0
+integral over p = 0</p>
+</div></blockquote>
+<p>The spectral discretization uses FFT horizontally, implying periodic BCs, and an ultraspherical method vertically to
+facilitate the Dirichlet BCs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Prandtl</strong> (<em>float</em>) – Prandtl number</p></li>
+<li><p><strong>Rayleigh</strong> (<em>float</em>) – Rayleigh number</p></li>
+<li><p><strong>nx</strong> (<em>int</em>) – Horizontal resolution</p></li>
+<li><p><strong>nz</strong> (<em>int</em>) – Vertical resolution</p></li>
+<li><p><strong>BCs</strong> (<em>dict</em>) – Can specify boundary conditions here</p></li>
+<li><p><strong>dealiasing</strong> (<em>float</em>) – Dealiasing factor for evaluating the non-linear part</p></li>
+<li><p><strong>comm</strong> (<em>mpi4py.Intracomm</em>) – Space communicator</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.apply_BCs">
+<span class="sig-name descname"><span class="pre">apply_BCs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.apply_BCs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.apply_BCs" title="Link to this definition">¶</a></dt>
+<dd><p>Enforce the Dirichlet BCs at the top and bottom for arbitrary solution.
+The function modifies the last two modes of u, v, and T in order to achieve this.
+Note that the pressure is not modified here and the Nyquist mode is not altered either.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sol</strong> – Some solution that does not need to enforce boundary conditions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Modified version of the solution that satisfies Dirichlet BCs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.compute_Nusselt_numbers">
+<span class="sig-name descname"><span class="pre">compute_Nusselt_numbers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.compute_Nusselt_numbers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_Nusselt_numbers" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the various versions of the Nusselt number. This reflects the type of heat transport.
+If the Nusselt number is equal to one, it indicates heat transport due to conduction. If it is larger,
+advection is present.
+Computing the Nusselt number at various places can be used to check the code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>u</strong> – The solution you want to compute the Nusselt numbers of</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nusselt number averaged over the entire volume and horizontally averaged at the top and bottom.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.compute_buoyancy_generation">
+<span class="sig-name descname"><span class="pre">compute_buoyancy_generation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.compute_buoyancy_generation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_buoyancy_generation" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.compute_viscous_dissipation">
+<span class="sig-name descname"><span class="pre">compute_viscous_dissipation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.compute_viscous_dissipation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_viscous_dissipation" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.compute_vorticity">
+<span class="sig-name descname"><span class="pre">compute_vorticity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.compute_vorticity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_vorticity" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_f" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.eval_f" title="Link to this definition">¶</a></dt>
+<dd><p>Abstract interface to RHS computation of the ODE</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – The RHS values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.get_fig">
+<span class="sig-name descname"><span class="pre">get_fig</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.get_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.get_fig" title="Link to this definition">¶</a></dt>
+<dd><p>Get a figure suitable to plot the solution of this problem</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self.fig</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>matplotlib.pyplot.figure.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.plot" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Solution to be plotted</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Time to display at the top of the figure</p></li>
+<li><p><strong>fig</strong> (<em>matplotlib.pyplot.figure.Figure</em>) – Figure with the same structure as a figure generated by <cite>self.get_fig</cite>. If none is supplied, a new figure will be generated.</p></li>
+<li><p><strong>quantity</strong> (<em>(</em><em>str</em><em>)</em>) – quantity you want to plot</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.u_exact">
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.u_exact" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.problem_classes.RayleighBenard module</a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.CFLLimit"><code class="docutils literal notranslate"><span class="pre">CFLLimit</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.CFLLimit.compute_max_step_size"><code class="docutils literal notranslate"><span class="pre">compute_max_step_size()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.CFLLimit.dependencies"><code class="docutils literal notranslate"><span class="pre">dependencies()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.CFLLimit.get_new_step_size"><code class="docutils literal notranslate"><span class="pre">get_new_step_size()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.CFLLimit.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.CFLLimit.setup_status_variables"><code class="docutils literal notranslate"><span class="pre">setup_status_variables()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.LogAnalysisVariables"><code class="docutils literal notranslate"><span class="pre">LogAnalysisVariables</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.LogAnalysisVariables.post_step"><code class="docutils literal notranslate"><span class="pre">post_step()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.LogCFL"><code class="docutils literal notranslate"><span class="pre">LogCFL</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.LogCFL.post_step"><code class="docutils literal notranslate"><span class="pre">post_step()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard"><code class="docutils literal notranslate"><span class="pre">RayleighBenard</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.apply_BCs"><code class="docutils literal notranslate"><span class="pre">apply_BCs()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_Nusselt_numbers"><code class="docutils literal notranslate"><span class="pre">compute_Nusselt_numbers()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_buoyancy_generation"><code class="docutils literal notranslate"><span class="pre">compute_buoyancy_generation()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_viscous_dissipation"><code class="docutils literal notranslate"><span class="pre">compute_viscous_dissipation()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_vorticity"><code class="docutils literal notranslate"><span class="pre">compute_vorticity()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.get_fig"><code class="docutils literal notranslate"><span class="pre">get_fig()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.plot"><code class="docutils literal notranslate"><span class="pre">plot()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.Quench.html"
+                          title="previous chapter">implementations.problem_classes.Quench module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.TestEquation_0D.html"
+                          title="next chapter">implementations.problem_classes.TestEquation_0D module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.problem_classes.RayleighBenard.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.TestEquation_0D.html" title="implementations.problem_classes.TestEquation_0D module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.Quench.html" title="implementations.problem_classes.Quench module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.RayleighBenard module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

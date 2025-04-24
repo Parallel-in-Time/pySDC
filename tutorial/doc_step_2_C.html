@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>&lt;no title&gt; &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=81710850"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_2/C_using_pySDCs_frontend.py">pySDC/tutorial/step_2/C_using_pySDCs_frontend.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">heatNd_forced</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span><span class="w"> </span><span class="kn">import</span> <span class="n">imex_1st_order</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to run IMEX SDC for a single time step</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># initialize level parameters</span>
+    <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+    <span class="c1"># initialize sweeper parameters</span>
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1"># initialize problem parameters</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1023</span>  <span class="c1"># number of degrees of freedom</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
+
+    <span class="c1"># initialize step parameters</span>
+    <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+
+    <span class="c1"># initialize controller parameters</span>
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;log_to_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;fname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;data/step_2_C_out.txt&#39;</span>
+
+    <span class="c1"># Fill description dictionary for easy hierarchy creation</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_forced</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imex_1st_order</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+
+    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># instantiate the controller</span>
+    <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+    <span class="c1"># set time parameters</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">Tend</span> <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1"># note that we are requesting 2 time steps here (dt is 0.1)</span>
+
+    <span class="c1"># get initial values on finest level</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+    <span class="n">uinit</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t0</span><span class="p">)</span>
+
+    <span class="c1"># call main function to get things done...</span>
+    <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+
+    <span class="c1"># compute exact solution and compare</span>
+    <span class="n">uex</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">Tend</span><span class="p">)</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uex</span> <span class="o">-</span> <span class="n">uend</span><span class="p">)</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/step_2_C_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Error after SDC iterations: </span><span class="si">%8.6e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="mf">2e-5</span><span class="p">,</span> <span class="s2">&quot;ERROR: controller doing IMEX SDC iteration did not reduce the error enough, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2025-04-24 08:08:46,358 - controller - controller - welcome_message - 147 - INFO: Welcome to the one and only, really very astonishing and 87.3% bug free
+                                 _____ _____   _____ 
+                                / ____|  __ \ / ____|
+                    _ __  _   _| (___ | |  | | |     
+                   | &#39;_ \| | | |\___ \| |  | | |     
+                   | |_) | |_| |____) | |__| | |____ 
+                   | .__/ \__, |_____/|_____/ \_____|
+                   | |     __/ |                     
+                   |_|    |___/                      
+                                                     
+2025-04-24 08:08:46,358 - controller - controller - dump_setup - 161 - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- BEGIN
+2025-04-24 08:08:46,358 - controller - controller - dump_setup - 228 - INFO: ----------------------------------------------------------------------------------------------------
+
+Controller: &lt;class &#39;pySDC.implementations.controller_classes.controller_nonMPI.controller_nonMPI&#39;&gt;
+    all_to_done = False
+    dump_setup = True
+--&gt; fname = data/step_2_C_out.txt
+--&gt; hook_class = [&lt;class &#39;pySDC.implementations.hooks.default_hook.DefaultHooks&#39;&gt;, &lt;class &#39;pySDC.implementations.hooks.log_timings.CPUTimings&#39;&gt;]
+--&gt; log_to_file = True
+    logger_level = 20
+    mssdc_jac = True
+    predict_type = None
+    use_iteration_estimator = False
+
+Step: &lt;class &#39;pySDC.core.step.Step&#39;&gt;
+--&gt; maxiter = 20
+    Number of steps: None
+    Level: &lt;class &#39;pySDC.core.level.Level&#39;&gt;
+        Level  0
+--&gt;         dt = 0.1
+            dt_initial = 0.1
+            nsweeps = 1
+            residual_type = full_abs
+--&gt;         restol = 1e-10
+--&gt;         Problem: &lt;class &#39;pySDC.implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced&#39;&gt;
+--&gt;             bc = dirichlet-zero
+--&gt;             freq = (4,)
+                liniter = 10000
+                lintol = 1e-12
+--&gt;             nu = 0.1
+--&gt;             nvars = (1023,)
+                order = 2
+                sigma = 0.06
+                solver_type = direct
+                stencil_type = center
+--&gt;             Data type u: &lt;class &#39;pySDC.implementations.datatype_classes.mesh.mesh&#39;&gt;
+--&gt;             Data type f: &lt;class &#39;pySDC.implementations.datatype_classes.mesh.imex_mesh&#39;&gt;
+--&gt;             Sweeper: &lt;class &#39;pySDC.implementations.sweeper_classes.imex_1st_order.imex_1st_order&#39;&gt;
+                    QE = EE
+                    QI = IE
+                    do_coll_update = False
+                    initial_guess = spread
+--&gt;                 num_nodes = 3
+--&gt;                 quad_type = RADAU-RIGHT
+                    skip_residual_computation = ()
+--&gt;                 Collocation: &lt;class &#39;pySDC.core.collocation.CollBase&#39;&gt;
+
+Active convergence controllers:
+    |  # | order | convergence controller
+----+----+-------+---------------------------------------------------------------------------------------
+    |  0 |    95 | BasicRestartingNonMPI
+ -&gt; |  1 |   100 | SpreadStepSizesBlockwiseNonMPI
+    |  2 |   200 | CheckConvergence
+
+2025-04-24 08:08:46,359 - controller - controller - dump_setup - 231 - INFO: ----------------------------------------------------------------------------------------------------
+2025-04-24 08:08:46,359 - controller - controller - dump_setup - 233 - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- END
+
+2025-04-24 08:08:46,362 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 4.11190756e-03
+2025-04-24 08:08:46,365 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 6.68442667e-04
+2025-04-24 08:08:46,368 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 8.80377591e-05
+2025-04-24 08:08:46,372 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 1.21707909e-05
+2025-04-24 08:08:46,375 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 1.38272147e-06
+2025-04-24 08:08:46,378 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 6.36445413e-07
+2025-04-24 08:08:46,381 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.68953216e-07
+2025-04-24 08:08:46,384 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 3.52601840e-08
+2025-04-24 08:08:46,387 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 6.07249025e-09
+2025-04-24 08:08:46,390 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 8.27343378e-10
+2025-04-24 08:08:46,393 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 1.18931339e-10
+2025-04-24 08:08:46,396 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 12 -- Sweep:  1 -- residual: 1.48499772e-11
+2025-04-24 08:08:46,400 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 6.69984764e-03
+2025-04-24 08:08:46,403 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 1.05518433e-03
+2025-04-24 08:08:46,406 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 1.40642621e-04
+2025-04-24 08:08:46,409 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 1.85982063e-05
+2025-04-24 08:08:46,412 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 2.79216702e-06
+2025-04-24 08:08:46,415 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.12278839e-06
+2025-04-24 08:08:46,418 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 2.85495353e-07
+2025-04-24 08:08:46,421 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 5.78947003e-08
+2025-04-24 08:08:46,424 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 9.68230621e-09
+2025-04-24 08:08:46,427 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 1.26313315e-09
+2025-04-24 08:08:46,430 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 1.82951499e-10
+2025-04-24 08:08:46,433 - hooks - default_hook - post_sweep - 22 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 12 -- Sweep:  1 -- residual: 1.99691114e-11
+2025-04-24 08:08:46,434 - hooks - log_timings - post_run - 290 - INFO: Finished run after 7.52e-02s
+Error after SDC iterations: 1.166689e-05
+</pre></div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/doc_step_2_C.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

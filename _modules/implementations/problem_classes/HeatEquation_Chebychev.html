@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>implementations.problem_classes.HeatEquation_Chebychev &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../../_static/documentation_options.js?v=81710850"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.HeatEquation_Chebychev</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.problem_classes.HeatEquation_Chebychev</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">sparse</span> <span class="k">as</span> <span class="n">sp</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.problem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Problem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.generic_spectral</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenericSpectralLinear</span>
+
+
+<div class="viewcode-block" id="Heat1DChebychev">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Heat1DChebychev</span><span class="p">(</span><span class="n">GenericSpectralLinear</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    1D Heat equation with Dirichlet Boundary conditions discretized on (-1, 1) using a Chebychev spectral method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nvars</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;T2U&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor. `kwargs` are forwarded to parent class constructor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            nvars (int): Resolution</span>
+<span class="sd">            a (float): Left BC value</span>
+<span class="sd">            b (float): Right BC value</span>
+<span class="sd">            f (int): Frequency of the solution</span>
+<span class="sd">            nu (float): Diffusion parameter</span>
+<span class="sd">            mode (&#39;T2T&#39; or &#39;T2U&#39;): Mode for Chebychev method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;nvars&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="s1">&#39;nu&#39;</span><span class="p">,</span> <span class="s1">&#39;mode&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">bases</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="s1">&#39;chebychev&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">nvars</span><span class="p">}]</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;ux&#39;</span><span class="p">]</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">bases</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">real_spectral_coefficients</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">I</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Id</span><span class="p">()</span>
+        <span class="n">Dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_differentiation_matrix</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Dx</span> <span class="o">=</span> <span class="n">Dx</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">T2U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basis_change_matrix</span><span class="p">(</span><span class="n">conv</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+
+        <span class="n">L_lhs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;ux&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">T2U</span> <span class="o">@</span> <span class="n">Dx</span><span class="p">,</span> <span class="s1">&#39;ux&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">T2U</span> <span class="o">@</span> <span class="n">I</span><span class="p">},</span>
+            <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;ux&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">nu</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">T2U</span> <span class="o">@</span> <span class="n">Dx</span><span class="p">)},</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_L</span><span class="p">(</span><span class="n">L_lhs</span><span class="p">)</span>
+
+        <span class="n">M_lhs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">T2U</span> <span class="o">@</span> <span class="n">I</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_M</span><span class="p">(</span><span class="n">M_lhs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;Dirichlet&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;ux&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;Dirichlet&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_BCs</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Heat1DChebychev.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.eval_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_init</span>
+        <span class="n">iu</span><span class="p">,</span> <span class="n">iux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+        <span class="n">u_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dx</span> <span class="o">@</span> <span class="n">u_hat</span><span class="p">[</span><span class="n">iux</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">u_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
+            <span class="n">me</span> <span class="o">=</span> <span class="n">u_hat</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">u_hat</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+
+        <span class="n">f</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="n">me</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="Heat1DChebychev.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.u_exact">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">666</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get exact solution at time `t`</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t (float): When you want the exact solution</span>
+<span class="sd">            noise (float): Add noise of this level</span>
+<span class="sd">            seed (int): Random seed for the noise</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Heat1DChebychev.dtype_u: Exact solution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">xp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span>
+        <span class="n">iu</span><span class="p">,</span> <span class="n">iux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">u_init</span>
+
+        <span class="n">u</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">xp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">xp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
+            <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+            <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="p">)</span>
+        <span class="n">u</span><span class="p">[</span><span class="n">iux</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">xp</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">xp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
+            <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">noise</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="n">_noise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init</span>
+            <span class="n">rng</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+            <span class="n">_noise</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">u</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">noise_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">_noise</span><span class="p">)</span>
+            <span class="n">low_pass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_filter_matrix</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">kmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">noise_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">low_pass</span> <span class="o">@</span> <span class="n">noise_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">noise_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">_noise</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">noise_hat</span><span class="p">)</span>
+            <span class="n">u</span> <span class="o">+=</span> <span class="n">_noise</span> <span class="o">*</span> <span class="n">noise</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_BCs</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init</span>
+            <span class="n">u_hat</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">u_hat</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">u</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Heat1DUltraspherical">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Heat1DUltraspherical</span><span class="p">(</span><span class="n">GenericSpectralLinear</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    1D Heat equation with Dirichlet Boundary conditions discretized on (-1, 1) using an ultraspherical spectral method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nvars</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor. `kwargs` are forwarded to parent class constructor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            nvars (int): Resolution</span>
+<span class="sd">            a (float): Left BC value</span>
+<span class="sd">            b (float): Right BC value</span>
+<span class="sd">            f (int): Frequency of the solution</span>
+<span class="sd">            nu (float): Diffusion parameter</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;nvars&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="s1">&#39;nu&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">bases</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="s1">&#39;ultraspherical&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">nvars</span><span class="p">}]</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">]</span>
+
+        <span class="n">GenericSpectralLinear</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">real_spectral_coefficients</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">I</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Id</span><span class="p">()</span>
+        <span class="n">Dxx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_differentiation_matrix</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,),</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">S2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basis_change_matrix</span><span class="p">(</span><span class="n">p_in</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">p_out</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">U2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basis_change_matrix</span><span class="p">(</span><span class="n">p_in</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">p_out</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Dxx</span> <span class="o">=</span> <span class="n">S2</span> <span class="o">@</span> <span class="n">Dxx</span>
+
+        <span class="n">L_lhs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">nu</span> <span class="o">*</span> <span class="n">Dxx</span><span class="p">},</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_L</span><span class="p">(</span><span class="n">L_lhs</span><span class="p">)</span>
+
+        <span class="n">M_lhs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="n">U2</span> <span class="o">@</span> <span class="n">I</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_M</span><span class="p">(</span><span class="n">M_lhs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;Dirichlet&quot;</span><span class="p">,</span> <span class="n">line</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;Dirichlet&quot;</span><span class="p">,</span> <span class="n">line</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_BCs</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Heat1DUltraspherical.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.eval_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_init</span>
+        <span class="n">iu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+        <span class="n">u_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Dxx</span> <span class="o">@</span> <span class="n">u_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">u_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
+            <span class="n">me</span> <span class="o">=</span> <span class="n">u_hat</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">u_hat</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+
+        <span class="n">f</span><span class="p">[</span><span class="n">iu</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">me</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="Heat1DUltraspherical.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.u_exact">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">666</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get exact solution at time `t`</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t (float): When you want the exact solution</span>
+<span class="sd">            noise (float): Add noise of this level</span>
+<span class="sd">            seed (int): Random seed for the noise</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Heat1DUltraspherical.dtype_u: Exact solution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">xp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span>
+        <span class="n">iu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">u_init</span>
+
+        <span class="n">u</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">xp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">xp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
+            <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+            <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">noise</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="n">_noise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init</span>
+            <span class="n">rng</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+            <span class="n">_noise</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">u</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">noise_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">_noise</span><span class="p">)</span>
+            <span class="n">low_pass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_filter_matrix</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">kmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">noise_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">low_pass</span> <span class="o">@</span> <span class="n">noise_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">noise_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">_noise</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">noise_hat</span><span class="p">)</span>
+            <span class="n">u</span> <span class="o">+=</span> <span class="n">_noise</span> <span class="o">*</span> <span class="n">noise</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_BCs</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">u</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Heat2DChebychev">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Heat2DChebychev</span><span class="p">(</span><span class="n">GenericSpectralLinear</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    2D Heat equation with Dirichlet Boundary conditions discretized on (-1, 1)x(-1,1) using spectral methods based on FFT and Chebychev.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">ny</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">base_x</span><span class="o">=</span><span class="s1">&#39;fft&#39;</span><span class="p">,</span> <span class="n">base_y</span><span class="o">=</span><span class="s1">&#39;chebychev&#39;</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fy</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor. `kwargs` are forwarded to parent class constructor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            nx (int): Resolution in x-direction</span>
+<span class="sd">            ny (int): Resolution in y-direction</span>
+<span class="sd">            base_x (str): Spectral base in x-direction</span>
+<span class="sd">            base_y (str): Spectral base in y-direction</span>
+<span class="sd">            a (float): BC at y=0 and x=-1</span>
+<span class="sd">            b (float): BC at y=0 and x=+1</span>
+<span class="sd">            c (float): BC at y=1 and x = -1</span>
+<span class="sd">            fx (int): Horizontal frequency of initial conditions</span>
+<span class="sd">            fy (int): Vertical frequency of initial conditions</span>
+<span class="sd">            nu (float): Diffusion parameter</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">nx</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">base_x</span> <span class="o">==</span> <span class="s1">&#39;fft&#39;</span>
+        <span class="k">assert</span> <span class="n">ny</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">base_y</span> <span class="o">==</span> <span class="s1">&#39;fft&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
+            <span class="s1">&#39;nx&#39;</span><span class="p">,</span> <span class="s1">&#39;ny&#39;</span><span class="p">,</span> <span class="s1">&#39;base_x&#39;</span><span class="p">,</span> <span class="s1">&#39;base_y&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;fx&#39;</span><span class="p">,</span> <span class="s1">&#39;fy&#39;</span><span class="p">,</span> <span class="s1">&#39;nu&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="n">bases</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="n">base_x</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="n">base_y</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">ny</span><span class="p">}]</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;ux&#39;</span><span class="p">,</span> <span class="s1">&#39;uy&#39;</span><span class="p">]</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">bases</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">Dirichlet_recombination</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">spectral_space</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span>
+
+        <span class="n">I</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Id</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_differentiation_matrix</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_differentiation_matrix</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))</span>
+
+        <span class="n">L_lhs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;ux&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">Dx</span><span class="p">,</span> <span class="s1">&#39;ux&#39;</span><span class="p">:</span> <span class="n">I</span><span class="p">},</span>
+            <span class="s1">&#39;uy&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">Dy</span><span class="p">,</span> <span class="s1">&#39;uy&#39;</span><span class="p">:</span> <span class="n">I</span><span class="p">},</span>
+            <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;ux&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">nu</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dx</span><span class="p">,</span> <span class="s1">&#39;uy&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">nu</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dy</span><span class="p">},</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_L</span><span class="p">(</span><span class="n">L_lhs</span><span class="p">)</span>
+
+        <span class="n">M_lhs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="n">I</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_M</span><span class="p">(</span><span class="n">M_lhs</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="p">[</span><span class="n">base_x</span><span class="p">,</span> <span class="n">base_y</span><span class="p">]:</span>
+            <span class="k">assert</span> <span class="n">base</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;chebychev&#39;</span><span class="p">,</span> <span class="s1">&#39;fft&#39;</span><span class="p">]</span>
+
+        <span class="n">alpha</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">gamma</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+        <span class="k">if</span> <span class="n">base_x</span> <span class="o">==</span> <span class="s1">&#39;chebychev&#39;</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_y</span> <span class="o">==</span> <span class="s1">&#39;fft&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">beta</span> <span class="o">*</span> <span class="n">y</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">+</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;ux&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;ux&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;integral&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Need periodic boundary conditions in x for </span><span class="si">{</span><span class="n">base_x</span><span class="si">}</span><span class="s1"> method!&#39;</span>
+        <span class="k">if</span> <span class="n">base_y</span> <span class="o">==</span> <span class="s1">&#39;chebychev&#39;</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="n">beta</span> <span class="o">+</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;uy&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;uy&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">beta</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;integral&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">c</span> <span class="o">==</span> <span class="n">b</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Need periodic boundary conditions in y for </span><span class="si">{</span><span class="n">base_y</span><span class="si">}</span><span class="s1"> method!&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_BCs</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Heat2DChebychev.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.eval_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_init</span>
+        <span class="n">iu</span><span class="p">,</span> <span class="n">iux</span><span class="p">,</span> <span class="n">iuy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
+
+        <span class="n">me_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init_forward</span>
+        <span class="n">me_hat</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="n">me_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Dx</span> <span class="o">@</span> <span class="n">me_hat</span><span class="p">[</span><span class="n">iux</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dy</span> <span class="o">@</span> <span class="n">me_hat</span><span class="p">[</span><span class="n">iuy</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+            <span class="n">me_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+        <span class="p">)</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">me_hat</span><span class="p">)</span>
+
+        <span class="n">f</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;u&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">me</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">real</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="Heat2DChebychev.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.u_exact">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">xp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span>
+        <span class="n">iu</span><span class="p">,</span> <span class="n">iux</span><span class="p">,</span> <span class="n">iuy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init</span>
+
+        <span class="n">fx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fx</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_x</span> <span class="o">==</span> <span class="s1">&#39;fft&#39;</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fx</span>
+        <span class="n">fy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fy</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_y</span> <span class="o">==</span> <span class="s1">&#39;fft&#39;</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fy</span>
+
+        <span class="n">time_dep</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="p">(</span><span class="n">fx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">fy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
+
+        <span class="n">alpha</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">gamma</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+        <span class="n">u</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">fx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">)</span> <span class="o">*</span> <span class="n">xp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">fy</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">)</span> <span class="o">*</span> <span class="n">time_dep</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">+</span> <span class="n">beta</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">+</span> <span class="n">gamma</span>
+        <span class="n">u</span><span class="p">[</span><span class="n">iux</span><span class="p">]</span> <span class="o">=</span> <span class="n">fx</span> <span class="o">*</span> <span class="n">xp</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">fx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">)</span> <span class="o">*</span> <span class="n">xp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">fy</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">)</span> <span class="o">*</span> <span class="n">time_dep</span> <span class="o">+</span> <span class="n">alpha</span>
+        <span class="n">u</span><span class="p">[</span><span class="n">iuy</span><span class="p">]</span> <span class="o">=</span> <span class="n">fy</span> <span class="o">*</span> <span class="n">xp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">fx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">)</span> <span class="o">*</span> <span class="n">xp</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">fy</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">)</span> <span class="o">*</span> <span class="n">time_dep</span> <span class="o">+</span> <span class="n">beta</span>
+
+        <span class="k">return</span> <span class="n">u</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Heat2DUltraspherical">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Heat2DUltraspherical</span><span class="p">(</span><span class="n">GenericSpectralLinear</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    2D Heat equation with Dirichlet Boundary conditions discretized on (-1, 1)x(-1,1) using spectral methods based on FFT and Gegenbauer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">ny</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">base_x</span><span class="o">=</span><span class="s1">&#39;fft&#39;</span><span class="p">,</span> <span class="n">base_y</span><span class="o">=</span><span class="s1">&#39;ultraspherical&#39;</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fy</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor. `kwargs` are forwarded to parent class constructor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            nx (int): Resolution in x-direction</span>
+<span class="sd">            ny (int): Resolution in y-direction</span>
+<span class="sd">            base_x (str): Spectral base in x-direction</span>
+<span class="sd">            base_y (str): Spectral base in y-direction</span>
+<span class="sd">            a (float): BC at y=0 and x=-1</span>
+<span class="sd">            b (float): BC at y=0 and x=+1</span>
+<span class="sd">            c (float): BC at y=1 and x = -1</span>
+<span class="sd">            fx (int): Horizontal frequency of initial conditions</span>
+<span class="sd">            fy (int): Vertical frequency of initial conditions</span>
+<span class="sd">            nu (float): Diffusion parameter</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
+            <span class="s1">&#39;nx&#39;</span><span class="p">,</span> <span class="s1">&#39;ny&#39;</span><span class="p">,</span> <span class="s1">&#39;base_x&#39;</span><span class="p">,</span> <span class="s1">&#39;base_y&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;fx&#39;</span><span class="p">,</span> <span class="s1">&#39;fy&#39;</span><span class="p">,</span> <span class="s1">&#39;nu&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="n">bases</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="n">base_x</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="n">base_y</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">ny</span><span class="p">}]</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">]</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">bases</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">Dirichlet_recombination</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">spectral_space</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Dxx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_differentiation_matrix</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,),</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Dyy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_differentiation_matrix</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">S2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basis_change_matrix</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">I</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Id</span><span class="p">()</span>
+
+        <span class="n">L_lhs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">nu</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dxx</span> <span class="o">-</span> <span class="n">nu</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dyy</span><span class="p">},</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_L</span><span class="p">(</span><span class="n">L_lhs</span><span class="p">)</span>
+
+        <span class="n">M_lhs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="n">I</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_M</span><span class="p">(</span><span class="n">M_lhs</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="p">[</span><span class="n">base_x</span><span class="p">,</span> <span class="n">base_y</span><span class="p">]:</span>
+            <span class="k">assert</span> <span class="n">base</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ultraspherical&#39;</span><span class="p">,</span> <span class="s1">&#39;fft&#39;</span><span class="p">]</span>
+
+        <span class="n">alpha</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">gamma</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+        <span class="k">if</span> <span class="n">base_x</span> <span class="o">==</span> <span class="s1">&#39;ultraspherical&#39;</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_y</span> <span class="o">==</span> <span class="s1">&#39;fft&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">beta</span> <span class="o">*</span> <span class="n">y</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">+</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">beta</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">+</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">line</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Need periodic boundary conditions in x for </span><span class="si">{</span><span class="n">base_x</span><span class="si">}</span><span class="s1"> method!&#39;</span>
+        <span class="k">if</span> <span class="n">base_y</span> <span class="o">==</span> <span class="s1">&#39;ultraspherical&#39;</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span>
+                <span class="n">component</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="n">beta</span> <span class="o">+</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">,</span> <span class="n">line</span><span class="o">=-</span><span class="mi">1</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_BC</span><span class="p">(</span>
+                <span class="n">component</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">=+</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">beta</span> <span class="o">+</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Dirichlet&#39;</span><span class="p">,</span> <span class="n">line</span><span class="o">=-</span><span class="mi">2</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">c</span> <span class="o">==</span> <span class="n">b</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Need periodic boundary conditions in y for </span><span class="si">{</span><span class="n">base_y</span><span class="si">}</span><span class="s1"> method!&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_BCs</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Heat2DUltraspherical.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.eval_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_init</span>
+        <span class="n">iu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)</span>
+
+        <span class="n">me_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init_forward</span>
+        <span class="n">me_hat</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="n">me_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">S2</span> <span class="o">@</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Dxx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dyy</span><span class="p">)</span> <span class="o">@</span> <span class="n">me_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">me_hat</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">me_hat</span><span class="p">)</span>
+
+        <span class="n">f</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="n">me</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span><span class="o">.</span><span class="n">real</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="Heat2DUltraspherical.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.u_exact">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">xp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span>
+        <span class="n">iu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init</span>
+
+        <span class="n">fx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fx</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_x</span> <span class="o">==</span> <span class="s1">&#39;fft&#39;</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fx</span>
+        <span class="n">fy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fy</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_y</span> <span class="o">==</span> <span class="s1">&#39;fft&#39;</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fy</span>
+
+        <span class="n">time_dep</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="p">(</span><span class="n">fx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">fy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
+
+        <span class="n">alpha</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">gamma</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+        <span class="n">u</span><span class="p">[</span><span class="n">iu</span><span class="p">]</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">fx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">)</span> <span class="o">*</span> <span class="n">xp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">fy</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">)</span> <span class="o">*</span> <span class="n">time_dep</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">+</span> <span class="n">beta</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">+</span> <span class="n">gamma</span>
+
+        <span class="k">return</span> <span class="n">u</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.HeatEquation_Chebychev</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

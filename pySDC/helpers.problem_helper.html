@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>helpers.problem_helper module &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=81710850"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="helpers.pySDC_as_gusto_time_discretization module" href="helpers.pySDC_as_gusto_time_discretization.html" />
+    <link rel="prev" title="helpers.plot_helper module" href="helpers.plot_helper.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="helpers.pySDC_as_gusto_time_discretization.html" title="helpers.pySDC_as_gusto_time_discretization module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="helpers.plot_helper.html" title="helpers.plot_helper module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="helpers.html" accesskey="U">helpers package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">helpers.problem_helper module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-helpers.problem_helper">
+<span id="helpers-problem-helper-module"></span><h1>helpers.problem_helper module<a class="headerlink" href="#module-helpers.problem_helper" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="helpers.problem_helper.get_1d_grid">
+<span class="sig-name descname"><span class="pre">get_1d_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/problem_helper.html#get_1d_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.problem_helper.get_1d_grid" title="Link to this definition">¶</a></dt>
+<dd><p>Generate a grid in one dimension and obtain mesh spacing for finite difference discretization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>size</strong> (<em>int</em>) – Number of degrees of freedom per dimension</p></li>
+<li><p><strong>bc</strong> (<em>str</em>) – Boundary conditions for both sides</p></li>
+<li><p><strong>left_boundary</strong> (<em>float</em>) – x value at the left boundary</p></li>
+<li><p><strong>right_boundary</strong> (<em>float</em>) – x value at the right boundary</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>mesh spacing
+numpy.ndarray: 1d mesh</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="helpers.problem_helper.get_finite_difference_matrix">
+<span class="sig-name descname"><span class="pre">get_finite_difference_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">derivative</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cupy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/problem_helper.html#get_finite_difference_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.problem_helper.get_finite_difference_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Build FD matrix from stencils, with boundary conditions.
+Keep in mind that the boundary conditions may require further modification of the right hand side.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>derivative</strong> (<em>int</em>) – Order of the spatial derivative</p></li>
+<li><p><strong>order</strong> (<em>int</em>) – Order of accuracy</p></li>
+<li><p><strong>stencil_type</strong> (<em>str</em>) – Type of stencil</p></li>
+<li><p><strong>steps</strong> (<em>list</em>) – Provide specific steps, overrides <cite>stencil_type</cite></p></li>
+<li><p><strong>dx</strong> (<em>float</em>) – Mesh width</p></li>
+<li><p><strong>size</strong> (<em>int</em>) – Number of degrees of freedom per dimension</p></li>
+<li><p><strong>dim</strong> (<em>int</em>) – Number of dimensions</p></li>
+<li><p><strong>bc</strong> (<em>str</em>) – Boundary conditions for both sides</p></li>
+<li><p><strong>cupy</strong> (<em>bool</em>) – Construct a GPU ready matrix if yes</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Finite difference matrix
+numpy.ndarray: Vector containing information about the boundary conditions</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Sparse matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="helpers.problem_helper.get_finite_difference_stencil">
+<span class="sig-name descname"><span class="pre">get_finite_difference_stencil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">derivative</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/problem_helper.html#get_finite_difference_stencil"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.problem_helper.get_finite_difference_stencil" title="Link to this definition">¶</a></dt>
+<dd><p>Derive general finite difference stencils from Taylor expansions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>derivative</strong> (<em>int</em>) – Order of the derivative</p></li>
+<li><p><strong>order</strong> (<em>int</em>) – Order of accuracy</p></li>
+<li><p><strong>stencil_type</strong> (<em>str</em>) – Type of the stencil</p></li>
+<li><p><strong>steps</strong> (<em>list</em>) – Provide specific steps, overrides <cite>stencil_type</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The weights of the stencil
+numpy.ndarray: The offsets for the stencil</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="helpers.problem_helper.get_steps">
+<span class="sig-name descname"><span class="pre">get_steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">derivative</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/problem_helper.html#get_steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.problem_helper.get_steps" title="Link to this definition">¶</a></dt>
+<dd><p>Get the offsets for the FD stencil.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>derivative</strong> (<em>int</em>) – Order of the derivative</p></li>
+<li><p><strong>order</strong> (<em>int</em>) – Order of accuracy</p></li>
+<li><p><strong>stencil_type</strong> (<em>str</em>) – Type of the stencil</p></li>
+<li><p><strong>steps</strong> (<em>list</em>) – Provide specific steps, overrides <cite>stencil_type</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number of elements in the stencil
+numpy.ndarray: The offsets for the stencil</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">helpers.problem_helper module</a><ul>
+<li><a class="reference internal" href="#helpers.problem_helper.get_1d_grid"><code class="docutils literal notranslate"><span class="pre">get_1d_grid()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.problem_helper.get_finite_difference_matrix"><code class="docutils literal notranslate"><span class="pre">get_finite_difference_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.problem_helper.get_finite_difference_stencil"><code class="docutils literal notranslate"><span class="pre">get_finite_difference_stencil()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.problem_helper.get_steps"><code class="docutils literal notranslate"><span class="pre">get_steps()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="helpers.plot_helper.html"
+                          title="previous chapter">helpers.plot_helper module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="helpers.pySDC_as_gusto_time_discretization.html"
+                          title="next chapter">helpers.pySDC_as_gusto_time_discretization module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/helpers.problem_helper.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="helpers.pySDC_as_gusto_time_discretization.html" title="helpers.pySDC_as_gusto_time_discretization module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="helpers.plot_helper.html" title="helpers.plot_helper module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="helpers.html" >helpers package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">helpers.problem_helper module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

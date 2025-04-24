@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>implementations.convergence_controller_classes.check_convergence &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../../_static/documentation_options.js?v=81710850"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.check_convergence</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.convergence_controller_classes.check_convergence</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.convergence_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConvergenceController</span>
+
+
+<div class="viewcode-block" id="CheckConvergence">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CheckConvergence</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform simple checks on convergence for SDC iterations.</span>
+
+<span class="sd">    Iteration is terminated via one of two criteria:</span>
+<span class="sd">     - Residual tolerance</span>
+<span class="sd">     - Maximum number of iterations</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CheckConvergence.setup">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.setup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define default parameters here</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            params (dict): The params passed for this specific convergence controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (dict): The updated params dictionary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;control_order&#39;</span><span class="p">:</span> <span class="o">+</span><span class="mi">200</span><span class="p">,</span> <span class="s1">&#39;use_e_tol&#39;</span><span class="p">:</span> <span class="s1">&#39;e_tol&#39;</span> <span class="ow">in</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="CheckConvergence.dependencies">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.dependencies">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load the embedded error estimator if needed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">useMPI</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prepare_MPI_logical_operations</span><span class="p">()</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_e_tol</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.convergence_controller_classes.estimate_embedded_error</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+                <span class="n">EstimateEmbeddedError</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
+                <span class="n">EstimateEmbeddedError</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="CheckConvergence.check_convergence">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.check_convergence">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_convergence</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="bp">self</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check the convergence of a single step.</span>
+<span class="sd">        Test the residual and max. number of iterations as well as allowing overrides to both stop and continue.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            S (pySDC.Step): The current step</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: Convergence status of the step</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># do all this on the finest level</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># get residual and check against prescribed tolerance (plus check number of iterations)</span>
+        <span class="n">iter_converged</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;=</span> <span class="n">S</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span>
+        <span class="n">res_converged</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">&lt;=</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restol</span> <span class="ow">and</span> <span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">e_tol_converged</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">increment</span> <span class="o">&lt;</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span> <span class="k">if</span> <span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;e_tol&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;increment&#39;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="p">)</span>
+        <span class="n">converged</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">iter_converged</span> <span class="ow">or</span> <span class="n">res_converged</span> <span class="ow">or</span> <span class="n">e_tol_converged</span> <span class="ow">or</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span>
+        <span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_continue</span>
+        <span class="k">if</span> <span class="n">converged</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">converged</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># print information for debugging</span>
+        <span class="k">if</span> <span class="n">converged</span> <span class="ow">and</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Declared convergence: maxiter reached[</span><span class="si">{</span><span class="s2">&quot;x&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">iter_converged</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="si">}</span><span class="s1">] restol reached[</span><span class="si">{</span><span class="s2">&quot;x&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">res_converged</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="si">}</span><span class="s1">] e_tol reached[</span><span class="si">{</span><span class="s2">&quot;x&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">e_tol_converged</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">,</span>
+                <span class="n">S</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">converged</span></div>
+
+
+<div class="viewcode-block" id="CheckConvergence.check_iteration_status">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.check_iteration_status">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_iteration_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to determine whether to stop iterating (currently testing the residual + the max. number of iterations)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller.controller): The controller</span>
+<span class="sd">            S (pySDC.Step.step): The current step</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_convergence</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;comm&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">communicate_convergence</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_continue</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="CheckConvergence.communicate_convergence">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.communicate_convergence">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">communicate_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">comm</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Communicate the convergence status during `check_iteration_status` if MPI is used.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            S (pySDC.Step.step): The current step</span>
+<span class="sd">            comm (mpi4py.MPI.Comm): MPI communicator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Either gather information about all status or send forward own</span>
+        <span class="k">if</span> <span class="n">controller</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">all_to_done</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="n">controller</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                <span class="n">hook</span><span class="o">.</span><span class="n">pre_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">sendobj</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MPI_LAND</span><span class="p">)</span>
+            <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">sendobj</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MPI_LOR</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="n">controller</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                <span class="n">hook</span><span class="o">.</span><span class="n">post_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">add_to_stats</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="ow">or</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="n">controller</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                <span class="n">hook</span><span class="o">.</span><span class="n">pre_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="c1"># check if an open request of the status send is pending</span>
+            <span class="n">controller</span><span class="o">.</span><span class="n">wait_with_interrupt</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">controller</span><span class="o">.</span><span class="n">req_status</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="c1"># recv status</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">first</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">prev_done</span><span class="p">:</span>
+                <span class="n">buff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Recv</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="p">[</span><span class="n">buff</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPI_BOOL</span><span class="p">])</span>
+                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">prev_done</span> <span class="o">=</span> <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="ow">and</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">prev_done</span>
+
+            <span class="c1"># send status forward</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">last</span><span class="p">:</span>
+                <span class="n">buff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+                <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Send</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="p">[</span><span class="n">buff</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPI_BOOL</span><span class="p">])</span>
+
+            <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="n">controller</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                <span class="n">hook</span><span class="o">.</span><span class="n">post_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">add_to_stats</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.check_convergence</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

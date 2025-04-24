@@ -1,0 +1,1 @@
+.. include:: /../../pySDC/tutorial/step_6/README.rst

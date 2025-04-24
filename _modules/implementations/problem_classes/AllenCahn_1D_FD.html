@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>implementations.problem_classes.AllenCahn_1D_FD &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../../_static/documentation_options.js?v=81710850"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.AllenCahn_1D_FD</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.problem_classes.AllenCahn_1D_FD</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">spsolve</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProblemError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.problem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Problem</span><span class="p">,</span> <span class="n">WorkCounter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">problem_helper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span><span class="p">,</span> <span class="n">comp2_mesh</span>
+
+
+<div class="viewcode-block" id="allencahn_front_fullyimplicit">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">allencahn_front_fullyimplicit</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example implementing the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet</span>
+<span class="sd">    boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)</span>
+<span class="sd">            - 6 d_w u (1 - u)</span>
+
+<span class="sd">    for :math:`u \in [0, 1]`. The second order spatial derivative is approximated using centered finite differences. The</span>
+<span class="sd">    exact solution is given by</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u(x, t)= 0.5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)</span>
+
+<span class="sd">    with :math:`v = 3 \sqrt{2} \varepsilon d_w`. For time-stepping, this problem is implemented to be treated</span>
+<span class="sd">    *fully-implicit* using Newton to solve the nonlinear system.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nvars : int</span>
+<span class="sd">        Number of unknowns in the problem.</span>
+<span class="sd">    dw : float</span>
+<span class="sd">        Driving force.</span>
+<span class="sd">    eps : float</span>
+<span class="sd">        Scaling parameter :math:`\varepsilon`.</span>
+<span class="sd">    newton_maxiter : int</span>
+<span class="sd">        Maximum number of iterations for Newton&#39;s method.</span>
+<span class="sd">    newton_tol : float</span>
+<span class="sd">        Tolerance for Newton&#39;s method to terminate.</span>
+<span class="sd">    interval : list</span>
+<span class="sd">        Interval of spatial domain.</span>
+<span class="sd">    stop_at_nan : bool, optional</span>
+<span class="sd">        Indicates that the Newton solver should stop if ``nan`` values arise.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : scipy.diags</span>
+<span class="sd">        Second-order FD discretization of the 1D laplace operator.</span>
+<span class="sd">    dx : float</span>
+<span class="sd">        Distance between two spatial nodes.</span>
+<span class="sd">    xvalues : np.1darray</span>
+<span class="sd">        Spatial grid values.</span>
+<span class="sd">    uext : dtype_u</span>
+<span class="sd">        Contains additionally the external values of the boundary.</span>
+<span class="sd">    work_counters : WorkCounter</span>
+<span class="sd">        Counter for statistics. Here, number of Newton calls and number of evaluations</span>
+<span class="sd">        of right-hand side are counted.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">nvars</span><span class="o">=</span><span class="mi">127</span><span class="p">,</span>
+        <span class="n">dw</span><span class="o">=-</span><span class="mf">0.04</span><span class="p">,</span>
+        <span class="n">eps</span><span class="o">=</span><span class="mf">0.04</span><span class="p">,</span>
+        <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
+        <span class="n">interval</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">stop_at_maxiter</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nvars</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;setup requires nvars = 2^p - 1&#39;</span><span class="p">)</span>
+
+        <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
+            <span class="s1">&#39;nvars&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dw&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;eps&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;newton_maxiter&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;newton_tol&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;interval&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;stop_at_nan&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;stop_at_maxiter&#39;</span><span class="p">,</span>
+            <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span>
+            <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># compute dx and get discretization matrix A</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">problem_helper</span><span class="o">.</span><span class="n">get_finite_difference_matrix</span><span class="p">(</span>
+            <span class="n">derivative</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">stencil_type</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+            <span class="n">dx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">bc</span><span class="o">=</span><span class="s1">&#39;dirichlet-zero&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uext</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+
+<div class="viewcode-block" id="allencahn_front_fullyimplicit.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.solve_system">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple Newton solver.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the nonlinear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the node-to-node stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (required here for the BC).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The solution as mesh.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
+        <span class="n">eps2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span>
+
+        <span class="n">Id</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
+
+        <span class="n">v</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)))</span>
+
+        <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># start newton iteration</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="mi">99</span>
+        <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
+            <span class="c1"># print(n)</span>
+            <span class="c1"># # form the function g(u), such that the solution to the nonlinear problem is a root of g</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:]</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">u</span>
+                <span class="o">-</span> <span class="n">rhs</span>
+                <span class="o">-</span> <span class="n">factor</span>
+                <span class="o">*</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="o">-</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="n">eps2</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span>
+                    <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="n">dw</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="c1"># if g is close to 0, then we are done</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">res</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_tol</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="c1"># assemble dg</span>
+            <span class="n">dg</span> <span class="o">=</span> <span class="n">Id</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="n">A</span>
+                <span class="o">-</span> <span class="mf">2.0</span>
+                <span class="o">/</span> <span class="n">eps2</span>
+                <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="n">u</span> <span class="o">*</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)),</span> <span class="n">offsets</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="n">dw</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="n">u</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="c1"># newton update: u1 = u0 - g/dg</span>
+            <span class="n">u</span> <span class="o">-=</span> <span class="n">spsolve</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+            <span class="c1"># u -= gmres(dg, g, x0=z, rtol=self.lin_tol)[0]</span>
+            <span class="c1"># increase iteration count</span>
+            <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]()</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_at_nan</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations, aborting...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Newton did not converge after </span><span class="si">%i</span><span class="s1"> iterations, error is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_at_maxiter</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:]</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+
+
+<div class="viewcode-block" id="allencahn_front_fullyimplicit.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.eval_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time of the numerical solution is computed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The right-hand side of the problem.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># set up boundary values to embed inner points</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:]</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="o">-</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span>
+            <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="allencahn_front_fullyimplicit.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.u_exact">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to return initial condition or the exact solution</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time at which the exact solution is computed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The exact solution (in space and time).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="allencahn_front_semiimplicit">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">allencahn_front_semiimplicit</span><span class="p">(</span><span class="n">allencahn_front_fullyimplicit</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet</span>
+<span class="sd">    boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)</span>
+<span class="sd">            - 6 d_w u (1 - u)</span>
+
+<span class="sd">    for :math:`u \in [0, 1]`. Centered finite differences are used for discretization of the second order spatial derivative.</span>
+<span class="sd">    The exact solution is given by</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u(x, t) = 0.5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)</span>
+
+<span class="sd">    with :math:`v = 3 \sqrt{2} \varepsilon d_w`. For time-stepping, this problem will be treated in a</span>
+<span class="sd">    *semi-implicit* way, i.e., the Laplacian is treated implicitly, and the rest of the right-hand side will be handled</span>
+<span class="sd">    explicitly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
+
+<div class="viewcode-block" id="allencahn_front_semiimplicit.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.eval_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time of the numerical solution is computed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The right-hand side of the problem.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># set up boundary values to embed inner points</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:]</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="allencahn_front_semiimplicit.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.solve_system">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The solution as mesh.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">rhs</span><span class="p">[:]</span>
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">spsolve</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="allencahn_front_finel">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">allencahn_front_finel</span><span class="p">(</span><span class="n">allencahn_front_fullyimplicit</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet</span>
+<span class="sd">    boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)</span>
+<span class="sd">            - 6 d_w u (1 - u)</span>
+
+<span class="sd">    for :math:`u \in [0, 1]`. Centered finite differences are used for discretization of the Laplacian.</span>
+<span class="sd">    The exact solution is given by</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u(x, t) = 0.5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)</span>
+
+<span class="sd">    with :math:`v = 3 \sqrt{2} \varepsilon d_w`.</span>
+
+<span class="sd">    Let :math:`A` denote the finite difference matrix to discretize :math:`\frac{\partial^2 u}{\partial x^2}`. Here,</span>
+<span class="sd">    *Finel&#39;s trick* is used. Let</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        a = \tanh\left(\frac{\Delta x}{\sqrt{2}\varepsilon}\right)^2,</span>
+
+<span class="sd">    then, the right-hand side of the problem can be written as</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = A u - \frac{1}{\Delta x^2} \left[</span>
+<span class="sd">                \frac{1 - a}{1 - a (2u - 1)^2} - 1</span>
+<span class="sd">            \right] (2u - 1).</span>
+
+<span class="sd">    For time-stepping, this problem will be treated in a *fully-implicit* way. The nonlinear system is solved using Newton.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># noinspection PyTypeChecker</span>
+<div class="viewcode-block" id="allencahn_front_finel.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel.solve_system">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple Newton solver.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the nonlinear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the node-to-node stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The solution as mesh.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span>
+        <span class="n">a2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span>
+
+        <span class="n">Id</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
+
+        <span class="n">v</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)))</span>
+
+        <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># start newton iteration</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="mi">99</span>
+        <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
+            <span class="c1"># form the function g(u), such that the solution to the nonlinear problem is a root of g</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:]</span>
+            <span class="n">gprim</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">a2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">a2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">u</span> <span class="o">-</span> <span class="n">rhs</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">gprim</span> <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="n">dw</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">))</span>
+
+            <span class="c1"># if g is close to 0, then we are done</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">res</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_tol</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="c1"># assemble dg</span>
+            <span class="n">dgprim</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="mf">1.0</span>
+                <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span>
+                <span class="o">*</span> <span class="p">(</span>
+                    <span class="mf">2.0</span> <span class="o">*</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">a2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">a2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">a2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">a2</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">a2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">dg</span> <span class="o">=</span> <span class="n">Id</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">dgprim</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="n">dw</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="n">u</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+            <span class="c1"># newton update: u1 = u0 - g/dg</span>
+            <span class="n">u</span> <span class="o">-=</span> <span class="n">spsolve</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+            <span class="c1"># For some reason, doing cg or gmres does not work so well here...</span>
+            <span class="c1"># u -= cg(dg, g, x0=z, rtol=self.lin_tol)[0]</span>
+            <span class="c1"># increase iteration count</span>
+            <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]()</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_at_nan</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations, aborting...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Newton did not converge after </span><span class="si">%i</span><span class="s1"> iterations, error is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">res</span><span class="p">))</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:]</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+
+
+<div class="viewcode-block" id="allencahn_front_finel.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel.eval_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time of the numerical solution is computed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The right-hand side of the problem.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># set up boundary values to embed inner points</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:]</span>
+
+        <span class="n">a2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">gprim</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">a2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">a2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">gprim</span> <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="allencahn_periodic_fullyimplicit">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">allencahn_periodic_fullyimplicit</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example implementing the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)</span>
+<span class="sd">            - 6 d_w u (1 - u)</span>
+
+<span class="sd">    for :math:`u \in [0, 1]`. Centered finite differences are used for discretization of the Laplacian.</span>
+<span class="sd">    The exact solution is</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u(x, t) = 0.5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)</span>
+
+<span class="sd">    with :math:`v = 3 \sqrt{2} \varepsilon d_w` and radius :math:`r` of the circles. For time-stepping, the problem is treated</span>
+<span class="sd">    *fully-implicitly*, i.e., the nonlinear system is solved by Newton.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nvars : int</span>
+<span class="sd">        Number of unknowns in the problem.</span>
+<span class="sd">    dw : float</span>
+<span class="sd">        Driving force.</span>
+<span class="sd">    eps : float</span>
+<span class="sd">        Scaling parameter :math:`\varepsilon`.</span>
+<span class="sd">    newton_maxiter : int</span>
+<span class="sd">        Maximum number of iterations for Newton&#39;s method.</span>
+<span class="sd">    newton_tol : float</span>
+<span class="sd">        Tolerance for Newton&#39;s method to terminate.</span>
+<span class="sd">    interval : list</span>
+<span class="sd">        Interval of spatial domain.</span>
+<span class="sd">    radius : float</span>
+<span class="sd">        Radius of the circles.</span>
+<span class="sd">    stop_at_nan : bool, optional</span>
+<span class="sd">        Indicates that the Newton solver should stop if nan values arise.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : scipy.diags</span>
+<span class="sd">        Second-order FD discretization of the 1D laplace operator.</span>
+<span class="sd">    dx : float</span>
+<span class="sd">        Distance between two spatial nodes.</span>
+<span class="sd">    xvalues : np.1darray</span>
+<span class="sd">        Spatial grid points.</span>
+<span class="sd">    work_counters : WorkCounter</span>
+<span class="sd">        Counter for statistics. Here, number of Newton calls and number of evaluations</span>
+<span class="sd">        of right-hand side are counted.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">nvars</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">dw</span><span class="o">=-</span><span class="mf">0.04</span><span class="p">,</span>
+        <span class="n">eps</span><span class="o">=</span><span class="mf">0.04</span><span class="p">,</span>
+        <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
+        <span class="n">interval</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="n">radius</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+        <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nvars</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;setup requires nvars = 2^p&#39;</span><span class="p">)</span>
+
+        <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
+            <span class="s1">&#39;nvars&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dw&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;eps&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;newton_maxiter&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;newton_tol&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;interval&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;radius&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;stop_at_nan&#39;</span><span class="p">,</span>
+            <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span>
+            <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># compute dx and get discretization matrix A</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">nvars</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">problem_helper</span><span class="o">.</span><span class="n">get_finite_difference_matrix</span><span class="p">(</span>
+            <span class="n">derivative</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">stencil_type</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+            <span class="n">dx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">,</span>
+            <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">bc</span><span class="o">=</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+
+<div class="viewcode-block" id="allencahn_periodic_fullyimplicit.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.solve_system">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple Newton solver.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the nonlinear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the node-to-node stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (required here for the BC).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            The solution as mesh.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
+        <span class="n">eps2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span>
+
+        <span class="n">Id</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
+
+        <span class="c1"># start newton iteration</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="mi">99</span>
+        <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
+            <span class="c1"># form the function g(u), such that the solution to the nonlinear problem is a root of g</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">u</span>
+                <span class="o">-</span> <span class="n">rhs</span>
+                <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="n">eps2</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="n">dw</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">))</span>
+            <span class="p">)</span>
+
+            <span class="c1"># if g is close to 0, then we are done</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">res</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_tol</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="c1"># assemble dg</span>
+            <span class="n">dg</span> <span class="o">=</span> <span class="n">Id</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">A</span>
+                <span class="o">-</span> <span class="mf">2.0</span>
+                <span class="o">/</span> <span class="n">eps2</span>
+                <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="n">u</span> <span class="o">*</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)),</span> <span class="n">offsets</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="n">dw</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="n">u</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="c1"># newton update: u1 = u0 - g/dg</span>
+            <span class="n">u</span> <span class="o">-=</span> <span class="n">spsolve</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+            <span class="c1"># u -= gmres(dg, g, x0=z, rtol=self.lin_tol)[0]</span>
+            <span class="c1"># increase iteration count</span>
+            <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]()</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_at_nan</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations, aborting...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Newton did not converge after </span><span class="si">%i</span><span class="s1"> iterations, error is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">res</span><span class="p">))</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:]</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+
+
+<div class="viewcode-block" id="allencahn_periodic_fullyimplicit.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.eval_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time of the numerical solution is computed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The right-hand side of the problem.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="allencahn_periodic_fullyimplicit.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.u_exact">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to return initial condition or the exact solution.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time at which the approximated exact solution is computed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The approximated exact solution.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span><span class="p">)</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="allencahn_periodic_semiimplicit">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">allencahn_periodic_semiimplicit</span><span class="p">(</span><span class="n">allencahn_periodic_fullyimplicit</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)</span>
+<span class="sd">            - 6 d_w u (1 - u)</span>
+
+<span class="sd">    for :math:`u \in [0, 1]`. For discretization of the Laplacian, centered finite differences are used.</span>
+<span class="sd">    The exact solution is</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u(x, t) = 0.5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)</span>
+
+<span class="sd">    with :math:`v = 3 \sqrt{2} \varepsilon d_w` and radius :math:`r` of the circles. For time-stepping, the problem is treated</span>
+<span class="sd">    in *semi-implicit* way, i.e., the part containing the Laplacian is treated implicitly, and the rest of the right-hand</span>
+<span class="sd">    side is only evaluated at each time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">nvars</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">dw</span><span class="o">=-</span><span class="mf">0.04</span><span class="p">,</span>
+        <span class="n">eps</span><span class="o">=</span><span class="mf">0.04</span><span class="p">,</span>
+        <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
+        <span class="n">interval</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="n">radius</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+        <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="n">dw</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="p">,</span> <span class="n">newton_tol</span><span class="p">,</span> <span class="n">interval</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="p">)</span>
+
+<div class="viewcode-block" id="allencahn_periodic_semiimplicit.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.solve_system">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The solution as mesh.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">spsolve</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">me</span></div>
+
+
+<div class="viewcode-block" id="allencahn_periodic_semiimplicit.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.eval_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time of the numerical solution is computed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The right-hand side of the problem.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="o">-</span><span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="allencahn_periodic_multiimplicit">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">allencahn_periodic_multiimplicit</span><span class="p">(</span><span class="n">allencahn_periodic_fullyimplicit</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)</span>
+<span class="sd">            - 6 d_w u (1 - u)</span>
+
+<span class="sd">    for :math:`u \in [0, 1]`. For discretization of the second order spatial derivative, centered finite differences are used.</span>
+<span class="sd">    The exact solution is then given by</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u(x, t) = 0.5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)</span>
+
+<span class="sd">    with :math:`v = 3 \sqrt{2} \varepsilon d_w` and radius :math:`r` of the circles. For time-stepping, the problem is treated</span>
+<span class="sd">    in a *multi-implicit* fashion, i.e., the nonlinear system containing the part with the Laplacian is solved with a</span>
+<span class="sd">    linear solver provided by a ``SciPy`` routine, and the nonlinear system including the rest of the right-hand side is solved by</span>
+<span class="sd">    Newton&#39;s method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">comp2_mesh</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">nvars</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">dw</span><span class="o">=-</span><span class="mf">0.04</span><span class="p">,</span>
+        <span class="n">eps</span><span class="o">=</span><span class="mf">0.04</span><span class="p">,</span>
+        <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
+        <span class="n">interval</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="n">radius</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+        <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="n">dw</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="p">,</span> <span class="n">newton_tol</span><span class="p">,</span> <span class="n">interval</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="p">)</span>
+
+<div class="viewcode-block" id="allencahn_periodic_multiimplicit.solve_system_1">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.solve_system_1">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The solution as mesh.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">spsolve</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">me</span></div>
+
+
+<div class="viewcode-block" id="allencahn_periodic_multiimplicit.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.eval_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time of the numerical solution is computed (not used here).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The right-hand side of the problem.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">comp1</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">comp2</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="o">-</span><span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="allencahn_periodic_multiimplicit.solve_system_2">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.solve_system_2">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The solution as mesh.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
+        <span class="n">eps2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span>
+
+        <span class="n">Id</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
+
+        <span class="c1"># start newton iteration</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="mi">99</span>
+        <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
+            <span class="c1"># form the function g(u), such that the solution to the nonlinear problem is a root of g</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">u</span>
+                <span class="o">-</span> <span class="n">rhs</span>
+                <span class="o">-</span> <span class="n">factor</span>
+                <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.0</span> <span class="o">/</span> <span class="n">eps2</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="n">dw</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="c1"># if g is close to 0, then we are done</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">res</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_tol</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="c1"># assemble dg</span>
+            <span class="n">dg</span> <span class="o">=</span> <span class="n">Id</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="o">-</span><span class="mf">2.0</span> <span class="o">/</span> <span class="n">eps2</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="n">u</span> <span class="o">*</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)),</span> <span class="n">offsets</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="n">dw</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="n">u</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="o">+</span> <span class="mf">0.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">Id</span>
+            <span class="p">)</span>
+
+            <span class="c1"># newton update: u1 = u0 - g/dg</span>
+            <span class="n">u</span> <span class="o">-=</span> <span class="n">spsolve</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+            <span class="c1"># u -= gmres(dg, g, x0=z, rtol=self.lin_tol)[0]</span>
+            <span class="c1"># increase iteration count</span>
+            <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]()</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_at_nan</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations, aborting...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Newton did not converge after </span><span class="si">%i</span><span class="s1"> iterations, error is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">res</span><span class="p">))</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:]</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.AllenCahn_1D_FD</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>implementations.datatype_classes.mesh &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../../_static/documentation_options.js?v=81710850"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.datatype_classes.mesh</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.datatype_classes.mesh</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># TODO : mpi4py cannot be imported before dolfin when using fenics mesh</span>
+    <span class="c1"># see https://github.com/Parallel-in-Time/pySDC/pull/285#discussion_r1145850590</span>
+    <span class="c1"># This should be dealt with at some point</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">MPI</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="mesh">
+<a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.mesh">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">mesh</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Numpy-based datatype for serial or parallel meshes.</span>
+<span class="sd">    Can include a communicator and expects a dtype to allow complex data.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        comm: MPI communicator or None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">comm</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">xp</span> <span class="o">=</span> <span class="n">np</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Instantiates new datatype. This ensures that even when manipulating data, the result is still a mesh.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            init: either another mesh or a tuple containing the dimensions, the communicator and the dtype</span>
+<span class="sd">            val: value to initialize</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            obj of type mesh</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">mesh</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">init</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">init</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">obj</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">init</span><span class="p">[:]</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">MPI</span><span class="o">.</span><span class="n">Intracomm</span><span class="p">))</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">init</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">init</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__array_ufunc__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ufunc</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">inputs</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overriding default ufunc, cf. https://numpy.org/doc/stable/user/basics.subclassing.html#array-ufunc-for-ufuncs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">input_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_</span><span class="p">,</span> <span class="n">mesh</span><span class="p">):</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">input_</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">input_</span><span class="p">)</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__array_ufunc__</span><span class="p">(</span><span class="n">ufunc</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">results</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overloading the abs operator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: absolute maximum of all mesh values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># take absolute values of the mesh values</span>
+        <span class="n">local_absval</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">global_absval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">sendobj</span><span class="o">=</span><span class="n">local_absval</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">MAX</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">global_absval</span> <span class="o">=</span> <span class="n">local_absval</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">global_absval</span> <span class="o">=</span> <span class="n">local_absval</span>
+
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">global_absval</span><span class="p">)</span>
+
+<div class="viewcode-block" id="mesh.isend">
+<a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.mesh.isend">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine for sending data forward in time (non-blocking)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dest (int): target rank</span>
+<span class="sd">            tag (int): communication tag</span>
+<span class="sd">            comm: communicator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            request handle</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">comm</span><span class="o">.</span><span class="n">Issend</span><span class="p">(</span><span class="bp">self</span><span class="p">[:],</span> <span class="n">dest</span><span class="o">=</span><span class="n">dest</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mesh.irecv">
+<a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.mesh.irecv">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">irecv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine for receiving in time</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            source (int): source rank</span>
+<span class="sd">            tag (int): communication tag</span>
+<span class="sd">            comm: communicator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">comm</span><span class="o">.</span><span class="n">Irecv</span><span class="p">(</span><span class="bp">self</span><span class="p">[:],</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mesh.bcast">
+<a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.mesh.bcast">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine for broadcasting values</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            root (int): process with value to broadcast</span>
+<span class="sd">            comm: communicator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            broadcasted values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">comm</span><span class="o">.</span><span class="n">Bcast</span><span class="p">(</span><span class="bp">self</span><span class="p">[:],</span> <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MultiComponentMesh">
+<a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.MultiComponentMesh">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiComponentMesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generic mesh with multiple components.</span>
+
+<span class="sd">    To make a specific multi-component mesh, derive from this class and list the components as strings in the class</span>
+<span class="sd">    attribute ``components``. An example:</span>
+
+<span class="sd">    ```</span>
+<span class="sd">    class imex_mesh(MultiComponentMesh):</span>
+<span class="sd">        components = [&#39;impl&#39;, &#39;expl&#39;]</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    Instantiating such a mesh will expand the mesh along an added first dimension for each component and allow access</span>
+<span class="sd">    to the components with ``.``. Continuing the above example:</span>
+
+<span class="sd">    ```</span>
+<span class="sd">    init = ((100,), None, numpy.dtype(&#39;d&#39;))</span>
+<span class="sd">    f = imex_mesh(init)</span>
+<span class="sd">    f.shape  # (2, 100)</span>
+<span class="sd">    f.expl.shape  # (100,)</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    Note that the components are not attributes of the mesh: ``&quot;expl&quot; in dir(f)`` will return False! Rather, the</span>
+<span class="sd">    components are handled in ``__getattr__``. This function is called if an attribute is not found and returns a view</span>
+<span class="sd">    on to the component if appropriate. Importantly, this means that you cannot name a component like something that</span>
+<span class="sd">    is already an attribute of ``mesh`` or ``numpy.ndarray`` because this will not result in calls to ``__getattr__``.</span>
+
+<span class="sd">    There are a couple more things to keep in mind:</span>
+<span class="sd">     - Because a ``MultiComponentMesh`` is just a ``numpy.ndarray`` with one more dimension, all components must have</span>
+<span class="sd">       the same shape.</span>
+<span class="sd">     - You can use the entire ``MultiComponentMesh`` like a ``numpy.ndarray`` in operations that accept arrays, but make</span>
+<span class="sd">       sure that you really want to apply the same operation on all components if you do.</span>
+<span class="sd">     - If you omit the assignment operator ``[:]`` during assignment, you will not change the mesh at all. Omitting this</span>
+<span class="sd">       leads to all kinds of trouble throughout the code. But here you really cannot get away without.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">components</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">],)</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">int</span> <span class="k">else</span> <span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">components</span><span class="p">),</span> <span class="o">*</span><span class="n">shape</span><span class="p">),</span> <span class="o">*</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">:]),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">name</span><span class="p">)]</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cannot access </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s1"> in </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">!r}</span><span class="s1"> because the shape is unexpected.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">!r}</span><span class="s2"> does not have attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">!&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="imex_mesh">
+<a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.imex_mesh">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">imex_mesh</span><span class="p">(</span><span class="n">MultiComponentMesh</span><span class="p">):</span>
+    <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;impl&#39;</span><span class="p">,</span> <span class="s1">&#39;expl&#39;</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="comp2_mesh">
+<a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.comp2_mesh">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">comp2_mesh</span><span class="p">(</span><span class="n">MultiComponentMesh</span><span class="p">):</span>
+    <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;comp1&#39;</span><span class="p">,</span> <span class="s1">&#39;comp2&#39;</span><span class="p">]</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.datatype_classes.mesh</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

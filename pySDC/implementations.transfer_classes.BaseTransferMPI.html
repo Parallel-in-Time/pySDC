@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.transfer_classes.BaseTransferMPI module &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=81710850"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.transfer_classes.BaseTransfer_mass module" href="implementations.transfer_classes.BaseTransfer_mass.html" />
+    <link rel="prev" title="implementations.transfer_classes package" href="implementations.transfer_classes.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.transfer_classes.BaseTransfer_mass.html" title="implementations.transfer_classes.BaseTransfer_mass module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.transfer_classes.html" title="implementations.transfer_classes package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.transfer_classes.html" accesskey="U">implementations.transfer_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.transfer_classes.BaseTransferMPI module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.transfer_classes.BaseTransferMPI">
+<span id="implementations-transfer-classes-basetransfermpi-module"></span><h1>implementations.transfer_classes.BaseTransferMPI module<a class="headerlink" href="#module-implementations.transfer_classes.BaseTransferMPI" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">base_transfer_MPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/BaseTransferMPI.html#base_transfer_MPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTransfer</span></code></p>
+<p>Standard base_transfer class</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.logger">
+<span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.logger" title="Link to this definition">¶</a></dt>
+<dd><p>custom logger for sweeper-related logging</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.params">
+<span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.params" title="Link to this definition">¶</a></dt>
+<dd><p>parameter object containing the custom parameters passed by the user</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>__Pars</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.fine">
+<span class="sig-name descname"><span class="pre">fine</span></span><a class="headerlink" href="#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.fine" title="Link to this definition">¶</a></dt>
+<dd><p>reference to the fine level</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pySDC.Level.level</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.coarse">
+<span class="sig-name descname"><span class="pre">coarse</span></span><a class="headerlink" href="#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.coarse" title="Link to this definition">¶</a></dt>
+<dd><p>reference to the coarse level</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pySDC.Level.level</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.prolong">
+<span class="sig-name descname"><span class="pre">prolong</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/BaseTransferMPI.html#base_transfer_MPI.prolong"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.prolong" title="Link to this definition">¶</a></dt>
+<dd><p>Space-time prolongation routine</p>
+<p>This routine applies the spatial prolongation routine to the difference between the computed and the restricted
+values on the coarse level and then adds this difference to the fine values as coarse correction.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.prolong_f">
+<span class="sig-name descname"><span class="pre">prolong_f</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/BaseTransferMPI.html#base_transfer_MPI.prolong_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.prolong_f" title="Link to this definition">¶</a></dt>
+<dd><p>Space-time prolongation routine w.r.t. the rhs f</p>
+<p>This routine applies the spatial prolongation routine to the difference between the computed and the restricted
+values on the coarse level and then adds this difference to the fine values as coarse correction.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.restrict">
+<span class="sig-name descname"><span class="pre">restrict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/BaseTransferMPI.html#base_transfer_MPI.restrict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.restrict" title="Link to this definition">¶</a></dt>
+<dd><p>Space-time restriction routine</p>
+<p>The routine applies the spatial restriction operator to the fine values on the fine nodes, then reevaluates f
+on the coarse level. This is used for the first part of the FAS correction tau via integration. The second part
+is the integral over the fine values, restricted to the coarse level. Finally, possible tau corrections on the
+fine level are restricted as well.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.transfer_classes.BaseTransferMPI module</a><ul>
+<li><a class="reference internal" href="#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI"><code class="docutils literal notranslate"><span class="pre">base_transfer_MPI</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
+<li><a class="reference internal" href="#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.params"><code class="docutils literal notranslate"><span class="pre">params</span></code></a></li>
+<li><a class="reference internal" href="#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.fine"><code class="docutils literal notranslate"><span class="pre">fine</span></code></a></li>
+<li><a class="reference internal" href="#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.coarse"><code class="docutils literal notranslate"><span class="pre">coarse</span></code></a></li>
+<li><a class="reference internal" href="#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.prolong"><code class="docutils literal notranslate"><span class="pre">prolong()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.prolong_f"><code class="docutils literal notranslate"><span class="pre">prolong_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.restrict"><code class="docutils literal notranslate"><span class="pre">restrict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.transfer_classes.html"
+                          title="previous chapter">implementations.transfer_classes package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.transfer_classes.BaseTransfer_mass.html"
+                          title="next chapter">implementations.transfer_classes.BaseTransfer_mass module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.transfer_classes.BaseTransferMPI.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.transfer_classes.BaseTransfer_mass.html" title="implementations.transfer_classes.BaseTransfer_mass module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.transfer_classes.html" title="implementations.transfer_classes package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.transfer_classes.html" >implementations.transfer_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.transfer_classes.BaseTransferMPI module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+implementations.problem\_classes.HenonHeiles module
+===================================================
+
+.. automodule:: implementations.problem_classes.HenonHeiles
+   :members:
+   :show-inheritance:
+   :undoc-members:

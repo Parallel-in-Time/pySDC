@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>helpers.stats_helper &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../_static/documentation_options.js?v=81710850"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">helpers.stats_helper</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for helpers.stats_helper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<div class="viewcode-block" id="filter_stats">
+<a class="viewcode-back" href="../../pySDC/helpers.stats_helper.html#helpers.stats_helper.filter_stats">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">recomputed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper function to extract data from the dictionary of statistics. Please supply metadata as keyword arguments.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        stats (dict): raw statistics from a controller run</span>
+<span class="sd">        recomputed (bool): filter recomputed values from stats if set to anything other than None</span>
+<span class="sd">        comm (mpi4py.MPI.Intracomm): Communicator (or None if not applicable)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: dictionary containing only the entries corresponding to the filter</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">k</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k2</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">v2</span> <span class="k">for</span> <span class="n">k2</span><span class="p">,</span> <span class="n">v2</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="kc">True</span><span class="p">]):</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
+    <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># gather the results across all ranks</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">sub_result</span> <span class="ow">in</span> <span class="n">comm</span><span class="o">.</span><span class="n">allgather</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">sub_result</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="k">if</span> <span class="n">recomputed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># delete values that have been recorded and superseded by similar, but not identical keys</span>
+        <span class="n">times_restarted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">([</span><span class="n">me</span><span class="o">.</span><span class="n">time</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">me</span><span class="o">.</span><span class="n">num_restarts</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times_restarted</span><span class="p">:</span>
+            <span class="n">restarts</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">stats_now</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">stats_now</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">restarts</span><span class="p">[</span><span class="n">me</span><span class="o">.</span><span class="n">type</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">restarts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">me</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">me</span><span class="o">.</span><span class="n">num_restarts</span><span class="p">])</span>
+
+            <span class="p">[</span>
+                <span class="p">[</span>
+                    <span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">you</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">you</span> <span class="ow">in</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats_now</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">type_</span><span class="p">,</span> <span class="n">num_restarts</span><span class="o">=</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_restarts_</span><span class="p">)</span>
+                <span class="p">]</span>
+                <span class="k">for</span> <span class="n">type_</span><span class="p">,</span> <span class="n">num_restarts_</span> <span class="ow">in</span> <span class="n">restarts</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">]</span>
+
+        <span class="c1"># delete values that were recorded at times that shouldn&#39;t be recorded because we performed a different step after the restart</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;_recomputed&#39;</span><span class="p">:</span>
+            <span class="n">other_restarted_steps</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;_recomputed&#39;</span><span class="p">,</span> <span class="n">recomputed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">val</span>
+            <span class="p">]</span>
+            <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">other_restarted_steps</span><span class="p">:</span>
+                <span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">me</span><span class="p">)</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">time</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="sort_stats">
+<a class="viewcode-back" href="../../pySDC/helpers.stats_helper.html#helpers.stats_helper.sort_stats">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sort_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">sortby</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper function to transform stats dictionary to sorted list of tuples</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        stats (dict): dictionary of statistics</span>
+<span class="sd">        sortby (str): string to specify which key to use for sorting</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: list of tuples containing the sortby item and the value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># convert string to attribute and append key + value to result as tuple</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">sortby</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">item</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+
+    <span class="c1"># sort by first element of the tuple (which is the sortby key) and return</span>
+    <span class="n">sorted_data</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">tup</span><span class="p">:</span> <span class="n">tup</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">sorted_data</span></div>
+
+
+
+<div class="viewcode-block" id="get_list_of_types">
+<a class="viewcode-back" href="../../pySDC/helpers.stats_helper.html#helpers.stats_helper.get_list_of_types">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_list_of_types</span><span class="p">(</span><span class="n">stats</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper function to get list of types registered in stats</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        stats (dict): dictionary with statistics</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: list of types registered</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">type_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">type_list</span><span class="p">:</span>
+            <span class="n">type_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">type_list</span></div>
+
+
+
+<div class="viewcode-block" id="get_sorted">
+<a class="viewcode-back" href="../../pySDC/helpers.stats_helper.html#helpers.stats_helper.get_sorted">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Utility for filtering and sorting stats in a single call. Pass a communicator if using MPI.</span>
+<span class="sd">    Keyword arguments are passed to `filter_stats` for filtering.</span>
+
+<span class="sd">    stats (dict): raw statistics from a controller run</span>
+<span class="sd">    sortby (str): string to specify which key to use for sorting</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: list of tuples containing the sortby item and the value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">sort_stats</span><span class="p">(</span>
+        <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+        <span class="n">sortby</span><span class="o">=</span><span class="n">sortby</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">helpers.stats_helper</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>
