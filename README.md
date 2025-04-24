@@ -112,7 +112,7 @@ Any contribution is dearly welcome! If you want to contribute, please take the t
 This project has received funding from the [European High-Performance
 Computing Joint Undertaking](https://eurohpc-ju.europa.eu/) (JU) under
 grant agreement No 955701 ([TIME-X](https://www.time-x-eurohpc.eu/))
-and grant agreement No 101118139.
+and grant agreement No 101118139. 
 The JU receives support from the European Union's Horizon 2020 research
 and innovation programme and Belgium, France, Germany, and Switzerland.
 This project also received funding from the [German Federal Ministry of
