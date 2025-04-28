@@ -1,6 +1,6 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from distutils.spawn import find_executable
+import shutil
 
 default_mpl_params = mpl.rcParams.copy()
 
@@ -100,7 +100,7 @@ def setup_mpl(font_size=8, reset=False):
 
     mpl.rcParams.update(style_options)
 
-    if find_executable('latex'):
+    if shutil.which('latex'):
         latex_support = {
             "pgf.texsystem": "pdflatex",  # change this if using xetex or lautex
             "text.usetex": True,  # use LaTeX to write all text
