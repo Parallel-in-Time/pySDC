@@ -204,6 +204,7 @@ jobs:
           . venv-pySDC/bin/activate
           pip install -e /repositories/pySDC
           pip install qmat
+          pip install pytest-isolate-mpi
           # test installation
           python -c "import pySDC; print(f'pySDC module: {pySDC}')"
       - name: Install gusto
