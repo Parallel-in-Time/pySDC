@@ -522,23 +522,9 @@ class Rectilinear(Scalar):
         cls.comm = comm
         cls.iLoc = iLoc
         cls.nLoc = nLoc
-        cls.mpiFile:MPI.File = None
-        cls.mpiType:MPI.Datatype = None
-        cls.mpiFileType:MPI.Datatype = None
-        cls._nCollectiveIO = None
-
-    @property
-    def nCollectiveIO(self):
-        """
-        Number of collective IO operations over all processes, when reading or writing a field.
-
-        Returns:
-        --------
-        int: Number of collective IO accesses
-        """
-        if self._nCollectiveIO is None:
-            self._nCollectiveIO = self.comm.allreduce(self.nVar * np.prod(self.nLoc[:-1]), op=MPI.MAX)
-        return self._nCollectiveIO
+        cls.mpiFile: MPI.File = None
+        cls.mpiType: MPI.Datatype = None
+        cls.mpiFileType: MPI.Datatype = None
 
     @property
     def MPI_ON(self):
@@ -558,13 +544,11 @@ class Rectilinear(Scalar):
         """Setup subarray masks for each processes"""
         self.mpiType = MPI_DTYPE(self.dtype)
         self.mpiFileType = self.mpiType.Create_subarray(
-            [self.nVar, *self.gridSizes],   # Global array sizes
-            [self.nVar, *self.nLoc],    # Local array sizes
-            [0, *self.iLoc]     # Global starting indices of local blocks
-            )
+            [self.nVar, *self.gridSizes],  # Global array sizes
+            [self.nVar, *self.nLoc],  # Local array sizes
+            [0, *self.iLoc],  # Global starting indices of local blocks
+        )
         self.mpiFileType.Commit()
-        print("MPI_TYPE ", self.mpiType)
-        print("MPI_FILETYPE ", self.mpiFileType)
 
     def MPI_FILE_OPEN(self, mode):
         """Open the binary file in MPI mode"""
