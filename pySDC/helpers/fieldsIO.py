@@ -502,7 +502,6 @@ class Rectilinear(Scalar):
     # MPI-parallel implementation
     # -------------------------------------------------------------------------
     comm: MPI.Intracomm = None
-    _nCollectiveIO = None
 
     @classmethod
     def setupMPI(cls, comm: MPI.Intracomm, iLoc, nLoc):
