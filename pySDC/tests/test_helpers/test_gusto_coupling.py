@@ -647,10 +647,10 @@ def test_pySDC_integrator_MSSDC(n_steps, useMPIController, setup, submit=True, n
         )
         return None
 
+    from firedrake import norm, Constant, COMM_WORLD
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.helpers.pySDC_as_gusto_time_discretization import pySDC_integrator
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit as sweeper_cls
-    from firedrake import norm, Constant, COMM_WORLD
     import numpy as np
 
     MSSDC_args = {}
