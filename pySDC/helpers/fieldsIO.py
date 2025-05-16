@@ -439,7 +439,7 @@ class Rectilinear(Scalar):
         coords = [np.fromfile(f, dtype=np.float64, count=n) for n in gridSizes]
         self.setHeader(nVar, coords)
         if self.MPI_ON:
-            self.MPI_SETUP()
+            self.MPI_SETUP_FILETYPE()
 
     def reshape(self, fields: np.ndarray):
         """Reshape the fields to a N-d array (inplace operation)"""
@@ -537,7 +537,7 @@ class Rectilinear(Scalar):
             return True
         return self.comm.Get_rank() == 0
 
-    def MPI_SETUP(self):
+    def MPI_SETUP_FILETYPE(self):
         """Setup subarray masks for each processes"""
         self.mpiType = MPI_DTYPE(self.dtype)
         self.mpiFileType = self.mpiType.Create_subarray(
@@ -554,6 +554,8 @@ class Rectilinear(Scalar):
             "a": MPI.MODE_WRONLY | MPI.MODE_APPEND,
         }[mode]
         self.mpiFile = MPI.File.Open(self.comm, self.fileName, amode)
+        if self.mpiType is None:
+            self.MPI_SETUP_FILETYPE()
 
     def MPI_WRITE(self, data):
         """Write data (np.ndarray) in the binary file in MPI mode, at the current file cursor position."""
@@ -571,8 +573,6 @@ class Rectilinear(Scalar):
         data : np.ndarray
             Data to be written in the binary file.
         """
-        if self.mpiType is None:
-            self.MPI_SETUP()
         self.mpiFile.Set_view(disp=offset, etype=self.mpiType, filetype=self.mpiFileType)
         self.mpiFile.Write_all(data)
 
@@ -588,8 +588,6 @@ class Rectilinear(Scalar):
         data : np.ndarray
             Array on which to read the data from the binary file.
         """
-        if self.mpiType is None:
-            self.MPI_SETUP()
         self.mpiFile.Set_view(disp=offset, etype=self.mpiType, filetype=self.mpiFileType)
         self.mpiFile.Read_all(data)
 
