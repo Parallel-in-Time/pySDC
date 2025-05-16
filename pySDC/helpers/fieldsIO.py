@@ -438,8 +438,6 @@ class Rectilinear(Scalar):
         gridSizes = np.fromfile(f, dtype=np.int32, count=dim)
         coords = [np.fromfile(f, dtype=np.float64, count=n) for n in gridSizes]
         self.setHeader(nVar, coords)
-        if self.MPI_ON:
-            self.MPI_SETUP_FILETYPE()
 
     def reshape(self, fields: np.ndarray):
         """Reshape the fields to a N-d array (inplace operation)"""
