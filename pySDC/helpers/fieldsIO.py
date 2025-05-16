@@ -417,8 +417,6 @@ class Rectilinear(Scalar):
         coords = self.setupCoords(*coords)
         self.header = {"nVar": int(nVar), "coords": coords}
         self.nItems = nVar * self.nDoF
-        if self.MPI_ON:
-            self.MPI_SETUP()
 
     @property
     def hInfos(self):
@@ -573,6 +571,8 @@ class Rectilinear(Scalar):
         data : np.ndarray
             Data to be written in the binary file.
         """
+        if self.mpiType is None:
+            self.MPI_SETUP()
         self.mpiFile.Set_view(disp=offset, etype=self.mpiType, filetype=self.mpiFileType)
         self.mpiFile.Write_all(data)
 
@@ -588,6 +588,8 @@ class Rectilinear(Scalar):
         data : np.ndarray
             Array on which to read the data from the binary file.
         """
+        if self.mpiType is None:
+            self.MPI_SETUP()
         self.mpiFile.Set_view(disp=offset, etype=self.mpiType, filetype=self.mpiFileType)
         self.mpiFile.Read_all(data)
 
