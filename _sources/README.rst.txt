@@ -161,7 +161,7 @@ and innovation programme and Belgium, France, Germany, and Switzerland.
 This project also received funding from the `German Federal Ministry of
 Education and Research <https://www.bmbf.de/bmbf/en/home/home_node.html>`_
 (BMBF) grants  16HPC047 and 16ME0679K. Supported by the European Union - NextGenerationEU. 
-The project also received help from the `Helmholtz Platform for Research Software Engineering - Preparatory Study (HiRSE_PS) <https://www.helmholtz-hirse.de/>`_.
+The project also received help from the `Joint Lab "Helmholtz Information -  Research Software Engineering" (HiRSE) <https://www.helmholtz-hirse.de/>`_.
 
 
 .. raw:: html
