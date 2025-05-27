@@ -203,7 +203,6 @@ jobs:
         run: |
           . venv-pySDC/bin/activate
           pip install -e /repositories/pySDC
-          pip install qmat
           # test installation
           python -c "import pySDC; print(f'pySDC module: {pySDC}')"
       - name: Install gusto

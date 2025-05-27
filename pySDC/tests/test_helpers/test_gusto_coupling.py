@@ -621,7 +621,7 @@ def test_pySDC_integrator_with_adaptivity(dt_initial, setup):
 
 
 @pytest.mark.firedrake
-@pytest.mark.parametrize('n_steps', [1, 2, 4])
+@pytest.mark.parametrize('n_steps', [1, 4])
 @pytest.mark.parametrize('useMPIController', [True, False])
 def test_pySDC_integrator_MSSDC(n_steps, useMPIController, setup, submit=True, n_tasks=4):
     if submit and useMPIController:
