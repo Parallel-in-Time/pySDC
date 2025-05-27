@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_41564483689e14fd_problem_helper_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.8.2">coverage.py v7.8.2</a>,
-            created at 2025-05-27 13:51 +0000
+            created at 2025-05-27 16:07 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -82,7 +82,7 @@
 <main id="source">
     <p class="run"><span class="n"><a id="t1" href="#t1">1</a></span><span class="t"><span class="key">import</span> <span class="nam">matplotlib</span> <span class="key">as</span> <span class="nam">mpl</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t2" href="#t2">2</a></span><span class="t"><span class="key">import</span> <span class="nam">matplotlib</span><span class="op">.</span><span class="nam">pyplot</span> <span class="key">as</span> <span class="nam">plt</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t3" href="#t3">3</a></span><span class="t"><span class="key">from</span> <span class="nam">distutils</span><span class="op">.</span><span class="nam">spawn</span> <span class="key">import</span> <span class="nam">find_executable</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t3" href="#t3">3</a></span><span class="t"><span class="key">import</span> <span class="nam">shutil</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t4" href="#t4">4</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t5" href="#t5">5</a></span><span class="t"><span class="nam">default_mpl_params</span> <span class="op">=</span> <span class="nam">mpl</span><span class="op">.</span><span class="nam">rcParams</span><span class="op">.</span><span class="nam">copy</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t6" href="#t6">6</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -182,7 +182,7 @@
     <p class="pln"><span class="n"><a id="t100" href="#t100">100</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t101" href="#t101">101</a></span><span class="t">    <span class="nam">mpl</span><span class="op">.</span><span class="nam">rcParams</span><span class="op">.</span><span class="nam">update</span><span class="op">(</span><span class="nam">style_options</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t102" href="#t102">102</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t103" href="#t103">103</a></span><span class="t">    <span class="key">if</span> <span class="nam">find_executable</span><span class="op">(</span><span class="str">'latex'</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t103" href="#t103">103</a></span><span class="t">    <span class="key">if</span> <span class="nam">shutil</span><span class="op">.</span><span class="nam">which</span><span class="op">(</span><span class="str">'latex'</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t104" href="#t104">104</a></span><span class="t">        <span class="nam">latex_support</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t105" href="#t105">105</a></span><span class="t">            <span class="str">"pgf.texsystem"</span><span class="op">:</span> <span class="str">"pdflatex"</span><span class="op">,</span>  <span class="com"># change this if using xetex or lautex</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t106" href="#t106">106</a></span><span class="t">            <span class="str">"text.usetex"</span><span class="op">:</span> <span class="key">True</span><span class="op">,</span>  <span class="com"># use LaTeX to write all text</span>&nbsp;</span><span class="r"></span></p>
@@ -207,7 +207,7 @@
     <p class="pln"><span class="n"><a id="t125" href="#t125">125</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t126" href="#t126">126</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t127" href="#t127">127</a></span><span class="t"><span class="key">def</span> <span class="nam">savefig</span><span class="op">(</span><span class="nam">filename</span><span class="op">,</span> <span class="nam">save_pdf</span><span class="op">=</span><span class="key">True</span><span class="op">,</span> <span class="nam">save_pgf</span><span class="op">=</span><span class="key">True</span><span class="op">,</span> <span class="nam">save_png</span><span class="op">=</span><span class="key">True</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t128" href="#t128">128</a></span><span class="t">    <span class="key">if</span> <span class="nam">save_pgf</span> <span class="key">and</span> <span class="nam">find_executable</span><span class="op">(</span><span class="str">'latex'</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t128" href="#t128">128</a></span><span class="t">    <span class="key">if</span> <span class="nam">save_pgf</span> <span class="key">and</span> <span class="nam">shutil</span><span class="op">.</span><span class="nam">which</span><span class="op">(</span><span class="str">'latex'</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t129" href="#t129">129</a></span><span class="t">        <span class="nam">plt</span><span class="op">.</span><span class="nam">savefig</span><span class="op">(</span><span class="str">'{}.pgf'</span><span class="op">.</span><span class="nam">format</span><span class="op">(</span><span class="nam">filename</span><span class="op">)</span><span class="op">,</span> <span class="nam">bbox_inches</span><span class="op">=</span><span class="str">'tight'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t130" href="#t130">130</a></span><span class="t">    <span class="key">if</span> <span class="nam">save_pdf</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t131" href="#t131">131</a></span><span class="t">        <span class="nam">plt</span><span class="op">.</span><span class="nam">savefig</span><span class="op">(</span><span class="str">'{}.pdf'</span><span class="op">.</span><span class="nam">format</span><span class="op">(</span><span class="nam">filename</span><span class="op">)</span><span class="op">,</span> <span class="nam">bbox_inches</span><span class="op">=</span><span class="str">'tight'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -223,7 +223,7 @@
             <a class="nav" href="z_41564483689e14fd_problem_helper_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.8.2">coverage.py v7.8.2</a>,
-            created at 2025-05-27 13:51 +0000
+            created at 2025-05-27 16:07 +0000
         </p>
     </div>
 </footer>

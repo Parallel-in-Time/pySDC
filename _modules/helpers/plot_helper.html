@@ -39,7 +39,7 @@
   <h1>Source code for helpers.plot_helper</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpl</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">distutils.spawn</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_executable</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
 
 <span class="n">default_mpl_params</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
@@ -147,7 +147,7 @@
 
     <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">style_options</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">find_executable</span><span class="p">(</span><span class="s1">&#39;latex&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;latex&#39;</span><span class="p">):</span>
         <span class="n">latex_support</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;pgf.texsystem&quot;</span><span class="p">:</span> <span class="s2">&quot;pdflatex&quot;</span><span class="p">,</span>  <span class="c1"># change this if using xetex or lautex</span>
             <span class="s2">&quot;text.usetex&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># use LaTeX to write all text</span>
@@ -178,7 +178,7 @@
 <div class="viewcode-block" id="savefig">
 <a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.savefig">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">save_pdf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_pgf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_png</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">save_pgf</span> <span class="ow">and</span> <span class="n">find_executable</span><span class="p">(</span><span class="s1">&#39;latex&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">save_pgf</span> <span class="ow">and</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;latex&#39;</span><span class="p">):</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.pgf&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">save_pdf</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.pdf&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
