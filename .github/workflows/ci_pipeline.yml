@@ -25,7 +25,7 @@ jobs:
         with:
           environment-file: ${{ env.YML }}
           create-args: >-
-              python=3.12
+              python=3.13
       - name: Code reformatting with black
         run: |
           black pySDC  --check --diff --color
@@ -39,7 +39,7 @@ jobs:
       fail-fast: false
       matrix:
         env: ['base', 'fenics', 'mpi4py', 'petsc', 'pytorch']
-        python: ['3.9', '3.10', '3.11', '3.12']
+        python: ['3.9', '3.10', '3.11', '3.12', '3.13']
     defaults:
       run:
         shell: bash -l {0}
@@ -70,7 +70,7 @@ jobs:
           mv .coverage coverage_${{ matrix.env }}.dat
       - name: Uploading artifacts
         uses: actions/upload-artifact@v4
-        if: matrix.python == '3.12'
+        if: matrix.python == '3.13'
         with:
           name: test-artifacts-cpu-${{ matrix.env }}
           path: |
@@ -98,7 +98,6 @@ jobs:
           - Second_orderSDC
           - soft_failure
           - TOMS
-        python: ['3.9', '3.10', '3.11', '3.12']
     defaults:
       run:
         shell: bash -l {0}
@@ -109,8 +108,6 @@ jobs:
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: "pySDC/projects/${{ matrix.env }}/environment.yml"
-          create-args: >-
-              python=${{ matrix.python }}
       - name: Install additional packages as needed
         run: |
           micromamba install -y --file etc/environment-tests.yml --freeze-installed
@@ -126,7 +123,6 @@ jobs:
           mv .coverage coverage_${{ matrix.env }}.dat
       - name: Uploading artifacts
         uses: actions/upload-artifact@v4
-        if: matrix.python == '3.12'
         with:
           name: test-artifacts-project-${{ matrix.env }}
           path: |
