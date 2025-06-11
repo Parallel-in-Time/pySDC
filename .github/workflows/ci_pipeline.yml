@@ -25,7 +25,7 @@ jobs:
         with:
           environment-file: ${{ env.YML }}
           create-args: >-
-              python=3.12
+              python=3.13
       - name: Code reformatting with black
         run: |
           black pySDC  --check --diff --color
@@ -70,7 +70,7 @@ jobs:
           mv .coverage coverage_${{ matrix.env }}.dat
       - name: Uploading artifacts
         uses: actions/upload-artifact@v4
-        if: matrix.python == '3.12'
+        if: matrix.python == '3.13'
         with:
           name: test-artifacts-cpu-${{ matrix.env }}
           path: |
