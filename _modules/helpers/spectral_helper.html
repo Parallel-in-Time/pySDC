@@ -41,6 +41,57 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.special</span><span class="w"> </span><span class="kn">import</span> <span class="n">factorial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">wraps</span>
+
+
+<div class="viewcode-block" id="cache">
+<a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.cache">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cache</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator for caching return values of functions.</span>
+<span class="sd">    This is very similar to `functools.cache`, but without the memory leaks (see</span>
+<span class="sd">    https://docs.astral.sh/ruff/rules/cached-instance-method/).</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        num_calls = 0</span>
+
+<span class="sd">        @cache</span>
+<span class="sd">        def increment(x):</span>
+<span class="sd">            num_calls += 1</span>
+<span class="sd">            return x + 1</span>
+
+<span class="sd">        increment(0)  # returns 1, num_calls = 1</span>
+<span class="sd">        increment(1)  # returns 2, num_calls = 2</span>
+<span class="sd">        increment(0)  # returns 1, num_calls = 2</span>
+
+
+<span class="sd">    Args:</span>
+<span class="sd">        func (function): The function you want to cache the return value of</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        return value of func</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">attr_cache</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">_cache&quot;</span>
+
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_cache</span><span class="p">):</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_cache</span><span class="p">,</span> <span class="p">{})</span>
+
+        <span class="n">cache</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_cache</span><span class="p">)</span>
+
+        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cache</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
 
 
 <div class="viewcode-block" id="SpectralHelper1D">
@@ -280,7 +331,6 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_type</span> <span class="o">==</span> <span class="s1">&#39;fft&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">get_fft_utils</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_norm</span><span class="p">()</span>
 
 <div class="viewcode-block" id="ChebychevHelper.get_1dgrid">
@@ -306,6 +356,7 @@
 
 <div class="viewcode-block" id="ChebychevHelper.get_conv">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_conv">[docs]</a>
+    <span class="nd">@cache</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_conv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Get conversion matrix between different kinds of polynomials. The supported kinds are</span>
@@ -323,9 +374,6 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            scipy.sparse: Sparse conversion matrix</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">N</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-
         <span class="n">N</span> <span class="o">=</span> <span class="n">N</span> <span class="k">if</span> <span class="n">N</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span>
         <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span>
         <span class="n">xp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span>
@@ -356,7 +404,6 @@
             <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span> <span class="kn">from</span><span class="w"> </span><span class="nn">E</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mat</span>
         <span class="k">return</span> <span class="n">mat</span></div>
 
 

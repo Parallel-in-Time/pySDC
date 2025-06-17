@@ -1494,6 +1494,35 @@ integration constant such that integration starts from x=-1.</p>
 
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="helpers.spectral_helper.cache">
+<span class="sig-name descname"><span class="pre">cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.cache" title="Link to this definition">¶</a></dt>
+<dd><p>Decorator for caching return values of functions.
+This is very similar to <cite>functools.cache</cite>, but without the memory leaks (see
+<a class="reference external" href="https://docs.astral.sh/ruff/rules/cached-instance-method/">https://docs.astral.sh/ruff/rules/cached-instance-method/</a>).</p>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">num_calls</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="nd">@cache</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">increment</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">num_calls</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+
+<span class="n">increment</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># returns 1, num_calls = 1</span>
+<span class="n">increment</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># returns 2, num_calls = 2</span>
+<span class="n">increment</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># returns 1, num_calls = 2</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>func</strong> (<em>function</em>) – The function you want to cache the return value of</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>return value of func</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -1635,6 +1664,7 @@ integration constant such that integration starts from x=-1.</p>
 <li><a class="reference internal" href="#helpers.spectral_helper.UltrasphericalHelper.get_integration_matrix"><code class="docutils literal notranslate"><span class="pre">get_integration_matrix()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#helpers.spectral_helper.cache"><code class="docutils literal notranslate"><span class="pre">cache()</span></code></a></li>
 </ul>
 </li>
 </ul>
