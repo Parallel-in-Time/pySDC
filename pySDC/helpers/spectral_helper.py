@@ -2,6 +2,52 @@ import numpy as np
 import scipy
 from pySDC.implementations.datatype_classes.mesh import mesh
 from scipy.special import factorial
+from functools import wraps
+
+
+def cache(func):
+    """
+    Decorator for caching return values of functions.
+
+    Example:
+
+    .. code-block:: python
+
+        num_calls = 0
+
+        @cache
+        def increment(x):
+            num_calls += 1
+            return x + 1
+
+        increment(0)  # returns 1, num_calls = 1
+        increment(1)  # returns 2, num_calls = 2
+        increment(0)  # returns 1, num_calls = 2
+
+
+    Args:
+        func (function): The function you want to cache the return value of
+
+    Returns:
+        return value of func
+    """
+    attr_cache = f"_{func.__name__}_cache"
+
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        if not hasattr(self, attr_cache):
+            setattr(self, attr_cache, {})
+
+        cache = getattr(self, attr_cache)
+
+        key = (args, frozenset(kwargs.items()))
+        if key in cache:
+            return cache[key]
+        result = func(self, *args, **kwargs)
+        cache[key] = result
+        return result
+
+    return wrapper
 
 
 class SpectralHelper1D:
@@ -203,7 +249,6 @@ class ChebychevHelper(SpectralHelper1D):
         if self.transform_type == 'fft':
             self.get_fft_utils()
 
-        self.cache = {}
         self.norm = self.get_norm()
 
     def get_1dgrid(self):
@@ -221,6 +266,7 @@ class ChebychevHelper(SpectralHelper1D):
         """Get the domain in spectral space"""
         return self.xp.arange(self.N)
 
+    @cache
     def get_conv(self, name, N=None):
         '''
         Get conversion matrix between different kinds of polynomials. The supported kinds are
@@ -238,9 +284,6 @@ class ChebychevHelper(SpectralHelper1D):
         Returns:
             scipy.sparse: Sparse conversion matrix
         '''
-        if name in self.cache.keys() and not N:
-            return self.cache[name]
-
         N = N if N else self.N
         sp = self.sparse_lib
         xp = self.xp
@@ -271,7 +314,6 @@ class ChebychevHelper(SpectralHelper1D):
             except NotImplementedError:
                 raise NotImplementedError from E
 
-        self.cache[name] = mat
         return mat
 
     def get_basis_change_matrix(self, conv='T2T', **kwargs):
