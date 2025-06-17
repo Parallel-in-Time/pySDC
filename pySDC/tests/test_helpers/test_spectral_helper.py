@@ -551,6 +551,30 @@ def test_dealias_MPI(num_procs, axis, bx, bz, nx=32, nz=64, **kwargs):
     run_MPI_test(num_procs=num_procs, axis=axis, nx=nx, nz=nz, bx=bx, bz=bz, test='dealias')
 
 
+@pytest.mark.base
+def test_cache_decorator():
+    from pySDC.helpers.spectral_helper import cache
+    import numpy as np
+
+    class Dummy:
+        num_calls = 0
+
+        @cache
+        def increment(self, x):
+            self.num_calls += 1
+            return x + 1
+
+    dummy = Dummy()
+    values = [0, 1, 1, 0, 3, 1, 2]
+    unique_vals = np.unique(values)
+
+    for x in values:
+        assert dummy.increment(x) == x + 1
+
+    assert dummy.num_calls < len(values)
+    assert dummy.num_calls == len(unique_vals)
+
+
 if __name__ == '__main__':
     str_to_bool = lambda me: False if me == 'False' else True
     str_to_tuple = lambda arg: tuple(int(me) for me in arg.split(','))
