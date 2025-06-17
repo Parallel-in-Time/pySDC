@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Coverage for pySDC/projects/Resilience/work_precision.py: 0%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_58284776.png">
-    <link rel="stylesheet" href="style_cb_8e611ae1.css" type="text/css">
+    <link rel="stylesheet" href="style_cb_81f8c14c.css" type="text/css">
     <script src="coverage_html_cb_6fb7b396.js" defer></script>
 </head>
 <body class="pyfile">
@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_327f90590a9d3ec6_SDC_timing_Fisher_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.8.2">coverage.py v7.8.2</a>,
-            created at 2025-05-27 16:07 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.9.1">coverage.py v7.9.1</a>,
+            created at 2025-06-17 10:12 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -897,7 +897,7 @@
     <p class="pln"><span class="n"><a id="t815" href="#t815">815</a></span><span class="t">                <span class="str">'plotting_params'</span><span class="op">:</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t816" href="#t816">816</a></span><span class="t">                    <span class="str">'color'</span><span class="op">:</span> <span class="nam">colors</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t817" href="#t817">817</a></span><span class="t">                    <span class="str">'marker'</span><span class="op">:</span> <span class="nam">markers</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t818" href="#t818">818</a></span><span class="t">                    <span class="str">'label'</span><span class="op">:</span> <span class="fst">rf'</span><span class="fst">$\Delta t \leq {</span> <span class="op">{</span><span class="nam">limits</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">:</span><span class="fst">.0f</span><span class="op">}</span><span class="fst">}</span> <span class="fst">$</span><span class="fst">'</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t818" href="#t818">818</a></span><span class="t">                    <span class="str">'label'</span><span class="op">:</span> <span class="fst">rf'</span><span class="fst">$\Delta t \leq {{</span><span class="op">{</span><span class="nam">limits</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">:</span><span class="fst">.0f</span><span class="op">}</span><span class="fst">}}</span><span class="fst">$</span><span class="fst">'</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t819" href="#t819">819</a></span><span class="t">                    <span class="com"># 'ls': '',</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t820" href="#t820">820</a></span><span class="t">                    <span class="str">'markersize'</span><span class="op">:</span> <span class="nam">markersize</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t821" href="#t821">821</a></span><span class="t">                <span class="op">}</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
@@ -2002,7 +2002,7 @@
     <p class="exc show_exc"><span class="n"><a id="t1920" href="#t1920">1920</a></span><span class="t">        <span class="nam">mode</span> <span class="op">=</span> <span class="fst">f'</span><span class="fst">vdp_stiffness-</span><span class="op">{</span><span class="nam">mus</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">}</span><span class="fst">'</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t1921" href="#t1921">1921</a></span><span class="t">        <span class="nam">configurations</span> <span class="op">=</span> <span class="nam">get_configs</span><span class="op">(</span><span class="nam">mode</span><span class="op">=</span><span class="nam">mode</span><span class="op">,</span> <span class="nam">problem</span><span class="op">=</span><span class="nam">run_vdp</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t1922" href="#t1922">1922</a></span><span class="t">        <span class="nam">execute_configurations</span><span class="op">(</span><span class="op">**</span><span class="nam">params</span><span class="op">,</span> <span class="nam">ax</span><span class="op">=</span><span class="nam">axs</span><span class="op">.</span><span class="nam">flatten</span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">,</span> <span class="nam">decorate</span><span class="op">=</span><span class="key">True</span><span class="op">,</span> <span class="nam">configurations</span><span class="op">=</span><span class="nam">configurations</span><span class="op">,</span> <span class="nam">mode</span><span class="op">=</span><span class="nam">mode</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t1923" href="#t1923">1923</a></span><span class="t">        <span class="nam">axs</span><span class="op">.</span><span class="nam">flatten</span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">.</span><span class="nam">set_title</span><span class="op">(</span><span class="fst">rf'</span><span class="fst">$\mu={</span> <span class="op">{</span><span class="nam">mus</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">}</span><span class="fst">}</span> <span class="fst">$</span><span class="fst">'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t1923" href="#t1923">1923</a></span><span class="t">        <span class="nam">axs</span><span class="op">.</span><span class="nam">flatten</span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">.</span><span class="nam">set_title</span><span class="op">(</span><span class="fst">rf'</span><span class="fst">$\mu={{</span><span class="op">{</span><span class="nam">mus</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">}</span><span class="fst">}}</span><span class="fst">$</span><span class="fst">'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t1924" href="#t1924">1924</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t1925" href="#t1925">1925</a></span><span class="t">    <span class="nam">fig</span><span class="op">.</span><span class="nam">suptitle</span><span class="op">(</span><span class="str">'Van der Pol'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t1926" href="#t1926">1926</a></span><span class="t">    <span class="key">if</span> <span class="nam">params</span><span class="op">[</span><span class="str">'comm_world'</span><span class="op">]</span><span class="op">.</span><span class="nam">rank</span> <span class="op">==</span> <span class="num">0</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -2121,8 +2121,8 @@
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_327f90590a9d3ec6_SDC_timing_Fisher_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.8.2">coverage.py v7.8.2</a>,
-            created at 2025-05-27 16:07 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.9.1">coverage.py v7.9.1</a>,
+            created at 2025-06-17 10:12 +0000
         </p>
     </div>
 </footer>
