@@ -575,6 +575,39 @@ def test_cache_decorator():
     assert dummy.num_calls == len(unique_vals)
 
 
+@pytest.mark.base
+def test_cache_memory_leaks():
+    from pySDC.helpers.spectral_helper import cache
+
+    track = [0, 0]
+
+    class KeepTrack:
+
+        def __init__(self):
+            track[0] += 1
+            track[1] = 0
+
+        @cache
+        def method(self, a, b, c=1, d=2):
+            track[1] += 1
+            return f"{a},{b},c={c},d={d}"
+
+        def __del__(self):
+            track[0] -= 1
+
+    def function():
+        obj = KeepTrack()
+        for _ in range(10):
+            obj.method(1, 2, d=2)
+            assert track[0] == 1
+            assert track[1] == 1
+
+    for _ in range(3):
+        function()
+
+    assert track[0] == 0, "possible memory leak with the @cache"
+
+
 if __name__ == '__main__':
     str_to_bool = lambda me: False if me == 'False' else True
     str_to_tuple = lambda arg: tuple(int(me) for me in arg.split(','))
