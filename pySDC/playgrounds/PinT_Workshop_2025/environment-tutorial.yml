@@ -1,0 +1,23 @@
+---
+
+name: pySDC_tutorial
+channels:
+  - conda-forge
+dependencies:
+  - numpy>=1.15.4
+  - scipy>=0.17.1
+  - matplotlib>=3.0
+  - dill>=0.2.6
+  - vtk
+  - mpich
+  - mpi4py-fft
+  - mpi4py>=3.0.0
+  - pytest
+  - pytest-cov
+  - jupyter
+  - ipyparallel
+  - pip
+  - ipython
+  - pip:
+    - jdc
+    - qmat
