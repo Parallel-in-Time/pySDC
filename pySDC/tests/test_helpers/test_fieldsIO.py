@@ -14,10 +14,10 @@ FieldsIO.ALLOW_OVERWRITE = True
 @pytest.mark.base
 @pytest.mark.parametrize("dtypeIdx", DTYPES.keys())
 @pytest.mark.parametrize("dim", range(4))
-def testHeader(dim, dtypeIdx):
+def testHeader(tmpdir, dim, dtypeIdx):
     from pySDC.helpers.fieldsIO import FieldsIO, Scalar, Rectilinear
 
-    fileName = "testHeader.pysdc"
+    fileName = f"{tmpdir}/testHeader.pysdc"
     dtype = DTYPES[dtypeIdx]
 
     coords = [np.linspace(0, 1, num=256, endpoint=False) for n in [256, 64, 32]]
@@ -67,10 +67,10 @@ def testHeader(dim, dtypeIdx):
 @pytest.mark.parametrize("dtypeIdx", DTYPES.keys())
 @pytest.mark.parametrize("nSteps", [1, 2, 10, 100])
 @pytest.mark.parametrize("nVar", [1, 2, 5])
-def testScalar(nVar, nSteps, dtypeIdx):
+def testScalar(tmpdir, nVar, nSteps, dtypeIdx):
     from pySDC.helpers.fieldsIO import FieldsIO, Scalar
 
-    fileName = "testScalar.pysdc"
+    fileName = f'{tmpdir}/testScalar.pySDC'
     dtype = DTYPES[dtypeIdx]
 
     f1 = Scalar(dtype, fileName)
@@ -110,10 +110,10 @@ def testScalar(nVar, nSteps, dtypeIdx):
 @pytest.mark.parametrize("nSteps", [1, 2, 5, 10])
 @pytest.mark.parametrize("nVar", [1, 2, 5])
 @pytest.mark.parametrize("dim", [1, 2, 3])
-def testRectilinear(dim, nVar, nSteps, dtypeIdx):
+def testRectilinear(tmpdir, dim, nVar, nSteps, dtypeIdx):
     from pySDC.helpers.fieldsIO import FieldsIO, Rectilinear, DTYPES
 
-    fileName = f"testRectilinear{dim}D.pysdc"
+    fileName = f"{tmpdir}/testRectilinear{dim}D.pysdc"
     dtype = DTYPES[dtypeIdx]
 
     for gridSizes in itertools.product(*[[5, 10, 16]] * dim):
@@ -161,13 +161,13 @@ def testRectilinear(dim, nVar, nSteps, dtypeIdx):
 @pytest.mark.parametrize("nY", [1, 5, 16])
 @pytest.mark.parametrize("nX", [1, 5, 16])
 @pytest.mark.parametrize("nVar", [1, 2, 3])
-def testToVTR(nVar, nX, nY, nZ, nSteps):
+def testToVTR(tmpdir, nVar, nX, nY, nZ, nSteps):
 
     from pySDC.helpers.fieldsIO import Rectilinear
     from pySDC.helpers.vtkIO import readFromVTR
 
     coords = [np.linspace(0, 1, num=n, endpoint=False) for n in [nX, nY, nZ]]
-    file = Rectilinear(np.float64, "testToVTR.pysdc")
+    file = Rectilinear(np.float64, f"{tmpdir}/testToVTR.pysdc")
     file.setHeader(nVar=nVar, coords=coords)
     file.initialize()
     u0 = np.random.rand(nVar, nX, nY, nZ).astype(file.dtype)
@@ -176,13 +176,9 @@ def testToVTR(nVar, nX, nY, nZ, nSteps):
         ut = (u0 * t).astype(file.dtype)
         file.addField(t, ut)
 
-    # Cleaning after eventuall other tests ...
-    for f in glob.glob("testToVTR*.vtr"):
-        os.remove(f)
+    file.toVTR(f"{tmpdir}/testToVTR", varNames=[f"var{i}" for i in range(nVar)])
 
-    file.toVTR("testToVTR", varNames=[f"var{i}" for i in range(nVar)])
-
-    vtrFiles = glob.glob("testToVTR*.vtr")
+    vtrFiles = glob.glob(f"{tmpdir}/testToVTR*.vtr")
     assert len(vtrFiles) == file.nFields
 
     vtrFiles.sort(key=lambda name: int(name.split("_")[-1][:-4]))
@@ -201,11 +197,11 @@ def testToVTR(nVar, nX, nY, nZ, nSteps):
 @pytest.mark.parametrize("dtypeIdx", [0, 1])
 @pytest.mark.parametrize("nProcs", [2, 4])
 @pytest.mark.parametrize("dim", [2, 3])
-def testRectilinear_MPI(dim, nProcs, dtypeIdx, algo, nSteps, nVar):
+def testRectilinear_MPI(tmpdir, dim, nProcs, dtypeIdx, algo, nSteps, nVar):
 
     import subprocess
 
-    fileName = f"testRectilinear{dim}D_MPI.pysdc"
+    fileName = f"{tmpdir}/testRectilinear{dim}D_MPI.pysdc"
 
     for gridSizes in itertools.product(*[[61, 16]] * dim):
 

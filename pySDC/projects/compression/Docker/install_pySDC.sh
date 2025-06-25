@@ -15,7 +15,7 @@ cd /pySDC
 pip install -e .
 python -m pip install pytest
 python -m pip install coverage
-python -m pip install mpi4py
+python -m pip install "mpi4py<4.1.0"
 
 # go back to original working directory
 cd $current_dir
