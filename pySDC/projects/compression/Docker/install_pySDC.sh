@@ -20,7 +20,8 @@ python -m pip install pytest
 python -m pip install coverage
 python -m pip install mpi4py
 
-python -c "import mpi4py; print(mpi4py)"
+python -c "from mpi4py import MPI"
+mpirun -np 2 python -c "from mpi4py import MPI"
 
 # go back to original working directory
 cd $current_dir
