@@ -44,16 +44,13 @@ See :class:`pySDC.helpers.fieldsIO.writeFields_MPI` for an illustrative example.
 
 Warning
 -------
-To use MPI collective writing, you need to call first the class methods :class:`Rectilinear.initMPI` (cf their docstring).
-Also, `Rectilinear.setHeader` **must be given the global grids coordinates**, wether the code is run in parallel or not.
-
-> ⚠️ Also : this module can only be imported with **Python 3.11 or higher** !
+To use MPI collective writing, you need to call first the class methods :class:`Rectilinear.setupMPI` (cf their docstring).
+Also, `Rectilinear.setHeader` **must be given the global grids coordinates**, whether the code is run in parallel or not.
 """
 import os
 import numpy as np
 from typing import Type, TypeVar
 import logging
-import itertools
 
 T = TypeVar("T")
 
@@ -63,11 +60,17 @@ try:
     except ImportError:
         pass
     from mpi4py import MPI
+    from mpi4py.util.dtlib import from_numpy_dtype as MPI_DTYPE
 except ImportError:
 
     class MPI:
         COMM_WORLD = None
         Intracomm = T
+        File = T
+        Datatype = T
+
+    def MPI_DTYPE():
+        pass
 
 
 # Supported data types
@@ -200,9 +203,10 @@ class FieldsIO:
         assert not self.initialized, "FieldsIO already initialized"
 
         if not self.ALLOW_OVERWRITE:
-            assert not os.path.isfile(
-                self.fileName
-            ), "file already exists, use FieldsIO.ALLOW_OVERWRITE = True to allow overwriting"
+            if os.path.isfile(self.fileName):
+                raise FileExistsError(
+                    f"file {self.fileName!r} already exists, use FieldsIO.ALLOW_OVERWRITE = True to allow overwriting"
+                )
 
         with open(self.fileName, "w+b") as f:
             self.hBase.tofile(f)
@@ -475,7 +479,7 @@ class Rectilinear(Scalar):
 
         Example
         -------
-        >>> # Suppose the FieldsIO object is already writen into outputs.pysdc
+        >>> # Suppose the FieldsIO object is already written into outputs.pysdc
         >>> import os
         >>> from pySDC.utils.fieldsIO import Rectilinear
         >>> os.makedirs("vtrFiles")  # to store all VTR files into a subfolder
@@ -499,7 +503,7 @@ class Rectilinear(Scalar):
     def setupMPI(cls, comm: MPI.Intracomm, iLoc, nLoc):
         """
         Setup the MPI mode for the files IO, considering a decomposition
-        of the 1D grid into contiuous subintervals.
+        of the 1D grid into contiguous subintervals.
 
         Parameters
         ----------
@@ -513,7 +517,9 @@ class Rectilinear(Scalar):
         cls.comm = comm
         cls.iLoc = iLoc
         cls.nLoc = nLoc
-        cls.mpiFile = None
+        cls.mpiFile: MPI.File = None
+        cls.mpiType: MPI.Datatype = None
+        cls.mpiFileType: MPI.Datatype = None
 
     @property
     def MPI_ON(self):
@@ -529,6 +535,16 @@ class Rectilinear(Scalar):
             return True
         return self.comm.Get_rank() == 0
 
+    def MPI_SETUP_FILETYPE(self):
+        """Setup subarray masks for each processes"""
+        self.mpiType = MPI_DTYPE(self.dtype)
+        self.mpiFileType = self.mpiType.Create_subarray(
+            [self.nVar, *self.gridSizes],  # Global array sizes
+            [self.nVar, *self.nLoc],  # Local array sizes
+            [0, *self.iLoc],  # Global starting indices of local blocks
+        )
+        self.mpiFileType.Commit()
+
     def MPI_FILE_OPEN(self, mode):
         """Open the binary file in MPI mode"""
         amode = {
@@ -536,12 +552,14 @@ class Rectilinear(Scalar):
             "a": MPI.MODE_WRONLY | MPI.MODE_APPEND,
         }[mode]
         self.mpiFile = MPI.File.Open(self.comm, self.fileName, amode)
+        if self.mpiType is None:
+            self.MPI_SETUP_FILETYPE()
 
     def MPI_WRITE(self, data):
         """Write data (np.ndarray) in the binary file in MPI mode, at the current file cursor position."""
         self.mpiFile.Write(data)
 
-    def MPI_WRITE_AT(self, offset, data: np.ndarray):
+    def MPI_WRITE_AT_ALL(self, offset, data: np.ndarray):
         """
         Write data in the binary file in MPI mode, with a given offset
         **relative to the beginning of the file**.
@@ -553,9 +571,10 @@ class Rectilinear(Scalar):
         data : np.ndarray
             Data to be written in the binary file.
         """
-        self.mpiFile.Write_at(offset, data)
+        self.mpiFile.Set_view(disp=offset, etype=self.mpiType, filetype=self.mpiFileType)
+        self.mpiFile.Write_all(data)
 
-    def MPI_READ_AT(self, offset, data):
+    def MPI_READ_AT_ALL(self, offset, data: np.ndarray):
         """
         Read data from the binary file in MPI mode, with a given offset
         **relative to the beginning of the file**.
@@ -567,7 +586,8 @@ class Rectilinear(Scalar):
         data : np.ndarray
             Array on which to read the data from the binary file.
         """
-        self.mpiFile.Read_at(offset, data)
+        self.mpiFile.Set_view(disp=offset, etype=self.mpiType, filetype=self.mpiFileType)
+        self.mpiFile.Read_all(data)
 
     def MPI_FILE_CLOSE(self):
         """Close the binary file in MPI mode"""
@@ -618,23 +638,14 @@ class Rectilinear(Scalar):
             *self.nLoc,
         ), f"expected {(self.nVar, *self.nLoc)} shape, got {field.shape}"
 
-        offset0 = self.fileSize
+        offset = self.fileSize
         self.MPI_FILE_OPEN(mode="a")
+
         if self.MPI_ROOT:
             self.MPI_WRITE(np.array(time, dtype=T_DTYPE))
-        offset0 += self.tSize
-
-        for (iVar, *iBeg) in itertools.product(range(self.nVar), *[range(n) for n in self.nLoc[:-1]]):
-            offset = offset0 + self.iPos(iVar, iBeg) * self.itemSize
-            self.MPI_WRITE_AT(offset, field[iVar, *iBeg])
+        offset += self.tSize
+        self.MPI_WRITE_AT_ALL(offset, field)
         self.MPI_FILE_CLOSE()
-
-    def iPos(self, iVar, iX):
-        iPos = iVar * self.nDoF
-        for axis in range(self.dim - 1):
-            iPos += (self.iLoc[axis] + iX[axis]) * np.prod(self.gridSizes[axis + 1 :])
-        iPos += self.iLoc[-1]
-        return iPos
 
     def readField(self, idx):
         """
@@ -661,17 +672,15 @@ class Rectilinear(Scalar):
             return super().readField(idx)
 
         idx = self.formatIndex(idx)
-        offset0 = self.hSize + idx * (self.tSize + self.fSize)
+        offset = self.hSize + idx * (self.tSize + self.fSize)
         with open(self.fileName, "rb") as f:
-            t = float(np.fromfile(f, dtype=T_DTYPE, count=1, offset=offset0)[0])
-        offset0 += self.tSize
+            t = float(np.fromfile(f, dtype=T_DTYPE, count=1, offset=offset)[0])
+        offset += self.tSize
 
         field = np.empty((self.nVar, *self.nLoc), dtype=self.dtype)
 
         self.MPI_FILE_OPEN(mode="r")
-        for (iVar, *iBeg) in itertools.product(range(self.nVar), *[range(n) for n in self.nLoc[:-1]]):
-            offset = offset0 + self.iPos(iVar, iBeg) * self.itemSize
-            self.MPI_READ_AT(offset, field[iVar, *iBeg])
+        self.MPI_READ_AT_ALL(offset, field)
         self.MPI_FILE_CLOSE()
 
         return t, field
@@ -684,7 +693,7 @@ def initGrid(nVar, gridSizes):
     dim = len(gridSizes)
     coords = [np.linspace(0, 1, num=n, endpoint=False) for n in gridSizes]
     s = [None] * dim
-    u0 = np.array(np.arange(nVar) + 1)[:, *s]
+    u0 = np.array(np.arange(nVar) + 1)[(slice(None), *s)]
     for x in np.meshgrid(*coords, indexing="ij"):
         u0 = u0 * x
     return coords, u0
@@ -706,8 +715,7 @@ def writeFields_MPI(fileName, dtypeIdx, algo, nSteps, nVar, gridSizes):
     iLoc, nLoc = blocks.localBounds
     Rectilinear.setupMPI(comm, iLoc, nLoc)
     s = [slice(i, i + n) for i, n in zip(iLoc, nLoc)]
-    u0 = u0[:, *s]
-    print(MPI_RANK, u0.shape)
+    u0 = u0[(slice(None), *s)]
 
     f1 = Rectilinear(DTYPES[dtypeIdx], fileName)
     f1.setHeader(nVar=nVar, coords=coords)
@@ -725,6 +733,11 @@ def writeFields_MPI(fileName, dtypeIdx, algo, nSteps, nVar, gridSizes):
 
 def compareFields_MPI(fileName, u0, nSteps):
     from pySDC.helpers.fieldsIO import FieldsIO
+
+    comm = MPI.COMM_WORLD
+    MPI_RANK = comm.Get_rank()
+    if MPI_RANK == 0:
+        print("Comparing fields with MPI")
 
     f2 = FieldsIO.fromFile(fileName)
 

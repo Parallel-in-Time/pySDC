@@ -54,6 +54,7 @@ def plot_scalings_separately(problem, journal='TUHH_thesis', **kwargs):  # pragm
 
 def make_plots_for_thesis():  # pragma: no cover
     from pySDC.projects.GPU.analysis_scripts.plot_RBC_matrix import plot_DCT, plot_preconditioners, plot_ultraspherical
+    from pySDC.projects.GPU.analysis_scripts.parallel_scaling import plot_scalings
 
     # small plots with no simulations
     plot_DCT()
@@ -61,8 +62,11 @@ def make_plots_for_thesis():  # pragma: no cover
     plot_ultraspherical()
 
     # plot space-time parallel scaling
-    for problem in ['GS3D', 'RBC']:
-        plot_scalings_separately(problem=problem)
+    plot_scalings(problem='GS3D', XPU='both', space_time=False)
+    plot_scalings(problem='GS3D', XPU='GPU', space_time=None)
+    plot_scalings(problem='RBC', XPU='both', space_time=False)
+    plot_scalings(problem='RBC', XPU='GPU', space_time=None)
+    plot_scalings(problem='RBC', XPU='CPU', space_time=None)
 
 
 if __name__ == '__main__':

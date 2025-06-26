@@ -22,7 +22,7 @@ def test_integration_matrix2D(nx, nz, variant, axes, useMPI=False, **kwargs):
     helper.add_axis(base='cheby', N=nz)
     helper.setup_fft()
 
-    Z, X = helper.get_grid()
+    X, Z = helper.get_grid()
 
     conv = helper.get_basis_change_matrix()
     S = helper.get_integration_matrix(axes=axes)
@@ -68,7 +68,7 @@ def test_differentiation_matrix2D(nx, nz, variant, axes, bx, bz, useMPI=False, *
     helper.add_axis(base=bz, N=nz)
     helper.setup_fft()
 
-    Z, X = helper.get_grid()
+    X, Z = helper.get_grid()
     conv = helper.get_basis_change_matrix()
     D = helper.get_differentiation_matrix(axes)
 
@@ -123,7 +123,7 @@ def test_identity_matrix2D(nx, nz, variant, bx, useMPI=False, **kwargs):
     helper.add_axis(base='cheby', N=nz)
     helper.setup_fft()
 
-    Z, X = helper.get_grid()
+    X, Z = helper.get_grid()
     conv = helper.get_basis_change_matrix()
     I = helper.get_Id()
 
@@ -215,9 +215,9 @@ def _test_transform_dealias(
     u2_hat_expect = helper.u_init_forward
     u_expect = helper.u_init
     u_expect_pad = helper_pad.u_init
-    Kz, Kx = helper.get_wavenumbers()
-    Z, X = helper.get_grid()
-    Z_pad, X_pad = helper_pad.get_grid()
+    Kx, Kz = helper.get_wavenumbers()
+    X, Z = helper.get_grid()
+    X_pad, Z_pad = helper_pad.get_grid()
 
     if axis == -2:
         f = nx // 3
@@ -476,7 +476,7 @@ def test_tau_method2D(variant, nz, nx, bc_val, bc=-1, useMPI=False, plotting=Fal
     helper.add_component(['u'])
     helper.setup_fft()
 
-    Z, X = helper.get_grid()
+    X, Z = helper.get_grid()
     x = X[:, 0]
     z = Z[0, :]
     shape = helper.init[0][1:]
@@ -549,6 +549,63 @@ def test_tau_method2D_MPI(variant, nz, nx, bc_val, num_procs, **kwargs):
 @pytest.mark.parametrize('bz', ['cheby'])
 def test_dealias_MPI(num_procs, axis, bx, bz, nx=32, nz=64, **kwargs):
     run_MPI_test(num_procs=num_procs, axis=axis, nx=nx, nz=nz, bx=bx, bz=bz, test='dealias')
+
+
+@pytest.mark.base
+def test_cache_decorator():
+    from pySDC.helpers.spectral_helper import cache
+    import numpy as np
+
+    class Dummy:
+        num_calls = 0
+
+        @cache
+        def increment(self, x):
+            self.num_calls += 1
+            return x + 1
+
+    dummy = Dummy()
+    values = [0, 1, 1, 0, 3, 1, 2]
+    unique_vals = np.unique(values)
+
+    for x in values:
+        assert dummy.increment(x) == x + 1
+
+    assert dummy.num_calls < len(values)
+    assert dummy.num_calls == len(unique_vals)
+
+
+@pytest.mark.base
+def test_cache_memory_leaks():
+    from pySDC.helpers.spectral_helper import cache
+
+    track = [0, 0]
+
+    class KeepTrack:
+
+        def __init__(self):
+            track[0] += 1
+            track[1] = 0
+
+        @cache
+        def method(self, a, b, c=1, d=2):
+            track[1] += 1
+            return f"{a},{b},c={c},d={d}"
+
+        def __del__(self):
+            track[0] -= 1
+
+    def function():
+        obj = KeepTrack()
+        for _ in range(10):
+            obj.method(1, 2, d=2)
+            assert track[0] == 1
+            assert track[1] == 1
+
+    for _ in range(3):
+        function()
+
+    assert track[0] == 0, "possible memory leak with the @cache"
 
 
 if __name__ == '__main__':

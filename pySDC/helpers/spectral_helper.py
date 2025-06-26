@@ -2,6 +2,54 @@ import numpy as np
 import scipy
 from pySDC.implementations.datatype_classes.mesh import mesh
 from scipy.special import factorial
+from functools import wraps
+
+
+def cache(func):
+    """
+    Decorator for caching return values of functions.
+    This is very similar to `functools.cache`, but without the memory leaks (see
+    https://docs.astral.sh/ruff/rules/cached-instance-method/).
+
+    Example:
+
+    .. code-block:: python
+
+        num_calls = 0
+
+        @cache
+        def increment(x):
+            num_calls += 1
+            return x + 1
+
+        increment(0)  # returns 1, num_calls = 1
+        increment(1)  # returns 2, num_calls = 2
+        increment(0)  # returns 1, num_calls = 2
+
+
+    Args:
+        func (function): The function you want to cache the return value of
+
+    Returns:
+        return value of func
+    """
+    attr_cache = f"_{func.__name__}_cache"
+
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        if not hasattr(self, attr_cache):
+            setattr(self, attr_cache, {})
+
+        cache = getattr(self, attr_cache)
+
+        key = (args, frozenset(kwargs.items()))
+        if key in cache:
+            return cache[key]
+        result = func(self, *args, **kwargs)
+        cache[key] = result
+        return result
+
+    return wrapper
 
 
 class SpectralHelper1D:
@@ -194,15 +242,15 @@ class ChebychevHelper(SpectralHelper1D):
             x0 (float): Coordinate of left boundary. Note that only -1 is currently implented
             x1 (float): Coordinate of right boundary. Note that only +1 is currently implented
         """
-        assert x0 == -1
-        assert x1 == 1
+        # need linear transformation y = ax + b with a = (x1-x0)/2 and b = (x1+x0)/2
+        self.lin_trf_fac = (x1 - x0) / 2
+        self.lin_trf_off = (x1 + x0) / 2
         super().__init__(*args, x0=x0, x1=x1, **kwargs)
         self.transform_type = transform_type
 
         if self.transform_type == 'fft':
             self.get_fft_utils()
 
-        self.cache = {}
         self.norm = self.get_norm()
 
     def get_1dgrid(self):
@@ -214,12 +262,13 @@ class ChebychevHelper(SpectralHelper1D):
         Returns:
             numpy.ndarray: 1D grid
         '''
-        return self.xp.cos(np.pi / self.N * (self.xp.arange(self.N) + 0.5))
+        return self.lin_trf_fac * self.xp.cos(np.pi / self.N * (self.xp.arange(self.N) + 0.5)) + self.lin_trf_off
 
     def get_wavenumbers(self):
         """Get the domain in spectral space"""
         return self.xp.arange(self.N)
 
+    @cache
     def get_conv(self, name, N=None):
         '''
         Get conversion matrix between different kinds of polynomials. The supported kinds are
@@ -237,9 +286,6 @@ class ChebychevHelper(SpectralHelper1D):
         Returns:
             scipy.sparse: Sparse conversion matrix
         '''
-        if name in self.cache.keys() and not N:
-            return self.cache[name]
-
         N = N if N else self.N
         sp = self.sparse_lib
         xp = self.xp
@@ -270,7 +316,6 @@ class ChebychevHelper(SpectralHelper1D):
             except NotImplementedError:
                 raise NotImplementedError from E
 
-        self.cache[name] = mat
         return mat
 
     def get_basis_change_matrix(self, conv='T2T', **kwargs):
@@ -306,7 +351,7 @@ class ChebychevHelper(SpectralHelper1D):
                 (n / (2 * (self.xp.arange(self.N) + 1)))[1::2]
                 * (-1) ** (self.xp.arange(self.N // 2))
                 / (np.append([1], self.xp.arange(self.N // 2 - 1) + 1))
-            )
+            ) * self.lin_trf_fac
         else:
             raise NotImplementedError(f'This function allows to integrate only from x=0, you attempted from x={lbnd}.')
         return S
@@ -327,7 +372,7 @@ class ChebychevHelper(SpectralHelper1D):
                 D[k, j] = 2 * j * ((j - k) % 2)
 
         D[0, :] /= 2
-        return self.sparse_lib.csc_matrix(self.xp.linalg.matrix_power(D, p))
+        return self.sparse_lib.csc_matrix(self.xp.linalg.matrix_power(D, p)) / self.lin_trf_fac**p
 
     def get_norm(self, N=None):
         '''
@@ -565,7 +610,7 @@ class UltrasphericalHelper(ChebychevHelper):
         xp = self.xp
         N = self.N
         l = p
-        return 2 ** (l - 1) * factorial(l - 1) * sp.diags(xp.arange(N - l) + l, offsets=l)
+        return 2 ** (l - 1) * factorial(l - 1) * sp.diags(xp.arange(N - l) + l, offsets=l) / self.lin_trf_fac**p
 
     def get_S(self, lmbda):
         """
@@ -647,8 +692,10 @@ class UltrasphericalHelper(ChebychevHelper):
         Returns:
             sparse integration matrix
         """
-        return self.sparse_lib.diags(1 / (self.xp.arange(self.N - 1) + 1), offsets=-1) @ self.get_basis_change_matrix(
-            p_out=1, p_in=0
+        return (
+            self.sparse_lib.diags(1 / (self.xp.arange(self.N - 1) + 1), offsets=-1)
+            @ self.get_basis_change_matrix(p_out=1, p_in=0)
+            * self.lin_trf_fac
         )
 
     def get_integration_constant(self, u_hat, axis):
@@ -1041,7 +1088,7 @@ class SpectralHelper:
         """
         Remove a BC from the matrix. This is useful e.g. when you add a non-scalar BC and then need to selectively
         remove single BCs again, as in incompressible Navier-Stokes, for instance.
-        Forward arguments for the boundary conditions using `kwargs`. Refer to documentation of 1D bases for details.
+        Forwards arguments for the boundary conditions using `kwargs`. Refer to documentation of 1D bases for details.
 
         Args:
             component (str): Name of the component the BC should act on
@@ -1308,15 +1355,15 @@ class SpectralHelper:
         """
         Get grid in spectral space
         """
-        grids = [self.axes[i].get_wavenumbers()[self.local_slice[i]] for i in range(len(self.axes))][::-1]
-        return self.xp.meshgrid(*grids)
+        grids = [self.axes[i].get_wavenumbers()[self.local_slice[i]] for i in range(len(self.axes))]
+        return self.xp.meshgrid(*grids, indexing='ij')
 
     def get_grid(self):
         """
         Get grid in physical space
         """
-        grids = [self.axes[i].get_1dgrid()[self.local_slice[i]] for i in range(len(self.axes))][::-1]
-        return self.xp.meshgrid(*grids)
+        grids = [self.axes[i].get_1dgrid()[self.local_slice[i]] for i in range(len(self.axes))]
+        return self.xp.meshgrid(*grids, indexing='ij')
 
     def get_fft(self, axes=None, direction='object', padding=None, shape=None):
         """
@@ -1850,6 +1897,26 @@ class SpectralHelper:
         """
         return M.tocsc()[self.local_slice[axis], self.local_slice[axis]]
 
+    def expand_matrix_ND(self, matrix, aligned):
+        sp = self.sparse_lib
+        axes = np.delete(np.arange(self.ndim), aligned)
+        ndim = len(axes) + 1
+
+        if ndim == 1:
+            return matrix
+        elif ndim == 2:
+            axis = axes[0]
+            I1D = sp.eye(self.axes[axis].N)
+
+            mats = [None] * ndim
+            mats[aligned] = self.get_local_slice_of_1D_matrix(matrix, aligned)
+            mats[axis] = self.get_local_slice_of_1D_matrix(I1D, axis)
+
+            return sp.kron(*mats)
+
+        else:
+            raise NotImplementedError(f'Matrix expansion not implemented for {ndim} dimensions!')
+
     def get_filter_matrix(self, axis, **kwargs):
         """
         Get bandpass filter along `axis`. See the documentation `get_filter_matrix` in the 1D bases for what kwargs are
@@ -1875,31 +1942,10 @@ class SpectralHelper:
         Returns:
             sparse differentiation matrix
         """
-        sp = self.sparse_lib
-        ndim = self.ndim
-
-        if ndim == 1:
-            D = self.axes[0].get_differentiation_matrix(**kwargs)
-        elif ndim == 2:
-            for axis in axes:
-                axis2 = (axis + 1) % ndim
-                D1D = self.axes[axis].get_differentiation_matrix(**kwargs)
-
-                if len(axes) > 1:
-                    I1D = sp.eye(self.axes[axis2].N)
-                else:
-                    I1D = self.axes[axis2].get_Id()
-
-                mats = [None] * ndim
-                mats[axis] = self.get_local_slice_of_1D_matrix(D1D, axis)
-                mats[axis2] = self.get_local_slice_of_1D_matrix(I1D, axis2)
-
-                if axis == axes[0]:
-                    D = sp.kron(*mats)
-                else:
-                    D = D @ sp.kron(*mats)
-        else:
-            raise NotImplementedError(f'Differentiation matrix not implemented for {ndim} dimension!')
+        D = self.expand_matrix_ND(self.axes[axes[0]].get_differentiation_matrix(**kwargs), axes[0])
+        for axis in axes[1:]:
+            _D = self.axes[axis].get_differentiation_matrix(**kwargs)
+            D = D @ self.expand_matrix_ND(_D, axis)
 
         return D
 
@@ -1913,31 +1959,10 @@ class SpectralHelper:
         Returns:
             sparse integration matrix
         """
-        sp = self.sparse_lib
-        ndim = len(self.axes)
-
-        if ndim == 1:
-            S = self.axes[0].get_integration_matrix()
-        elif ndim == 2:
-            for axis in axes:
-                axis2 = (axis + 1) % ndim
-                S1D = self.axes[axis].get_integration_matrix()
-
-                if len(axes) > 1:
-                    I1D = sp.eye(self.axes[axis2].N)
-                else:
-                    I1D = self.axes[axis2].get_Id()
-
-                mats = [None] * ndim
-                mats[axis] = self.get_local_slice_of_1D_matrix(S1D, axis)
-                mats[axis2] = self.get_local_slice_of_1D_matrix(I1D, axis2)
-
-                if axis == axes[0]:
-                    S = sp.kron(*mats)
-                else:
-                    S = S @ sp.kron(*mats)
-        else:
-            raise NotImplementedError(f'Integration matrix not implemented for {ndim} dimension!')
+        S = self.expand_matrix_ND(self.axes[axes[0]].get_integration_matrix(), axes[0])
+        for axis in axes[1:]:
+            _S = self.axes[axis].get_integration_matrix()
+            S = S @ self.expand_matrix_ND(_S, axis)
 
         return S
 
@@ -1948,27 +1973,10 @@ class SpectralHelper:
         Returns:
             sparse identity matrix
         """
-        sp = self.sparse_lib
-        ndim = self.ndim
-        I = sp.eye(np.prod(self.init[0][1:]), dtype=complex)
-
-        if ndim == 1:
-            I = self.axes[0].get_Id()
-        elif ndim == 2:
-            for axis in range(ndim):
-                axis2 = (axis + 1) % ndim
-                I1D = self.axes[axis].get_Id()
-
-                I1D2 = sp.eye(self.axes[axis2].N)
-
-                mats = [None] * ndim
-                mats[axis] = self.get_local_slice_of_1D_matrix(I1D, axis)
-                mats[axis2] = self.get_local_slice_of_1D_matrix(I1D2, axis2)
-
-                I = I @ sp.kron(*mats)
-        else:
-            raise NotImplementedError(f'Identity matrix not implemented for {ndim} dimension!')
-
+        I = self.expand_matrix_ND(self.axes[0].get_Id(), 0)
+        for axis in range(1, self.ndim):
+            _I = self.axes[axis].get_Id()
+            I = I @ self.expand_matrix_ND(_I, axis)
         return I
 
     def get_Dirichlet_recombination_matrix(self, axis=-1):
@@ -1981,26 +1989,8 @@ class SpectralHelper:
         Returns:
             sparse matrix
         """
-        sp = self.sparse_lib
-        ndim = len(self.axes)
-
-        if ndim == 1:
-            C = self.axes[0].get_Dirichlet_recombination_matrix()
-        elif ndim == 2:
-            axis2 = (axis + 1) % ndim
-            C1D = self.axes[axis].get_Dirichlet_recombination_matrix()
-
-            I1D = self.axes[axis2].get_Id()
-
-            mats = [None] * ndim
-            mats[axis] = self.get_local_slice_of_1D_matrix(C1D, axis)
-            mats[axis2] = self.get_local_slice_of_1D_matrix(I1D, axis2)
-
-            C = sp.kron(*mats)
-        else:
-            raise NotImplementedError(f'Basis change matrix not implemented for {ndim} dimension!')
-
-        return C
+        C1D = self.axes[axis].get_Dirichlet_recombination_matrix()
+        return self.expand_matrix_ND(C1D, axis)
 
     def get_basis_change_matrix(self, axes=None, **kwargs):
         """
@@ -2015,30 +2005,9 @@ class SpectralHelper:
         """
         axes = tuple(-i - 1 for i in range(self.ndim)) if axes is None else axes
 
-        sp = self.sparse_lib
-        ndim = len(self.axes)
-
-        if ndim == 1:
-            C = self.axes[0].get_basis_change_matrix(**kwargs)
-        elif ndim == 2:
-            for axis in axes:
-                axis2 = (axis + 1) % ndim
-                C1D = self.axes[axis].get_basis_change_matrix(**kwargs)
-
-                if len(axes) > 1:
-                    I1D = sp.eye(self.axes[axis2].N)
-                else:
-                    I1D = self.axes[axis2].get_Id()
-
-                mats = [None] * ndim
-                mats[axis] = self.get_local_slice_of_1D_matrix(C1D, axis)
-                mats[axis2] = self.get_local_slice_of_1D_matrix(I1D, axis2)
-
-                if axis == axes[0]:
-                    C = sp.kron(*mats)
-                else:
-                    C = C @ sp.kron(*mats)
-        else:
-            raise NotImplementedError(f'Basis change matrix not implemented for {ndim} dimension!')
+        C = self.expand_matrix_ND(self.axes[axes[0]].get_basis_change_matrix(**kwargs), axes[0])
+        for axis in axes[1:]:
+            _C = self.axes[axis].get_basis_change_matrix(**kwargs)
+            C = C @ self.expand_matrix_ND(_C, axis)
 
         return C
