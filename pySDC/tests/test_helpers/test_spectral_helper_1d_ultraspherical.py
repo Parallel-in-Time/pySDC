@@ -15,7 +15,7 @@ def test_differentiation_matrix(N, p):
     D = helper.get_differentiation_matrix(p=p)
     Q = helper.get_basis_change_matrix(p_in=p, p_out=0)
 
-    du = helper.itransform(Q @ D @ coeffs)
+    du = helper.itransform(Q @ D @ coeffs, axes=(-1,))
     exact = np.polynomial.Chebyshev(coeffs).deriv(p)(x)
 
     assert np.allclose(exact, du)
@@ -46,7 +46,7 @@ def test_differentiation_non_standard_domain_size(N, x0, x1, p):
     Q = helper.get_basis_change_matrix(p_in=p, p_out=0)
 
     du_hat = Q @ D @ u_hat
-    du = helper.itransform(du_hat)
+    du = helper.itransform(du_hat, axes=(-1,))
 
     assert np.allclose(du_hat_exact, du_hat), np.linalg.norm(du_hat_exact - du_hat)
     assert np.allclose(du, du_exact), np.linalg.norm(du_exact - du)
@@ -119,7 +119,7 @@ def test_poisson_problem(N, deg, Dirichlet_recombination):
 
     u_hat = Pr @ sp.linalg.spsolve(A @ Pr, rhs)
 
-    u = helper.itransform(u_hat)
+    u = helper.itransform(u_hat, axes=(-1,))
 
     u_exact = (a - b) / 2 * x ** (deg + 2) + (b + a) / 2
 
