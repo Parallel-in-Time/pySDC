@@ -316,7 +316,7 @@ class ChebychevHelper(SpectralHelper1D):
 
         def get_forward_conv(name):
             if name == 'T2U':
-                mat = (sp.eye(N) - sp.diags(xp.ones(N - 2), offsets=+2)) / 2.0
+                mat = (sp.eye(N) - sp.diags(xp.ones(N - 2), offsets=+2)).tocsc() / 2.0
                 mat[:, 0] *= 2
             elif name == 'D2T':
                 mat = sp.eye(N) - sp.diags(xp.ones(N - 2), offsets=+2)
