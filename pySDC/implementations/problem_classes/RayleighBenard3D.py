@@ -11,7 +11,7 @@ from pySDC.core.problem import WorkCounter
 
 class RayleighBenard3D(GenericSpectralLinear):
     """
-    Rayleigh-Benard Convection is a variation of incompressible Navier-Stokes.
+    Rayleigh-Benard Convection is a variation of incompressible fluid dynamics.
 
     The equations we solve are
 
@@ -28,10 +28,11 @@ class RayleighBenard3D(GenericSpectralLinear):
 
     The domain, vertical boundary conditions and pressure gauge are
 
-        Omega = [0, 8) x (-1, 1)
-        T(z=+1) = 0
-        T(z=-1) = 2
-        u(z=+-1) = v(z=+-1) = 0
+        Omega = [0, Lx) x [0, Ly) x (0, Lz)
+        T(z=Lz) = 0
+        T(z=0) = Lz
+        u(z=0) = v(z=0) = w(z=0) = 0
+        u(z=Lz) = v(z=Lz) = w(z=Lz) = 0
         integral over p = 0
 
     The spectral discretization uses FFT horizontally, implying periodic BCs, and an ultraspherical method vertically to
