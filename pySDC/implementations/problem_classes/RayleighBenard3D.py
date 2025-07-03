@@ -11,7 +11,7 @@ from pySDC.core.problem import WorkCounter
 
 class RayleighBenard3D(GenericSpectralLinear):
     """
-    Rayleigh-Benard Convection is a variation of incompressible fluid dynamics.
+    Rayleigh-Benard Convection is a variation of incompressible Navier-Stokes.
 
     The equations we solve are
 
@@ -28,11 +28,10 @@ class RayleighBenard3D(GenericSpectralLinear):
 
     The domain, vertical boundary conditions and pressure gauge are
 
-        Omega = [0, Lx) x [0, Ly) x (0, Lz)
-        T(z=Lz) = 0
-        T(z=0) = Lz
-        u(z=0) = v(z=0) = w(z=0) = 0
-        u(z=Lz) = v(z=Lz) = w(z=Lz) = 0
+        Omega = [0, 8) x (-1, 1)
+        T(z=+1) = 0
+        T(z=-1) = 2
+        u(z=+-1) = v(z=+-1) = 0
         integral over p = 0
 
     The spectral discretization uses FFT horizontally, implying periodic BCs, and an ultraspherical method vertically to
@@ -150,6 +149,8 @@ class RayleighBenard3D(GenericSpectralLinear):
         self.Dyy = Dyy
         self.Dz = S1 @ Dz
         self.Dzz = S2 @ Dzz
+        self.S2 = S2
+        self.S1 = S1
 
         # compute rescaled Rayleigh number to extract viscosity and thermal diffusivity
         Ra = Rayleigh / (max([abs(BCs['T_top'] - BCs['T_bottom']), np.finfo(float).eps]) * self.axes[2].L ** 3)
@@ -169,9 +170,6 @@ class RayleighBenard3D(GenericSpectralLinear):
         # mass matrix
         M_lhs = {i: {i: U02 @ Id} for i in ['u', 'v', 'w', 'T']}
         self.setup_M(M_lhs)
-
-        # Prepare going from second (first for divergence free equation) derivative basis back to Chebychev-T
-        self.base_change = self._setup_operator({**{comp: {comp: S2} for comp in ['u', 'v', 'w', 'T']}, 'p': {'p': S1}})
 
         # BCs
         self.add_BC(
@@ -224,14 +222,16 @@ class RayleighBenard3D(GenericSpectralLinear):
         f_impl_hat = self.u_init_forward
 
         iu, iv, iw, iT, ip = self.index(['u', 'v', 'w', 'T', 'p'])
+        derivative_indices = [iu, iv, iw, iT]
 
         # evaluate implicit terms
-        if not hasattr(self, '_L_T_base'):
-            self._L_T_base = self.base_change @ self.L
-        f_impl_hat = -(self._L_T_base @ u_hat.flatten()).reshape(u_hat.shape)
+        f_impl_hat = -(self.L @ u_hat.flatten()).reshape(u_hat.shape)
+        for i in derivative_indices:
+            f_impl_hat[i] = (self.S2 @ f_impl_hat[i].flatten()).reshape(f_impl_hat[i].shape)
+        f_impl_hat[ip] = (self.S1 @ f_impl_hat[ip].flatten()).reshape(f_impl_hat[ip].shape)
 
         if self.spectral_space:
-            f.impl[:] = f_impl_hat
+            self.xp.copyto(f.impl, f_impl_hat)
         else:
             f.impl[:] = self.itransform(f_impl_hat).real
 
@@ -239,38 +239,26 @@ class RayleighBenard3D(GenericSpectralLinear):
         # treat convection explicitly with dealiasing
 
         # start by computing derivatives
-        if not hasattr(self, '_Dx_expanded') or not hasattr(self, '_Dz_expanded'):
-            Dz = self.Dz
-            Dy = self.Dy
-            Dx = self.Dx
-
-            self._Dx_expanded = self._setup_operator(
-                {'u': {'u': Dx}, 'v': {'v': Dx}, 'w': {'w': Dx}, 'T': {'T': Dx}, 'p': {}}
-            )
-            self._Dy_expanded = self._setup_operator(
-                {'u': {'u': Dy}, 'v': {'v': Dy}, 'w': {'w': Dy}, 'T': {'T': Dy}, 'p': {}}
-            )
-            self._Dz_expanded = self._setup_operator(
-                {'u': {'u': Dz}, 'v': {'v': Dz}, 'w': {'w': Dz}, 'T': {'T': Dz}, 'p': {}}
-            )
-        Dx_u_hat = (self._Dx_expanded @ u_hat.flatten()).reshape(u_hat.shape)
-        Dy_u_hat = (self._Dy_expanded @ u_hat.flatten()).reshape(u_hat.shape)
-        Dz_u_hat = (self._Dz_expanded @ u_hat.flatten()).reshape(u_hat.shape)
-
         padding = (self.dealiasing,) * self.ndim
-        Dx_u_pad = self.itransform(Dx_u_hat, padding=padding).real
-        Dy_u_pad = self.itransform(Dy_u_hat, padding=padding).real
-        Dz_u_pad = self.itransform(Dz_u_hat, padding=padding).real
+        derivatives = []
+        u_hat_flat = [u_hat[i].flatten() for i in derivative_indices]
+
+        _D_u_hat = self.u_init_forward
+        for D in [self.Dx, self.Dy, self.Dz]:
+            _D_u_hat *= 0
+            for i in derivative_indices:
+                self.xp.copyto(_D_u_hat[i], (D @ u_hat_flat[i]).reshape(_D_u_hat[i].shape))
+            derivatives.append(self.itransform(_D_u_hat, padding=padding).real)
+
         u_pad = self.itransform(u_hat, padding=padding).real
 
         fexpl_pad = self.xp.zeros_like(u_pad)
-        fexpl_pad[iu][:] = -(u_pad[iu] * Dx_u_pad[iu] + u_pad[iv] * Dy_u_pad[iu] + u_pad[iw] * Dz_u_pad[iu])
-        fexpl_pad[iv][:] = -(u_pad[iu] * Dx_u_pad[iv] + u_pad[iv] * Dy_u_pad[iv] + u_pad[iw] * Dz_u_pad[iv])
-        fexpl_pad[iw][:] = -(u_pad[iu] * Dx_u_pad[iw] + u_pad[iv] * Dy_u_pad[iw] + u_pad[iw] * Dz_u_pad[iw])
-        fexpl_pad[iT][:] = -(u_pad[iu] * Dx_u_pad[iT] + u_pad[iv] * Dy_u_pad[iT] + u_pad[iw] * Dz_u_pad[iT])
+        for i in derivative_indices:
+            for i_vel, iD in zip([iu, iv, iw], range(self.ndim)):
+                fexpl_pad[i] -= u_pad[i_vel] * derivatives[iD][i]
 
         if self.spectral_space:
-            f.expl[:] = self.transform(fexpl_pad, padding=padding)
+            self.xp.copyto(f.expl, self.transform(fexpl_pad, padding=padding))
         else:
             f.expl[:] = self.itransform(self.transform(fexpl_pad, padding=padding)).real
 
@@ -307,3 +295,63 @@ class RayleighBenard3D(GenericSpectralLinear):
             return me_hat
         else:
             return me
+
+    def get_fig(self):  # pragma: no cover
+        """
+        Get a figure suitable to plot the solution of this problem
+
+        Returns
+        -------
+        self.fig : matplotlib.pyplot.figure.Figure
+        """
+        import matplotlib.pyplot as plt
+        from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+        plt.rcParams['figure.constrained_layout.use'] = True
+        self.fig, axs = plt.subplots(2, 1, sharex=True, sharey=True, figsize=((10, 5)))
+        self.cax = []
+        divider = make_axes_locatable(axs[0])
+        self.cax += [divider.append_axes('right', size='3%', pad=0.03)]
+        divider2 = make_axes_locatable(axs[1])
+        self.cax += [divider2.append_axes('right', size='3%', pad=0.03)]
+        return self.fig
+
+    def plot(self, u, t=None, fig=None, quantity='T'):  # pragma: no cover
+        r"""
+        Plot the solution.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Solution to be plotted
+        t : float
+            Time to display at the top of the figure
+        fig : matplotlib.pyplot.figure.Figure
+            Figure with the same structure as a figure generated by `self.get_fig`. If none is supplied, a new figure will be generated.
+        quantity : (str)
+            quantity you want to plot
+
+        Returns
+        -------
+        None
+        """
+        fig = self.get_fig() if fig is None else fig
+        axs = fig.axes
+
+        imV = axs[1].pcolormesh(self.X, self.Z, self.compute_vorticity(u).real)
+
+        if self.spectral_space:
+            u = self.itransform(u)
+
+        imT = axs[0].pcolormesh(self.X, self.Z, u[self.index(quantity)].real)
+
+        for i, label in zip([0, 1], [rf'${quantity}$', 'vorticity']):
+            axs[i].set_aspect(1)
+            axs[i].set_title(label)
+
+        if t is not None:
+            fig.suptitle(f't = {t:.2f}')
+        axs[1].set_xlabel(r'$x$')
+        axs[1].set_ylabel(r'$z$')
+        fig.colorbar(imT, self.cax[0])
+        fig.colorbar(imV, self.cax[1])
