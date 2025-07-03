@@ -158,17 +158,19 @@ class RayleighBenard3D(GenericSpectralLinear):
         self.nu = (Ra / Prandtl) ** (-1 / 2.0)
 
         # construct operators
+        _D = U02 @ (Dxx + Dyy) + Dzz
         L_lhs = {
             'p': {'u': U01 @ Dx, 'v': U01 @ Dy, 'w': Dz},  # divergence free constraint
-            'u': {'p': U02 @ Dx, 'u': -self.nu * (U02 @ (Dxx + Dyy) + Dzz)},
-            'v': {'p': U02 @ Dy, 'v': -self.nu * (U02 @ (Dxx + Dyy) + Dzz)},
-            'w': {'p': U12 @ Dz, 'w': -self.nu * (U02 @ (Dxx + Dyy) + Dzz), 'T': -U02 @ Id},
-            'T': {'T': -self.kappa * (U02 @ (Dxx + Dyy) + Dzz)},
+            'u': {'p': U02 @ Dx, 'u': -self.nu * _D},
+            'v': {'p': U02 @ Dy, 'v': -self.nu * _D},
+            'w': {'p': U12 @ Dz, 'w': -self.nu * _D, 'T': -U02 @ Id},
+            'T': {'T': -self.kappa * _D},
         }
         self.setup_L(L_lhs)
 
         # mass matrix
-        M_lhs = {i: {i: U02 @ Id} for i in ['u', 'v', 'w', 'T']}
+        _U02 = U02 @ Id
+        M_lhs = {i: {i: _U02} for i in ['u', 'v', 'w', 'T']}
         self.setup_M(M_lhs)
 
         # BCs

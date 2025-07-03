@@ -257,7 +257,7 @@ class ChebychevHelper(SpectralHelper1D):
     that moves to Chebychev U basis during differentiation, which is sparse. When using this technique, problems need to
     be formulated in first order formulation.
 
-    This implementation is largely based on the Dedalus paper (arXiv:1905.10388).
+    This implementation is largely based on the Dedalus paper (https://doi.org/10.1103/PhysRevResearch.2.023068).
     """
 
     def __init__(self, *args, x0=-1, x1=1, **kwargs):
