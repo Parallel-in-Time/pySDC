@@ -69,14 +69,6 @@ Anyway, you are now ready to play with `pySDC`.
 
 Jupyter
 -------
-In order to work with the Jupyter notebooks, we need one more magical package, this time via ``pip``:
-
-.. code-block:: bash
-
-    pip install jdc
-
-These `Jupyter Dynamic Classes <https://alexhagen.github.io/jdc/>`_ allow us to define a class spanning multiple cells to keep things short and to have sufficient documentation.
-
 In order to use our virtual environment within Jupyter, we make a kernel for it with all our nice packages.
 We do that with
 
@@ -84,22 +76,8 @@ We do that with
 
     python -m ipykernel install --user --name=pySDC_tutorial
 
-
-Then, if you want to run stuff in parallel (but locally), start an ``ipcluster`` with
-
-.. code-block:: bash
-
-    ipcluster start --engines=MPI -n 4
-
-This is only required for the third step of the tutorial, but you can do this already now.
-
-Fire up a new shell, activate the virtual Python environment as before, and start a jupyter notebook via
+Now, start jupyter and have a look at the notebooks!
 
 .. code-block:: bash
 
-    jupyter notebook
-
-and navigate to the ``1_Run_problem.ipynb`` notebook.
-Make sure to select the ``pySDC_tutorial`` kernel when running the notebook!
-When using the ``ipcluster`` to do parallel computing in the notebook, the engine replaces the kernel and everything that is run in the cluster uses the kernel associated with the engine rather then the kernel you selected for running the rest of the notebook.
-Make sure to start the ``ipcluster`` inside the ``pySDC_tutorial`` virtual environment!
+   jupyter notebook
