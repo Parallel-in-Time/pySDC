@@ -136,20 +136,21 @@ class GenericSpectralLinear(Problem):
         """
         return getattr(self.spectral, name)
 
-    def _setup_operator(self, LHS):
+    def _setup_operator(self, LHS, diag=False):
         """
         Setup a sparse linear operator by adding relationships. See documentation for ``GenericSpectralLinear.setup_L`` to learn more.
 
         Args:
             LHS (dict): Equations to be added to the operator
+            diag (bool): Whether operator is block-diagonal
 
         Returns:
             sparse linear operator
         """
-        operator = self.spectral.get_empty_operator_matrix()
+        operator = self.spectral.get_empty_operator_matrix(diag=diag)
         for line, equation in LHS.items():
-            self.spectral.add_equation_lhs(operator, line, equation)
-        return self.spectral.convert_operator_matrix_to_operator(operator)
+            self.spectral.add_equation_lhs(operator, line, equation, diag=diag)
+        return self.spectral.convert_operator_matrix_to_operator(operator, diag=diag)
 
     def setup_L(self, LHS):
         """
@@ -171,13 +172,13 @@ class GenericSpectralLinear(Problem):
         """
         self.L = self._setup_operator(LHS)
 
-    def setup_M(self, LHS):
+    def setup_M(self, LHS, diag=True):
         '''
         Setup mass matrix, see documentation of ``GenericSpectralLinear.setup_L``.
         '''
         diff_index = list(LHS.keys())
         self.diff_mask = [me in diff_index for me in self.components]
-        self.M = self._setup_operator(LHS)
+        self.M = self._setup_operator(LHS, diag=diag)
 
     def setup_preconditioner(self, Dirichlet_recombination=True, left_preconditioner=True):
         """
@@ -192,7 +193,7 @@ class GenericSpectralLinear(Problem):
 
         Id = sp.eye(N)
         Pl_lhs = {comp: {comp: Id} for comp in self.components}
-        self.Pl = self._setup_operator(Pl_lhs)
+        self.Pl = self._setup_operator(Pl_lhs, diag=True)
 
         if left_preconditioner:
             # reverse Kronecker product
@@ -214,7 +215,7 @@ class GenericSpectralLinear(Problem):
             _Pr = Id
 
         Pr_lhs = {comp: {comp: _Pr} for comp in self.components}
-        self.Pr = self._setup_operator(Pr_lhs) @ self.Pl.T
+        self.Pr = self._setup_operator(Pr_lhs, diag=True) @ self.Pl.T
 
     def solve_system(self, rhs, dt, u0=None, *args, skip_itransform=False, **kwargs):
         """
