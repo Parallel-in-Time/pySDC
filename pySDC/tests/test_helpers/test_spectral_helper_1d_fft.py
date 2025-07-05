@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.base
+@pytest.mark.mpi4py
 @pytest.mark.parametrize('N', [9, 64])
 @pytest.mark.parametrize('x0', [-4, 0, 1])
 @pytest.mark.parametrize('x1', [None, 4, 8])
@@ -15,7 +15,7 @@ def test_differentiation_matrix(N, x0, x1, plot=False):
     x = helper.get_1dgrid()
     D = helper.get_differentiation_matrix()
 
-    u = np.zeros_like(x)
+    u = np.zeros_like(x).astype('D')
     expect = np.zeros_like(u)
 
     num_coef = N // 2
@@ -42,15 +42,37 @@ def test_differentiation_matrix(N, x0, x1, plot=False):
     assert np.allclose(expect, Du)
 
 
-@pytest.mark.base
-def test_transform(N=8):
+@pytest.mark.mpi4py
+@pytest.mark.parametrize('useFFTW', [False, True])
+def test_transform(useFFTW, N=8):
     import numpy as np
     from pySDC.helpers.spectral_helper import FFTHelper
 
-    u = np.random.random(N)
-    helper = FFTHelper(N=N)
+    u = np.random.random(N).astype('D')
+    helper = FFTHelper(N=N, useFFTW=useFFTW)
     u_hat = helper.transform(u)
+
+    assert np.allclose(u_hat, np.fft.fft(u))
     assert np.allclose(u, helper.itransform(u_hat))
+
+
+@pytest.mark.cupy
+@pytest.mark.parametrize('d', [1, 2, 3])
+def test_transform_cupy(d, N=8):
+    import numpy as np
+    import cupy as cp
+    from pySDC.helpers.spectral_helper import FFTHelper
+
+    u = cp.random.random((d, N)).astype('D')
+
+    helper_CPU = FFTHelper(N=N, useGPU=False)
+    u_hat_CPU = helper_CPU.transform(u.get(), axes=(-1,))
+
+    helper = FFTHelper(N=N, useGPU=True)
+    u_hat = helper.transform(u, axes=(-1,))
+
+    assert np.allclose(u_hat.get(), u_hat_CPU)
+    assert cp.allclose(u, helper.itransform(u_hat, axes=(-1,)))
 
 
 @pytest.mark.base
@@ -114,6 +136,9 @@ def test_tau_method(N, v):
 
 
 if __name__ == '__main__':
-    # test_differentiation_matrix(64, 4, True)
+    # test_differentiation_matrix(64, 4, 8, True, True)
     # test_integration_matrix(8, True)
-    test_tau_method(6, 1)
+    # test_tau_method(6, 1)
+    # test_transform(True)
+    # test_transform(False)
+    test_transform_cupy(4)
