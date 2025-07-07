@@ -176,3 +176,35 @@ class Problem(RegisterParams):
         None
         """
         raise NotImplementedError
+
+    def solve_system(self, rhs, dt, u0, t):
+        """
+        Perform an Euler step.
+
+        Args:
+            rhs: Right hand side for the Euler step
+            dt (float): Step size for the Euler step
+            u0: Initial guess
+            t (float): Current time
+
+        Returns:
+            solution to the Euler step
+        """
+        raise NotImplementedError
+
+    def solve_jacobian(self, rhs, dt, u=None, u0=None, t=0, **kwargs):
+        """
+        Solve the Jacobian for an Euler step, linearized around u.
+        This defaults to an Euler step to accommodate linear problems.
+
+        Args:
+            rhs: Right hand side for the Euler step
+            dt (float): Step size for the Euler step
+            u: Solution to linearize around
+            u0: Initial guess
+            t (float): Current time
+
+        Returns:
+            Solution
+        """
+        return self.solve_system(rhs, dt, u0=u, t=t, **kwargs)
