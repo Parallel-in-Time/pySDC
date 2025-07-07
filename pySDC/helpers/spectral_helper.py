@@ -1024,16 +1024,22 @@ class SpectralHelper:
         else:
             raise NotImplementedError(f'Don\'t know how to compute index for {type(name)=}')
 
-    def get_empty_operator_matrix(self):
+    def get_empty_operator_matrix(self, diag=False):
         """
         Return a matrix of operators to be filled with the connections between the solution components.
+
+        Args:
+            diag (bool): Whether operator is block-diagonal
 
         Returns:
             list containing sparse zeros
         """
         S = len(self.components)
         O = self.get_Id() * 0
-        return [[O for _ in range(S)] for _ in range(S)]
+        if diag:
+            return [O for _ in range(S)]
+        else:
+            return [[O for _ in range(S)] for _ in range(S)]
 
     def get_BC(self, axis, kind, line=-1, scalar=False, **kwargs):
         """
@@ -1296,7 +1302,7 @@ class SpectralHelper:
 
         return rhs
 
-    def add_equation_lhs(self, A, equation, relations):
+    def add_equation_lhs(self, A, equation, relations, diag=False):
         """
         Add the left hand part (that you want to solve implicitly) of an equation to a list of lists of sparse matrices
         that you will convert to an operator later.
@@ -1331,11 +1337,16 @@ class SpectralHelper:
             A (list of lists of sparse matrices): The operator to be
             equation (str): The equation of the component you want this in
             relations: (dict): Relations between quantities
+            diag (bool): Whether operator is block-diagonal
         """
         for k, v in relations.items():
-            A[self.index(equation)][self.index(k)] = v
+            if diag:
+                assert k == equation, 'You are trying to put a non-diagonal equation into a diagonal operator'
+                A[self.index(equation)] = v
+            else:
+                A[self.index(equation)][self.index(k)] = v
 
-    def convert_operator_matrix_to_operator(self, M):
+    def convert_operator_matrix_to_operator(self, M, diag=False):
         """
         Promote the list of lists of sparse matrices to a single sparse matrix that can be used as linear operator.
         See documentation of `SpectralHelper.add_equation_lhs` for an example.
@@ -1347,9 +1358,14 @@ class SpectralHelper:
             sparse linear operator
         """
         if len(self.components) == 1:
-            return M[0][0]
+            if diag:
+                return M[0]
+            else:
+                return M[0][0]
+        elif diag:
+            return self.sparse_lib.block_diag(M, format='csc')
         else:
-            return self.sparse_lib.bmat(M, format='csc')
+            return self.sparse_lib.block_array(M, format='csc')
 
     def get_wavenumbers(self):
         """
