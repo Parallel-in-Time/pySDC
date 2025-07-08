@@ -58,6 +58,7 @@ Submodules
    implementations.problem_classes.Piline
    implementations.problem_classes.Quench
    implementations.problem_classes.RayleighBenard
+   implementations.problem_classes.RayleighBenard3D
    implementations.problem_classes.TestEquation_0D
    implementations.problem_classes.Van_der_Pol_implicit
    implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic

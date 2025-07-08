@@ -889,6 +889,12 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE">DiscontinuousTestODE (class in implementations.problem_classes.DiscontinuousTestODE)</a>
 </li>
+      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper.distributable">distributable (FFTHelper attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.distributable">(SpectralHelper1D attribute)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/core.level.html#core.level.Level.dt">dt (Level property)</a>
 
       <ul>
@@ -1032,6 +1038,8 @@
 </li>
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_f">(RayleighBenard attribute)</a>
 </li>
+        <li><a href="pySDC/implementations.problem_classes.RayleighBenard3D.html#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.dtype_f">(RayleighBenard3D attribute)</a>
+</li>
         <li><a href="pySDC/implementations.problem_classes.FastWaveSlowWave_0D.html#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.dtype_f">(swfw_scalar attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.dtype_f">(test_equation_IMEX attribute)</a>
@@ -1141,6 +1149,8 @@
         <li><a href="pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench.dtype_u">(Quench attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u">(RayleighBenard attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.RayleighBenard3D.html#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.dtype_u">(RayleighBenard3D attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.FastWaveSlowWave_0D.html#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.dtype_u">(swfw_scalar attribute)</a>
 </li>
@@ -1393,6 +1403,8 @@
         <li><a href="pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.QuenchIMEX.eval_f">(QuenchIMEX method)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.eval_f">(RayleighBenard method)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.RayleighBenard3D.html#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.eval_f">(RayleighBenard3D method)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.FastWaveSlowWave_0D.html#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.eval_f">(swfw_scalar method)</a>
 </li>
@@ -1757,8 +1769,6 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.get_1dgrid">(SpectralHelper1D method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_aligned">get_aligned() (SpectralHelper method)</a>
-</li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_basis_change_matrix">get_basis_change_matrix() (ChebychevHelper method)</a>
 
       <ul>
@@ -1845,12 +1855,6 @@
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_fft">get_fft() (SpectralHelper method)</a>
 </li>
-      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_fft_shift">get_fft_shift() (ChebychevHelper method)</a>
-</li>
-      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_fft_shuffle">get_fft_shuffle() (ChebychevHelper method)</a>
-</li>
-      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_fft_utils">get_fft_utils() (ChebychevHelper method)</a>
-</li>
       <li><a href="pySDC/implementations.problem_classes.Brusselator.html#implementations.problem_classes.Brusselator.Brusselator.get_fig">get_fig() (Brusselator method)</a>
 
       <ul>
@@ -1863,6 +1867,8 @@
         <li><a href="pySDC/core.problem.html#core.problem.Problem.get_fig">(Problem method)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.get_fig">(RayleighBenard method)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.RayleighBenard3D.html#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.get_fig">(RayleighBenard3D method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_filter_matrix">get_filter_matrix() (SpectralHelper method)</a>
@@ -1897,14 +1903,14 @@
         <li><a href="pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise.get_implementation">(SpreadStepSizesBlockwise class method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_indices">get_indices() (SpectralHelper method)</a>
+</li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_integ_BC_row">get_integ_BC_row() (ChebychevHelper method)</a>
 
       <ul>
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper.get_integ_BC_row">(FFTHelper method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.UltrasphericalHelper.get_integration_constant">get_integration_constant() (UltrasphericalHelper method)</a>
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_integration_matrix">get_integration_matrix() (ChebychevHelper method)</a>
@@ -1919,6 +1925,8 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.UltrasphericalHelper.get_integration_matrix">(UltrasphericalHelper method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.get_interactions">get_interactions() (penningtrap method)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.html#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.get_interpolated_solution">get_interpolated_solution() (EstimatePolynomialError method)</a>
@@ -1978,6 +1986,10 @@
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper.get_Nyquist_mode_index">get_Nyquist_mode_index() (FFTHelper method)</a>
 </li>
       <li><a href="pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.get_op">get_op() (NCCLComm method)</a>
+</li>
+      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_pfft">get_pfft() (SpectralHelper method)</a>
+</li>
+      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper.get_plan">get_plan() (FFTHelper method)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.get_problem_dict">get_problem_dict() (battery_n_capacitors method)</a>
 </li>
@@ -2126,6 +2138,8 @@
       <li><a href="pySDC/implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.html#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWaveBCRight">getWaveBCRight() (in module implementations.problem_classes.acoustic_helpers.buildWave1DMatrix)</a>
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.global_shape">global_shape (SpectralHelper attribute)</a>
+</li>
+      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.global_slice">global_slice() (SpectralHelper method)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableau.globally_stiffly_accurate">globally_stiffly_accurate (ButcherTableau property)</a>
 
@@ -2951,6 +2965,13 @@
 </li>
       </ul></li>
       <li>
+    implementations.problem_classes.RayleighBenard3D
+
+      <ul>
+        <li><a href="pySDC/implementations.problem_classes.RayleighBenard3D.html#module-implementations.problem_classes.RayleighBenard3D">module</a>
+</li>
+      </ul></li>
+      <li>
     implementations.problem_classes.TestEquation_0D
 
       <ul>
@@ -3145,6 +3166,8 @@
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.index">index() (SpectralHelper method)</a>
 </li>
+      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.infer_alignment">infer_alignment() (SpectralHelper method)</a>
+</li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.init">init (SpectralHelper attribute)</a>
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.init_forward">init_forward (SpectralHelper attribute)</a>
@@ -3251,8 +3274,6 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.itransform">(SpectralHelper method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.itransform_single_component">itransform_single_component() (SpectralHelper method)</a>
-</li>
   </ul></td>
 </tr></table>
 
@@ -3377,7 +3398,7 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.linalg">(SpectralHelper1D attribute)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.local_slice">local_slice (SpectralHelper attribute)</a>
+      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.local_slice">local_slice() (SpectralHelper method)</a>
 </li>
       <li><a href="pySDC/helpers.blocks.html#helpers.blocks.BlockDecomposition.localBounds">localBounds (BlockDecomposition property)</a>
 </li>
@@ -3793,6 +3814,8 @@
 </li>
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#module-implementations.problem_classes.RayleighBenard">implementations.problem_classes.RayleighBenard</a>
 </li>
+        <li><a href="pySDC/implementations.problem_classes.RayleighBenard3D.html#module-implementations.problem_classes.RayleighBenard3D">implementations.problem_classes.RayleighBenard3D</a>
+</li>
         <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#module-implementations.problem_classes.TestEquation_0D">implementations.problem_classes.TestEquation_0D</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.Van_der_Pol_implicit.html#module-implementations.problem_classes.Van_der_Pol_implicit">implementations.problem_classes.Van_der_Pol_implicit</a>
@@ -3903,6 +3926,8 @@
 </li>
       </ul></li>
       <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.nDoF">nDoF (Rectilinear property)</a>
+</li>
+      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.newDistArray">newDistArray() (SpectralHelper method)</a>
 </li>
       <li><a href="pySDC/helpers.plot_helper.html#helpers.plot_helper.newfig">newfig() (in module helpers.plot_helper)</a>
 </li>
@@ -4102,6 +4127,8 @@
         <li><a href="pySDC/core.problem.html#core.problem.Problem.plot">(Problem method)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.plot">(RayleighBenard method)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.RayleighBenard3D.html#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.plot">(RayleighBenard3D method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.problem_classes.polynomial_test_problem.html#implementations.problem_classes.polynomial_test_problem.polynomial_testequation">polynomial_testequation (class in implementations.problem_classes.polynomial_test_problem)</a>
@@ -4366,6 +4393,8 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard">RayleighBenard (class in implementations.problem_classes.RayleighBenard)</a>
 </li>
+      <li><a href="pySDC/implementations.problem_classes.RayleighBenard3D.html#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D">RayleighBenard3D (class in implementations.problem_classes.RayleighBenard3D)</a>
+</li>
       <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.readField">readField() (FieldsIO method)</a>
 
       <ul>
@@ -4400,6 +4429,8 @@
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.recv_full">(controller_nonMPI method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.redistribute">redistribute() (SpectralHelper method)</a>
+</li>
       <li><a href="pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.Reduce">Reduce() (NCCLComm method)</a>
 </li>
       <li><a href="pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.reduce">reduce() (NCCLComm method)</a>
@@ -4436,10 +4467,10 @@
         <li><a href="pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.html#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.reset_status_variables">(EstimatePolynomialError method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/core.step.html#core.step.Step.reset_step">reset_step() (Step method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/core.step.html#core.step.Step.reset_step">reset_step() (Step method)</a>
+</li>
       <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.reshape">reshape() (FieldsIO method)</a>
 
       <ul>
@@ -4638,6 +4669,12 @@
 </li>
       <li><a href="pySDC/core.controller.html#core.controller.Controller.setup_convergence_controllers">setup_convergence_controllers() (Controller method)</a>
 </li>
+      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.setup_CPU">setup_CPU() (SpectralHelper class method)</a>
+
+      <ul>
+        <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.setup_CPU">(SpectralHelper1D class method)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.setup_fft">setup_fft() (SpectralHelper method)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_GPU">setup_GPU() (GenericSpectralLinear method)</a>
@@ -5026,8 +5063,6 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.transform">(SpectralHelper method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.transform_single_component">transform_single_component() (SpectralHelper method)</a>
-</li>
       <li><a href="pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.trapezoidal">trapezoidal (class in implementations.problem_classes.acoustic_helpers.standard_integrators)</a>
 
       <ul>
@@ -5159,6 +5194,8 @@
 </li>
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.u_exact">(RayleighBenard method)</a>
 </li>
+        <li><a href="pySDC/implementations.problem_classes.RayleighBenard3D.html#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.u_exact">(RayleighBenard3D method)</a>
+</li>
         <li><a href="pySDC/implementations.problem_classes.FastWaveSlowWave_0D.html#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.u_exact">(swfw_scalar method)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.u_exact">(test_equation_IMEX method)</a>
@@ -5183,6 +5220,8 @@
 </li>
       </ul></li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.u_init_forward">u_init_forward (SpectralHelper property)</a>
+</li>
+      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.u_init_physical">u_init_physical (SpectralHelper property)</a>
 </li>
       <li><a href="pySDC/core.level.html#core.level.Level.uend">uend (Level attribute)</a>
 </li>

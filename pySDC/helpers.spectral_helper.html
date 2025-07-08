@@ -49,14 +49,14 @@
 <span id="helpers-spectral-helper-module"></span><h1>helpers.spectral_helper module<a class="headerlink" href="#module-helpers.spectral_helper" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ChebychevHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fft'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ChebychevHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D" title="helpers.spectral_helper.SpectralHelper1D"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpectralHelper1D</span></code></a></p>
 <p>The Chebychev base consists of special kinds of polynomials, with the main advantage that you can easily transform
 between physical and spectral space by discrete cosine transform.
 The differentiation in the Chebychev T base is dense, but can be preconditioned to yield a differentiation operator
 that moves to Chebychev U basis during differentiation, which is sparse. When using this technique, problems need to
 be formulated in first order formulation.</p>
-<p>This implementation is largely based on the Dedalus paper (arXiv:1905.10388).</p>
+<p>This implementation is largely based on the Dedalus paper (<a class="reference external" href="https://doi.org/10.1103/PhysRevResearch.2.023068">https://doi.org/10.1103/PhysRevResearch.2.023068</a>).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_1dgrid">
 <span class="sig-name descname"><span class="pre">get_1dgrid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_1dgrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_1dgrid" title="Link to this definition">¶</a></dt>
@@ -183,55 +183,6 @@ Once generates matrices are cached. So feel free to call the method as often as 
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_fft_shift">
-<span class="sig-name descname"><span class="pre">get_fft_shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_fft_shift"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_fft_shift" title="Link to this definition">¶</a></dt>
-<dd><p>As described in the docstring for <cite>get_fft_shuffle</cite>, we need to rotate in the complex plane in order to use FFT for DCT.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>forward</strong> (<em>bool</em>) – Whether you want the rotation for forward transform or backward transform</p></li>
-<li><p><strong>N</strong> (<em>int</em>) – size of the grid</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Rotation</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>self.xp.array</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_fft_shuffle">
-<span class="sig-name descname"><span class="pre">get_fft_shuffle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_fft_shuffle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_fft_shuffle" title="Link to this definition">¶</a></dt>
-<dd><p>In order to more easily parallelize using distributed FFT libraries, we express the DCT via an FFT following
-doi.org/10.1109/TASSP.1980.1163351. The idea is based on reshuffling the data to be periodic and rotating it
-in the complex plane. This function returns a mask to do the shuffling.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>forward</strong> (<em>bool</em>) – Whether you want the shuffle for forward transform or backward transform</p></li>
-<li><p><strong>N</strong> (<em>int</em>) – size of the grid</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Use as mask</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>self.xp.array</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_fft_utils">
-<span class="sig-name descname"><span class="pre">get_fft_utils</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_fft_utils"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_fft_utils" title="Link to this definition">¶</a></dt>
-<dd><p>Get the required utilities for using FFT to do DCT as described in the docstring for <cite>get_fft_shuffle</cite> and keep
-them cached.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_integ_BC_row">
 <span class="sig-name descname"><span class="pre">get_integ_BC_row</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_integ_BC_row"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_integ_BC_row" title="Link to this definition">¶</a></dt>
 <dd><p>Get a row for generating integral BCs with T polynomials.
@@ -285,13 +236,13 @@ It returns the values of the integrals of T polynomials over the entire interval
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.itransform">
-<span class="sig-name descname"><span class="pre">itransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.itransform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.itransform" title="Link to this definition">¶</a></dt>
-<dd><p>1D inverse DCT along axis.</p>
+<span class="sig-name descname"><span class="pre">itransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.itransform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.itransform" title="Link to this definition">¶</a></dt>
+<dd><p>Inverse DCT along axis.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>u</strong> – Data you want to transform</p></li>
-<li><p><strong>axis</strong> (<em>int</em>) – Axis you want to transform along</p></li>
+<li><p><strong>axes</strong> (<em>tuple</em>) – Axes you want to transform along</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -302,13 +253,13 @@ It returns the values of the integrals of T polynomials over the entire interval
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.transform">
-<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.transform" title="Link to this definition">¶</a></dt>
-<dd><p>1D DCT along axis. <cite>kwargs</cite> will be passed on to the FFT library.</p>
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.transform" title="Link to this definition">¶</a></dt>
+<dd><p>DCT along axes. <cite>kwargs</cite> will be passed on to the FFT library.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>u</strong> – Data you want to transform</p></li>
-<li><p><strong>axis</strong> (<em>int</em>) – Axis you want to transform along</p></li>
+<li><p><strong>axes</strong> (<em>tuple</em>) – Axes you want to transform along</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -323,6 +274,11 @@ It returns the values of the integrals of T polynomials over the entire interval
 <dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FFTHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.283185307179586</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D" title="helpers.spectral_helper.SpectralHelper1D"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpectralHelper1D</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.distributable">
+<span class="sig-name descname"><span class="pre">distributable</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.distributable" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.get_1dgrid">
 <span class="sig-name descname"><span class="pre">get_1dgrid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.get_1dgrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.get_1dgrid" title="Link to this definition">¶</a></dt>
@@ -400,6 +356,11 @@ after.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.get_plan">
+<span class="sig-name descname"><span class="pre">get_plan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.get_plan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.get_plan" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.get_wavenumbers">
 <span class="sig-name descname"><span class="pre">get_wavenumbers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.get_wavenumbers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.get_wavenumbers" title="Link to this definition">¶</a></dt>
 <dd><p>Be careful that this ordering is very unintuitive.</p>
@@ -407,13 +368,13 @@ after.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.itransform">
-<span class="sig-name descname"><span class="pre">itransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.itransform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.itransform" title="Link to this definition">¶</a></dt>
-<dd><p>Inverse 1D FFT.</p>
+<span class="sig-name descname"><span class="pre">itransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.itransform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.itransform" title="Link to this definition">¶</a></dt>
+<dd><p>Inverse FFT.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>u</strong> – Data you want to transform</p></li>
-<li><p><strong>axis</strong> (<em>int</em>) – Axis you want to transform along</p></li>
+<li><p><strong>axes</strong> (<em>tuple</em>) – Axes over which to transform</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -424,13 +385,13 @@ after.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.transform">
-<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.transform" title="Link to this definition">¶</a></dt>
-<dd><p>1D FFT along axis. <cite>kwargs</cite> are passed on to the FFT library.</p>
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.transform" title="Link to this definition">¶</a></dt>
+<dd><p>FFT along axes. <cite>kwargs</cite> are passed on to the FFT library.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>u</strong> – Data you want to transform</p></li>
-<li><p><strong>axis</strong> (<em>int</em>) – Axis you want to transform along</p></li>
+<li><p><strong>axes</strong> (<em>tuple</em>) – Axes you want to transform over</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -608,17 +569,6 @@ after.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.local_slice">
-<span class="sig-name descname"><span class="pre">local_slice</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.local_slice" title="Link to this definition">¶</a></dt>
-<dd><p>Local slice of the solution as in <cite>mpi4py-fft</cite></p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>slice</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.fft_obj">
 <span class="sig-name descname"><span class="pre">fft_obj</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.fft_obj" title="Link to this definition">¶</a></dt>
 <dd><p>When using distributed FFTs, this will be a parallel transform object from <cite>mpi4py-fft</cite></p>
@@ -699,7 +649,7 @@ bases for possible arguments.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.add_equation_lhs">
-<span class="sig-name descname"><span class="pre">add_equation_lhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relations</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.add_equation_lhs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.add_equation_lhs" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_equation_lhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.add_equation_lhs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.add_equation_lhs" title="Link to this definition">¶</a></dt>
 <dd><p>Add the left hand part (that you want to solve implicitly) of an equation to a list of lists of sparse matrices
 that you will convert to an operator later.</p>
 <p>Example:
@@ -711,6 +661,7 @@ preconditioning:</p>
 <li><p><strong>A</strong> (<em>list</em><em> of </em><em>lists</em><em> of </em><em>sparse matrices</em>) – The operator to be</p></li>
 <li><p><strong>equation</strong> (<em>str</em>) – The equation of the component you want this in</p></li>
 <li><p><strong>relations</strong> – (dict): Relations between quantities</p></li>
+<li><p><strong>diag</strong> (<em>bool</em>) – Whether operator is block-diagonal</p></li>
 </ul>
 </dd>
 </dl>
@@ -729,7 +680,7 @@ preconditioning:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.convert_operator_matrix_to_operator">
-<span class="sig-name descname"><span class="pre">convert_operator_matrix_to_operator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.convert_operator_matrix_to_operator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.convert_operator_matrix_to_operator" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">convert_operator_matrix_to_operator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.convert_operator_matrix_to_operator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.convert_operator_matrix_to_operator" title="Link to this definition">¶</a></dt>
 <dd><p>Promote the list of lists of sparse matrices to a single sparse matrix that can be used as linear operator.
 See documentation of <cite>SpectralHelper.add_equation_lhs</cite> for an example.</p>
 <dl class="field-list simple">
@@ -755,7 +706,7 @@ See documentation of <cite>SpectralHelper.add_equation_lhs</cite> for an example
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.fft_backend">
-<span class="sig-name descname"><span class="pre">fft_backend</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'fftw'</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.fft_backend" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">fft_backend</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'scipy'</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.fft_backend" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -816,28 +767,6 @@ Forward arguments for the boundary conditions using <cite>kwargs</cite>. Refer t
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_aligned">
-<span class="sig-name descname"><span class="pre">get_aligned</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fft</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_aligned"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_aligned" title="Link to this definition">¶</a></dt>
-<dd><p>Realign the data along the axis when using distributed FFTs. <cite>kwargs</cite> will be used to get the correct PFFT
-object from <cite>mpi4py-fft</cite>, which has suitable transfer classes for the shape of data. Hence, they should include
-shape especially, if applicable.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> – The solution</p></li>
-<li><p><strong>axis_in</strong> (<em>int</em>) – Current alignment</p></li>
-<li><p><strong>axis_out</strong> (<em>int</em>) – New alignment</p></li>
-<li><p><strong>fft</strong> (<em>mpi4py_fft.PFFT</em>) – parallel FFT object</p></li>
-<li><p><strong>forward</strong> (<em>bool</em>) – Whether the input is in spectral space or not</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>solution aligned on <cite>axis_in</cite></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_basis_change_matrix">
 <span class="sig-name descname"><span class="pre">get_basis_change_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_basis_change_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_basis_change_matrix" title="Link to this definition">¶</a></dt>
 <dd><p>Some spectral bases do a change between bases while differentiating. This method returns matrices that changes the basis to whatever you want.
@@ -868,11 +797,14 @@ Refer to the methods of the same name of the 1D bases to learn what parameters y
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_empty_operator_matrix">
-<span class="sig-name descname"><span class="pre">get_empty_operator_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_empty_operator_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_empty_operator_matrix" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_empty_operator_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_empty_operator_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_empty_operator_matrix" title="Link to this definition">¶</a></dt>
 <dd><p>Return a matrix of operators to be filled with the connections between the solution components.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list containing sparse zeros</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>diag</strong> (<em>bool</em>) – Whether operator is block-diagonal</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list containing sparse zeros</p>
 </dd>
 </dl>
 </dd></dl>
@@ -910,9 +842,14 @@ admissible.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_grid">
-<span class="sig-name descname"><span class="pre">get_grid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_grid" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_grid" title="Link to this definition">¶</a></dt>
 <dd><p>Get grid in physical space</p>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_indices">
+<span class="sig-name descname"><span class="pre">get_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_indices" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_integration_matrix">
@@ -932,13 +869,13 @@ admissible.</p>
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_local_slice_of_1D_matrix">
 <span class="sig-name descname"><span class="pre">get_local_slice_of_1D_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_local_slice_of_1D_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_local_slice_of_1D_matrix" title="Link to this definition">¶</a></dt>
 <dd><p>Get the local version of a 1D matrix. When using distributed FFTs, each rank will carry only a subset of modes,
-which you can sort out via the <cite>SpectralHelper.local_slice</cite> attribute. When constructing a 1D matrix, you can
+which you can sort out via the <cite>SpectralHelper.local_slice()</cite> attribute. When constructing a 1D matrix, you can
 use this method to get the part corresponding to the modes carried by this rank.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>M</strong> (<em>sparse matrix</em>) – Global 1D matrix you want to get the local version of</p></li>
-<li><p><strong>axis</strong> (<em>int</em>) – Direction in which you want the local version. You will get the global matrix in other directions. This means slab decomposition only.</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – Direction in which you want the local version. You will get the global matrix in other directions.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -948,10 +885,20 @@ use this method to get the part corresponding to the modes carried by this rank.
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_pfft">
+<span class="sig-name descname"><span class="pre">get_pfft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_pfft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_pfft" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_wavenumbers">
 <span class="sig-name descname"><span class="pre">get_wavenumbers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_wavenumbers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_wavenumbers" title="Link to this definition">¶</a></dt>
 <dd><p>Get grid in spectral space</p>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.global_slice">
+<span class="sig-name descname"><span class="pre">global_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.global_slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.global_slice" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.index">
@@ -971,44 +918,23 @@ use this method to get the part corresponding to the modes carried by this rank.
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.itransform">
-<span class="sig-name descname"><span class="pre">itransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.itransform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.itransform" title="Link to this definition">¶</a></dt>
-<dd><p>Inverse transform over all components of the solution</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>transform</strong> (<em>u data to</em>)</p></li>
-<li><p><strong>axes</strong> (<em>tuple</em>) – Axes over which to transform</p></li>
-<li><p><strong>padding</strong> (<em>list</em>) – Padding factor for transform. E.g. a padding factor of 2 will add as many zeros as there were modes before before transforming</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Transformed data</p>
-</dd>
-</dl>
-</dd></dl>
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.infer_alignment">
+<span class="sig-name descname"><span class="pre">infer_alignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward_output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.infer_alignment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.infer_alignment" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.itransform_single_component">
-<span class="sig-name descname"><span class="pre">itransform_single_component</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.itransform_single_component"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.itransform_single_component" title="Link to this definition">¶</a></dt>
-<dd><p>Inverse transform over single component of the solution</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>transform</strong> (<em>u data to</em>)</p></li>
-<li><p><strong>axes</strong> (<em>tuple</em>) – Axes over which to transform</p></li>
-<li><p><strong>padding</strong> (<em>list</em>) – Padding factor for transform. E.g. a padding factor of 2 will add as many zeros as there were modes before before transforming</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Transformed data</p>
-</dd>
-</dl>
-</dd></dl>
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.itransform">
+<span class="sig-name descname"><span class="pre">itransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.itransform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.itransform" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.linalg">
 <span class="sig-name descname"><span class="pre">linalg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.sparse.linalg'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.13/site-packages/scipy/sparse/linalg/__init__.py'&gt;</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.linalg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.local_slice">
+<span class="sig-name descname"><span class="pre">local_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.local_slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.local_slice" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
@@ -1020,6 +946,13 @@ use this method to get the part corresponding to the modes carried by this rank.
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.ndim">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.ndim" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.newDistArray">
+<span class="sig-name descname"><span class="pre">newDistArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pfft</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.newDistArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.newDistArray" title="Link to this definition">¶</a></dt>
+<dd><p>Get an empty distributed array. This is almost a copy of the function of the same name from mpi4py-fft, but
+takes care of all the solution components in the tensor.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.put_BCs_in_matrix">
@@ -1059,6 +992,11 @@ This function needs no transforms and caches a mask for faster subsequent use.</
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.redistribute">
+<span class="sig-name descname"><span class="pre">redistribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward_output</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.redistribute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.redistribute" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.remove_BC">
 <span class="sig-name descname"><span class="pre">remove_BC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">component</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.remove_BC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.remove_BC" title="Link to this definition">¶</a></dt>
 <dd><p>Remove a BC from the matrix. This is useful e.g. when you add a non-scalar BC and then need to selectively
@@ -1085,6 +1023,12 @@ Forwards arguments for the boundary conditions using <cite>kwargs</cite>. Refer 
 <dd><p>Convert the list of lists of BCs to the boundary condition operator.
 Also, boundary bordering requires to zero out all other entries in the matrix in rows containing a boundary
 condition. This method sets up a suitable sparse matrix to do this.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.setup_CPU">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setup_CPU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">useFFTW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.setup_CPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.setup_CPU" title="Link to this definition">¶</a></dt>
+<dd><p>switch to CPU modules</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1118,39 +1062,8 @@ This must also be called before setting up any BCs.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.transform">
-<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.transform" title="Link to this definition">¶</a></dt>
-<dd><p>Transform all components from physical space to spectral space</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>transform</strong> (<em>u data to</em>)</p></li>
-<li><p><strong>axes</strong> (<em>tuple</em>) – Axes over which to transform</p></li>
-<li><p><strong>padding</strong> (<em>list</em>) – Padding factor for transform. E.g. a padding factor of 2 will discard the upper half of modes after transforming</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Transformed data</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.transform_single_component">
-<span class="sig-name descname"><span class="pre">transform_single_component</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.transform_single_component"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.transform_single_component" title="Link to this definition">¶</a></dt>
-<dd><p>Transform a single component of the solution</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>transform</strong> (<em>u data to</em>)</p></li>
-<li><p><strong>axes</strong> (<em>tuple</em>) – Axes over which to transform</p></li>
-<li><p><strong>padding</strong> (<em>list</em>) – Padding factor for transform. E.g. a padding factor of 2 will discard the upper half of modes after transforming</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Transformed data</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.transform" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.u_init">
@@ -1164,6 +1077,12 @@ This must also be called before setting up any BCs.</p>
 <dd><p>Get empty data container in spectral space</p>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.u_init_physical">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">u_init_physical</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.u_init_physical" title="Link to this definition">¶</a></dt>
+<dd><p>Get empty data container in physical space</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.xp">
 <span class="sig-name descname"><span class="pre">xp</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'numpy'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.13/site-packages/numpy/__init__.py'&gt;</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.xp" title="Link to this definition">¶</a></dt>
@@ -1173,7 +1092,7 @@ This must also be called before setting up any BCs.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SpectralHelper1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useGPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SpectralHelper1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useGPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useFFTW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Abstract base class for 1D spectral discretizations. Defines a common interface with parameters and functions that
 all bases need to have.</p>
@@ -1233,6 +1152,11 @@ the code for GPUs.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.distributable">
+<span class="sig-name descname"><span class="pre">distributable</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.distributable" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.fft_lib">
@@ -1372,6 +1296,12 @@ you want. This is what the <cite>SpectralHelper</cite> does when you call the me
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.setup_CPU">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setup_CPU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">useFFTW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.setup_CPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.setup_CPU" title="Link to this definition">¶</a></dt>
+<dd><p>switch to CPU modules</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.setup_GPU">
 <em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setup_GPU</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.setup_GPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.setup_GPU" title="Link to this definition">¶</a></dt>
 <dd><p>switch to GPU modules</p>
@@ -1391,7 +1321,7 @@ you want. This is what the <cite>SpectralHelper</cite> does when you call the me
 
 <dl class="py class">
 <dt class="sig sig-object py" id="helpers.spectral_helper.UltrasphericalHelper">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UltrasphericalHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fft'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#UltrasphericalHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.UltrasphericalHelper" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UltrasphericalHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#UltrasphericalHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.UltrasphericalHelper" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper" title="helpers.spectral_helper.ChebychevHelper"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChebychevHelper</span></code></a></p>
 <p>This implementation follows <a class="reference external" href="https://doi.org/10.1137/120865458">https://doi.org/10.1137/120865458</a>.
 The ultraspherical method works in Chebychev polynomials as well, but also uses various Gegenbauer polynomials.
@@ -1544,9 +1474,6 @@ This is very similar to <cite>functools.cache</cite>, but without the memory lea
 <li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_basis_change_matrix"><code class="docutils literal notranslate"><span class="pre">get_basis_change_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_conv"><code class="docutils literal notranslate"><span class="pre">get_conv()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_differentiation_matrix"><code class="docutils literal notranslate"><span class="pre">get_differentiation_matrix()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_fft_shift"><code class="docutils literal notranslate"><span class="pre">get_fft_shift()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_fft_shuffle"><code class="docutils literal notranslate"><span class="pre">get_fft_shuffle()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_fft_utils"><code class="docutils literal notranslate"><span class="pre">get_fft_utils()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_integ_BC_row"><code class="docutils literal notranslate"><span class="pre">get_integ_BC_row()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_integration_matrix"><code class="docutils literal notranslate"><span class="pre">get_integration_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_norm"><code class="docutils literal notranslate"><span class="pre">get_norm()</span></code></a></li>
@@ -1556,12 +1483,14 @@ This is very similar to <cite>functools.cache</cite>, but without the memory lea
 </ul>
 </li>
 <li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper"><code class="docutils literal notranslate"><span class="pre">FFTHelper</span></code></a><ul>
+<li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.distributable"><code class="docutils literal notranslate"><span class="pre">distributable</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_1dgrid"><code class="docutils literal notranslate"><span class="pre">get_1dgrid()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_BC"><code class="docutils literal notranslate"><span class="pre">get_BC()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_Nyquist_mode_index"><code class="docutils literal notranslate"><span class="pre">get_Nyquist_mode_index()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_differentiation_matrix"><code class="docutils literal notranslate"><span class="pre">get_differentiation_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_integ_BC_row"><code class="docutils literal notranslate"><span class="pre">get_integ_BC_row()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_integration_matrix"><code class="docutils literal notranslate"><span class="pre">get_integration_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_plan"><code class="docutils literal notranslate"><span class="pre">get_plan()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_wavenumbers"><code class="docutils literal notranslate"><span class="pre">get_wavenumbers()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.itransform"><code class="docutils literal notranslate"><span class="pre">itransform()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.transform"><code class="docutils literal notranslate"><span class="pre">transform()</span></code></a></li>
@@ -1582,7 +1511,6 @@ This is very similar to <cite>functools.cache</cite>, but without the memory lea
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.BC_line_zero_matrix"><code class="docutils literal notranslate"><span class="pre">BC_line_zero_matrix</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.rhs_BCs_hat"><code class="docutils literal notranslate"><span class="pre">rhs_BCs_hat</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.global_shape"><code class="docutils literal notranslate"><span class="pre">global_shape</span></code></a></li>
-<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.local_slice"><code class="docutils literal notranslate"><span class="pre">local_slice</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.fft_obj"><code class="docutils literal notranslate"><span class="pre">fft_obj</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.init"><code class="docutils literal notranslate"><span class="pre">init</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.init_forward"><code class="docutils literal notranslate"><span class="pre">init_forward</span></code></a></li>
@@ -1601,35 +1529,41 @@ This is very similar to <cite>functools.cache</cite>, but without the memory lea
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_BC"><code class="docutils literal notranslate"><span class="pre">get_BC()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_Dirichlet_recombination_matrix"><code class="docutils literal notranslate"><span class="pre">get_Dirichlet_recombination_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_Id"><code class="docutils literal notranslate"><span class="pre">get_Id()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_aligned"><code class="docutils literal notranslate"><span class="pre">get_aligned()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_basis_change_matrix"><code class="docutils literal notranslate"><span class="pre">get_basis_change_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_differentiation_matrix"><code class="docutils literal notranslate"><span class="pre">get_differentiation_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_empty_operator_matrix"><code class="docutils literal notranslate"><span class="pre">get_empty_operator_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_fft"><code class="docutils literal notranslate"><span class="pre">get_fft()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_filter_matrix"><code class="docutils literal notranslate"><span class="pre">get_filter_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_grid"><code class="docutils literal notranslate"><span class="pre">get_grid()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_indices"><code class="docutils literal notranslate"><span class="pre">get_indices()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_integration_matrix"><code class="docutils literal notranslate"><span class="pre">get_integration_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_local_slice_of_1D_matrix"><code class="docutils literal notranslate"><span class="pre">get_local_slice_of_1D_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_pfft"><code class="docutils literal notranslate"><span class="pre">get_pfft()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.get_wavenumbers"><code class="docutils literal notranslate"><span class="pre">get_wavenumbers()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.global_slice"><code class="docutils literal notranslate"><span class="pre">global_slice()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.index"><code class="docutils literal notranslate"><span class="pre">index()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.infer_alignment"><code class="docutils literal notranslate"><span class="pre">infer_alignment()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.itransform"><code class="docutils literal notranslate"><span class="pre">itransform()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.itransform_single_component"><code class="docutils literal notranslate"><span class="pre">itransform_single_component()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.linalg"><code class="docutils literal notranslate"><span class="pre">linalg</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.local_slice"><code class="docutils literal notranslate"><span class="pre">local_slice()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.ncomponents"><code class="docutils literal notranslate"><span class="pre">ncomponents</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.ndim"><code class="docutils literal notranslate"><span class="pre">ndim</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.newDistArray"><code class="docutils literal notranslate"><span class="pre">newDistArray()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.put_BCs_in_matrix"><code class="docutils literal notranslate"><span class="pre">put_BCs_in_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.put_BCs_in_rhs"><code class="docutils literal notranslate"><span class="pre">put_BCs_in_rhs()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.put_BCs_in_rhs_hat"><code class="docutils literal notranslate"><span class="pre">put_BCs_in_rhs_hat()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.redistribute"><code class="docutils literal notranslate"><span class="pre">redistribute()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.remove_BC"><code class="docutils literal notranslate"><span class="pre">remove_BC()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.setup_BCs"><code class="docutils literal notranslate"><span class="pre">setup_BCs()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.setup_CPU"><code class="docutils literal notranslate"><span class="pre">setup_CPU()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.setup_GPU"><code class="docutils literal notranslate"><span class="pre">setup_GPU()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.setup_fft"><code class="docutils literal notranslate"><span class="pre">setup_fft()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.shape"><code class="docutils literal notranslate"><span class="pre">shape</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.sparse_lib"><code class="docutils literal notranslate"><span class="pre">sparse_lib</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.transform"><code class="docutils literal notranslate"><span class="pre">transform()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.transform_single_component"><code class="docutils literal notranslate"><span class="pre">transform_single_component()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.u_init"><code class="docutils literal notranslate"><span class="pre">u_init</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.u_init_forward"><code class="docutils literal notranslate"><span class="pre">u_init_forward</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.u_init_physical"><code class="docutils literal notranslate"><span class="pre">u_init_physical</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.xp"><code class="docutils literal notranslate"><span class="pre">xp</span></code></a></li>
 </ul>
 </li>
@@ -1639,6 +1573,7 @@ This is very similar to <cite>functools.cache</cite>, but without the memory lea
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.x1"><code class="docutils literal notranslate"><span class="pre">x1</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.L"><code class="docutils literal notranslate"><span class="pre">L</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.useGPU"><code class="docutils literal notranslate"><span class="pre">useGPU</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.distributable"><code class="docutils literal notranslate"><span class="pre">distributable</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.fft_lib"><code class="docutils literal notranslate"><span class="pre">fft_lib</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_1dgrid"><code class="docutils literal notranslate"><span class="pre">get_1dgrid()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_BC"><code class="docutils literal notranslate"><span class="pre">get_BC()</span></code></a></li>
@@ -1651,6 +1586,7 @@ This is very similar to <cite>functools.cache</cite>, but without the memory lea
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_wavenumbers"><code class="docutils literal notranslate"><span class="pre">get_wavenumbers()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_zero"><code class="docutils literal notranslate"><span class="pre">get_zero()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.linalg"><code class="docutils literal notranslate"><span class="pre">linalg</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.setup_CPU"><code class="docutils literal notranslate"><span class="pre">setup_CPU()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.setup_GPU"><code class="docutils literal notranslate"><span class="pre">setup_GPU()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.sparse_lib"><code class="docutils literal notranslate"><span class="pre">sparse_lib</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.xp"><code class="docutils literal notranslate"><span class="pre">xp</span></code></a></li>
