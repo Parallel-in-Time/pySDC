@@ -347,8 +347,8 @@ class GenericSpectralLinear(Problem):
     def setUpFieldsIO(self):
         Rectilinear.setupMPI(
             comm=self.comm,
-            iLoc=[me.start for me in self.local_slice],
-            nLoc=[me.stop - me.start for me in self.local_slice],
+            iLoc=[me.start for me in self.local_slice(False)],
+            nLoc=[me.stop - me.start for me in self.local_slice(False)],
         )
 
     def getOutputFile(self, fileName):
