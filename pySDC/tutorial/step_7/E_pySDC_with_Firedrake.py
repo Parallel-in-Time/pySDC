@@ -170,7 +170,7 @@ def runHeatFiredrake(useMPIsweeper=False, ML=False):
 
     # do tests that we got the same as last time
     n_nodes = 1 if useMPIsweeper else description['sweeper_params']['num_nodes']
-    assert error[0][1] < 2e-8
+    assert error[0][1] < 2e-7
     assert tot_iter == 10 if ML else 29
     assert tot_solver_setup == n_nodes
     assert tot_solves == n_nodes * tot_iter

@@ -22,6 +22,7 @@ from pySDC.projects.Resilience.Schroedinger import run_Schroedinger
 from pySDC.projects.Resilience.quench import run_quench
 from pySDC.projects.Resilience.AC import run_AC
 from pySDC.projects.Resilience.RBC import run_RBC
+from pySDC.projects.Resilience.GS import run_GS
 
 from pySDC.projects.Resilience.strategies import BaseStrategy, AdaptivityStrategy, IterateStrategy, HotRodStrategy
 import logging
@@ -108,7 +109,7 @@ class FaultStats:
         Returns:
             float: Tend to put into the run
         '''
-        return self.strategies[0].get_Tend(self.prob, self.num_procs)
+        return self.strategies[0].get_Tend(self.prob, self.num_procs, resilience_experiment=True)
 
     def run_stats_generation(
         self, runs=1000, step=None, comm=None, kwargs_range=None, faults=None, _reload=False, _runs_partial=0
@@ -637,6 +638,8 @@ class FaultStats:
             prob_name = 'Allen-Cahn'
         elif self.prob.__name__ == 'run_RBC':
             prob_name = 'Rayleigh-Benard'
+        elif self.prob.__name__ == 'run_GS':
+            prob_name = 'Gray-Scott'
         else:
             raise NotImplementedError(f'Name not implemented for problem {self.prob}')
 
@@ -717,7 +720,7 @@ class FaultStats:
         else:
             try:
                 with_faults = self.load(faults=True, **kwargs)
-                with_faults['recovered'] = with_faults['error'] < self.get_thresh(kwargs['strategy'])
+                with_faults['recovered'] = with_faults['error'] <= self.get_thresh(kwargs['strategy'])
                 self.store(faults=True, dat=with_faults, **kwargs)
             except KeyError as error:
                 print(
@@ -836,10 +839,10 @@ class FaultStats:
         me_recovered = np.zeros_like(me)
 
         for i in range(len(me)):
-            _mask = (dat[thingB] == admissable_thingB[i]) & mask
+            _mask = np.logical_and((dat[thingB] == admissable_thingB[i]), mask)
             if _mask.any():
                 me[i] = op(dat, no_faults, thingA, _mask)
-                me_recovered[i] = op(dat, no_faults, thingA, _mask & dat['recovered'])
+                me_recovered[i] = op(dat, no_faults, thingA, np.logical_and(_mask, dat['recovered']))
 
         if recovered:
             ax.plot(
@@ -965,7 +968,7 @@ class FaultStats:
             if recoverable_only:
                 recoverable_mask = self.get_fixable_faults_only(strategy)
             else:
-                recoverable_mask = self.get_mask()
+                recoverable_mask = self.get_mask(strategy=strategy)
 
             for thresh_idx in range(len(thresh_range)):
                 rec_mask = self.get_mask(
@@ -1514,7 +1517,7 @@ class FaultStats:
 
         HR_strategy = HotRodStrategy(useMPI=self.use_MPI)
 
-        description = HR_strategy.get_custom_description(self.prob, self.num_procs)
+        description = HR_strategy.get_custom_description_for_faults(self.prob, self.num_procs)
         description['convergence_controllers'][HotRod]['HotRod_tol'] = 1e2
 
         stats, _, _ = self.single_run(HR_strategy, force_params=description)
@@ -1578,6 +1581,8 @@ def parse_args():
                 kwargs['prob'] = run_AC
             elif sys.argv[i + 1] == 'run_RBC':
                 kwargs['prob'] = run_RBC
+            elif sys.argv[i + 1] == 'run_GS':
+                kwargs['prob'] = run_GS
             else:
                 raise NotImplementedError
         elif 'num_procs' in sys.argv[i]:
@@ -1667,11 +1672,11 @@ def compare_adaptivity_modes():
 
 def main():
     kwargs = {
-        'prob': run_RBC,
+        'prob': run_vdp,
         'num_procs': 1,
         'mode': 'default',
-        'runs': 2000,
-        'reload': False,
+        'runs': 4000,
+        'reload': True,
         **parse_args(),
     }
 
@@ -1690,12 +1695,14 @@ def main():
             AdaptivityPolynomialError(**strategy_args),
         ],
         faults=[False, True],
-        recovery_thresh=1.15,
+        recovery_thresh=1.1,
         recovery_thresh_abs=RECOVERY_THRESH_ABS.get(kwargs.get('prob', None), 0),
         stats_path='data/stats-jusuf',
         **kwargs,
     )
-    stats_analyser.run_stats_generation(runs=kwargs['runs'], step=25)
+    stats_analyser.get_recovered()
+
+    stats_analyser.run_stats_generation(runs=kwargs['runs'], step=8)
 
     if MPI.COMM_WORLD.rank > 0:  # make sure only one rank accesses the data
         return None

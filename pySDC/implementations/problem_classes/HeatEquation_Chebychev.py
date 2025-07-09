@@ -264,7 +264,7 @@ class Heat2DChebychev(GenericSpectralLinear):
 
         super().__init__(bases, components, Dirichlet_recombination=False, spectral_space=False, **kwargs)
 
-        self.Y, self.X = self.get_grid()
+        self.X, self.Y = self.get_grid()
 
         I = self.get_Id()
         self.Dx = self.get_differentiation_matrix(axes=(0,))
@@ -372,7 +372,7 @@ class Heat2DUltraspherical(GenericSpectralLinear):
 
         super().__init__(bases, components, Dirichlet_recombination=False, spectral_space=False, **kwargs)
 
-        self.Y, self.X = self.get_grid()
+        self.X, self.Y = self.get_grid()
 
         self.Dxx = self.get_differentiation_matrix(axes=(0,), p=2)
         self.Dyy = self.get_differentiation_matrix(axes=(1,), p=2)

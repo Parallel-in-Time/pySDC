@@ -2,6 +2,10 @@
 
 :arrow_left: [Back to main page](./README.md)
 
+-   April 11, 2025: Version 5.6 adds a framework for MPI-parallel I/O, developed by [\@tlunet](https://github.com/tlunet), making it easier to visualize the data obtained with pySDC on HPC machines in software such as ParaView.
+    Also, pySDC is now compatible with the finite element library [Firedrake](https://github.com/firedrakeproject/firedrake) and the geophysical fluid dynamics library
+    [Gusto](https://github.com/firedrakeproject/gusto), thanks to [\@jshipton](https://github.com/jshipton) and [\@brownbaerchen](https://github.com/brownbaerchen).
+    The former allows to setup PDEs with finite element discretizations in pySDC and then solve in time with SDC and PFASST, while the latter allows to setup a geophysical fluid dynamics problem and then use pySDC with any SDC setup as a timestepper in Gusto.
 -   June 24, 2024: Major summer cleanup with Version 5.5. [\@tlunet](https://github.com/tlunet) extracted all quadrature-related stuff into his new standalone code 
     [qmat](https://github.com/Parallel-in-Time/qmat), which makes pySDC much more focussed and both parts easier to maintain. 
     [\@lisawim](https://github.com/lisawim) worked a lot on the DAE sweepers (including an MPI-parallel version), while [\@brownbaerchen](https://github.com/brownbaerchen) has fun with GPUs.

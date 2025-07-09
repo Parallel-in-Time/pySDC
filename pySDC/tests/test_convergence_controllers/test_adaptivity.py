@@ -197,9 +197,7 @@ def multiple_tests(adaptivity, e_tol_range, num_nodes, **kwargs):
         not_passed += [(4, f'Expected order wrt e_tol {expected_order_error_e_tol}, but got {order_e_tol}!')]
     if not np.isclose(np.median(order_estimate_e_tol), expected_order_estimate_e_tol, atol=0.4):
         not_passed += [
-            (
-                f'Expected order wrt e_tol {expected_order_estimate_e_tol} in the estimate, but got {order_estimate_e_tol}!'
-            )
+            f'Expected order wrt e_tol {expected_order_estimate_e_tol} in the estimate, but got {order_estimate_e_tol}!'
         ]
 
     return not_passed

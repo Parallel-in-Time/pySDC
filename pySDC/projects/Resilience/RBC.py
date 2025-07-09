@@ -4,16 +4,17 @@ from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.Resilience.hook import hook_collection, LogData
 from pySDC.projects.Resilience.strategies import merge_descriptions
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.core.convergence_controller import ConvergenceController
+from pySDC.projects.Resilience.sweepers import imex_1st_order_efficient
 from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import (
     EstimateExtrapolationErrorNonMPI,
 )
-from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+from pySDC.projects.Resilience.reachTendExactly import ReachTendExactly
 
 from pySDC.core.errors import ConvergenceError
 
 import numpy as np
+
+PROBLEM_PARAMS = {'Rayleigh': 3.2e5, 'nx': 256, 'nz': 128, 'max_cached_factorizations': 30}
 
 
 def u_exact(self, t, u_init=None, t_init=None, recompute=False, _t0=None):
@@ -54,45 +55,9 @@ def u_exact(self, t, u_init=None, t_init=None, recompute=False, _t0=None):
     return data
 
 
-RayleighBenard._u_exact = RayleighBenard.u_exact
-RayleighBenard.u_exact = u_exact
-
-PROBLEM_PARAMS = {'Rayleigh': 2e4, 'nx': 256, 'nz': 128}
-
-
-class ReachTendExactly(ConvergenceController):
-    """
-    This convergence controller will adapt the step size of (hopefully) the last step such that `Tend` is reached very closely.
-    Please pass the same `Tend` that you pass to the controller to the params for this to work.
-    """
-
-    def setup(self, controller, params, description, **kwargs):
-        defaults = {
-            "control_order": +94,
-            "Tend": None,
-            'min_step_size': 1e-10,
-        }
-        return {**defaults, **super().setup(controller, params, description, **kwargs)}
-
-    def get_new_step_size(self, controller, step, **kwargs):
-        L = step.levels[0]
-
-        if not CheckConvergence.check_convergence(step):
-            return None
-
-        dt = L.status.dt_new if L.status.dt_new else L.params.dt
-        time_left = self.params.Tend - L.time - L.dt
-        if time_left <= dt + self.params.min_step_size and not step.status.restart and time_left > 0:
-            dt_new = (
-                min([dt + self.params.min_step_size, max([time_left, self.params.min_step_size])])
-                + np.finfo('float').eps * 10
-            )
-            if dt_new != L.status.dt_new:
-                L.status.dt_new = dt_new
-                self.log(
-                    f'Reducing step size from {dt:12e} to {L.status.dt_new:.12e} because there is only {time_left:.12e} left.',
-                    step,
-                )
+if not hasattr(RayleighBenard, '_u_exact'):
+    RayleighBenard._u_exact = RayleighBenard.u_exact
+    RayleighBenard.u_exact = u_exact
 
 
 def run_RBC(
@@ -105,6 +70,7 @@ def run_RBC(
     u0=None,
     t0=20.0,
     use_MPI=False,
+    step_size_rounding=False,
     **kwargs,
 ):
     """
@@ -135,6 +101,7 @@ def run_RBC(
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'LU'
     sweeper_params['QE'] = 'PIC'
+    sweeper_params['initial_guess'] = 'copy'
 
     from mpi4py import MPI
 
@@ -147,22 +114,23 @@ def run_RBC(
     convergence_controllers[ReachTendExactly] = {'Tend': Tend}
     from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeRounding
 
-    convergence_controllers[StepSizeRounding] = {}
+    if step_size_rounding:
+        convergence_controllers[StepSizeRounding] = {}
 
     controller_params = {}
-    controller_params['logger_level'] = 30
+    controller_params['logger_level'] = 15
     controller_params['hook_class'] = hook_collection + (hook_class if type(hook_class) == list else [hook_class])
     controller_params['mssdc_jac'] = False
 
     if custom_controller_params is not None:
         controller_params = {**controller_params, **custom_controller_params}
 
-    imex_1st_order.compute_residual = compute_residual_DAE
+    imex_1st_order_efficient.compute_residual = compute_residual_DAE
 
     description = {}
     description['problem_class'] = RayleighBenard
     description['problem_params'] = problem_params
-    description['sweeper_class'] = imex_1st_order
+    description['sweeper_class'] = imex_1st_order_efficient
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
@@ -204,14 +172,15 @@ def run_RBC(
     return stats, controller, crash
 
 
-def generate_data_for_fault_stats():
+def generate_data_for_fault_stats(Tend):
     prob = RayleighBenard(**PROBLEM_PARAMS)
-    _ts = np.linspace(0, 22, 220, dtype=float)
+    _ts = np.linspace(0, Tend, Tend * 10 + 1, dtype=float)
     for i in range(len(_ts) - 1):
-        prob.u_exact(_ts[i + 1], _t0=_ts[i])
+        print(f'Generating reference solution from {_ts[i]:.4e} to {_ts[i+1]:.4e}')
+        prob.u_exact(_ts[i + 1], _t0=_ts[i], recompute=False)
 
 
-def plot_order(t, dt, steps, num_nodes, e_tol=1e-9, restol=1e-9, ax=None, recompute=False):
+def plot_order(t, dt, steps, num_nodes, e_tol=1e-9, restol=1e-9, ax=None, recompute=False):  # pragma: no cover
     from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRun
     from pySDC.implementations.hooks.log_work import LogSDCIterations, LogWork
     from pySDC.implementations.convergence_controller_classes.crash import StopAtNan
@@ -294,7 +263,7 @@ def check_order(t=14, dt=1e-1, steps=6):
     plt.show()
 
 
-def plot_step_size(t0=0, Tend=30, e_tol=1e-3, recompute=False):
+def plot_step_size(t0=0, Tend=30, e_tol=1e-3, recompute=False):  # pragma: no cover
     import matplotlib.pyplot as plt
     import pickle
     import os
@@ -327,8 +296,86 @@ def plot_step_size(t0=0, Tend=30, e_tol=1e-3, recompute=False):
     plt.show()
 
 
+def plot_factorizations_over_time(t0=0, Tend=50, e_tol=1e-3, recompute=False, adaptivity_mode='dt'):  # pragma: no cover
+    import matplotlib.pyplot as plt
+    import pickle
+    import os
+    from pySDC.helpers.stats_helper import get_sorted
+    from pySDC.implementations.hooks.log_work import LogWork
+    from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity, AdaptivityPolynomialError
+    from pySDC.helpers.plot_helper import figsize_by_journal, setup_mpl
+    from pySDC.projects.Resilience.paper_plots import savefig
+
+    setup_mpl()
+
+    fig, axs = plt.subplots(1, 2, figsize=figsize_by_journal('TUHH_thesis', 1.0, 0.4))
+
+    if adaptivity_mode == 'dt':
+        adaptivity = Adaptivity
+    elif adaptivity_mode == 'dt_k':
+        adaptivity = AdaptivityPolynomialError
+
+    dt_controllers = {
+        'basic': {
+            adaptivity: {
+                'e_tol': e_tol,
+            }
+        },
+        'min slope': {adaptivity: {'e_tol': e_tol, 'beta': 0.5, 'dt_rel_min_slope': 2}},
+        'fixed': {},
+        # 'rounding': {adaptivity: {'e_tol': e_tol, 'beta': 0.5, 'dt_rel_min_slope': 2}, StepSizeRounding: {}},
+    }
+
+    for name, params in dt_controllers.items():
+        if adaptivity_mode == 'dt':
+            path = f'data/stats/RBC-u-{t0:.8f}-{Tend:.8f}-{e_tol:.2e}-{name}.pickle'
+        elif adaptivity_mode == 'dt_k':
+            path = f'data/stats/RBC-u-{t0:.8f}-{Tend:.8f}-{e_tol:.2e}-{name}-dtk.pickle'
+
+        if os.path.exists(path) and not recompute:
+            with open(path, 'rb') as file:
+                stats = pickle.load(file)
+        else:
+
+            convergence_controllers = {
+                **params,
+            }
+            desc = {'convergence_controllers': convergence_controllers}
+
+            if name == 'fixed':
+                if adaptivity_mode == 'dt':
+                    desc['level_params'] = {'dt': 2e-2}
+                elif adaptivity_mode == 'dt_k':
+                    desc['level_params'] = {'dt': 2e-3}
+            elif adaptivity_mode == 'dt_k':
+                desc['level_params'] = {'restol': 1e-7}
+
+            stats, _, _ = run_RBC(
+                Tend=Tend, t0=t0, custom_description=desc, hook_class=LogWork, step_size_rounding=False
+            )
+
+            with open(path, 'wb') as file:
+                pickle.dump(stats, file)
+
+        factorizations = get_sorted(stats, type='work_factorizations')
+        rhs_evals = get_sorted(stats, type='work_rhs')
+        axs[0].plot([me[0] for me in factorizations], np.cumsum([me[1] for me in factorizations]), label=name)
+        axs[1].plot([me[0] for me in rhs_evals], np.cumsum([me[1] for me in rhs_evals]), label=name)
+
+    axs[0].set_ylabel(r'matrix factorizations')
+    axs[1].set_ylabel(r'right hand side evaluations')
+    axs[0].set_xlabel(r'$t$')
+    axs[1].set_xlabel(r'$t$')
+    axs[0].set_yscale('log')
+    axs[1].set_yscale('log')
+    axs[0].legend(frameon=False)
+    savefig(fig, f'RBC_step_size_controller_{adaptivity_mode}')
+
+
 if __name__ == '__main__':
-    # plot_step_size(0, 3)
-    generate_data_for_fault_stats()
+    # plot_step_size(0, 30)
+    generate_data_for_fault_stats(Tend=30)
+    # plot_factorizations_over_time(e_tol=1e-3, adaptivity_mode='dt')
+    # plot_factorizations_over_time(recompute=False, e_tol=1e-5, adaptivity_mode='dt_k')
     # check_order(t=20, dt=1., steps=7)
     # stats, _, _ = run_RBC()

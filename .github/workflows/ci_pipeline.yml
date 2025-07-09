@@ -25,7 +25,7 @@ jobs:
         with:
           environment-file: ${{ env.YML }}
           create-args: >-
-              python=3.12
+              python=3.13
       - name: Code reformatting with black
         run: |
           black pySDC  --check --diff --color
@@ -39,7 +39,7 @@ jobs:
       fail-fast: false
       matrix:
         env: ['base', 'fenics', 'mpi4py', 'petsc', 'pytorch']
-        python: ['3.9', '3.10', '3.11', '3.12']
+        python: ['3.9', '3.10', '3.11', '3.12', '3.13']
     defaults:
       run:
         shell: bash -l {0}
@@ -70,7 +70,7 @@ jobs:
           mv .coverage coverage_${{ matrix.env }}.dat
       - name: Uploading artifacts
         uses: actions/upload-artifact@v4
-        if: matrix.python == '3.12'
+        if: matrix.python == '3.13'
         with:
           name: test-artifacts-cpu-${{ matrix.env }}
           path: |
@@ -98,7 +98,6 @@ jobs:
           - Second_orderSDC
           - soft_failure
           - TOMS
-        python: ['3.9', '3.10', '3.11', '3.12']
     defaults:
       run:
         shell: bash -l {0}
@@ -109,8 +108,6 @@ jobs:
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: "pySDC/projects/${{ matrix.env }}/environment.yml"
-          create-args: >-
-              python=${{ matrix.python }}
       - name: Install additional packages as needed
         run: |
           micromamba install -y --file etc/environment-tests.yml --freeze-installed
@@ -126,7 +123,6 @@ jobs:
           mv .coverage coverage_${{ matrix.env }}.dat
       - name: Uploading artifacts
         uses: actions/upload-artifact@v4
-        if: matrix.python == '3.12'
         with:
           name: test-artifacts-project-${{ matrix.env }}
           path: |
@@ -173,7 +169,7 @@ jobs:
   user_firedrake_tests:
     runs-on: ubuntu-latest
     container:
-      image: firedrakeproject/firedrake-vanilla:2025-01
+      image: firedrakeproject/firedrake-vanilla-default:latest
       options: --user root
       volumes:
         - ${{ github.workspace }}:/repositories
@@ -181,6 +177,11 @@ jobs:
       run:
         shell: bash -l {0}
     steps:
+      - name: Fix HOME
+        # For unknown reasons GitHub actions overwrite HOME to /github/home
+        # which will break everything unless fixed
+        # (https://github.com/actions/runner/issues/863)
+        run: echo "HOME=/home/firedrake" >> "$GITHUB_ENV"
       - name: Checkout pySDC
         uses: actions/checkout@v4
         with: 
@@ -190,25 +191,31 @@ jobs:
         with:
           repository: firedrakeproject/gusto
           path: ./gusto_repo
+      - name: Create virtual environment
+        # pass '--system-site-packages' so Firedrake can be found
+        run: python3 -m venv --system-site-packages venv-pySDC
+
       - name: Install pySDC
         run: |
-          . /home/firedrake/firedrake/bin/activate
-          python -m pip install --no-deps -e /repositories/pySDC
-          python -m pip install qmat
+          . venv-pySDC/bin/activate
+          pip install -e /repositories/pySDC
+          # test installation
+          python -c "import pySDC; print(f'pySDC module: {pySDC}')"
       - name: Install gusto
         run: |
-          . /home/firedrake/firedrake/bin/activate
-          python -m pip install -e /repositories/gusto_repo
+          . venv-pySDC/bin/activate
+          pip install -e /repositories/gusto_repo
+          # test installation
+          python -c "import gusto; print(f'gusto module: {gusto}')"
       - name: run pytest
         run: |
-          . /home/firedrake/firedrake/bin/activate
+          . venv-pySDC/bin/activate
           firedrake-clean
           cd ./pySDC
-          coverage run -m pytest --continue-on-collection-errors -v --durations=0 /repositories/pySDC/pySDC/tests -m firedrake
-        timeout-minutes: 120
+          python -m coverage run -m pytest --continue-on-collection-errors -v --durations=0 /repositories/pySDC/pySDC/tests -m firedrake
+        timeout-minutes: 45
       - name: Make coverage report
         run: |
-          . /home/firedrake/firedrake/bin/activate
 
           cd ./pySDC
           mv data ../data_firedrake

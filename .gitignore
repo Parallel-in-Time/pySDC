@@ -11,6 +11,7 @@ step_*.png
 *_data.json
 !_dataRef.json
 *.pysdc
+*.vtr
 
 # Created by https://www.gitignore.io
 

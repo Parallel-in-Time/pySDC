@@ -45,18 +45,84 @@ For instance, use
 
 .. code-block:: bash
  
-    srun -n 4 python work_precision.py --config=GS_USkate --procs=1/1/4 --useGPU=True --mode=run
-    mpirun -np 8 python work_precision.py --config=GS_USkate --procs=1/1/4 --useGPU=True --mode=plot
-    python work_precision.py --config=GS_USkate --procs=1/1/4 --useGPU=True --mode=video
+    srun -n 4 python run_experiment.pyy --config=GS_USkate --procs=1/1/4 --useGPU=True --mode=run
+    mpirun -np 8 python run_experiment.py --config=GS_USkate --procs=1/1/4 --useGPU=True --mode=plot
+    python run_experiment.py --config=GS_USkate --procs=1/1/4 --useGPU=True --mode=video
 
 to first run the problem, then make plots and then make a video for Gray-Scott with the U-Skate configuration (see arXiv:1501.01990).
 
 To do a parallel scaling test, you can go to JUWELS Booster and use, for instance,
 
 .. code-block:: bash
-   python analysis_scripts/parallel_scaling.py --mode=run --scaling=strong --space_time=True --XPU=GPU --problem=GS
-   srun python analysis_scripts/parallel_scaling.py --mode=plot --scaling=strong --space_time=True --XPU=GPU --problem=GS
+
+   python analysis_scripts/parallel_scaling.py --mode=run --space_time=True --XPU=GPU --problem=GS3D
+   python analysis_scripts/parallel_scaling.py --mode=plot --space_time=True --XPU=GPU --problem=GS3D
 
 This will generate jobscripts and submit the jobs. Notice that you have to wait for the jobs to complete before you can plot them.
 
 To learn more about the options for the scripts, run them with `--help`.
+
+Reproducing plots in Thomas Baumann's thesis
+--------------------------------------------
+Keep in mind that the results of the experiments are specific to the hardware that was used in the experiments.
+To record the data for space-time parallel scaling experiments with Gray-Scott and RBC, run the following commands on the specified machines within the directory that contains this README.
+
+.. code-block:: bash
+
+    # run on JUWELS
+    python analysis_scripts/parallel_scaling.py --mode=run --problem=GS3D --XPU=CPU --space_time=False
+    python analysis_scripts/parallel_scaling.py --mode=run --problem=GS3D --XPU=CPU --space_time=True
+
+    # run on JUWELS booster
+    python analysis_scripts/parallel_scaling.py --mode=run --problem=GS3D --XPU=GPU --space_time=False
+    python analysis_scripts/parallel_scaling.py --mode=run --problem=GS3D --XPU=GPU --space_time=True
+
+    # run on JURECA DC
+    python analysis_scripts/parallel_scaling.py --mode=run --problem=RBC --XPU=CPU --space_time=False
+    python analysis_scripts/parallel_scaling.py --mode=run --problem=RBC --XPU=CPU --space_time=True
+
+    # run on JUWELS booster
+    python analysis_scripts/parallel_scaling.py --mode=run --problem=RBC --XPU=GPU --space_time=False
+    python analysis_scripts/parallel_scaling.py --mode=run --problem=RBC --XPU=GPU --space_time=True
+
+These commands will submit a bunch of jobscripts with the individual runs.
+Keep in mind that these are specific to a compute project and some paths are account-specific.
+Most likely, you will have to change options at the top of the file `./etc/generate_jobscript.py` before you can run anything.
+Also, notice that you may not be allowed to request all resources needed for the largest Gray-Scott GPU run during normal operation of JUWELS booster.
+
+After all jobs have run to completion, you have recorded all scaling data and may plot the results with the following command:
+
+.. code-block:: bash
+
+    python paper_plots.py --target=thesis
+
+In order to run the production runs, modify the `path` class attribute of `LargeSim` in `analysis_scripts/large_simulations.py`.
+Then use the following commands on the specified machines:
+
+.. code-block:: bash
+
+    # run on JUWELS booster
+    python analysis_scripts/large_simulations.py --mode=run --problem=GS --XPU=GPU
+
+    # run on JURECA DC
+    python analysis_scripts/large_simulations.py --mode=run --problem=RBC --XPU=CPU
+
+Plotting the results of the Gray-Scott simulation requires a lot of memory and will take very long.
+Modify the paths in `analysis_scripts/plot_large_simulations.py` and then run:
+
+.. code-block:: bash
+
+    python analysis_scripts/3d_plot_GS_large.py --base_path=<path>
+    python analysis_scripts/plot_large_simulations.py --problem=GS
+
+Plotting the results of the Rayleigh-Benard production run is more easy.
+After modifying the paths as earlier, run the following commands:
+
+.. code-block:: bash
+
+    python analysis_scripts/large_simulations.py --mode=plot --problem=RBC --XPU=CPU
+    python analysis_scripts/large_simulations.py --mode=video --problem=RBC --XPU=CPU
+    python analysis_scripts/plot_large_simulations.py --problem=RBC
+    
+Run scripts with `--help` to learn more about parameters.
+Keep in mind that not all features are supported with all problems.

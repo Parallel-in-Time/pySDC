@@ -1,3 +1,6 @@
+import numpy as np
+
+
 class BlockDecomposition(object):
     """
     Class decomposing a cartesian space domain (1D to 3D) into a given number of processors.
@@ -92,16 +95,9 @@ class BlockDecomposition(object):
 
     @property
     def ranks(self):
-        gRank, order = self.gRank, self.order
-        assert gRank is not None, "gRank attribute need to be set"
-        dim, nBlocks = self.dim, self.nBlocks
-        if dim == 1:
-            return (gRank,)
-        elif dim == 2:
-            div = nBlocks[-1] if order == "C" else nBlocks[0]
-            return (gRank // div, gRank % div)
-        else:
-            raise NotImplementedError(f"dim={dim}")
+        assert self.gRank is not None, "gRank attribute needs to be set"
+        cart = np.arange(np.prod(self.nBlocks)).reshape(self.nBlocks, order=self.order)
+        return list(np.argwhere(cart == self.gRank)[0])
 
     @property
     def localBounds(self):

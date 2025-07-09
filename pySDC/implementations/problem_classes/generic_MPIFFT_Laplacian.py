@@ -85,6 +85,7 @@ class IMEX_Laplacian_MPIFFT(Problem):
             collapse=True,
             backend=self.fft_backend,
             comm_backend=self.fft_comm_backend,
+            grid=(-1,),
         )
 
         # get test data to figure out type and dimensions
