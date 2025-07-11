@@ -1,4 +1,5 @@
 import pytest
+import sys
 
 
 @pytest.mark.mpi4py
@@ -203,6 +204,7 @@ def test_libraries():
 
 
 @pytest.mark.mpi4py
+@pytest.mark.skipif(sys.version_info < (3, 10), reason="requires python3.10 or higher")
 @pytest.mark.parametrize('preconditioning', [True, False])
 def test_banded_matrix(preconditioning):
     from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
@@ -224,7 +226,6 @@ def test_banded_matrix(preconditioning):
     LU = sp.splu(A)
     for me in [LU.L, LU.U]:
 
-        print(sp.spbandwidth(me), bandwidth)
         assert max(sp.spbandwidth(me)) <= max(
             bandwidth
         ), 'One-sided bandwidth of LU decomposition is larger than that of the full matrix!'
