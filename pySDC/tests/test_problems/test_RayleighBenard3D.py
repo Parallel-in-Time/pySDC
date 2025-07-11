@@ -1,4 +1,5 @@
 import pytest
+import sys
 
 
 @pytest.mark.mpi4py
@@ -202,8 +203,37 @@ def test_libraries():
     assert P.axes[2].fft_lib == fft
 
 
+@pytest.mark.mpi4py
+@pytest.mark.skipif(sys.version_info < (3, 10), reason="requires python3.10 or higher")
+@pytest.mark.parametrize('preconditioning', [True, False])
+def test_banded_matrix(preconditioning):
+    from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
+
+    P = RayleighBenard3D(
+        nx=16, ny=16, nz=16, left_preconditioner=preconditioning, Dirichlet_recombination=preconditioning
+    )
+    sp = P.spectral.linalg
+
+    A = P.M + P.L
+    A = P.Pl @ P.spectral.put_BCs_in_matrix(A) @ P.Pr
+
+    bandwidth = sp.spbandwidth(A)
+    if preconditioning:
+        assert all(250 * me < A.shape[0] for me in bandwidth), 'Preconditioned matrix is not banded!'
+    else:
+        assert all(2 * me > A.shape[0] for me in bandwidth), 'Unpreconditioned matrix is unexpectedly banded!'
+
+    LU = sp.splu(A)
+    for me in [LU.L, LU.U]:
+
+        assert max(sp.spbandwidth(me)) <= max(
+            bandwidth
+        ), 'One-sided bandwidth of LU decomposition is larger than that of the full matrix!'
+
+
 if __name__ == '__main__':
     # test_eval_f(2**2, 2**1, 'x', False)
     # test_libraries()
     # test_Poisson_problems(4, 'u')
-    test_Poisson_problem_w()
+    # test_Poisson_problem_w()
+    test_banded_matrix(False)
