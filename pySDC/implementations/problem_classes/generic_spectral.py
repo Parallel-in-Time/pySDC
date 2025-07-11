@@ -84,9 +84,11 @@ class GenericSpectralLinear(Problem):
             debug (bool): Make additional tests at extra computational cost
         """
         solver_args = {} if solver_args is None else solver_args
+
         preconditioner_args = {} if preconditioner_args is None else preconditioner_args
         preconditioner_args['drop_tol'] = preconditioner_args.get('drop_tol', 1e-3)
         preconditioner_args['fill_factor'] = preconditioner_args.get('fill_factor', 100)
+
         self._makeAttributeAndRegister(
             'max_cached_factorizations',
             'useGPU',
@@ -209,7 +211,7 @@ class GenericSpectralLinear(Problem):
 
             self.Pl = self.spectral.sparse_lib.csc_matrix(R)
 
-        if Dirichlet_recombination and type(self.axes[-1]).__name__ in ['ChebychevHelper, Ultraspherical']:
+        if Dirichlet_recombination and type(self.axes[-1]).__name__ in ['ChebychevHelper', 'UltrasphericalHelper']:
             _Pr = self.spectral.get_Dirichlet_recombination_matrix(axis=-1)
         else:
             _Pr = Id
@@ -234,18 +236,21 @@ class GenericSpectralLinear(Problem):
         if self.spectral_space:
             rhs_hat = rhs.copy()
             if u0 is not None:
-                u0_hat = self.Pr.T @ u0.copy().flatten()
+                u0_hat = u0.copy().flatten()
             else:
                 u0_hat = None
         else:
             rhs_hat = self.spectral.transform(rhs)
             if u0 is not None:
-                u0_hat = self.Pr.T @ self.spectral.transform(u0).flatten()
+                u0_hat = self.spectral.transform(u0).flatten()
             else:
                 u0_hat = None
 
-        if self.useGPU:
-            self.xp.cuda.Device().synchronize()
+        # apply inverse right preconditioner to initial guess
+        if u0_hat is not None and 'direct' not in self.solver_type:
+            if not hasattr(self, '_Pr_inv'):
+                self._PR_inv = self.linalg.splu(self.Pr.astype(complex)).solve
+            u0_hat[...] = self._PR_inv(u0_hat)
 
         rhs_hat = (self.M @ rhs_hat.flatten()).reshape(rhs_hat.shape)
         rhs_hat = self.spectral.put_BCs_in_rhs_hat(rhs_hat)
@@ -255,17 +260,13 @@ class GenericSpectralLinear(Problem):
             A = self.M + dt * self.L
             A = self.Pl @ self.spectral.put_BCs_in_matrix(A) @ self.Pr
 
-        # import numpy as np
-        # if A.shape[0] < 200:
-        #     import matplotlib.pyplot as plt
+            # if A.shape[0] < 200e20:
+            #     import matplotlib.pyplot as plt
 
-        #     # M = self.spectral.put_BCs_in_matrix(self.L.copy())
-        #     M = A  # self.L
-        #     im = plt.imshow((M / abs(M)).real)
-        #     # im = plt.imshow(np.log10(abs(A.toarray())).real)
-        #     # im = plt.imshow(((A.toarray())).real)
-        #     plt.colorbar(im)
-        #     plt.show()
+            #     # M = self.spectral.put_BCs_in_matrix(self.L.copy())
+            #     M = A  # self.L
+            #     im = plt.spy(M)
+            #     plt.show()
 
         if 'ilu' in self.solver_type.lower():
             if dt not in self.cached_factorizations.keys():
@@ -329,9 +330,6 @@ class GenericSpectralLinear(Problem):
 
         sol_hat = self.spectral.u_init_forward
         sol_hat[...] = (self.Pr @ _sol_hat).reshape(sol_hat.shape)
-
-        if self.useGPU:
-            self.xp.cuda.Device().synchronize()
 
         if self.spectral_space:
             return sol_hat
