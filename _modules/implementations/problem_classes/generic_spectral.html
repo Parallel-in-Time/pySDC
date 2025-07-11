@@ -128,9 +128,11 @@
 <span class="sd">            debug (bool): Make additional tests at extra computational cost</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">solver_args</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">solver_args</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">solver_args</span>
+
         <span class="n">preconditioner_args</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">preconditioner_args</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">preconditioner_args</span>
         <span class="n">preconditioner_args</span><span class="p">[</span><span class="s1">&#39;drop_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">preconditioner_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;drop_tol&#39;</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">)</span>
         <span class="n">preconditioner_args</span><span class="p">[</span><span class="s1">&#39;fill_factor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">preconditioner_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fill_factor&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
             <span class="s1">&#39;max_cached_factorizations&#39;</span><span class="p">,</span>
             <span class="s1">&#39;useGPU&#39;</span><span class="p">,</span>
@@ -261,7 +263,7 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">Pl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">Dirichlet_recombination</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ChebychevHelper, Ultraspherical&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">Dirichlet_recombination</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ChebychevHelper&#39;</span><span class="p">,</span> <span class="s1">&#39;UltrasphericalHelper&#39;</span><span class="p">]:</span>
             <span class="n">_Pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">get_Dirichlet_recombination_matrix</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">_Pr</span> <span class="o">=</span> <span class="n">Id</span>
@@ -289,18 +291,21 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
             <span class="n">rhs_hat</span> <span class="o">=</span> <span class="n">rhs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">u0</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">u0_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pr</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">u0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+                <span class="n">u0_hat</span> <span class="o">=</span> <span class="n">u0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">u0_hat</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">rhs_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">rhs</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">u0</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">u0_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pr</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+                <span class="n">u0_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">u0_hat</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">useGPU</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">Device</span><span class="p">()</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+        <span class="c1"># apply inverse right preconditioner to initial guess</span>
+        <span class="k">if</span> <span class="n">u0_hat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;direct&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_Pr_inv&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_PR_inv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">splu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Pr</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">complex</span><span class="p">))</span><span class="o">.</span><span class="n">solve</span>
+            <span class="n">u0_hat</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PR_inv</span><span class="p">(</span><span class="n">u0_hat</span><span class="p">)</span>
 
         <span class="n">rhs_hat</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">@</span> <span class="n">rhs_hat</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">rhs_hat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         <span class="n">rhs_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">put_BCs_in_rhs_hat</span><span class="p">(</span><span class="n">rhs_hat</span><span class="p">)</span>
@@ -310,17 +315,13 @@
             <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span>
             <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pl</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">put_BCs_in_matrix</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pr</span>
 
-        <span class="c1"># import numpy as np</span>
-        <span class="c1"># if A.shape[0] &lt; 200:</span>
-        <span class="c1">#     import matplotlib.pyplot as plt</span>
+            <span class="c1"># if A.shape[0] &lt; 200e20:</span>
+            <span class="c1">#     import matplotlib.pyplot as plt</span>
 
-        <span class="c1">#     # M = self.spectral.put_BCs_in_matrix(self.L.copy())</span>
-        <span class="c1">#     M = A  # self.L</span>
-        <span class="c1">#     im = plt.imshow((M / abs(M)).real)</span>
-        <span class="c1">#     # im = plt.imshow(np.log10(abs(A.toarray())).real)</span>
-        <span class="c1">#     # im = plt.imshow(((A.toarray())).real)</span>
-        <span class="c1">#     plt.colorbar(im)</span>
-        <span class="c1">#     plt.show()</span>
+            <span class="c1">#     # M = self.spectral.put_BCs_in_matrix(self.L.copy())</span>
+            <span class="c1">#     M = A  # self.L</span>
+            <span class="c1">#     im = plt.spy(M)</span>
+            <span class="c1">#     plt.show()</span>
 
         <span class="k">if</span> <span class="s1">&#39;ilu&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">dt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_factorizations</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -384,9 +385,6 @@
 
         <span class="n">sol_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">u_init_forward</span>
         <span class="n">sol_hat</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Pr</span> <span class="o">@</span> <span class="n">_sol_hat</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">sol_hat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">useGPU</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">Device</span><span class="p">()</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">sol_hat</span>

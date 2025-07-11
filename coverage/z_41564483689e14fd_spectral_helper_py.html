@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/helpers/spectral_helper.py: 89%</title>
+    <title>Coverage for pySDC/helpers/spectral_helper.py: 90%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_58284776.png">
     <link rel="stylesheet" href="style_cb_81f8c14c.css" type="text/css">
     <script src="coverage_html_cb_6fb7b396.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC/helpers/spectral_helper.py</b>:
-            <span class="pc_cov">89%</span>
+            <span class="pc_cov">90%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">765 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">683<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">82<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">685<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">80<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">26<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_41564483689e14fd_stats_helper_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.9.2">coverage.py v7.9.2</a>,
-            created at 2025-07-08 09:26 +0000
+            created at 2025-07-11 11:36 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -1969,8 +1969,8 @@
     <p class="pln"><span class="n"><a id="t1887" href="#t1887">1887</a></span><span class="t"><span class="str">        Returns:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t1888" href="#t1888">1888</a></span><span class="t"><span class="str">            sparse matrix</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t1889" href="#t1889">1889</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t1890" href="#t1890">1890</a></span><span class="t">        <span class="nam">C1D</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">axes</span><span class="op">[</span><span class="nam">axis</span><span class="op">]</span><span class="op">.</span><span class="nam">get_Dirichlet_recombination_matrix</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t1891" href="#t1891">1891</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">expand_matrix_ND</span><span class="op">(</span><span class="nam">C1D</span><span class="op">,</span> <span class="nam">axis</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t1890" href="#t1890">1890</a></span><span class="t">        <span class="nam">C1D</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">axes</span><span class="op">[</span><span class="nam">axis</span><span class="op">]</span><span class="op">.</span><span class="nam">get_Dirichlet_recombination_matrix</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t1891" href="#t1891">1891</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">expand_matrix_ND</span><span class="op">(</span><span class="nam">C1D</span><span class="op">,</span> <span class="nam">axis</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t1892" href="#t1892">1892</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t1893" href="#t1893">1893</a></span><span class="t">    <span class="key">def</span> <span class="nam">get_basis_change_matrix</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">axes</span><span class="op">=</span><span class="key">None</span><span class="op">,</span> <span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t1894" href="#t1894">1894</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
@@ -2000,7 +2000,7 @@
             <a class="nav" href="z_41564483689e14fd_stats_helper_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.9.2">coverage.py v7.9.2</a>,
-            created at 2025-07-08 09:26 +0000
+            created at 2025-07-11 11:36 +0000
         </p>
     </div>
 </footer>
