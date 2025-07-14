@@ -1175,7 +1175,7 @@ class SpectralHelper:
             raise NotImplementedError(
                 f'Matrix expansion for boundary conditions not implemented for {ndim} dimensions!'
             )
-        mat.eliminate_zeros()
+        mat = self.eliminate_zeros(mat)
         return mat
 
     def remove_BC(self, component, equation, axis, kind, line=-1, scalar=False, **kwargs):
@@ -1194,7 +1194,7 @@ class SpectralHelper:
             scalar (bool): Put the BC in all space positions in the other direction
         """
         _BC = self.get_BC(axis=axis, kind=kind, line=line, scalar=scalar, **kwargs)
-        _BC.eliminate_zeros()
+        _BC = self.eliminate_zeros(_BC)
         self.BC_mat[self.index(equation)][self.index(component)] -= _BC
 
         if scalar:
@@ -1417,6 +1417,26 @@ class SpectralHelper:
         for k, v in relations.items():
             A[self.index(equation)][self.index(k)] = v
 
+    def eliminate_zeros(self, A):
+        """
+        Eliminate zeros from sparse matrix. This can reduce memory footprint of matrices somewhat.
+        Note: At the time of writing, there are memory problems in the cupy implementation of `eliminate_zeros`.
+        Therefore, this function copies the matrix to host, eliminates the zeros there and then copies back to GPU.
+
+        Args:
+            A: sparse matrix to be pruned
+
+        Returns:
+            CSC sparse matrix
+        """
+        if self.useGPU:
+            A = A.get()
+        A = A.tocsc()
+        A.eliminate_zeros()
+        if self.useGPU:
+            A = self.sparse_lib.csc_matrix(A)
+        return A
+
     def convert_operator_matrix_to_operator(self, M):
         """
         Promote the list of lists of sparse matrices to a single sparse matrix that can be used as linear operator.
@@ -1433,7 +1453,7 @@ class SpectralHelper:
         else:
             op = self.sparse_lib.bmat(M, format='csc')
 
-        op.eliminate_zeros()
+        op = self.eliminate_zeros(op)
         return op
 
     def get_wavenumbers(self):
@@ -1811,8 +1831,7 @@ class SpectralHelper:
         else:
             raise NotImplementedError(f'Matrix expansion not implemented for {ndim} dimensions!')
 
-        mat = mat.tocsc()
-        mat.eliminate_zeros()
+        mat = self.eliminate_zeros(mat)
         return mat
 
     def get_filter_matrix(self, axis, **kwargs):
