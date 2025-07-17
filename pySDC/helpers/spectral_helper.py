@@ -312,14 +312,13 @@ class ChebychevHelper(SpectralHelper1D):
         '''
         N = N if N else self.N
         sp = self.sparse_lib
-        xp = self.xp
 
         def get_forward_conv(name):
             if name == 'T2U':
-                mat = (sp.eye(N) - sp.diags(xp.ones(N - 2), offsets=+2)).tocsc() / 2.0
+                mat = (sp.eye(N) - sp.eye(N, k=2)).tocsc() / 2.0
                 mat[:, 0] *= 2
             elif name == 'D2T':
-                mat = sp.eye(N) - sp.diags(xp.ones(N - 2), offsets=+2)
+                mat = sp.eye(N) - sp.eye(N, k=2)
             elif name[0] == name[-1]:
                 mat = self.sparse_lib.eye(self.N)
             else:
@@ -585,9 +584,8 @@ class ChebychevHelper(SpectralHelper1D):
         '''
         N = self.N
         sp = self.sparse_lib
-        xp = self.xp
 
-        return sp.eye(N) - sp.diags(xp.ones(N - 2), offsets=+2)
+        return sp.eye(N) - sp.eye(N, k=2)
 
 
 class UltrasphericalHelper(ChebychevHelper):
@@ -632,7 +630,7 @@ class UltrasphericalHelper(ChebychevHelper):
 
         if lmbda == 0:
             sp = scipy.sparse
-            mat = ((sp.eye(N) - sp.diags(np.ones(N - 2), offsets=+2)) / 2.0).tolil()
+            mat = ((sp.eye(N) - sp.eye(N, k=2)) / 2.0).tolil()
             mat[:, 0] *= 2
         else:
             sp = self.sparse_lib
