@@ -364,20 +364,19 @@ class RayleighBenard3DHeterogeneous(RayleighBenard3D):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        CPU_only = ['BC_line_zero_matrix', 'BCs']
+        both = ['Pl', 'Pr', 'L', 'M']
+
         # copy matrices we need on CPU
         if self.useGPU:
-            for key in ['BC_line_zero_matrix', 'BCs']:  # TODO complete this list!
+            for key in CPU_only:
                 setattr(self.spectral, key, getattr(self.spectral, key).get())
-            for key in ['Pl', 'Pr', 'M']:  # TODO complete this list!
-                setattr(self, key, getattr(self, key).get())
 
-            self.L_CPU = self.L.get()
+            for key in both:
+                setattr(self, f'{key}_CPU', getattr(self, key).get())
         else:
-            self.L_CPU = self.L.copy()
-
-        # delete matrices we do not need on GPU
-        for key in []:  # TODO: complete list
-            delattr(self, key)
+            for key in both:
+                setattr(self, f'{key}_CPU', getattr(self, key))
 
     def solve_system(self, rhs, dt, u0=None, *args, skip_itransform=False, **kwargs):
         """
@@ -417,8 +416,8 @@ class RayleighBenard3DHeterogeneous(RayleighBenard3D):
         rhs_hat = self.Pl @ rhs_hat.flatten()
 
         if dt not in self.cached_factorizations.keys() or not self.solver_type.lower() == 'cached_direct':
-            A = self.M + dt * self.L_CPU
-            A = self.Pl @ self.spectral.put_BCs_in_matrix(A) @ self.Pr
+            A = self.M_CPU + dt * self.L_CPU
+            A = self.Pl_CPU @ self.spectral.put_BCs_in_matrix(A) @ self.Pr_CPU
             A = self.spectral.sparse_lib.csc_matrix(A)
 
             # if A.shape[0] < 200e20:

@@ -277,7 +277,7 @@ def test_banded_matrix(preconditioning):
 def test_heterogeneous_implementation():
     from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D, RayleighBenard3DHeterogeneous
 
-    params = {'nx': 2, 'ny': 2, 'nz': 2, 'useGPU': False}
+    params = {'nx': 2, 'ny': 2, 'nz': 2, 'useGPU': True}
     gpu = RayleighBenard3D(**params)
     het = RayleighBenard3DHeterogeneous(**params)
 
