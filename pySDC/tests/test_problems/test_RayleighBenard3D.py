@@ -192,6 +192,48 @@ def test_Poisson_problem_w():
 
 
 @pytest.mark.mpi4py
+@pytest.mark.parametrize('solver_type', ['gmres+ilu', 'bicgstab+ilu'])
+@pytest.mark.parametrize('N', [4, 16])
+@pytest.mark.parametrize('left_preconditioner', [True, False])
+@pytest.mark.parametrize('Dirichlet_recombination', [True, False])
+def test_solver_convergence(solver_type, N, left_preconditioner, Dirichlet_recombination):
+    import numpy as np
+    from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
+
+    fill_factor = 5 if left_preconditioner or Dirichlet_recombination else 10
+
+    P = RayleighBenard3D(
+        nx=N,
+        ny=N,
+        nz=N,
+        solver_type=solver_type,
+        solver_args={'atol': 1e-10, 'rtol': 0},
+        preconditioner_args={'fill_factor': fill_factor, 'drop_tol': 1e-4},
+        left_preconditioner=left_preconditioner,
+        Dirichlet_recombination=Dirichlet_recombination,
+    )
+    P_direct = RayleighBenard3D(nx=N, ny=N, nz=N, solver_type='cached_direct')
+
+    u0 = P.u_exact(0, noise_level=1.0e-3)
+
+    dt = 1.0e-3
+    u_direct = P_direct.solve_system(u0.copy(), dt)
+    u_good_ig = P.solve_system(u0.copy(), dt, u0=u_direct.copy())
+    assert P.work_counters[P.solver_type].niter == 0
+    assert np.allclose(u_good_ig, u_direct)
+
+    u = P.solve_system(u0.copy(), dt, u0=u0.copy())
+
+    error = abs(u - u_direct)
+    assert error <= P.solver_args['atol'] * 1e3, error
+
+    if 'ilu' in solver_type.lower():
+        size_LU = P_direct.cached_factorizations[dt].__sizeof__()
+        size_iLU = P.cached_factorizations[dt].__sizeof__()
+        assert size_iLU < size_LU, 'iLU does not require less memory than LU!'
+
+
+@pytest.mark.mpi4py
 def test_libraries():
     from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
     from mpi4py_fft import fftw
@@ -231,9 +273,30 @@ def test_banded_matrix(preconditioning):
         ), 'One-sided bandwidth of LU decomposition is larger than that of the full matrix!'
 
 
+@pytest.mark.cupy
+def test_heterogeneous_implementation():
+    from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D, RayleighBenard3DHeterogeneous
+
+    params = {'nx': 2, 'ny': 2, 'nz': 2, 'useGPU': False}
+    gpu = RayleighBenard3D(**params)
+    het = RayleighBenard3DHeterogeneous(**params)
+
+    xp = gpu.xp
+
+    u0 = gpu.u_exact()
+
+    f = [me.eval_f(u0) for me in [gpu, het]]
+    assert xp.allclose(*f)
+
+    un = [me.solve_system(u0, 1e-3) for me in [gpu, het]]
+    assert xp.allclose(*un)
+
+
 if __name__ == '__main__':
     # test_eval_f(2**2, 2**1, 'x', False)
     # test_libraries()
     # test_Poisson_problems(4, 'u')
     # test_Poisson_problem_w()
-    test_banded_matrix(False)
+    # test_solver_convergence('bicgstab+ilu', 32, False, True)
+    # test_banded_matrix(False)
+    test_heterogeneous_implementation()
