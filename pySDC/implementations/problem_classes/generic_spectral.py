@@ -133,10 +133,7 @@ class GenericSpectralLinear(Problem):
             self.__heterogeneous_setup = False
 
     def heterogeneous_setup(self):
-        if self.heterogeneous and self.useGPU and not self.__heterogeneous_setup:
-            for key in ['BC_line_zero_matrix', 'BCs']:
-                setattr(self.spectral, key, getattr(self.spectral, key).get())
-
+        if self.heterogeneous and not self.__heterogeneous_setup:
             CPU_only = ['BC_line_zero_matrix', 'BCs']
             both = ['Pl', 'Pr', 'L', 'M']
 
