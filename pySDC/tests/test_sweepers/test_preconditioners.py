@@ -19,7 +19,7 @@ def test_MIN_SR(node_type, quad_type, M):
 
     # Check non-stiff limit
     QDelta = sweeper.get_Qdelta_implicit('MIN-SR-NS')[1:, 1:]
-    assert np.all(np.diag(np.diag(QDelta)) == QDelta), "no diagonal QDelta"
+    assert np.all(np.diag(np.diag(QDelta)) == QDelta), "QDelta not diagonal"
     K = Q - QDelta
     Km = np.linalg.matrix_power(K, M)
     nilpotency = np.linalg.norm(Km, ord=np.inf)
@@ -27,7 +27,7 @@ def test_MIN_SR(node_type, quad_type, M):
 
     # Check stiff limit
     QDelta = sweeper.get_Qdelta_implicit('MIN-SR-S')[1:, 1:]
-    assert np.all(np.diag(np.diag(QDelta)) == QDelta), "no diagonal QDelta"
+    assert np.all(np.diag(np.diag(QDelta)) == QDelta), "QDelta not diagonal"
 
     if params['quad_type'] in ['LOBATTO', 'RADAU-LEFT']:
         QDelta = np.diag(1 / np.diag(QDelta[1:, 1:]))
@@ -39,6 +39,38 @@ def test_MIN_SR(node_type, quad_type, M):
     Km = np.linalg.matrix_power(K, M)
     nilpotency = np.linalg.norm(Km, ord=np.inf)
     assert nilpotency < 1e-10, "I-QDelta^{-1}Q not nilpotent " f"(M={M}, norm={nilpotency})"
+
+
+@pytest.mark.base
+@pytest.mark.parametrize("node_type", node_types)
+@pytest.mark.parametrize("quad_type", quad_types)
+@pytest.mark.parametrize("M", num_nodes)
+def test_MIN_SR_FLEX(node_type, quad_type, M):
+    params = {'num_nodes': M, 'quad_type': quad_type, 'node_type': node_type}
+    sweeper = Sweeper(params)
+
+    start_idx = 1
+    for i in range(M):
+        if sweeper.coll.nodes[i] == 0:
+            start_idx += 1
+        else:
+            break
+
+    Q = sweeper.coll.Qmat[start_idx:, start_idx:]
+
+    QDelta = [sweeper.get_Qdelta_implicit('MIN-SR-FLEX', k=i + 1)[start_idx:, start_idx:] for i in range(M)]
+    for QD in QDelta:
+        assert np.all(np.diag(np.diag(QD)) == QD), "QDelta not diagonal"
+
+    I = np.eye(M + 1 - start_idx)
+    K = np.eye(M + 1 - start_idx)
+    for QD in QDelta:
+        K = (I - np.linalg.inv(QD) @ Q) @ K
+
+    nilpotency = np.linalg.norm(K, ord=np.inf)
+    assert (
+        nilpotency < 1e-10
+    ), f"Applying FLEX preconditioner does not give nilpotent SDC iteration matrix after {M} iterations! (M={M}, norm={nilpotency})"
 
 
 @pytest.mark.base
@@ -122,6 +154,8 @@ def test_PIC(node_type, quad_type, M):
 
 
 if __name__ == '__main__':
+    test_MIN_SR_FLEX('LEGENDRE', 'LOBATTO', 4)
+
     test_MIN_SR('LEGENDRE', 'RADAU-RIGHT', 4)
     test_MIN_SR('EQUID', 'LOBATTO', 5)
 
