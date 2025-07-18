@@ -74,6 +74,60 @@ def test_MIN_SR_FLEX(node_type, quad_type, M):
 
 
 @pytest.mark.base
+@pytest.mark.parametrize('imex', [True, False])
+@pytest.mark.parametrize('num_nodes', num_nodes)
+def test_FLEX_preconditioner_in_sweepers(imex, num_nodes, MPI=False):
+    from pySDC.core.level import Level
+
+    if imex:
+        from pySDC.implementations.problem_classes.TestEquation_0D import test_equation_IMEX as problem_class
+
+        if MPI:
+            from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as sweeper_class
+        else:
+            from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order as sweeper_class
+    else:
+        from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d as problem_class
+
+        if MPI:
+            from pySDC.implementations.sweeper_classes.generic_implicit_MPI import generic_implicit_MPI as sweeper_class
+        else:
+            from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit as sweeper_class
+
+    sweeper_params = {'quad_type': 'RADAU-RIGHT', 'num_nodes': num_nodes, 'QI': 'MIN-SR-FLEX', 'QE': 'PIC'}
+    if MPI:
+        from mpi4py import MPI
+
+        sweeper_params['comm'] = MPI.COMM_WORLD
+    level_params = {'nsweeps': num_nodes, 'dt': 1}
+
+    lvl = Level(problem_class, {}, sweeper_class, sweeper_params, level_params, 0)
+
+    lvl.status.unlocked = True
+    lvl.u[0] = lvl.prob.u_exact(0)
+    lvl.status.time = 0
+
+    sweep = lvl.sweep
+    sweep.predict()
+
+    for k in range(1, level_params['nsweeps'] + 1):
+        lvl.status.sweep = k
+        sweep.update_nodes()
+        assert np.allclose(
+            sweep.QI, sweep.get_Qdelta_implicit(sweeper_params['QI'], k)
+        ), f'Got incorrect FLEX preconditioner in sweep {k}'
+
+
+@pytest.mark.mpi4py
+@pytest.mark.parametrize('imex', [True, False])
+@pytest.mark.mpi(ranks=[3])
+def test_FLEX_preconditioner_in_MPI_sweepers(mpi_ranks, imex):
+    from mpi4py import MPI
+
+    test_FLEX_preconditioner_in_sweepers(imex, num_nodes=MPI.COMM_WORLD.size, MPI=True)
+
+
+@pytest.mark.base
 @pytest.mark.parametrize("node_type", node_types)
 @pytest.mark.parametrize("quad_type", quad_types)
 @pytest.mark.parametrize("M", num_nodes)
@@ -161,3 +215,5 @@ if __name__ == '__main__':
 
     test_LU('LEGENDRE', 'RADAU-RIGHT', 4)
     test_LU('EQUID', 'LOBATTO', 5)
+
+    test_FLEX_preconditioner_in_sweepers(True)
