@@ -577,10 +577,9 @@ def test_tau_method2D(nz, nx, bc_val, bc=-1, plotting=False, useMPI=False, **kwa
     Dxx = helper.get_differentiation_matrix(axes=(0,), p=2)
 
     # generate operator
-    diag = True
-    _A = helper.get_empty_operator_matrix(diag=diag)
-    helper.add_equation_lhs(_A, 'u', {'u': Dz - Dxx * 1e-1 - Dx}, diag=diag)
-    A = helper.convert_operator_matrix_to_operator(_A, diag=diag)
+    _A = helper.get_empty_operator_matrix()
+    helper.add_equation_lhs(_A, 'u', {'u': Dz - Dxx * 1e-1 - Dx})
+    A = helper.convert_operator_matrix_to_operator(_A)
 
     # prepare system to solve
     A = helper.put_BCs_in_matrix(A)
@@ -839,34 +838,6 @@ def test_cache_memory_leaks():
         function()
 
     assert track[0] == 0, "possible memory leak with the @cache"
-
-
-@pytest.mark.base
-def test_block_diagonal_operators(N=16):
-    from pySDC.helpers.spectral_helper import SpectralHelper
-    import numpy as np
-
-    helper = SpectralHelper(comm=None, debug=True)
-    helper.add_axis('fft', N=N)
-    helper.add_axis('cheby', N=N)
-    helper.add_component(['u', 'v'])
-    helper.setup_fft()
-
-    # generate matrices
-    Dz = helper.get_differentiation_matrix(axes=(1,))
-    Dx = helper.get_differentiation_matrix(axes=(0,))
-
-    def get_operator(diag):
-        _A = helper.get_empty_operator_matrix(diag=diag)
-        helper.add_equation_lhs(_A, 'u', {'u': Dx}, diag=diag)
-        helper.add_equation_lhs(_A, 'v', {'v': Dz}, diag=diag)
-        return helper.convert_operator_matrix_to_operator(_A, diag=diag)
-
-    AD = get_operator(True)
-    A = get_operator(False)
-
-    assert np.allclose(A.toarray(), AD.toarray()), 'Operators don\'t match'
-    assert A.data.nbytes > AD.data.nbytes, 'Block diagonal operator did not conserve memory over general operator'
 
 
 if __name__ == '__main__':
