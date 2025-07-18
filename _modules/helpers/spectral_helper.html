@@ -1331,7 +1331,7 @@
 
         <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">BC</span><span class="p">)</span>
+            <span class="n">mat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">BC</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">axis2</span> <span class="o">=</span> <span class="p">(</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">ndim</span>
 
@@ -1347,8 +1347,8 @@
             <span class="p">]</span> <span class="o">*</span> <span class="n">ndim</span>
             <span class="n">mats</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="n">BC</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
             <span class="n">mats</span><span class="p">[</span><span class="n">axis2</span><span class="p">]</span> <span class="o">=</span> <span class="n">Id</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="o">*</span><span class="n">mats</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">mat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="o">*</span><span class="n">mats</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
             <span class="n">mats</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="kc">None</span><span class="p">,</span>
             <span class="p">]</span> <span class="o">*</span> <span class="n">ndim</span>
@@ -1366,11 +1366,13 @@
 
             <span class="n">mats</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="n">BC</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
 
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">mats</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="o">*</span><span class="n">mats</span><span class="p">[</span><span class="mi">1</span><span class="p">:])))</span>
+            <span class="n">mat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">mats</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="o">*</span><span class="n">mats</span><span class="p">[</span><span class="mi">1</span><span class="p">:])))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s1">&#39;Matrix expansion for boundary conditions not implemented for </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> dimensions!&#39;</span>
-            <span class="p">)</span></div>
+            <span class="p">)</span>
+        <span class="n">mat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eliminate_zeros</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mat</span></div>
 
 
 <div class="viewcode-block" id="SpectralHelper.remove_BC">
@@ -1391,6 +1393,7 @@
 <span class="sd">            scalar (bool): Put the BC in all space positions in the other direction</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_BC</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_BC</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="n">scalar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">_BC</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eliminate_zeros</span><span class="p">(</span><span class="n">_BC</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">BC_mat</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">equation</span><span class="p">)][</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">component</span><span class="p">)]</span> <span class="o">-=</span> <span class="n">_BC</span>
 
         <span class="k">if</span> <span class="n">scalar</span><span class="p">:</span>
@@ -1595,7 +1598,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.add_equation_lhs">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.add_equation_lhs">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">add_equation_lhs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">equation</span><span class="p">,</span> <span class="n">relations</span><span class="p">,</span> <span class="n">diag</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_equation_lhs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">equation</span><span class="p">,</span> <span class="n">relations</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add the left hand part (that you want to solve implicitly) of an equation to a list of lists of sparse matrices</span>
 <span class="sd">        that you will convert to an operator later.</span>
@@ -1630,19 +1633,37 @@
 <span class="sd">            A (list of lists of sparse matrices): The operator to be</span>
 <span class="sd">            equation (str): The equation of the component you want this in</span>
 <span class="sd">            relations: (dict): Relations between quantities</span>
-<span class="sd">            diag (bool): Whether operator is block-diagonal</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">relations</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">diag</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="n">k</span> <span class="o">==</span> <span class="n">equation</span><span class="p">,</span> <span class="s1">&#39;You are trying to put a non-diagonal equation into a diagonal operator&#39;</span>
-                <span class="n">A</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">equation</span><span class="p">)]</span> <span class="o">=</span> <span class="n">v</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">A</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">equation</span><span class="p">)][</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">v</span></div>
+            <span class="n">A</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">equation</span><span class="p">)][</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="SpectralHelper.eliminate_zeros">
+<a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.eliminate_zeros">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eliminate_zeros</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Eliminate zeros from sparse matrix. This can reduce memory footprint of matrices somewhat.</span>
+<span class="sd">        Note: At the time of writing, there are memory problems in the cupy implementation of `eliminate_zeros`.</span>
+<span class="sd">        Therefore, this function copies the matrix to host, eliminates the zeros there and then copies back to GPU.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            A: sparse matrix to be pruned</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            CSC sparse matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">useGPU</span><span class="p">:</span>
+            <span class="n">A</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
+        <span class="n">A</span><span class="o">.</span><span class="n">eliminate_zeros</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">useGPU</span><span class="p">:</span>
+            <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">A</span></div>
 
 
 <div class="viewcode-block" id="SpectralHelper.convert_operator_matrix_to_operator">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.convert_operator_matrix_to_operator">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">convert_operator_matrix_to_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">diag</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert_operator_matrix_to_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Promote the list of lists of sparse matrices to a single sparse matrix that can be used as linear operator.</span>
 <span class="sd">        See documentation of `SpectralHelper.add_equation_lhs` for an example.</span>
@@ -1654,14 +1675,12 @@
 <span class="sd">            sparse linear operator</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">diag</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">M</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">M</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="n">diag</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">block_diag</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span>
+            <span class="n">op</span> <span class="o">=</span> <span class="n">M</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">block_array</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span></div>
+            <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">bmat</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span>
+
+        <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eliminate_zeros</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">op</span></div>
 
 
 <div class="viewcode-block" id="SpectralHelper.get_wavenumbers">
@@ -2060,7 +2079,7 @@
         <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">matrix</span>
+            <span class="n">mat</span> <span class="o">=</span> <span class="n">matrix</span>
         <span class="k">elif</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">axis</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">I1D</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
@@ -2069,7 +2088,7 @@
             <span class="n">mats</span><span class="p">[</span><span class="n">aligned</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">aligned</span><span class="p">)</span>
             <span class="n">mats</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="n">I1D</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
 
-            <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="o">*</span><span class="n">mats</span><span class="p">)</span>
+            <span class="n">mat</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="o">*</span><span class="n">mats</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
 
             <span class="n">mats</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">ndim</span>
@@ -2078,10 +2097,13 @@
                 <span class="n">I1D</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
                 <span class="n">mats</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_slice_of_1D_matrix</span><span class="p">(</span><span class="n">I1D</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
 
-            <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">mats</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="o">*</span><span class="n">mats</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+            <span class="n">mat</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">mats</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="o">*</span><span class="n">mats</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Matrix expansion not implemented for </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> dimensions!&#39;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Matrix expansion not implemented for </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> dimensions!&#39;</span><span class="p">)</span>
+
+        <span class="n">mat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eliminate_zeros</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mat</span></div>
 
 
 <div class="viewcode-block" id="SpectralHelper.get_filter_matrix">

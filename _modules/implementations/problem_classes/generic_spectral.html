@@ -182,21 +182,20 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LHS</span><span class="p">,</span> <span class="n">diag</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LHS</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Setup a sparse linear operator by adding relationships. See documentation for ``GenericSpectralLinear.setup_L`` to learn more.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            LHS (dict): Equations to be added to the operator</span>
-<span class="sd">            diag (bool): Whether operator is block-diagonal</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            sparse linear operator</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">operator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">get_empty_operator_matrix</span><span class="p">(</span><span class="n">diag</span><span class="o">=</span><span class="n">diag</span><span class="p">)</span>
+        <span class="n">operator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">get_empty_operator_matrix</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">line</span><span class="p">,</span> <span class="n">equation</span> <span class="ow">in</span> <span class="n">LHS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">add_equation_lhs</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">equation</span><span class="p">,</span> <span class="n">diag</span><span class="o">=</span><span class="n">diag</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">convert_operator_matrix_to_operator</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">diag</span><span class="o">=</span><span class="n">diag</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">add_equation_lhs</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">equation</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">convert_operator_matrix_to_operator</span><span class="p">(</span><span class="n">operator</span><span class="p">)</span>
 
 <div class="viewcode-block" id="GenericSpectralLinear.setup_L">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_L">[docs]</a>
@@ -223,13 +222,13 @@
 
 <div class="viewcode-block" id="GenericSpectralLinear.setup_M">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_M">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">setup_M</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LHS</span><span class="p">,</span> <span class="n">diag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_M</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LHS</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Setup mass matrix, see documentation of ``GenericSpectralLinear.setup_L``.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">diff_index</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">LHS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">diff_mask</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span> <span class="ow">in</span> <span class="n">diff_index</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_operator</span><span class="p">(</span><span class="n">LHS</span><span class="p">,</span> <span class="n">diag</span><span class="o">=</span><span class="n">diag</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_operator</span><span class="p">(</span><span class="n">LHS</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="GenericSpectralLinear.setup_preconditioner">
@@ -247,7 +246,7 @@
 
         <span class="n">Id</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
         <span class="n">Pl_lhs</span> <span class="o">=</span> <span class="p">{</span><span class="n">comp</span><span class="p">:</span> <span class="p">{</span><span class="n">comp</span><span class="p">:</span> <span class="n">Id</span><span class="p">}</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">Pl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_operator</span><span class="p">(</span><span class="n">Pl_lhs</span><span class="p">,</span> <span class="n">diag</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Pl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_operator</span><span class="p">(</span><span class="n">Pl_lhs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">left_preconditioner</span><span class="p">:</span>
             <span class="c1"># reverse Kronecker product</span>
@@ -269,7 +268,7 @@
             <span class="n">_Pr</span> <span class="o">=</span> <span class="n">Id</span>
 
         <span class="n">Pr_lhs</span> <span class="o">=</span> <span class="p">{</span><span class="n">comp</span><span class="p">:</span> <span class="p">{</span><span class="n">comp</span><span class="p">:</span> <span class="n">_Pr</span><span class="p">}</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">Pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_operator</span><span class="p">(</span><span class="n">Pr_lhs</span><span class="p">,</span> <span class="n">diag</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pl</span><span class="o">.</span><span class="n">T</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_operator</span><span class="p">(</span><span class="n">Pr_lhs</span><span class="p">)</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pl</span><span class="o">.</span><span class="n">T</span></div>
 
 
 <div class="viewcode-block" id="GenericSpectralLinear.solve_system">

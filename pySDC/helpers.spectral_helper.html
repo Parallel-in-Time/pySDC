@@ -649,7 +649,7 @@ bases for possible arguments.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.add_equation_lhs">
-<span class="sig-name descname"><span class="pre">add_equation_lhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.add_equation_lhs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.add_equation_lhs" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_equation_lhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relations</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.add_equation_lhs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.add_equation_lhs" title="Link to this definition">¶</a></dt>
 <dd><p>Add the left hand part (that you want to solve implicitly) of an equation to a list of lists of sparse matrices
 that you will convert to an operator later.</p>
 <p>Example:
@@ -661,7 +661,6 @@ preconditioning:</p>
 <li><p><strong>A</strong> (<em>list</em><em> of </em><em>lists</em><em> of </em><em>sparse matrices</em>) – The operator to be</p></li>
 <li><p><strong>equation</strong> (<em>str</em>) – The equation of the component you want this in</p></li>
 <li><p><strong>relations</strong> – (dict): Relations between quantities</p></li>
-<li><p><strong>diag</strong> (<em>bool</em>) – Whether operator is block-diagonal</p></li>
 </ul>
 </dd>
 </dl>
@@ -680,7 +679,7 @@ preconditioning:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.convert_operator_matrix_to_operator">
-<span class="sig-name descname"><span class="pre">convert_operator_matrix_to_operator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.convert_operator_matrix_to_operator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.convert_operator_matrix_to_operator" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">convert_operator_matrix_to_operator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.convert_operator_matrix_to_operator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.convert_operator_matrix_to_operator" title="Link to this definition">¶</a></dt>
 <dd><p>Promote the list of lists of sparse matrices to a single sparse matrix that can be used as linear operator.
 See documentation of <cite>SpectralHelper.add_equation_lhs</cite> for an example.</p>
 <dl class="field-list simple">
@@ -697,6 +696,22 @@ See documentation of <cite>SpectralHelper.add_equation_lhs</cite> for an example
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.dtype">
 <span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.dtype" title="Link to this definition">¶</a></dt>
 <dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.eliminate_zeros">
+<span class="sig-name descname"><span class="pre">eliminate_zeros</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.eliminate_zeros"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.eliminate_zeros" title="Link to this definition">¶</a></dt>
+<dd><p>Eliminate zeros from sparse matrix. This can reduce memory footprint of matrices somewhat.
+Note: At the time of writing, there are memory problems in the cupy implementation of <cite>eliminate_zeros</cite>.
+Therefore, this function copies the matrix to host, eliminates the zeros there and then copies back to GPU.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>A</strong> – sparse matrix to be pruned</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>CSC sparse matrix</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1522,6 +1537,7 @@ This is very similar to <cite>functools.cache</cite>, but without the memory lea
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.check_BCs"><code class="docutils literal notranslate"><span class="pre">check_BCs()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.convert_operator_matrix_to_operator"><code class="docutils literal notranslate"><span class="pre">convert_operator_matrix_to_operator()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.dtype"><code class="docutils literal notranslate"><span class="pre">dtype</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.eliminate_zeros"><code class="docutils literal notranslate"><span class="pre">eliminate_zeros()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.expand_matrix_ND"><code class="docutils literal notranslate"><span class="pre">expand_matrix_ND()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.fft_backend"><code class="docutils literal notranslate"><span class="pre">fft_backend</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper.fft_comm_backend"><code class="docutils literal notranslate"><span class="pre">fft_comm_backend</span></code></a></li>
