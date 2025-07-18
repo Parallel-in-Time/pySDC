@@ -64,6 +64,7 @@ class GenericSpectralLinear(Problem):
         max_cached_factorizations=12,
         spectral_space=True,
         real_spectral_coefficients=False,
+        heterogeneous=False,
         debug=False,
     ):
         """
@@ -81,6 +82,7 @@ class GenericSpectralLinear(Problem):
             max_cached_factorizations (int): Number of matrix decompositions to cache before starting eviction
             spectral_space (bool): If yes, the solution will not be transformed back after solving and evaluating the RHS, and is expected as input in spectral space to these functions
             real_spectral_coefficients (bool): If yes, allow only real values in spectral space, otherwise, allow complex.
+            heterogeneous (bool): If yes, perform memory intensive sparse matrix operations on CPU
             debug (bool): Make additional tests at extra computational cost
         """
         solver_args = {} if solver_args is None else solver_args
@@ -100,6 +102,7 @@ class GenericSpectralLinear(Problem):
             'comm',
             'spectral_space',
             'real_spectral_coefficients',
+            'heterogeneous',
             'debug',
             localVars=locals(),
         )
@@ -125,6 +128,26 @@ class GenericSpectralLinear(Problem):
         self.setup_preconditioner(Dirichlet_recombination, left_preconditioner)
 
         self.cached_factorizations = {}
+
+        if self.heterogeneous:
+            self.__heterogeneous_setup = False
+
+    def heterogeneous_setup(self):
+        if self.heterogeneous and not self.__heterogeneous_setup:
+            CPU_only = ['BC_line_zero_matrix', 'BCs']
+            both = ['Pl', 'Pr', 'L', 'M']
+
+            if self.useGPU:
+                for key in CPU_only:
+                    setattr(self.spectral, key, getattr(self.spectral, key).get())
+
+                for key in both:
+                    setattr(self, f'{key}_CPU', getattr(self, key).get())
+            else:
+                for key in both:
+                    setattr(self, f'{key}_CPU', getattr(self, key))
+
+        self.__heterogeneous_setup = True
 
     def __getattr__(self, name):
         """
@@ -232,6 +255,8 @@ class GenericSpectralLinear(Problem):
 
         sp = self.spectral.sparse_lib
 
+        self.heterogeneous_setup()
+
         if self.spectral_space:
             rhs_hat = rhs.copy()
             if u0 is not None:
@@ -256,8 +281,19 @@ class GenericSpectralLinear(Problem):
         rhs_hat = self.Pl @ rhs_hat.flatten()
 
         if dt not in self.cached_factorizations.keys() or not self.solver_type.lower() == 'cached_direct':
-            A = self.M + dt * self.L
-            A = self.Pl @ self.spectral.put_BCs_in_matrix(A) @ self.Pr
+            if self.heterogeneous:
+                M = self.M_CPU
+                L = self.L_CPU
+                Pl = self.Pl_CPU
+                Pr = self.Pr_CPU
+            else:
+                M = self.M
+                L = self.L
+                Pl = self.Pl
+                Pr = self.Pr
+
+            A = M + dt * L
+            A = Pl @ self.spectral.put_BCs_in_matrix(A) @ Pr
 
             # if A.shape[0] < 200e20:
             #     import matplotlib.pyplot as plt
@@ -289,7 +325,21 @@ class GenericSpectralLinear(Problem):
                 if len(self.cached_factorizations) >= self.max_cached_factorizations:
                     self.cached_factorizations.pop(list(self.cached_factorizations.keys())[0])
                     self.logger.debug(f'Evicted matrix factorization for {dt=:.6f} from cache')
-                self.cached_factorizations[dt] = self.spectral.linalg.factorized(A)
+
+                if self.heterogeneous:
+                    import scipy.sparse as sp
+
+                    cpu_decomp = sp.linalg.splu(A)
+                    if self.useGPU:
+                        from cupyx.scipy.sparse.linalg import SuperLU
+
+                        solver = SuperLU(cpu_decomp).solve
+                    else:
+                        solver = cpu_decomp.solve
+                else:
+                    solver = self.spectral.linalg.factorized(A)
+
+                self.cached_factorizations[dt] = solver
                 self.logger.debug(f'Cached matrix factorization for {dt=:.6f}')
                 self.work_counters['factorizations']()
 
