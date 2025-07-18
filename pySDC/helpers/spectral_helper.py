@@ -1135,7 +1135,7 @@ class SpectralHelper:
 
         ndim = len(self.axes)
         if ndim == 1:
-            return self.sparse_lib.csc_matrix(BC)
+            mat = self.sparse_lib.csc_matrix(BC)
         elif ndim == 2:
             axis2 = (axis + 1) % ndim
 
@@ -1151,8 +1151,8 @@ class SpectralHelper:
             ] * ndim
             mats[axis] = self.get_local_slice_of_1D_matrix(BC, axis=axis)
             mats[axis2] = Id
-            return self.sparse_lib.csc_matrix(self.sparse_lib.kron(*mats))
-        if ndim == 3:
+            mat = self.sparse_lib.csc_matrix(self.sparse_lib.kron(*mats))
+        elif ndim == 3:
             mats = [
                 None,
             ] * ndim
@@ -1170,11 +1170,13 @@ class SpectralHelper:
 
             mats[axis] = self.get_local_slice_of_1D_matrix(BC, axis=axis)
 
-            return self.sparse_lib.csc_matrix(self.sparse_lib.kron(mats[0], self.sparse_lib.kron(*mats[1:])))
+            mat = self.sparse_lib.csc_matrix(self.sparse_lib.kron(mats[0], self.sparse_lib.kron(*mats[1:])))
         else:
             raise NotImplementedError(
                 f'Matrix expansion for boundary conditions not implemented for {ndim} dimensions!'
             )
+        mat = self.eliminate_zeros(mat)
+        return mat
 
     def remove_BC(self, component, equation, axis, kind, line=-1, scalar=False, **kwargs):
         """
@@ -1192,6 +1194,7 @@ class SpectralHelper:
             scalar (bool): Put the BC in all space positions in the other direction
         """
         _BC = self.get_BC(axis=axis, kind=kind, line=line, scalar=scalar, **kwargs)
+        _BC = self.eliminate_zeros(_BC)
         self.BC_mat[self.index(equation)][self.index(component)] -= _BC
 
         if scalar:
@@ -1375,7 +1378,7 @@ class SpectralHelper:
 
         return rhs
 
-    def add_equation_lhs(self, A, equation, relations, diag=False):
+    def add_equation_lhs(self, A, equation, relations):
         """
         Add the left hand part (that you want to solve implicitly) of an equation to a list of lists of sparse matrices
         that you will convert to an operator later.
@@ -1410,16 +1413,31 @@ class SpectralHelper:
             A (list of lists of sparse matrices): The operator to be
             equation (str): The equation of the component you want this in
             relations: (dict): Relations between quantities
-            diag (bool): Whether operator is block-diagonal
         """
         for k, v in relations.items():
-            if diag:
-                assert k == equation, 'You are trying to put a non-diagonal equation into a diagonal operator'
-                A[self.index(equation)] = v
-            else:
-                A[self.index(equation)][self.index(k)] = v
+            A[self.index(equation)][self.index(k)] = v
 
-    def convert_operator_matrix_to_operator(self, M, diag=False):
+    def eliminate_zeros(self, A):
+        """
+        Eliminate zeros from sparse matrix. This can reduce memory footprint of matrices somewhat.
+        Note: At the time of writing, there are memory problems in the cupy implementation of `eliminate_zeros`.
+        Therefore, this function copies the matrix to host, eliminates the zeros there and then copies back to GPU.
+
+        Args:
+            A: sparse matrix to be pruned
+
+        Returns:
+            CSC sparse matrix
+        """
+        if self.useGPU:
+            A = A.get()
+        A = A.tocsc()
+        A.eliminate_zeros()
+        if self.useGPU:
+            A = self.sparse_lib.csc_matrix(A)
+        return A
+
+    def convert_operator_matrix_to_operator(self, M):
         """
         Promote the list of lists of sparse matrices to a single sparse matrix that can be used as linear operator.
         See documentation of `SpectralHelper.add_equation_lhs` for an example.
@@ -1431,14 +1449,12 @@ class SpectralHelper:
             sparse linear operator
         """
         if len(self.components) == 1:
-            if diag:
-                return M[0]
-            else:
-                return M[0][0]
-        elif diag:
-            return self.sparse_lib.block_diag(M, format='csc')
+            op = M[0][0]
         else:
-            return self.sparse_lib.block_array(M, format='csc')
+            op = self.sparse_lib.bmat(M, format='csc')
+
+        op = self.eliminate_zeros(op)
+        return op
 
     def get_wavenumbers(self):
         """
@@ -1792,7 +1808,7 @@ class SpectralHelper:
         ndim = len(axes) + 1
 
         if ndim == 1:
-            return matrix
+            mat = matrix
         elif ndim == 2:
             axis = axes[0]
             I1D = sp.eye(self.axes[axis].N)
@@ -1801,7 +1817,7 @@ class SpectralHelper:
             mats[aligned] = self.get_local_slice_of_1D_matrix(matrix, aligned)
             mats[axis] = self.get_local_slice_of_1D_matrix(I1D, axis)
 
-            return sp.kron(*mats)
+            mat = sp.kron(*mats)
         elif ndim == 3:
 
             mats = [None] * ndim
@@ -1810,10 +1826,13 @@ class SpectralHelper:
                 I1D = sp.eye(self.axes[axis].N)
                 mats[axis] = self.get_local_slice_of_1D_matrix(I1D, axis)
 
-            return sp.kron(mats[0], sp.kron(*mats[1:]))
+            mat = sp.kron(mats[0], sp.kron(*mats[1:]))
 
         else:
             raise NotImplementedError(f'Matrix expansion not implemented for {ndim} dimensions!')
+
+        mat = self.eliminate_zeros(mat)
+        return mat
 
     def get_filter_matrix(self, axis, **kwargs):
         """
