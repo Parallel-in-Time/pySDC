@@ -8,5 +8,6 @@ ABSOLUTE_PATH="$(realpath "${RELATIVE_PATH}")"
 ####################################
 
 ### User Configuration
+jutil env activate -p ccstma
 export ENV_NAME="$(basename "$ABSOLUTE_PATH")"             # Default Name of the venv is the directory that contains this file
-export ENV_DIR="${ABSOLUTE_PATH}"/venv         # Default location of this VENV is "./venv"
+export ENV_DIR="${SCRATCH}"/venv         # Default location of this VENV is "./venv"
