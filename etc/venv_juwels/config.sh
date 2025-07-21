@@ -11,4 +11,4 @@ ABSOLUTE_PATH="$(realpath "${RELATIVE_PATH}")"
 export COMPUTE_PROJECT=ccstma
 export ENV_NAME="$(basename "$ABSOLUTE_PATH")"             # Default Name of the venv is the directory that contains this file
 jutil env activate -p $COMPUTE_PROJECT
-export ENV_DIR="${SCRATCH}"/.pySDC_venvs/venv_juwels         # Default location of this VENV is "./venv"
+export ENV_DIR="${SCRATCH}"/.pySDC_venvs/venv_juwels_"${USER}"         # Default location of this VENV is "./venv"
