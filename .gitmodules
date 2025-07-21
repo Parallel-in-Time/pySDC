@@ -1,8 +1,0 @@
-[submodule "/p/project1/ccstma/baumann7/pySDC/etc/venv_juwels_booster/mpi4py-fft"]
-	path = /p/project1/ccstma/baumann7/pySDC/etc/venv_juwels_booster/mpi4py-fft
-	url = https://github.com/brownbaerchen/mpi4py-fft.git
-	branch = cupy_implementation
-[submodule "/p/project1/ccstma/baumann7/pySDC/etc/venv_juwels/mpi4py-fft"]
-	path = /p/project1/ccstma/baumann7/pySDC/etc/venv_juwels/mpi4py-fft
-	url = https://github.com/brownbaerchen/mpi4py-fft.git
-	branch = cupy_implementation
