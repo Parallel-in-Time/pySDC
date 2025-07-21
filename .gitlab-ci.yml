@@ -28,7 +28,7 @@ prepare_JUWELS:
   script:
     - mkdir -p benchmarks
     - jutil env activate -p ${JUWELS_PROJECT}
-    - source ./etc/venv_juwels_booster/setup.sh
+    - source ./etc/venv_juwels/setup.sh
 
 
 test_JUWELS:
@@ -62,7 +62,7 @@ test_JUWELS:
   before_script:
     - mkdir -p benchmarks
     - jutil env activate -p ${JUWELS_PROJECT}
-    - source ./etc/venv_juwels_booster/activate.sh
+    - source ./etc/venv_juwels/activate.sh
   script:
     - bash etc/check_node_avail.sh || PARTITION_AVAIL=$?
     - if [ -n "$PARTITION_AVAIL" ] ; then exit $PARTITION_AVAIL ; fi
