@@ -8,7 +8,7 @@ ABSOLUTE_PATH="$(realpath "${RELATIVE_PATH}")"
 
 [[ "$0" != "${SOURCE_PATH}" ]] && echo "The activation script must be sourced, otherwise the virtual environment will not work." || ( echo "Vars script must be sourced." && exit 1) ;
 
-jutil env activate -p ccstma
+jutil env activate -p $COMPUTE_PROJECT
 
 source "${ABSOLUTE_PATH}"/config.sh
 source "${ABSOLUTE_PATH}"/modules.sh
