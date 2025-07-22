@@ -14,7 +14,7 @@ num_nodes = [2, 3, 4, 5]
 @pytest.mark.parametrize("M", num_nodes)
 def test_MIN_SR(node_type, quad_type, M):
     params = {'num_nodes': M, 'quad_type': quad_type, 'node_type': node_type}
-    sweeper = Sweeper(params)
+    sweeper = Sweeper(params, None)
     Q = sweeper.coll.Qmat[1:, 1:]
 
     # Check non-stiff limit
@@ -47,7 +47,7 @@ def test_MIN_SR(node_type, quad_type, M):
 @pytest.mark.parametrize("M", num_nodes)
 def test_MIN_SR_FLEX(node_type, quad_type, M):
     params = {'num_nodes': M, 'quad_type': quad_type, 'node_type': node_type}
-    sweeper = Sweeper(params)
+    sweeper = Sweeper(params, None)
 
     start_idx = 1
     for i in range(M):
@@ -138,7 +138,7 @@ def test_LU(node_type, quad_type, M):
         return
 
     params = {'num_nodes': M, 'quad_type': quad_type, 'node_type': node_type}
-    sweeper = Sweeper(params)
+    sweeper = Sweeper(params, None)
     Q = sweeper.coll.Qmat[1:, 1:]
 
     # Check nilpotency
@@ -160,7 +160,7 @@ def test_LU(node_type, quad_type, M):
 @pytest.mark.parametrize("M", num_nodes)
 def test_Qpar(node_type, quad_type, M):
     params = {'num_nodes': M, 'quad_type': quad_type, 'node_type': node_type}
-    sweeper = Sweeper(params)
+    sweeper = Sweeper(params, None)
     Q = sweeper.coll.Qmat[1:, 1:]
 
     QDelta = sweeper.get_Qdelta_implicit('Qpar')[1:, 1:]
@@ -174,7 +174,7 @@ def test_Qpar(node_type, quad_type, M):
 @pytest.mark.parametrize("M", num_nodes)
 def test_IE(node_type, quad_type, M):
     params = {'num_nodes': M, 'quad_type': quad_type, 'node_type': node_type}
-    sweeper = Sweeper(params)
+    sweeper = Sweeper(params, None)
 
     QDelta = sweeper.get_Qdelta_implicit('IE')[1:, 1:]
     for i in range(M):
@@ -188,7 +188,7 @@ def test_IE(node_type, quad_type, M):
 @pytest.mark.parametrize("M", num_nodes)
 def test_IEpar(node_type, quad_type, M):
     params = {'num_nodes': M, 'quad_type': quad_type, 'node_type': node_type}
-    sweeper = Sweeper(params)
+    sweeper = Sweeper(params, None)
 
     QDelta = sweeper.get_Qdelta_implicit('IEpar')[1:, 1:]
     assert np.all(np.diag(np.diag(QDelta)) == QDelta), "no diagonal QDelta"
@@ -201,7 +201,7 @@ def test_IEpar(node_type, quad_type, M):
 @pytest.mark.parametrize("M", num_nodes)
 def test_PIC(node_type, quad_type, M):
     params = {'num_nodes': M, 'quad_type': quad_type, 'node_type': node_type}
-    sweeper = Sweeper(params)
+    sweeper = Sweeper(params, None)
 
     QDelta = sweeper.get_Qdelta_implicit('PIC')[1:, 1:]
     assert np.all(QDelta == 0), "not a null matrix"

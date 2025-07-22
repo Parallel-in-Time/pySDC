@@ -68,7 +68,7 @@ class Level(FrozenClass):
         """
 
         # instantiate sweeper, problem and hooks
-        self.__sweep = sweeper_class(sweeper_params)
+        self.__sweep = sweeper_class(sweeper_params, self)
         self.__prob = problem_class(**problem_params)
 
         # set level parameters and status
@@ -86,9 +86,6 @@ class Level(FrozenClass):
         self.fold = [None] * (self.sweep.coll.num_nodes + 1)
 
         self.tau = [None] * self.sweep.coll.num_nodes
-
-        # pass this level to the sweeper for easy access
-        self.sweep.level = self
 
         self.__tag = None
 
