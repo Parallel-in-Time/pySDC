@@ -12,12 +12,13 @@ class multi_implicit(Sweeper):
         Q2: implicit integration matrix for the second component
     """
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """
         Initialization routine for the custom sweeper
 
         Args:
             params: parameters for the sweeper
+            level (pySDC.Level.level): the level that uses this sweeper
         """
 
         # Default choice: implicit Euler
@@ -27,7 +28,7 @@ class multi_implicit(Sweeper):
             params['Q2'] = 'IE'
 
         # call parent's initialization routine
-        super(multi_implicit, self).__init__(params)
+        super(multi_implicit, self).__init__(params, level)
 
         # Integration matrices
         self.Q1 = self.get_Qdelta_implicit(qd_type=self.params.Q1)

@@ -22,13 +22,20 @@ class SweeperMPI(Sweeper):
     `generic_implicit`.
     """
 
-    def __init__(self, params):
+    def __init__(self, params, level):
+        """
+        Initialization routine for the sweeper
+
+        Args:
+            params: parameters for the sweeper
+            level (pySDC.Level.level): the level that uses this sweeper
+        """
         self.logger = logging.getLogger('sweeper')
 
         if 'comm' not in params.keys():
             params['comm'] = MPI.COMM_WORLD
             self.logger.debug('Using MPI.COMM_WORLD for the communicator because none was supplied in the params.')
-        super().__init__(params)
+        super().__init__(params, level)
 
         if self.params.comm.size != self.coll.num_nodes:
             raise NotImplementedError(

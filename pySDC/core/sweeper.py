@@ -44,16 +44,15 @@ class Sweeper(object):
         coll (pySDC.Collocation.CollBase): collocation object
     """
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """
         Initialization routine for the base sweeper
 
         Args:
             params (dict): parameter object
-
+            level (pySDC.Level.level): the level that uses this sweeper
         """
 
-        # set up logger
         self.logger = logging.getLogger('sweeper')
 
         essential_keys = ['num_nodes']
@@ -81,9 +80,7 @@ class Sweeper(object):
             )
             self.params.do_coll_update = True
 
-        # This will be set as soon as the sweeper is instantiated at the level
-        self.__level = None
-
+        self.__level = level
         self.parallelizable = False
 
     def setupGenerator(self, qd_type):

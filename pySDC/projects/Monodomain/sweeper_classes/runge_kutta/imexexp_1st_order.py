@@ -13,19 +13,19 @@ class imexexp_1st_order(Sweeper):
 
     """
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """
         Initialization routine for the custom sweeper
 
         Args:
             params: parameters for the sweeper
+            level (pySDC.Level.level): the level that uses this sweeper
         """
 
         if "QI" not in params:
             params["QI"] = "IE"
 
-        # call parent's initialization routine
-        super(imexexp_1st_order, self).__init__(params)
+        super().__init__(params, level)
 
         # IMEX integration matrices
         self.QI = self.get_Qdelta_implicit(qd_type=self.params.QI)

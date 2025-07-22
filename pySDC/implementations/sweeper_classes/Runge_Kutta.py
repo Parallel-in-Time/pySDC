@@ -125,12 +125,13 @@ class RungeKutta(Sweeper):
     The entries of the Butcher tableau are stored as class attributes.
     """
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """
         Initialization routine for the custom sweeper
 
         Args:
             params: parameters for the sweeper
+            level (pySDC.Level.level): the level that uses this sweeper
         """
         # set up logger
         self.logger = logging.getLogger('sweeper')
@@ -156,8 +157,9 @@ class RungeKutta(Sweeper):
 
         self.params = _Pars(params)
 
-        # This will be set as soon as the sweeper is instantiated at the level
+        # set level using the setter in order to adapt residual tolerance if needed
         self.__level = None
+        self.level = level
 
         self.parallelizable = False
         self.QI = self.coll.Qmat
@@ -343,14 +345,15 @@ class RungeKuttaIMEX(RungeKutta):
     weights_explicit = None
     ButcherTableauClass_explicit = ButcherTableau
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """
         Initialization routine
 
         Args:
             params: parameters for the sweeper
+            level (pySDC.Level.level): the level that uses this sweeper
         """
-        super().__init__(params)
+        super().__init__(params, level)
         type(self).weights_explicit = self.weights if self.weights_explicit is None else self.weights_explicit
         self.coll_explicit = self.get_Butcher_tableau_explicit()
         self.QE = self.coll_explicit.Qmat

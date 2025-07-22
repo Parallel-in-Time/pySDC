@@ -104,14 +104,15 @@ class RungeKuttaNystrom(RungeKutta):
     weights_bar = None
     matrix_bar = None
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """
         Initialization routine for the custom sweeper
 
         Args:
             params: parameters for the sweeper
+            level (pySDC.Level.level): the level that uses this sweeper
         """
-        super().__init__(params)
+        super().__init__(params, level)
         self.coll_bar = self.get_Butcher_tableau_bar()
         self.Qx = self.coll_bar.Qmat
 

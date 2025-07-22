@@ -16,22 +16,21 @@ class boris_2nd_order(Sweeper):
         Sx: node-to-node Euler half-step for position update
     """
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """
         Initialization routine for the custom sweeper
 
         Args:
             params: parameters for the sweeper
+            level (pySDC.Level.level): the level that uses this sweeper
         """
-
-        # call parent's initialization routine
 
         if "QI" not in params:
             params["QI"] = "IE"
         if "QE" not in params:
             params["QE"] = "EE"
 
-        super(boris_2nd_order, self).__init__(params)
+        super(boris_2nd_order, self).__init__(params, level)
 
         # S- and SQ-matrices (derived from Q) and Sx- and ST-matrices for the integrator
         [

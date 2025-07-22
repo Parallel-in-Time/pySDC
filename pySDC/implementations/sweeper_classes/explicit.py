@@ -9,19 +9,19 @@ class explicit(Sweeper):
         QE: explicit Euler integration matrix
     """
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """
         Initialization routine for the custom sweeper
 
         Args:
             params: parameters for the sweeper
+            level (pySDC.Level.level): the level that uses this sweeper
         """
 
         if 'QE' not in params:
             params['QE'] = 'EE'
 
-        # call parent's initialization routine
-        super(explicit, self).__init__(params)
+        super(explicit, self).__init__(params, level)
 
         # integration matrix
         self.QE = self.get_Qdelta_explicit(qd_type=self.params.QE)

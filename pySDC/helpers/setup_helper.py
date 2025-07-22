@@ -24,7 +24,9 @@ def generate_description(problem_class, **kwargs):
 
     problem_keys = problem_class.__init__.__code__.co_varnames
     level_keys = level_params({}).__dict__.keys()
-    sweeper_keys = description['sweeper_class']({'num_nodes': 1, 'quad_type': 'RADAU-RIGHT'}).params.__dict__.keys()
+    sweeper_keys = description['sweeper_class'](
+        {'num_nodes': 1, 'quad_type': 'RADAU-RIGHT'}, None
+    ).params.__dict__.keys()
     step_keys = step_params({}).__dict__.keys()
 
     # TODO: add convergence controllers

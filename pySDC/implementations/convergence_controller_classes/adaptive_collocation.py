@@ -142,8 +142,7 @@ class AdaptiveCollocation(ConvergenceController):
             nodes_old = L.sweep.coll.nodes.copy()
 
             # change sweeper
-            L.sweep.__init__(update_params_sweeper)
-            L.sweep.level = L
+            L.sweep.__init__(update_params_sweeper, L)
 
             # reset level to tell it the new structure of the solution
             L.params.__dict__.update(new_params_level)
