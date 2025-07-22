@@ -182,5 +182,5 @@ def test_RKN_VV(sweeper_name, cwd=''):
 
 
 if __name__ == '__main__':
-    test_RKN_VV('RKN')
+    pass
     # BorisSDC_global_convergence()

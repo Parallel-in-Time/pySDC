@@ -157,7 +157,9 @@ class RungeKutta(Sweeper):
 
         self.params = _Pars(params)
 
-        self.__level = level
+        # set level using the setter in order to adapt residual tolerance if needed
+        self.__level = None
+        self.level = level
 
         self.parallelizable = False
         self.QI = self.coll.Qmat
