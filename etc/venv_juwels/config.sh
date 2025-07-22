@@ -1,3 +1,4 @@
+# See https://stackoverflow.com/a/28336473
 SOURCE_PATH="${BASH_SOURCE[0]:-${(%):-%x}}"
 
 ## Check if this script is sourced

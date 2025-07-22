@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# See https://stackoverflow.com/a/28336473
 SOURCE_PATH="${BASH_SOURCE[0]:-${(%):-%x}}"
 
 RELATIVE_PATH="$(dirname "$SOURCE_PATH")"
