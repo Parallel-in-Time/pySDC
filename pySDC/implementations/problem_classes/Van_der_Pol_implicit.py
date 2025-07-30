@@ -69,6 +69,7 @@ class vanderpol(Problem):
             localVars=locals(),
         )
         self.work_counters['newton'] = WorkCounter()
+        self.work_counters['jacobian_solves'] = WorkCounter()
         self.work_counters['rhs'] = WorkCounter()
 
     def u_exact(self, t, u_init=None, t_init=None):
@@ -167,13 +168,7 @@ class vanderpol(Problem):
             if res < self.newton_tol or np.isnan(res):
                 break
 
-            # prefactor for dg/du
-            c = 1.0 / (-2 * dt**2 * mu * x1 * x2 - dt**2 - 1 + dt * mu * (1 - x1**2))
-            # assemble dg/du
-            dg = c * np.array([[dt * mu * (1 - x1**2) - 1, -dt], [2 * dt * mu * x1 * x2 + dt, -1]])
-
-            # newton update: u1 = u0 - g/dg
-            u -= np.dot(dg, g)
+            u -= self.solve_jacobian(g, dt, u)
 
             # set new values and increase iteration count
             x1 = u[0]
@@ -191,3 +186,16 @@ class vanderpol(Problem):
             raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         return u
+
+    def solve_jacobian(self, rhs, dt, u, **kwargs):
+        mu = self.mu
+        u1 = u[0]
+        u2 = u[1]
+
+        # assemble prefactor
+        c = 1.0 / (-2 * dt**2 * mu * u1 * u2 - dt**2 - 1 + dt * mu * (1 - u1**2))
+        # assemble (dg/du)^-1
+        dg = c * np.array([[dt * mu * (1 - u1**2) - 1, -dt], [2 * dt * mu * u1 * u2 + dt, -1]])
+
+        self.work_counters['jacobian_solves']()
+        return np.dot(dg, rhs)
