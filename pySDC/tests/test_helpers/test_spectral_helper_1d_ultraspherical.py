@@ -72,6 +72,42 @@ def test_integration(N):
 
 
 @pytest.mark.base
+@pytest.mark.parametrize('N', [4, 7, 32])
+@pytest.mark.parametrize('x0', [-1, 0])
+def test_integration_rescaled_domain(N, x0, x1=1):
+    import numpy as np
+    from pySDC.helpers.spectral_helper import UltrasphericalHelper
+
+    helper = UltrasphericalHelper(N, x0=x0, x1=x1)
+
+    x = helper.get_1dgrid()
+    y = N - 2
+    u = x**y * (y + 1)
+    u_hat = helper.transform(u)
+
+    S = helper.get_integration_matrix()
+    U_hat = S @ u_hat
+    U_hat[0] = helper.get_integration_constant(U_hat, axis=-1)
+
+    int_expect = x ** (y + 1)
+    int_hat_expect = helper.transform(int_expect)
+
+    # compare indefinite integral
+    assert np.allclose(int_hat_expect[1:], U_hat[1:])
+    if x0 == 0:
+        assert np.allclose(int_hat_expect[0], U_hat[0]), 'Integration constant is wrong!'
+
+    # compare definite integral
+    top = helper.get_BC(kind='dirichlet', x=1)
+    bot = helper.get_BC(kind='dirichlet', x=-1)
+    res = ((top - bot) * U_hat).sum()
+    if x0 == 0:
+        assert np.isclose(res, 1)
+    elif x0 == -1:
+        assert np.isclose(res, 0 if y % 2 == 1 else 2)
+
+
+@pytest.mark.base
 @pytest.mark.parametrize('N', [6, 33])
 @pytest.mark.parametrize('deg', [1, 3])
 @pytest.mark.parametrize('Dirichlet_recombination', [False, True])
