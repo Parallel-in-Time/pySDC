@@ -25,19 +25,20 @@ class QDiagonalization(generic_implicit):
     parameters if you want to use this sweeper in SDC.
     """
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """
         Initialization routine for the custom sweeper
 
         Args:
             params: parameters for the sweeper
+            level (pySDC.Level.level): the level that uses this sweeper
         """
         if 'G_inv' not in params.keys():
             params['G_inv'] = np.eye(params['num_nodes'])
         params['update_f_evals'] = params.get('update_f_evals', False)
         params['ignore_ic'] = params.get('ignore_ic', True)
 
-        super().__init__(params)
+        super().__init__(params, level)
 
         self.set_G_inv(self.params.G_inv)
 
