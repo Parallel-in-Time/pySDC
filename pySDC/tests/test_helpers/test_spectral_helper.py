@@ -519,7 +519,7 @@ def test_tau_method(bc, N, bc_val, kind='Dirichlet', useGPU=False):
 
     sol_poly = np.polynomial.Chebyshev(sol_hat)
     d_sol_poly = sol_poly.deriv(1)
-    x = xp.linspace(-1, 1, 100)
+    x = np.linspace(-1, 1, 100)
 
     if kind == 'integral':
         integral = sol_poly.integ(1, lbnd=-1)
