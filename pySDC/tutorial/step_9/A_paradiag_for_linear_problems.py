@@ -35,7 +35,7 @@ my_print(f'Running ParaDiag test script with {L} time steps, {M} collocation nod
 # setup pySDC infrastructure for Dahlquist problem and quadrature
 prob = problem_class(lambdas=-1.0 * np.ones(shape=(N)), u0=1.0)
 sweeper_params = params = {'num_nodes': M, 'quad_type': 'RADAU-RIGHT'}
-sweep = generic_implicit(sweeper_params)
+sweep = generic_implicit(sweeper_params, None)
 
 # Setup a global NumPy array and insert initial conditions in the first step
 u = np.zeros((L, M, N), dtype=complex)
@@ -235,7 +235,7 @@ Here, we will not use the sweepers, but just the diagonalization computed there 
 """
 G = [(D_alpha_diag_vals[l] * H_M + I_M).tocsc() for l in range(L)]  # MxM
 G_inv = [sp.linalg.inv(_G).toarray() for _G in G]  # MxM
-sweepers = [QDiagonalization(params={**sweeper_params, 'G_inv': _G_inv}) for _G_inv in G_inv]
+sweepers = [QDiagonalization(params={**sweeper_params, 'G_inv': _G_inv}, level=None) for _G_inv in G_inv]
 
 
 sol_ParaDiag = u.copy().astype(complex)

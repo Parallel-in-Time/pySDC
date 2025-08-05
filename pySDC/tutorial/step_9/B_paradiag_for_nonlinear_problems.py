@@ -58,7 +58,7 @@ prob.init = tuple([*prob.init[:2]] + [np.dtype('complex128')])
 u = np.zeros((L, M, N), dtype=complex)
 
 # setup collocation problem
-sweep = sweeper_class({'num_nodes': M, 'quad_type': 'RADAU-RIGHT'})
+sweep = sweeper_class({'num_nodes': M, 'quad_type': 'RADAU-RIGHT'}, None)
 
 # initial conditions
 u[0, :, :] = prob.u_exact(t=0)
