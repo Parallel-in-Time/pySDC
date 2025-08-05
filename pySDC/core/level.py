@@ -67,13 +67,13 @@ class Level(FrozenClass):
             level_index (int): custom name for this level
         """
 
-        # instantiate sweeper, problem and hooks
-        self.__sweep = sweeper_class(sweeper_params)
-        self.__prob = problem_class(**problem_params)
-
         # set level parameters and status
         self.params = _Pars(level_params)
         self.status = _Status()
+
+        # instantiate sweeper, problem and hooks
+        self.__sweep = sweeper_class(sweeper_params, self)
+        self.__prob = problem_class(**problem_params)
 
         # set name
         self.level_index = level_index
@@ -89,9 +89,6 @@ class Level(FrozenClass):
         self.fold = [None] * (self.sweep.coll.num_nodes + 1)
 
         self.tau = [None] * self.sweep.coll.num_nodes
-
-        # pass this level to the sweeper for easy access
-        self.sweep.level = self
 
         self.__tag = None
 

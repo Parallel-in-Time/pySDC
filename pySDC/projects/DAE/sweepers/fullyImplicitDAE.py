@@ -45,14 +45,13 @@ class FullyImplicitDAE(generic_implicit):
        J. Comput. Phys. Vol. 221 No. 2 (2007).
     """
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """Initialization routine"""
 
         if 'QI' not in params:
             params['QI'] = 'IE'
 
-        # call parent's initialization routine
-        super().__init__(params)
+        super().__init__(params, level)
 
         msg = f"Quadrature type {self.params.quad_type} is not implemented yet. Use 'RADAU-RIGHT' instead!"
         if self.coll.left_is_node:

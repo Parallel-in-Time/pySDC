@@ -76,8 +76,8 @@ class RungeKuttaDAE(RungeKutta):
     More details can be found [here](https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/sweeper_classes/Runge_Kutta.py).
     """
 
-    def __init__(self, params):
-        super().__init__(params)
+    def __init__(self, params, level):
+        super().__init__(params, level)
         self.du_init = None
         self.fully_initialized = False
 

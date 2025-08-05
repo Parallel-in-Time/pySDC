@@ -28,12 +28,13 @@ class implicit_sweeper_faults(generic_implicit):
 
     """
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """
         Initialization routine for the custom sweeper
 
         Args:
             params: parameters for the sweeper
+            level (pySDC.Level.level): the level that uses this sweeper
         """
 
         if 'allow_fault_correction' not in params:
@@ -45,8 +46,7 @@ class implicit_sweeper_faults(generic_implicit):
         if 'dump_injections_filehandle' not in params:
             params['dump_injections_filehandle'] = None
 
-        # call parent's initialization routine
-        super(implicit_sweeper_faults, self).__init__(params)
+        super().__init__(params, level)
 
         self.fault_stats = _fault_stats()
 

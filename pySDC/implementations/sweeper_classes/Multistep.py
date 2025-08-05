@@ -1,4 +1,5 @@
 from pySDC.core.sweeper import Sweeper, _Pars
+from pySDC.core.level import Level
 
 
 class Cache(object):
@@ -55,7 +56,7 @@ class MultiStep(Sweeper):
     alpha = None
     beta = None
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """
         Initialization routine for the base sweeper.
 
@@ -71,6 +72,7 @@ class MultiStep(Sweeper):
 
         Args:
             params (dict): parameter object
+            level (pySDC.Level.level): the level that uses this sweeper
         """
         import logging
         from pySDC.core.collocation import CollBase
@@ -88,14 +90,35 @@ class MultiStep(Sweeper):
         # we need a dummy collocation object to instantiate the levels.
         self.coll = CollBase(num_nodes=1, quad_type='RADAU-RIGHT')
 
-        # This will be set as soon as the sweeper is instantiated at the level
-        self.__level = None
+        self.__level = level
 
         self.parallelizable = False
 
         # proprietary variables for the multistep methods
         self.steps = len(self.alpha)
         self.cache = Cache(self.steps)
+
+    @property
+    def level(self):
+        """
+        Returns the current level
+
+        Returns:
+            pySDC.Level.level: Current level
+        """
+        return self.__level
+
+    @level.setter
+    def level(self, lvl):
+        """
+        Sets a reference to the current level (done in the initialization of the level)
+
+        Args:
+            lvl (pySDC.Level.level): Current level
+        """
+        assert isinstance(lvl, Level), f"You tried to set the sweeper's level with an instance of {type(lvl)}!"
+
+        self.__level = lvl
 
     def predict(self):
         """
