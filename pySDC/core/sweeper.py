@@ -192,14 +192,14 @@ class Sweeper(object):
 
         # build QF(u)
         res_norm = []
-        res = self.integrate()
+        L.residual = self.integrate()
         for m in range(self.coll.num_nodes):
-            res[m] += L.u[0] - L.u[m + 1]
+            L.residual[m] += L.u[0] - L.u[m + 1]
             # add tau if associated
             if L.tau[m] is not None:
-                res[m] += L.tau[m]
+                L.residual[m] += L.tau[m]
             # use abs function from data type here
-            res_norm.append(abs(res[m]))
+            res_norm.append(abs(L.residual[m]))
 
         # find maximal residual over the nodes
         if L.params.residual_type == 'full_abs':
