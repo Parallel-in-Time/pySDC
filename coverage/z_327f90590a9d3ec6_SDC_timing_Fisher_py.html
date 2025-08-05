@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Coverage for pySDC/projects/SDC_showdown/SDC_timing_Fisher.py: 100%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_58284776.png">
-    <link rel="stylesheet" href="style_cb_81f8c14c.css" type="text/css">
+    <link rel="stylesheet" href="style_cb_6b508a39.css" type="text/css">
     <script src="coverage_html_cb_6fb7b396.js" defer></script>
 </head>
 <body class="pyfile">
@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_327f90590a9d3ec6_SDC_timing_GrayScott_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.9.2">coverage.py v7.9.2</a>,
-            created at 2025-07-18 13:09 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.10.2">coverage.py v7.10.2</a>,
+            created at 2025-08-05 18:27 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -90,10 +90,10 @@
     <p class="pln"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">controller_classes</span><span class="op">.</span><span class="nam">controller_nonMPI</span> <span class="key">import</span> <span class="nam">controller_nonMPI</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">problem_classes</span><span class="op">.</span><span class="nam">GeneralizedFisher_1D_PETSc</span> <span class="key">import</span> <span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">    <span class="nam">petsc_fisher_multiimplicit</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t">    <span class="nam">petsc_fisher_fullyimplicit</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">    <span class="nam">petsc_fisher_semiimplicit</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">    <span class="nam">petsc_fisher_multiimplicit</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t">    <span class="nam">petsc_fisher_fullyimplicit</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">    <span class="nam">petsc_fisher_semiimplicit</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">sweeper_classes</span><span class="op">.</span><span class="nam">generic_implicit</span> <span class="key">import</span> <span class="nam">generic_implicit</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">sweeper_classes</span><span class="op">.</span><span class="nam">imex_1st_order</span> <span class="key">import</span> <span class="nam">imex_1st_order</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">sweeper_classes</span><span class="op">.</span><span class="nam">multi_implicit</span> <span class="key">import</span> <span class="nam">multi_implicit</span>&nbsp;</span><span class="r"></span></p>
@@ -232,9 +232,9 @@
     <p class="pln"><span class="n"><a id="t150" href="#t150">150</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t151" href="#t151">151</a></span><span class="t">    <span class="nam">print</span><span class="op">(</span><span class="str">'Iteration count (nonlinear/linear): %i / %i'</span> <span class="op">%</span> <span class="op">(</span><span class="nam">P</span><span class="op">.</span><span class="nam">snes_itercount</span><span class="op">,</span> <span class="nam">P</span><span class="op">.</span><span class="nam">ksp_itercount</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t152" href="#t152">152</a></span><span class="t">    <span class="nam">print</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t153" href="#t153">153</a></span><span class="t">        <span class="str">'Mean Iteration count per call: %4.2f / %4.2f'</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t154" href="#t154">154</a></span><span class="t">        <span class="op">%</span> <span class="op">(</span><span class="nam">P</span><span class="op">.</span><span class="nam">snes_itercount</span> <span class="op">/</span> <span class="nam">max</span><span class="op">(</span><span class="nam">P</span><span class="op">.</span><span class="nam">snes_ncalls</span><span class="op">,</span> <span class="num">1</span><span class="op">)</span><span class="op">,</span> <span class="nam">P</span><span class="op">.</span><span class="nam">ksp_itercount</span> <span class="op">/</span> <span class="nam">max</span><span class="op">(</span><span class="nam">P</span><span class="op">.</span><span class="nam">ksp_ncalls</span><span class="op">,</span> <span class="num">1</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t155" href="#t155">155</a></span><span class="t">    <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t153" href="#t153">153</a></span><span class="t">        <span class="str">'Mean Iteration count per call: %4.2f / %4.2f'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t154" href="#t154">154</a></span><span class="t">        <span class="op">%</span> <span class="op">(</span><span class="nam">P</span><span class="op">.</span><span class="nam">snes_itercount</span> <span class="op">/</span> <span class="nam">max</span><span class="op">(</span><span class="nam">P</span><span class="op">.</span><span class="nam">snes_ncalls</span><span class="op">,</span> <span class="num">1</span><span class="op">)</span><span class="op">,</span> <span class="nam">P</span><span class="op">.</span><span class="nam">ksp_itercount</span> <span class="op">/</span> <span class="nam">max</span><span class="op">(</span><span class="nam">P</span><span class="op">.</span><span class="nam">ksp_ncalls</span><span class="op">,</span> <span class="num">1</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t155" href="#t155">155</a></span><span class="t">    <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t156" href="#t156">156</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t157" href="#t157">157</a></span><span class="t">    <span class="nam">timing</span> <span class="op">=</span> <span class="nam">get_sorted</span><span class="op">(</span><span class="nam">stats</span><span class="op">,</span> <span class="nam">type</span><span class="op">=</span><span class="str">'timing_run'</span><span class="op">,</span> <span class="nam">sortby</span><span class="op">=</span><span class="str">'time'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t158" href="#t158">158</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -320,8 +320,8 @@
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_327f90590a9d3ec6_SDC_timing_GrayScott_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.9.2">coverage.py v7.9.2</a>,
-            created at 2025-07-18 13:09 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.10.2">coverage.py v7.10.2</a>,
+            created at 2025-08-05 18:27 +0000
         </p>
     </div>
 </footer>

@@ -38,6 +38,7 @@
             
   <h1>Source code for implementations.sweeper_classes.Multistep</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.sweeper</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sweeper</span><span class="p">,</span> <span class="n">_Pars</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.level</span><span class="w"> </span><span class="kn">import</span> <span class="n">Level</span>
 
 
 <div class="viewcode-block" id="Cache">
@@ -102,7 +103,7 @@
     <span class="n">alpha</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">beta</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine for the base sweeper.</span>
 
@@ -118,6 +119,7 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            params (dict): parameter object</span>
+<span class="sd">            level (pySDC.Level.level): the level that uses this sweeper</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.collocation</span><span class="w"> </span><span class="kn">import</span> <span class="n">CollBase</span>
@@ -135,14 +137,35 @@
         <span class="c1"># we need a dummy collocation object to instantiate the levels.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coll</span> <span class="o">=</span> <span class="n">CollBase</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">quad_type</span><span class="o">=</span><span class="s1">&#39;RADAU-RIGHT&#39;</span><span class="p">)</span>
 
-        <span class="c1"># This will be set as soon as the sweeper is instantiated at the level</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__level</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__level</span> <span class="o">=</span> <span class="n">level</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">parallelizable</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># proprietary variables for the multistep methods</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">steps</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">Cache</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">level</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the current level</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pySDC.Level.level: Current level</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__level</span>
+
+    <span class="nd">@level</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lvl</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets a reference to the current level (done in the initialization of the level)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lvl (pySDC.Level.level): Current level</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lvl</span><span class="p">,</span> <span class="n">Level</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;You tried to set the sweeper&#39;s level with an instance of </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">lvl</span><span class="p">)</span><span class="si">}</span><span class="s2">!&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__level</span> <span class="o">=</span> <span class="n">lvl</span>
 
 <div class="viewcode-block" id="MultiStep.predict">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.MultiStep.predict">[docs]</a>

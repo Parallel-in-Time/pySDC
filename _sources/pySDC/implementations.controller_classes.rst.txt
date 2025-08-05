@@ -8,6 +8,7 @@ Submodules
    :maxdepth: 2
 
    implementations.controller_classes.controller_MPI
+   implementations.controller_classes.controller_ParaDiag_nonMPI
    implementations.controller_classes.controller_nonMPI
 
 Module contents

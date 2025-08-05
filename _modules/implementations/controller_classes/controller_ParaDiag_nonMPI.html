@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>implementations.controller_classes.controller_ParaDiag_nonMPI &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../../_static/documentation_options.js?v=81710850"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.controller_classes.controller_ParaDiag_nonMPI</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.controller_classes.controller_ParaDiag_nonMPI</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParaDiagController</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">step</span> <span class="k">as</span> <span class="n">stepclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ControllerError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.convergence_controller_classes.basic_restarting</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasicRestarting</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.ParaDiagHelper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_G_inv_matrix</span>
+
+
+<div class="viewcode-block" id="controller_ParaDiag_nonMPI">
+<a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">controller_ParaDiag_nonMPI</span><span class="p">(</span><span class="n">ParaDiagController</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    ParaDiag controller, running serialized version.</span>
+
+<span class="sd">    This controller uses the increment formulation. That is to say, we setup the residual of the all at once problem,</span>
+<span class="sd">    put it on the right hand side, invert the ParaDiag preconditioner on the left-hand side to compute the increment</span>
+<span class="sd">    and then add the increment onto the solution. For this reason, we need to replace the solution values in the steps</span>
+<span class="sd">    with the residual values before the solves and then put the solution plus increment back into the steps. This is a</span>
+<span class="sd">    bit counter to what you expect when you access the `u` variable in the levels, but it is mathematically advantageous.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_procs</span><span class="p">,</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization routine for ParaDiag controller</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">           num_procs: number of parallel time steps (still serial, though), can be 1</span>
+<span class="sd">           controller_params: parameter set for the controller and the steps</span>
+<span class="sd">           description: all the parameters to set up the rest (levels, problems, transfer, ...)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">useMPI</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">n_steps</span><span class="o">=</span><span class="n">num_procs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">MS</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_procs</span><span class="p">):</span>
+            <span class="n">G_inv</span> <span class="o">=</span> <span class="n">get_G_inv_matrix</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">num_procs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">])</span>
+            <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">][</span><span class="s1">&#39;G_inv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">G_inv</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stepclass</span><span class="o">.</span><span class="n">Step</span><span class="p">(</span><span class="n">description</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_convergence_controllers</span> <span class="o">+=</span> <span class="p">[</span><span class="n">BasicRestarting</span><span class="o">.</span><span class="n">get_implementation</span><span class="p">(</span><span class="n">useMPI</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">convergence_controller</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_convergence_controllers</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span><span class="n">convergence_controller</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dump_setup</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dump_setup</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;This controller does not support multiple levels&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
+            <span class="n">C</span><span class="o">.</span><span class="n">reset_buffers_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">C</span><span class="o">.</span><span class="n">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MS</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">)</span>
+
+<div class="viewcode-block" id="controller_ParaDiag_nonMPI.ParaDiag">
+<a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.ParaDiag">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ParaDiag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_active</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Main function for ParaDiag</span>
+
+<span class="sd">        For the workflow of this controller, see https://arxiv.org/abs/2103.12571</span>
+
+<span class="sd">        This method changes self.MS directly by accessing active steps through local_MS_active.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            local_MS_active (list): all active steps</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            boot: Whether all steps are done</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># if all stages are the same (or DONE), continue, otherwise abort</span>
+        <span class="n">stages</span> <span class="o">=</span> <span class="p">[</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">stage</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_active</span> <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">stage</span> <span class="o">!=</span> <span class="s1">&#39;DONE&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">stages</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="n">stages</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">stage</span> <span class="o">=</span> <span class="n">stages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ControllerError</span><span class="p">(</span><span class="s1">&#39;not all stages are equal&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">stage</span><span class="p">)</span>
+
+        <span class="n">MS_running</span> <span class="o">=</span> <span class="p">[</span><span class="n">S</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_active</span> <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">stage</span> <span class="o">!=</span> <span class="s1">&#39;DONE&#39;</span><span class="p">]</span>
+
+        <span class="n">switcher</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;SPREAD&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">spread</span><span class="p">,</span>
+            <span class="s1">&#39;IT_CHECK&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">it_check</span><span class="p">,</span>
+            <span class="s1">&#39;IT_PARADIAG&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">it_ParaDiag</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">assert</span> <span class="n">stage</span> <span class="ow">in</span> <span class="n">switcher</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="sa">f</span><span class="s1">&#39;Got unexpected stage </span><span class="si">{</span><span class="n">stage</span><span class="si">!r}</span><span class="s1">&#39;</span>
+        <span class="n">switcher</span><span class="p">[</span><span class="n">stage</span><span class="p">](</span><span class="n">MS_running</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_active</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="controller_ParaDiag_nonMPI.apply_matrix">
+<a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.apply_matrix">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mat</span><span class="p">,</span> <span class="n">quantity</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply a matrix on the step level. Needs to be square. Puts the result back into the controller.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mat: square LxL matrix with L number of steps</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+
+        <span class="n">level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">level</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">num_nodes</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">level</span><span class="o">.</span><span class="n">prob</span>
+
+        <span class="c1"># buffer for storing the result</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="kc">None</span><span class="p">,</span>
+        <span class="p">]</span> <span class="o">*</span> <span class="n">L</span>
+
+        <span class="k">if</span> <span class="n">quantity</span> <span class="o">==</span> <span class="s1">&#39;residual&#39;</span><span class="p">:</span>
+            <span class="n">me</span> <span class="o">=</span> <span class="p">[</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">residual</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">quantity</span> <span class="o">==</span> <span class="s1">&#39;increment&#39;</span><span class="p">:</span>
+            <span class="n">me</span> <span class="o">=</span> <span class="p">[</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">increment</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+        <span class="c1"># compute matrix-vector product</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">prob</span><span class="o">.</span><span class="n">u_init</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+                    <span class="n">res</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">m</span><span class="p">]</span> <span class="o">+=</span> <span class="n">mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">me</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">m</span><span class="p">]</span>
+
+        <span class="c1"># put the result in the &quot;output&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+                <span class="n">me</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">m</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="controller_ParaDiag_nonMPI.compute_all_at_once_residual">
+<a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.compute_all_at_once_residual">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_all_at_once_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This requires to communicate the solutions at the end of the steps to be the initial conditions for the next</span>
+<span class="sd">        steps. Afterwards, the residual can be computed locally on the steps.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            local_MS_running (list): list of currently running steps</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
+            <span class="c1"># communicate initial conditions</span>
+            <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_end_point</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                <span class="n">hook</span><span class="o">.</span><span class="n">pre_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
+                <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">uend</span>
+
+            <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                <span class="n">hook</span><span class="o">.</span><span class="n">post_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">add_to_stats</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># compute residuals locally</span>
+            <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_residual</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="controller_ParaDiag_nonMPI.update_solution">
+<a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.update_solution">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Since we solve for the increment, we need to update the solution between iterations by adding the increment.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            local_MS_running (list): list of currently running steps</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">):</span>
+                <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">increment</span><span class="p">[</span><span class="n">m</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="controller_ParaDiag_nonMPI.prepare_Jacobians">
+<a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.prepare_Jacobians">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_Jacobians</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
+        <span class="c1"># get solutions for constructing average Jacobians</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">average_jacobian</span><span class="p">:</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="n">local_MS_running</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">M</span> <span class="o">=</span> <span class="n">level</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
+
+            <span class="n">u_avg</span> <span class="o">=</span> <span class="p">[</span><span class="n">level</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">level</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">0</span><span class="p">)]</span> <span class="o">*</span> <span class="n">M</span>
+
+            <span class="c1"># communicate average solution</span>
+            <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+                    <span class="n">u_avg</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">+=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span>
+
+            <span class="c1"># store the averaged solution in the steps</span>
+            <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
+                <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u_avg</span> <span class="o">=</span> <span class="n">u_avg</span></div>
+
+
+<div class="viewcode-block" id="controller_ParaDiag_nonMPI.it_ParaDiag">
+<a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.it_ParaDiag">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">it_ParaDiag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Do a single ParaDiag iteration. Does the following steps</span>
+<span class="sd">         - (1) Compute the residual of the all-at-once / composite collocation problem</span>
+<span class="sd">         - (2) Compute an FFT in time to diagonalize the preconditioner</span>
+<span class="sd">         - (3) Solve the collocation problems locally on the steps for the increment</span>
+<span class="sd">         - (4) Compute iFFT in time to go back to the original base</span>
+<span class="sd">         - (5) Update the solution by adding increment</span>
+
+<span class="sd">        Note that this is the only place where we compute the all-at-once residual because it requires communication and</span>
+<span class="sd">        swaps the solution values for the residuals. So after the residual tolerance is reached, one more ParaDiag</span>
+<span class="sd">        iteration will be done.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            local_MS_running (list): list of currently running steps</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                <span class="n">hook</span><span class="o">.</span><span class="n">pre_sweep</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># communicate average residual for setting up Jacobians for non-linear problems</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_Jacobians</span><span class="p">(</span><span class="n">local_MS_running</span><span class="p">)</span>
+
+        <span class="c1"># compute the all-at-once residual to use as right hand side</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_all_at_once_residual</span><span class="p">(</span><span class="n">local_MS_running</span><span class="p">)</span>
+
+        <span class="c1"># weighted FFT of the residual in time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">FFT_in_time</span><span class="p">(</span><span class="n">quantity</span><span class="o">=</span><span class="s1">&#39;residual&#39;</span><span class="p">)</span>
+
+        <span class="c1"># perform local solves of &quot;collocation problems&quot; on the steps (can be done in parallel)</span>
+        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Multi-level SDC not implemented in ParaDiag&#39;</span>
+            <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">update_nodes</span><span class="p">()</span>
+
+        <span class="c1"># inverse FFT of the increment in time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iFFT_in_time</span><span class="p">(</span><span class="n">quantity</span><span class="o">=</span><span class="s1">&#39;increment&#39;</span><span class="p">)</span>
+
+        <span class="c1"># get the next iterate by adding increment to previous iterate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_solution</span><span class="p">(</span><span class="n">local_MS_running</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                <span class="n">hook</span><span class="o">.</span><span class="n">post_sweep</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># update stage</span>
+        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
+            <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="s1">&#39;IT_CHECK&#39;</span></div>
+
+
+<div class="viewcode-block" id="controller_ParaDiag_nonMPI.it_check">
+<a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.it_check">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">it_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Key routine to check for convergence/termination</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            local_MS_running (list): list of currently running steps</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                    <span class="n">hook</span><span class="o">.</span><span class="n">post_iteration</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="c1"># decide if the step is done, needs to be restarted and other things convergence related</span>
+            <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
+                <span class="n">C</span><span class="o">.</span><span class="n">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">MS</span><span class="o">=</span><span class="n">local_MS_running</span><span class="p">)</span>
+                <span class="n">C</span><span class="o">.</span><span class="n">convergence_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">MS</span><span class="o">=</span><span class="n">local_MS_running</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                    <span class="n">hook</span><span class="o">.</span><span class="n">pre_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">prev_done</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span>  <span class="c1"># &quot;communicate&quot;</span>
+                <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                    <span class="n">hook</span><span class="o">.</span><span class="n">post_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">add_to_stats</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="ow">and</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">prev_done</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">all_to_done</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                    <span class="n">hook</span><span class="o">.</span><span class="n">pre_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="k">for</span> <span class="n">T</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                    <span class="n">hook</span><span class="o">.</span><span class="n">post_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">add_to_stats</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span><span class="p">:</span>
+                <span class="c1"># increment iteration count here (and only here)</span>
+                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                    <span class="n">hook</span><span class="o">.</span><span class="n">pre_iteration</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
+                    <span class="n">C</span><span class="o">.</span><span class="n">pre_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">MS</span><span class="o">=</span><span class="n">local_MS_running</span><span class="p">)</span>
+
+                <span class="c1"># Do another ParaDiag iteration</span>
+                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="s1">&#39;IT_PARADIAG&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_end_point</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                    <span class="n">hook</span><span class="o">.</span><span class="n">post_step</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="s1">&#39;DONE&#39;</span>
+
+        <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
+            <span class="n">C</span><span class="o">.</span><span class="n">reset_buffers_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="controller_ParaDiag_nonMPI.spread">
+<a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.spread">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">spread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Spreading phase</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            local_MS_running (list): list of currently running steps</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
+
+            <span class="c1"># first stage: spread values</span>
+            <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                <span class="n">hook</span><span class="o">.</span><span class="n">pre_step</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="c1"># call predictor from sweeper</span>
+            <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+
+            <span class="c1"># compute the residual</span>
+            <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_residual</span><span class="p">()</span>
+
+            <span class="c1"># update stage</span>
+            <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="s1">&#39;IT_CHECK&#39;</span>
+
+            <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
+                <span class="n">C</span><span class="o">.</span><span class="n">post_spread_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">MS</span><span class="o">=</span><span class="n">local_MS_running</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="controller_ParaDiag_nonMPI.run">
+<a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.run">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Main driver for running the serial version of ParaDiag</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">           u0: initial values</span>
+<span class="sd">           t0: starting time</span>
+<span class="sd">           Tend: ending time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            end values on the last step</span>
+<span class="sd">            stats object containing statistics for each step, each level and each iteration</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># some initializations and reset of statistics</span>
+        <span class="n">uend</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">num_procs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+            <span class="n">hook</span><span class="o">.</span><span class="n">reset_stats</span><span class="p">()</span>
+
+        <span class="c1"># initial ordering of the steps: 0,1,...,Np-1</span>
+        <span class="n">slots</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_procs</span><span class="p">))</span>
+
+        <span class="c1"># initialize time variables of each step</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="p">[</span><span class="n">t0</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">slots</span><span class="p">]</span>
+
+        <span class="c1"># determine which steps are still active (time &lt; Tend)</span>
+        <span class="n">active</span> <span class="o">=</span> <span class="p">[</span><span class="n">time</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">Tend</span> <span class="o">-</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">slots</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">active</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">active</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s1">&#39;Warning: This controller will solve past your desired end time until the end of its block!&#39;</span>
+            <span class="p">)</span>
+            <span class="n">active</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="kc">True</span><span class="p">,</span>
+            <span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">active</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ControllerError</span><span class="p">(</span><span class="s1">&#39;Nothing to do, check t0, dt and Tend.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># compress slots according to active steps, i.e. remove all steps which have times above Tend</span>
+        <span class="n">active_slots</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">slots</span><span class="p">,</span> <span class="n">active</span><span class="p">))</span>
+
+        <span class="c1"># initialize block of steps with u0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restart_block</span><span class="p">(</span><span class="n">active_slots</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+            <span class="n">hook</span><span class="o">.</span><span class="n">post_setup</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># call pre-run hook</span>
+        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                <span class="n">hook</span><span class="o">.</span><span class="n">pre_run</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># main loop: as long as at least one step is still active (time &lt; Tend), do something</span>
+        <span class="k">while</span> <span class="nb">any</span><span class="p">(</span><span class="n">active</span><span class="p">):</span>
+            <span class="n">MS_active</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">active_slots</span><span class="p">]</span>
+            <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+                <span class="n">done</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ParaDiag</span><span class="p">(</span><span class="n">MS_active</span><span class="p">)</span>
+
+            <span class="n">restarts</span> <span class="o">=</span> <span class="p">[</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">MS_active</span><span class="p">]</span>
+            <span class="n">restart_at</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">restarts</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="kc">True</span> <span class="ow">in</span> <span class="n">restarts</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">MS_active</span><span class="p">)</span>
+            <span class="k">if</span> <span class="kc">True</span> <span class="ow">in</span> <span class="n">restarts</span><span class="p">:</span>  <span class="c1"># restart part of the block</span>
+                <span class="c1"># initial condition to next block is initial condition of step that needs restarting</span>
+                <span class="n">uend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">restart_at</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">time</span><span class="p">[</span><span class="n">active_slots</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="n">restart_at</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Starting next block with initial conditions from step </span><span class="si">{</span><span class="n">restart_at</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># move on to next block</span>
+                <span class="c1"># initial condition for next block is last solution of current block</span>
+                <span class="n">uend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">active_slots</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">uend</span>
+                <span class="n">time</span><span class="p">[</span><span class="n">active_slots</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="n">active_slots</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">active_slots</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">dt</span>
+
+            <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">MS_active</span><span class="p">[:</span><span class="n">restart_at</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
+                    <span class="n">C</span><span class="o">.</span><span class="n">post_step_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">MS</span><span class="o">=</span><span class="n">MS_active</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
+                <span class="p">[</span><span class="n">C</span><span class="o">.</span><span class="n">prepare_next_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">active_slots</span><span class="p">),</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="n">MS</span><span class="o">=</span><span class="n">MS_active</span><span class="p">)</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">]</span>
+
+            <span class="c1"># setup the times of the steps for the next block</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">active_slots</span><span class="p">)):</span>
+                <span class="n">time</span><span class="p">[</span><span class="n">active_slots</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="n">active_slots</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">active_slots</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span>
+
+            <span class="c1"># determine new set of active steps and compress slots accordingly</span>
+            <span class="n">active</span> <span class="o">=</span> <span class="p">[</span><span class="n">time</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">Tend</span> <span class="o">-</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">slots</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">active</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">active</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s1">&#39;Warning: This controller will solve past your desired end time until the end of its block!&#39;</span>
+                <span class="p">)</span>
+                <span class="n">active</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="kc">True</span><span class="p">,</span>
+                <span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
+            <span class="n">active_slots</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">slots</span><span class="p">,</span> <span class="n">active</span><span class="p">))</span>
+
+            <span class="c1"># restart active steps (reset all values and pass uend to u0)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">restart_block</span><span class="p">(</span><span class="n">active_slots</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">uend</span><span class="p">)</span>
+
+        <span class="c1"># call post-run hook</span>
+        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                <span class="n">hook</span><span class="o">.</span><span class="n">post_run</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
+                <span class="n">C</span><span class="o">.</span><span class="n">post_run_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">MS</span><span class="o">=</span><span class="n">MS_active</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">uend</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_stats</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="controller_ParaDiag_nonMPI.restart_block">
+<a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.restart_block">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restart_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">active_slots</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">u0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper routine to reset/restart block of (active) steps</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            active_slots: list of active steps</span>
+<span class="sd">            time: list of new times</span>
+<span class="sd">            u0: initial value to distribute across the steps</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">active_slots</span><span class="p">)):</span>
+            <span class="c1"># get slot number</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">active_slots</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+
+            <span class="c1"># store current slot number for diagnostics</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">=</span> <span class="n">p</span>
+            <span class="c1"># store link to previous step</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">active_slots</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">reset_step</span><span class="p">()</span>
+
+            <span class="c1"># determine whether I am the first and/or last in line</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">first</span> <span class="o">=</span> <span class="n">active_slots</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">last</span> <span class="o">=</span> <span class="n">active_slots</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">active_slots</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+            <span class="c1"># initialize step with u0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">init_step</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
+
+            <span class="c1"># setup G^{-1} for new number of active slots</span>
+            <span class="c1"># self.MS[j].levels[0].sweep.set_G_inv(get_G_inv_matrix(j, len(active_slots), self.params.alpha, self.description[&#39;sweeper_params&#39;]))</span>
+
+            <span class="c1"># reset some values</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">prev_done</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="s1">&#39;SPREAD&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">time_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">active_slots</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>
+                <span class="n">l</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">l</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">active_slots</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">lvl</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>
+                <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
+            <span class="n">C</span><span class="o">.</span><span class="n">reset_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">active_slots</span><span class="o">=</span><span class="n">active_slots</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.controller_classes.controller_ParaDiag_nonMPI</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

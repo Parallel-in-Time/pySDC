@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>&lt;no title&gt; &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=81710850"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_9/A_paradiag_for_linear_problems.py">pySDC/tutorial/step_9/A_paradiag_for_linear_problems.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This script introduces ParaDiag for linear problems.</span>
+<span class="sd">It is recommended to view this code side by side with `Gaya&#39;s paper on ParaDiag with collocation methods</span>
+<span class="sd">&lt;https://arxiv.org/abs/2103.12571&gt;`_ as the code is close to the equations presented there but offers no explanations</span>
+<span class="sd">about them.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.TestEquation_0D</span><span class="w"> </span><span class="kn">import</span> <span class="n">testequation0d</span> <span class="k">as</span> <span class="n">problem_class</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.ParaDiagSweepers</span><span class="w"> </span><span class="kn">import</span> <span class="n">QDiagonalization</span>
+
+<span class="c1"># setup output</span>
+<span class="n">out_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/step_9_A_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">output</span> <span class="ow">in</span> <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">out_file</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">output</span><span class="p">)</span>
+
+
+<span class="c1"># setup parameters</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># Number of parallel time steps</span>
+<span class="n">M</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># Number of collocation nodes</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># Number of spatial degrees of freedom</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">1e-4</span>  <span class="c1"># Circular perturbation parameter</span>
+<span class="n">restol</span> <span class="o">=</span> <span class="mf">1e-10</span>  <span class="c1"># Residual tolerance for the composite collocation problem</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># step size</span>
+
+<span class="n">my_print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Running ParaDiag test script with </span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s1"> time steps, </span><span class="si">{</span><span class="n">M</span><span class="si">}</span><span class="s1"> collocation nodes and </span><span class="si">{</span><span class="n">N</span><span class="si">}</span><span class="s1"> spatial degrees of freedom&#39;</span><span class="p">)</span>
+
+<span class="c1"># setup pySDC infrastructure for Dahlquist problem and quadrature</span>
+<span class="n">prob</span> <span class="o">=</span> <span class="n">problem_class</span><span class="p">(</span><span class="n">lambdas</span><span class="o">=-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N</span><span class="p">)),</span> <span class="n">u0</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">sweeper_params</span> <span class="o">=</span> <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">:</span> <span class="n">M</span><span class="p">,</span> <span class="s1">&#39;quad_type&#39;</span><span class="p">:</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span><span class="p">}</span>
+<span class="n">sweep</span> <span class="o">=</span> <span class="n">generic_implicit</span><span class="p">(</span><span class="n">sweeper_params</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># Setup a global NumPy array and insert initial conditions in the first step</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+<span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># setup matrices for composite collocation problem. We note the sizes of the matrices in comments after generating them.</span>
+
+<span class="c1"># Start with identity matrices (I) of various sizes</span>
+<span class="n">I_L</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>  <span class="c1"># LxL</span>
+<span class="n">I_MN</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">((</span><span class="n">M</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span><span class="p">)</span>  <span class="c1"># MNxMN</span>
+<span class="n">I_N</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>  <span class="c1"># NxN</span>
+<span class="n">I_M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>  <span class="c1"># MxM</span>
+
+<span class="c1"># E matrix propagates the solution of the steps to be the initial condition for the next step</span>
+<span class="n">E</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="o">*</span> <span class="p">(</span><span class="n">L</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="n">offsets</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span>  <span class="c1"># LxL</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The H matrix computes the solution at the of an individual step from the solutions at the collocation nodes.</span>
+<span class="sd">For the RADAU-RIGHT rule we use here, the right node coincides with the end of the interval, so this is simple.</span>
+<span class="sd">We start with building the MxM matrix H_M on the node level and then extend to the spatial dimension with a Kronecker product.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">H_M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">tolil</span><span class="p">()</span> <span class="o">*</span> <span class="mi">0</span>  <span class="c1"># MxM</span>
+<span class="n">H_M</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">H_M</span><span class="p">,</span> <span class="n">I_N</span><span class="p">)</span>  <span class="c1"># MNxMN</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Set up collocation problem.</span>
+<span class="sd">Note that the Kronecker product from Q and A is only possible when there is an A, i.e. when the problem is linear.</span>
+<span class="sd">We will discuss non-linear problems in later steps in this tutorial</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">Q</span> <span class="o">=</span> <span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>  <span class="c1"># MxM</span>
+<span class="n">C_coll</span> <span class="o">=</span> <span class="n">I_MN</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">prob</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>  <span class="c1"># MNxMN</span>
+
+<span class="c1"># Set up the composite collocation / all-at-once problem</span>
+<span class="n">C</span> <span class="o">=</span> <span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">I_L</span><span class="p">,</span> <span class="n">C_coll</span><span class="p">)</span> <span class="o">+</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">H</span><span class="p">))</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>  <span class="c1"># LMNxLMN</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Now that we have the full composite collocation problem as one large matrix, we can just solve it directly to get a reference solution.</span>
+<span class="sd">Of course, this is prohibitively expensive for any actual application and we would never want to do this in practice.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">sol_direct</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The normal time-stepping approach is to solve the composite collocation problem with forward substitution</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">sol_stepping</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solve the current step (sol_stepping[l] currently contains the initial conditions at step l)</span>
+<span class="sd">    Here, we only solve MNxMN systems rather than LMNxLMN systems. This is still really expensive in practice, which is why there is SDC, for example.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sol_stepping</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">C_coll</span><span class="p">,</span> <span class="n">sol_stepping</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">sol_stepping</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># place the solution to the current step as the initial conditions to the next step</span>
+    <span class="k">if</span> <span class="n">l</span> <span class="o">&lt;</span> <span class="n">L</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">sol_stepping</span><span class="p">[</span><span class="n">l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">sol_stepping</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">sol_stepping</span><span class="p">,</span> <span class="n">sol_direct</span><span class="p">)</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">So far, so serial and boring. We will now parallelize this using ParaDiag.</span>
+<span class="sd">We will solve the composite collocation problem using preconditioned Picard iterations:</span>
+<span class="sd">    C_alpha delta = u_0 - Cu^k = &lt; residual of the composite collocation problem &gt;</span>
+<span class="sd">    u^{k+1} = u^k + delta</span>
+<span class="sd">The trick behind ParaDiag is to choose the preconditioner C_alpha to be a time-periodic approximation to C that can be diagonalized and therefore inverted in parallel.</span>
+<span class="sd">What we change in C_alpha compared to C is the E matrix that propagates the solutions between steps, which we amend to feed the solution to the last step back into the first step.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">E_alpha</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="o">*</span> <span class="p">(</span><span class="n">L</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="n">offsets</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">tolil</span><span class="p">()</span>  <span class="c1"># LxL</span>
+<span class="n">E_alpha</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">alpha</span>  <span class="c1"># make the problem time-periodic</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">In order to diagonalize C_alpha, on the step level, we need to diagonalize I_L and E_alpha simultaneously.</span>
+<span class="sd">I_L and E_alpha are alpha-circular matrices which can be simultaneously diagonalized by a weighted Fourier transform.</span>
+<span class="sd">We start by setting the weighting matrices for the Fourier transforms and then compute the diagonal entries of the diagonal version D_alpha of E_alpha.</span>
+<span class="sd">We refrain from actually setting up the preconditioner because we will not use the expanded version here.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">gamma</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="o">/</span> <span class="n">L</span><span class="p">)</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>  <span class="c1"># LxL</span>
+<span class="n">J_inv</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">gamma</span><span class="p">)</span>  <span class="c1"># LxL</span>
+
+<span class="c1"># compute diagonal entries via Fourier transform</span>
+<span class="n">D_alpha_diag_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">E_alpha</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">norm</span><span class="o">=</span><span class="s1">&#39;backward&#39;</span><span class="p">)</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">We need some convenience functions for computing matrix vector multiplication and the composite collocation problem residual here</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mat_vec</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">vec</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Matrix vector product</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mat (np.ndarray or scipy.sparse) : Matrix</span>
+<span class="sd">        vec (np.ndarray) : vector</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: mat @ vec</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">+=</span> <span class="n">mat</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">vec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">res</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">residual</span><span class="p">(</span><span class="n">_u</span><span class="p">,</span> <span class="n">u0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the residual of the composite collocation problem</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        _u (np.ndarray): Current iterate</span>
+<span class="sd">        u0 (np.ndarray): Initial conditions</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: LMN size array with the residual</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">_u</span> <span class="o">*</span> <span class="mi">0</span><span class="n">j</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+        <span class="c1"># build step local residual</span>
+
+        <span class="c1"># communicate initial conditions for each step</span>
+        <span class="k">if</span> <span class="n">l</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">_u</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+
+        <span class="c1"># evaluate and subtract integral over right hand side functions</span>
+        <span class="n">f_evals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">_u</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="n">m</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">)])</span>
+        <span class="n">Qf</span> <span class="o">=</span> <span class="n">mat_vec</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">f_evals</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+            <span class="c1"># res[l, m, ...] -= (_u[l] - dt * Qf)[-1]</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">-=</span> <span class="p">(</span><span class="n">_u</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">Qf</span><span class="p">)[</span><span class="n">m</span><span class="p">]</span>
+            <span class="c1"># res[l, m, ...] -= np.mean((_u[l] - dt * Qf), axis=0)</span>
+
+    <span class="k">return</span> <span class="n">res</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">We will start with ParaDiag where we parallelize across the L steps but solve the collocation problems directly in serial.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">sol_ParaDiag_L</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">u0</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">niter_ParaDiag_L</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">sol_ParaDiag_L</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+<span class="k">while</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">restol</span><span class="p">:</span>
+    <span class="c1"># compute weighted FFT in time to go to diagonal base of C_alpha</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span>
+        <span class="n">mat_vec</span><span class="p">(</span><span class="n">J_inv</span><span class="o">.</span><span class="n">tolil</span><span class="p">(),</span> <span class="n">res</span><span class="p">),</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">norm</span><span class="o">=</span><span class="s1">&#39;ortho&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># solve the collocation problems in parallel on the steps</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+        <span class="c1"># construct local matrix of &quot;collocation problem&quot;</span>
+        <span class="n">local_matrix</span> <span class="o">=</span> <span class="p">(</span><span class="n">D_alpha_diag_vals</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">*</span> <span class="n">H</span> <span class="o">+</span> <span class="n">C_coll</span><span class="p">)</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
+
+        <span class="c1"># solve local &quot;collocation problem&quot; directly</span>
+        <span class="n">y</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">local_matrix</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># compute inverse weighted FFT in time to go back from diagonal base of C_alpha</span>
+    <span class="n">sol_ParaDiag_L</span> <span class="o">+=</span> <span class="n">mat_vec</span><span class="p">(</span><span class="n">J</span><span class="o">.</span><span class="n">tolil</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s1">&#39;ortho&#39;</span><span class="p">))</span>
+
+    <span class="c1"># update residual</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">sol_ParaDiag_L</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+    <span class="n">niter_ParaDiag_L</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="n">my_print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s1">&#39;Needed </span><span class="si">{</span><span class="n">niter_ParaDiag_L</span><span class="si">}</span><span class="s1"> iterations in parallel across the steps ParaDiag. Stopped at residual </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">res</span><span class="p">)</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">&#39;</span>
+<span class="p">)</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">sol_ParaDiag_L</span><span class="p">,</span> <span class="n">sol_direct</span><span class="p">)</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">While we have distributed the work across L tasks, we are still solving perturbed collocation problems directly on a single task here.</span>
+<span class="sd">This is very expensive, and we will now additionally diagonalize the quadrature matrix Q in order to distribute the work on LM tasks, where we solve NxN systems each.</span>
+<span class="sd">We rearrange the contribution of E_alpha to arrive at a problem (I - dtQG^{-1}A)u = u0.</span>
+<span class="sd">After diagonalizing QG^{-1}, we can simply utilize the Euler solves that are implemented in pySDC, but need to keep in mind that complex valued &quot;step sizes&quot; are required.</span>
+
+<span class="sd">We start by setting up the G and G^{-1} matrices. Then we will setup pySDC sweepers that solve QG^{-1} with diagonalization.</span>
+<span class="sd">Here, we will not use the sweepers, but just the diagonalization computed there in order to make more clear what is going on.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">G</span> <span class="o">=</span> <span class="p">[(</span><span class="n">D_alpha_diag_vals</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">*</span> <span class="n">H_M</span> <span class="o">+</span> <span class="n">I_M</span><span class="p">)</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">)]</span>  <span class="c1"># MxM</span>
+<span class="n">G_inv</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">_G</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span> <span class="k">for</span> <span class="n">_G</span> <span class="ow">in</span> <span class="n">G</span><span class="p">]</span>  <span class="c1"># MxM</span>
+<span class="n">sweepers</span> <span class="o">=</span> <span class="p">[</span><span class="n">QDiagonalization</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="o">**</span><span class="n">sweeper_params</span><span class="p">,</span> <span class="s1">&#39;G_inv&#39;</span><span class="p">:</span> <span class="n">_G_inv</span><span class="p">},</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">_G_inv</span> <span class="ow">in</span> <span class="n">G_inv</span><span class="p">]</span>
+
+
+<span class="n">sol_ParaDiag</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">complex</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">sol_ParaDiag</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+<span class="n">niter</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">while</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">residual</span><span class="p">(</span><span class="n">sol_ParaDiag</span><span class="p">,</span> <span class="n">u0</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="n">restol</span><span class="p">:</span>
+
+    <span class="c1"># weighted FFT in time</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span>
+        <span class="n">mat_vec</span><span class="p">(</span><span class="n">J_inv</span><span class="o">.</span><span class="n">tolil</span><span class="p">(),</span> <span class="n">res</span><span class="p">),</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">norm</span><span class="o">=</span><span class="s1">&#39;ortho&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># perform local solves of &quot;collocation problems&quot; on the steps in parallel</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+
+        <span class="c1"># diagonalize QG^-1 matrix</span>
+        <span class="n">w</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">S_inv</span> <span class="o">=</span> <span class="n">sweepers</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">sweepers</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">S</span><span class="p">,</span> <span class="n">sweepers</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">S_inv</span>
+
+        <span class="c1"># perform local solves on the collocation nodes in parallel</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="n">S_inv</span> <span class="o">@</span> <span class="n">x</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+            <span class="n">x2</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span><span class="n">rhs</span><span class="o">=</span><span class="n">x1</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">factor</span><span class="o">=</span><span class="n">w</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">*</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="o">=</span><span class="n">x1</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">S</span> <span class="o">@</span> <span class="n">x2</span>
+        <span class="n">y</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">G_inv</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">@</span> <span class="n">z</span>
+
+    <span class="c1"># inverse weighted FFT in time</span>
+    <span class="n">sol_ParaDiag</span> <span class="o">+=</span> <span class="n">mat_vec</span><span class="p">(</span><span class="n">J</span><span class="o">.</span><span class="n">tolil</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s1">&#39;ortho&#39;</span><span class="p">))</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">sol_ParaDiag</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+    <span class="n">niter</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="n">my_print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s1">&#39;Needed </span><span class="si">{</span><span class="n">niter</span><span class="si">}</span><span class="s1"> iterations in parallel and local paradiag with increment formulation, stopped at residual </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">res</span><span class="p">)</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">&#39;</span>
+<span class="p">)</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">sol_ParaDiag</span><span class="p">,</span> <span class="n">sol_direct</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">niter</span><span class="p">,</span> <span class="n">niter_ParaDiag_L</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Running</span> <span class="n">ParaDiag</span> <span class="n">test</span> <span class="n">script</span> <span class="k">with</span> <span class="mi">4</span> <span class="n">time</span> <span class="n">steps</span><span class="p">,</span> <span class="mi">3</span> <span class="n">collocation</span> <span class="n">nodes</span> <span class="ow">and</span> <span class="mi">2</span> <span class="n">spatial</span> <span class="n">degrees</span> <span class="n">of</span> <span class="n">freedom</span>
+<span class="n">Needed</span> <span class="mi">3</span> <span class="n">iterations</span> <span class="ow">in</span> <span class="n">parallel</span> <span class="n">across</span> <span class="n">the</span> <span class="n">steps</span> <span class="n">ParaDiag</span><span class="o">.</span> <span class="n">Stopped</span> <span class="n">at</span> <span class="n">residual</span> <span class="mf">7.38e-13</span>
+<span class="n">Needed</span> <span class="mi">3</span> <span class="n">iterations</span> <span class="ow">in</span> <span class="n">parallel</span> <span class="ow">and</span> <span class="n">local</span> <span class="n">paradiag</span> <span class="k">with</span> <span class="n">increment</span> <span class="n">formulation</span><span class="p">,</span> <span class="n">stopped</span> <span class="n">at</span> <span class="n">residual</span> <span class="mf">7.38e-13</span>
+</pre></div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/doc_step_9_A.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

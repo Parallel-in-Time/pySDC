@@ -55,12 +55,13 @@
 <span class="sd">        QE: explicit Euler integration matrix</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine for the custom sweeper</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            params: parameters for the sweeper</span>
+<span class="sd">            level (pySDC.Level.level): the level that uses this sweeper</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="s1">&#39;QI&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
@@ -68,8 +69,7 @@
         <span class="k">if</span> <span class="s1">&#39;QE&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
             <span class="n">params</span><span class="p">[</span><span class="s1">&#39;QE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;EE&#39;</span>
 
-        <span class="c1"># call parent&#39;s initialization routine</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span>
 
         <span class="c1"># IMEX integration matrices</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">QI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Qdelta_implicit</span><span class="p">(</span><span class="n">qd_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QI</span><span class="p">)</span>
@@ -117,6 +117,9 @@
 
         <span class="c1"># get number of collocation nodes for easier access</span>
         <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
+
+        <span class="c1"># update the MIN-SR-FLEX preconditioner</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateVariableCoeffs</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">)</span>
 
         <span class="c1"># gather all terms which are known already (e.g. from the previous iteration)</span>
         <span class="c1"># this corresponds to u0 + QF(u^k) - QIFI(u^k) - QEFE(u^k) + tau</span>

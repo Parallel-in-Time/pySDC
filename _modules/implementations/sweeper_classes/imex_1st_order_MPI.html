@@ -45,11 +45,11 @@
 <div class="viewcode-block" id="imex_1st_order_MPI">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order_MPI.html#implementations.sweeper_classes.imex_1st_order_MPI.imex_1st_order_MPI">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">imex_1st_order_MPI</span><span class="p">(</span><span class="n">SweeperMPI</span><span class="p">,</span> <span class="n">imex_1st_order</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">assert</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QE</span> <span class="o">==</span> <span class="s1">&#39;PIC&#39;</span>
-        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Only Picard is implemented for explicit precondioner so far in </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">! You chose </span><span class="se">\&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QE</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Only Picard is implemented for explicit preconditioner so far in </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">! You chose </span><span class="se">\&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QE</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
 
 <div class="viewcode-block" id="imex_1st_order_MPI.integrate">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order_MPI.html#implementations.sweeper_classes.imex_1st_order_MPI.imex_1st_order_MPI.integrate">[docs]</a>
@@ -100,6 +100,9 @@
 
         <span class="c1"># gather all terms which are known already (e.g. from the previous iteration)</span>
         <span class="c1"># this corresponds to u0 + QF(u^k) - QdF(u^k) + tau</span>
+
+        <span class="c1"># update the MIN-SR-FLEX preconditioner</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateVariableCoeffs</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">)</span>
 
         <span class="c1"># get QF(u^k)</span>
         <span class="n">rhs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span>

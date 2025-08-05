@@ -82,6 +82,7 @@
 <span class="sd">            controller_params (dict): parameter set for the controller and the steps</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">useMPI</span> <span class="o">=</span> <span class="n">useMPI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
 
         <span class="c1"># check if we have a hook on this list. If not, use default class.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__hooks</span> <span class="o">=</span> <span class="p">[]</span>
@@ -405,6 +406,77 @@
         <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
             <span class="n">stats</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">stats</span><span class="p">,</span> <span class="o">**</span><span class="n">hook</span><span class="o">.</span><span class="n">return_stats</span><span class="p">()}</span>
         <span class="k">return</span> <span class="n">stats</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ParaDiagController">
+<a class="viewcode-back" href="../../pySDC/core.controller.html#core.controller.ParaDiagController">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParaDiagController</span><span class="p">(</span><span class="n">Controller</span><span class="p">):</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">,</span> <span class="n">useMPI</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization routine for ParaDiag controllers</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">           num_procs: number of parallel time steps (still serial, though), can be 1</span>
+<span class="sd">           controller_params: parameter set for the controller and the steps</span>
+<span class="sd">           description: all the parameters to set up the rest (levels, problems, transfer, ...)</span>
+<span class="sd">           n_steps (int): Number of parallel steps</span>
+<span class="sd">           alpha (float): alpha parameter for ParaDiag</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.ParaDiagSweepers</span><span class="w"> </span><span class="kn">import</span> <span class="n">QDiagonalization</span>
+
+        <span class="k">if</span> <span class="n">QDiagonalization</span> <span class="ow">in</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">:</span>
+            <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">][</span><span class="s1">&#39;ignore_ic&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">][</span><span class="s1">&#39;update_f_evals&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;controller&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Warning: Your sweeper class </span><span class="si">{</span><span class="n">description</span><span class="p">[</span><span class="s2">&quot;sweeper_class&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1"> is not derived from </span><span class="si">{</span><span class="n">QDiagonalization</span><span class="si">}</span><span class="s1">. You probably want to use another sweeper class.&#39;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">controller_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;all_to_done&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;ParaDiag only implemented with option `all_to_done=True`&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;alpha&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">controller_params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParameterError</span>
+
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Please supply alpha as a parameter to the ParaDiag controller!&#39;</span><span class="p">)</span>
+        <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;average_jacobian&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">controller_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;average_jacobian&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;all_to_done&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">useMPI</span><span class="o">=</span><span class="n">useMPI</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span> <span class="o">=</span> <span class="n">n_steps</span>
+
+<div class="viewcode-block" id="ParaDiagController.FFT_in_time">
+<a class="viewcode-back" href="../../pySDC/core.controller.html#core.controller.ParaDiagController.FFT_in_time">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">FFT_in_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute weighted forward FFT in time. The weighting is determined by the alpha parameter in ParaDiag</span>
+
+<span class="sd">        Note: The implementation via matrix-vector multiplication may be inefficient and less stable compared to an FFT</span>
+<span class="sd">              with transposes!</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__FFT_matrix&#39;</span><span class="p">):</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.ParaDiagHelper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_weighted_FFT_matrix</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">__FFT_matrix</span> <span class="o">=</span> <span class="n">get_weighted_FFT_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__FFT_matrix</span><span class="p">,</span> <span class="n">quantity</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ParaDiagController.iFFT_in_time">
+<a class="viewcode-back" href="../../pySDC/core.controller.html#core.controller.ParaDiagController.iFFT_in_time">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iFFT_in_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute weighted backward FFT in time. The weighting is determined by the alpha parameter in ParaDiag</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__iFFT_matrix&#39;</span><span class="p">):</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.ParaDiagHelper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_weighted_iFFT_matrix</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">__iFFT_matrix</span> <span class="o">=</span> <span class="n">get_weighted_iFFT_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__iFFT_matrix</span><span class="p">,</span> <span class="n">quantity</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

@@ -1,0 +1,7 @@
+implementations.sweeper\_classes.ParaDiagSweepers module
+========================================================
+
+.. automodule:: implementations.sweeper_classes.ParaDiagSweepers
+   :members:
+   :show-inheritance:
+   :undoc-members:

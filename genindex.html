@@ -188,14 +188,14 @@
         <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FFT_gpu.html#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex">(class in implementations.problem_classes.AllenCahn_2D_FFT_gpu)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab">allencahn2d_imex_stab (class in implementations.problem_classes.AllenCahn_2D_FFT)</a>
 
       <ul>
         <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FFT_gpu.html#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab">(class in implementations.problem_classes.AllenCahn_2D_FFT_gpu)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel">allencahn_front_finel (class in implementations.problem_classes.AllenCahn_1D_FD)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit">allencahn_front_fullyimplicit (class in implementations.problem_classes.AllenCahn_1D_FD)</a>
@@ -274,6 +274,8 @@
         <li><a href="pySDC/core.problem.html#core.problem.Problem.apply_mass_matrix">(Problem method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.apply_matrix">apply_matrix() (controller_ParaDiag_nonMPI method)</a>
+</li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK2">ARK2 (class in implementations.sweeper_classes.Runge_Kutta)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK3">ARK3 (class in implementations.sweeper_classes.Runge_Kutta)</a>
@@ -586,6 +588,8 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.components">(SpectralHelper attribute)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.compute_all_at_once_residual">compute_all_at_once_residual() (controller_ParaDiag_nonMPI method)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_buoyancy_generation">compute_buoyancy_generation() (RayleighBenard method)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.compute_end_point">compute_end_point() (boris_2nd_order method)</a>
@@ -625,13 +629,19 @@
       <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit.compute_max_step_size">compute_max_step_size() (CFLLimit static method)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_Nusselt_numbers">compute_Nusselt_numbers() (RayleighBenard method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.problem_classes.RayleighBenard3D.html#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.compute_Nusselt_numbers">(RayleighBenard3D method)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.compute_optimal_step_size">compute_optimal_step_size() (AdaptivityBase method)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order_mass.html#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_residual">compute_residual() (imex_1st_order_mass method)</a>
 
       <ul>
         <li><a href="pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.MultiStep.compute_residual">(MultiStep method)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.ParaDiagSweepers.html#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.compute_residual">(QDiagonalization method)</a>
 </li>
         <li><a href="pySDC/core.sweeper.html#core.sweeper.Sweeper.compute_residual">(Sweeper method)</a>
 </li>
@@ -650,6 +660,8 @@
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_vorticity">(RayleighBenard method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.sweeper_classes.ParaDiagSweepers.html#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.computeDiagonalization">computeDiagonalization() (QDiagonalization static method)</a>
+</li>
       <li><a href="pySDC/core.step.html#core.step.Step.connect_levels">connect_levels() (Step method)</a>
 </li>
       <li><a href="pySDC/helpers.transfer_helper.html#helpers.transfer_helper.continue_periodic_array">continue_periodic_array() (in module helpers.transfer_helper)</a>
@@ -659,6 +671,8 @@
       <li><a href="pySDC/implementations.controller_classes.controller_MPI.html#implementations.controller_classes.controller_MPI.controller_MPI">controller_MPI (class in implementations.controller_classes.controller_MPI)</a>
 </li>
       <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI">controller_nonMPI (class in implementations.controller_classes.controller_nonMPI)</a>
+</li>
+      <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI">controller_ParaDiag_nonMPI (class in implementations.controller_classes.controller_ParaDiag_nonMPI)</a>
 </li>
       <li><a href="pySDC/core.errors.html#core.errors.ControllerError">ControllerError</a>
 </li>
@@ -1419,6 +1433,8 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/implementations.sweeper_classes.ParaDiagSweepers.html#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.eval_f_at_all_nodes">eval_f_at_all_nodes() (QDiagonalization method)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench.eval_f_non_linear">eval_f_non_linear() (Quench method)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.FermiPastaUlamTsingou.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_hamiltonian">eval_hamiltonian() (fermi_pasta_ulam_tsingou method)</a>
@@ -1567,6 +1583,8 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.fft_comm_backend">(SpectralHelper attribute)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/core.controller.html#core.controller.ParaDiagController.FFT_in_time">FFT_in_time() (ParaDiagController method)</a>
+</li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.fft_lib">fft_lib (SpectralHelper attribute)</a>
 
       <ul>
@@ -1841,6 +1859,8 @@
       </ul></li>
       <li><a href="pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.get_dtype">get_dtype() (NCCLComm static method)</a>
 </li>
+      <li><a href="pySDC/helpers.ParaDiagHelper.html#helpers.ParaDiagHelper.get_E_matrix">get_E_matrix() (in module helpers.ParaDiagHelper)</a>
+</li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_empty_operator_matrix">get_empty_operator_matrix() (SpectralHelper method)</a>
 
       <ul>
@@ -1857,6 +1877,8 @@
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_fft">get_fft() (SpectralHelper method)</a>
 </li>
+      <li><a href="pySDC/helpers.ParaDiagHelper.html#helpers.ParaDiagHelper.get_FFT_matrix">get_FFT_matrix() (in module helpers.ParaDiagHelper)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.Brusselator.html#implementations.problem_classes.Brusselator.Brusselator.get_fig">get_fig() (Brusselator method)</a>
 
       <ul>
@@ -1869,8 +1891,6 @@
         <li><a href="pySDC/core.problem.html#core.problem.Problem.get_fig">(Problem method)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.get_fig">(RayleighBenard method)</a>
-</li>
-        <li><a href="pySDC/implementations.problem_classes.RayleighBenard3D.html#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.get_fig">(RayleighBenard3D method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_filter_matrix">get_filter_matrix() (SpectralHelper method)</a>
@@ -1889,7 +1909,11 @@
         <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.get_full_f">(RungeKuttaNystrom method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/helpers.ParaDiagHelper.html#helpers.ParaDiagHelper.get_G_inv_matrix">get_G_inv_matrix() (in module helpers.ParaDiagHelper)</a>
+</li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_grid">get_grid() (SpectralHelper method)</a>
+</li>
+      <li><a href="pySDC/helpers.ParaDiagHelper.html#helpers.ParaDiagHelper.get_H_matrix">get_H_matrix() (in module helpers.ParaDiagHelper)</a>
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_Id">get_Id() (SpectralHelper method)</a>
 
@@ -1937,6 +1961,10 @@
         <li><a href="pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.html#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialErrorFiredrake.get_interpolated_solution">(EstimatePolynomialErrorFiredrake method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/helpers.ParaDiagHelper.html#helpers.ParaDiagHelper.get_J_inv_matrix">get_J_inv_matrix() (in module helpers.ParaDiagHelper)</a>
+</li>
+      <li><a href="pySDC/helpers.ParaDiagHelper.html#helpers.ParaDiagHelper.get_J_matrix">get_J_matrix() (in module helpers.ParaDiagHelper)</a>
+</li>
       <li><a href="pySDC/helpers.stats_helper.html#helpers.stats_helper.get_list_of_types">get_list_of_types() (in module helpers.stats_helper)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.Adaptivity.get_local_error_estimate">get_local_error_estimate() (Adaptivity method)</a>
@@ -2000,6 +2028,8 @@
       <li><a href="pySDC/core.sweeper.html#core.sweeper.Sweeper.get_Qdelta_explicit">get_Qdelta_explicit() (Sweeper method)</a>
 </li>
       <li><a href="pySDC/core.sweeper.html#core.sweeper.Sweeper.get_Qdelta_implicit">get_Qdelta_implicit() (Sweeper method)</a>
+</li>
+      <li><a href="pySDC/implementations.sweeper_classes.ParaDiagSweepers.html#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.get_residual">get_residual() (QDiagonalization method)</a>
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.UltrasphericalHelper.get_S">get_S() (UltrasphericalHelper method)</a>
 </li>
@@ -2079,6 +2109,10 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.get_wavenumbers">(SpectralHelper1D method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/helpers.ParaDiagHelper.html#helpers.ParaDiagHelper.get_weighted_FFT_matrix">get_weighted_FFT_matrix() (in module helpers.ParaDiagHelper)</a>
+</li>
+      <li><a href="pySDC/helpers.ParaDiagHelper.html#helpers.ParaDiagHelper.get_weighted_iFFT_matrix">get_weighted_iFFT_matrix() (in module helpers.ParaDiagHelper)</a>
+</li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.get_zero">get_zero() (SpectralHelper1D method)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.html#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.getBCHorizontal">getBCHorizontal() (in module implementations.problem_classes.boussinesq_helpers.build2DFDMatrix)</a>
@@ -2230,6 +2264,13 @@
 </li>
       </ul></li>
       <li>
+    helpers.ParaDiagHelper
+
+      <ul>
+        <li><a href="pySDC/helpers.ParaDiagHelper.html#module-helpers.ParaDiagHelper">module</a>
+</li>
+      </ul></li>
+      <li>
     helpers.plot_helper
 
       <ul>
@@ -2296,6 +2337,8 @@
       </ul></li>
       <li><a href="pySDC/implementations.problem_classes.HenonHeiles.html#implementations.problem_classes.HenonHeiles.henon_heiles">henon_heiles (class in implementations.problem_classes.HenonHeiles)</a>
 </li>
+      <li><a href="pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.heterogeneous_setup">heterogeneous_setup() (GenericSpectralLinear method)</a>
+</li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler">Heun_Euler (class in implementations.sweeper_classes.Runge_Kutta)</a>
 </li>
       <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.hInfos">hInfos (FieldsIO property)</a>
@@ -2340,6 +2383,8 @@
         <li><a href="pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench.Id">(Quench attribute)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/core.controller.html#core.controller.ParaDiagController.iFFT_in_time">iFFT_in_time() (ParaDiagController method)</a>
+</li>
       <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order">imex_1st_order (class in implementations.sweeper_classes.imex_1st_order)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order_mass.html#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass">imex_1st_order_mass (class in implementations.sweeper_classes.imex_1st_order_mass)</a>
@@ -2388,6 +2433,13 @@
 
       <ul>
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#module-implementations.controller_classes.controller_nonMPI">module</a>
+</li>
+      </ul></li>
+      <li>
+    implementations.controller_classes.controller_ParaDiag_nonMPI
+
+      <ul>
+        <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#module-implementations.controller_classes.controller_ParaDiag_nonMPI">module</a>
 </li>
       </ul></li>
       <li>
@@ -2810,8 +2862,6 @@
         <li><a href="pySDC/implementations.problem_classes.generic_spectral.html#module-implementations.problem_classes.generic_spectral">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.GrayScott_1D_FEniCS_implicit
 
@@ -2819,6 +2869,8 @@
         <li><a href="pySDC/implementations.problem_classes.GrayScott_1D_FEniCS_implicit.html#module-implementations.problem_classes.GrayScott_1D_FEniCS_implicit">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.GrayScott_2D_PETSc_periodic
 
@@ -3065,6 +3117,13 @@
 </li>
       </ul></li>
       <li>
+    implementations.sweeper_classes.ParaDiagSweepers
+
+      <ul>
+        <li><a href="pySDC/implementations.sweeper_classes.ParaDiagSweepers.html#module-implementations.sweeper_classes.ParaDiagSweepers">module</a>
+</li>
+      </ul></li>
+      <li>
     implementations.sweeper_classes.Runge_Kutta
 
       <ul>
@@ -3201,6 +3260,8 @@
 </li>
         <li><a href="pySDC/implementations.sweeper_classes.multi_implicit.html#implementations.sweeper_classes.multi_implicit.multi_implicit.integrate">(multi_implicit method)</a>
 </li>
+        <li><a href="pySDC/implementations.sweeper_classes.ParaDiagSweepers.html#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalizationIMEX.integrate">(QDiagonalizationIMEX method)</a>
+</li>
         <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.integrate">(RungeKutta method)</a>
 </li>
         <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX.integrate">(RungeKuttaIMEX method)</a>
@@ -3239,6 +3300,8 @@
       <ul>
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_check">(controller_nonMPI method)</a>
 </li>
+        <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.it_check">(controller_ParaDiag_nonMPI method)</a>
+</li>
       </ul></li>
       <li><a href="pySDC/implementations.controller_classes.controller_MPI.html#implementations.controller_classes.controller_MPI.controller_MPI.it_coarse">it_coarse() (controller_MPI method)</a>
 
@@ -3258,6 +3321,8 @@
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_fine">(controller_nonMPI method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.it_ParaDiag">it_ParaDiag() (controller_ParaDiag_nonMPI method)</a>
+</li>
       <li><a href="pySDC/implementations.controller_classes.controller_MPI.html#implementations.controller_classes.controller_MPI.controller_MPI.it_up">it_up() (controller_MPI method)</a>
 
       <ul>
@@ -3381,6 +3446,8 @@
       <li><a href="pySDC/core.hooks.html#core.hooks.Entry.level">level (Entry attribute)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.MultiStep.level">(MultiStep property)</a>
+</li>
         <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.level">(RungeKutta property)</a>
 </li>
         <li><a href="pySDC/core.sweeper.html#core.sweeper.Sweeper.level">(Sweeper property)</a>
@@ -3402,10 +3469,10 @@
       </ul></li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.local_slice">local_slice() (SpectralHelper method)</a>
 </li>
-      <li><a href="pySDC/helpers.blocks.html#helpers.blocks.BlockDecomposition.localBounds">localBounds (BlockDecomposition property)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/helpers.blocks.html#helpers.blocks.BlockDecomposition.localBounds">localBounds (BlockDecomposition property)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_full.localX">localX (Fisher_full attribute)</a>
 
       <ul>
@@ -3475,6 +3542,8 @@
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.datatype_classes.particles.html#implementations.datatype_classes.particles.fields.magn">magn (fields attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.sweeper_classes.ParaDiagSweepers.html#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.mat_vec">mat_vec() (QDiagonalization method)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptive_collocation.html#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.matmul">matmul() (AdaptiveCollocation method)</a>
 
@@ -3626,6 +3695,8 @@
 </li>
         <li><a href="pySDC/helpers.NCCL_communicator.html#module-helpers.NCCL_communicator">helpers.NCCL_communicator</a>
 </li>
+        <li><a href="pySDC/helpers.ParaDiagHelper.html#module-helpers.ParaDiagHelper">helpers.ParaDiagHelper</a>
+</li>
         <li><a href="pySDC/helpers.plot_helper.html#module-helpers.plot_helper">helpers.plot_helper</a>
 </li>
         <li><a href="pySDC/helpers.problem_helper.html#module-helpers.problem_helper">helpers.problem_helper</a>
@@ -3651,6 +3722,8 @@
         <li><a href="pySDC/implementations.controller_classes.controller_MPI.html#module-implementations.controller_classes.controller_MPI">implementations.controller_classes.controller_MPI</a>
 </li>
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#module-implementations.controller_classes.controller_nonMPI">implementations.controller_classes.controller_nonMPI</a>
+</li>
+        <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#module-implementations.controller_classes.controller_ParaDiag_nonMPI">implementations.controller_classes.controller_ParaDiag_nonMPI</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.html#module-implementations.convergence_controller_classes">implementations.convergence_controller_classes</a>
 </li>
@@ -3843,6 +3916,8 @@
         <li><a href="pySDC/implementations.sweeper_classes.multi_implicit.html#module-implementations.sweeper_classes.multi_implicit">implementations.sweeper_classes.multi_implicit</a>
 </li>
         <li><a href="pySDC/implementations.sweeper_classes.Multistep.html#module-implementations.sweeper_classes.Multistep">implementations.sweeper_classes.Multistep</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.ParaDiagSweepers.html#module-implementations.sweeper_classes.ParaDiagSweepers">implementations.sweeper_classes.ParaDiagSweepers</a>
 </li>
         <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#module-implementations.sweeper_classes.Runge_Kutta">implementations.sweeper_classes.Runge_Kutta</a>
 </li>
@@ -4055,6 +4130,10 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.ParaDiag">ParaDiag() (controller_ParaDiag_nonMPI method)</a>
+</li>
+      <li><a href="pySDC/core.controller.html#core.controller.ParaDiagController">ParaDiagController (class in core.controller)</a>
+</li>
       <li><a href="pySDC/core.errors.html#core.errors.ParameterError">ParameterError</a>
 </li>
       <li><a href="pySDC/implementations.transfer_classes.BaseTransfer_mass.html#implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.params">params (base_transfer_mass attribute)</a>
@@ -4129,8 +4208,6 @@
         <li><a href="pySDC/core.problem.html#core.problem.Problem.plot">(Problem method)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.plot">(RayleighBenard method)</a>
-</li>
-        <li><a href="pySDC/implementations.problem_classes.RayleighBenard3D.html#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.plot">(RayleighBenard3D method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.problem_classes.polynomial_test_problem.html#implementations.problem_classes.polynomial_test_problem.polynomial_testequation">polynomial_testequation (class in implementations.problem_classes.polynomial_test_problem)</a>
@@ -4245,6 +4322,8 @@
         <li><a href="pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.predict">(SweeperMPI method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.prepare_Jacobians">prepare_Jacobians() (controller_ParaDiag_nonMPI method)</a>
+</li>
       <li><a href="pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.prepare_MPI_datatypes">prepare_MPI_datatypes() (ConvergenceController method)</a>
 </li>
       <li><a href="pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.prepare_MPI_logical_operations">prepare_MPI_logical_operations() (ConvergenceController method)</a>
@@ -4346,6 +4425,10 @@
       <li><a href="pySDC/implementations.sweeper_classes.multi_implicit.html#implementations.sweeper_classes.multi_implicit.multi_implicit.Q1">Q1 (multi_implicit attribute)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.multi_implicit.html#implementations.sweeper_classes.multi_implicit.multi_implicit.Q2">Q2 (multi_implicit attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.sweeper_classes.ParaDiagSweepers.html#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization">QDiagonalization (class in implementations.sweeper_classes.ParaDiagSweepers)</a>
+</li>
+      <li><a href="pySDC/implementations.sweeper_classes.ParaDiagSweepers.html#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalizationIMEX">QDiagonalizationIMEX (class in implementations.sweeper_classes.ParaDiagSweepers)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.explicit.html#implementations.sweeper_classes.explicit.explicit.QE">QE (explicit attribute)</a>
 
@@ -4469,10 +4552,10 @@
         <li><a href="pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.html#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.reset_status_variables">(EstimatePolynomialError method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.step.html#core.step.Step.reset_step">reset_step() (Step method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.reshape">reshape() (FieldsIO method)</a>
 
       <ul>
@@ -4483,6 +4566,8 @@
 
       <ul>
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.restart_block">(controller_nonMPI method)</a>
+</li>
+        <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.restart_block">(controller_ParaDiag_nonMPI method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.transfer_classes.BaseTransfer_mass.html#implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.restrict">restrict() (base_transfer_mass method)</a>
@@ -4552,6 +4637,8 @@
 </li>
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.run">(controller_nonMPI method)</a>
 </li>
+        <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.run">(controller_ParaDiag_nonMPI method)</a>
+</li>
       </ul></li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta">RungeKutta (class in implementations.sweeper_classes.Runge_Kutta)</a>
 </li>
@@ -4585,6 +4672,8 @@
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.send_full">(controller_nonMPI method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.sweeper_classes.ParaDiagSweepers.html#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.set_G_inv">set_G_inv() (QDiagonalization method)</a>
+</li>
       <li><a href="pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.set_level_status_variable">set_level_status_variable() (ConvergenceController method)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.inexactness.html#implementations.convergence_controller_classes.inexactness.NewtonInexactness.set_maxiter">set_maxiter() (NewtonInexactness method)</a>
@@ -4763,6 +4852,12 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.snes_ncalls">snes_ncalls (petsc_grayscott_multiimplicit attribute)</a>
 </li>
+      <li><a href="pySDC/core.problem.html#core.problem.Problem.solve_jacobian">solve_jacobian() (Problem method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.problem_classes.Van_der_Pol_implicit.html#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.solve_jacobian">(vanderpol method)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.AcousticAdvection_1D_FD_imex.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.solve_system">solve_system() (acoustic_1d_imex method)</a>
 
       <ul>
@@ -4862,6 +4957,8 @@
 </li>
         <li><a href="pySDC/implementations.problem_classes.polynomial_test_problem.html#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.solve_system">(polynomial_testequation method)</a>
 </li>
+        <li><a href="pySDC/core.problem.html#core.problem.Problem.solve_system">(Problem method)</a>
+</li>
         <li><a href="pySDC/implementations.problem_classes.odeScalar.html#implementations.problem_classes.odeScalar.ProtheroRobinson.solve_system">(ProtheroRobinson method)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.solve_system">(ProtheroRobinsonAutonomous method)</a>
@@ -4939,6 +5036,8 @@
 
       <ul>
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.spread">(controller_nonMPI method)</a>
+</li>
+        <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.spread">(controller_ParaDiag_nonMPI method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise">SpreadStepSizesBlockwise (class in implementations.convergence_controller_classes.spread_step_sizes)</a>
@@ -5258,6 +5357,8 @@
 </li>
         <li><a href="pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.MultiStep.update_nodes">(MultiStep method)</a>
 </li>
+        <li><a href="pySDC/implementations.sweeper_classes.ParaDiagSweepers.html#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.update_nodes">(QDiagonalization method)</a>
+</li>
         <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.update_nodes">(RungeKutta method)</a>
 </li>
         <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX.update_nodes">(RungeKuttaIMEX method)</a>
@@ -5269,6 +5370,8 @@
         <li><a href="pySDC/implementations.sweeper_classes.verlet.html#implementations.sweeper_classes.verlet.verlet.update_nodes">(verlet method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.update_solution">update_solution() (controller_ParaDiag_nonMPI method)</a>
+</li>
       <li><a href="pySDC/core.sweeper.html#core.sweeper.Sweeper.updateVariableCoeffs">updateVariableCoeffs() (Sweeper method)</a>
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.useGPU">useGPU (SpectralHelper attribute)</a>

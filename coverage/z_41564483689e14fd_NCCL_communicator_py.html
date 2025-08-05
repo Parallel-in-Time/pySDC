@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/helpers/NCCL_communicator.py: 22%</title>
+    <title>Coverage for pySDC/helpers/NCCL_communicator.py: 26%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_58284776.png">
-    <link rel="stylesheet" href="style_cb_81f8c14c.css" type="text/css">
+    <link rel="stylesheet" href="style_cb_6b508a39.css" type="text/css">
     <script src="coverage_html_cb_6fb7b396.js" defer></script>
 </head>
 <body class="pyfile">
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC/helpers/NCCL_communicator.py</b>:
-            <span class="pc_cov">22%</span>
+            <span class="pc_cov">26%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,17 +55,17 @@
         </aside>
         <h2>
             <span class="text">81 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">18<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">63<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">21<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">60<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">2<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
             <a id="prevFileLink" class="nav" href="z_8d0d803e4e125e5c_sweeper_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a id="nextFileLink" class="nav" href="z_41564483689e14fd_blocks_py.html">&#xbb; next</a>
+            <a id="nextFileLink" class="nav" href="z_41564483689e14fd_ParaDiagHelper_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.9.2">coverage.py v7.9.2</a>,
-            created at 2025-07-18 13:09 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.10.2">coverage.py v7.10.2</a>,
+            created at 2025-08-05 18:27 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -96,10 +96,10 @@
     <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="str">        Args:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="str">            comm (mpi4py.Intracomm): MPI communicator</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">commMPI</span> <span class="op">=</span> <span class="nam">comm</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">commMPI</span> <span class="op">=</span> <span class="nam">comm</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t">        <span class="nam">uid</span> <span class="op">=</span> <span class="nam">comm</span><span class="op">.</span><span class="nam">bcast</span><span class="op">(</span><span class="nam">nccl</span><span class="op">.</span><span class="nam">get_unique_id</span><span class="op">(</span><span class="op">)</span><span class="op">,</span> <span class="nam">root</span><span class="op">=</span><span class="num">0</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">commNCCL</span> <span class="op">=</span> <span class="nam">nccl</span><span class="op">.</span><span class="nam">NcclCommunicator</span><span class="op">(</span><span class="nam">comm</span><span class="op">.</span><span class="nam">size</span><span class="op">,</span> <span class="nam">uid</span><span class="op">,</span> <span class="nam">comm</span><span class="op">.</span><span class="nam">rank</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t">        <span class="nam">uid</span> <span class="op">=</span> <span class="nam">comm</span><span class="op">.</span><span class="nam">bcast</span><span class="op">(</span><span class="nam">nccl</span><span class="op">.</span><span class="nam">get_unique_id</span><span class="op">(</span><span class="op">)</span><span class="op">,</span> <span class="nam">root</span><span class="op">=</span><span class="num">0</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">commNCCL</span> <span class="op">=</span> <span class="nam">nccl</span><span class="op">.</span><span class="nam">NcclCommunicator</span><span class="op">(</span><span class="nam">comm</span><span class="op">.</span><span class="nam">size</span><span class="op">,</span> <span class="nam">uid</span><span class="op">,</span> <span class="nam">comm</span><span class="op">.</span><span class="nam">rank</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t">    <span class="key">def</span> <span class="nam">__getattr__</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">name</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t23" href="#t23">23</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
@@ -184,14 +184,14 @@
     <p class="mis show_mis"><span class="n"><a id="t102" href="#t102">102</a></span><span class="t">        <span class="nam">stream</span> <span class="op">=</span> <span class="nam">cp</span><span class="op">.</span><span class="nam">cuda</span><span class="op">.</span><span class="nam">get_current_stream</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t103" href="#t103">103</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t104" href="#t104">104</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">commNCCL</span><span class="op">.</span><span class="nam">reduce</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t105" href="#t105">105</a></span><span class="t">            <span class="nam">sendbuf</span><span class="op">=</span><span class="nam">sendbuf</span><span class="op">.</span><span class="nam">data</span><span class="op">.</span><span class="nam">ptr</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t106" href="#t106">106</a></span><span class="t">            <span class="nam">recvbuf</span><span class="op">=</span><span class="nam">recvbuf</span><span class="op">.</span><span class="nam">data</span><span class="op">.</span><span class="nam">ptr</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t107" href="#t107">107</a></span><span class="t">            <span class="nam">count</span><span class="op">=</span><span class="nam">count</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t108" href="#t108">108</a></span><span class="t">            <span class="nam">datatype</span><span class="op">=</span><span class="nam">dtype</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t109" href="#t109">109</a></span><span class="t">            <span class="nam">op</span><span class="op">=</span><span class="nam">op</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t110" href="#t110">110</a></span><span class="t">            <span class="nam">root</span><span class="op">=</span><span class="nam">root</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t111" href="#t111">111</a></span><span class="t">            <span class="nam">stream</span><span class="op">=</span><span class="nam">stream</span><span class="op">.</span><span class="nam">ptr</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t112" href="#t112">112</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis mis2 show_mis"><span class="n"><a id="t105" href="#t105">105</a></span><span class="t">            <span class="nam">sendbuf</span><span class="op">=</span><span class="nam">sendbuf</span><span class="op">.</span><span class="nam">data</span><span class="op">.</span><span class="nam">ptr</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis mis2 show_mis"><span class="n"><a id="t106" href="#t106">106</a></span><span class="t">            <span class="nam">recvbuf</span><span class="op">=</span><span class="nam">recvbuf</span><span class="op">.</span><span class="nam">data</span><span class="op">.</span><span class="nam">ptr</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis mis2 show_mis"><span class="n"><a id="t107" href="#t107">107</a></span><span class="t">            <span class="nam">count</span><span class="op">=</span><span class="nam">count</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis mis2 show_mis"><span class="n"><a id="t108" href="#t108">108</a></span><span class="t">            <span class="nam">datatype</span><span class="op">=</span><span class="nam">dtype</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis mis2 show_mis"><span class="n"><a id="t109" href="#t109">109</a></span><span class="t">            <span class="nam">op</span><span class="op">=</span><span class="nam">op</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis mis2 show_mis"><span class="n"><a id="t110" href="#t110">110</a></span><span class="t">            <span class="nam">root</span><span class="op">=</span><span class="nam">root</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis mis2 show_mis"><span class="n"><a id="t111" href="#t111">111</a></span><span class="t">            <span class="nam">stream</span><span class="op">=</span><span class="nam">stream</span><span class="op">.</span><span class="nam">ptr</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis mis2 show_mis"><span class="n"><a id="t112" href="#t112">112</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t113" href="#t113">113</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t114" href="#t114">114</a></span><span class="t">    <span class="key">def</span> <span class="nam">Allreduce</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">sendbuf</span><span class="op">,</span> <span class="nam">recvbuf</span><span class="op">,</span> <span class="nam">op</span><span class="op">=</span><span class="nam">MPI</span><span class="op">.</span><span class="nam">SUM</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t115" href="#t115">115</a></span><span class="t">        <span class="key">if</span> <span class="key">not</span> <span class="nam">hasattr</span><span class="op">(</span><span class="nam">sendbuf</span><span class="op">.</span><span class="nam">data</span><span class="op">,</span> <span class="str">'ptr'</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -203,8 +203,8 @@
     <p class="mis show_mis"><span class="n"><a id="t121" href="#t121">121</a></span><span class="t">        <span class="nam">stream</span> <span class="op">=</span> <span class="nam">cp</span><span class="op">.</span><span class="nam">cuda</span><span class="op">.</span><span class="nam">get_current_stream</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t122" href="#t122">122</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t123" href="#t123">123</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">commNCCL</span><span class="op">.</span><span class="nam">allReduce</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t124" href="#t124">124</a></span><span class="t">            <span class="nam">sendbuf</span><span class="op">=</span><span class="nam">sendbuf</span><span class="op">.</span><span class="nam">data</span><span class="op">.</span><span class="nam">ptr</span><span class="op">,</span> <span class="nam">recvbuf</span><span class="op">=</span><span class="nam">recvbuf</span><span class="op">.</span><span class="nam">data</span><span class="op">.</span><span class="nam">ptr</span><span class="op">,</span> <span class="nam">count</span><span class="op">=</span><span class="nam">count</span><span class="op">,</span> <span class="nam">datatype</span><span class="op">=</span><span class="nam">dtype</span><span class="op">,</span> <span class="nam">op</span><span class="op">=</span><span class="nam">op</span><span class="op">,</span> <span class="nam">stream</span><span class="op">=</span><span class="nam">stream</span><span class="op">.</span><span class="nam">ptr</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t125" href="#t125">125</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis mis2 show_mis"><span class="n"><a id="t124" href="#t124">124</a></span><span class="t">            <span class="nam">sendbuf</span><span class="op">=</span><span class="nam">sendbuf</span><span class="op">.</span><span class="nam">data</span><span class="op">.</span><span class="nam">ptr</span><span class="op">,</span> <span class="nam">recvbuf</span><span class="op">=</span><span class="nam">recvbuf</span><span class="op">.</span><span class="nam">data</span><span class="op">.</span><span class="nam">ptr</span><span class="op">,</span> <span class="nam">count</span><span class="op">=</span><span class="nam">count</span><span class="op">,</span> <span class="nam">datatype</span><span class="op">=</span><span class="nam">dtype</span><span class="op">,</span> <span class="nam">op</span><span class="op">=</span><span class="nam">op</span><span class="op">,</span> <span class="nam">stream</span><span class="op">=</span><span class="nam">stream</span><span class="op">.</span><span class="nam">ptr</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis mis2 show_mis"><span class="n"><a id="t125" href="#t125">125</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t126" href="#t126">126</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t127" href="#t127">127</a></span><span class="t">    <span class="key">def</span> <span class="nam">Bcast</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">buf</span><span class="op">,</span> <span class="nam">root</span><span class="op">=</span><span class="num">0</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t128" href="#t128">128</a></span><span class="t">        <span class="key">if</span> <span class="key">not</span> <span class="nam">hasattr</span><span class="op">(</span><span class="nam">buf</span><span class="op">.</span><span class="nam">data</span><span class="op">,</span> <span class="str">'ptr'</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -225,10 +225,10 @@
         <p>
             <a class="nav" href="z_8d0d803e4e125e5c_sweeper_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a class="nav" href="z_41564483689e14fd_blocks_py.html">&#xbb; next</a>
+            <a class="nav" href="z_41564483689e14fd_ParaDiagHelper_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.9.2">coverage.py v7.9.2</a>,
-            created at 2025-07-18 13:09 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.10.2">coverage.py v7.10.2</a>,
+            created at 2025-08-05 18:27 +0000
         </p>
     </div>
 </footer>

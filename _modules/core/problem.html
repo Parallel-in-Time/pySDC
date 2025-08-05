@@ -249,6 +249,44 @@
 <span class="sd">        None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+
+<div class="viewcode-block" id="Problem.solve_system">
+<a class="viewcode-back" href="../../pySDC/core.problem.html#core.problem.Problem.solve_system">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform an Euler step.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rhs: Right hand side for the Euler step</span>
+<span class="sd">            dt (float): Step size for the Euler step</span>
+<span class="sd">            u0: Initial guess</span>
+<span class="sd">            t (float): Current time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            solution to the Euler step</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+
+<div class="viewcode-block" id="Problem.solve_jacobian">
+<a class="viewcode-back" href="../../pySDC/core.problem.html#core.problem.Problem.solve_jacobian">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_jacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">u0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Solve the Jacobian for an Euler step, linearized around u.</span>
+<span class="sd">        This defaults to an Euler step to accommodate linear problems.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rhs: Right hand side for the Euler step</span>
+<span class="sd">            dt (float): Step size for the Euler step</span>
+<span class="sd">            u: Solution to linearize around</span>
+<span class="sd">            u0: Initial guess</span>
+<span class="sd">            t (float): Current time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Solution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="o">=</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

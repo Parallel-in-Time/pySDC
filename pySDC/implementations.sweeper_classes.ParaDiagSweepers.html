@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.sweeper_classes.ParaDiagSweepers module &#8212; pySDC 5.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=81710850"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.sweeper_classes.Runge_Kutta module" href="implementations.sweeper_classes.Runge_Kutta.html" />
+    <link rel="prev" title="implementations.sweeper_classes.Multistep module" href="implementations.sweeper_classes.Multistep.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.Runge_Kutta.html" title="implementations.sweeper_classes.Runge_Kutta module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.Multistep.html" title="implementations.sweeper_classes.Multistep module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.sweeper_classes.html" accesskey="U">implementations.sweeper_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.ParaDiagSweepers module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.sweeper_classes.ParaDiagSweepers">
+<span id="implementations-sweeper-classes-paradiagsweepers-module"></span><h1>implementations.sweeper_classes.ParaDiagSweepers module<a class="headerlink" href="#module-implementations.sweeper_classes.ParaDiagSweepers" title="Link to this heading">¶</a></h1>
+<p>These sweepers are made for use with ParaDiag. They can be used to some degree with SDC as well, but unless you know what you are doing, you probably want another sweeper.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QDiagonalization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/ParaDiagSweepers.html#QDiagonalization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">generic_implicit</span></code></p>
+<p>Sweeper solving the collocation problem directly via diagonalization of Q. Mainly made for ParaDiag.
+Can be reconfigured for use with SDC.</p>
+<p>Note that the initial conditions for the collocation problem are generally stored in node zero in pySDC. However,
+this sweeper is intended for ParaDiag, where a node-local residual is needed as a right hand side for this sweeper
+rather than a step local one. Therefore, this sweeper has an option <cite>ignore_ic</cite>. If true, the value in node zero
+will only be used in computing the step-local residual, but not in the solves. If false, the values on the nodes
+will be ignored in the solves and the node-zero value will be used as initial conditions. When using this as a time-
+parallel algorithm outside ParaDiag, you should set this parameter to false, which is not the default!</p>
+<p>Similarly, in ParaDiag, the solution is in Fourier space right after the solve. It therefore makes little sense to
+evaluate the right hand side directly after. By default, this is not done! Set <cite>update_f_evals=True</cite> in the
+parameters if you want to use this sweeper in SDC.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.computeDiagonalization">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computeDiagonalization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/ParaDiagSweepers.html#QDiagonalization.computeDiagonalization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.computeDiagonalization" title="Link to this definition">¶</a></dt>
+<dd><p>Compute diagonalization of dense matrix A = S diag(w) S^-1</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>A</strong> (<em>numpy.ndarray</em>) – dense matrix to diagonalize</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Diagonal entries of the diagonalized matrix w
+numpy.ndarray: Matrix of eigenvectors S
+numpy.ndarray: Inverse of S</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.compute_residual">
+<span class="sig-name descname"><span class="pre">compute_residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/ParaDiagSweepers.html#QDiagonalization.compute_residual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.compute_residual" title="Link to this definition">¶</a></dt>
+<dd><p>Computation of the residual using the collocation matrix Q</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stage</strong> (<em>str</em>) – The current stage of the step the level belongs to</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.eval_f_at_all_nodes">
+<span class="sig-name descname"><span class="pre">eval_f_at_all_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/ParaDiagSweepers.html#QDiagonalization.eval_f_at_all_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.eval_f_at_all_nodes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.get_residual">
+<span class="sig-name descname"><span class="pre">get_residual</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/ParaDiagSweepers.html#QDiagonalization.get_residual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.get_residual" title="Link to this definition">¶</a></dt>
+<dd><p>This function computes and returns the “spatially extended” residual, not the norm of the residual!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Spatially extended residual</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pySDC.datatype</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.mat_vec">
+<span class="sig-name descname"><span class="pre">mat_vec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/ParaDiagSweepers.html#QDiagonalization.mat_vec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.mat_vec" title="Link to this definition">¶</a></dt>
+<dd><p>Compute matrix-vector multiplication. Vector can be list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mat</strong> – Matrix</p></li>
+<li><p><strong>vec</strong> – Vector</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>mat &#64; vec</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.set_G_inv">
+<span class="sig-name descname"><span class="pre">set_G_inv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G_inv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/ParaDiagSweepers.html#QDiagonalization.set_G_inv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.set_G_inv" title="Link to this definition">¶</a></dt>
+<dd><p>In ParaDiag, QG^{-1} is diagonalized. This function stores the G_inv matrix and computes and stores the diagonalization.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.update_nodes">
+<span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/ParaDiagSweepers.html#QDiagonalization.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.update_nodes" title="Link to this definition">¶</a></dt>
+<dd><p>Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalizationIMEX">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QDiagonalizationIMEX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/ParaDiagSweepers.html#QDiagonalizationIMEX"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalizationIMEX" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization" title="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization"><code class="xref py py-class docutils literal notranslate"><span class="pre">QDiagonalization</span></code></a></p>
+<p>Use as sweeper class for ParaDiag with IMEX splitting. Note that it will not work with SDC.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalizationIMEX.integrate">
+<span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalizationIMEX.integrate" title="Link to this definition">¶</a></dt>
+<dd><p>Integrates the right-hand side (here impl + expl)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>containing the integral as values</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.sweeper_classes.ParaDiagSweepers module</a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization"><code class="docutils literal notranslate"><span class="pre">QDiagonalization</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.computeDiagonalization"><code class="docutils literal notranslate"><span class="pre">computeDiagonalization()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.compute_residual"><code class="docutils literal notranslate"><span class="pre">compute_residual()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.eval_f_at_all_nodes"><code class="docutils literal notranslate"><span class="pre">eval_f_at_all_nodes()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.get_residual"><code class="docutils literal notranslate"><span class="pre">get_residual()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.mat_vec"><code class="docutils literal notranslate"><span class="pre">mat_vec()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.set_G_inv"><code class="docutils literal notranslate"><span class="pre">set_G_inv()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.update_nodes"><code class="docutils literal notranslate"><span class="pre">update_nodes()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalizationIMEX"><code class="docutils literal notranslate"><span class="pre">QDiagonalizationIMEX</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalizationIMEX.integrate"><code class="docutils literal notranslate"><span class="pre">integrate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.sweeper_classes.Multistep.html"
+                          title="previous chapter">implementations.sweeper_classes.Multistep module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.sweeper_classes.Runge_Kutta.html"
+                          title="next chapter">implementations.sweeper_classes.Runge_Kutta module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.sweeper_classes.ParaDiagSweepers.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.Runge_Kutta.html" title="implementations.sweeper_classes.Runge_Kutta module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.Multistep.html" title="implementations.sweeper_classes.Multistep module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.sweeper_classes.html" >implementations.sweeper_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.ParaDiagSweepers module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

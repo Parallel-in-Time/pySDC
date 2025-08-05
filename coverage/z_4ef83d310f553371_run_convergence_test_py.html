@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Coverage for pySDC/projects/DAE/run/run_convergence_test.py: 100%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_58284776.png">
-    <link rel="stylesheet" href="style_cb_81f8c14c.css" type="text/css">
+    <link rel="stylesheet" href="style_cb_6b508a39.css" type="text/css">
     <script src="coverage_html_cb_6fb7b396.js" defer></script>
 </head>
 <body class="pyfile">
@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_4ef83d310f553371_run_iteration_test_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.9.2">coverage.py v7.9.2</a>,
-            created at 2025-07-18 13:09 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.10.2">coverage.py v7.10.2</a>,
+            created at 2025-08-05 18:27 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -161,8 +161,8 @@
     <p class="pln"><span class="n"><a id="t79" href="#t79">79</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t80" href="#t80">80</a></span><span class="t">                <span class="com"># instantiate the controller</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t81" href="#t81">81</a></span><span class="t">                <span class="nam">controller</span> <span class="op">=</span> <span class="nam">controller_nonMPI</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t82" href="#t82">82</a></span><span class="t">                    <span class="nam">num_procs</span><span class="op">=</span><span class="num">1</span><span class="op">,</span> <span class="nam">controller_params</span><span class="op">=</span><span class="nam">controller_params</span><span class="op">,</span> <span class="nam">description</span><span class="op">=</span><span class="nam">description</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t83" href="#t83">83</a></span><span class="t">                <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t82" href="#t82">82</a></span><span class="t">                    <span class="nam">num_procs</span><span class="op">=</span><span class="num">1</span><span class="op">,</span> <span class="nam">controller_params</span><span class="op">=</span><span class="nam">controller_params</span><span class="op">,</span> <span class="nam">description</span><span class="op">=</span><span class="nam">description</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t83" href="#t83">83</a></span><span class="t">                <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t84" href="#t84">84</a></span><span class="t">                <span class="com"># get initial values</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t85" href="#t85">85</a></span><span class="t">                <span class="nam">P</span> <span class="op">=</span> <span class="nam">controller</span><span class="op">.</span><span class="nam">MS</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">levels</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">prob</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t86" href="#t86">86</a></span><span class="t">                <span class="nam">uinit</span> <span class="op">=</span> <span class="nam">P</span><span class="op">.</span><span class="nam">u_exact</span><span class="op">(</span><span class="nam">run_params</span><span class="op">[</span><span class="str">'t0'</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -182,9 +182,9 @@
     <p class="pln"><span class="n"><a id="t100" href="#t100">100</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t101" href="#t101">101</a></span><span class="t"><span class="key">if</span> <span class="nam">__name__</span> <span class="op">==</span> <span class="str">"__main__"</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t102" href="#t102">102</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t103" href="#t103">103</a></span><span class="t"><span class="str">    Routine to run convergence tests for the fully implicit solver using specified example with various preconditioners, time step sizes and collocation node counts</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t104" href="#t104">104</a></span><span class="t"><span class="str">    Error data is stored in a dictionary and then pickled for use with the loglog_plot.py routine</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t105" href="#t105">105</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc exc2 show_exc"><span class="n"><a id="t103" href="#t103">103</a></span><span class="t"><span class="str">    Routine to run convergence tests for the fully implicit solver using specified example with various preconditioners, time step sizes and collocation node counts</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc exc2 show_exc"><span class="n"><a id="t104" href="#t104">104</a></span><span class="t"><span class="str">    Error data is stored in a dictionary and then pickled for use with the loglog_plot.py routine</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc exc2 show_exc"><span class="n"><a id="t105" href="#t105">105</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t106" href="#t106">106</a></span><span class="t">    <span class="nam">description</span><span class="op">,</span> <span class="nam">controller_params</span><span class="op">,</span> <span class="nam">run_params</span> <span class="op">=</span> <span class="nam">setup</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t107" href="#t107">107</a></span><span class="t">    <span class="nam">conv_data</span> <span class="op">=</span> <span class="nam">run</span><span class="op">(</span><span class="nam">description</span><span class="op">,</span> <span class="nam">controller_params</span><span class="op">,</span> <span class="nam">run_params</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t108" href="#t108">108</a></span><span class="t">    <span class="nam">pickle</span><span class="op">.</span><span class="nam">dump</span><span class="op">(</span><span class="nam">conv_data</span><span class="op">,</span> <span class="nam">open</span><span class="op">(</span><span class="str">"data/dae_conv_data.p"</span><span class="op">,</span> <span class="str">'wb'</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -197,8 +197,8 @@
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_4ef83d310f553371_run_iteration_test_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.9.2">coverage.py v7.9.2</a>,
-            created at 2025-07-18 13:09 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.10.2">coverage.py v7.10.2</a>,
+            created at 2025-08-05 18:27 +0000
         </p>
     </div>
 </footer>

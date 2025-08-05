@@ -115,6 +115,27 @@ and number of Newton calls in each Newton iterations are counted.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.Van_der_Pol_implicit.vanderpol.solve_jacobian">
+<span class="sig-name descname"><span class="pre">solve_jacobian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Van_der_Pol_implicit.html#vanderpol.solve_jacobian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.solve_jacobian" title="Link to this definition">¶</a></dt>
+<dd><p>Solve the Jacobian for an Euler step, linearized around u.
+This defaults to an Euler step to accommodate linear problems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> – Right hand side for the Euler step</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – Step size for the Euler step</p></li>
+<li><p><strong>u</strong> – Solution to linearize around</p></li>
+<li><p><strong>u0</strong> – Initial guess</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Solution</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Van_der_Pol_implicit.vanderpol.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Van_der_Pol_implicit.html#vanderpol.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.solve_system" title="Link to this definition">¶</a></dt>
 <dd><p>Simple Newton solver for the nonlinear system.</p>
@@ -177,6 +198,7 @@ and number of Newton calls in each Newton iterations are counted.</p>
 <li><a class="reference internal" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.solve_jacobian"><code class="docutils literal notranslate"><span class="pre">solve_jacobian()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
 </ul>

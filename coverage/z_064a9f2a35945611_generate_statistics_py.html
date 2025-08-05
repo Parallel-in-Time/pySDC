@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Coverage for pySDC/projects/soft_failure/generate_statistics.py: 75%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_58284776.png">
-    <link rel="stylesheet" href="style_cb_81f8c14c.css" type="text/css">
+    <link rel="stylesheet" href="style_cb_6b508a39.css" type="text/css">
     <script src="coverage_html_cb_6fb7b396.js" defer></script>
 </head>
 <body class="pyfile">
@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_064a9f2a35945611_implicit_sweeper_faults_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.9.2">coverage.py v7.9.2</a>,
-            created at 2025-07-18 13:09 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.10.2">coverage.py v7.10.2</a>,
+            created at 2025-08-05 18:27 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -94,10 +94,10 @@
     <p class="run"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">soft_failure</span><span class="op">.</span><span class="nam">FaultHooks</span> <span class="key">import</span> <span class="nam">fault_hook</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">soft_failure</span><span class="op">.</span><span class="nam">implicit_sweeper_faults</span> <span class="key">import</span> <span class="nam">implicit_sweeper_faults</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">soft_failure</span><span class="op">.</span><span class="nam">visualization_helper</span> <span class="key">import</span> <span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t">    <span class="nam">show_residual_across_simulation</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t">    <span class="nam">show_min_max_residual_across_simulation</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t">    <span class="nam">show_iter_hist</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t"><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t">    <span class="nam">show_residual_across_simulation</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t">    <span class="nam">show_min_max_residual_across_simulation</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t">    <span class="nam">show_iter_hist</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t"><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t"><span class="key">def</span> <span class="nam">diffusion_setup</span><span class="op">(</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -394,8 +394,8 @@
     <p class="pln"><span class="n"><a id="t312" href="#t312">312</a></span><span class="t">    <span class="com"># fname = 'min_max_residuals.png'</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t313" href="#t313">313</a></span><span class="t">    <span class="nam">fname</span> <span class="op">=</span> <span class="nam">cwd</span> <span class="op">+</span> <span class="str">'data/'</span> <span class="op">+</span> <span class="nam">type</span> <span class="op">+</span> <span class="str">'_'</span> <span class="op">+</span> <span class="nam">str</span><span class="op">(</span><span class="nam">nruns</span><span class="op">)</span> <span class="op">+</span> <span class="str">'_'</span> <span class="op">+</span> <span class="str">'runs'</span> <span class="op">+</span> <span class="str">'_'</span> <span class="op">+</span> <span class="str">'min_max_residuals.png'</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t314" href="#t314">314</a></span><span class="t">    <span class="nam">show_min_max_residual_across_simulation</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t315" href="#t315">315</a></span><span class="t">        <span class="nam">fname</span><span class="op">=</span><span class="nam">fname</span><span class="op">,</span> <span class="nam">minres</span><span class="op">=</span><span class="nam">minres</span><span class="op">,</span> <span class="nam">maxres</span><span class="op">=</span><span class="nam">maxres</span><span class="op">,</span> <span class="nam">meanres</span><span class="op">=</span><span class="nam">meanres</span><span class="op">,</span> <span class="nam">medianres</span><span class="op">=</span><span class="nam">medianres</span><span class="op">,</span> <span class="nam">maxiter</span><span class="op">=</span><span class="nam">minlen</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t316" href="#t316">316</a></span><span class="t">    <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t315" href="#t315">315</a></span><span class="t">        <span class="nam">fname</span><span class="op">=</span><span class="nam">fname</span><span class="op">,</span> <span class="nam">minres</span><span class="op">=</span><span class="nam">minres</span><span class="op">,</span> <span class="nam">maxres</span><span class="op">=</span><span class="nam">maxres</span><span class="op">,</span> <span class="nam">meanres</span><span class="op">=</span><span class="nam">meanres</span><span class="op">,</span> <span class="nam">medianres</span><span class="op">=</span><span class="nam">medianres</span><span class="op">,</span> <span class="nam">maxiter</span><span class="op">=</span><span class="nam">minlen</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t316" href="#t316">316</a></span><span class="t">    <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t317" href="#t317">317</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t318" href="#t318">318</a></span><span class="t">    <span class="com"># calculate maximum number of iterations per test run</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t319" href="#t319">319</a></span><span class="t">    <span class="nam">maxiter</span> <span class="op">=</span> <span class="op">[</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
@@ -484,8 +484,8 @@
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_064a9f2a35945611_implicit_sweeper_faults_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.9.2">coverage.py v7.9.2</a>,
-            created at 2025-07-18 13:09 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.10.2">coverage.py v7.10.2</a>,
+            created at 2025-08-05 18:27 +0000
         </p>
     </div>
 </footer>

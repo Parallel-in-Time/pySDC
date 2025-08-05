@@ -204,6 +204,46 @@ as <cite>jac=jac</cite>.</p>
 <dd><p>Set up FieldsIO for MPI with the space decomposition of this problem</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="core.problem.Problem.solve_jacobian">
+<span class="sig-name descname"><span class="pre">solve_jacobian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/problem.html#Problem.solve_jacobian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.problem.Problem.solve_jacobian" title="Link to this definition">¶</a></dt>
+<dd><p>Solve the Jacobian for an Euler step, linearized around u.
+This defaults to an Euler step to accommodate linear problems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> – Right hand side for the Euler step</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – Step size for the Euler step</p></li>
+<li><p><strong>u</strong> – Solution to linearize around</p></li>
+<li><p><strong>u0</strong> – Initial guess</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Solution</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.problem.Problem.solve_system">
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/problem.html#Problem.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.problem.Problem.solve_system" title="Link to this definition">¶</a></dt>
+<dd><p>Perform an Euler step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> – Right hand side for the Euler step</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – Step size for the Euler step</p></li>
+<li><p><strong>u0</strong> – Initial guess</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>solution to the Euler step</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="core.problem.Problem.u_init">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">u_init</span></span><a class="headerlink" href="#core.problem.Problem.u_init" title="Link to this definition">¶</a></dt>
@@ -261,6 +301,8 @@ a function, e.g</p>
 <li><a class="reference internal" href="#core.problem.Problem.plot"><code class="docutils literal notranslate"><span class="pre">plot()</span></code></a></li>
 <li><a class="reference internal" href="#core.problem.Problem.processSolutionForOutput"><code class="docutils literal notranslate"><span class="pre">processSolutionForOutput()</span></code></a></li>
 <li><a class="reference internal" href="#core.problem.Problem.setUpFieldsIO"><code class="docutils literal notranslate"><span class="pre">setUpFieldsIO()</span></code></a></li>
+<li><a class="reference internal" href="#core.problem.Problem.solve_jacobian"><code class="docutils literal notranslate"><span class="pre">solve_jacobian()</span></code></a></li>
+<li><a class="reference internal" href="#core.problem.Problem.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 <li><a class="reference internal" href="#core.problem.Problem.u_init"><code class="docutils literal notranslate"><span class="pre">u_init</span></code></a></li>
 </ul>
 </li>

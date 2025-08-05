@@ -1,0 +1,7 @@
+implementations.controller\_classes.controller\_ParaDiag\_nonMPI module
+=======================================================================
+
+.. automodule:: implementations.controller_classes.controller_ParaDiag_nonMPI
+   :members:
+   :show-inheritance:
+   :undoc-members:

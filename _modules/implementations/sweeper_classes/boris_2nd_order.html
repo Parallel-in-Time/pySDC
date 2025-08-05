@@ -57,22 +57,21 @@
 <span class="sd">        Sx: node-to-node Euler half-step for position update</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine for the custom sweeper</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            params: parameters for the sweeper</span>
+<span class="sd">            level (pySDC.Level.level): the level that uses this sweeper</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># call parent&#39;s initialization routine</span>
 
         <span class="k">if</span> <span class="s2">&quot;QI&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
             <span class="n">params</span><span class="p">[</span><span class="s2">&quot;QI&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;IE&quot;</span>
         <span class="k">if</span> <span class="s2">&quot;QE&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
             <span class="n">params</span><span class="p">[</span><span class="s2">&quot;QE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;EE&quot;</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">boris_2nd_order</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">boris_2nd_order</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span>
 
         <span class="c1"># S- and SQ-matrices (derived from Q) and Sx- and ST-matrices for the integrator</span>
         <span class="p">[</span>

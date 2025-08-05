@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Coverage for pySDC/projects/FastWaveSlowWave/plot_stability.py: 95%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_58284776.png">
-    <link rel="stylesheet" href="style_cb_81f8c14c.css" type="text/css">
+    <link rel="stylesheet" href="style_cb_6b508a39.css" type="text/css">
     <script src="coverage_html_cb_6fb7b396.js" defer></script>
 </head>
 <body class="pyfile">
@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_60ee0c9d7735ef11_plot_stifflimit_specrad_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.9.2">coverage.py v7.9.2</a>,
-            created at 2025-07-18 13:09 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.10.2">coverage.py v7.10.2</a>,
+            created at 2025-08-05 18:27 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -208,16 +208,16 @@
     <p class="run"><span class="n"><a id="t126" href="#t126">126</a></span><span class="t">    <span class="key">if</span> <span class="nam">K</span> <span class="op">></span> <span class="num">0</span><span class="op">:</span>  <span class="com"># for K=0 and no 1.0 isoline, this crashes Matplotlib for somer reason</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t127" href="#t127">127</a></span><span class="t">        <span class="nam">plt</span><span class="op">.</span><span class="nam">clabel</span><span class="op">(</span><span class="nam">CS2</span><span class="op">,</span> <span class="nam">inline</span><span class="op">=</span><span class="key">True</span><span class="op">,</span> <span class="nam">fmt</span><span class="op">=</span><span class="str">'%3.2f'</span><span class="op">,</span> <span class="nam">fontsize</span><span class="op">=</span><span class="nam">fs</span> <span class="op">-</span> <span class="num">2</span><span class="op">,</span> <span class="nam">manual</span><span class="op">=</span><span class="nam">manual_locations</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t128" href="#t128">128</a></span><span class="t">    <span class="nam">plt</span><span class="op">.</span><span class="nam">gca</span><span class="op">(</span><span class="op">)</span><span class="op">.</span><span class="nam">add_patch</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t129" href="#t129">129</a></span><span class="t">        <span class="nam">Polygon</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t130" href="#t130">130</a></span><span class="t">            <span class="op">[</span><span class="op">[</span><span class="num">0</span><span class="op">,</span> <span class="num">0</span><span class="op">]</span><span class="op">,</span> <span class="op">[</span><span class="nam">lam_s_max</span><span class="op">,</span> <span class="num">0</span><span class="op">]</span><span class="op">,</span> <span class="op">[</span><span class="nam">lam_s_max</span><span class="op">,</span> <span class="nam">lam_s_max</span><span class="op">]</span><span class="op">]</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t131" href="#t131">131</a></span><span class="t">            <span class="nam">visible</span><span class="op">=</span><span class="key">True</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t132" href="#t132">132</a></span><span class="t">            <span class="nam">fill</span><span class="op">=</span><span class="key">True</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t133" href="#t133">133</a></span><span class="t">            <span class="nam">facecolor</span><span class="op">=</span><span class="str">'.75'</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t134" href="#t134">134</a></span><span class="t">            <span class="nam">edgecolor</span><span class="op">=</span><span class="str">'k'</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t135" href="#t135">135</a></span><span class="t">            <span class="nam">linewidth</span><span class="op">=</span><span class="num">1.0</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t136" href="#t136">136</a></span><span class="t">            <span class="nam">zorder</span><span class="op">=</span><span class="num">11</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t137" href="#t137">137</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t138" href="#t138">138</a></span><span class="t">    <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t129" href="#t129">129</a></span><span class="t">        <span class="nam">Polygon</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t130" href="#t130">130</a></span><span class="t">            <span class="op">[</span><span class="op">[</span><span class="num">0</span><span class="op">,</span> <span class="num">0</span><span class="op">]</span><span class="op">,</span> <span class="op">[</span><span class="nam">lam_s_max</span><span class="op">,</span> <span class="num">0</span><span class="op">]</span><span class="op">,</span> <span class="op">[</span><span class="nam">lam_s_max</span><span class="op">,</span> <span class="nam">lam_s_max</span><span class="op">]</span><span class="op">]</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t131" href="#t131">131</a></span><span class="t">            <span class="nam">visible</span><span class="op">=</span><span class="key">True</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t132" href="#t132">132</a></span><span class="t">            <span class="nam">fill</span><span class="op">=</span><span class="key">True</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t133" href="#t133">133</a></span><span class="t">            <span class="nam">facecolor</span><span class="op">=</span><span class="str">'.75'</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t134" href="#t134">134</a></span><span class="t">            <span class="nam">edgecolor</span><span class="op">=</span><span class="str">'k'</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t135" href="#t135">135</a></span><span class="t">            <span class="nam">linewidth</span><span class="op">=</span><span class="num">1.0</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t136" href="#t136">136</a></span><span class="t">            <span class="nam">zorder</span><span class="op">=</span><span class="num">11</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t137" href="#t137">137</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t138" href="#t138">138</a></span><span class="t">    <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t139" href="#t139">139</a></span><span class="t">    <span class="nam">plt</span><span class="op">.</span><span class="nam">gca</span><span class="op">(</span><span class="op">)</span><span class="op">.</span><span class="nam">set_xticks</span><span class="op">(</span><span class="nam">np</span><span class="op">.</span><span class="nam">arange</span><span class="op">(</span><span class="num">0</span><span class="op">,</span> <span class="nam">int</span><span class="op">(</span><span class="nam">lam_s_max</span><span class="op">)</span> <span class="op">+</span> <span class="num">1</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t140" href="#t140">140</a></span><span class="t">    <span class="nam">plt</span><span class="op">.</span><span class="nam">gca</span><span class="op">(</span><span class="op">)</span><span class="op">.</span><span class="nam">set_yticks</span><span class="op">(</span><span class="nam">np</span><span class="op">.</span><span class="nam">arange</span><span class="op">(</span><span class="num">0</span><span class="op">,</span> <span class="nam">int</span><span class="op">(</span><span class="nam">lam_f_max</span><span class="op">)</span> <span class="op">+</span> <span class="num">2</span><span class="op">,</span> <span class="num">2</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t141" href="#t141">141</a></span><span class="t">    <span class="nam">plt</span><span class="op">.</span><span class="nam">gca</span><span class="op">(</span><span class="op">)</span><span class="op">.</span><span class="nam">tick_params</span><span class="op">(</span><span class="nam">axis</span><span class="op">=</span><span class="str">'both'</span><span class="op">,</span> <span class="nam">which</span><span class="op">=</span><span class="str">'both'</span><span class="op">,</span> <span class="nam">labelsize</span><span class="op">=</span><span class="nam">fs</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -241,8 +241,8 @@
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_60ee0c9d7735ef11_plot_stifflimit_specrad_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.9.2">coverage.py v7.9.2</a>,
-            created at 2025-07-18 13:09 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.10.2">coverage.py v7.10.2</a>,
+            created at 2025-08-05 18:27 +0000
         </p>
     </div>
 </footer>

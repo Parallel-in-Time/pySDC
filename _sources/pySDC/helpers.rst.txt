@@ -8,6 +8,7 @@ Submodules
    :maxdepth: 2
 
    helpers.NCCL_communicator
+   helpers.ParaDiagHelper
    helpers.blocks
    helpers.fieldsIO
    helpers.firedrake_ensemble_communicator

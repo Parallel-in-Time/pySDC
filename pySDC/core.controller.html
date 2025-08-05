@@ -185,6 +185,28 @@ count or a residual based stopping criterion, as well as all convergence control
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="core.controller.ParaDiagController">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ParaDiagController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useMPI</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/controller.html#ParaDiagController"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.controller.ParaDiagController" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#core.controller.Controller" title="core.controller.Controller"><code class="xref py py-class docutils literal notranslate"><span class="pre">Controller</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.controller.ParaDiagController.FFT_in_time">
+<span class="sig-name descname"><span class="pre">FFT_in_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/controller.html#ParaDiagController.FFT_in_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.controller.ParaDiagController.FFT_in_time" title="Link to this definition">¶</a></dt>
+<dd><p>Compute weighted forward FFT in time. The weighting is determined by the alpha parameter in ParaDiag</p>
+<dl class="simple">
+<dt>Note: The implementation via matrix-vector multiplication may be inefficient and less stable compared to an FFT</dt><dd><p>with transposes!</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.controller.ParaDiagController.iFFT_in_time">
+<span class="sig-name descname"><span class="pre">iFFT_in_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/controller.html#ParaDiagController.iFFT_in_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.controller.ParaDiagController.iFFT_in_time" title="Link to this definition">¶</a></dt>
+<dd><p>Compute weighted backward FFT in time. The weighting is determined by the alpha parameter in ParaDiag</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 
@@ -208,6 +230,11 @@ count or a residual based stopping criterion, as well as all convergence control
 <li><a class="reference internal" href="#core.controller.Controller.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
 <li><a class="reference internal" href="#core.controller.Controller.setup_convergence_controllers"><code class="docutils literal notranslate"><span class="pre">setup_convergence_controllers()</span></code></a></li>
 <li><a class="reference internal" href="#core.controller.Controller.welcome_message"><code class="docutils literal notranslate"><span class="pre">welcome_message()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core.controller.ParaDiagController"><code class="docutils literal notranslate"><span class="pre">ParaDiagController</span></code></a><ul>
+<li><a class="reference internal" href="#core.controller.ParaDiagController.FFT_in_time"><code class="docutils literal notranslate"><span class="pre">FFT_in_time()</span></code></a></li>
+<li><a class="reference internal" href="#core.controller.ParaDiagController.iFFT_in_time"><code class="docutils literal notranslate"><span class="pre">iFFT_in_time()</span></code></a></li>
 </ul>
 </li>
 </ul>
