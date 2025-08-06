@@ -270,5 +270,5 @@ class Sweeper(object):
         k : int
             Index of the sweep (0 for initial sweep, 1 for the first one, ...).
         """
-        if self.params.QI == 'MIN-SR-FLEX':
+        if self.params.QI.lower() in ['min-sr-flex', 'min_sr_flex']:
             self.QI = self.get_Qdelta_implicit(qd_type="MIN-SR-FLEX", k=k)
