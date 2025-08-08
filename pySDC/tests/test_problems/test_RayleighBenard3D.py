@@ -11,7 +11,7 @@ def test_eval_f(nx, nz, direction, spectral_space):
     import numpy as np
     from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
 
-    P = RayleighBenard3D(nx=nx, ny=nx, nz=nz, Rayleigh=1, spectral_space=spectral_space)
+    P = RayleighBenard3D(nx=nx, ny=nx, nz=nz, Rayleigh=1, spectral_space=spectral_space, Lx=1, Ly=1, Lz=1)
     iu, iv, iw, ip, iT = P.index(['u', 'v', 'w', 'p', 'T'])
     X, Y, Z = P.X, P.Y, P.Z
     cos, sin = np.cos, np.sin
@@ -297,7 +297,7 @@ def test_heterogeneous_implementation():
 def test_Nusselt_number_computation(w, N=4):
     from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
 
-    prob = RayleighBenard3D(nx=N, ny=N, nz=N, dealiasing=1.0, spectral_space=False)
+    prob = RayleighBenard3D(nx=N, ny=N, nz=N, dealiasing=1.0, spectral_space=False, Rayleigh=1.0, Prandtl=1.0)
     xp = prob.xp
     iw, iT = prob.index(['w', 'T'])
 
@@ -341,12 +341,58 @@ def test_Nusselt_number_computation(w, N=4):
         assert xp.isclose(Nu[key], w), f'Expected Nu_{key}={w}, but got {Nu[key]} with constant T and perturbed w!'
 
 
+@pytest.mark.mpi4py
+@pytest.mark.mpi(ranks=[1, 2, 5])
+def test_spectrum_computation(mpi_ranks):
+    from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
+
+    N = 5
+    prob = RayleighBenard3D(nx=N, ny=N, nz=2, dealiasing=1.0, spectral_space=False, Rayleigh=1.0)
+    xp = prob.xp
+    iu, iv = prob.index(['u', 'v'])
+
+    num_k = int(N // 2) + 1
+
+    u = prob.u_exact() * 0
+    u[iu] = 1
+    ks, spectrum = prob.get_frequency_spectrum(u)
+
+    expect_spectrum = xp.zeros((prob.nz, num_k))
+    expect_spectrum[:, 0] = 1
+
+    assert len(ks) == num_k
+    assert xp.allclose(spectrum[iv], 0)
+    assert xp.allclose(spectrum[iu], expect_spectrum)
+
+    assert N >= 5
+    u = prob.u_exact() * 0
+    u[iu] = xp.sin(prob.Y * 2 * xp.pi / prob.axes[1].L)
+    ks, spectrum = prob.get_frequency_spectrum(u)
+    assert xp.allclose(spectrum[iu, :, 2:], 0)
+    assert not xp.allclose(spectrum[iu, :, :2], 0)
+
+    assert N >= 5
+    u = prob.u_exact() * 0
+    u[iu] = xp.sin(prob.X * 2 * xp.pi / prob.axes[0].L) * xp.sin(prob.Y * 2 * xp.pi / prob.axes[1].L)
+    ks, spectrum = prob.get_frequency_spectrum(u)
+    assert xp.allclose(spectrum[iu, :, 2:], 0)
+    assert xp.allclose(spectrum[iu, :, 0], 0)
+    assert not xp.allclose(spectrum[iu, :, 1], 0)
+
+    assert N >= 5
+    u = prob.u_exact() * 0
+    u[iu] = xp.sin(prob.X * 4 * xp.pi / prob.axes[0].L) * xp.sin(prob.Y * 2 * xp.pi / prob.axes[1].L)
+    ks, spectrum = prob.get_frequency_spectrum(u)
+    assert not xp.allclose(spectrum[iu, :, 1:], 0)
+    assert xp.allclose(spectrum[iu, :, 0], 0)
+
+
 if __name__ == '__main__':
-    # test_eval_f(2**2, 2**1, 'x', False)
+    test_eval_f(2**2, 2**1, 'x', False)
     # test_libraries()
     # test_Poisson_problems(4, 'u')
     # test_Poisson_problem_w()
     # test_solver_convergence('bicgstab+ilu', 32, False, True)
     # test_banded_matrix(False)
     # test_heterogeneous_implementation()
-    test_Nusselt_number_computation(N=4, w=3.14)
+    # test_Nusselt_number_computation(N=4, w=3.14)

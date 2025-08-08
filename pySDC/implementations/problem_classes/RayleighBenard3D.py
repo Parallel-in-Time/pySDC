@@ -28,9 +28,9 @@ class RayleighBenard3D(GenericSpectralLinear):
 
     The domain, vertical boundary conditions and pressure gauge are
 
-        Omega = [0, 8) x (-1, 1)
+        Omega = [0, Lx) x [0, Ly] x (0, Lz)
         T(z=+1) = 0
-        T(z=-1) = 2
+        T(z=-1) = Lz
         u(z=+-1) = v(z=+-1) = 0
         integral over p = 0
 
@@ -53,16 +53,16 @@ class RayleighBenard3D(GenericSpectralLinear):
     def __init__(
         self,
         Prandtl=1,
-        Rayleigh=2e6,
-        nx=256,
-        ny=256,
-        nz=64,
+        Rayleigh=1e6,
+        nx=64,
+        ny=64,
+        nz=32,
         BCs=None,
         dealiasing=1.5,
         comm=None,
         Lz=1,
-        Lx=1,
-        Ly=1,
+        Lx=4,
+        Ly=4,
         useGPU=False,
         **kwargs,
     ):
@@ -79,7 +79,6 @@ class RayleighBenard3D(GenericSpectralLinear):
             comm (mpi4py.Intracomm): Space communicator
             Lx (float): Horizontal length of the domain
         """
-        # TODO: documentation
         BCs = {} if BCs is None else BCs
         BCs = {
             'T_top': 0,
@@ -328,7 +327,7 @@ class RayleighBenard3D(GenericSpectralLinear):
         _me[0] = u_pad[iw] * u_pad[iT]
         wT_hat = self.transform(_me, padding=padding)[0]
 
-        nusselt_hat = wT_hat - DzT_hat
+        nusselt_hat = (wT_hat / self.kappa - DzT_hat) * self.axes[-1].L
 
         if not hasattr(self, '_zInt'):
             self._zInt = zAxis.get_integration_matrix()
@@ -354,3 +353,55 @@ class RayleighBenard3D(GenericSpectralLinear):
             't': Nusselt_t,
             'b': Nusselt_b,
         }
+
+    def get_frequency_spectrum(self, u):
+        xp = self.xp
+        indices = slice(0, 2)
+
+        # transform the solution to be in frequency space in x and y, but real space in z
+        if self.spectral_space:
+            u_hat = self.itransform(u, axes=(-1,))
+        else:
+            u_hat = self.transform(
+                u,
+                axes=(
+                    -3,
+                    -2,
+                ),
+            )
+        u_hat = self.spectral.redistribute(u_hat, axis=2, forward_output=False)
+
+        # compute "energy density" as absolute square of the velocity modes
+        energy = (u_hat[indices] * xp.conjugate(u_hat[indices])).real / (self.axes[0].N ** 2 * self.axes[1].N ** 2)
+
+        # prepare wave numbers at which to compute the spectrum
+        abs_kx = xp.abs(self.Kx[:, :, 0])
+        abs_ky = xp.abs(self.Ky[:, :, 0])
+
+        unique_k = xp.unique(xp.append(xp.unique(abs_kx), xp.unique(abs_ky)))
+        n_k = len(unique_k)
+
+        # compute local spectrum
+        local_spectrum = self.xp.empty(shape=(2, energy.shape[3], n_k))
+        for i, k in zip(range(n_k), unique_k):
+            mask = xp.logical_or(abs_kx == k, abs_ky == k)
+            local_spectrum[..., i] = xp.sum(energy[indices, mask, :], axis=1)
+
+        # assemble global spectrum from local spectra
+        k_all = self.comm.allgather(unique_k)
+        unique_k_all = []
+        for k in k_all:
+            unique_k_all = xp.unique(xp.append(unique_k_all, xp.unique(k)))
+        n_k_all = len(unique_k_all)
+
+        spectra = self.comm.allgather(local_spectrum)
+        spectrum = self.xp.zeros(shape=(2, self.axes[2].N, n_k_all))
+        for ks, _spectrum in zip(k_all, spectra):
+            ks = list(ks)
+            unique_k_all = list(unique_k_all)
+            for k in ks:
+                index_global = unique_k_all.index(k)
+                index_local = ks.index(k)
+                spectrum[..., index_global] += _spectrum[..., index_local]
+
+        return xp.array(unique_k_all), spectrum
