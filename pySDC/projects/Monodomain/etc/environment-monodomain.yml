@@ -17,7 +17,7 @@ dependencies:
   - pytest-order
   - coverage[toml]
   - sphinx
-  - numdifftools
+  - numdifftools>=0.9.41
   - pybind11
   - mpi4py
   - mpich

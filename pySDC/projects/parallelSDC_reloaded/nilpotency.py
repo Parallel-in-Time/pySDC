@@ -3,7 +3,7 @@
 """
 Created on Fri Dec 22 17:17:14 2023
 
-Evaluate the nilpotency of diagonal preconditionners MIN-SR-S and MIN-SR-NS
+Evaluate the nilpotency of diagonal preconditioners MIN-SR-S and MIN-SR-NS
 with increasing number of nodes.
 """
 import numpy as np
@@ -36,7 +36,7 @@ nil_MIN_SR_S = []
 nil_MIN_SR_NS = []
 nNodes = range(2, 20)
 for m in nNodes:
-    s = Sweeper({"num_nodes": m, "quad_type": quadType, "node_type": nodeType})
+    s = Sweeper({"num_nodes": m, "quad_type": quadType, "node_type": nodeType}, None)
     Q = s.coll.Qmat[1:, 1:]
     nodes = s.coll.nodes
 

@@ -15,7 +15,7 @@ def test_differentiation_matrix(N, p):
     D = helper.get_differentiation_matrix(p=p)
     Q = helper.get_basis_change_matrix(p_in=p, p_out=0)
 
-    du = helper.itransform(Q @ D @ coeffs)
+    du = helper.itransform(Q @ D @ coeffs, axes=(-1,))
     exact = np.polynomial.Chebyshev(coeffs).deriv(p)(x)
 
     assert np.allclose(exact, du)
@@ -46,7 +46,7 @@ def test_differentiation_non_standard_domain_size(N, x0, x1, p):
     Q = helper.get_basis_change_matrix(p_in=p, p_out=0)
 
     du_hat = Q @ D @ u_hat
-    du = helper.itransform(du_hat)
+    du = helper.itransform(du_hat, axes=(-1,))
 
     assert np.allclose(du_hat_exact, du_hat), np.linalg.norm(du_hat_exact - du_hat)
     assert np.allclose(du, du_exact), np.linalg.norm(du_exact - du)
@@ -69,6 +69,42 @@ def test_integration(N):
     U_hat[0] = helper.get_integration_constant(U_hat, axis=-1)
 
     assert np.allclose(poly.integ(lbnd=-1).coef[:-1], U_hat)
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('N', [4, 7, 32])
+@pytest.mark.parametrize('x0', [-1, 0])
+def test_integration_rescaled_domain(N, x0, x1=1):
+    import numpy as np
+    from pySDC.helpers.spectral_helper import UltrasphericalHelper
+
+    helper = UltrasphericalHelper(N, x0=x0, x1=x1)
+
+    x = helper.get_1dgrid()
+    y = N - 2
+    u = x**y * (y + 1)
+    u_hat = helper.transform(u)
+
+    S = helper.get_integration_matrix()
+    U_hat = S @ u_hat
+    U_hat[0] = helper.get_integration_constant(U_hat, axis=-1)
+
+    int_expect = x ** (y + 1)
+    int_hat_expect = helper.transform(int_expect)
+
+    # compare indefinite integral
+    assert np.allclose(int_hat_expect[1:], U_hat[1:])
+    if x0 == 0:
+        assert np.allclose(int_hat_expect[0], U_hat[0]), 'Integration constant is wrong!'
+
+    # compare definite integral
+    top = helper.get_BC(kind='dirichlet', x=1)
+    bot = helper.get_BC(kind='dirichlet', x=-1)
+    res = ((top - bot) * U_hat).sum()
+    if x0 == 0:
+        assert np.isclose(res, 1)
+    elif x0 == -1:
+        assert np.isclose(res, 0 if y % 2 == 1 else 2)
 
 
 @pytest.mark.base
@@ -119,7 +155,7 @@ def test_poisson_problem(N, deg, Dirichlet_recombination):
 
     u_hat = Pr @ sp.linalg.spsolve(A @ Pr, rhs)
 
-    u = helper.itransform(u_hat)
+    u = helper.itransform(u_hat, axes=(-1,))
 
     u_exact = (a - b) / 2 * x ** (deg + 2) + (b + a) / 2
 

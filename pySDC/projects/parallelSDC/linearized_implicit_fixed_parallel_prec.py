@@ -11,19 +11,19 @@ class linearized_implicit_fixed_parallel_prec(linearized_implicit_fixed_parallel
         D: eigenvalues of the QI
     """
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """
         Initialization routine for the custom sweeper
 
         Args:
             params: parameters for the sweeper
+            level (pySDC.Level.level): the level that uses this sweeper
         """
 
         if 'fixed_time_in_jacobian' not in params:
             params['fixed_time_in_jacobian'] = 0
 
-        # call parent's initialization routine
-        super(linearized_implicit_fixed_parallel, self).__init__(params)
+        super().__init__(params, level)
 
         assert self.params.fixed_time_in_jacobian in range(self.coll.num_nodes + 1), (
             "ERROR: fixed_time_in_jacobian is too small or too large, got %s" % self.params.fixed_time_in_jacobian

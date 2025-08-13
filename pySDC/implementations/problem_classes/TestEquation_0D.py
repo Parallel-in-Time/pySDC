@@ -173,11 +173,8 @@ class test_equation_IMEX(Problem):
                 [[complex(re[i], im[j]) for i in range(len(re))] for j in range(len(im))]
             ).reshape((len(re) * len(im)))
         if lambdas_explicit is None:
-            re = self.xp.linspace(-30, 19, 50)
-            im = self.xp.linspace(-50, 49, 50)
-            lambdas_implicit = self.xp.array(
-                [[complex(re[i], im[j]) for i in range(len(re))] for j in range(len(im))]
-            ).reshape((len(re) * len(im)))
+            lambdas_explicit = lambdas_implicit.copy()
+
         lambdas_implicit = self.xp.asarray(lambdas_implicit)
         lambdas_explicit = self.xp.asarray(lambdas_explicit)
 

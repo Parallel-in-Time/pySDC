@@ -16,12 +16,13 @@ class verlet(Sweeper):
         qQ: update rule for final value (if needed)
     """
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """
         Initialization routine for the custom sweeper
 
         Args:
             params: parameters for the sweeper
+            level (pySDC.Level.level): the level that uses this sweeper
         """
 
         if 'QI' not in params:
@@ -29,8 +30,7 @@ class verlet(Sweeper):
         if 'QE' not in params:
             params['QE'] = 'EE'
 
-        # call parent's initialization routine
-        super(verlet, self).__init__(params)
+        super(verlet, self).__init__(params, level)
 
         # Trapezoidal rule, Qx and Double-Q as in the Boris-paper
         [self.QT, self.Qx, self.QQ] = self.__get_Qd()

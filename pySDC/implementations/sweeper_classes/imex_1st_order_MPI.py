@@ -4,11 +4,11 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 
 class imex_1st_order_MPI(SweeperMPI, imex_1st_order):
-    def __init__(self, params):
-        super().__init__(params)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         assert (
             self.params.QE == 'PIC'
-        ), f"Only Picard is implemented for explicit precondioner so far in {type(self).__name__}! You chose \"{self.params.QE}\""
+        ), f"Only Picard is implemented for explicit preconditioner so far in {type(self).__name__}! You chose \"{self.params.QE}\""
 
     def integrate(self, last_only=False):
         """
@@ -53,6 +53,9 @@ class imex_1st_order_MPI(SweeperMPI, imex_1st_order):
 
         # gather all terms which are known already (e.g. from the previous iteration)
         # this corresponds to u0 + QF(u^k) - QdF(u^k) + tau
+
+        # update the MIN-SR-FLEX preconditioner
+        self.updateVariableCoeffs(L.status.sweep)
 
         # get QF(u^k)
         rhs = self.integrate()

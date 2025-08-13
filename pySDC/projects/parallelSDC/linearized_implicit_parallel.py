@@ -8,19 +8,19 @@ class linearized_implicit_parallel(generic_implicit):
     Parallel sweeper using Newton for linearization
     """
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """
         Initialization routine for the custom sweeper
 
         Args:
             params: parameters for the sweeper
+            level (pySDC.Level.level): the level that uses this sweeper
         """
 
         if 'fixed_time_in_jacobian' not in params:
             params['fixed_time_in_jacobian'] = 0
 
-        # call parent's initialization routine
-        super(linearized_implicit_parallel, self).__init__(params)
+        super().__init__(params, level)
 
         self.D, self.V = np.linalg.eig(self.QI[1:, 1:])
         self.Vi = np.linalg.inv(self.V)

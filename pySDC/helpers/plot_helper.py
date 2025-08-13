@@ -1,6 +1,6 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from distutils.spawn import find_executable
+import shutil
 
 default_mpl_params = mpl.rcParams.copy()
 
@@ -100,7 +100,7 @@ def setup_mpl(font_size=8, reset=False):
 
     mpl.rcParams.update(style_options)
 
-    if find_executable('latex'):
+    if shutil.which('latex'):
         latex_support = {
             "pgf.texsystem": "pdflatex",  # change this if using xetex or lautex
             "text.usetex": True,  # use LaTeX to write all text
@@ -125,7 +125,7 @@ def newfig(textwidth, scale, ratio=0.6180339887):
 
 
 def savefig(filename, save_pdf=True, save_pgf=True, save_png=True):
-    if save_pgf and find_executable('latex'):
+    if save_pgf and shutil.which('latex'):
         plt.savefig('{}.pgf'.format(filename), bbox_inches='tight')
     if save_pdf:
         plt.savefig('{}.pdf'.format(filename), bbox_inches='tight')
