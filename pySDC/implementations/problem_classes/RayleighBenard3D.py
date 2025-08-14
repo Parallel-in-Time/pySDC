@@ -355,6 +355,21 @@ class RayleighBenard3D(GenericSpectralLinear):
         }
 
     def get_frequency_spectrum(self, u):
+        """
+        Compute the frequency spectrum of the velocities in x and y direction in the horizontal plane for every point in
+        z. If the problem is well resolved, the coefficients will decay quickly with the wave number, and the reverse
+        indicates that the resolution is too low.
+
+        The returned spectrum has three dimensions. The first is for component (i.e. u or v), the second is for every
+        point in z and the third is the energy in every wave number.
+
+        Args:
+            u: The solution you want to compute the spectrum of
+
+        Returns:
+            RayleighBenard3D.xp.ndarray: wave numbers
+            RayleighBenard3D.xp.ndarray: spectrum
+        """
         xp = self.xp
         indices = slice(0, 2)
 
