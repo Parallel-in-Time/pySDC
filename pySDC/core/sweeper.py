@@ -87,6 +87,9 @@ class Sweeper(object):
 
         self.__level = level
         self.parallelizable = False
+        for name in ["genQI", "genQE"]:
+            if hasattr(self, name):
+                delattr(self, name)
 
     def buildGenerator(self, qdType: str) -> QDeltaGenerator:
         return QDELTA_GENERATORS[qdType](qGen=self.coll.generator, tLeft=self.coll.tleft)
