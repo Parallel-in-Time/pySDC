@@ -3,7 +3,6 @@ import numpy as np
 from qmat.qdelta import QDeltaGenerator, QDELTA_GENERATORS
 
 from pySDC.core.errors import ParameterError
-from pySDC.core.level import Level
 from pySDC.core.collocation import CollBase
 from pySDC.helpers.pysdc_helper import FrozenClass
 
@@ -245,6 +244,8 @@ class Sweeper(object):
         Args:
             L (pySDC.Level.level): current level
         """
+        from pySDC.core.level import Level
+
         assert isinstance(L, Level)
         self.__level = L
 
