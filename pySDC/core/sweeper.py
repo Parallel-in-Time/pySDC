@@ -8,7 +8,7 @@ from pySDC.helpers.pysdc_helper import FrozenClass
 
 
 # Organize QDeltaGenerator class in dict[type(QDeltaGenerator),set(str)] to retrieve aliases
-QDELTA_GENERATORS_ALIASES = {v: [] for v in set(QDELTA_GENERATORS.values())}
+QDELTA_GENERATORS_ALIASES = {v: set() for v in set(QDELTA_GENERATORS.values())}
 for k, v in QDELTA_GENERATORS.items():
     QDELTA_GENERATORS_ALIASES[v].add(k)
 
@@ -262,9 +262,9 @@ class Sweeper(object):
         k : int
             Index of the sweep (0 for initial sweep, 1 for the first one, ...).
         """
-        if self.genQI.isKDependent():
+        if hasattr(self, "genQI") and self.genQI.isKDependent():
             qdType = type(self.genQI).__name__
             self.QI = self.get_Qdelta_implicit(qdType, k=k)
-        if self.genQE.isKDependent():
+        if hasattr(self, "genQE") and self.genQE.isKDependent():
             qdType = type(self.genQE).__name__
             self.QE = self.get_Qdelta_explicit(qdType, k=k)
