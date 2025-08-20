@@ -59,6 +59,7 @@ class Config(object):
     sweeper_type = None
     Tend = None
     base_path = './'
+    logging_time_increment = 0.5
 
     def __init__(self, args, comm_world=None):
         from mpi4py import MPI
@@ -72,6 +73,21 @@ class Config(object):
             self.comms = [MPI.COMM_SELF, MPI.COMM_SELF, MPI.COMM_SELF]
         self.ranks = [me.rank for me in self.comms]
 
+    def get_file_name(self):
+        res = self.args['res']
+        return f'{self.base_path}/data/{type(self).__name__}-res{res}.pySDC'
+
+    def get_LogToFile(self, *args, **kwargs):
+        if self.comms[1].rank > 0:
+            return None
+        from pySDC.implementations.hooks.log_solution import LogToFile
+
+        LogToFile.filename = self.get_file_name()
+        LogToFile.time_increment = self.logging_time_increment
+        LogToFile.allow_overwriting = True
+
+        return LogToFile
+
     def get_description(self, *args, MPIsweeper=False, useGPU=False, **kwargs):
         description = {}
         description['problem_class'] = None
@@ -83,7 +99,8 @@ class Config(object):
         description['convergence_controllers'] = {}
 
         if self.get_LogToFile():
-            description['convergence_controllers'][LogStats] = {}
+            path = self.get_file_name()[:-6]
+            description['convergence_controllers'][LogStats] = {'path': path}
 
         if MPIsweeper:
             description['sweeper_params']['comm'] = self.comms[1]
@@ -137,7 +154,27 @@ class Config(object):
         raise NotImplementedError
 
     def get_initial_condition(self, P, *args, restart_idx=0, **kwargs):
-        if restart_idx > 0:
+        if restart_idx == 0:
+            return P.u_exact(t=0), 0
+        else:
+
+            from pySDC.helpers.fieldsIO import FieldsIO
+
+            P.setUpFieldsIO()
+            outfile = FieldsIO.fromFile(self.get_file_name())
+
+            t0, solution = outfile.readField(restart_idx)
+            solution = solution[: P.spectral.ncomponents, ...]
+
+            u0 = P.u_init
+
+            if P.spectral_space:
+                u0[...] = P.transform(solution)
+            else:
+                u0[...] = solution
+
+            return u0, t0
+
             LogToFile = self.get_LogToFile()
             file = LogToFile.load(restart_idx)
             LogToFile.counter = restart_idx
@@ -150,26 +187,19 @@ class Config(object):
             else:
                 u0[...] = file['u']
             return u0, file['t']
-        else:
-            return P.u_exact(t=0), 0
-
-    def get_LogToFile(self):
-        return None
 
 
 class LogStats(ConvergenceController):
 
-    @staticmethod
-    def get_stats_path(hook, counter_offset=-1, index=None):
-        index = hook.counter + counter_offset if index is None else index
-        return f'{hook.path}/{hook.file_name}_{hook.format_index(index)}-stats.pickle'
+    def get_stats_path(self, index=0):
+        return f'{self.params.path}_{self.counter:06d}-stats.pickle'
 
     def merge_all_stats(self, controller):
         hook = self.params.hook
 
         stats = {}
         for i in range(hook.counter):
-            with open(self.get_stats_path(hook, index=i), 'rb') as file:
+            with open(self.get_stats_path(index=i), 'rb') as file:
                 _stats = pickle.load(file)
                 stats = {**stats, **_stats}
 
@@ -184,12 +214,11 @@ class LogStats(ConvergenceController):
     def setup(self, controller, params, *args, **kwargs):
         params['control_order'] = 999
         if 'hook' not in params.keys():
-            from pySDC.implementations.hooks.log_solution import LogToFileAfterXs
+            from pySDC.implementations.hooks.log_solution import LogToFile
 
-            params['hook'] = LogToFileAfterXs
+            params['hook'] = LogToFile
 
         self.counter = params['hook'].counter
-
         return super().setup(controller, params, *args, **kwargs)
 
     def post_step_processing(self, controller, S, **kwargs):
@@ -199,16 +228,18 @@ class LogStats(ConvergenceController):
             _hook.post_step(S, 0)
 
         P = S.levels[0].prob
-        skip_logging = False
-        if hasattr(P, 'comm'):
-            if P.comm.rank > 0:
-                skip_logging = True
-                return None
 
+        if S.time > 0 and self.counter == 0:
+            self.counter = hook.counter - 1
         while self.counter < hook.counter:
-            path = self.get_stats_path(hook, index=self.counter)
+            path = self.get_stats_path(index=self.counter)
             stats = controller.return_stats()
-            if hook.logging_condition(S.levels[0]) and not skip_logging:
+            store = True
+            if hasattr(S.levels[0].sweep, 'comm') and S.levels[0].sweep.comm.rank > 0:
+                store = False
+            elif P.comm.rank > 0:
+                store = False
+            if store:
                 with open(path, 'wb') as file:
                     pickle.dump(stats, file)
                     self.log(f'Stored stats in {path!r}', S)

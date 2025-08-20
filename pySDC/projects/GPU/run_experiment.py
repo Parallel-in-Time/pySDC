@@ -155,6 +155,7 @@ def make_video(args, config):  # pragma: no cover
     cmd = f'ffmpeg -i {path} -pix_fmt yuv420p -r 9 -s 2048:1536 -y {path_target}'.split()
 
     subprocess.run(cmd)
+    print(f'Made video {path_target!r}')
 
 
 if __name__ == '__main__':

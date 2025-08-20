@@ -378,6 +378,38 @@ class RayleighBenard(GenericSpectralLinear):
         vorticity_hat[0] = (Dx * u_hat[iv].flatten() + Dz @ u_hat[iu].flatten()).reshape(u[iu].shape)
         return self.itransform(vorticity_hat)[0].real
 
+    def getOutputFile(self, fileName):
+        from pySDC.helpers.fieldsIO import Rectilinear
+
+        self.setUpFieldsIO()
+
+        coords = [me.get_1dgrid() for me in self.spectral.axes]
+        assert np.allclose([len(me) for me in coords], self.spectral.global_shape[1:])
+
+        fOut = Rectilinear(np.float64, fileName=fileName)
+        fOut.setHeader(nVar=len(self.components) + 1, coords=coords)
+        fOut.initialize()
+        return fOut
+
+    def processSolutionForOutput(self, u):
+        vorticity = self.compute_vorticity(u)
+
+        if self.spectral_space:
+            u_real = self.itransform(u).real
+        else:
+            u_real = u.real
+
+        me = np.empty(shape=(u_real.shape[0] + 1, *vorticity.shape))
+        me[:-1] = u_real
+        me[-1] = vorticity
+        return me
+        print(u.shape, vorticity.shape)
+        exit()
+        if self.spectral_space:
+            return np.array(self.itransform(u).real)
+        else:
+            return np.array(u.real)
+
     def compute_Nusselt_numbers(self, u):
         """
         Compute the various versions of the Nusselt number. This reflects the type of heat transport.
@@ -407,10 +439,10 @@ class RayleighBenard(GenericSpectralLinear):
         u_pad = self.itransform(u_hat, padding=padding).real
         _me = self.xp.zeros_like(u_pad)
         _me[0] = u_pad[iv] * u_pad[iT]
-        vT_hat = self.transform(_me, padding=padding)
+        vT_hat = self.transform(_me, padding=padding)[0]
 
-        nusselt_hat = (vT_hat[0] - DzT_hat[iT]) / self.nx
-        nusselt_no_v_hat = (-DzT_hat[iT]) / self.nx
+        # nusselt_hat = (vT_hat - DzT_hat[iT]) / self.nx
+        nusselt_hat = (vT_hat / self.kappa - DzT_hat) * self.axes[-1].L
 
         integral_z = self.xp.sum(nusselt_hat * self.spectral.axes[1].get_BC(kind='integral'), axis=-1).real
         integral_V = (
@@ -424,20 +456,11 @@ class RayleighBenard(GenericSpectralLinear):
         Nusselt_b = self.comm.bcast(
             self.xp.sum(nusselt_hat * self.spectral.axes[1].get_BC(kind='Dirichlet', x=-1), axis=-1).real[0], root=0
         )
-        Nusselt_no_v_t = self.comm.bcast(
-            self.xp.sum(nusselt_no_v_hat * self.spectral.axes[1].get_BC(kind='Dirichlet', x=1), axis=-1).real[0], root=0
-        )
-        Nusselt_no_v_b = self.comm.bcast(
-            self.xp.sum(nusselt_no_v_hat * self.spectral.axes[1].get_BC(kind='Dirichlet', x=-1), axis=-1).real[0],
-            root=0,
-        )
 
         return {
             'V': Nusselt_V,
             't': Nusselt_t,
             'b': Nusselt_b,
-            't_no_v': Nusselt_no_v_t,
-            'b_no_v': Nusselt_no_v_b,
         }
 
     def compute_viscous_dissipation(self, u):
