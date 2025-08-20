@@ -1,6 +1,6 @@
 import logging
 
-from pySDC.core import level as levclass
+from pySDC.core.level import Level
 from pySDC.core.base_transfer import BaseTransfer
 from pySDC.core.errors import ParameterError
 from pySDC.helpers.pysdc_helper import FrozenClass
@@ -73,7 +73,7 @@ class Step(FrozenClass):
         # empty attributes
         self.__transfer_dict = {}
         self.base_transfer = None
-        self.levels = []
+        self.levels: list[Level] = []
         self.__prev = None
         self.__next = None
 
@@ -149,7 +149,7 @@ class Step(FrozenClass):
 
         # generate levels, register and connect if needed
         for l in range(len(descr_list)):
-            L = levclass.Level(
+            L = Level(
                 problem_class=descr_list[l]['problem_class'],
                 problem_params=descr_list[l]['problem_params'],
                 sweeper_class=descr_list[l]['sweeper_class'],
