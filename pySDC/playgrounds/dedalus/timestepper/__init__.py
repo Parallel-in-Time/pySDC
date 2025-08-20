@@ -98,18 +98,9 @@ class IMEXSDCCore(object):
         nNodes=DEFAULT['nNodes'], nodeType=nodeType, quadType=quadType)
     nodes, weights, Q = coll.genCoeffs()
     # IMEX SDC attributes, QDelta matrices are 3D with shape (K, M, M)
-    QDeltaI, dtauI = genQDeltaCoeffs(
-        implSweep, dTau=True, nSweeps=nSweeps,
-        Q=Q, nodes=nodes, nNodes=DEFAULT['nNodes'],
-        nodeType=nodeType, quadType=quadType)
-    QDeltaE, dtauE = genQDeltaCoeffs(
-        explSweep, dTau=True, nSweeps=nSweeps,
-        Q=Q, nodes=nodes, nNodes=DEFAULT['nNodes'],
-        nodeType=nodeType, quadType=quadType)
-    QDelta0 = genQDeltaCoeffs(
-        initSweepQDelta,
-        Q=Q, nodes=nodes, nNodes=DEFAULT['nNodes'],
-        nodeType=nodeType, quadType=quadType)
+    QDeltaI, dtauI = genQDeltaCoeffs(implSweep, dTau=True, nSweeps=nSweeps, qGen=coll)
+    QDeltaE, dtauE = genQDeltaCoeffs(explSweep, dTau=True, nSweeps=nSweeps, qGen=coll)
+    QDelta0 = genQDeltaCoeffs(initSweepQDelta, qGen=coll)
 
     diagonal = np.all([np.diag(np.diag(qD)) == qD for qD in QDeltaI])
     diagonal *= np.all([np.diag(np.diag(qD)) == 0 for qD in QDeltaE])

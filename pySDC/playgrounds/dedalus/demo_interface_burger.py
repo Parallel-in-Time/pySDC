@@ -10,22 +10,24 @@ import dedalus.public as d3
 import logging
 logger = logging.getLogger(__name__)
 
-from problem import DedalusProblem
-from sweeper import DedalusSweeperIMEX
+from pySDC.playgrounds.dedalus.interface.problem import DedalusProblem
+from pySDC.playgrounds.dedalus.interface.sweeper import DedalusSweeperIMEX
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
-
-# Parameters
+# Space parameters
 Lx = 10
-Nx = 1024
+Nx = 512
 a = 1e-4
 b = 2e-4
 dealias = 3/2
 dtype = np.float64
 
+# Time-integration parameters
+nSweeps = 4
+nNodes = 4
 tEnd = 10
-nSteps = 10000
-
+nSteps = 5000
+timeStep = tEnd / nSteps
 
 # Bases
 xcoord = d3.Coordinate('x')
@@ -47,11 +49,6 @@ x = dist.local_grid(xbasis)
 n = 20
 u['g'] = np.log(1 + np.cosh(n)**2/np.cosh(n*(x-0.2*Lx))**2) / (2*n)
 
-# pySDC parameters
-dt = tEnd / nSteps
-nSweeps = 1
-nNodes = 4
-
 description = {
     # Sweeper and its parameters
     "sweeper_class": DedalusSweeperIMEX,
@@ -61,8 +58,8 @@ description = {
         "node_type": "LEGENDRE",
         "initial_guess": "copy",
         "do_coll_update": False,
-        "QI": "IE",
-        "QE": "EE",
+        "QI": "MIN-SR-S",
+        "QE": "PIC",
         'skip_residual_computation':
             ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE'),
     },
@@ -72,7 +69,7 @@ description = {
     },
     # Level parameters
     "level_params": {
-        "dt": dt,
+        "dt": timeStep,
         "restol": -1,
         "nsweeps": nSweeps,
     },
@@ -104,7 +101,6 @@ for i in range(nSteps):
     if (i+1) % 100 == 0:
         print(f"step {i+1}/{nSteps}")
     if (i+1) % 25 == 0:
-
         u.change_scales(1)
         u_list.append(np.copy(u['g']))
         t_list.append(tVals[i])
@@ -121,4 +117,4 @@ plt.xlabel('x')
 plt.ylabel('t')
 plt.title(f'KdV-Burgers, (a,b)=({a},{b})')
 plt.tight_layout()
-plt.savefig("KdV_Burgers_pySDC.pdf")
+plt.savefig("KdV_Burgers_interface.pdf")

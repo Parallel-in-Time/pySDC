@@ -5,17 +5,19 @@ Sweeper class for dedalus
 """
 import numpy as np
 
-from problem import DedalusProblem
+from pySDC.playgrounds.dedalus.interface.problem import DedalusProblem
 from pySDC.core.sweeper import Sweeper
 
 
 class DedalusSweeperIMEX(Sweeper):
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         if 'QI' not in params: params['QI'] = 'IE'
         if 'QE' not in params: params['QE'] = 'EE'
+
         # call parent's initialization routine
-        super().__init__(params)
+        super().__init__(params, level)
+
         # IMEX integration matrices
         self.QI = self.get_Qdelta_implicit(qd_type=self.params.QI)
         self.QE = self.get_Qdelta_explicit(qd_type=self.params.QE)

@@ -19,7 +19,7 @@ import dedalus.public as d3
 import logging
 logger = logging.getLogger(__name__)
 
-from pySDC.playgrounds.dedalus.sdc import SpectralDeferredCorrectionIMEX
+from pySDC.playgrounds.dedalus.timestepper import SpectralDeferredCorrectionIMEX
 
 SpectralDeferredCorrectionIMEX.setParameters(
     nSweeps=4,
@@ -31,13 +31,14 @@ useSDC = True
 
 # Parameters
 Lx = 10
-Nx = 1024
+Nx = 512
 a = 1e-4
 b = 2e-4
 dealias = 3/2
 stop_sim_time = 10
-timestepper = SpectralDeferredCorrectionIMEX if useSDC else d3.SBDF2
-timestep = 2e-3
+nSteps = 5000
+timestepper = SpectralDeferredCorrectionIMEX if useSDC else d3.RK443
+timestep = stop_sim_time/nSteps
 dtype = np.float64
 
 # Bases
@@ -72,7 +73,7 @@ i = 0
 while solver.proceed:
     solver.step(timestep)
     if solver.iteration % 100 == 0:
-        print(f"step {solver.iteration}/...")
+        print(f"step {solver.iteration}/{nSteps}")
         logger.info('Iteration=%i, Time=%e, dt=%e' %(solver.iteration, solver.sim_time, timestep))
     if solver.iteration % 25 == 0:
         u.change_scales(1)
@@ -89,4 +90,4 @@ plt.xlabel('x')
 plt.ylabel('t')
 plt.title(f'KdV-Burgers, (a,b)=({a},{b})')
 plt.tight_layout()
-plt.savefig(f"KdV_Burgers_ref_useSDC{useSDC}.pdf")
+plt.savefig(f"KdV_Burgers_timestepper{'_SDC' if useSDC else ''}.pdf")

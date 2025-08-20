@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Problem class for dedalus
+Problem class for Dedalus
 """
 from pySDC.core.problem import Problem
 
