@@ -4,7 +4,7 @@
 Quick demo to solve the 1D advection-diffusion with Dedalus
 using the pySDC interface
 """
-# Base user imports
+# Base python imports
 import numpy as np
 import matplotlib.pyplot as plt
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Demo script for the KdV-Burgers equation
+Demo script for the KdV-Burgers equation, using the pySDC interface
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,20 +12,28 @@ from pySDC.playgrounds.dedalus.problems import buildKdVBurgerProblem
 from pySDC.playgrounds.dedalus.interface import DedalusProblem, DedalusSweeperIMEX
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
-# Space parameters
-xEnd = 10
-nX = 512
-nu = 1e-4
-b = 2e-4
+# -----------------------------------------------------------------------------
+# User parameters
+# -----------------------------------------------------------------------------
+xEnd = 10   # space domain size
+nX = 512    # number of point in space
+nu = 1e-4   # diffusion coefficient
+b = 2e-4    # hyper-diffusion coefficient
 
-# Time-integration parameters
+
+# -- time integration
 nSweeps = 4
 nNodes = 4
 tEnd = 10
 nSteps = 5000
+
+# -----------------------------------------------------------------------------
+# Solver setup
+# -----------------------------------------------------------------------------
 timeStep = tEnd / nSteps
 
 pData = buildKdVBurgerProblem(nX, xEnd, nu, b)
+problem, u, x = [pData[key] for key in ["problem", "u", "x"]]
 
 description = {
     # Sweeper and its parameters
@@ -36,7 +44,7 @@ description = {
         "node_type": "LEGENDRE",
         "initial_guess": "copy",
         "do_coll_update": False,
-        "QI": "MIN-SR-S",
+        "QI": "MIN-SR-FLEX",
         "QE": "PIC",
         'skip_residual_computation':
             ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE'),
@@ -53,13 +61,14 @@ description = {
     },
     "problem_class": DedalusProblem,
     "problem_params": {
-        'problem': pData["problem"],
+        'problem': problem,
         'nNodes': nNodes,
     }
 }
 
-# Main loop
-u, x = [pData[key] for key in ["u", "x"]]
+# -----------------------------------------------------------------------------
+# Simulation run
+# -----------------------------------------------------------------------------
 u.change_scales(1)
 u_list = [np.copy(u['g'])]
 t_list = [0]
@@ -84,8 +93,9 @@ for i in range(nSteps):
         u_list.append(np.copy(u['g']))
         t_list.append(tVals[i])
 
-
-# Plot
+# -----------------------------------------------------------------------------
+# Plotting solution in real space
+# -----------------------------------------------------------------------------
 plt.figure(figsize=(6, 4))
 plt.pcolormesh(
     x.ravel(), np.array(t_list), np.array(u_list), cmap='RdBu_r',

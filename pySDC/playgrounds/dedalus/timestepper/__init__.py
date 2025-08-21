@@ -221,6 +221,10 @@ class IMEXSDCCore(object):
     def doProlongation(cls):
         return not cls.rightIsNode or cls.forceProl
 
+    @classmethod
+    def isKDependent(cls):
+        return not np.all(cls.QDeltaI == cls.QDeltaI[0])
+
 
 # -----------------------------------------------------------------------------
 # Dedalus based IMEX timeintegrator class
@@ -312,15 +316,26 @@ class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
             if init:
                 # Potentially instantiate list of solver (ony first time step)
                 sp.LHS_solvers = [[None for _ in range(self.M)] for _ in range(self.nSweeps)]
-            for k in range(self.nSweeps):
+            if self.isKDependent():
+                for k in range(self.nSweeps):
+                    for m in range(self.M):
+                        if solver.store_expanded_matrices:
+                            raise NotImplementedError("code correction required")
+                        else:
+                            sp.LHS = (sp.M_min + dt*qI[k, m, m]*sp.L_min)
+                        sp.LHS_solvers[k][m] = solver.matsolver(sp.LHS, solver)
+            else:
                 for m in range(self.M):
-                    if solver.store_expanded_matrices:
-                        raise NotImplementedError("code correction required")
-                        np.copyto(sp.LHS.data, sp.M_exp.data)
-                        self.axpy(a=dt*qI[k, m, m], x=sp.L_exp.data, y=sp.LHS.data)
-                    else:
-                        sp.LHS = (sp.M_min + dt*qI[k, m, m]*sp.L_min)
-                    sp.LHS_solvers[k][m] = solver.matsolver(sp.LHS, solver)
+                    for k in range(self.nSweeps):
+                        if k == 0:
+                            if solver.store_expanded_matrices:
+                                raise NotImplementedError("code correction required")
+                            else:
+                                sp.LHS = (sp.M_min + dt*qI[k, m, m]*sp.L_min)
+                            sp.LHS_solvers[k][m] = solver.matsolver(sp.LHS, solver)
+                        else:
+                            sp.LHS_solvers[k][m] = sp.LHS_solvers[0][m]
+
             if self.initSweep == "QDELTA":
                 raise NotImplementedError()
 

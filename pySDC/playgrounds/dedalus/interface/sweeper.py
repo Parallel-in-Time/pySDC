@@ -96,8 +96,7 @@ class DedalusSweeperIMEX(Sweeper):
 
             # Add quadrature terms
             for j in range(M):
-                axpy(a=dt*q[m, j], x=Fk[j].data, y=RHS.data)
-                axpy(a=-dt*q[m, j], x=LXk[j].data, y=RHS.data)
+                axpy(a=dt*q[m, j], x=(Fk[j].data - LXk[j].data), y=RHS.data)
 
             # Add F and LX terms from iteration k+1
             for j in range(m):
@@ -111,6 +110,8 @@ class DedalusSweeperIMEX(Sweeper):
             axpy(a=dt*qI[m, m], x=LXk[m].data, y=RHS.data)
 
             # Solve system and store node solution in solver state
+            if self.genQI.isKDependent():
+                P.updateLHS(dt, qI)
             P.solveAndStoreState(m)
 
             # Evaluate and store LX with current state
