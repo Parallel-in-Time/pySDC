@@ -1,11 +1,16 @@
 import logging
 import numpy as np
-from qmat import QDELTA_GENERATORS
+from qmat.qdelta import QDeltaGenerator, QDELTA_GENERATORS
 
 from pySDC.core.errors import ParameterError
-from pySDC.core.level import Level
 from pySDC.core.collocation import CollBase
 from pySDC.helpers.pysdc_helper import FrozenClass
+
+
+# Organize QDeltaGenerator class in dict[type(QDeltaGenerator),set(str)] to retrieve aliases
+QDELTA_GENERATORS_ALIASES = {v: set() for v in set(QDELTA_GENERATORS.values())}
+for k, v in QDELTA_GENERATORS.items():
+    QDELTA_GENERATORS_ALIASES[v].add(k)
 
 
 # short helper class to add params as attributes
@@ -82,27 +87,17 @@ class Sweeper(object):
 
         self.__level = level
         self.parallelizable = False
+        for name in ["genQI", "genQE"]:
+            if hasattr(self, name):
+                delattr(self, name)
 
-    def getGenerator(self, qd_type):
-        coll = self.coll
-
-        generator = QDELTA_GENERATORS[qd_type](
-            # for algebraic types (LU, ...)
-            Q=coll.generator.Q,
-            # for MIN in tables, MIN-SR-S ...
-            nNodes=coll.num_nodes,
-            nodeType=coll.node_type,
-            quadType=coll.quad_type,
-            # for time-stepping types, MIN-SR-NS
-            nodes=coll.nodes,
-            tLeft=coll.tleft,
-        )
-
-        return generator
+    def buildGenerator(self, qdType: str) -> QDeltaGenerator:
+        return QDELTA_GENERATORS[qdType](qGen=self.coll.generator, tLeft=self.coll.tleft)
 
     def get_Qdelta_implicit(self, qd_type, k=None):
         QDmat = np.zeros_like(self.coll.Qmat)
-        self.genQI = self.getGenerator(qd_type)
+        if not hasattr(self, "genQI") or qd_type not in QDELTA_GENERATORS_ALIASES[type(self.genQI)]:
+            self.genQI: QDeltaGenerator = self.buildGenerator(qd_type)
         QDmat[1:, 1:] = self.genQI.genCoeffs(k=k)
 
         err_msg = 'Lower triangular matrix expected!'
@@ -114,7 +109,8 @@ class Sweeper(object):
     def get_Qdelta_explicit(self, qd_type, k=None):
         coll = self.coll
         QDmat = np.zeros(coll.Qmat.shape, dtype=float)
-        self.genQE = self.getGenerator(qd_type)
+        if not hasattr(self, "genQE") or qd_type not in QDELTA_GENERATORS_ALIASES[type(self.genQE)]:
+            self.genQE: QDeltaGenerator = self.buildGenerator(qd_type)
         QDmat[1:, 1:], QDmat[1:, 0] = self.genQE.genCoeffs(k=k, dTau=True)
 
         err_msg = 'Strictly lower triangular matrix expected!'
@@ -251,6 +247,8 @@ class Sweeper(object):
         Args:
             L (pySDC.Level.level): current level
         """
+        from pySDC.core.level import Level
+
         assert isinstance(L, Level)
         self.__level = L
 
@@ -267,5 +265,9 @@ class Sweeper(object):
         k : int
             Index of the sweep (0 for initial sweep, 1 for the first one, ...).
         """
-        if self.genQI._K_DEPENDENT:
-            self.QI = self.get_Qdelta_implicit(qd_type=self.genQI.__class__.__name__, k=k)
+        if hasattr(self, "genQI") and self.genQI.isKDependent():
+            qdType = type(self.genQI).__name__
+            self.QI = self.get_Qdelta_implicit(qdType, k=k)
+        if hasattr(self, "genQE") and self.genQE.isKDependent():
+            qdType = type(self.genQE).__name__
+            self.QE = self.get_Qdelta_explicit(qdType, k=k)
