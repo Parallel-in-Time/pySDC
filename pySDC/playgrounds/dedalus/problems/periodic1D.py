@@ -102,13 +102,13 @@ def buildKdVBurgerProblem(nX, xEnd, nu=1e-4, b=2e-4, n=20, dtype=np.float64, dea
     nu : float, optional
         Diffusion coefficient :math:`\nu`. The default is 1e-4.
     b : float, optional
-        Hyperdiffusion coefficient :math:`b`.. The default is 2e-4.
+        Hyper-diffusion coefficient :math:`b`.. The default is 2e-4.
     n : int, optional
         Initial solution parameter :math:`n`. The default is 20.
     dtype : np.dtype, optional
         Dtype used for the solution. The default is np.float64.
     dealias : float, optional
-        Dealiasing coefficient for space discretization. The default is 3/2.
+        De-aliasing coefficient for space discretization. The default is 3/2.
 
     Returns
     -------
