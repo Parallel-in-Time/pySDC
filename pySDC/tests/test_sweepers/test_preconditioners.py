@@ -112,7 +112,7 @@ def test_FLEX_preconditioner_in_sweepers(imex, num_nodes, MPI=False):
 
     for k in range(1, level_params['nsweeps'] + 1):
         lvl.status.sweep = k
-        sweep.update_nodes()
+        sweep.updateVariableCoeffs(k)
         assert np.allclose(
             sweep.QI, sweep.get_Qdelta_implicit(sweeper_params['QI'], k)
         ), f'Got incorrect FLEX preconditioner in sweep {k}'
@@ -216,4 +216,4 @@ if __name__ == '__main__':
     test_LU('LEGENDRE', 'RADAU-RIGHT', 4)
     test_LU('EQUID', 'LOBATTO', 5)
 
-    test_FLEX_preconditioner_in_sweepers(True)
+    test_FLEX_preconditioner_in_sweepers(True, 4)

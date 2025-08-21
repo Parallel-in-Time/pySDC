@@ -70,9 +70,6 @@ class imex_1st_order(Sweeper):
 
         self.updateVariableCoeffs(L.status.sweep)
 
-        # update the MIN-SR-FLEX preconditioner
-        self.updateVariableCoeffs(L.status.sweep)
-
         # gather all terms which are known already (e.g. from the previous iteration)
         # this corresponds to u0 + QF(u^k) - QIFI(u^k) - QEFE(u^k) + tau
 

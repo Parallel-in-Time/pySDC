@@ -4,7 +4,7 @@ import numpy as np
 import dill
 
 from pySDC.core.controller import Controller
-from pySDC.core import step as stepclass
+from pySDC.core.step import Step
 from pySDC.core.errors import ControllerError, CommunicationError
 from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
 
@@ -32,7 +32,7 @@ class controller_nonMPI(Controller):
         # call parent's initialization routine
         super().__init__(controller_params, description, useMPI=False)
 
-        self.MS = [stepclass.Step(description)]
+        self.MS: list[Step] = [Step(description)]
 
         # try to initialize via dill.copy (much faster for many time-steps)
         try:
@@ -42,7 +42,7 @@ class controller_nonMPI(Controller):
         except (dill.PicklingError, TypeError, ValueError) as error:
             self.logger.warning(f'Need to initialize steps separately due to pickling error: {error}')
             for _ in range(num_procs - 1):
-                self.MS.append(stepclass.Step(description))
+                self.MS.append(Step(description))
 
         self.base_convergence_controllers += [BasicRestarting.get_implementation(useMPI=False)]
         for convergence_controller in self.base_convergence_controllers:
@@ -542,7 +542,7 @@ class controller_nonMPI(Controller):
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.reset_buffers_nonMPI(self)
 
-    def it_fine(self, local_MS_running):
+    def it_fine(self, local_MS_running: list[Step]):
         """
         Fine sweeps
 
@@ -567,8 +567,11 @@ class controller_nonMPI(Controller):
                 # standard sweep workflow: update nodes, compute residual, log progress
                 for hook in self.hooks:
                     hook.pre_sweep(step=S, level_number=0)
+
+                S.levels[0].sweep.updateVariableCoeffs(k + 1)  # update QDelta coefficients if variable preconditioner
                 S.levels[0].sweep.update_nodes()
                 S.levels[0].sweep.compute_residual(stage='IT_FINE')
+
                 for hook in self.hooks:
                     hook.post_sweep(step=S, level_number=0)
 
