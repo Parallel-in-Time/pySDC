@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import dedalus.public as d3
 
+from pySDC.playgrounds.dedalus.problems import buildAdvDiffProblem
 from pySDC.playgrounds.dedalus.timestepper import SpectralDeferredCorrectionIMEX
 
 
@@ -15,32 +16,15 @@ from pySDC.playgrounds.dedalus.timestepper import SpectralDeferredCorrectionIMEX
 # User parameters
 # -----------------------------------------------------------------------------
 listK = [0, 1, 2]   # list of initial wavenumber in the solution (amplitude 1)
-
-# -- Space discretisation
-xEnd = 2*np.pi      # domain [0, xEnd]
-nX = 64             # number of points in x (periodic domain)
-
+nX = 128            # number of points in x (periodic domain)
 
 # -----------------------------------------------------------------------------
 # Solver setup
 # -----------------------------------------------------------------------------
-
-# -- Bases and field
-coords = d3.CartesianCoordinates('x')
-dist = d3.Distributor(coords, dtype=np.float64)
-xbasis = d3.RealFourier(coords['x'], size=nX, bounds=(0, xEnd))
-u = dist.Field(name='u', bases=xbasis)
-
-# -- Initial solution
-x = xbasis.local_grid(dist, scale=1)
-u0 = np.sum([np.cos(k*x) for k in listK], axis=0)
-np.copyto(u['g'], u0)
-uInit = u.copy() # copy initial field for latter
-
-# -- Problem
-dx = lambda f: d3.Differentiate(f, coords['x'])
-problem = d3.IVP([u], namespace=locals())
-problem.add_equation("dt(u) + dx(u) = 0")
+pData = buildAdvDiffProblem(nX, listK)
+u = pData["u"]
+uInit = pData["u0"]
+u0 = uInit['g'].data
 
 # -- Prepare plots
 orderPlot = {'RK111': 1,
@@ -48,11 +32,14 @@ orderPlot = {'RK111': 1,
              'RK443': 3,
              'ERK4': 4}
 
-plt.figure('Error')
 SpectralDeferredCorrectionIMEX.setParameters(
-    nNodes=3, nodeType='LEGENDRE', quadType='RADAU-RIGHT',
+    nNodes=4, nodeType='LEGENDRE', quadType='RADAU-RIGHT',
     implSweep='MIN-SR-FLEX', explSweep='PIC', initSweep='COPY')
 
+# -----------------------------------------------------------------------------
+# Simulations
+# -----------------------------------------------------------------------------
+plt.figure('Error')
 for timeStepper in [d3.RK111, d3.RK222, d3.RK443, 1, 2, 3]:
 
     useSDC = False
@@ -71,6 +58,7 @@ for timeStepper in [d3.RK111, d3.RK222, d3.RK443, 1, 2, 3]:
     print(f" -- solving using {scheme}")
 
     # -- Build solver
+    problem = pData["problem"]
     solver = problem.build_solver(timeStepper)
     solver.stop_sim_time = 2*np.pi
     name = timeStepper.__name__
@@ -106,6 +94,7 @@ plt.ylim(1e-9, 1e2)
 plt.legend()
 plt.grid(True)
 plt.tight_layout()
+plt.savefig("demo_timestepper_advDiff_convergence.png")
 
 # Plotting solution in real and Fourier space
 fig, (ax1, ax2) = plt.subplots(1, 2)
@@ -131,3 +120,4 @@ plt.ylabel("$u$")
 
 fig.set_size_inches(12, 5)
 plt.tight_layout()
+plt.savefig("demo_timestepper_advDiff.png")

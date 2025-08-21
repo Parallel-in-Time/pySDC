@@ -3,24 +3,20 @@
 """
 Demo script for the KdV-Burgers equation
 """
-
 import numpy as np
 import matplotlib.pyplot as plt
-import dedalus.public as d3
 import logging
 logger = logging.getLogger(__name__)
 
-from pySDC.playgrounds.dedalus.interface.problem import DedalusProblem
-from pySDC.playgrounds.dedalus.interface.sweeper import DedalusSweeperIMEX
+from pySDC.playgrounds.dedalus.problems import buildKdVBurgerProblem
+from pySDC.playgrounds.dedalus.interface import DedalusProblem, DedalusSweeperIMEX
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 # Space parameters
-Lx = 10
-Nx = 512
-a = 1e-4
+xEnd = 10
+nX = 512
+nu = 1e-4
 b = 2e-4
-dealias = 3/2
-dtype = np.float64
 
 # Time-integration parameters
 nSweeps = 4
@@ -29,25 +25,7 @@ tEnd = 10
 nSteps = 5000
 timeStep = tEnd / nSteps
 
-# Bases
-xcoord = d3.Coordinate('x')
-dist = d3.Distributor(xcoord, dtype=dtype)
-xbasis = d3.RealFourier(xcoord, size=Nx, bounds=(0, Lx), dealias=dealias)
-
-# Fields
-u = dist.Field(name='u', bases=xbasis)
-
-# Substitutions
-dx = lambda A: d3.Differentiate(A, xcoord)
-
-# Problem
-problem = d3.IVP([u], namespace=locals())
-problem.add_equation("dt(u) - a*dx(dx(u)) - b*dx(dx(dx(u))) = - u*dx(u)")
-
-# Initial conditions
-x = dist.local_grid(xbasis)
-n = 20
-u['g'] = np.log(1 + np.cosh(n)**2/np.cosh(n*(x-0.2*Lx))**2) / (2*n)
+pData = buildKdVBurgerProblem(nX, xEnd, nu, b)
 
 description = {
     # Sweeper and its parameters
@@ -75,12 +53,13 @@ description = {
     },
     "problem_class": DedalusProblem,
     "problem_params": {
-        'problem': problem,
+        'problem': pData["problem"],
         'nNodes': nNodes,
     }
 }
 
 # Main loop
+u, x = [pData[key] for key in ["u", "x"]]
 u.change_scales(1)
 u_list = [np.copy(u['g'])]
 t_list = [0]
@@ -111,10 +90,10 @@ plt.figure(figsize=(6, 4))
 plt.pcolormesh(
     x.ravel(), np.array(t_list), np.array(u_list), cmap='RdBu_r',
     shading='gouraud', rasterized=True, clim=(-0.8, 0.8))
-plt.xlim(0, Lx)
+plt.xlim(0, xEnd)
 plt.ylim(0, tEnd)
 plt.xlabel('x')
 plt.ylabel('t')
-plt.title(f'KdV-Burgers, (a,b)=({a},{b})')
+plt.title(r'KdV-Burgers, $(\nu,b)='f'({nu},{b})$')
 plt.tight_layout()
-plt.savefig("KdV_Burgers_interface.pdf")
+plt.savefig("demo_interface_burger.png")

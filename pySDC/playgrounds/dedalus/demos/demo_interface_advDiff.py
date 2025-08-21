@@ -7,11 +7,10 @@ using the pySDC interface
 # Base user imports
 import numpy as np
 import matplotlib.pyplot as plt
-import dedalus.public as d3
 
 # pySDC imports
-from pySDC.playgrounds.dedalus.interface.problem import DedalusProblem
-from pySDC.playgrounds.dedalus.interface.sweeper import DedalusSweeperIMEX
+from pySDC.playgrounds.dedalus.problems import buildAdvDiffProblem
+from pySDC.playgrounds.dedalus.interface import DedalusProblem, DedalusSweeperIMEX
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 # -----------------------------------------------------------------------------
@@ -21,7 +20,6 @@ listK = [0, 1, 2]   # list of initial wavenumber in the solution (amplitude 1)
 nu = 1e-2           # viscosity (unitary velocity)
 
 # -- Space discretisation
-xEnd = 2*np.pi      # domain [0, xEnd]
 nX = 16             # number of points in x (periodic domain)
 
 # -- Time integration
@@ -33,23 +31,7 @@ nSteps = 50         # number of time-steps
 # -----------------------------------------------------------------------------
 # Solver setup
 # -----------------------------------------------------------------------------
-
-# -- Dedalus space grid
-coords = d3.CartesianCoordinates('x')
-dist = d3.Distributor(coords, dtype=np.float64)
-xbasis = d3.RealFourier(coords['x'], size=nX, bounds=(0, xEnd))
-u = dist.Field(name='u', bases=xbasis)
-
-# -- Initial solution
-x = xbasis.local_grid(dist, scale=1)
-u0 = np.sum([np.cos(k*x) for k in listK], axis=0)
-np.copyto(u['g'], u0)
-u0 = u.copy()   # store initial field for later
-
-# -- Problem
-dx = lambda f: d3.Differentiate(f, coords['x'])
-problem = d3.IVP([u], namespace=locals())
-problem.add_equation("dt(u) + dx(u) - nu*dx(dx(u)) = 0")
+pData = buildAdvDiffProblem(nX, listK, nu)
 
 nSweeps = 4
 nNodes = 4
@@ -84,7 +66,7 @@ description = {
     },
     "problem_class": DedalusProblem,
     "problem_params": {
-        'problem': problem,
+        'problem': pData["problem"],
         'nNodes': nNodes,
     }
 }
@@ -93,6 +75,9 @@ controller = controller_nonMPI(
     num_procs=1, controller_params={'logger_level': 30},
     description=description)
 
+# -----------------------------------------------------------------------------
+# Simulation run
+# -----------------------------------------------------------------------------
 prob = controller.MS[0].levels[0].prob
 uSol = prob.solver.state
 tVals = np.linspace(0, tEnd, nSteps + 1)
@@ -100,14 +85,18 @@ tVals = np.linspace(0, tEnd, nSteps + 1)
 for i in range(nSteps):
     uSol, _ = controller.run(u0=uSol, t0=tVals[i], Tend=tVals[i + 1])
 
-# -- Plotting solution in real and Fourier space
+# -----------------------------------------------------------------------------
+# Plotting solution in real and Fourier space
+# -----------------------------------------------------------------------------
+x, u, u0 = [pData[key] for key in ("x", "u", "u0")]
+
 fig, (ax1, ax2) = plt.subplots(1, 2)
 fig.suptitle(rf"Advection-diffusion with $\nu={nu:1.1e}$")
 
 plt.sca(ax1)
 plt.title("Real space")
-plt.plot(u0['g'], label='$u_0$')
-plt.plot(u['g'], label='$u(T)$')
+plt.plot(x, u0['g'], label='$u_0$')
+plt.plot(x, u['g'], label='$u(T)$')
 plt.legend()
 plt.grid(True)
 plt.xlabel("$x$")
@@ -124,3 +113,4 @@ plt.ylabel("$u$")
 
 fig.set_size_inches(12, 5)
 plt.tight_layout()
+plt.savefig("demo_interface_advDiff.png")
