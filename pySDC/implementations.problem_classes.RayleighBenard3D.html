@@ -50,7 +50,7 @@
 <span id="implementations-problem-classes-rayleighbenard3d-module"></span><h1>implementations.problem_classes.RayleighBenard3D module<a class="headerlink" href="#module-implementations.problem_classes.RayleighBenard3D" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard3D.RayleighBenard3D">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RayleighBenard3D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Prandtl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rayleigh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ny</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BCs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dealiasing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useGPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard3D.html#RayleighBenard3D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RayleighBenard3D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Prandtl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rayleigh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ny</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BCs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dealiasing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useGPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard3D.html#RayleighBenard3D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericSpectralLinear</span></code></p>
 <p>Rayleigh-Benard Convection is a variation of incompressible Navier-Stokes.</p>
 <p>The equations we solve are</p>
@@ -67,9 +67,9 @@ hand side, that is the viscous part, the pressure gradient and the buoyancy due 
 implicitly, while the non-linear convection part on the right hand side is integrated explicitly.</p>
 <p>The domain, vertical boundary conditions and pressure gauge are</p>
 <blockquote>
-<div><p>Omega = [0, 8) x (-1, 1)
+<div><p>Omega = [0, Lx) x [0, Ly] x (0, Lz)
 T(z=+1) = 0
-T(z=-1) = 2
+T(z=-1) = Lz
 u(z=+-1) = v(z=+-1) = 0
 integral over p = 0</p>
 </div></blockquote>
@@ -141,6 +141,28 @@ Computing the Nusselt number at various places can be used to check the code.</p
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.get_frequency_spectrum">
+<span class="sig-name descname"><span class="pre">get_frequency_spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard3D.html#RayleighBenard3D.get_frequency_spectrum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.get_frequency_spectrum" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the frequency spectrum of the velocities in x and y direction in the horizontal plane for every point in
+z. If the problem is well resolved, the coefficients will decay quickly with the wave number, and the reverse
+indicates that the resolution is too low.</p>
+<p>The returned spectrum has three dimensions. The first is for component (i.e. u or v), the second is for every
+point in z and the third is the energy in every wave number.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>u</strong> – The solution you want to compute the spectrum of</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>wave numbers
+RayleighBenard3D.xp.ndarray: spectrum</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>RayleighBenard3D.xp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard3D.html#RayleighBenard3D.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.u_exact" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -165,6 +187,7 @@ Computing the Nusselt number at various places can be used to check the code.</p
 <li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.get_frequency_spectrum"><code class="docutils literal notranslate"><span class="pre">get_frequency_spectrum()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
 </ul>
 </li>

@@ -98,6 +98,11 @@ check it out to see all available coefficient types.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="core.sweeper.Sweeper.buildGenerator">
+<span class="sig-name descname"><span class="pre">buildGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qdType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QDeltaGenerator</span></span></span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.buildGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.buildGenerator" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.compute_end_point">
 <span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.compute_end_point" title="Link to this definition">¶</a></dt>
 <dd><p>Abstract interface to end-node computation</p>
@@ -113,11 +118,6 @@ check it out to see all available coefficient types.</p>
 </dd>
 </dl>
 </dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="core.sweeper.Sweeper.getGenerator">
-<span class="sig-name descname"><span class="pre">getGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qd_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.getGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.getGenerator" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.get_Qdelta_explicit">
@@ -198,9 +198,9 @@ and evaluates the RHS of the ODE there</p>
 <li><a class="reference internal" href="#core.sweeper.Sweeper.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
 <li><a class="reference internal" href="#core.sweeper.Sweeper.params"><code class="docutils literal notranslate"><span class="pre">params</span></code></a></li>
 <li><a class="reference internal" href="#core.sweeper.Sweeper.coll"><code class="docutils literal notranslate"><span class="pre">coll</span></code></a></li>
+<li><a class="reference internal" href="#core.sweeper.Sweeper.buildGenerator"><code class="docutils literal notranslate"><span class="pre">buildGenerator()</span></code></a></li>
 <li><a class="reference internal" href="#core.sweeper.Sweeper.compute_end_point"><code class="docutils literal notranslate"><span class="pre">compute_end_point()</span></code></a></li>
 <li><a class="reference internal" href="#core.sweeper.Sweeper.compute_residual"><code class="docutils literal notranslate"><span class="pre">compute_residual()</span></code></a></li>
-<li><a class="reference internal" href="#core.sweeper.Sweeper.getGenerator"><code class="docutils literal notranslate"><span class="pre">getGenerator()</span></code></a></li>
 <li><a class="reference internal" href="#core.sweeper.Sweeper.get_Qdelta_explicit"><code class="docutils literal notranslate"><span class="pre">get_Qdelta_explicit()</span></code></a></li>
 <li><a class="reference internal" href="#core.sweeper.Sweeper.get_Qdelta_implicit"><code class="docutils literal notranslate"><span class="pre">get_Qdelta_implicit()</span></code></a></li>
 <li><a class="reference internal" href="#core.sweeper.Sweeper.integrate"><code class="docutils literal notranslate"><span class="pre">integrate()</span></code></a></li>

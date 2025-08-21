@@ -39,12 +39,17 @@
   <h1>Source code for core.sweeper</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">qmat</span><span class="w"> </span><span class="kn">import</span> <span class="n">QDELTA_GENERATORS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qmat.qdelta</span><span class="w"> </span><span class="kn">import</span> <span class="n">QDeltaGenerator</span><span class="p">,</span> <span class="n">QDELTA_GENERATORS</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParameterError</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.level</span><span class="w"> </span><span class="kn">import</span> <span class="n">Level</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.collocation</span><span class="w"> </span><span class="kn">import</span> <span class="n">CollBase</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.pysdc_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrozenClass</span>
+
+
+<span class="c1"># Organize QDeltaGenerator class in dict[type(QDeltaGenerator),set(str)] to retrieve aliases</span>
+<span class="n">QDELTA_GENERATORS_ALIASES</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="nb">set</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">QDELTA_GENERATORS</span><span class="o">.</span><span class="n">values</span><span class="p">())}</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">QDELTA_GENERATORS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">QDELTA_GENERATORS_ALIASES</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
 
 
 <span class="c1"># short helper class to add params as attributes</span>
@@ -123,32 +128,22 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__level</span> <span class="o">=</span> <span class="n">level</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parallelizable</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;genQI&quot;</span><span class="p">,</span> <span class="s2">&quot;genQE&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+                <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Sweeper.getGenerator">
-<a class="viewcode-back" href="../../pySDC/core.sweeper.html#core.sweeper.Sweeper.getGenerator">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">getGenerator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qd_type</span><span class="p">):</span>
-        <span class="n">coll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span>
-
-        <span class="n">generator</span> <span class="o">=</span> <span class="n">QDELTA_GENERATORS</span><span class="p">[</span><span class="n">qd_type</span><span class="p">](</span>
-            <span class="c1"># for algebraic types (LU, ...)</span>
-            <span class="n">Q</span><span class="o">=</span><span class="n">coll</span><span class="o">.</span><span class="n">generator</span><span class="o">.</span><span class="n">Q</span><span class="p">,</span>
-            <span class="c1"># for MIN in tables, MIN-SR-S ...</span>
-            <span class="n">nNodes</span><span class="o">=</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">,</span>
-            <span class="n">nodeType</span><span class="o">=</span><span class="n">coll</span><span class="o">.</span><span class="n">node_type</span><span class="p">,</span>
-            <span class="n">quadType</span><span class="o">=</span><span class="n">coll</span><span class="o">.</span><span class="n">quad_type</span><span class="p">,</span>
-            <span class="c1"># for time-stepping types, MIN-SR-NS</span>
-            <span class="n">nodes</span><span class="o">=</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span>
-            <span class="n">tLeft</span><span class="o">=</span><span class="n">coll</span><span class="o">.</span><span class="n">tleft</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">generator</span></div>
+<div class="viewcode-block" id="Sweeper.buildGenerator">
+<a class="viewcode-back" href="../../pySDC/core.sweeper.html#core.sweeper.Sweeper.buildGenerator">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">buildGenerator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qdType</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QDeltaGenerator</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">QDELTA_GENERATORS</span><span class="p">[</span><span class="n">qdType</span><span class="p">](</span><span class="n">qGen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">generator</span><span class="p">,</span> <span class="n">tLeft</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">tleft</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Sweeper.get_Qdelta_implicit">
 <a class="viewcode-back" href="../../pySDC/core.sweeper.html#core.sweeper.Sweeper.get_Qdelta_implicit">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_Qdelta_implicit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qd_type</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">QDmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">genQI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getGenerator</span><span class="p">(</span><span class="n">qd_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;genQI&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">qd_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">QDELTA_GENERATORS_ALIASES</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genQI</span><span class="p">)]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">genQI</span><span class="p">:</span> <span class="n">QDeltaGenerator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buildGenerator</span><span class="p">(</span><span class="n">qd_type</span><span class="p">)</span>
         <span class="n">QDmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">genQI</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
 
         <span class="n">err_msg</span> <span class="o">=</span> <span class="s1">&#39;Lower triangular matrix expected!&#39;</span>
@@ -163,7 +158,8 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">get_Qdelta_explicit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qd_type</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">coll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span>
         <span class="n">QDmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">genQE</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getGenerator</span><span class="p">(</span><span class="n">qd_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;genQE&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">qd_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">QDELTA_GENERATORS_ALIASES</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genQE</span><span class="p">)]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">genQE</span><span class="p">:</span> <span class="n">QDeltaGenerator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buildGenerator</span><span class="p">(</span><span class="n">qd_type</span><span class="p">)</span>
         <span class="n">QDmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">QDmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">genQE</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">dTau</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="n">err_msg</span> <span class="o">=</span> <span class="s1">&#39;Strictly lower triangular matrix expected!&#39;</span>
@@ -316,6 +312,8 @@
 <span class="sd">        Args:</span>
 <span class="sd">            L (pySDC.Level.level): current level</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.level</span><span class="w"> </span><span class="kn">import</span> <span class="n">Level</span>
+
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">Level</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__level</span> <span class="o">=</span> <span class="n">L</span>
 
@@ -334,8 +332,12 @@
 <span class="sd">        k : int</span>
 <span class="sd">            Index of the sweep (0 for initial sweep, 1 for the first one, ...).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">genQI</span><span class="o">.</span><span class="n">_K_DEPENDENT</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">QI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Qdelta_implicit</span><span class="p">(</span><span class="n">qd_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">genQI</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;genQI&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">genQI</span><span class="o">.</span><span class="n">isKDependent</span><span class="p">():</span>
+            <span class="n">qdType</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genQI</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">QI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Qdelta_implicit</span><span class="p">(</span><span class="n">qdType</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;genQE&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">genQE</span><span class="o">.</span><span class="n">isKDependent</span><span class="p">():</span>
+            <span class="n">qdType</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genQE</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">QE</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Qdelta_explicit</span><span class="p">(</span><span class="n">qdType</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

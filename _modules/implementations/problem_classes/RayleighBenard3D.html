@@ -69,9 +69,9 @@
 
 <span class="sd">    The domain, vertical boundary conditions and pressure gauge are</span>
 
-<span class="sd">        Omega = [0, 8) x (-1, 1)</span>
+<span class="sd">        Omega = [0, Lx) x [0, Ly] x (0, Lz)</span>
 <span class="sd">        T(z=+1) = 0</span>
-<span class="sd">        T(z=-1) = 2</span>
+<span class="sd">        T(z=-1) = Lz</span>
 <span class="sd">        u(z=+-1) = v(z=+-1) = 0</span>
 <span class="sd">        integral over p = 0</span>
 
@@ -94,16 +94,16 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">Prandtl</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">Rayleigh</span><span class="o">=</span><span class="mf">2e6</span><span class="p">,</span>
-        <span class="n">nx</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
-        <span class="n">ny</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
-        <span class="n">nz</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">Rayleigh</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span>
+        <span class="n">nx</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">ny</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">nz</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
         <span class="n">BCs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">dealiasing</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
         <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">Lz</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">Lx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">Ly</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">Lx</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">Ly</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
         <span class="n">useGPU</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
@@ -120,7 +120,6 @@
 <span class="sd">            comm (mpi4py.Intracomm): Space communicator</span>
 <span class="sd">            Lx (float): Horizontal length of the domain</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># TODO: documentation</span>
         <span class="n">BCs</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">BCs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">BCs</span>
         <span class="n">BCs</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;T_top&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
@@ -377,7 +376,7 @@
         <span class="n">_me</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u_pad</span><span class="p">[</span><span class="n">iw</span><span class="p">]</span> <span class="o">*</span> <span class="n">u_pad</span><span class="p">[</span><span class="n">iT</span><span class="p">]</span>
         <span class="n">wT_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">_me</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="n">nusselt_hat</span> <span class="o">=</span> <span class="n">wT_hat</span> <span class="o">-</span> <span class="n">DzT_hat</span>
+        <span class="n">nusselt_hat</span> <span class="o">=</span> <span class="p">(</span><span class="n">wT_hat</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">kappa</span> <span class="o">-</span> <span class="n">DzT_hat</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">L</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_zInt&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_zInt</span> <span class="o">=</span> <span class="n">zAxis</span><span class="o">.</span><span class="n">get_integration_matrix</span><span class="p">()</span>
@@ -403,6 +402,76 @@
             <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="n">Nusselt_t</span><span class="p">,</span>
             <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="n">Nusselt_b</span><span class="p">,</span>
         <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="RayleighBenard3D.get_frequency_spectrum">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard3D.html#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.get_frequency_spectrum">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_frequency_spectrum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the frequency spectrum of the velocities in x and y direction in the horizontal plane for every point in</span>
+<span class="sd">        z. If the problem is well resolved, the coefficients will decay quickly with the wave number, and the reverse</span>
+<span class="sd">        indicates that the resolution is too low.</span>
+
+<span class="sd">        The returned spectrum has three dimensions. The first is for component (i.e. u or v), the second is for every</span>
+<span class="sd">        point in z and the third is the energy in every wave number.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u: The solution you want to compute the spectrum of</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            RayleighBenard3D.xp.ndarray: wave numbers</span>
+<span class="sd">            RayleighBenard3D.xp.ndarray: spectrum</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">xp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># transform the solution to be in frequency space in x and y, but real space in z</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+                <span class="n">u</span><span class="p">,</span>
+                <span class="n">axes</span><span class="o">=</span><span class="p">(</span>
+                    <span class="o">-</span><span class="mi">3</span><span class="p">,</span>
+                    <span class="o">-</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">redistribute</span><span class="p">(</span><span class="n">u_hat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">forward_output</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># compute &quot;energy density&quot; as absolute square of the velocity modes</span>
+        <span class="n">energy</span> <span class="o">=</span> <span class="p">(</span><span class="n">u_hat</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span> <span class="o">*</span> <span class="n">xp</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">u_hat</span><span class="p">[</span><span class="n">indices</span><span class="p">]))</span><span class="o">.</span><span class="n">real</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">N</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">N</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># prepare wave numbers at which to compute the spectrum</span>
+        <span class="n">abs_kx</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Kx</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">abs_ky</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ky</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">unique_k</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">abs_kx</span><span class="p">),</span> <span class="n">xp</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">abs_ky</span><span class="p">)))</span>
+        <span class="n">n_k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_k</span><span class="p">)</span>
+
+        <span class="c1"># compute local spectrum</span>
+        <span class="n">local_spectrum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">energy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">n_k</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_k</span><span class="p">),</span> <span class="n">unique_k</span><span class="p">):</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">abs_kx</span> <span class="o">==</span> <span class="n">k</span><span class="p">,</span> <span class="n">abs_ky</span> <span class="o">==</span> <span class="n">k</span><span class="p">)</span>
+            <span class="n">local_spectrum</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">energy</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># assemble global spectrum from local spectra</span>
+        <span class="n">k_all</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">allgather</span><span class="p">(</span><span class="n">unique_k</span><span class="p">)</span>
+        <span class="n">unique_k_all</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">k_all</span><span class="p">:</span>
+            <span class="n">unique_k_all</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unique_k_all</span><span class="p">,</span> <span class="n">xp</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">k</span><span class="p">)))</span>
+        <span class="n">n_k_all</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_k_all</span><span class="p">)</span>
+
+        <span class="n">spectra</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">allgather</span><span class="p">(</span><span class="n">local_spectrum</span><span class="p">)</span>
+        <span class="n">spectrum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="n">n_k_all</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">ks</span><span class="p">,</span> <span class="n">_spectrum</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">k_all</span><span class="p">,</span> <span class="n">spectra</span><span class="p">):</span>
+            <span class="n">ks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ks</span><span class="p">)</span>
+            <span class="n">unique_k_all</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">unique_k_all</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ks</span><span class="p">:</span>
+                <span class="n">index_global</span> <span class="o">=</span> <span class="n">unique_k_all</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="n">index_local</span> <span class="o">=</span> <span class="n">ks</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="n">spectrum</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">index_global</span><span class="p">]</span> <span class="o">+=</span> <span class="n">_spectrum</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">index_local</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">xp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">unique_k_all</span><span class="p">),</span> <span class="n">spectrum</span></div>
 </div>
 
 </pre></div>

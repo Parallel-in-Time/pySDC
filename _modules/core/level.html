@@ -37,7 +37,10 @@
           <div class="body" role="main">
             
   <h1>Source code for core.level</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.pysdc_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrozenClass</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.sweeper</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sweeper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.problem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Problem</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.pysdc_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrozenClass</span>
 
 
 <span class="c1"># short helper class to add params as attributes</span>
@@ -113,8 +116,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">_Status</span><span class="p">()</span>
 
         <span class="c1"># instantiate sweeper, problem and hooks</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__sweep</span> <span class="o">=</span> <span class="n">sweeper_class</span><span class="p">(</span><span class="n">sweeper_params</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__prob</span> <span class="o">=</span> <span class="n">problem_class</span><span class="p">(</span><span class="o">**</span><span class="n">problem_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sweep</span><span class="p">:</span> <span class="n">Sweeper</span> <span class="o">=</span> <span class="n">sweeper_class</span><span class="p">(</span><span class="n">sweeper_params</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__prob</span><span class="p">:</span> <span class="n">Problem</span> <span class="o">=</span> <span class="n">problem_class</span><span class="p">(</span><span class="o">**</span><span class="n">problem_params</span><span class="p">)</span>
 
         <span class="c1"># set name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">level_index</span> <span class="o">=</span> <span class="n">level_index</span>
@@ -163,7 +166,7 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sweeper</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter for the sweeper</span>
 
@@ -173,7 +176,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sweep</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">prob</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prob</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Problem</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter for the problem</span>
 

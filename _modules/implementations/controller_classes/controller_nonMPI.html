@@ -43,7 +43,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">dill</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">Controller</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">step</span> <span class="k">as</span> <span class="n">stepclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.step</span><span class="w"> </span><span class="kn">import</span> <span class="n">Step</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ControllerError</span><span class="p">,</span> <span class="n">CommunicationError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.convergence_controller_classes.basic_restarting</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasicRestarting</span>
 
@@ -73,7 +73,7 @@
         <span class="c1"># call parent&#39;s initialization routine</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">useMPI</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">MS</span> <span class="o">=</span> <span class="p">[</span><span class="n">stepclass</span><span class="o">.</span><span class="n">Step</span><span class="p">(</span><span class="n">description</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Step</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">Step</span><span class="p">(</span><span class="n">description</span><span class="p">)]</span>
 
         <span class="c1"># try to initialize via dill.copy (much faster for many time-steps)</span>
         <span class="k">try</span><span class="p">:</span>
@@ -83,7 +83,7 @@
         <span class="k">except</span> <span class="p">(</span><span class="n">dill</span><span class="o">.</span><span class="n">PicklingError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Need to initialize steps separately due to pickling error: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_procs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stepclass</span><span class="o">.</span><span class="n">Step</span><span class="p">(</span><span class="n">description</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Step</span><span class="p">(</span><span class="n">description</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">base_convergence_controllers</span> <span class="o">+=</span> <span class="p">[</span><span class="n">BasicRestarting</span><span class="o">.</span><span class="n">get_implementation</span><span class="p">(</span><span class="n">useMPI</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span>
         <span class="k">for</span> <span class="n">convergence_controller</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_convergence_controllers</span><span class="p">:</span>
@@ -609,7 +609,7 @@
 
 <div class="viewcode-block" id="controller_nonMPI.it_fine">
 <a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_fine">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">it_fine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">it_fine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Step</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fine sweeps</span>
 
@@ -634,8 +634,11 @@
                 <span class="c1"># standard sweep workflow: update nodes, compute residual, log progress</span>
                 <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
                     <span class="n">hook</span><span class="o">.</span><span class="n">pre_sweep</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+                <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">updateVariableCoeffs</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># update QDelta coefficients if variable preconditioner</span>
                 <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">update_nodes</span><span class="p">()</span>
                 <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_residual</span><span class="p">(</span><span class="n">stage</span><span class="o">=</span><span class="s1">&#39;IT_FINE&#39;</span><span class="p">)</span>
+
                 <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
                     <span class="n">hook</span><span class="o">.</span><span class="n">post_sweep</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
