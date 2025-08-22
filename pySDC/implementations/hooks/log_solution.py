@@ -266,12 +266,11 @@ class LogToFile(Hooks):
         L = step.levels[level_number]
 
         value_exists = True in [abs(me - (L.time + L.dt)) < np.finfo(float).eps * 1000 for me in self.outfile.times]
-        if value_exists and not self.allow_overwriting:
-            raise DataError(f'Already have recorded data for time {L.time + L.dt} in this file!')
-        self.outfile.addField(time=L.time + L.dt, field=L.prob.processSolutionForOutput(L.uend))
-        self.logger.info(f'Written solution at t={L.time+L.dt:.4f} to file')
-        self.t_next_log = max([L.time + L.dt, self.t_next_log]) + self.time_increment
-        type(self).counter = len(self.outfile.times)
+        if not value_exists:
+            self.outfile.addField(time=L.time + L.dt, field=L.prob.processSolutionForOutput(L.uend))
+            self.logger.info(f'Written solution at t={L.time+L.dt:.4f} to file')
+            self.t_next_log = max([L.time + L.dt, self.t_next_log]) + self.time_increment
+            type(self).counter = len(self.outfile.times)
 
     @classmethod
     def load(cls, index):

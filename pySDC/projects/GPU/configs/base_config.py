@@ -192,13 +192,13 @@ class Config(object):
 class LogStats(ConvergenceController):
 
     def get_stats_path(self, index=0):
-        return f'{self.params.path}_{self.counter:06d}-stats.pickle'
+        return f'{self.params.path}_{index:06d}-stats.pickle'
 
     def merge_all_stats(self, controller):
         hook = self.params.hook
 
         stats = {}
-        for i in range(hook.counter):
+        for i in range(hook.counter - 1):
             with open(self.get_stats_path(index=i), 'rb') as file:
                 _stats = pickle.load(file)
                 stats = {**stats, **_stats}
@@ -226,11 +226,8 @@ class LogStats(ConvergenceController):
 
         P = S.levels[0].prob
 
-        if self.counter == 0:
-            self.counter = hook.counter - 1
-
         while self.counter < hook.counter:
-            path = self.get_stats_path(index=self.counter - 1)
+            path = self.get_stats_path(index=hook.counter - 2)
             stats = controller.return_stats()
             store = True
             if hasattr(S.levels[0].sweep, 'comm') and S.levels[0].sweep.comm.rank > 0:
@@ -241,11 +238,14 @@ class LogStats(ConvergenceController):
                 with open(path, 'wb') as file:
                     pickle.dump(stats, file)
                     self.log(f'Stored stats in {path!r}', S)
+                # print(stats)
                 self.reset_stats(controller)
             self.counter = hook.counter
 
-    def post_run_processing(self, controller, *args, **kwargs):
+    def post_run_processing(self, controller, S, **kwargs):
         stats = self.merge_all_stats(controller)
+
+        self.post_step_processing(controller, S, **kwargs)
 
         def return_stats():
             return stats
