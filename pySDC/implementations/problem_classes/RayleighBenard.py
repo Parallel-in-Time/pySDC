@@ -403,12 +403,6 @@ class RayleighBenard(GenericSpectralLinear):
         me[:-1] = u_real
         me[-1] = vorticity
         return me
-        print(u.shape, vorticity.shape)
-        exit()
-        if self.spectral_space:
-            return np.array(self.itransform(u).real)
-        else:
-            return np.array(u.real)
 
     def compute_Nusselt_numbers(self, u):
         """

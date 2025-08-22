@@ -239,6 +239,7 @@ class LogToFile(Hooks):
                 self.logger.info(f'Written initial conditions at t={L.time:4f} to file')
 
         type(self).counter = len(self.outfile.times)
+        self.logger.info(f'Will write to disk every {self.time_increment:.4e} time units')
 
     def post_step(self, step, level_number):
         if level_number > 0:

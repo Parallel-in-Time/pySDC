@@ -35,6 +35,41 @@ def create_directories():
     os.makedirs(path, exist_ok=True)
 
 
+def test_run(tmpdir):
+    from pySDC.projects.GPU.configs.base_config import get_config
+    from pySDC.projects.GPU.run_experiment import run_experiment
+
+    args = {
+        'config': 'RBC',
+        'procs': [1, 1, 1],
+        'res': 16,
+        'mode': 'run',
+        'useGPU': False,
+        'o': tmpdir,
+        'logger_level': 15,
+        'restart_idx': 0,
+    }
+    config = get_config(args)
+
+    def get_LogToFile(self, *args, **kwargs):
+        if self.comms[1].rank > 0:
+            return None
+        from pySDC.implementations.hooks.log_solution import LogToFile
+
+        LogToFile.filename = self.get_file_name()
+        LogToFile.time_increment = 0
+        LogToFile.allow_overwriting = True
+
+        return LogToFile
+
+    type(config).get_LogToFile = get_LogToFile
+
+    # first run for a short time
+    dt = config.get_description()['level_params']['dt']
+    config.Tend = 2 * dt
+    run_experiment(args, config)
+
+
 @pytest.mark.order(1)
 def test_run_experiment(restart_idx=0):
     from pySDC.projects.GPU.configs.base_config import Config
@@ -108,6 +143,9 @@ def test_restart():
 
 
 if __name__ == '__main__':
+    test_run('.')
+    exit()
+
     import argparse
 
     parser = argparse.ArgumentParser()

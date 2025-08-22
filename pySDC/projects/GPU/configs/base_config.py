@@ -224,15 +224,13 @@ class LogStats(ConvergenceController):
     def post_step_processing(self, controller, S, **kwargs):
         hook = self.params.hook
 
-        for _hook in controller.hooks:
-            _hook.post_step(S, 0)
-
         P = S.levels[0].prob
 
-        if S.time > 0 and self.counter == 0:
+        if self.counter == 0:
             self.counter = hook.counter - 1
+
         while self.counter < hook.counter:
-            path = self.get_stats_path(index=self.counter)
+            path = self.get_stats_path(index=self.counter - 1)
             stats = controller.return_stats()
             store = True
             if hasattr(S.levels[0].sweep, 'comm') and S.levels[0].sweep.comm.rank > 0:
