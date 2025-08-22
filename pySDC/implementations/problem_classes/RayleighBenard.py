@@ -58,7 +58,8 @@ class RayleighBenard(GenericSpectralLinear):
         BCs=None,
         dealiasing=3 / 2,
         comm=None,
-        Lx=8,
+        Lx=4,
+        Lz=1,
         **kwargs,
     ):
         """
@@ -77,7 +78,7 @@ class RayleighBenard(GenericSpectralLinear):
         BCs = {} if BCs is None else BCs
         BCs = {
             'T_top': 0,
-            'T_bottom': 2,
+            'T_bottom': 1,
             'v_top': 0,
             'v_bottom': 0,
             'u_top': 0,
@@ -101,11 +102,15 @@ class RayleighBenard(GenericSpectralLinear):
             'dealiasing',
             'comm',
             'Lx',
+            'Lz',
             localVars=locals(),
             readOnly=True,
         )
 
-        bases = [{'base': 'fft', 'N': nx, 'x0': 0, 'x1': self.Lx}, {'base': 'ultraspherical', 'N': nz}]
+        bases = [
+            {'base': 'fft', 'N': nx, 'x0': 0, 'x1': self.Lx},
+            {'base': 'ultraspherical', 'N': nz, 'x0': 0, 'x1': self.Lz},
+        ]
         components = ['u', 'v', 'T', 'p']
         super().__init__(bases, components, comm=comm, **kwargs)
 
@@ -370,12 +375,13 @@ class RayleighBenard(GenericSpectralLinear):
             u_hat = u.copy()
         else:
             u_hat = self.transform(u)
+
         Dz = self.Dz
         Dx = self.Dx
         iu, iv = self.index(['u', 'v'])
 
         vorticity_hat = self.spectral.u_init_forward
-        vorticity_hat[0] = (Dx * u_hat[iv].flatten() + Dz @ u_hat[iu].flatten()).reshape(u[iu].shape)
+        vorticity_hat[0] = (Dx * u_hat[iv].flatten() + Dz @ u_hat[iu].flatten()).reshape(u_hat[iu].shape)
         return self.itransform(vorticity_hat)[0].real
 
     def getOutputFile(self, fileName):
@@ -418,14 +424,14 @@ class RayleighBenard(GenericSpectralLinear):
             dict: Nusselt number averaged over the entire volume and horizontally averaged at the top and bottom.
         """
         iv, iT = self.index(['v', 'T'])
-
-        DzT_hat = self.spectral.u_init_forward
+        zAxis = self.spectral.axes[-1]
 
         if self.spectral_space:
             u_hat = u.copy()
         else:
             u_hat = self.transform(u)
 
+        DzT_hat = self.spectral.u_init_forward
         DzT_hat[iT] = (self.Dz @ u_hat[iT].flatten()).reshape(DzT_hat[iT].shape)
 
         # compute vT with dealiasing
@@ -435,21 +441,25 @@ class RayleighBenard(GenericSpectralLinear):
         _me[0] = u_pad[iv] * u_pad[iT]
         vT_hat = self.transform(_me, padding=padding)[0]
 
-        # nusselt_hat = (vT_hat - DzT_hat[iT]) / self.nx
+        if not hasattr(self, '_zInt'):
+            self._zInt = zAxis.get_integration_matrix()
+
         nusselt_hat = (vT_hat / self.kappa - DzT_hat) * self.axes[-1].L
 
-        integral_z = self.xp.sum(nusselt_hat * self.spectral.axes[1].get_BC(kind='integral'), axis=-1).real
-        integral_V = (
-            integral_z[0] * self.axes[0].L
-        )  # only the first Fourier mode has non-zero integral with periodic BCs
-        Nusselt_V = self.comm.bcast(integral_V / self.spectral.V, root=0)
+        # get coefficients for evaluation on the boundary
+        top = zAxis.get_BC(kind='Dirichlet', x=1)
+        bot = zAxis.get_BC(kind='Dirichlet', x=-1)
 
-        Nusselt_t = self.comm.bcast(
-            self.xp.sum(nusselt_hat * self.spectral.axes[1].get_BC(kind='Dirichlet', x=1), axis=-1).real[0], root=0
-        )
-        Nusselt_b = self.comm.bcast(
-            self.xp.sum(nusselt_hat * self.spectral.axes[1].get_BC(kind='Dirichlet', x=-1), axis=-1).real[0], root=0
-        )
+        integral_V = 0
+        if self.comm.rank == 0:
+
+            integral_z = (self._zInt @ nusselt_hat[0, 0]).real
+            integral_z[0] = zAxis.get_integration_constant(integral_z, axis=-1)
+            integral_V = ((top - bot) * integral_z).sum() * self.axes[0].L / self.nx
+
+        Nusselt_V = self.comm.bcast(integral_V / self.spectral.V, root=0)
+        Nusselt_t = self.comm.bcast(self.xp.sum(nusselt_hat.real[0, 0] * top, axis=-1) / self.nx, root=0)
+        Nusselt_b = self.comm.bcast(self.xp.sum(nusselt_hat.real[0, 0] * bot, axis=-1) / self.nx, root=0)
 
         return {
             'V': Nusselt_V,

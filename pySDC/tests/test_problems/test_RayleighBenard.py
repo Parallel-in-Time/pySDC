@@ -110,18 +110,34 @@ def test_Nusselt_numbers(v, nx=6, nz=4):
     from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
 
     BCs = {
-        'v_top': v,
-        'v_bottom': v,
+        'v_top': 0,
+        'v_bottom': 0,
     }
 
-    P = RayleighBenard(nx=nx, nz=nz, BCs=BCs, dealiasing=1.5)
+    P = RayleighBenard(nx=nx, nz=nz, BCs=BCs, dealiasing=1.0, Rayleigh=1)
+    prob = P
+    xp = prob.xp
+    iv, iT = prob.index(['v', 'T'])
 
     u = P.u_exact(noise_level=0)
 
-    nusselt = P.compute_Nusselt_numbers(u)
-    expect = {'V': 1 + v, 't': 1, 'b': +1 + 2 * v, 'b_no_v': 1, 't_no_v': 1}
-    for key in nusselt.keys():
-        assert np.isclose(nusselt[key], expect[key]), key
+    u = prob.u_init
+    u[iT, ...] = 3 * prob.Z**2 + 1
+    u[iv] = v * (1 + xp.sin(prob.X / prob.axes[0].L * 2 * xp.pi))
+    Nu = prob.compute_Nusselt_numbers(u)
+    for key, expect in zip(['t', 'b', 'V'], [prob.Lz * (3 + 1) * v - 6, v, v * (1 + 1) - 3]):
+        assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
+
+    return None
+
+    # for key, expect in zip(['t', 'b', 'V'], [prob.Lz * (3 + 1) * w - 6, w, w * (1 + 1) - 3]):
+    #     assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
+
+    # nusselt = P.compute_Nusselt_numbers(u)
+    # expect = {'V':v, 't': 0, 'b': + 2 * v}
+    # print(nusselt, expect)
+    # for key in nusselt.keys():
+    #     assert np.isclose(nusselt[key], expect[key]), key
 
 
 def test_viscous_dissipation(nx=2**5 + 1, nz=2**3 + 1):
@@ -318,7 +334,7 @@ if __name__ == '__main__':
     # test_Poisson_problem(1, 'T')
     # test_Poisson_problem_v()
     # test_apply_BCs()
-    test_Nusselt_numbers(3.14)
+    test_Nusselt_numbers(1)
     # test_buoyancy_computation()
     # test_viscous_dissipation()
     # test_CFL()
