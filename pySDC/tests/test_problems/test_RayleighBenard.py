@@ -105,7 +105,7 @@ def test_vorticity(nx, nz, direction):
 
 @pytest.mark.mpi4py
 @pytest.mark.parametrize('v', [0, 3.14])
-def test_Nusselt_numbers(v, nx=6, nz=4):
+def test_Nusselt_numbers(v, nx=1, nz=10):
     import numpy as np
     from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
 
@@ -114,12 +114,22 @@ def test_Nusselt_numbers(v, nx=6, nz=4):
         'v_bottom': 0,
     }
 
-    P = RayleighBenard(nx=nx, nz=nz, BCs=BCs, dealiasing=1.0, Rayleigh=1)
+    P = RayleighBenard(nx=nx, nz=nz, BCs=BCs, dealiasing=1.0, Rayleigh=1, spectral_space=False)
     prob = P
     xp = prob.xp
     iv, iT = prob.index(['v', 'T'])
 
-    u = P.u_exact(noise_level=0)
+    u = prob.u_init
+    u[iT, ...] = prob.Z
+    Nu = prob.compute_Nusselt_numbers(u)
+    for key, expect in zip(['t', 'b', 'V'], [-1, -1, -1]):
+        assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
+
+    u = prob.u_init
+    u[iT, ...] = 3 * prob.Z**2 + 1
+    Nu = prob.compute_Nusselt_numbers(u)
+    for key, expect in zip(['t', 'b', 'V'], [-6, 0, -3]):
+        assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
 
     u = prob.u_init
     u[iT, ...] = 3 * prob.Z**2 + 1
@@ -127,17 +137,6 @@ def test_Nusselt_numbers(v, nx=6, nz=4):
     Nu = prob.compute_Nusselt_numbers(u)
     for key, expect in zip(['t', 'b', 'V'], [prob.Lz * (3 + 1) * v - 6, v, v * (1 + 1) - 3]):
         assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
-
-    return None
-
-    # for key, expect in zip(['t', 'b', 'V'], [prob.Lz * (3 + 1) * w - 6, w, w * (1 + 1) - 3]):
-    #     assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
-
-    # nusselt = P.compute_Nusselt_numbers(u)
-    # expect = {'V':v, 't': 0, 'b': + 2 * v}
-    # print(nusselt, expect)
-    # for key in nusselt.keys():
-    #     assert np.isclose(nusselt[key], expect[key]), key
 
 
 def test_viscous_dissipation(nx=2**5 + 1, nz=2**3 + 1):
@@ -198,7 +197,7 @@ def test_Poisson_problems(nx, component):
         'T_bottom': 0,
     }
     P = RayleighBenard(
-        nx=nx, nz=6, BCs=BCs, Rayleigh=(max([abs(BCs['T_top'] - BCs['T_bottom']), np.finfo(float).eps]) * 2**3)
+        nx=nx, nz=6, BCs=BCs, Rayleigh=(max([abs(BCs['T_top'] - BCs['T_bottom']), np.finfo(float).eps]) * 2**3), Lz=2
     )
     rhs = P.u_init
 
@@ -237,7 +236,7 @@ def test_Poisson_problem_v():
         'v_top': 0,
         'v_bottom': 0,
         'T_top': 0,
-        'T_bottom': 2,
+        'T_bottom': 1,
     }
     P = RayleighBenard(nx=2, nz=2**3, BCs=BCs, Rayleigh=1.0)
     iv = P.index('v')
@@ -272,7 +271,7 @@ def test_CFL():
     from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard, CFLLimit
     import numpy as np
 
-    P = RayleighBenard(nx=5, nz=2, spectral_space=False)
+    P = RayleighBenard(nx=5, nz=2, spectral_space=False, Lz=2)
     iu, iv = P.index(['u', 'v'])
 
     u = P.u_init
@@ -331,11 +330,11 @@ def test_apply_BCs():
 
 if __name__ == '__main__':
     # test_eval_f(2**0, 2**2, 'z', True)
-    # test_Poisson_problem(1, 'T')
+    # test_Poisson_problems(1, 'T')
     # test_Poisson_problem_v()
     # test_apply_BCs()
-    test_Nusselt_numbers(1)
+    # test_Nusselt_numbers(1)
     # test_buoyancy_computation()
     # test_viscous_dissipation()
-    # test_CFL()
+    test_CFL()
     # test_Nyquist_mode_elimination()

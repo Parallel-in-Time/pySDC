@@ -431,8 +431,7 @@ class RayleighBenard(GenericSpectralLinear):
         else:
             u_hat = self.transform(u)
 
-        DzT_hat = self.spectral.u_init_forward
-        DzT_hat[iT] = (self.Dz @ u_hat[iT].flatten()).reshape(DzT_hat[iT].shape)
+        DzT_hat = (self.Dz @ u_hat[iT].flatten()).reshape(u_hat[iT].shape)
 
         # compute vT with dealiasing
         padding = (self.dealiasing, self.dealiasing)
@@ -453,13 +452,13 @@ class RayleighBenard(GenericSpectralLinear):
         integral_V = 0
         if self.comm.rank == 0:
 
-            integral_z = (self._zInt @ nusselt_hat[0, 0]).real
+            integral_z = (self._zInt @ nusselt_hat[0]).real
             integral_z[0] = zAxis.get_integration_constant(integral_z, axis=-1)
             integral_V = ((top - bot) * integral_z).sum() * self.axes[0].L / self.nx
 
         Nusselt_V = self.comm.bcast(integral_V / self.spectral.V, root=0)
-        Nusselt_t = self.comm.bcast(self.xp.sum(nusselt_hat.real[0, 0] * top, axis=-1) / self.nx, root=0)
-        Nusselt_b = self.comm.bcast(self.xp.sum(nusselt_hat.real[0, 0] * bot, axis=-1) / self.nx, root=0)
+        Nusselt_t = self.comm.bcast(self.xp.sum(nusselt_hat.real[0] * top, axis=-1) / self.nx, root=0)
+        Nusselt_b = self.comm.bcast(self.xp.sum(nusselt_hat.real[0] * bot, axis=-1) / self.nx, root=0)
 
         return {
             'V': Nusselt_V,
@@ -536,8 +535,8 @@ class CFLLimit(ConvergenceController):
         grid_spacing_x = P.X[1, 0] - P.X[0, 0]
 
         cell_wallz = P.xp.zeros(P.nz + 1)
-        cell_wallz[0] = 1
-        cell_wallz[-1] = -1
+        cell_wallz[0] = P.Lz
+        cell_wallz[-1] = 0
         cell_wallz[1:-1] = (P.Z[0, :-1] + P.Z[0, 1:]) / 2
         grid_spacing_z = cell_wallz[:-1] - cell_wallz[1:]
 

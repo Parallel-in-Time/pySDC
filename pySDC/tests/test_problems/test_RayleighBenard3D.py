@@ -294,7 +294,7 @@ def test_heterogeneous_implementation():
 
 @pytest.mark.mpi4py
 @pytest.mark.parametrize('w', [0, 1, 3.14])
-def test_Nusselt_number_computation(w, N=4):
+def test_Nusselt_number_computation(w, N=6):
     from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
 
     prob = RayleighBenard3D(nx=N, ny=N, nz=N, dealiasing=1.0, spectral_space=False)
