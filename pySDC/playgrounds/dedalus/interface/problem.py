@@ -17,6 +17,60 @@ from dedalus.tools.array import apply_sparse
 from dedalus.core.field import Field
 
 
+# -----------------------------------------------------------------------------
+# Tentative for a cleaner interface between pySDC and Dedalus
+# -----------------------------------------------------------------------------
+class Tendencies(object):
+
+    def __init__(self):
+        # TODO : constructor requirements ?
+        # -> Step.init_step : copy of initial tendency with u[0] = P.dtype_u(u0)
+        self.terms = []
+
+    def __iadd__(self, f:"Tendencies") -> "Tendencies":
+        # TODO : inplace addition with other full tendencies
+        pass
+
+    def axpy(self, a:float|list[float], x:"Tendencies") -> "Tendencies":
+        if isinstance(a, float):
+            # TODO : y += a*x when x contains all tendencies
+            pass
+        if isinstance(a, list):
+            # TODO : y += a1*x1 + a2*x2 + ... when x1, x2 are each tendency
+            # Note : if some a[i] are zeros, it should be a no-op
+            pass
+        raise ValueError("wrong type for a")
+
+
+class Solution(object):
+
+    def __init__(self, init=None, val=0.0):
+        # TODO : constructor requirements ?
+        pass
+
+class DProblem(Problem):
+
+    dtype_u = Solution
+    dtype_f = Tendencies
+
+    def eval_f(self, u:Solution, t:float, f:Tendencies) -> Tendencies:
+        # TODO : inplace modify f with the tendencies evaluation
+        pass
+
+    def solve_system(self, rhs:Tendencies, dt:float, u:Solution, t:float) -> Solution:
+        # TODO : inplace modify u with the system solve
+        #   u + dt*f_I(u, t) = rhs
+        #   using u as initial solution for an eventual iterative solver
+        pass
+
+    def apply_mass_matrix(self, u:Solution, rhs:Tendencies) -> Tendencies:
+        # TODO : inplace evaluation in rhs of mass-matrix multiplication
+        pass
+
+
+# -----------------------------------------------------------------------------
+# First interface
+# -----------------------------------------------------------------------------
 def State(cls, fields):
     return [f.copy() for f in fields]
 
