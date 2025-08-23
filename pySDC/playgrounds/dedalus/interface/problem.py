@@ -18,55 +18,114 @@ from dedalus.core.field import Field
 
 
 # -----------------------------------------------------------------------------
-# Tentative for a cleaner interface between pySDC and Dedalus
+# Tentative for a cleaner interface for pySDC
 # -----------------------------------------------------------------------------
-class Tendencies(object):
+class FValues(object):
 
-    def __init__(self):
-        # TODO : constructor requirements ?
-        # -> Step.init_step : copy of initial tendency with u[0] = P.dtype_u(u0)
-        self.terms = []
+    def copy(self) -> "FValues":
+        # TODO : return a copy of itself
+        raise NotImplementedError
 
-    def __iadd__(self, f:"Tendencies") -> "Tendencies":
+class Tendency(object):
+
+    def __iadd__(self, f:FValues) -> "Tendency":
         # TODO : inplace addition with other full tendencies
-        pass
+        raise NotImplementedError
 
-    def axpy(self, a:float|list[float], x:"Tendencies") -> "Tendencies":
-        if isinstance(a, float):
+    def axpy(self, a:float, x:FValues|"Tendency") -> "Tendency":
+        # Note : if a == 0, this should be a no-op ... or better, assert a != 0
+        if isinstance(x, FValues):
             # TODO : y += a*x when x contains all tendencies
             pass
-        if isinstance(a, list):
-            # TODO : y += a1*x1 + a2*x2 + ... when x1, x2 are each tendency
-            # Note : if some a[i] are zeros, it should be a no-op
+        if isinstance(x, Tendency):
+            # TODO : y += a*x when x is only one tendency
             pass
-        raise ValueError("wrong type for a")
+        raise ValueError("wrong type for x")
 
-
-class Solution(object):
+class UValues(object):
 
     def __init__(self, init=None, val=0.0):
         # TODO : constructor requirements ?
+        # -> Step.init_step : copy of initial tendency with u[0] = P.dtype_u(u0)
+        if isinstance(init, UValues):
+            pass
+        else:
+            pass
+
+
+    def setValues(self, other:"UValues"):
+        # TODO : copy other values into current instance
+        raise NotImplementedError
+
+    def toTendency(self) -> Tendency:
+        """Convert into a Tendency instance"""
+        raise NotImplementedError
+
+
+
+class BaseProblem(Problem):
+
+    dtype_u = UValues
+    dtype_f = FValues
+
+    def eval_f(self, u:UValues, t:float, f:FValues) -> FValues:
+        # TODO : inplace evaluate f(u, t)
+        raise NotImplementedError
+
+    def solve_system(self, rhs:Tendency, dt:float, u:UValues, t:float) -> UValues:
+        # TODO : inplace modify u with the system solve
+        #   u + dt*f_I(u, t) = rhs
+        #   using u as initial solution for an eventual iterative solver
+        raise NotImplementedError
+
+    def apply_mass_matrix(self, u:UValues) -> Tendency:
+        """Apply eventual mass matrix on u to produce a tendency (default: no mass matrix)"""
+        return u.toTendency()
+
+# -----------------------------------------------------------------------------
+# Dedalus specific implementation
+# -----------------------------------------------------------------------------
+class DedalusTendency(Tendency):
+
+    def __init__(self):
+        self.vals:CoeffSystem = None
+
+    def __iadd__(self, f: "DedalusTendency"):
+        self.vals.data += f.vals.data
+        return self
+
+    def axpy(self, a:float, x:"DedalusTendency"|"DedalusFValues") -> "DedalusTendency":
+        if isinstance(x, DedalusTendency):
+            self.vals.data += a*x.vals.data
+        if isinstance(x, DedalusFValues):
+            self.vals.data += a*(x.impl.vals.data + x.expl.vals.data)
+
+
+class DedalusFValues(FValues):
+
+    def __init__(self):
+        self.impl:DedalusTendency = None
+        self.expl:DedalusTendency = None
+
+
+class DedalProblem(BaseProblem):
+
+    dtype_u = UValues
+    dtype_f = FValues
+
+    def eval_f(self, u:UValues, t:float) -> FValues:
+        # TODO : evaluate f(u, t)
         pass
 
-class DProblem(Problem):
-
-    dtype_u = Solution
-    dtype_f = Tendencies
-
-    def eval_f(self, u:Solution, t:float, f:Tendencies) -> Tendencies:
-        # TODO : inplace modify f with the tendencies evaluation
-        pass
-
-    def solve_system(self, rhs:Tendencies, dt:float, u:Solution, t:float) -> Solution:
+    def solve_system(self, rhs:Tendency, dt:float, u:UValues, t:float) -> UValues:
         # TODO : inplace modify u with the system solve
         #   u + dt*f_I(u, t) = rhs
         #   using u as initial solution for an eventual iterative solver
         pass
 
-    def apply_mass_matrix(self, u:Solution, rhs:Tendencies) -> Tendencies:
+    def apply_mass_matrix(self, u:UValues, rhs:Tendency) -> Tendency:
         # TODO : inplace evaluation in rhs of mass-matrix multiplication
         pass
-
 
 # -----------------------------------------------------------------------------
 # First interface

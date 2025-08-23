@@ -22,9 +22,11 @@ def buildAdvDiffProblem(nX, listK, nu=0):
     It uses an initial solution of the form :
 
     .. math::
-        u_0 = \sum_{i=0}^{N-1} \cos(k[i]x)
+        u_0 = \sum_{i=0}^{N-1} \cos(k[i](x-2\pi\phi[i]))
 
-    with the list of :math:`k[...]` given as argument.
+    with the list of :math:`k[...]` given as argument
+    and the :math:`\phi` values determined using a random normal
+    distribution between 0 and 1.
 
     Parameters
     ----------
@@ -59,7 +61,7 @@ def buildAdvDiffProblem(nX, listK, nu=0):
 
     # -- initial solution
     x = xbasis.local_grid(dist, scale=1)
-    u0 = np.sum([np.cos(k*x) for k in listK], axis=0)
+    u0 = np.sum([np.cos(k*(x - np.random.rand()*2*np.pi)) for k in listK], axis=0)
     np.copyto(u['g'], u0)
     u0 = u.copy()   # store initial field into a copy
 

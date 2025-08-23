@@ -15,8 +15,8 @@ from pySDC.playgrounds.dedalus.timestepper import SpectralDeferredCorrectionIMEX
 # -----------------------------------------------------------------------------
 # User parameters
 # -----------------------------------------------------------------------------
-listK = [0, 1, 2]   # list of initial wavenumber in the solution (amplitude 1)
-nX = 128            # number of points in x (periodic domain)
+listK = range(32)   # list of initial wavenumber in the solution (amplitude 1)
+nX = 64             # number of points in x (periodic domain)
 
 # -----------------------------------------------------------------------------
 # Solver setup
@@ -32,9 +32,10 @@ orderPlot = {'RK111': 1,
              'RK443': 3,
              'ERK4': 4}
 
+implSweep = 'MIN-SR-FLEX'
 SpectralDeferredCorrectionIMEX.setParameters(
     nNodes=4, nodeType='LEGENDRE', quadType='RADAU-RIGHT',
-    implSweep='MIN-SR-FLEX', explSweep='PIC', initSweep='COPY')
+    implSweep=implSweep, explSweep='PIC', initSweep='COPY')
 
 # -----------------------------------------------------------------------------
 # Simulations
@@ -52,7 +53,7 @@ for timeStepper in [d3.RK111, d3.RK222, d3.RK443, 1, 2, 3]:
         timeStepper.setParameters(nSweeps=nSweeps)
         useSDC = True
 
-        scheme = f"SDC[{SpectralDeferredCorrectionIMEX.implSweep}, K={nSweeps}]"
+        scheme = f"SDC[{implSweep}, K={nSweeps}]"
     else:
         scheme = timeStepper.__name__
     print(f" -- solving using {scheme}")
@@ -74,7 +75,7 @@ for timeStepper in [d3.RK111, d3.RK222, d3.RK443, 1, 2, 3]:
         return dt, err
 
     # Run all simulations
-    listNumStep = [2**(i+2) for i in range(11)]
+    listNumStep = [2**(i+3) for i in range(11)]
     dt, err = np.array([getErr(n) for n in listNumStep]).T
 
     # Plot error VS time step
