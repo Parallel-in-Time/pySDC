@@ -22,8 +22,6 @@ class imex_1st_order_mass(imex_1st_order):
         # only if the level has been touched before
         assert L.status.unlocked
 
-        self.updateVariableCoeffs(L.status.sweep)
-
         # gather all terms which are known already (e.g. from the previous iteration)
         # this corresponds to u0 + QF(u^k) - QIFI(u^k) - QEFE(u^k) + tau
 
