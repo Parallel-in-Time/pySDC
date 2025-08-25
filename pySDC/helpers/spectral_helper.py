@@ -535,6 +535,8 @@ class ChebychevHelper(SpectralHelper1D):
             return self.get_integ_BC_row(**kwargs)
         elif kind.lower() == 'dirichlet':
             return self.get_Dirichlet_BC_row(**kwargs)
+        elif kind.lower() == 'neumann':
+            return self.get_Neumann_BC_row(**kwargs)
         else:
             return super().get_BC(kind)
 
@@ -571,6 +573,27 @@ class ChebychevHelper(SpectralHelper1D):
             n = (1 + (-1) ** self.xp.arange(self.N)) / 2
             n[2::4] *= -1
             return n
+        else:
+            raise NotImplementedError(f'Don\'t know how to generate Dirichlet BC\'s at {x=}!')
+
+    def get_Neumann_BC_row(self, x):
+        """
+        Get a row for generating Neumann BCs at x with T polynomials.
+
+        Args:
+            x (float): Position of the boundary condition
+
+        Returns:
+            self.xp.ndarray: Row to put into a matrix
+        """
+        n = self.xp.arange(self.N, dtype='D')
+        nn = n**2
+        if x == -1:
+            me = nn
+            me[1:] *= (-1) ** n[:-1]
+            return me
+        elif x == 1:
+            return nn
         else:
             raise NotImplementedError(f'Don\'t know how to generate Dirichlet BC\'s at {x=}!')
 
