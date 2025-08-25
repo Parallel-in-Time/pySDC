@@ -243,9 +243,9 @@ class LogStats(ConvergenceController):
             self.counter = hook.counter
 
     def post_run_processing(self, controller, S, **kwargs):
-        stats = self.merge_all_stats(controller)
-
         self.post_step_processing(controller, S, **kwargs)
+
+        stats = self.merge_all_stats(controller)
 
         def return_stats():
             return stats

@@ -60,6 +60,7 @@ class RayleighBenard(GenericSpectralLinear):
         comm=None,
         Lx=4,
         Lz=1,
+        z0=0,
         **kwargs,
     ):
         """
@@ -74,6 +75,8 @@ class RayleighBenard(GenericSpectralLinear):
             dealiasing (float): Dealiasing for evaluating the non-linear part in real space
             comm (mpi4py.Intracomm): Space communicator
             Lx (float): Horizontal length of the domain
+            Lz (float): Vertical length of the domain
+            z0 (float): Position of lower boundary
         """
         BCs = {} if BCs is None else BCs
         BCs = {
@@ -103,13 +106,14 @@ class RayleighBenard(GenericSpectralLinear):
             'comm',
             'Lx',
             'Lz',
+            'z0',
             localVars=locals(),
             readOnly=True,
         )
 
         bases = [
             {'base': 'fft', 'N': nx, 'x0': 0, 'x1': self.Lx},
-            {'base': 'ultraspherical', 'N': nz, 'x0': 0, 'x1': self.Lz},
+            {'base': 'ultraspherical', 'N': nz, 'x0': self.z0, 'x1': self.Lz},
         ]
         components = ['u', 'v', 'T', 'p']
         super().__init__(bases, components, comm=comm, **kwargs)
@@ -252,8 +256,8 @@ class RayleighBenard(GenericSpectralLinear):
 
         # linear temperature gradient
         for comp in ['T', 'v', 'u']:
-            a = (self.BCs[f'{comp}_top'] - self.BCs[f'{comp}_bottom']) / 2
-            b = (self.BCs[f'{comp}_top'] + self.BCs[f'{comp}_bottom']) / 2
+            a = (self.BCs[f'{comp}_top'] - self.BCs[f'{comp}_bottom']) / self.Lz
+            b = self.BCs[f'{comp}_bottom'] - a * self.z0
             me[self.index(comp)] = a * self.Z + b
 
         # perturb slightly
@@ -262,7 +266,7 @@ class RayleighBenard(GenericSpectralLinear):
         noise = self.spectral.u_init
         noise[iT] = rng.random(size=me[iT].shape)
 
-        me[iT] += noise[iT].real * noise_level * (self.Z - 1) * (self.Z + 1)
+        me[iT] += noise[iT].real * noise_level * (self.Z - self.z0) * (self.Z - self.z0 + self.Lz)
 
         if self.spectral_space:
             me_hat = self.spectral.u_init_forward
