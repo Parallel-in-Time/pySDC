@@ -419,5 +419,25 @@ def test_tau_method2D_diffusion(nz, nx, bc_val, plotting=False):
         ), f'Solution is incorrectly transformed back to real space at x={x[i]}'
 
 
-if __name__ == '__main__':
-    test_transform_cupy()
+@pytest.mark.base
+@pytest.mark.parametrize('N', [4, 7, 32])
+@pytest.mark.parametrize('x', [-1, 1])
+@pytest.mark.parametrize('v', [2, 3])
+def test_Neumann_BCs(N, x, v):
+    from pySDC.helpers.spectral_helper import ChebychevHelper
+    import numpy as np
+
+    helper = ChebychevHelper(N)
+
+    BC = helper.get_BC('Neumann', x=x)
+
+    grid = helper.get_1dgrid()
+    u = grid**v
+
+    u_hat = helper.transform(u)
+
+    value_at_BC = np.sum(u_hat * BC, axis=0)
+    if v % 2 == 1:
+        assert np.isclose(value_at_BC, v)
+    else:
+        assert np.isclose(value_at_BC, x * v)
