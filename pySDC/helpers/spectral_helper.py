@@ -595,7 +595,7 @@ class ChebychevHelper(SpectralHelper1D):
         elif x == 1:
             return nn
         else:
-            raise NotImplementedError(f'Don\'t know how to generate Dirichlet BC\'s at {x=}!')
+            raise NotImplementedError(f'Don\'t know how to generate Neumann BC\'s at {x=}!')
 
     def get_Dirichlet_recombination_matrix(self):
         '''
