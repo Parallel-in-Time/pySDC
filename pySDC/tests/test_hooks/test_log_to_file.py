@@ -126,7 +126,10 @@ def test_logging(tmpdir, use_pickle, ODE=True):
 
     for us, uf in zip(u, u_file):
         assert us[0] == uf[0], 'time does not match'
-        assert np.allclose(us[1], uf[1]), 'solution does not match'
+        if ODE:
+            assert np.allclose(us[1], uf[1]), 'solution does not match'
+        else:
+            assert np.allclose(us[1], uf[1][:4]), 'solution does not match'
 
 
 @pytest.mark.base

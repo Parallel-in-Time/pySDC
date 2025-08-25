@@ -35,76 +35,69 @@ def create_directories():
     os.makedirs(path, exist_ok=True)
 
 
-@pytest.mark.order(1)
-def test_run_experiment(restart_idx=0):
-    from pySDC.projects.GPU.configs.base_config import Config
-    from pySDC.projects.GPU.run_experiment import run_experiment, parse_args
+def test_run(tmpdir):
+    from pySDC.projects.GPU.configs.base_config import get_config
+    from pySDC.projects.GPU.run_experiment import run_experiment
     from pySDC.helpers.stats_helper import get_sorted
+    from pySDC.helpers.fieldsIO import FieldsIO
     import pickle
     import numpy as np
 
-    create_directories()
-
-    class VdPConfig(Config):
-        sweeper_type = 'generic_implicit'
-        Tend = 1
-
-        def get_description(self, *args, **kwargs):
-            from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
-
-            desc = super().get_description(*args, **kwargs)
-            desc['problem_class'] = vanderpol
-            desc['problem_params'].pop('useGPU')
-            desc['problem_params'].pop('comm')
-            desc['sweeper_params']['num_nodes'] = 2
-            desc['sweeper_params']['quad_type'] = 'RADAU-RIGHT'
-            desc['sweeper_params']['QI'] = 'LU'
-            desc['level_params']['dt'] = 0.1
-            desc['step_params']['maxiter'] = 3
-            return desc
-
-        def get_LogToFile(self, ranks=None):
-            from pySDC.implementations.hooks.log_solution import LogToPickleFileAfterXS as LogToFile
-
-            LogToFile.path = './data/'
-            LogToFile.file_name = f'{self.get_path(ranks=ranks)}-solution'
-            LogToFile.time_increment = 2e-1
-
-            def logging_condition(L):
-                sweep = L.sweep
-                if hasattr(sweep, 'comm'):
-                    if sweep.comm.rank == sweep.comm.size - 1:
-                        return True
-                    else:
-                        return False
-                else:
-                    return True
-
-            LogToFile.logging_condition = logging_condition
-            return LogToFile
-
     args = {
+        'config': 'RBC',
         'procs': [1, 1, 1],
-        'useGPU': False,
-        'res': -1,
-        'logger_level': 15,
-        'restart_idx': restart_idx,
+        'res': 16,
         'mode': 'run',
+        'useGPU': False,
+        'o': tmpdir,
+        'logger_level': 15,
+        'restart_idx': 0,
     }
-    config = VdPConfig(args)
+    config = get_config(args)
+    type(config).base_path = args['o']
+
+    def get_LogToFile(self, *args, **kwargs):
+        if self.comms[1].rank > 0:
+            return None
+        from pySDC.implementations.hooks.log_solution import LogToFile
+
+        LogToFile.filename = self.get_file_name()
+        LogToFile.time_increment = 0
+        LogToFile.allow_overwriting = True
+
+        return LogToFile
+
+    type(config).get_LogToFile = get_LogToFile
+    stats_path = f'{config.base_path}/data/{config.get_path()}-stats-whole-run.pickle'
+    file_path = config.get_file_name()
+
+    # first run for a short time
+    dt = config.get_description()['level_params']['dt']
+    config.Tend = 2 * dt
     run_experiment(args, config)
 
-    with open(f'data/{config.get_path()}-stats-whole-run.pickle', 'rb') as file:
+    # check data
+    data = FieldsIO.fromFile(file_path)
+    with open(stats_path, 'rb') as file:
         stats = pickle.load(file)
 
-    k_Newton = get_sorted(stats, type='work_newton')
-    assert len(k_Newton) == 10
-    assert sum([me[1] for me in k_Newton]) == 91
+    dts = get_sorted(stats, type='dt')
+    assert len(dts) == len(data.times) - 1
+    assert np.allclose(data.times, 0.1 * np.arange(3)), 'Did not record solutions at expected times'
 
+    # restart run
+    args['restart_idx'] = -1
+    config.Tend = 4 * dt
+    run_experiment(args, config)
 
-@pytest.mark.order(2)
-def test_restart():
-    test_run_experiment(3)
+    # check data
+    data = FieldsIO.fromFile(file_path)
+    with open(stats_path, 'rb') as file:
+        stats = pickle.load(file)
+    dts = get_sorted(stats, type='dt')
+
+    assert len(dts) == len(data.times) - 1
+    assert np.allclose(data.times, 0.1 * np.arange(5)), 'Did not record solutions at expected times after restart'
 
 
 if __name__ == '__main__':
@@ -117,9 +110,5 @@ if __name__ == '__main__':
 
     if args.test == 'get_comms':
         test_get_comms(False)
-    elif args.test == 'run_experiment':
-        test_run_experiment()
-    elif args.test == 'restart':
-        test_restart()
     else:
         raise NotImplementedError

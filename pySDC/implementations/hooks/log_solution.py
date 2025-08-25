@@ -208,6 +208,7 @@ class LogToFile(Hooks):
     filename = 'myRun.pySDC'
     time_increment = 0
     allow_overwriting = False
+    counter = 0  # number of stored time points in the file
 
     def __init__(self):
         super().__init__()
@@ -224,8 +225,9 @@ class LogToFile(Hooks):
         if os.path.isfile(self.filename) and L.time > 0:
             L.prob.setUpFieldsIO()
             self.outfile = FieldsIO.fromFile(self.filename)
+            self.counter = len(self.outfile.times)
             self.logger.info(
-                f'Set up file {self.filename!r} for writing output. This file already contains solutions up to t={self.outfile.times[-1]:.4f}.'
+                f'Set up file {self.filename!r} for writing output. This file already contains {self.counter} solutions up to t={self.outfile.times[-1]:.4f}.'
             )
         else:
             self.outfile = L.prob.getOutputFile(self.filename)
@@ -235,6 +237,9 @@ class LogToFile(Hooks):
             if L.time not in self.outfile.times:
                 self.outfile.addField(time=L.time, field=L.prob.processSolutionForOutput(L.u[0]))
                 self.logger.info(f'Written initial conditions at t={L.time:4f} to file')
+
+        type(self).counter = len(self.outfile.times)
+        self.logger.info(f'Will write to disk every {self.time_increment:.4e} time units')
 
     def post_step(self, step, level_number):
         if level_number > 0:
@@ -252,6 +257,20 @@ class LogToFile(Hooks):
             self.outfile.addField(time=L.time + L.dt, field=L.prob.processSolutionForOutput(L.uend))
             self.logger.info(f'Written solution at t={L.time+L.dt:.4f} to file')
             self.t_next_log = max([L.time + L.dt, self.t_next_log]) + self.time_increment
+            type(self).counter = len(self.outfile.times)
+
+    def post_run(self, step, level_number):
+        if level_number > 0:
+            return None
+
+        L = step.levels[level_number]
+
+        value_exists = True in [abs(me - (L.time + L.dt)) < np.finfo(float).eps * 1000 for me in self.outfile.times]
+        if not value_exists:
+            self.outfile.addField(time=L.time + L.dt, field=L.prob.processSolutionForOutput(L.uend))
+            self.logger.info(f'Written solution at t={L.time+L.dt:.4f} to file')
+            self.t_next_log = max([L.time + L.dt, self.t_next_log]) + self.time_increment
+            type(self).counter = len(self.outfile.times)
 
     @classmethod
     def load(cls, index):
