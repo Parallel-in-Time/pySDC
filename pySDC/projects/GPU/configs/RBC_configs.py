@@ -29,54 +29,6 @@ class RayleighBenardRegular(Config):
     sweeper_type = 'IMEX'
     Tend = 50
 
-    def get_LogToFile(self, ranks=None):
-        import numpy as np
-        from pySDC.implementations.hooks.log_solution import LogToPickleFileAfterXS as LogToFile
-
-        LogToFile.path = f'{self.base_path}/data/'
-        LogToFile.file_name = f'{self.get_path(ranks=ranks)}-solution'
-        LogToFile.time_increment = 1e-1
-
-        def process_solution(L):
-            P = L.prob
-
-            if P.spectral_space:
-                uend = P.itransform(L.uend)
-
-            data = {
-                't': L.time + L.dt,
-                'local_slice': P.local_slice,
-                'shape': P.global_shape,
-            }
-
-            if P.useGPU:
-                data['u'] = uend.get().view(np.ndarray)
-                data['vorticity'] = L.prob.compute_vorticity(L.uend).get().view(np.ndarray)
-                if L.time == 0:
-                    data['X'] = L.prob.X.get()
-                    data['Z'] = L.prob.Z.get()
-            else:
-                data['u'] = uend.view(np.ndarray)
-                data['vorticity'] = L.prob.compute_vorticity(L.uend).view(np.ndarray)
-                if L.time == 0:
-                    data['X'] = L.prob.X
-                    data['Z'] = L.prob.Z
-            return data
-
-        def logging_condition(L):
-            sweep = L.sweep
-            if hasattr(sweep, 'comm'):
-                if sweep.comm.rank == sweep.comm.size - 1:
-                    return True
-                else:
-                    return False
-            else:
-                return True
-
-        LogToFile.process_solution = process_solution
-        LogToFile.logging_condition = logging_condition
-        return LogToFile
-
     def get_controller_params(self, *args, **kwargs):
         from pySDC.implementations.hooks.log_step_size import LogStepSize
 
@@ -125,12 +77,12 @@ class RayleighBenardRegular(Config):
         return desc
 
     def get_initial_condition(self, P, *args, restart_idx=0, **kwargs):
-        if restart_idx > 0:
-            return super().get_initial_condition(P, *args, restart_idx=restart_idx, **kwargs)
-        else:
+        if restart_idx == 0:
             u0 = P.u_exact(t=0, seed=P.comm.rank, noise_level=1e-3)
             u0_with_pressure = P.solve_system(u0, 1e-9, u0)
             return u0_with_pressure, 0
+        else:
+            return super().get_initial_condition(P, *args, restart_idx=restart_idx, **kwargs)
 
     def prepare_caches(self, prob):
         """
@@ -139,6 +91,7 @@ class RayleighBenardRegular(Config):
         prob.eval_f(prob.u_init)
 
     def plot(self, P, idx, n_procs_list, quantitiy='T', quantitiy2='vorticity'):
+        from pySDC.helpers.fieldsIO import FieldsIO
         import numpy as np
 
         cmaps = {'vorticity': 'bwr', 'p': 'bwr'}
@@ -147,48 +100,30 @@ class RayleighBenardRegular(Config):
         cax = P.cax
         axs = fig.get_axes()
 
-        buffer = {}
-        vmin = {quantitiy: np.inf, quantitiy2: np.inf}
-        vmax = {quantitiy: -np.inf, quantitiy2: -np.inf}
+        outfile = FieldsIO.fromFile(self.get_file_name())
 
-        X = {}
-        Z = {}
+        x = outfile.header['coords'][0]
+        z = outfile.header['coords'][1]
+        X, Z = np.meshgrid(x, z, indexing='ij')
 
-        for rank in range(n_procs_list[2]):
-            ranks = self.ranks[:-1] + [rank]
-            LogToFile = self.get_LogToFile(ranks=ranks)
+        t, data = outfile.readField(idx)
+        im = axs[0].pcolormesh(
+            X,
+            Z,
+            data[P.index(quantitiy)].real,
+            cmap=cmaps.get(quantitiy, 'plasma'),
+        )
 
-            buffer[f'u-{rank}'] = LogToFile.load(idx)
+        im2 = axs[1].pcolormesh(
+            X,
+            Z,
+            data[-1].real,
+            cmap=cmaps.get(quantitiy2, None),
+        )
 
-            vmin[quantitiy2] = min([vmin[quantitiy2], buffer[f'u-{rank}'][quantitiy2].real.min()])
-            vmax[quantitiy2] = max([vmax[quantitiy2], buffer[f'u-{rank}'][quantitiy2].real.max()])
-            vmin[quantitiy] = min([vmin[quantitiy], buffer[f'u-{rank}']['u'][P.index(quantitiy)].real.min()])
-            vmax[quantitiy] = max([vmax[quantitiy], buffer[f'u-{rank}']['u'][P.index(quantitiy)].real.max()])
-
-            first_frame = LogToFile.load(0)
-            X[rank] = first_frame['X']
-            Z[rank] = first_frame['Z']
-
-        for rank in range(n_procs_list[2]):
-            im2 = axs[1].pcolormesh(
-                X[rank],
-                Z[rank],
-                buffer[f'u-{rank}'][quantitiy2].real,
-                vmin=-vmax[quantitiy2] if cmaps.get(quantitiy2, None) in ['bwr'] else vmin[quantitiy2],
-                vmax=vmax[quantitiy2],
-                cmap=cmaps.get(quantitiy2, None),
-            )
-            im = axs[0].pcolormesh(
-                X[rank],
-                Z[rank],
-                buffer[f'u-{rank}']['u'][P.index(quantitiy)].real,
-                vmin=vmin[quantitiy],
-                vmax=-vmin[quantitiy] if cmaps.get(quantitiy, None) in ['bwr', 'seismic'] else vmax[quantitiy],
-                cmap=cmaps.get(quantitiy, 'plasma'),
-            )
         fig.colorbar(im2, cax[1])
         fig.colorbar(im, cax[0])
-        axs[0].set_title(f't={buffer[f"u-{rank}"]["t"]:.2f}')
+        axs[0].set_title(f't={t:.2f}')
         axs[1].set_xlabel('x')
         axs[1].set_ylabel('z')
         axs[0].set_aspect(1.0)

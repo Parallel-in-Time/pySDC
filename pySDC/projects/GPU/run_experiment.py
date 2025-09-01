@@ -32,12 +32,15 @@ def parse_args():
 
 def run_experiment(args, config, **kwargs):
     import pickle
+    import os
 
     # from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.helpers.stats_helper import filter_stats
 
     type(config).base_path = args['o']
+    os.makedirs(f'{args["o"]}/data', exist_ok=True)
+
     description = config.get_description(
         useGPU=args['useGPU'], MPIsweeper=args['procs'][1] > 1, res=args['res'], **kwargs
     )
@@ -155,6 +158,7 @@ def make_video(args, config):  # pragma: no cover
     cmd = f'ffmpeg -i {path} -pix_fmt yuv420p -r 9 -s 2048:1536 -y {path_target}'.split()
 
     subprocess.run(cmd)
+    print(f'Made video {path_target!r}')
 
 
 if __name__ == '__main__':

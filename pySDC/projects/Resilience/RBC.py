@@ -14,7 +14,7 @@ from pySDC.core.errors import ConvergenceError
 
 import numpy as np
 
-PROBLEM_PARAMS = {'Rayleigh': 3.2e5, 'nx': 256, 'nz': 128, 'max_cached_factorizations': 30}
+PROBLEM_PARAMS = {'Rayleigh': 3.2e5, 'nx': 256, 'nz': 128, 'max_cached_factorizations': 30, 'Lx': 8, 'Lz': 4, 'z0': 0}
 
 
 def u_exact(self, t, u_init=None, t_init=None, recompute=False, _t0=None):
