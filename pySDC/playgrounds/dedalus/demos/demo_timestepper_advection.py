@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import dedalus.public as d3
 
 from pySDC.playgrounds.dedalus.problems import buildAdvDiffProblem
-from pySDC.playgrounds.dedalus.timestepper import SpectralDeferredCorrectionIMEX
+from pySDC.playgrounds.dedalus.timestepper import SDCIMEX
 
 
 # -----------------------------------------------------------------------------
@@ -33,7 +33,7 @@ orderPlot = {'RK111': 1,
              'ERK4': 4}
 
 implSweep = 'MIN-SR-FLEX'
-SpectralDeferredCorrectionIMEX.setParameters(
+SDCIMEX.setParameters(
     nNodes=4, nodeType='LEGENDRE', quadType='RADAU-RIGHT',
     implSweep=implSweep, explSweep='PIC', initSweep='COPY')
 
@@ -49,7 +49,7 @@ for timeStepper in [d3.RK111, d3.RK222, d3.RK443, 1, 2, 3]:
     if isinstance(timeStepper, int):
         # Using SDC with a given number of sweeps
         nSweeps = timeStepper
-        timeStepper = SpectralDeferredCorrectionIMEX
+        timeStepper = SDCIMEX
         timeStepper.setParameters(nSweeps=nSweeps)
         useSDC = True
 

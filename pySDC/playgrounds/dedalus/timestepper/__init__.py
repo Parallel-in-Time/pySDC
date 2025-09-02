@@ -63,25 +63,10 @@ PARAMS = {
              action='store_true')
     }
 
-# Printing function
-def sdcInfos(nNodes, quadType, nodeDistr, nSweeps,
-             implSweep, explSweep, initSweep, forceProl,
-             **kwargs):
-    return f"""
--- nNodes : {nNodes}
--- quadType : {quadType}
--- nodeDistr : {nodeDistr}
--- nSweeps : {nSweeps}
--- implSweep : {implSweep}
--- explSweep : {explSweep}
--- initSweep : {initSweep}
--- forceProl : {forceProl}
-""".strip()
-
 # -----------------------------------------------------------------------------
 # Base class implementation
 # -----------------------------------------------------------------------------
-class IMEXSDCCore(object):
+class SDCIMEXCore(object):
 
     # Initialize parameters with default values
     nSweeps:int = DEFAULT['nSweeps']
@@ -201,9 +186,16 @@ class IMEXSDCCore(object):
 
     @classmethod
     def getInfos(cls):
-        return sdcInfos(
-            len(cls.nodes), cls.quadType, cls.nodeType, cls.nSweeps,
-            cls.implSweep, cls.explSweep, cls.initSweep, cls.forceProl)
+        return f"""
+-- nNodes : {len(cls.nodes)}
+-- quadType : {cls.quadType}
+-- nodeType : {cls.nodeType}
+-- nSweeps : {cls.nSweeps}
+-- implSweep : {cls.implSweep}
+-- explSweep : {cls.explSweep}
+-- initSweep : {cls.initSweep}
+-- forceProl : {cls.forceProl}
+""".strip()
 
     @classmethod
     def getM(cls):
@@ -229,7 +221,7 @@ class IMEXSDCCore(object):
 # -----------------------------------------------------------------------------
 # Dedalus based IMEX timeintegrator class
 # -----------------------------------------------------------------------------
-class SpectralDeferredCorrectionIMEX(IMEXSDCCore):
+class SDCIMEX(SDCIMEXCore):
 
     steps = 1
 
@@ -790,7 +782,7 @@ def initSpaceTimeMPI(nProcSpace=None, nProcTime=None, groupTime=False):
         return gComm, sComm, tComm
 
 
-class SDCIMEX_MPI(SpectralDeferredCorrectionIMEX):
+class SDCIMEX_MPI(SDCIMEX):
 
     comm:MPI.Intracomm = None
 

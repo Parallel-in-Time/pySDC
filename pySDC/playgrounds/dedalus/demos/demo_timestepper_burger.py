@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 # pySDC imports
 from pySDC.playgrounds.dedalus.problems import buildKdVBurgerProblem
-from pySDC.playgrounds.dedalus.timestepper import SpectralDeferredCorrectionIMEX
+from pySDC.playgrounds.dedalus.timestepper import SDCIMEX
 
 # Dedalus import (for alternative time-stepper)
 import dedalus.public as d3
@@ -28,7 +28,7 @@ b = 2e-4    # hyper-diffusion coefficient
 # -- time integration
 tEnd = 10
 nSteps = 5000
-SpectralDeferredCorrectionIMEX.setParameters(
+SDCIMEX.setParameters(
     nSweeps=4,
     nNodes=4,
     implSweep="MIN-SR-FLEX",
@@ -38,7 +38,7 @@ useSDC = True
 # -----------------------------------------------------------------------------
 # Solver setup
 # -----------------------------------------------------------------------------
-timestepper = SpectralDeferredCorrectionIMEX if useSDC else d3.RK443
+timestepper = SDCIMEX if useSDC else d3.RK443
 timestep = tEnd/nSteps
 
 pData = buildKdVBurgerProblem(nX, xEnd, nu, b)
