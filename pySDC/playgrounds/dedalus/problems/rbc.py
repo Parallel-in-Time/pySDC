@@ -370,11 +370,11 @@ if __name__ == "__main__":
     from qmat.lagrange import LagrangeApproximation
     import matplotlib.pyplot as plt
 
-    dirName = "test_F2"
+    dirName = "test_R4_F2"
 
     problem = RBCProblem2D.runSimulation(
         dirName, 100, 1e-2/2, logEvery=20, dtWrite=1.0,
-        meshRatio=1, resFactor=2)
+        meshRatio=4, resFactor=2)
 
     output = OutputFiles(dirName)
     approx = LagrangeApproximation(output.z)
