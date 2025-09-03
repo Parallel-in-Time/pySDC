@@ -370,57 +370,99 @@ if __name__ == "__main__":
     from qmat.lagrange import LagrangeApproximation
     import matplotlib.pyplot as plt
 
-    dirName = "test_F2"
+    dirName = "test_M4_R1"
 
     problem = RBCProblem2D.runSimulation(
-        dirName, 100, 1e-2/2, logEvery=20, dtWrite=1.0,
-        meshRatio=1, resFactor=2)
+        dirName, 140, 1e-2/2, logEvery=20, dtWrite=1.0,
+        meshRatio=4, resFactor=1)
 
     output = OutputFiles(dirName)
     approx = LagrangeApproximation(output.z)
-    uAll = u, w = output.vData(0)[-1]
+
+    uAll = output.vData(0)[:]
+    bAll = output.bData(0)[:]
+    u, w = uAll[:, 0], uAll[:, 1]
     nX, nZ = output.nX, output.nZ
 
     # Kinetic energy
     mIz = approx.getIntegrationMatrix([(0, 1)])
-    ke = (u-u.mean())**2 + (w-w.mean())**2
-    keMean = (mIz @ ke.T).mean()
-    # 2D spectrum
-    uAll = uAll - uAll.mean(axis=(-2,-1))[:, None, None]
-    mPz = approx.getInterpolationMatrix(np.linspace(0, 1, nZ, endpoint=False))
-    uReg = (mPz @ uAll[:, :, :, None])[..., 0]
-    uHat = np.fft.fft2(uReg)
-    reParts = [uF.ravel().real**2 for uF in uHat]
-    imParts = [uF.ravel().imag**2 for uF in uHat]
+    ke = (u-u.mean(axis=(-1, -2))[:, None, None])**2 \
+        + (w-w.mean(axis=(-1, -2))[:, None, None])**2
+
+    nThrow = 20
+    keProfile = ke[nThrow:].mean(axis=(0, 1))
+    plt.figure("keProfile")
+    plt.plot(keProfile, output.z, label=dirName)
+    plt.legend()
 
 
-    kX = np.fft.fftfreq(nX, 1/nX)**2
-    kZ = np.fft.fftfreq(nZ, 1/nZ)**2
+    # keMean = np.sum(mIz*ke, axis=-1).mean(axis=-1)
+    # plt.figure("ke")
+    # plt.plot(keMean, label=dirName)
+    # plt.legend()
 
-    ell = kX[:, None]/(nX//2)**2 + kZ[None, :]/(nZ//2)**2
+    # Removing constant component
+    # uAll = uAll - uAll.mean(axis=(-2,-1))[:, None, None]
 
-    kMod = kX[:, None] + kZ[None, :]
-    kMod **= 0.5
+    # # 2D spectrum
+    # mPz = approx.getInterpolationMatrix(np.linspace(0, 1, nZ, endpoint=False))
+    # uReg = (mPz @ uAll[:, :, :, None])[..., 0]
+    # uHat = np.fft.fft2(uReg)
+    # reParts = [uF.ravel().real**2 for uF in uHat]
+    # imParts = [uF.ravel().imag**2 for uF in uHat]
 
-    idx = kMod.copy()
-    idx *= (ell < 1)
-    idx -= (ell >= 1)
-    idxList = range(int(idx.max()) + 1)
-    flatIdx = idx.ravel()
 
-    spectrum = np.zeros(len(idxList))
-    for i in idxList:
-        kIdx = np.argwhere(flatIdx == i)
-        tmp = np.empty(kIdx.shape)
-        for re, im in zip(reParts, imParts):
-            np.copyto(tmp, re[kIdx])
-            tmp += im[kIdx]
-            spectrum[i] += tmp.sum()
-    spectrum /= 2*(nX*nZ)**2
-    wavenumbers = list(i + 0.5 for i in idxList)
+    # kX = np.fft.fftfreq(nX, 1/nX)**2
+    # kZ = np.fft.fftfreq(nZ, 1/nZ)**2
 
-    plt.figure("spectrum")
-    plt.loglog(wavenumbers, spectrum)
+    # ell = kX[:, None]/(nX//2)**2 + kZ[None, :]/(nZ//2)**2
 
-    plt.figure("contour")
-    plt.pcolormesh(output.x, output.z, ke.T)
+    # kMod = kX[:, None] + kZ[None, :]
+    # kMod **= 0.5
+
+    # idx = kMod.copy()
+    # idx *= (ell < 1)
+    # idx -= (ell >= 1)
+    # idxList = range(int(idx.max()) + 1)
+    # flatIdx = idx.ravel()
+
+    # spectrum = np.zeros(len(idxList))
+    # for i in idxList:
+    #     kIdx = np.argwhere(flatIdx == i)
+    #     tmp = np.empty(kIdx.shape)
+    #     for re, im in zip(reParts, imParts):
+    #         np.copyto(tmp, re[kIdx])
+    #         tmp += im[kIdx]
+    #         spectrum[i] += tmp.sum()
+    # spectrum /= 2*(nX*nZ)**2
+    # wavenumbers = list(i + 0.5 for i in idxList)
+
+    # plt.figure("spectrum-2D")
+    # plt.loglog(wavenumbers, spectrum)
+
+
+    # 1D spectrum (average)
+    spectrum1D = []
+    for i in range(2):
+        u = uAll[:, i]                       # (nT, Nx, Nz)
+        s = np.fft.rfft(u, axis=-2)          # over Nx --> (nT, Kx, Nz)
+        s *= np.conj(s)                      # (nT, Kx, Nz)
+        s = np.sum(mIz*s.real, axis=-1)      # integrate over Nz --> (nT, Kx)
+        s = s[40:].mean(axis=0)                   # mean over nT -> (Kx,)
+        s /= nX**2
+
+        spectrum1D.append(s)
+    waveNum = np.fft.rfftfreq(nX, 1/nX)+0.5
+
+    plt.figure("spectrum-1D")
+    plt.loglog(waveNum, spectrum1D[0], label="ux")
+    plt.loglog(waveNum, spectrum1D[1], label="uz")
+    plt.loglog(waveNum, waveNum**(-5/3), '--k')
+    plt.legend()
+
+    print(f"iS[ux] : {float(spectrum1D[0].sum())}")
+    print(f"iS[uz] : {float(spectrum1D[1].sum())}")
+
+    plt.figure(f"contour-{dirName}")
+    plt.pcolormesh(output.x, output.z, ke[-1].T)
+    plt.colorbar()
