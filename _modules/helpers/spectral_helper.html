@@ -647,6 +647,8 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_integ_BC_row</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">kind</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;dirichlet&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Dirichlet_BC_row</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">kind</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;neumann&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Neumann_BC_row</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_BC</span><span class="p">(</span><span class="n">kind</span><span class="p">)</span></div>
 
@@ -691,6 +693,30 @@
             <span class="k">return</span> <span class="n">n</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Don</span><span class="se">\&#39;</span><span class="s1">t know how to generate Dirichlet BC</span><span class="se">\&#39;</span><span class="s1">s at </span><span class="si">{</span><span class="n">x</span><span class="si">=}</span><span class="s1">!&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChebychevHelper.get_Neumann_BC_row">
+<a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_Neumann_BC_row">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_Neumann_BC_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a row for generating Neumann BCs at x with T polynomials.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x (float): Position of the boundary condition</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            self.xp.ndarray: Row to put into a matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+        <span class="n">nn</span> <span class="o">=</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">me</span> <span class="o">=</span> <span class="n">nn</span>
+            <span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">*=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="n">n</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">me</span>
+        <span class="k">elif</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">nn</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Don</span><span class="se">\&#39;</span><span class="s1">t know how to generate Neumann BC</span><span class="se">\&#39;</span><span class="s1">s at </span><span class="si">{</span><span class="n">x</span><span class="si">=}</span><span class="s1">!&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ChebychevHelper.get_Dirichlet_recombination_matrix">
@@ -2255,7 +2281,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.3.0.
     </div>
   </body>
 </html>

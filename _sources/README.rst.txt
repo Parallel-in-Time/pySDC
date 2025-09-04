@@ -35,6 +35,11 @@
    :alt: PyPI - Downloads
 
 
+.. image:: https://img.shields.io/badge/Promo-8db427?style=plastic&label=HiRSE&labelColor=005aa0&link=https%3A%2F%2Fgo.fzj.de%2FCodePromo
+   :target: https://go.fzj.de/CodePromo
+   :alt: HiRSE Code Promo Badge
+
+
 Welcome to pySDC!
 =================
 

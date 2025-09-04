@@ -120,6 +120,23 @@ This makes for a good right preconditioner.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_Neumann_BC_row">
+<span class="sig-name descname"><span class="pre">get_Neumann_BC_row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_Neumann_BC_row"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_Neumann_BC_row" title="Link to this definition">¶</a></dt>
+<dd><p>Get a row for generating Neumann BCs at x with T polynomials.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>float</em>) – Position of the boundary condition</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Row to put into a matrix</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>self.xp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_basis_change_matrix">
 <span class="sig-name descname"><span class="pre">get_basis_change_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T2T'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_basis_change_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_basis_change_matrix" title="Link to this definition">¶</a></dt>
 <dd><p>As the differentiation matrix in Chebychev-T base is dense but is sparse when simultaneously changing base to
@@ -1486,6 +1503,7 @@ This is very similar to <cite>functools.cache</cite>, but without the memory lea
 <li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_BC"><code class="docutils literal notranslate"><span class="pre">get_BC()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_Dirichlet_BC_row"><code class="docutils literal notranslate"><span class="pre">get_Dirichlet_BC_row()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_Dirichlet_recombination_matrix"><code class="docutils literal notranslate"><span class="pre">get_Dirichlet_recombination_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_Neumann_BC_row"><code class="docutils literal notranslate"><span class="pre">get_Neumann_BC_row()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_basis_change_matrix"><code class="docutils literal notranslate"><span class="pre">get_basis_change_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_conv"><code class="docutils literal notranslate"><span class="pre">get_conv()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_differentiation_matrix"><code class="docutils literal notranslate"><span class="pre">get_differentiation_matrix()</span></code></a></li>
@@ -1675,7 +1693,7 @@ This is very similar to <cite>functools.cache</cite>, but without the memory lea
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.3.0.
     </div>
   </body>
 </html>
