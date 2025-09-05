@@ -24,7 +24,8 @@ MPI_RANK = COMM_WORLD.Get_rank()
 
 class RBCProblem2D():
 
-    def __init__(self, Rayleigh=1e7, Prandtl=1, resFactor=1, meshRatio=4,
+    def __init__(self, Rayleigh=1e7, Prandtl=1,
+                 resFactor=1, aspectRatio=4, meshRatio=1,
                  sComm=COMM_WORLD, mpiBlocks=None, writeSpaceDistr=False,
                  initFields=None, seed=999):
 
@@ -36,15 +37,17 @@ class RBCProblem2D():
             "Pr": Prandtl,
             }
 
-        self.buildGrid(meshRatio, sComm, mpiBlocks)
+        self.buildGrid(aspectRatio, meshRatio, sComm, mpiBlocks)
         if writeSpaceDistr: self.writeSpaceDistr()
         self.buildProblem()
         self.initFields(initFields, seed)
 
 
-    def buildGrid(self, meshRatio, sComm, mpiBlocks):
-        Lx, Lz = meshRatio, 1
-        Nx, Nz = int(64*meshRatio*self.resFactor), int(64*self.resFactor)
+    def buildGrid(self, aspectRatio, meshRatio, sComm, mpiBlocks):
+        baseSize = 64
+        Lx, Lz = aspectRatio, 1
+        Nx = int(baseSize*aspectRatio*meshRatio*self.resFactor)
+        Nz = int(baseSize*self.resFactor)
         dealias = 3/2
         dtype = np.float64
 
@@ -233,6 +236,7 @@ class RBCProblem2D():
         p.infos.update(dirName=dirName)
 
         # Solver
+        if MPI_RANK == 0: print(" -- building dedalus solver ...")
         solver = p.problem.build_solver(timeStepper)
         solver.sim_time = tBeg
         solver.stop_sim_time = tEnd
@@ -309,18 +313,22 @@ class RBCProblem2D():
 
 class RBCProblem3D(RBCProblem2D):
 
-    def __init__(self, Rayleigh=1e5, Prandtl=0.7, resFactor=1, meshRatio=0.5,
+    def __init__(self, Rayleigh=1e5, Prandtl=0.7,
+                 resFactor=1, aspectRatio=4, meshRatio=0.5,
                  sComm=COMM_WORLD, mpiBlocks=None, writeSpaceDistr=False,
                  initFields=None, seed=999):
         super().__init__(
-            Rayleigh, Prandtl, resFactor, meshRatio,
+            Rayleigh, Prandtl,
+            resFactor, aspectRatio, meshRatio,
             sComm, mpiBlocks, writeSpaceDistr,
             initFields, seed)
 
-    def buildGrid(self, meshRatio, sComm, mpiBlocks):
-        Lx, Ly, Lz = 4, 4, 1
-        Nx = Ny = int(meshRatio*64*self.resFactor)
-        Nz = int(64*self.resFactor)
+    def buildGrid(self, aspectRatio, meshRatio, sComm, mpiBlocks):
+        baseSize = 32
+
+        Lx, Ly, Lz = int(aspectRatio), int(aspectRatio), 1
+        Nx = Ny = int(baseSize*aspectRatio*meshRatio*self.resFactor)
+        Nz = int(baseSize*self.resFactor)
         dealias = 3/2
         dtype = np.float64
 
@@ -372,36 +380,36 @@ if __name__ == "__main__":
     from qmat.lagrange import LagrangeApproximation
     import matplotlib.pyplot as plt
 
-    dirName = "test_M4_R1"
+    dirName = "run_3D_A4_R1_M1"
 
-    problem = RBCProblem2D.runSimulation(
-        dirName, 140, 1e-2/2, logEvery=20, dtWrite=1.0,
-        meshRatio=4, resFactor=1)
+    problem = RBCProblem3D.runSimulation(
+        dirName, 100, 1e-2/2, logEvery=20, dtWrite=1.0,
+        aspectRatio=4, resFactor=1, meshRatio=1)
 
-    output = OutputFiles(dirName)
-    approx = LagrangeApproximation(output.z)
+    # output = OutputFiles(dirName)
+    # approx = LagrangeApproximation(output.z)
 
-    nThrow = 40
-    u = output.vData(0)[nThrow:]
-    b = output.bData(0)[nThrow:]
-    ux, uz = u[:, 0], u[:, 1]
-    nX, nZ = output.nX, output.nZ
+    # nThrow = 20
+    # nIgnore = 1
+    # u = output.vData(0)[nThrow::nIgnore]
+    # b = output.bData(0)[nThrow::nIgnore]
+    # ux, uz = u[:, 0], u[:, 1]
+    # nX, nZ = output.nX, output.nZ
 
-    # RMS quantities
-    mIz = approx.getIntegrationMatrix([(0, 1)])
-    uRMS = (ux**2 + uz**2).mean(axis=(0, 1))**0.5
-    bRMS = ((b - b.mean(axis=(0, 1)))**2).mean(axis=(0, 1))**0.5
+    # # RMS quantities
+    # uRMS = (ux**2 + uz**2).mean(axis=(0, 1))**0.5
+    # bRMS = ((b - b.mean(axis=(0, 1)))**2).mean(axis=(0, 1))**0.5
 
 
-    plt.figure("z-profile")
-    xOptU = sco.minimize_scalar(lambda z: -approx(z, fValues=uRMS), bounds=[0, 0.5])
-    xOptB = sco.minimize_scalar(lambda z: -approx(z, fValues=bRMS), bounds=[0, 0.5])
+    # plt.figure("z-profile")
+    # xOptU = sco.minimize_scalar(lambda z: -approx(z, fValues=uRMS), bounds=[0, 0.5])
+    # xOptB = sco.minimize_scalar(lambda z: -approx(z, fValues=bRMS), bounds=[0, 0.5])
 
-    plt.plot(uRMS, output.z, label=f"uRMS[{nX=},{nZ=}]")
-    plt.hlines(xOptU.x, uRMS.min(), uRMS.max(), linestyles="--", colors="black")
-    plt.plot(bRMS, output.z, label=f"bRMS[{nX=},{nZ=}]")
-    plt.hlines(xOptB.x, bRMS.min(), bRMS.max(), linestyles="--", colors="black")
-    plt.legend()
+    # plt.plot(uRMS, output.z, label=f"uRMS[{nX=},{nZ=}]")
+    # plt.hlines(xOptU.x, uRMS.min(), uRMS.max(), linestyles="--", colors="black")
+    # plt.plot(bRMS, output.z, label=f"bRMS[{nX=},{nZ=}]")
+    # plt.hlines(xOptB.x, bRMS.min(), bRMS.max(), linestyles="--", colors="black")
+    # plt.legend()
 
 
     # keMean = np.sum(mIz*ke, axis=-1).mean(axis=-1)
@@ -451,12 +459,13 @@ if __name__ == "__main__":
 
     # # 1D spectrum (average)
     # spectrum1D = []
-    # for i in range(2):
-    #     u = uAll[:, i]                       # (nT, Nx, Nz)
-    #     s = np.fft.rfft(u, axis=-2)          # over Nx --> (nT, Kx, Nz)
+    # mIz = approx.getIntegrationMatrix([(0, 1)])
+    # uAll = np.concat((u, b[:, None, :, :]), axis=1)
+    # for i in range(uAll.shape[1]):
+    #     s = np.fft.rfft(uAll[:, i], axis=-2)    # RFFT over Nx --> (nT, Kx, Nz)
     #     s *= np.conj(s)                      # (nT, Kx, Nz)
     #     s = np.sum(mIz*s.real, axis=-1)      # integrate over Nz --> (nT, Kx)
-    #     s = s[40:].mean(axis=0)                   # mean over nT -> (Kx,)
+    #     s = s.mean(axis=0)                   # mean over nT -> (Kx,)
     #     s /= nX**2
 
     #     spectrum1D.append(s)
@@ -465,12 +474,13 @@ if __name__ == "__main__":
     # plt.figure("spectrum-1D")
     # plt.loglog(waveNum, spectrum1D[0], label="ux")
     # plt.loglog(waveNum, spectrum1D[1], label="uz")
+    # plt.loglog(waveNum, spectrum1D[2], label="b")
     # plt.loglog(waveNum, waveNum**(-5/3), '--k')
     # plt.legend()
 
     # print(f"iS[ux] : {float(spectrum1D[0].sum())}")
     # print(f"iS[uz] : {float(spectrum1D[1].sum())}")
 
-    plt.figure(f"contour-{dirName}")
-    plt.pcolormesh(output.x, output.z, b[-1].T)
-    plt.colorbar()
+    # plt.figure(f"contour-{dirName}")
+    # plt.pcolormesh(output.x, output.z, b[-1].T)
+    # plt.colorbar()

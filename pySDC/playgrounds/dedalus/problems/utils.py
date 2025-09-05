@@ -6,7 +6,6 @@ Utilities
 import os
 import h5py
 import glob
-import random
 import numpy as np
 import scipy.optimize as sco
 import matplotlib.pyplot as plt
