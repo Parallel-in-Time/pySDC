@@ -1,3 +1,4 @@
 *.pdf
 demos/*.png
-problems/test*
+problems/test_*
+problems/run_*

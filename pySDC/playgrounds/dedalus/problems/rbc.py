@@ -223,7 +223,7 @@ class RBCProblem2D():
         if float(tEnd-tBeg) != round(nSteps*dt, ndigits=3):
             raise ValueError(f"{tEnd=} is not divisible by timestep {dt=} ({nSteps=})")
         nSteps = int(nSteps)
-        p.infos.update(dt=dt, nSteps=nSteps)
+        p.infos.update(tEnd=tEnd, dt=dt, nSteps=nSteps)
 
         if os.path.isfile(f"{dirName}/01_finalized.txt"):
             if MPI_RANK == 0:
@@ -366,6 +366,8 @@ class RBCProblem3D(RBCProblem2D):
 
 
 if __name__ == "__main__":
+    import scipy.optimize as sco
+
     from pySDC.playgrounds.dedalus.problems.utils import OutputFiles
     from qmat.lagrange import LagrangeApproximation
     import matplotlib.pyplot as plt
@@ -379,20 +381,26 @@ if __name__ == "__main__":
     output = OutputFiles(dirName)
     approx = LagrangeApproximation(output.z)
 
-    uAll = output.vData(0)[:]
-    bAll = output.bData(0)[:]
-    u, w = uAll[:, 0], uAll[:, 1]
+    nThrow = 40
+    u = output.vData(0)[nThrow:]
+    b = output.bData(0)[nThrow:]
+    ux, uz = u[:, 0], u[:, 1]
     nX, nZ = output.nX, output.nZ
 
-    # Kinetic energy
+    # RMS quantities
     mIz = approx.getIntegrationMatrix([(0, 1)])
-    ke = (u-u.mean(axis=(-1, -2))[:, None, None])**2 \
-        + (w-w.mean(axis=(-1, -2))[:, None, None])**2
+    uRMS = (ux**2 + uz**2).mean(axis=(0, 1))**0.5
+    bRMS = ((b - b.mean(axis=(0, 1)))**2).mean(axis=(0, 1))**0.5
 
-    nThrow = 20
-    keProfile = ke[nThrow:].mean(axis=(0, 1))
-    plt.figure("keProfile")
-    plt.plot(keProfile, output.z, label=dirName)
+
+    plt.figure("z-profile")
+    xOptU = sco.minimize_scalar(lambda z: -approx(z, fValues=uRMS), bounds=[0, 0.5])
+    xOptB = sco.minimize_scalar(lambda z: -approx(z, fValues=bRMS), bounds=[0, 0.5])
+
+    plt.plot(uRMS, output.z, label=f"uRMS[{nX=},{nZ=}]")
+    plt.hlines(xOptU.x, uRMS.min(), uRMS.max(), linestyles="--", colors="black")
+    plt.plot(bRMS, output.z, label=f"bRMS[{nX=},{nZ=}]")
+    plt.hlines(xOptB.x, bRMS.min(), bRMS.max(), linestyles="--", colors="black")
     plt.legend()
 
 
@@ -441,28 +449,28 @@ if __name__ == "__main__":
     # plt.loglog(wavenumbers, spectrum)
 
 
-    # 1D spectrum (average)
-    spectrum1D = []
-    for i in range(2):
-        u = uAll[:, i]                       # (nT, Nx, Nz)
-        s = np.fft.rfft(u, axis=-2)          # over Nx --> (nT, Kx, Nz)
-        s *= np.conj(s)                      # (nT, Kx, Nz)
-        s = np.sum(mIz*s.real, axis=-1)      # integrate over Nz --> (nT, Kx)
-        s = s[40:].mean(axis=0)                   # mean over nT -> (Kx,)
-        s /= nX**2
+    # # 1D spectrum (average)
+    # spectrum1D = []
+    # for i in range(2):
+    #     u = uAll[:, i]                       # (nT, Nx, Nz)
+    #     s = np.fft.rfft(u, axis=-2)          # over Nx --> (nT, Kx, Nz)
+    #     s *= np.conj(s)                      # (nT, Kx, Nz)
+    #     s = np.sum(mIz*s.real, axis=-1)      # integrate over Nz --> (nT, Kx)
+    #     s = s[40:].mean(axis=0)                   # mean over nT -> (Kx,)
+    #     s /= nX**2
 
-        spectrum1D.append(s)
-    waveNum = np.fft.rfftfreq(nX, 1/nX)+0.5
+    #     spectrum1D.append(s)
+    # waveNum = np.fft.rfftfreq(nX, 1/nX)+0.5
 
-    plt.figure("spectrum-1D")
-    plt.loglog(waveNum, spectrum1D[0], label="ux")
-    plt.loglog(waveNum, spectrum1D[1], label="uz")
-    plt.loglog(waveNum, waveNum**(-5/3), '--k')
-    plt.legend()
+    # plt.figure("spectrum-1D")
+    # plt.loglog(waveNum, spectrum1D[0], label="ux")
+    # plt.loglog(waveNum, spectrum1D[1], label="uz")
+    # plt.loglog(waveNum, waveNum**(-5/3), '--k')
+    # plt.legend()
 
-    print(f"iS[ux] : {float(spectrum1D[0].sum())}")
-    print(f"iS[uz] : {float(spectrum1D[1].sum())}")
+    # print(f"iS[ux] : {float(spectrum1D[0].sum())}")
+    # print(f"iS[uz] : {float(spectrum1D[1].sum())}")
 
     plt.figure(f"contour-{dirName}")
-    plt.pcolormesh(output.x, output.z, ke[-1].T)
+    plt.pcolormesh(output.x, output.z, b[-1].T)
     plt.colorbar()

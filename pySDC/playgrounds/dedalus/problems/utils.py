@@ -137,6 +137,49 @@ def rbc3dInterpolation(coarseFields):
 
     return fineFields
 
+
+def rbc2dInterpolation(coarseFields):
+    """
+    Interpolate a RBC2D field to twice its space resolution
+
+    Parameters
+    ----------
+    coarseFields : np.3darray
+        The fields values on the coarse grid, with shape [nV,nX,nZ].
+        The last dimension (z) uses a chebychev grid,
+        while x is uniform periodic.
+
+    Returns
+    -------
+    fineFields : np.4darray
+        The interpolated fields, with shape [nV,2*nX,2*nZ]
+    """
+    coarseFields = np.asarray(coarseFields)
+    assert coarseFields.ndim == 3, "requires 3D array"
+
+    nV, nX, nZ = coarseFields.shape
+
+    # Chebychev grids and interpolation matrix for z
+    zC = NodesGenerator("CHEBY-1", "GAUSS").getNodes(nZ)
+    zF = NodesGenerator("CHEBY-1", "GAUSS").getNodes(2*nZ)
+    Pz = LagrangeApproximation(zC, weightComputation="STABLE").getInterpolationMatrix(zF)
+
+    # Fourier interpolation in x
+    print(" -- computing 1D FFT ...")
+    uFFT = np.fft.fftshift(np.fft.fft(coarseFields, axis=1), axes=1)
+    print(" -- padding in Fourier space ...")
+    uPadded = np.zeros_like(uFFT, shape=(nV, 2*nX, nZ))
+    uPadded[:, nX//2:-nX//2] = uFFT
+    print(" -- computing 1D IFFT ...")
+    uXY = np.fft.ifft(np.fft.ifftshift(uPadded, axes=1), axis=1).real*2
+
+    # Polynomial interpolation in z
+    print(" -- interpolating in z direction ...")
+    fineFields = (Pz @ uXY.reshape(-1, nZ).T).T.reshape(nV, 2*nX, 2*nZ)
+
+    return fineFields
+
+
 def decomposeRange(iBeg, iEnd, step, maxSize):
     if iEnd is None:
         raise ValueError("need to provide iEnd for range decomposition")
@@ -218,7 +261,7 @@ class OutputFiles():
         if self.dim == 2:
             return (4, self.nX, self.nZ)
         elif self.dim == 3:
-            return (4, self.nX, self.nY, self.nZ)
+            return (5, self.nX, self.nY, self.nZ)
 
     @property
     def k(self):
@@ -442,8 +485,7 @@ class OutputFiles():
             writeToVTR(template.format(i), u, coords, varNames)
 
 
-    def interpolate(self, iFile:int, fileName:str, iField:int=-1):
-        assert self.dim == 3, "interpolation only possible for 3D RBC fields"
+    def toPySDC(self, iFile:int, fileName:str, iField:int=-1, interpolate=False):
 
         fields = self.file(iFile)["tasks"]
 
@@ -451,18 +493,58 @@ class OutputFiles():
         buoyancy = fields["buoyancy"][iField]
         pressure = fields["pressure"][iField]
 
-        uCoarse = np.concat([velocity, buoyancy[None, ...], pressure[None, ...]])
-        uFine = rbc3dInterpolation(uCoarse)
+        uAll = np.concat([velocity, buoyancy[None, ...], pressure[None, ...]])
 
-        nX, nY, nZ = uFine.shape[1:]
+        if self.dim == 3:
+            if interpolate:
+                uAll = rbc3dInterpolation(uAll)
+            nX, nY, nZ = uAll.shape[1:]
+            xCoord = np.linspace(0, 1, nX, endpoint=False)
+            yCoord = np.linspace(0, 1, nY, endpoint=False)
+            zCoord = NodesGenerator("CHEBY-1", "GAUSS").getNodes(nZ)
+            header = (5, [xCoord, yCoord, zCoord])
+
+        elif self.dim == 2:
+            if interpolate:
+                uAll = rbc2dInterpolation(uAll)
+            nX, nZ = uAll.shape[1:]
+            xCoord = np.linspace(0, 1, nX, endpoint=False)
+            zCoord = NodesGenerator("CHEBY-1", "GAUSS").getNodes(nZ)
+            header = (4, [xCoord, zCoord])
+        else:
+            raise NotImplementedError(f"dim={self.dim}")
+
+        output = Rectilinear(np.float64, fileName)
+        output.setHeader(*header)
+        output.initialize()
+        output.addField(0, uAll)
+
+
+def interpolateRBCFile(fileName, outputFile, idxField=-1):
+
+    inpt:Rectilinear = Rectilinear.fromFile(fileName)
+    _, uC = inpt.readField(idxField)
+
+    if inpt.dim == 2:
+        uF = rbc2dInterpolation(uC)
+        nX, nZ = uF.shape[1:]
+        xCoord = np.linspace(0, 1, nX, endpoint=False)
+        zCoord = NodesGenerator("CHEBY-1", "GAUSS").getNodes(nZ)
+        header = (4, [xCoord, zCoord])
+    elif inpt.dim == 3:
+        uF = rbc3dInterpolation(uC)
+        nX, nY, nZ = uF.shape[1:]
         xCoord = np.linspace(0, 1, nX, endpoint=False)
         yCoord = np.linspace(0, 1, nY, endpoint=False)
         zCoord = NodesGenerator("CHEBY-1", "GAUSS").getNodes(nZ)
+        header = (5, [xCoord, yCoord, zCoord])
+    else:
+        raise NotImplementedError(f"dim={inpt.dim}")
 
-        output = Rectilinear(np.float64, fileName)
-        output.setHeader(5, [xCoord, yCoord, zCoord])
-        output.initialize()
-        output.addField(0, uFine)
+    output = Rectilinear(np.float64, outputFile)
+    output.setHeader(*header)
+    output.initialize()
+    output.addField(0, uF)
 
 
 def checkDNS(sMean:np.ndarray, k:np.ndarray, vRatio:int=4, nThrow:int=1):
@@ -494,60 +576,6 @@ def checkDNS(sMean:np.ndarray, k:np.ndarray, vRatio:int=4, nThrow:int=1):
     status = "under-resolved" if a > 0 else "DNS !"
 
     return status, [a, b, c], x, y, nValues
-
-def generateChunkPairs(folder:str, N:int, M:int,
-                       tStep:int=1, xStep:int=1, zStep:int=1,
-                       shuffleSeed=None
-):
-    """
-    Function to generate chunk pairs
-
-    Args:
-        folder (str): path to dedalus hdf5 data
-        N (int): timesteps of dt
-        M (int): size of chunk
-        tStep (int, optional): time slicing. Defaults to 1.
-        xStep (int, optional): x-grid slicing. Defaults to 1.
-        zStep (int, optional): z-grid slicing. Defaults to 1.
-        shuffleSeed (int, optional): seed for random shuffle. Defaults to None.
-
-    Returns:
-        pairs (list): chunk pairs
-    """
-    out = OutputFiles(folder)
-
-    pairs = []
-    vxData, vzData,  bData, pData = [], [],  [], []
-    for iFile in range(0, out.nFiles):
-        vxData.append(out.vData(iFile)[:, 0, ::xStep, ::zStep])
-        vzData.append(out.vData(iFile)[:, 1, ::xStep, ::zStep])
-        bData.append(out.bData(iFile)[:, ::xStep, ::zStep])
-        pData.append(out.pData(iFile)[:, ::xStep, ::zStep])
-    # stack all arrays
-    vxData = np.concatenate(vxData)
-    vzData = np.concatenate(vzData)
-    bData = np.concatenate(bData)
-    pData = np.concatenate(pData)
-
-    assert vxData.shape[0] == vzData.shape[0]
-    assert vzData.shape[0] == pData.shape[0]
-    assert vzData.shape[0] == bData.shape[0]
-    nTimes = vxData.shape[0]
-
-    for i in range(0, nTimes-M-N+1, tStep):
-        chunk1 = np.stack((vxData[i:i+M],vzData[i:i+M],bData[i:i+M],pData[i:i+M]), axis=1)
-        chunk2 = np.stack((vxData[i+N:i+N+M],vzData[i+N:i+N+M], bData[i+N:i+N+M],
-                           pData[i+N:i+N+M]), axis=1)
-        # chunks are shape (M, 4, Nx//xStep, Nz//zStep)
-        assert chunk1.shape == chunk2.shape
-        pairs.append((chunk1, chunk2))
-
-    # shuffle if a seed is given
-    if shuffleSeed is not None:
-        random.seed(shuffleSeed)
-        random.shuffle(pairs)
-
-    return pairs
 
 
 def contourPlot(field, x, y, time=None,
