@@ -5,6 +5,7 @@ Functions building 2D/3D Rayleigh-Benard Convection problems with Dedalus
 """
 import os
 import socket
+import glob
 from datetime import datetime
 from time import sleep
 
@@ -12,7 +13,9 @@ import numpy as np
 import dedalus.public as d3
 from mpi4py import MPI
 import h5py
+import scipy.optimize as sco
 
+from qmat.lagrange import LagrangeApproximation
 from pySDC.helpers.fieldsIO import Rectilinear
 from pySDC.helpers.blocks import BlockDecomposition
 from pySDC.playgrounds.dedalus.timestepper import SDCIMEX, SDCIMEX_MPI, SDCIMEX_MPI2
@@ -373,11 +376,397 @@ class RBCProblem3D(RBCProblem2D):
         MPI.COMM_WORLD.Barrier()
 
 
+class OutputFiles():
+    """
+    Utility class used to load and post-process solution
+    writen with Dedalus HDF5 IO.
+    """
+    def __init__(self, folder):
+        self.folder = folder
+        fileNames = glob.glob(f"{self.folder}/*.h5")
+        fileNames.sort(key=lambda f: int(f.split("_s")[-1].split(".h5")[0]))
+
+        assert len(fileNames) == 1, "cannot read fields splitted in several files"
+        self.fileName = fileNames[0]
+
+        self._file = None   # temporary buffer to store the HDF5 file
+
+        vData0 = self.file['tasks']['velocity']
+        self.x = np.array(vData0.dims[2]["x"])
+        self.dim = dim = len(vData0.dims)-2
+        if dim == 2:
+            self.z = np.array(vData0.dims[3]["z"])
+            self.y = self.z
+        elif dim == 3:
+            self.y = np.array(vData0.dims[3]["y"])
+            self.z = np.array(vData0.dims[4]["z"])
+        else:
+            raise NotImplementedError(f"{dim = }")
+
+    @property
+    def file(self):
+        if self.file is None:
+            self._file = h5py.File(self.fileName, mode='r')
+        return self._file
+
+    def __del__(self):
+        try:
+            self._file.close()
+        except:
+            pass
+
+    @property
+    def nX(self):
+        return self.x.size
+
+    @property
+    def nY(self):
+        return self.y.size
+
+    @property
+    def nZ(self):
+        return self.z.size
+
+    @property
+    def shape(self):
+        if self.dim == 2:
+            return (4, self.nX, self.nZ)
+        elif self.dim == 3:
+            return (5, self.nX, self.nY, self.nZ)
+
+    @staticmethod
+    def getModes(coord):
+        nX = np.size(coord)
+        k = np.fft.rfftfreq(nX, 1/nX) + 0.5
+        return k
+
+    @property
+    def k(self):
+        if self.dim == 2:
+            return self.getModes(self.x)
+        elif self.dim == 3:
+            return self.getModes(self.x), self.getModes(self.y)
+
+    @property
+    def vData(self):
+        return self.file['tasks']['velocity']
+
+    @property
+    def bData(self):
+        return self.file['tasks']['buoyancy']
+
+    @property
+    def pData(self):
+        return self.file['tasks']['pressure']
+
+    @property
+    def times(self):
+        return np.array(self.vData.dims[0]["sim_time"])
+
+    @property
+    def nFields(self):
+        return len(self.times)
+
+    def readFields(self, iField):
+        data = self.file["tasks"]
+        fields = [
+            data["velocity"][iField, 0],
+            data["velocity"][iField, 1],
+            ]
+        if self.dim == 3:
+            fields += [data["velocity"][iField, 2]]
+        fields += [
+            data["buoyancy"][iField],
+            data["pressure"][iField]
+            ]
+        return np.array(fields)
+
+    def readField(self, name, iBeg=0, iEnd=None, step=1, verbose=False):
+        if verbose: print(f"Reading {name} from hdf5 file {self.fileName}")
+        if name == "velocity":
+            fData = self.vData
+        elif name == "buoyancy":
+            fData = self.bData
+        elif name == "pressure":
+            fData = self.pData
+        else:
+            raise ValueError(f"cannot read {name} from file")
+        shape = fData.shape
+        if iEnd is None:
+            iEnd = shape[0]
+        rData = range(iBeg, iEnd, step)
+        data = np.empty((len(rData), *shape[1:]), dtype=float)
+        for i, iData in enumerate(rData):
+            if verbose: print(f" -- field {i+1}/{len(rData)}, idx={iData}")
+            data[i] = fData[iData]
+        if verbose: print(" -- done !")
+        return data
+
+
+    def getMeanProfiles(self, buoyancy=False, bRMS=False, pressure=False,
+                            iBeg=0, iEnd=None, step=1, verbose=False):
+        """
+        Args:
+            iFile (int): file index
+            buoyancy (bool, optional): return buoyancy profile. Defaults to False.
+            pressure (bool, optional): return pressure profile. Defaults to False.
+
+        Returns:
+           profilr (list): mean profiles of velocity, buoyancy and pressure
+        """
+        profile = []
+        axes = 1 if self.dim==2 else (1, 2)
+        velocity = self.readField("velocity", iBeg, iEnd, step, verbose)
+
+        # Horizontal mean velocity amplitude
+        uH = velocity[:, :self.dim-1]
+        meanH = ((uH**2).sum(axis=1)**0.5).mean(axis=axes)
+        profile.append(meanH)
+
+        # Vertical mean velocity
+        uV = velocity[:, -1]
+        meanV = np.mean(abs(uV), axis=axes)
+        profile.append(meanV)
+
+
+
+        # uRMS = (ux**2 + uz**2).mean(axis=(0, 1))**0.5
+        # bRMS = ((b - b.mean(axis=(0, 1)))**2).mean(axis=(0, 1))**0.5
+
+        if bRMS or buoyancy:
+            b = self.readField("buoyancy", iBeg, iEnd, step, verbose)
+        if buoyancy:
+            profile.append(np.mean(b, axis=axes))
+        if bRMS:
+            diff = b - b.mean(axis=axes)[(slice(None), *[None]*(self.dim-1), slice(None))]
+            rms = (diff**2).mean(axis=axes)**0.5
+            profile.append(rms)
+        if pressure:
+            p = self.readField("pressure", iBeg, iEnd, step, verbose)
+            profile.append(np.mean(p, axis=axes))          # (time_index, Nz)
+        return profile
+
+
+    def getLayersQuantities(self, iBeg=0, iEnd=None, step=1, verbose=False):
+        uMean, _, bRMS = self.getMeanProfiles(
+            bRMS=True, iBeg=iBeg, iEnd=iEnd, step=step, verbose=verbose)
+        uMean = uMean.mean(axis=0)
+        bRMS = bRMS.mean(axis=0)
+
+        z = self.z
+        nFine = int(1e4)
+        zFine = np.linspace(0, 1, num=nFine)
+        P = LagrangeApproximation(z).getInterpolationMatrix(zFine)
+
+        uMeanFine = P @ uMean
+        bRMSFine = P @ bRMS
+
+        approx = LagrangeApproximation(z)
+
+        xOptU = sco.minimize_scalar(lambda z: -approx(z, fValues=uMeanFine), bounds=[0, 0.5])
+        xOptB = sco.minimize_scalar(lambda z: -approx(z, fValues=bRMS), bounds=[0, 0.5])
+
+        deltaU = xOptU.x
+        deltaT = xOptB.x
+
+        return zFine, uMeanFine, bRMSFine, deltaU, deltaT
+
+
+    @staticmethod
+    def decomposeRange(iBeg, iEnd, step, maxSize):
+        if iEnd is None:
+            raise ValueError("need to provide iEnd for range decomposition")
+        nIndices = len(range(iBeg, iEnd, step))
+        subRanges = []
+
+        # Iterate over the original range and create sub-ranges
+        iStart = iBeg
+        while nIndices > 0:
+            iStop = iStart + (maxSize - 1) * step
+            if step > 0 and iStop > iEnd:
+                iStop = iEnd
+            elif step < 0 and iStop < iEnd:
+                iStop = iEnd
+
+            subRanges.append((iStart, iStop + 1 - (iStop==iEnd), step))
+            nIndices -= maxSize
+            iStart = iStop + step if nIndices > 0 else iEnd
+
+        return subRanges
+
+    @staticmethod
+    def computeMeanSpectrum(uValues, xGrid=None, zGrid=None, verbose=False):
+        """ uValues[nT, nVar, nX, (nY,) nZ] """
+        uValues = np.asarray(uValues)
+        nT, nVar, *gridSizes = uValues.shape
+        dim = len(gridSizes)
+        assert nVar == dim
+        if verbose:
+            print(f"Computing Mean Spectrum on u[{', '.join([str(n) for n in uValues.shape])}]")
+
+        energy_spectrum = []
+        if dim == 2:
+
+            for i in range(2):
+                u = uValues[:, i]                           # (nT, Nx, Nz)
+                spectrum = np.fft.rfft(u, axis=-2)          # over Nx -->  #(nT, k, Nz)
+                spectrum *= np.conj(spectrum)               # (nT, k, Nz)
+                spectrum /= spectrum.shape[-2]              # normalize with Nx --> (nT, k, Nz)
+                spectrum = np.mean(spectrum.real, axis=-1)  # mean over Nz --> (nT,k)
+                energy_spectrum.append(spectrum)
+
+        elif dim == 3:
+
+            # Check for a cube with uniform dimensions
+            nX, nY, nZ = gridSizes
+            assert nX == nY
+            size = nX // 2
+
+            # Interpolate in z direction
+            assert xGrid is not None and zGrid is not None
+            if verbose: print(" -- interpolating from zGrid to a uniform mesh ...")
+
+            P = LagrangeApproximation(zGrid, weightComputation="STABLE").getInterpolationMatrix([0.1, 0.5, 0.9])
+            uValues = (P @ uValues.reshape(-1, nZ).T).T.reshape(nT, dim, nX, nY, 3)
+
+            # Compute 2D mode disks
+            k1D = np.fft.fftfreq(nX, 1/nX)**2
+            kMod = k1D[:, None] + k1D[None, :]
+            kMod **= 0.5
+            idx = kMod.copy()
+            idx *= (kMod < size)
+            idx -= (kMod >= size)
+
+            idxList = range(int(idx.max()) + 1)
+            flatIdx = idx.ravel()
+
+            # Fourier transform and square of Im,Re
+            if verbose: print(" -- 2D FFT on u, v & w ...")
+            uHat = np.fft.fftn(uValues, axes=(-3, -2))
+
+            if verbose: print(" -- square of Im,Re ...")
+            ffts = [uHat[:, i] for i in range(nVar)]
+            reParts = [uF.reshape((nT, nX*nY, 3)).real**2 for uF in ffts]
+            imParts = [uF.reshape((nT, nX*nY, 3)).imag**2 for uF in ffts]
+
+            # Spectrum computation
+            if verbose: print(" -- computing spectrum ...")
+            spectrum = np.zeros((nT, size, 3))
+            for i in idxList:
+                if verbose: print(f" -- k{i+1}/{len(idxList)}")
+                kIdx = np.argwhere(flatIdx == i)
+                tmp = np.empty((nT, *kIdx.shape, 3))
+                for re, im in zip(reParts, imParts):
+                    np.copyto(tmp, re[:, kIdx])
+                    tmp += im[:, kIdx]
+                    spectrum[:, i] += tmp.sum(axis=(1, 2))
+            spectrum /= 2*(nX*nY)**2
+
+            energy_spectrum.append(spectrum)
+            if verbose: print(" -- done !")
+
+        return energy_spectrum
+
+
+    def getMeanSpectrum(self, iFile:int, iBeg=0, iEnd=None, step=1, verbose=False, batchSize=5):
+        """
+        Mean spectrum from a given output file
+
+        Parameters
+        ----------
+        iFile : int
+            Index of the file to use.
+        iBeg : int, optional
+            Starting index for the fields to use. The default is 0.
+        iEnd : int, optional
+            Stopping index (non included) for the fields to use. The default is None.
+        step : int, optional
+            Index step for the fields to use. The default is 1.
+        verbose : bool, optional
+            Display infos message in stdout. The default is False.
+        batchSize : int, optional
+            Number of fields to regroup when computing one FFT. The default is 5.
+
+        Returns
+        -------
+        spectra : np.ndarray[nT,size]
+            The spectrum values for all nT fields.
+        """
+        spectra = []
+        if iEnd is None:
+            iEnd = self.nFields[iFile]
+        subRanges = self.decomposeRange(iBeg, iEnd, step, batchSize)
+        for iBegSub, iEndSub, stepSub in subRanges:
+            if verbose:
+                print(f" -- computing for fields in range ({iBegSub},{iEndSub},{stepSub})")
+            velocity = self.readField(iFile, "velocity", iBegSub, iEndSub, stepSub, verbose)
+            spectra += computeMeanSpectrum(velocity, verbose=verbose, xGrid=self.x, zGrid=self.z)
+        return np.concatenate(spectra)
+
+
+    def getFullMeanSpectrum(self, iBeg:int, iEnd=None):
+        """
+        Function to get full mean spectrum
+
+        Args:
+            iBeg (int): starting file index
+            iEnd (int, optional): stopping file index. Defaults to None.
+
+        Returns:
+           sMean (np.ndarray): mean spectrum
+           k (np.ndarray): wave number
+        """
+        if iEnd is None:
+            iEnd = self.nFiles
+        sMean = []
+        for iFile in range(iBeg, iEnd):
+            energy_spectrum = self.getMeanSpectrum(iFile)
+            sx, sz = energy_spectrum                        # (1,time_index,k)
+            sMean.append(np.mean((sx+sz)/2, axis=0))        # mean over time ---> (2, k)
+        sMean = np.mean(sMean, axis=0)                      # mean over x and z ---> (k)
+        np.savetxt(f'{self.folder}/spectrum.txt', np.vstack((sMean, self.k)))
+        return sMean, self.k
+
+    def toVTR(self, idxFormat="{:06d}"):
+        """
+        Convert all 3D fields from the OutputFiles object into a list
+        of VTR files, that can be read later with Paraview or equivalent to
+        make videos.
+
+        Parameters
+        ----------
+        idxFormat : str, optional
+            Formating string for the index suffix of the VTR file.
+            The default is "{:06d}".
+
+        Example
+        -------
+        >>> # Suppose the FieldsIO object is already writen into outputs.pysdc
+        >>> import os
+        >>> from pySDC.utils.fieldsIO import Rectilinear
+        >>> os.makedirs("vtrFiles")  # to store all VTR files into a subfolder
+        >>> Rectilinear.fromFile("outputs.pysdc").toVTR(
+        >>>    baseName="vtrFiles/field", varNames=["u", "v", "w", "T", "p"])
+        """
+        assert self.dim == 3, "can only be used with 3D fields"
+        from pySDC.helpers.vtkIO import writeToVTR
+
+        baseName = f"{self.folder}/vtrFiles"
+        os.makedirs(baseName, exist_ok=True)
+        baseName += "/out"
+        template = f"{baseName}_{idxFormat}"
+        coords = [self.x, self.y, self.z]
+        varNames = ["velocity_x", "velocity_y", "velocity_z", "buoyancy", "pressure"]
+        for i in range(np.cumsum(self.nFields)[0]):
+            u = self.fields(i)
+            writeToVTR(template.format(i), u, coords, varNames)
+
+
 if __name__ == "__main__":
     import scipy.optimize as sco
 
     from pySDC.playgrounds.dedalus.problems.utils import OutputFiles
-    from qmat.lagrange import LagrangeApproximation
+    # from qmat.lagrange import LagrangeApproximation
     import matplotlib.pyplot as plt
 
     dirName = "run_3D_A4_R1_M1"
