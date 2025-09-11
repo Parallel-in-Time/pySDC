@@ -376,6 +376,8 @@ class RBCProblem3D(RBCProblem2D):
         MPI.COMM_WORLD.Barrier()
 
 
+
+
 class OutputFiles():
     """
     Utility class used to load and post-process solution
@@ -389,7 +391,7 @@ class OutputFiles():
         assert len(fileNames) == 1, "cannot read fields splitted in several files"
         self.fileName = fileNames[0]
 
-        self._file = None   # temporary buffer to store the HDF5 file
+        self.file = h5py.File(self.fileName, mode='r')
 
         vData0 = self.file['tasks']['velocity']
         self.x = np.array(vData0.dims[2]["x"])
@@ -403,15 +405,9 @@ class OutputFiles():
         else:
             raise NotImplementedError(f"{dim = }")
 
-    @property
-    def file(self):
-        if self.file is None:
-            self._file = h5py.File(self.fileName, mode='r')
-        return self._file
-
     def __del__(self):
         try:
-            self._file.close()
+            self.file.close()
         except:
             pass
 
@@ -459,15 +455,7 @@ class OutputFiles():
     def pData(self):
         return self.file['tasks']['pressure']
 
-    @property
-    def times(self):
-        return np.array(self.vData.dims[0]["sim_time"])
-
-    @property
-    def nFields(self):
-        return len(self.times)
-
-    def readFields(self, iField):
+    def readFieldAt(self, iField):
         data = self.file["tasks"]
         fields = [
             data["velocity"][iField, 0],
@@ -481,7 +469,53 @@ class OutputFiles():
             ]
         return np.array(fields)
 
-    def readField(self, name, iBeg=0, iEnd=None, step=1, verbose=False):
+    @property
+    def times(self):
+        return np.array(self.vData.dims[0]["sim_time"])
+
+    @property
+    def nFields(self):
+        return len(self.times)
+
+
+    class BatchRanges():
+
+        def __init__(self, *args, maxSize=None, start=0, step=1):
+            assert len(args) < 5
+            try:
+                start, stop, step, maxSize = args
+            except:
+                try:
+                    start, stop, step = args
+                except:
+                    try:
+                        start, stop = args
+                    except:
+                        stop, = args
+            self.range = range(start, stop, step)
+            self.maxSize = stop if not maxSize else maxSize
+
+        @property
+        def start(self):
+            return self.range.start
+
+        @property
+        def stop(self):
+            return self.range.stop
+
+        @property
+        def step(self):
+            return self.range.step
+
+        def __len__(self):
+            return len(self.range)
+
+        def __iter__(self):
+            for i in range(self.start, self.stop, self.step*self.maxSize):
+                yield range(i, min(i+self.maxSize*self.step, self.stop), self.step)
+
+
+    def readFields(self, name, start=0, stop=None, step=1, verbose=False):
         if verbose: print(f"Reading {name} from hdf5 file {self.fileName}")
         if name == "velocity":
             fData = self.vData
@@ -491,60 +525,101 @@ class OutputFiles():
             fData = self.pData
         else:
             raise ValueError(f"cannot read {name} from file")
-        shape = fData.shape
-        if iEnd is None:
-            iEnd = shape[0]
-        rData = range(iBeg, iEnd, step)
-        data = np.empty((len(rData), *shape[1:]), dtype=float)
-        for i, iData in enumerate(rData):
-            if verbose: print(f" -- field {i+1}/{len(rData)}, idx={iData}")
-            data[i] = fData[iData]
+        if stop is None:
+            stop = self.nFields
+        if verbose: print(f" -- field[{start}:{stop}:{step}]")
+        data = fData[start:stop:step]
         if verbose: print(" -- done !")
         return data
 
 
-    def getMeanProfiles(self, buoyancy=False, bRMS=False, pressure=False,
-                            iBeg=0, iEnd=None, step=1, verbose=False):
-        """
-        Args:
-            iFile (int): file index
-            buoyancy (bool, optional): return buoyancy profile. Defaults to False.
-            pressure (bool, optional): return pressure profile. Defaults to False.
+    def getProfiles(self, which=["uRMS", "bRMS"],
+                        start=0, stop=None, step=1, batchSize=None,
+                        verbose=False):
+        avgAxes = (0, 1) if self.dim==2 else (0, 1, 2)
+        formula = {
+            "u" : "u.sum(axis=1)",
+            "uv": "u[:, -1]",
+            "uh": "u[:, :-1].sum(axis=1)",
+            "b": "b",
+            "p": "p"
+            }
+        if which == "all":
+            which = [var+"Mean" for var in formula.keys()] \
+                + [var+"RMS" for var in formula.keys()]
+        profiles = {name: np.zeros(self.nZ) for name in which}
+        if stop is None:
+            stop = self.nFields
 
-        Returns:
-           profilr (list): mean profiles of velocity, buoyancy and pressure
-        """
-        profile = []
-        axes = 1 if self.dim==2 else (1, 2)
-        velocity = self.readField("velocity", iBeg, iEnd, step, verbose)
+        nSamples = 0
+        def addSamples(current, new, nNew):
+            current *= nSamples
+            new *= nNew
+            current += new
+            current /= (nSamples + nNew)
 
-        # Horizontal mean velocity amplitude
-        uH = velocity[:, :self.dim-1]
-        meanH = ((uH**2).sum(axis=1)**0.5).mean(axis=axes)
-        profile.append(meanH)
+        for r in self.BatchRanges(start, stop, step, batchSize):
 
-        # Vertical mean velocity
-        uV = velocity[:, -1]
-        meanV = np.mean(abs(uV), axis=axes)
-        profile.append(meanV)
+            bSize = len(r)
 
+            # Read required data
+            if set(["uRMS", "uvRMS", "uhRMS",
+                    "uMean", "uvMean", "uhMean"]).intersection(which):
+                u = self.readFields("velocity", r.start, r.stop, r.step, verbose)
+            if set(["bRMS", "bMean"]).intersection(which):
+                b = self.readFields("buoyancy", r.start, r.stop, r.step, verbose)
+            if set(["pRMS", "pMean"]).intersection(which):
+                p = self.readFields("pressure", r.start, r.stop, r.step, verbose)
 
+            # Mean profiles
+            if "uMean" in which:
+                uMean = u.sum(axis=1).mean(axis=avgAxes)
+                addSamples(profiles["uMean"], uMean, bSize)
+            if "uvMean" in which:
+                uvMean = u[:, -1].mean(axis=avgAxes)
+                addSamples(profiles["uvMean"], uvMean, bSize)
+            if "uhMean" in which:
+                uhMean = u[:, :-1].sum(axis=1).mean(axis=avgAxes)
+                addSamples(profiles["uhMean"], uhMean, bSize)
+            if "bMean" in which:
+                bMean = b.mean(axis=avgAxes)
+                addSamples(profiles["bMean"], bMean, bSize)
+            if "pMean" in which:
+                pMean = p.mean(axis=avgAxes)
+                addSamples(profiles["pMean"], pMean, bSize)
 
-        # uRMS = (ux**2 + uz**2).mean(axis=(0, 1))**0.5
-        # bRMS = ((b - b.mean(axis=(0, 1)))**2).mean(axis=(0, 1))**0.5
+            # RMS profiles
+            # -- inplace power 2 first
+            try: u **= 2
+            except: pass
+            try: b **= 2
+            except: pass
+            try: p **= 2
+            except: pass
 
-        if bRMS or buoyancy:
-            b = self.readField("buoyancy", iBeg, iEnd, step, verbose)
-        if buoyancy:
-            profile.append(np.mean(b, axis=axes))
-        if bRMS:
-            diff = b - b.mean(axis=axes)[(slice(None), *[None]*(self.dim-1), slice(None))]
-            rms = (diff**2).mean(axis=axes)**0.5
-            profile.append(rms)
-        if pressure:
-            p = self.readField("pressure", iBeg, iEnd, step, verbose)
-            profile.append(np.mean(p, axis=axes))          # (time_index, Nz)
-        return profile
+            if "uRMS" in which:
+                uRMS = u.sum(axis=1).mean(axis=avgAxes)
+                addSamples(profiles["uRMS"], uRMS, bSize)
+            if "uvRMS" in which:
+                uvRMS = u[:, -1].mean(axis=avgAxes)
+                addSamples(profiles["uvRMS"], uvRMS, bSize)
+            if "uhRMS" in which:
+                uhRMS = u[:, :-1].sum(axis=1).mean(axis=avgAxes)
+                addSamples(profiles["uhRMS"], uhRMS, bSize)
+            if "bRMS" in which:
+                bRMS = b.mean(axis=avgAxes)
+                addSamples(profiles["bRMS"], bRMS, bSize)
+            if "pRMS" in which:
+                pRMS = p.mean(axis=avgAxes)
+                addSamples(profiles["pRMS"], pRMS, bSize)
+
+            nSamples += bSize
+
+        for name, val in profiles.items():
+            if "RMS" in name:
+                val **= 0.5
+        profiles["nSamples"] = nSamples
+        return profiles
 
 
     def getLayersQuantities(self, iBeg=0, iEnd=None, step=1, verbose=False):
@@ -668,7 +743,7 @@ class OutputFiles():
         return energy_spectrum
 
 
-    def getMeanSpectrum(self, iFile:int, iBeg=0, iEnd=None, step=1, verbose=False, batchSize=5):
+    def getMeanSpectrum(self, iFile:int, iBeg=0, iEnd=None, step=1, batchSize=5, verbose=False):
         """
         Mean spectrum from a given output file
 
@@ -700,7 +775,7 @@ class OutputFiles():
             if verbose:
                 print(f" -- computing for fields in range ({iBegSub},{iEndSub},{stepSub})")
             velocity = self.readField(iFile, "velocity", iBegSub, iEndSub, stepSub, verbose)
-            spectra += computeMeanSpectrum(velocity, verbose=verbose, xGrid=self.x, zGrid=self.z)
+            spectra += self.computeMeanSpectrum(velocity, verbose=verbose, xGrid=self.x, zGrid=self.z)
         return np.concatenate(spectra)
 
 
@@ -763,19 +838,32 @@ class OutputFiles():
 
 
 if __name__ == "__main__":
-    import scipy.optimize as sco
-
-    from pySDC.playgrounds.dedalus.problems.utils import OutputFiles
-    # from qmat.lagrange import LagrangeApproximation
     import matplotlib.pyplot as plt
 
     dirName = "run_3D_A4_R1_M1"
 
     problem = RBCProblem3D.runSimulation(
-        dirName, 100, 1e-2/2, logEvery=20, dtWrite=1.0,
+        dirName, 100, 1e-2/4, logEvery=20, dtWrite=1.0,
         aspectRatio=4, resFactor=1, meshRatio=1)
 
-    # output = OutputFiles(dirName)
+    output = OutputFiles(dirName)
+    profiles = output.getProfiles(which="all", verbose=True, batchSize=25)
+
+    for name, p in profiles.items():
+        if "Mean" in name:
+            plt.figure("Mean profiles")
+            plt.plot(p, output.z, label=name)
+        if "RMS" in name:
+            plt.figure("RMS profiles")
+            plt.plot(p, output.z, label=name)
+
+    for pType in ["Mean", "RMS"]:
+        plt.figure(f"{pType} profiles")
+        plt.legend()
+        plt.xlabel("profile")
+        plt.ylabel("z coord")
+
+
     # approx = LagrangeApproximation(output.z)
 
     # nThrow = 20
