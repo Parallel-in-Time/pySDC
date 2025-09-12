@@ -330,8 +330,10 @@ class RBCProblem3D(RBCProblem2D):
         baseSize = 32
 
         Lx, Ly, Lz = int(aspectRatio), int(aspectRatio), 1
-        Nx = Ny = int(baseSize*aspectRatio*meshRatio*self.resFactor)
-        Nz = int(baseSize*self.resFactor)
+        unitSize = baseSize*self.resFactor
+
+        Nx = Ny = int(aspectRatio*meshRatio*unitSize)
+        Nz = int(unitSize)
         dealias = 3/2
         dtype = np.float64
 
@@ -383,6 +385,8 @@ class OutputFiles():
     Utility class used to load and post-process solution
     writen with Dedalus HDF5 IO.
     """
+    VERBOSE = False
+
     def __init__(self, folder):
         self.folder = folder
         fileNames = glob.glob(f"{self.folder}/*.h5")
@@ -515,8 +519,8 @@ class OutputFiles():
                 yield range(i, min(i+self.maxSize*self.step, self.stop), self.step)
 
 
-    def readFields(self, name, start=0, stop=None, step=1, verbose=False):
-        if verbose: print(f"Reading {name} from hdf5 file {self.fileName}")
+    def readFields(self, name, start=0, stop=None, step=1):
+        if self.VERBOSE: print(f"Reading {name} from hdf5 file {self.fileName}")
         if name == "velocity":
             fData = self.vData
         elif name == "buoyancy":
@@ -527,29 +531,35 @@ class OutputFiles():
             raise ValueError(f"cannot read {name} from file")
         if stop is None:
             stop = self.nFields
-        if verbose: print(f" -- field[{start}:{stop}:{step}]")
+        if self.VERBOSE: print(f" -- field[{start}:{stop}:{step}]")
         data = fData[start:stop:step]
-        if verbose: print(" -- done !")
+        if self.VERBOSE: print(" -- done !")
         return data
 
 
     def getProfiles(self, which=["uRMS", "bRMS"],
-                        start=0, stop=None, step=1, batchSize=None,
-                        verbose=False):
+                    start=0, stop=None, step=1, batchSize=None):
+        if stop is None:
+            stop = self.nFields
         avgAxes = (0, 1) if self.dim==2 else (0, 1, 2)
         formula = {
             "u" : "u.sum(axis=1)",
             "uv": "u[:, -1]",
             "uh": "u[:, :-1].sum(axis=1)",
             "b": "b",
-            "p": "p"
+            "p": "p",
             }
+
         if which == "all":
             which = [var+"Mean" for var in formula.keys()] \
                 + [var+"RMS" for var in formula.keys()]
+        else:
+            which = list(which)
+        if "bRMS" in which and "bMean" not in which:
+            which.append("bMean")
+        if "pRMS" in  which and "pMean" not in which:
+            which.append("pMean")
         profiles = {name: np.zeros(self.nZ) for name in which}
-        if stop is None:
-            stop = self.nFields
 
         nSamples = 0
         def addSamples(current, new, nNew):
@@ -558,93 +568,111 @@ class OutputFiles():
             current += new
             current /= (nSamples + nNew)
 
+        # Mean profiles
         for r in self.BatchRanges(start, stop, step, batchSize):
 
             bSize = len(r)
 
             # Read required data
-            if set(["uRMS", "uvRMS", "uhRMS",
-                    "uMean", "uvMean", "uhMean"]).intersection(which):
-                u = self.readFields("velocity", r.start, r.stop, r.step, verbose)
-            if set(["bRMS", "bMean"]).intersection(which):
-                b = self.readFields("buoyancy", r.start, r.stop, r.step, verbose)
-            if set(["pRMS", "pMean"]).intersection(which):
-                p = self.readFields("pressure", r.start, r.stop, r.step, verbose)
+            if set(["uMean", "uvMean", "uhMean",
+                    "uRMS", "uvRMS", "uhRMS"]).intersection(which):
+                u = self.readFields("velocity", r.start, r.stop, r.step)
+            if set(["bMean"]).intersection(which):
+                b = self.readFields("buoyancy", r.start, r.stop, r.step)
+            if set(["pMean"]).intersection(which):
+                p = self.readFields("pressure", r.start, r.stop, r.step)
 
             # Mean profiles
-            if "uMean" in which:
-                uMean = u.sum(axis=1).mean(axis=avgAxes)
-                addSamples(profiles["uMean"], uMean, bSize)
-            if "uvMean" in which:
-                uvMean = u[:, -1].mean(axis=avgAxes)
-                addSamples(profiles["uvMean"], uvMean, bSize)
-            if "uhMean" in which:
-                uhMean = u[:, :-1].sum(axis=1).mean(axis=avgAxes)
-                addSamples(profiles["uhMean"], uhMean, bSize)
-            if "bMean" in which:
-                bMean = b.mean(axis=avgAxes)
-                addSamples(profiles["bMean"], bMean, bSize)
-            if "pMean" in which:
-                pMean = p.mean(axis=avgAxes)
-                addSamples(profiles["pMean"], pMean, bSize)
+            for name in which:
+                if "Mean" in name:
+                    var = eval(formula[name[:-4]]).mean(axis=avgAxes)
+                    addSamples(profiles[name], var, bSize)
 
-            # RMS profiles
-            # -- inplace power 2 first
             try: u **= 2
             except: pass
-            try: b **= 2
-            except: pass
-            try: p **= 2
-            except: pass
 
-            if "uRMS" in which:
-                uRMS = u.sum(axis=1).mean(axis=avgAxes)
-                addSamples(profiles["uRMS"], uRMS, bSize)
-            if "uvRMS" in which:
-                uvRMS = u[:, -1].mean(axis=avgAxes)
-                addSamples(profiles["uvRMS"], uvRMS, bSize)
-            if "uhRMS" in which:
-                uhRMS = u[:, :-1].sum(axis=1).mean(axis=avgAxes)
-                addSamples(profiles["uhRMS"], uhRMS, bSize)
+            # RMS profiles
+            for name in which:
+                if "RMS" in name and name not in ["bRMS", "pRMS"]:
+                    var = eval(formula[name[:-3]]).mean(axis=avgAxes)
+                    addSamples(profiles[name], var, bSize)
+
+            nSamples += bSize
+
+        # bRMS and pRMS require precomputed mean
+        nSamples = 0
+        for r in self.BatchRanges(start, stop, step, batchSize):
+
+            bSize = len(r)
+
             if "bRMS" in which:
+                b = self.readFields("buoyancy", r.start, r.stop, r.step)
+                b -= profiles["bMean"]
+                b **= 2
                 bRMS = b.mean(axis=avgAxes)
                 addSamples(profiles["bRMS"], bRMS, bSize)
+
             if "pRMS" in which:
+                p = self.readFields("pressure", r.start, r.stop, r.step)
+                p -= profiles["pMean"]
+                p **= 2
                 pRMS = p.mean(axis=avgAxes)
                 addSamples(profiles["pRMS"], pRMS, bSize)
 
             nSamples += bSize
 
+        # Square root after time averaging for RMS
         for name, val in profiles.items():
             if "RMS" in name:
                 val **= 0.5
+
         profiles["nSamples"] = nSamples
         return profiles
 
+    def getTimeSeries(self, which=["ke"], batchSize=None):
 
-    def getLayersQuantities(self, iBeg=0, iEnd=None, step=1, verbose=False):
-        uMean, _, bRMS = self.getMeanProfiles(
-            bRMS=True, iBeg=iBeg, iEnd=iEnd, step=step, verbose=verbose)
-        uMean = uMean.mean(axis=0)
-        bRMS = bRMS.mean(axis=0)
+        series = {name: [] for name in which}
+        avgAxes = 1 if self.dim==2 else (1, 2)
 
-        z = self.z
-        nFine = int(1e4)
-        zFine = np.linspace(0, 1, num=nFine)
-        P = LagrangeApproximation(z).getInterpolationMatrix(zFine)
+        Iz = LagrangeApproximation(self.z).getIntegrationMatrix([(0, 1)])
 
-        uMeanFine = P @ uMean
-        bRMSFine = P @ bRMS
+        for r in self.BatchRanges(self.nFields, maxSize=batchSize):
 
-        approx = LagrangeApproximation(z)
+            if "ke" in which:
+                u = self.readFields("velocity", r.start, r.stop, r.step)
+                u **= 2
+                ke = Iz @ u.sum(axis=1).mean(axis=avgAxes)[..., None]
+                series["ke"].append(ke.ravel())
 
-        xOptU = sco.minimize_scalar(lambda z: -approx(z, fValues=uMeanFine), bounds=[0, 0.5])
-        xOptB = sco.minimize_scalar(lambda z: -approx(z, fValues=bRMS), bounds=[0, 0.5])
+        for key, val in series.items():
+            series[key] = np.array(val).ravel()
 
-        deltaU = xOptU.x
-        deltaT = xOptB.x
+        return series
 
-        return zFine, uMeanFine, bRMSFine, deltaU, deltaT
+
+    def getBoundaryLayers(self,
+                          which=["uRMS", "bRMS"], profiles=None,
+                          start=0, stop=None, step=1, batchSize=None):
+
+        if which == "all":
+            which = ["uRMS", "bRMS", "uhRMS"]
+        else:
+            which = list(which)
+        deltas = {name: None for name in which}
+
+        if profiles is None:
+            profiles = {}
+        missing = set(which).difference(profiles.keys())
+        profiles.update(self.getProfiles(missing, start, stop, step, batchSize))
+
+        approx = LagrangeApproximation(self.z)
+
+        for name in which:
+            values = profiles[name]
+            opt = sco.minimize_scalar(lambda z: -approx(z, fValues=values), bounds=[0, 0.5])
+            deltas[name] = opt.x
+
+        return deltas
 
 
     @staticmethod
@@ -832,36 +860,54 @@ class OutputFiles():
         template = f"{baseName}_{idxFormat}"
         coords = [self.x, self.y, self.z]
         varNames = ["velocity_x", "velocity_y", "velocity_z", "buoyancy", "pressure"]
-        for i in range(np.cumsum(self.nFields)[0]):
-            u = self.fields(i)
+        for i in range(self.nFields):
+            u = self.readFieldAt(i)
             writeToVTR(template.format(i), u, coords, varNames)
 
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
-    dirName = "run_3D_A4_R1_M1"
+    aspectRatio = 4     # Lx = Ly = A*Lz
+    meshRatio = 0.5     # Nx/Lx = Ny/Ly = M*Nz/Lz
+    resFactor = 1       # Nz = R*32
+
+    dirName = f"run_3D_A{aspectRatio}_M{meshRatio}_R{resFactor}"
 
     problem = RBCProblem3D.runSimulation(
         dirName, 100, 1e-2/4, logEvery=20, dtWrite=1.0,
-        aspectRatio=4, resFactor=1, meshRatio=1)
+        aspectRatio=4, meshRatio=1, resFactor=1)
 
-    output = OutputFiles(dirName)
-    profiles = output.getProfiles(which="all", verbose=True, batchSize=25)
+    # OutputFiles.VERBOSE = True
+    # output = OutputFiles(dirName)
 
-    for name, p in profiles.items():
-        if "Mean" in name:
-            plt.figure("Mean profiles")
-            plt.plot(p, output.z, label=name)
-        if "RMS" in name:
-            plt.figure("RMS profiles")
-            plt.plot(p, output.z, label=name)
+    # series = output.getTimeSeries()
 
-    for pType in ["Mean", "RMS"]:
-        plt.figure(f"{pType} profiles")
-        plt.legend()
-        plt.xlabel("profile")
-        plt.ylabel("z coord")
+    # plt.figure("series")
+    # plt.plot(output.times, series["ke"], label="ke")
+    # plt.legend()
+
+    # profiles = output.getProfiles(which="all", batchSize=None, start=40)
+
+    # deltas = output.getBoundaryLayers(which="all", profiles=profiles)
+
+    # for name, p in profiles.items():
+    #     if "Mean" in name:
+    #         plt.figure("Mean profiles")
+    #         plt.plot(p, output.z, label=name)
+    #         if name in deltas:
+    #             plt.hlines(deltas[name], p.min(), p.max(), linestyles="--", colors="black")
+    #     if "RMS" in name:
+    #         plt.figure("RMS profiles")
+    #         plt.plot(p, output.z, label=name)
+    #         if name in deltas:
+    #             plt.hlines(deltas[name], p.min(), p.max(), linestyles="--", colors="black")
+
+    # for pType in ["Mean", "RMS"]:
+    #     plt.figure(f"{pType} profiles")
+    #     plt.legend()
+    #     plt.xlabel("profile")
+    #     plt.ylabel("z coord")
 
 
     # approx = LagrangeApproximation(output.z)
