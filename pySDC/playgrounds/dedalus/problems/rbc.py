@@ -434,18 +434,11 @@ class OutputFiles():
         elif self.dim == 3:
             return (5, self.nX, self.nY, self.nZ)
 
-    @staticmethod
-    def getModes(coord):
-        nX = np.size(coord)
+    @property
+    def waveNumbers(self) -> np.ndarray:
+        nX = self.nX
         k = np.fft.rfftfreq(nX, 1/nX) + 0.5
         return k
-
-    @property
-    def k(self):
-        if self.dim == 2:
-            return self.getModes(self.x)
-        elif self.dim == 3:
-            return self.getModes(self.x), self.getModes(self.y)
 
     @property
     def vData(self):
@@ -522,19 +515,40 @@ class OutputFiles():
     def readFields(self, name, start=0, stop=None, step=1):
         if self.VERBOSE: print(f"Reading {name} from hdf5 file {self.fileName}")
         if name == "velocity":
-            fData = self.vData
+            field = self.vData
         elif name == "buoyancy":
-            fData = self.bData
+            field = self.bData
         elif name == "pressure":
-            fData = self.pData
+            field = self.pData
         else:
             raise ValueError(f"cannot read {name} from file")
         if stop is None:
             stop = self.nFields
-        if self.VERBOSE: print(f" -- field[{start}:{stop}:{step}]")
-        data = fData[start:stop:step]
+        if self.VERBOSE: print(f" -- reading {name}[{start}:{stop}:{step}] ...")
+        data = field[start:stop:step]
         if self.VERBOSE: print(" -- done !")
         return data
+
+
+    def getTimeSeries(self, which=["ke"], batchSize=None):
+
+        series = {name: [] for name in which}
+        avgAxes = 1 if self.dim==2 else (1, 2)
+
+        Iz = LagrangeApproximation(self.z).getIntegrationMatrix([(0, 1)])
+
+        for r in self.BatchRanges(self.nFields, maxSize=batchSize):
+
+            if "ke" in which:
+                u = self.readFields("velocity", r.start, r.stop, r.step)
+                u **= 2
+                ke = Iz @ u.sum(axis=1).mean(axis=avgAxes)[..., None]
+                series["ke"].append(ke.ravel())
+
+        for key, val in series.items():
+            series[key] = np.array(val).ravel()
+
+        return series
 
 
     def getProfiles(self, which=["uRMS", "bRMS"],
@@ -629,26 +643,6 @@ class OutputFiles():
         profiles["nSamples"] = nSamples
         return profiles
 
-    def getTimeSeries(self, which=["ke"], batchSize=None):
-
-        series = {name: [] for name in which}
-        avgAxes = 1 if self.dim==2 else (1, 2)
-
-        Iz = LagrangeApproximation(self.z).getIntegrationMatrix([(0, 1)])
-
-        for r in self.BatchRanges(self.nFields, maxSize=batchSize):
-
-            if "ke" in which:
-                u = self.readFields("velocity", r.start, r.stop, r.step)
-                u **= 2
-                ke = Iz @ u.sum(axis=1).mean(axis=avgAxes)[..., None]
-                series["ke"].append(ke.ravel())
-
-        for key, val in series.items():
-            series[key] = np.array(val).ravel()
-
-        return series
-
 
     def getBoundaryLayers(self,
                           which=["uRMS", "bRMS"], profiles=None,
@@ -674,101 +668,106 @@ class OutputFiles():
 
         return deltas
 
+    def computeSpectrum(self, which=["uv", "uh"], zVal="all",
+                        start=0, stop=None, step=1, batchSize=None):
 
-    @staticmethod
-    def decomposeRange(iBeg, iEnd, step, maxSize):
-        if iEnd is None:
-            raise ValueError("need to provide iEnd for range decomposition")
-        nIndices = len(range(iBeg, iEnd, step))
-        subRanges = []
+        if which == "all":
+            which = ["uv", "uh", "b"]
+        else:
+            which = list(which)
+        waveNum = self.waveNumbers
+        spectrum = {name: np.zeros(waveNum.size) for name in which}
 
-        # Iterate over the original range and create sub-ranges
-        iStart = iBeg
-        while nIndices > 0:
-            iStop = iStart + (maxSize - 1) * step
-            if step > 0 and iStop > iEnd:
-                iStop = iEnd
-            elif step < 0 and iStop < iEnd:
-                iStop = iEnd
+        approx = LagrangeApproximation(self.z, weightComputation="STABLE")
+        if zVal == "all":
+            mIz = approx.getIntegrationMatrix([(0, 1)])
+        else:
+            mPz = approx.getInterpolationMatrix([zVal, 1-zVal])
 
-            subRanges.append((iStart, iStop + 1 - (iStop==iEnd), step))
-            nIndices -= maxSize
-            iStart = iStop + step if nIndices > 0 else iEnd
+        for name in which:
 
-        return subRanges
+            # read fields
+            if name in ["uv", "uh"]:
+                u = self.readFields("velocity", start, stop, step)
+                if name == "uv":
+                    field = u[:, -1:]
+                if name == "uh":
+                    field = u[:, :-1]
+            if name == "b":
+                field = self.readFields("buoyancy", start, stop, step)[:, None, ...]
+            # field.shape = (nT,nVar,nX[,nY],nZ)
 
-    @staticmethod
-    def computeMeanSpectrum(uValues, xGrid=None, zGrid=None, verbose=False):
-        """ uValues[nT, nVar, nX, (nY,) nZ] """
-        uValues = np.asarray(uValues)
-        nT, nVar, *gridSizes = uValues.shape
-        dim = len(gridSizes)
-        assert nVar == dim
-        if verbose:
-            print(f"Computing Mean Spectrum on u[{', '.join([str(n) for n in uValues.shape])}]")
+            if zVal != "all":
+                field = (mPz @ field[..., None])[..., 0]
 
-        energy_spectrum = []
-        if dim == 2:
+            # 2D case
+            if self.dim == 2:
+                if self.VERBOSE:
+                    print(f" -- computing 1D mean spectrum for {name}[{start},{stop},{step}] ...")
+                var = field[:, 0]
 
-            for i in range(2):
-                u = uValues[:, i]                           # (nT, Nx, Nz)
-                spectrum = np.fft.rfft(u, axis=-2)          # over Nx -->  #(nT, k, Nz)
-                spectrum *= np.conj(spectrum)               # (nT, k, Nz)
-                spectrum /= spectrum.shape[-2]              # normalize with Nx --> (nT, k, Nz)
-                spectrum = np.mean(spectrum.real, axis=-1)  # mean over Nz --> (nT,k)
-                energy_spectrum.append(spectrum)
+                # RFFT over nX --> (nT, nKx, nZ)
+                s = np.fft.rfft(var, axis=-2)
+                s *= np.conj(s)
 
-        elif dim == 3:
+                # scaling
+                s /= self.nX**2
 
-            # Check for a cube with uniform dimensions
-            nX, nY, nZ = gridSizes
-            assert nX == nY
-            size = nX // 2
+            # 3D case
+            elif self.dim == 3:
 
-            # Interpolate in z direction
-            assert xGrid is not None and zGrid is not None
-            if verbose: print(" -- interpolating from zGrid to a uniform mesh ...")
+                if self.VERBOSE:
+                    print(f" -- computing 2D mean spectrum for {name}[{start},{stop},{step}] ...")
 
-            P = LagrangeApproximation(zGrid, weightComputation="STABLE").getInterpolationMatrix([0.1, 0.5, 0.9])
-            uValues = (P @ uValues.reshape(-1, nZ).T).T.reshape(nT, dim, nX, nY, 3)
+                assert self.nX == self.nY, "nX != nY, that will be some weird spectrum"
+                nT, nVar, nX, nY, nZ = field.shape
 
-            # Compute 2D mode disks
-            k1D = np.fft.fftfreq(nX, 1/nX)**2
-            kMod = k1D[:, None] + k1D[None, :]
-            kMod **= 0.5
-            idx = kMod.copy()
-            idx *= (kMod < size)
-            idx -= (kMod >= size)
+                # Compute 2D mode disks
+                k1D = np.fft.fftfreq(nX, 1/nX)**2
+                kMod = k1D[:, None] + k1D[None, :]
+                kMod **= 0.5
+                idx = kMod.copy()
+                idx *= (kMod < waveNum.size)
+                idx -= (kMod >= waveNum.size)
 
-            idxList = range(int(idx.max()) + 1)
-            flatIdx = idx.ravel()
+                idxList = range(int(idx.max()) + 1)
+                flatIdx = idx.ravel()
 
-            # Fourier transform and square of Im,Re
-            if verbose: print(" -- 2D FFT on u, v & w ...")
-            uHat = np.fft.fftn(uValues, axes=(-3, -2))
+                if self.VERBOSE: print(" -- 2D FFT ...")
+                uHat = np.fft.fft2(field, axes=(-3, -2))
 
-            if verbose: print(" -- square of Im,Re ...")
-            ffts = [uHat[:, i] for i in range(nVar)]
-            reParts = [uF.reshape((nT, nX*nY, 3)).real**2 for uF in ffts]
-            imParts = [uF.reshape((nT, nX*nY, 3)).imag**2 for uF in ffts]
+                if self.VERBOSE: print(" -- square of Im,Re ...")
+                ffts = [uHat[:, i] for i in range(nVar)]
+                reParts = [uF.reshape((nT, nX*nY, -1)).real**2 for uF in ffts]
+                imParts = [uF.reshape((nT, nX*nY, -1)).imag**2 for uF in ffts]
 
-            # Spectrum computation
-            if verbose: print(" -- computing spectrum ...")
-            spectrum = np.zeros((nT, size, 3))
-            for i in idxList:
-                if verbose: print(f" -- k{i+1}/{len(idxList)}")
-                kIdx = np.argwhere(flatIdx == i)
-                tmp = np.empty((nT, *kIdx.shape, 3))
-                for re, im in zip(reParts, imParts):
-                    np.copyto(tmp, re[:, kIdx])
-                    tmp += im[:, kIdx]
-                    spectrum[:, i] += tmp.sum(axis=(1, 2))
-            spectrum /= 2*(nX*nY)**2
+                # Spectrum computation
+                if self.VERBOSE: print(" -- computing spectrum ...")
+                s = np.zeros((nT, waveNum.size, nZ))
+                for i in idxList:
+                    if self.VERBOSE: print(f" -- k{i+1}/{len(idxList)}")
+                    kIdx = np.argwhere(flatIdx == i)
+                    tmp = np.empty((nT, *kIdx.shape, nZ))
+                    for re, im in zip(reParts, imParts):
+                        np.copyto(tmp, re[:, kIdx])
+                        tmp += im[:, kIdx]
+                        s[:, i] += tmp.sum(axis=(1, 2))
 
-            energy_spectrum.append(spectrum)
-            if verbose: print(" -- done !")
+                # scaling
+                s /= 2*(nX*nY)**2
 
-        return energy_spectrum
+            # integral or mean over nZ --> (nT, Kx)
+            if zVal == "all":
+                s = (mIz @ s.real[..., None])[..., 0, 0]
+            else:
+                s = s.real.mean(axis=-1)
+
+            # mean over nT
+            spectrum[name] += s.mean(axis=0)
+
+            if self.VERBOSE: print(" -- done !")
+
+        return spectrum
 
 
     def getMeanSpectrum(self, iFile:int, iBeg=0, iEnd=None, step=1, batchSize=5, verbose=False):
@@ -874,136 +873,145 @@ if __name__ == "__main__":
 
     dirName = f"run_3D_A{aspectRatio}_M{meshRatio}_R{resFactor}"
 
-    problem = RBCProblem3D.runSimulation(
-        dirName, 100, 1e-2/4, logEvery=20, dtWrite=1.0,
-        aspectRatio=4, meshRatio=1, resFactor=1)
-
-    # OutputFiles.VERBOSE = True
-    # output = OutputFiles(dirName)
-
-    # series = output.getTimeSeries()
-
-    # plt.figure("series")
-    # plt.plot(output.times, series["ke"], label="ke")
-    # plt.legend()
-
-    # profiles = output.getProfiles(which="all", batchSize=None, start=40)
-
-    # deltas = output.getBoundaryLayers(which="all", profiles=profiles)
-
-    # for name, p in profiles.items():
-    #     if "Mean" in name:
-    #         plt.figure("Mean profiles")
-    #         plt.plot(p, output.z, label=name)
-    #         if name in deltas:
-    #             plt.hlines(deltas[name], p.min(), p.max(), linestyles="--", colors="black")
-    #     if "RMS" in name:
-    #         plt.figure("RMS profiles")
-    #         plt.plot(p, output.z, label=name)
-    #         if name in deltas:
-    #             plt.hlines(deltas[name], p.min(), p.max(), linestyles="--", colors="black")
-
-    # for pType in ["Mean", "RMS"]:
-    #     plt.figure(f"{pType} profiles")
-    #     plt.legend()
-    #     plt.xlabel("profile")
-    #     plt.ylabel("z coord")
+    # problem = RBCProblem3D.runSimulation(
+    #     dirName, 100, 1e-2/4, logEvery=20, dtWrite=1.0,
+    #     aspectRatio=4, meshRatio=1, resFactor=1)
 
 
-    # approx = LagrangeApproximation(output.z)
+    dirName = "run_3D_A4_M0.5_R1"
+    # dirName = "run_M4_R2"
+    OutputFiles.VERBOSE = True
+    output = OutputFiles(dirName)
 
-    # nThrow = 20
-    # nIgnore = 1
-    # u = output.vData(0)[nThrow::nIgnore]
-    # b = output.bData(0)[nThrow::nIgnore]
-    # ux, uz = u[:, 0], u[:, 1]
-    # nX, nZ = output.nX, output.nZ
+    if False:
+        series = output.getTimeSeries()
 
-    # # RMS quantities
-    # uRMS = (ux**2 + uz**2).mean(axis=(0, 1))**0.5
-    # bRMS = ((b - b.mean(axis=(0, 1)))**2).mean(axis=(0, 1))**0.5
+        plt.figure("series")
+        plt.plot(output.times, series["ke"], label="ke")
+        plt.legend()
 
+        profiles = output.getProfiles(
+            which="all", batchSize=None, start=30, step=5)
 
-    # plt.figure("z-profile")
-    # xOptU = sco.minimize_scalar(lambda z: -approx(z, fValues=uRMS), bounds=[0, 0.5])
-    # xOptB = sco.minimize_scalar(lambda z: -approx(z, fValues=bRMS), bounds=[0, 0.5])
+        deltas = output.getBoundaryLayers(which="all", profiles=profiles)
 
-    # plt.plot(uRMS, output.z, label=f"uRMS[{nX=},{nZ=}]")
-    # plt.hlines(xOptU.x, uRMS.min(), uRMS.max(), linestyles="--", colors="black")
-    # plt.plot(bRMS, output.z, label=f"bRMS[{nX=},{nZ=}]")
-    # plt.hlines(xOptB.x, bRMS.min(), bRMS.max(), linestyles="--", colors="black")
-    # plt.legend()
+        for name, p in profiles.items():
+            if "Mean" in name:
+                plt.figure("Mean profiles")
+                plt.plot(p, output.z, label=name)
+                if name in deltas:
+                    plt.hlines(deltas[name], p.min(), p.max(), linestyles="--", colors="black")
+            if "RMS" in name:
+                plt.figure("RMS profiles")
+                plt.plot(p, output.z, label=name)
+                if name in deltas:
+                    plt.hlines(deltas[name], p.min(), p.max(), linestyles="--", colors="black")
 
+        for pType in ["Mean", "RMS"]:
+            plt.figure(f"{pType} profiles")
+            plt.legend()
+            plt.xlabel("profile")
+            plt.ylabel("z coord")
 
-    # keMean = np.sum(mIz*ke, axis=-1).mean(axis=-1)
-    # plt.figure("ke")
-    # plt.plot(keMean, label=dirName)
-    # plt.legend()
+    spectrum = output.computeSpectrum(which="all", zVal="all")
+    waveNum = output.waveNumbers
 
-    # Removing constant component
-    # uAll = uAll - uAll.mean(axis=(-2,-1))[:, None, None]
-
-    # # 2D spectrum
-    # mPz = approx.getInterpolationMatrix(np.linspace(0, 1, nZ, endpoint=False))
-    # uReg = (mPz @ uAll[:, :, :, None])[..., 0]
-    # uHat = np.fft.fft2(uReg)
-    # reParts = [uF.ravel().real**2 for uF in uHat]
-    # imParts = [uF.ravel().imag**2 for uF in uHat]
-
-
-    # kX = np.fft.fftfreq(nX, 1/nX)**2
-    # kZ = np.fft.fftfreq(nZ, 1/nZ)**2
-
-    # ell = kX[:, None]/(nX//2)**2 + kZ[None, :]/(nZ//2)**2
-
-    # kMod = kX[:, None] + kZ[None, :]
-    # kMod **= 0.5
-
-    # idx = kMod.copy()
-    # idx *= (ell < 1)
-    # idx -= (ell >= 1)
-    # idxList = range(int(idx.max()) + 1)
-    # flatIdx = idx.ravel()
-
-    # spectrum = np.zeros(len(idxList))
-    # for i in idxList:
-    #     kIdx = np.argwhere(flatIdx == i)
-    #     tmp = np.empty(kIdx.shape)
-    #     for re, im in zip(reParts, imParts):
-    #         np.copyto(tmp, re[kIdx])
-    #         tmp += im[kIdx]
-    #         spectrum[i] += tmp.sum()
-    # spectrum /= 2*(nX*nZ)**2
-    # wavenumbers = list(i + 0.5 for i in idxList)
-
-    # plt.figure("spectrum-2D")
-    # plt.loglog(wavenumbers, spectrum)
+    plt.figure("spectrum")
+    for name, vals in spectrum.items():
+        plt.loglog(waveNum, vals, label=name)
+    plt.loglog(waveNum, waveNum**(-5/3), '--k')
+    plt.legend()
 
 
-    # # 1D spectrum (average)
-    # spectrum1D = []
-    # mIz = approx.getIntegrationMatrix([(0, 1)])
-    # uAll = np.concat((u, b[:, None, :, :]), axis=1)
-    # for i in range(uAll.shape[1]):
-    #     s = np.fft.rfft(uAll[:, i], axis=-2)    # RFFT over Nx --> (nT, Kx, Nz)
-    #     s *= np.conj(s)                      # (nT, Kx, Nz)
-    #     s = np.sum(mIz*s.real, axis=-1)      # integrate over Nz --> (nT, Kx)
-    #     s = s.mean(axis=0)                   # mean over nT -> (Kx,)
-    #     s /= nX**2
+    if False:
+        approx = LagrangeApproximation(output.z)
 
-    #     spectrum1D.append(s)
-    # waveNum = np.fft.rfftfreq(nX, 1/nX)+0.5
+        start = 20
+        stop = 1
+        u = output.vData[start::stop]
+        b = output.bData[start::stop]
+        ux, uz = u[:, 0], u[:, 1]
+        nX, nZ = output.nX, output.nZ
 
-    # plt.figure("spectrum-1D")
-    # plt.loglog(waveNum, spectrum1D[0], label="ux")
-    # plt.loglog(waveNum, spectrum1D[1], label="uz")
-    # plt.loglog(waveNum, spectrum1D[2], label="b")
-    # plt.loglog(waveNum, waveNum**(-5/3), '--k')
-    # plt.legend()
+        # # RMS quantities
+        # uRMS = (ux**2 + uz**2).mean(axis=(0, 1))**0.5
+        # bRMS = ((b - b.mean(axis=(0, 1)))**2).mean(axis=(0, 1))**0.5
 
-    # print(f"iS[ux] : {float(spectrum1D[0].sum())}")
-    # print(f"iS[uz] : {float(spectrum1D[1].sum())}")
 
-    # plt.figure(f"contour-{dirName}")
-    # plt.pcolormesh(output.x, output.z, b[-1].T)
-    # plt.colorbar()
+        # plt.figure("z-profile")
+        # xOptU = sco.minimize_scalar(lambda z: -approx(z, fValues=uRMS), bounds=[0, 0.5])
+        # xOptB = sco.minimize_scalar(lambda z: -approx(z, fValues=bRMS), bounds=[0, 0.5])
+
+        # plt.plot(uRMS, output.z, label=f"uRMS[{nX=},{nZ=}]")
+        # plt.hlines(xOptU.x, uRMS.min(), uRMS.max(), linestyles="--", colors="black")
+        # plt.plot(bRMS, output.z, label=f"bRMS[{nX=},{nZ=}]")
+        # plt.hlines(xOptB.x, bRMS.min(), bRMS.max(), linestyles="--", colors="black")
+        # plt.legend()
+
+
+        # keMean = np.sum(mIz*ke, axis=-1).mean(axis=-1)
+        # plt.figure("ke")
+        # plt.plot(keMean, label=dirName)
+        # plt.legend()
+
+        # Removing constant component
+        # uAll = uAll - uAll.mean(axis=(-2,-1))[:, None, None]
+
+        # # 2D spectrum
+        # mPz = approx.getInterpolationMatrix(np.linspace(0, 1, nZ, endpoint=False))
+        # uReg = (mPz @ uAll[:, :, :, None])[..., 0]
+        # uHat = np.fft.fft2(uReg)
+        # reParts = [uF.ravel().real**2 for uF in uHat]
+        # imParts = [uF.ravel().imag**2 for uF in uHat]
+
+
+        # kX = np.fft.fftfreq(nX, 1/nX)**2
+        # kZ = np.fft.fftfreq(nZ, 1/nZ)**2
+
+        # ell = kX[:, None]/(nX//2)**2 + kZ[None, :]/(nZ//2)**2
+
+        # kMod = kX[:, None] + kZ[None, :]
+        # kMod **= 0.5
+
+        # idx = kMod.copy()
+        # idx *= (ell < 1)
+        # idx -= (ell >= 1)
+        # idxList = range(int(idx.max()) + 1)
+        # flatIdx = idx.ravel()
+
+        # spectrum = np.zeros(len(idxList))
+        # for i in idxList:
+        #     kIdx = np.argwhere(flatIdx == i)
+        #     tmp = np.empty(kIdx.shape)
+        #     for re, im in zip(reParts, imParts):
+        #         np.copyto(tmp, re[kIdx])
+        #         tmp += im[kIdx]
+        #         spectrum[i] += tmp.sum()
+        # spectrum /= 2*(nX*nZ)**2
+        # wavenumbers = list(i + 0.5 for i in idxList)
+
+        # plt.figure("spectrum-2D")
+        # plt.loglog(wavenumbers, spectrum)
+
+
+        # # 1D spectrum (average)
+        spectrum1D = []
+        mIz = approx.getIntegrationMatrix([(0, 1)])
+        uAll = np.concat((u, b[:, None, ...]), axis=1)
+        for i in range(uAll.shape[1]):
+            s = np.fft.rfft(uAll[:, i], axis=-2)      # RFFT over Nx --> (nT, Kx, Nz)
+            s *= np.conj(s)                           # (nT, Kx, Nz)
+            s = (mIz @ s[..., None])[..., 0, 0]       # integrate over Nz --> (nT, Kx)
+            s /= nX**2
+            s = s.mean(axis=0)                        # mean over nT -> (Kx,)
+
+
+            spectrum1D.append(s)
+        waveNum = np.fft.rfftfreq(nX, 1/nX)+0.5
+
+        # print(f"iS[ux] : {float(spectrum1D[0].sum())}")
+        # print(f"iS[uz] : {float(spectrum1D[1].sum())}")
+
+        # plt.figure(f"contour-{dirName}")
+        # plt.pcolormesh(output.x, output.z, b[-1].T)
+        # plt.colorbar()
