@@ -27,10 +27,13 @@ MPI_RANK = COMM_WORLD.Get_rank()
 
 class RBCProblem2D():
 
+    BASE_RESOLUTION = 64
+    """Base number of mesh points in z direction"""
+
     def __init__(self, Rayleigh=1e7, Prandtl=1,
                  resFactor=1, aspectRatio=4, meshRatio=1,
-                 sComm=COMM_WORLD, mpiBlocks=None, writeSpaceDistr=False,
-                 initFields=None, seed=999):
+                 sComm=COMM_WORLD, mpiBlocks=None, printSpaceDistr=False,
+                 initField=None, seed=999):
 
         self.Rayleigh, self.Prandtl = Rayleigh, Prandtl
         self.resFactor = resFactor
@@ -41,13 +44,13 @@ class RBCProblem2D():
             }
 
         self.buildGrid(aspectRatio, meshRatio, sComm, mpiBlocks)
-        if writeSpaceDistr: self.writeSpaceDistr()
+        if printSpaceDistr: self.printSpaceDistr()
         self.buildProblem()
-        self.initFields(initFields, seed)
+        self.initField(initField, seed)
 
 
     def buildGrid(self, aspectRatio, meshRatio, sComm, mpiBlocks):
-        baseSize = 64
+        baseSize = self.BASE_RESOLUTION
         Lx, Lz = aspectRatio, 1
         Nx = int(baseSize*aspectRatio*meshRatio*self.resFactor)
         Nz = int(baseSize*self.resFactor)
@@ -63,7 +66,6 @@ class RBCProblem2D():
 
         self.infos.update(Nx=Nx, Nz=Nz, Lx=Lx, Lz=Lz, mpiBlocks=mpiBlocks)
         self.mpiBlocks = mpiBlocks
-
 
     @property
     def Lx(self):
@@ -152,28 +154,31 @@ class RBCProblem2D():
         self.problem = problem
 
 
-    def initFields(self, initFields, seed):
+    def initField(self, initPath, seed):
         b, u = self.fields["buoyancy"], self.fields["velocity"]
         z, Lz = self.z, self.Lz
 
-        if initFields is None:  # linear buoyancy with random noise
+        if initPath is None:  # linear buoyancy with random noise
             if MPI_RANK == 0: print(" -- generating randomly perturbed initial field")
             b.fill_random('g', seed=seed, distribution='normal', scale=1e-3) # Random noise
             b['g'] *= z * (Lz - z) # Damp noise at walls
             b['g'] += Lz - z # Add linear background
         else:
-            if type(initFields) == h5py._hl.group.Group:
+            if os.path.isdir(initPath): # use OutputFiles format
+                initPath = OutputFiles(initPath)
                 if MPI_RANK == 0: print(" -- reading field from HDF5 file")
+                uInit = initPath.file['tasks']
                 for name, field in self.fields.items():
                     localSlices = (slice(None),) * len(field.tensorsig) \
                         + self.dist.grid_layout.slices(field.domain, field.scales)
                     try:
-                        field['g'] = initFields[name][-1][localSlices]
+                        field['g'] = uInit[name][(-1, *localSlices)]
                     except KeyError:
                         # field not present in file, put zeros instead
                         field['g'] = 0
-            elif type(initFields) == Rectilinear:
+            elif initPath.lower().endswith(".pysdc"):
                 if MPI_RANK == 0: print(" -- reading field from pySDC file")
+                initPath = Rectilinear.fromFile(initPath)
                 sFields = {
                     "buoyancy": self.dim,
                     "pressure": self.dim+1,
@@ -184,18 +189,20 @@ class RBCProblem2D():
                     self.sComm,
                     [s.start for s in slices], [s.stop-s.start for s in slices]
                     )
-                _, uInit = initFields.readField(-1)
+                _, uInit = initPath.readField(-1)
                 for name, field in self.fields.items():
                     try:
                         field['g'] = uInit[sFields[name]]
                     except KeyError:
                         # field not present in file, put zeros instead
                         field['g'] = 0
+            else:
+                raise ValueError(f"unknown type for initField ({initPath})")
         if MPI_RANK == 0: print(" -- done !")
         self.fields0 = {name: field.copy() for name, field in self.fields.items()}
 
     @classmethod
-    def runSimulation(cls, dirName, tEnd, baseDt, tBeg=0, logEvery=100,
+    def runSimulation(cls, runDir, tEnd, baseDt, tBeg=0, logEvery=100,
                       dtWrite=None, writeVort=False, writeTau=False,
                       timeScheme="RK443", timeParallel=False, groupTimeProcs=False,
                       **pParams):
@@ -231,12 +238,12 @@ class RBCProblem2D():
         nSteps = int(nSteps)
         p.infos.update(tEnd=tEnd, dt=dt, nSteps=nSteps)
 
-        if os.path.isfile(f"{dirName}/01_finalized.txt"):
+        if os.path.isfile(f"{runDir}/01_finalized.txt"):
             if MPI_RANK == 0:
                 print(" -- simulation already finalized, skipping !")
             return p
-        os.makedirs(dirName, exist_ok=True)
-        p.infos.update(dirName=dirName)
+        os.makedirs(runDir, exist_ok=True)
+        p.infos.update(dirName=runDir)
 
         # Solver
         if MPI_RANK == 0: print(" -- building dedalus solver ...")
@@ -253,7 +260,7 @@ class RBCProblem2D():
                 raise ValueError(f"{dtWrite=} is not divisible by {dt=} ({iterWrite=})")
             iterWrite = int(iterWrite)
             snapshots = solver.evaluator.add_file_handler(
-                dirName, sim_dt=dtWrite, max_writes=tEnd/dt)
+                runDir, sim_dt=dtWrite, max_writes=tEnd/dt)
             for name in ["velocity", "buoyancy", "pressure"]:
                 snapshots.add_task(p.fields[name], name=name)
             if writeTau:
@@ -266,7 +273,7 @@ class RBCProblem2D():
 
 
         if MPI_RANK == 0:
-            with open(f"{dirName}/00_infoSimu.txt", "w") as f:
+            with open(f"{runDir}/00_infoSimu.txt", "w") as f:
                 for key, val in p.infos.items():
                     if type(val) == float:
                         f.write(f"{key} : {val:1.2e}\n")
@@ -275,8 +282,8 @@ class RBCProblem2D():
 
         def log(msg):
             if MPI_RANK == 0:
-                with open(f"{dirName}/simu.log", "a") as f:
-                    f.write(f"{dirName} -- ")
+                with open(f"{runDir}/simu.log", "a") as f:
+                    f.write(f"{runDir} -- ")
                     f.write(datetime.now().strftime("%d/%m/%Y  %H:%M:%S"))
                     f.write(f", MPI rank {MPI_RANK} ({MPI_SIZE})")
                     f.write(f" : {msg}\n")
@@ -303,7 +310,7 @@ class RBCProblem2D():
                 tCompAll=(t1-t0)*MPI_SIZE)
             log('End of simulation')
             if MPI_RANK == 0:
-                with open(f"{dirName}/01_finalized.txt", "w") as f:
+                with open(f"{runDir}/01_finalized.txt", "w") as f:
                     f.write("Done !")
         except:
             log('Exception raised, triggering end of main loop.')
@@ -316,18 +323,21 @@ class RBCProblem2D():
 
 class RBCProblem3D(RBCProblem2D):
 
+    BASE_RESOLUTION = 32
+    """Base number of mesh points in z direction"""
+
     def __init__(self, Rayleigh=1e5, Prandtl=0.7,
                  resFactor=1, aspectRatio=4, meshRatio=0.5,
-                 sComm=COMM_WORLD, mpiBlocks=None, writeSpaceDistr=False,
-                 initFields=None, seed=999):
+                 sComm=COMM_WORLD, mpiBlocks=None, printSpaceDistr=False,
+                 initField=None, seed=999):
         super().__init__(
             Rayleigh, Prandtl,
             resFactor, aspectRatio, meshRatio,
-            sComm, mpiBlocks, writeSpaceDistr,
-            initFields, seed)
+            sComm, mpiBlocks, printSpaceDistr,
+            initField, seed)
 
     def buildGrid(self, aspectRatio, meshRatio, sComm, mpiBlocks):
-        baseSize = 32
+        baseSize = self.BASE_RESOLUTION
 
         Lx, Ly, Lz = int(aspectRatio), int(aspectRatio), 1
         unitSize = baseSize*self.resFactor
@@ -438,7 +448,7 @@ class OutputFiles():
     def waveNumbers(self) -> np.ndarray:
         nX = self.nX
         k = np.fft.rfftfreq(nX, 1/nX) + 0.5
-        return k
+        return k[:-1].copy()
 
     @property
     def vData(self):
@@ -668,9 +678,10 @@ class OutputFiles():
 
         return deltas
 
-    def computeSpectrum(self, which=["uv", "uh"], zVal="all",
-                        start=0, stop=None, step=1, batchSize=None):
-
+    def getSpectrum(self, which=["uv", "uh"], zVal="all",
+                    start=0, stop=None, step=1, batchSize=None):
+        if stop is None:
+            stop = self.nFields
         if which == "all":
             which = ["uv", "uh", "b"]
         else:
@@ -684,150 +695,107 @@ class OutputFiles():
         else:
             mPz = approx.getInterpolationMatrix([zVal, 1-zVal])
 
-        for name in which:
+        nSamples = 0
+        for r in self.BatchRanges(start, stop, step, batchSize):
 
-            # read fields
-            if name in ["uv", "uh"]:
-                u = self.readFields("velocity", start, stop, step)
-                if name == "uv":
-                    field = u[:, -1:]
-                if name == "uh":
-                    field = u[:, :-1]
-            if name == "b":
-                field = self.readFields("buoyancy", start, stop, step)[:, None, ...]
-            # field.shape = (nT,nVar,nX[,nY],nZ)
+            bSize = len(r)
 
-            if zVal != "all":
-                field = (mPz @ field[..., None])[..., 0]
+            for name in which:
 
-            # 2D case
-            if self.dim == 2:
-                if self.VERBOSE:
-                    print(f" -- computing 1D mean spectrum for {name}[{start},{stop},{step}] ...")
-                var = field[:, 0]
+                # read fields
+                if name in ["uv", "uh"]:
+                    u = self.readFields("velocity", r.start, r.stop, r.step)
+                    if name == "uv":
+                        field = u[:, -1:]
+                    if name == "uh":
+                        field = u[:, :-1]
+                if name == "b":
+                    field = self.readFields("buoyancy", r.start, r.stop, r.step)[:, None, ...]
+                # field.shape = (nT,nVar,nX[,nY],nZ)
 
-                # RFFT over nX --> (nT, nKx, nZ)
-                s = np.fft.rfft(var, axis=-2)
-                s *= np.conj(s)
+                if zVal != "all":
+                    field = (mPz @ field[..., None])[..., 0]
 
-                # scaling
-                s /= self.nX**2
+                # 2D case
+                if self.dim == 2:
+                    if self.VERBOSE:
+                        print(f" -- computing 1D mean spectrum for {name}[{start},{stop},{step}] ...")
+                    var = field[:, 0]
 
-            # 3D case
-            elif self.dim == 3:
+                    # RFFT over nX --> (nT, nKx, nZ)
+                    s = np.fft.rfft(var, axis=-2)
+                    s *= np.conj(s)
 
-                if self.VERBOSE:
-                    print(f" -- computing 2D mean spectrum for {name}[{start},{stop},{step}] ...")
+                    # scaling
+                    s /= self.nX**2
 
-                assert self.nX == self.nY, "nX != nY, that will be some weird spectrum"
-                nT, nVar, nX, nY, nZ = field.shape
+                # 3D case
+                elif self.dim == 3:
 
-                # Compute 2D mode disks
-                k1D = np.fft.fftfreq(nX, 1/nX)**2
-                kMod = k1D[:, None] + k1D[None, :]
-                kMod **= 0.5
-                idx = kMod.copy()
-                idx *= (kMod < waveNum.size)
-                idx -= (kMod >= waveNum.size)
+                    if self.VERBOSE:
+                        print(f" -- computing 2D mean spectrum for {name}[{start},{stop},{step}] ...")
 
-                idxList = range(int(idx.max()) + 1)
-                flatIdx = idx.ravel()
+                    assert self.nX == self.nY, "nX != nY, that will be some weird spectrum"
+                    nT, nVar, nX, nY, nZ = field.shape
+                    size = waveNum.size
 
-                if self.VERBOSE: print(" -- 2D FFT ...")
-                uHat = np.fft.fft2(field, axes=(-3, -2))
+                    # compute 2D mode disks
+                    k1D = np.fft.fftfreq(nX, 1/nX)**2
+                    kMod = k1D[:, None] + k1D[None, :]
+                    kMod **= 0.5
+                    idx = kMod.copy()
 
-                if self.VERBOSE: print(" -- square of Im,Re ...")
-                ffts = [uHat[:, i] for i in range(nVar)]
-                reParts = [uF.reshape((nT, nX*nY, -1)).real**2 for uF in ffts]
-                imParts = [uF.reshape((nT, nX*nY, -1)).imag**2 for uF in ffts]
+                    import pdb; pdb.set_trace()
 
-                # Spectrum computation
-                if self.VERBOSE: print(" -- computing spectrum ...")
-                s = np.zeros((nT, waveNum.size, nZ))
-                for i in idxList:
-                    if self.VERBOSE: print(f" -- k{i+1}/{len(idxList)}")
-                    kIdx = np.argwhere(flatIdx == i)
-                    tmp = np.empty((nT, *kIdx.shape, nZ))
-                    for re, im in zip(reParts, imParts):
-                        np.copyto(tmp, re[:, kIdx])
-                        tmp += im[:, kIdx]
-                        s[:, i] += tmp.sum(axis=(1, 2))
+                    idx *= (kMod < size)
+                    idx -= (kMod >= size)
 
-                # scaling
-                s /= 2*(nX*nY)**2
+                    idxList = range(int(idx.max()) + 1)
+                    flatIdx = idx.ravel()
 
-            # integral or mean over nZ --> (nT, Kx)
-            if zVal == "all":
-                s = (mIz @ s.real[..., None])[..., 0, 0]
-            else:
-                s = s.real.mean(axis=-1)
+                    if self.VERBOSE: print(" -- 2D FFT ...")
+                    uHat = np.fft.fft2(field, axes=(-3, -2))
 
-            # mean over nT
-            spectrum[name] += s.mean(axis=0)
+                    if self.VERBOSE: print(" -- square of Im,Re ...")
+                    ffts = [uHat[:, i] for i in range(nVar)]
+                    reParts = [uF.reshape((nT, nX*nY, -1)).real**2 for uF in ffts]
+                    imParts = [uF.reshape((nT, nX*nY, -1)).imag**2 for uF in ffts]
 
-            if self.VERBOSE: print(" -- done !")
+                    # spectrum computation
+                    if self.VERBOSE: print(" -- computing spectrum ...")
+                    s = np.zeros((nT, size, nZ))
+                    for i in idxList:
+                        if self.VERBOSE: print(f" -- k{i+1}/{len(idxList)}")
+                        kIdx = np.argwhere(flatIdx == i)
+                        tmp = np.empty((nT, *kIdx.shape, nZ))
+                        for re, im in zip(reParts, imParts):
+                            np.copyto(tmp, re[:, kIdx])
+                            tmp += im[:, kIdx]
+                            s[:, i] += tmp.sum(axis=(1, 2))
+
+                    # scaling
+                    s /= 2*(nX*nY)**2
+
+                # integral or mean over nZ --> (nT, Kx)
+                if zVal == "all":
+                    s = (mIz @ s.real[..., None])[..., 0, 0]
+                else:
+                    s = s.real.mean(axis=-1)
+
+                # add batch mean over nT
+                sMean = spectrum[name]
+                sMean *= nSamples
+                s = s.mean(axis=0)
+                s *= bSize
+                sMean += s
+                sMean /= (nSamples + bSize)
+
+                if self.VERBOSE: print(" -- done !")
+
+            nSamples += bSize
 
         return spectrum
 
-
-    def getMeanSpectrum(self, iFile:int, iBeg=0, iEnd=None, step=1, batchSize=5, verbose=False):
-        """
-        Mean spectrum from a given output file
-
-        Parameters
-        ----------
-        iFile : int
-            Index of the file to use.
-        iBeg : int, optional
-            Starting index for the fields to use. The default is 0.
-        iEnd : int, optional
-            Stopping index (non included) for the fields to use. The default is None.
-        step : int, optional
-            Index step for the fields to use. The default is 1.
-        verbose : bool, optional
-            Display infos message in stdout. The default is False.
-        batchSize : int, optional
-            Number of fields to regroup when computing one FFT. The default is 5.
-
-        Returns
-        -------
-        spectra : np.ndarray[nT,size]
-            The spectrum values for all nT fields.
-        """
-        spectra = []
-        if iEnd is None:
-            iEnd = self.nFields[iFile]
-        subRanges = self.decomposeRange(iBeg, iEnd, step, batchSize)
-        for iBegSub, iEndSub, stepSub in subRanges:
-            if verbose:
-                print(f" -- computing for fields in range ({iBegSub},{iEndSub},{stepSub})")
-            velocity = self.readField(iFile, "velocity", iBegSub, iEndSub, stepSub, verbose)
-            spectra += self.computeMeanSpectrum(velocity, verbose=verbose, xGrid=self.x, zGrid=self.z)
-        return np.concatenate(spectra)
-
-
-    def getFullMeanSpectrum(self, iBeg:int, iEnd=None):
-        """
-        Function to get full mean spectrum
-
-        Args:
-            iBeg (int): starting file index
-            iEnd (int, optional): stopping file index. Defaults to None.
-
-        Returns:
-           sMean (np.ndarray): mean spectrum
-           k (np.ndarray): wave number
-        """
-        if iEnd is None:
-            iEnd = self.nFiles
-        sMean = []
-        for iFile in range(iBeg, iEnd):
-            energy_spectrum = self.getMeanSpectrum(iFile)
-            sx, sz = energy_spectrum                        # (1,time_index,k)
-            sMean.append(np.mean((sx+sz)/2, axis=0))        # mean over time ---> (2, k)
-        sMean = np.mean(sMean, axis=0)                      # mean over x and z ---> (k)
-        np.savetxt(f'{self.folder}/spectrum.txt', np.vstack((sMean, self.k)))
-        return sMean, self.k
 
     def toVTR(self, idxFormat="{:06d}"):
         """
@@ -870,15 +838,19 @@ if __name__ == "__main__":
     aspectRatio = 4     # Lx = Ly = A*Lz
     meshRatio = 0.5     # Nx/Lx = Ny/Ly = M*Nz/Lz
     resFactor = 1       # Nz = R*32
+    Rayleigh = 1e6
 
-    dirName = f"run_3D_A{aspectRatio}_M{meshRatio}_R{resFactor}"
+    # dirName = f"run_3D_A{aspectRatio}_M{meshRatio}_R{resFactor}_Ra{Rayleigh:.1e}"
+    # dirName = dirName.replace("e+0", "e").replace("e+", "e")
+
+    # initFile = OutputFiles("run_3D_A4_M0.5_R1_Ra1e5")
 
     # problem = RBCProblem3D.runSimulation(
     #     dirName, 100, 1e-2/4, logEvery=20, dtWrite=1.0,
-    #     aspectRatio=4, meshRatio=1, resFactor=1)
+    #     Rayleigh=Rayleigh,
+    #     aspectRatio=aspectRatio, meshRatio=meshRatio, resFactor=resFactor)
 
-
-    dirName = "run_3D_A4_M0.5_R1"
+    dirName = "run_3D_A4_M0.5_R1_Ra1e6"
     # dirName = "run_M4_R2"
     OutputFiles.VERBOSE = True
     output = OutputFiles(dirName)
@@ -890,8 +862,8 @@ if __name__ == "__main__":
         plt.plot(output.times, series["ke"], label="ke")
         plt.legend()
 
-        profiles = output.getProfiles(
-            which="all", batchSize=None, start=30, step=5)
+    if False:
+        profiles = output.getProfiles(which="all", batchSize=None)
 
         deltas = output.getBoundaryLayers(which="all", profiles=profiles)
 
@@ -913,7 +885,7 @@ if __name__ == "__main__":
             plt.xlabel("profile")
             plt.ylabel("z coord")
 
-    spectrum = output.computeSpectrum(which="all", zVal="all")
+    spectrum = output.getSpectrum(which=["b"], zVal="all", start=30, stop=None)
     waveNum = output.waveNumbers
 
     plt.figure("spectrum")
@@ -921,97 +893,3 @@ if __name__ == "__main__":
         plt.loglog(waveNum, vals, label=name)
     plt.loglog(waveNum, waveNum**(-5/3), '--k')
     plt.legend()
-
-
-    if False:
-        approx = LagrangeApproximation(output.z)
-
-        start = 20
-        stop = 1
-        u = output.vData[start::stop]
-        b = output.bData[start::stop]
-        ux, uz = u[:, 0], u[:, 1]
-        nX, nZ = output.nX, output.nZ
-
-        # # RMS quantities
-        # uRMS = (ux**2 + uz**2).mean(axis=(0, 1))**0.5
-        # bRMS = ((b - b.mean(axis=(0, 1)))**2).mean(axis=(0, 1))**0.5
-
-
-        # plt.figure("z-profile")
-        # xOptU = sco.minimize_scalar(lambda z: -approx(z, fValues=uRMS), bounds=[0, 0.5])
-        # xOptB = sco.minimize_scalar(lambda z: -approx(z, fValues=bRMS), bounds=[0, 0.5])
-
-        # plt.plot(uRMS, output.z, label=f"uRMS[{nX=},{nZ=}]")
-        # plt.hlines(xOptU.x, uRMS.min(), uRMS.max(), linestyles="--", colors="black")
-        # plt.plot(bRMS, output.z, label=f"bRMS[{nX=},{nZ=}]")
-        # plt.hlines(xOptB.x, bRMS.min(), bRMS.max(), linestyles="--", colors="black")
-        # plt.legend()
-
-
-        # keMean = np.sum(mIz*ke, axis=-1).mean(axis=-1)
-        # plt.figure("ke")
-        # plt.plot(keMean, label=dirName)
-        # plt.legend()
-
-        # Removing constant component
-        # uAll = uAll - uAll.mean(axis=(-2,-1))[:, None, None]
-
-        # # 2D spectrum
-        # mPz = approx.getInterpolationMatrix(np.linspace(0, 1, nZ, endpoint=False))
-        # uReg = (mPz @ uAll[:, :, :, None])[..., 0]
-        # uHat = np.fft.fft2(uReg)
-        # reParts = [uF.ravel().real**2 for uF in uHat]
-        # imParts = [uF.ravel().imag**2 for uF in uHat]
-
-
-        # kX = np.fft.fftfreq(nX, 1/nX)**2
-        # kZ = np.fft.fftfreq(nZ, 1/nZ)**2
-
-        # ell = kX[:, None]/(nX//2)**2 + kZ[None, :]/(nZ//2)**2
-
-        # kMod = kX[:, None] + kZ[None, :]
-        # kMod **= 0.5
-
-        # idx = kMod.copy()
-        # idx *= (ell < 1)
-        # idx -= (ell >= 1)
-        # idxList = range(int(idx.max()) + 1)
-        # flatIdx = idx.ravel()
-
-        # spectrum = np.zeros(len(idxList))
-        # for i in idxList:
-        #     kIdx = np.argwhere(flatIdx == i)
-        #     tmp = np.empty(kIdx.shape)
-        #     for re, im in zip(reParts, imParts):
-        #         np.copyto(tmp, re[kIdx])
-        #         tmp += im[kIdx]
-        #         spectrum[i] += tmp.sum()
-        # spectrum /= 2*(nX*nZ)**2
-        # wavenumbers = list(i + 0.5 for i in idxList)
-
-        # plt.figure("spectrum-2D")
-        # plt.loglog(wavenumbers, spectrum)
-
-
-        # # 1D spectrum (average)
-        spectrum1D = []
-        mIz = approx.getIntegrationMatrix([(0, 1)])
-        uAll = np.concat((u, b[:, None, ...]), axis=1)
-        for i in range(uAll.shape[1]):
-            s = np.fft.rfft(uAll[:, i], axis=-2)      # RFFT over Nx --> (nT, Kx, Nz)
-            s *= np.conj(s)                           # (nT, Kx, Nz)
-            s = (mIz @ s[..., None])[..., 0, 0]       # integrate over Nz --> (nT, Kx)
-            s /= nX**2
-            s = s.mean(axis=0)                        # mean over nT -> (Kx,)
-
-
-            spectrum1D.append(s)
-        waveNum = np.fft.rfftfreq(nX, 1/nX)+0.5
-
-        # print(f"iS[ux] : {float(spectrum1D[0].sum())}")
-        # print(f"iS[uz] : {float(spectrum1D[1].sum())}")
-
-        # plt.figure(f"contour-{dirName}")
-        # plt.pcolormesh(output.x, output.z, b[-1].T)
-        # plt.colorbar()
