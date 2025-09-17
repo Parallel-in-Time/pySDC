@@ -444,11 +444,10 @@ class OutputFiles():
         elif self.dim == 3:
             return (5, self.nX, self.nY, self.nZ)
 
-    @property
-    def waveNumbers(self) -> np.ndarray:
-        nX = self.nX
-        k = np.fft.rfftfreq(nX, 1/nX) + 0.5
-        return k[:-1].copy()
+    def getK(self, kRes=1) -> np.ndarray:
+        size = self.nX//2
+        dk = 1/kRes
+        return np.arange(0, size, dk) + 0.5
 
     @property
     def vData(self):
@@ -678,7 +677,7 @@ class OutputFiles():
 
         return deltas
 
-    def getSpectrum(self, which=["uv", "uh"], zVal="all",
+    def getSpectrum(self, which=["uv", "uh"], zVal="all", kRes=1,
                     start=0, stop=None, step=1, batchSize=None):
         if stop is None:
             stop = self.nFields
@@ -686,8 +685,12 @@ class OutputFiles():
             which = ["uv", "uh", "b"]
         else:
             which = list(which)
-        waveNum = self.waveNumbers
-        spectrum = {name: np.zeros(waveNum.size) for name in which}
+
+        if self.dim == 2:
+            assert kRes == 1, "cannot have kRes != 1 for 2D case"
+
+        k = self.getK(kRes)
+        spectrum = {name: np.zeros(k.size) for name in which}
 
         approx = LagrangeApproximation(self.z, weightComputation="STABLE")
         if zVal == "all":
@@ -711,6 +714,7 @@ class OutputFiles():
                         field = u[:, :-1]
                 if name == "b":
                     field = self.readFields("buoyancy", r.start, r.stop, r.step)[:, None, ...]
+                    field -= field.mean(axis=(2, 3))[:, :, None, None]
                 # field.shape = (nT,nVar,nX[,nY],nZ)
 
                 if zVal != "all":
@@ -737,16 +741,17 @@ class OutputFiles():
 
                     assert self.nX == self.nY, "nX != nY, that will be some weird spectrum"
                     nT, nVar, nX, nY, nZ = field.shape
-                    size = waveNum.size
+
+                    size = k.size
+                    dk = 1/kRes
 
                     # compute 2D mode disks
                     k1D = np.fft.fftfreq(nX, 1/nX)**2
                     kMod = k1D[:, None] + k1D[None, :]
                     kMod **= 0.5
-                    idx = kMod.copy()
 
-                    import pdb; pdb.set_trace()
-
+                    idx = kMod/dk
+                    np.trunc(idx, out=idx)
                     idx *= (kMod < size)
                     idx -= (kMod >= size)
 
@@ -850,7 +855,8 @@ if __name__ == "__main__":
     #     Rayleigh=Rayleigh,
     #     aspectRatio=aspectRatio, meshRatio=meshRatio, resFactor=resFactor)
 
-    dirName = "run_3D_A4_M0.5_R1_Ra1e6"
+    dirName = "run_3D_A4_M0.5_R1_Ra1e5"
+    # dirName = "run_3D_A4_M1_R1"
     # dirName = "run_M4_R2"
     OutputFiles.VERBOSE = True
     output = OutputFiles(dirName)
@@ -885,11 +891,13 @@ if __name__ == "__main__":
             plt.xlabel("profile")
             plt.ylabel("z coord")
 
-    spectrum = output.getSpectrum(which=["b"], zVal="all", start=30, stop=None)
-    waveNum = output.waveNumbers
+    kRes = 1
+    spectrum = output.getSpectrum(
+        which=["b"], zVal="all", start=30, stop=None, kRes=kRes)
+    kappa = output.getK(kRes)
 
     plt.figure("spectrum")
     for name, vals in spectrum.items():
-        plt.loglog(waveNum, vals, label=name)
-    plt.loglog(waveNum, waveNum**(-5/3), '--k')
+        plt.loglog(kappa, vals, label=name)
+    plt.loglog(kappa, kappa**(-5/3), '--k')
     plt.legend()
