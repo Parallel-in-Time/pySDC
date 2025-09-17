@@ -330,6 +330,8 @@ class RBCProblem2D():
             cls.log(" -- done !")
         except:
             log('Exception raised, triggering end of main loop.')
+            if MPI_SIZE > 1:
+                COMM_WORLD.Abort()
             raise
         finally:
             solver.log_stats()
@@ -432,6 +434,11 @@ class OutputFiles():
             self.z = np.array(vData0.dims[4]["z"])
         else:
             raise NotImplementedError(f"{dim = }")
+
+        with open(f"{self.folder}/00_infoSimu.txt", "r") as f:
+            lines = f.readlines()
+        self.Ra = float(lines[0].split(" : ")[-1])
+        self.Pr = float(lines[1].split(" : ")[-1])
 
     def __del__(self):
         try:
@@ -554,17 +561,49 @@ class OutputFiles():
 
     def getTimeSeries(self, which=["ke"], batchSize=None):
 
+
+        if which == "all":
+            which = ["ke", "NuV", "NuT", "NuB"]
+        else:
+            which = list(which)
+
         series = {name: [] for name in which}
         avgAxes = 1 if self.dim==2 else (1, 2)
 
-        Iz = LagrangeApproximation(self.z).getIntegrationMatrix([(0, 1)])
+        approx = LagrangeApproximation(self.z)
+        mIz = approx.getIntegrationMatrix([(0, 1)])
+        if set(which).intersection(["NuV", "NuT", "NuB"]):
+            mDz = approx.getDerivativeMatrix()
+            if "NuB" in which:
+                mDzB = approx.getInterpolationMatrix([0]) @ mDz
+            if "NuT" in which:
+                mDzT = approx.getInterpolationMatrix([1]) @ mDz
 
         for r in self.BatchRanges(self.nFields, maxSize=batchSize):
 
+            u = self.readFields("velocity", r.start, r.stop, r.step)
+            w = u[:, -1]
+
+            if set(which).intersection(["NuV", "NuT", "NuB"]):
+                b = self.readFields("buoyancy", r.start, r.stop, r.step)
+
+            if "NuV" in which:
+                coeff = (self.Ra*self.Pr)**0.5
+                integ = w*b*coeff - (mDz @ b[..., None])[..., 0]
+                nuV = mIz @ integ.mean(axis=avgAxes)[..., None]
+                series["NuV"].append(nuV.ravel())
+
+            if "NuT" in which:
+                nuT = - mDzT @ b.mean(axis=avgAxes)[..., None]
+                series["NuT"].append(nuT.ravel())
+
+            if "NuB" in which:
+                nuB = - mDzB @ b.mean(axis=avgAxes)[..., None]
+                series["NuB"].append(nuB.ravel())
+
             if "ke" in which:
-                u = self.readFields("velocity", r.start, r.stop, r.step)
                 u **= 2
-                ke = Iz @ u.sum(axis=1).mean(axis=avgAxes)[..., None]
+                ke = mIz @ u.sum(axis=1).mean(axis=avgAxes)[..., None]
                 series["ke"].append(ke.ravel())
 
         for key, val in series.items():
@@ -666,8 +705,7 @@ class OutputFiles():
         return profiles
 
 
-    def getBoundaryLayers(self,
-                          which=["uRMS", "bRMS"], profiles=None,
+    def getBoundaryLayers(self, which=["uRMS", "bRMS"], profiles=None,
                           start=0, stop=None, step=1, batchSize=None):
 
         if which == "all":
@@ -724,8 +762,10 @@ class OutputFiles():
                         field = u[:, :-1]
                 if name == "b":
                     field = self.readFields("buoyancy", r.start, r.stop, r.step)[:, None, ...]
-                    avgDir = 2 if self.dim == 2 else (2, 3)
-                    field -= field.mean(axis=avgDir)[:, :, None, None]
+                    if self.dim == 3:
+                        field -= field.mean(axis=(2, 3))[:, :, None, None, :]
+                    else:
+                        field -= field.mean(axis=2)[:, :, None, :]
                 # field.shape = (nT,nVar,nX[,nY],nZ)
 
                 if zVal != "all":
@@ -743,6 +783,9 @@ class OutputFiles():
 
                     # scaling
                     s /= self.nX**2
+
+                    # ignore last frequency (zero amplitude)
+                    s = s[:, :-1]
 
                 # 3D case
                 elif self.dim == 3:
@@ -850,45 +893,38 @@ class OutputFiles():
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
-    aspectRatio = 4     # Lx = Ly = A*Lz
-    meshRatio = 0.5     # Nx/Lx = Ny/Ly = M*Nz/Lz
-    resFactor = 1       # Nz = R*32
-    Rayleigh = 1e6
-
-    # dirName = f"run_3D_A{aspectRatio}_M{meshRatio}_R{resFactor}_Ra{Rayleigh:.1e}"
-    # dirName = dirName.replace("e+0", "e").replace("e+", "e")
-
-    # initFile = OutputFiles("run_3D_A4_M0.5_R1_Ra1e5")
-
-    # problem = RBCProblem3D.runSimulation(
-    #     dirName, 100, 1e-2/4, logEvery=20, dtWrite=1.0,
-    #     Rayleigh=Rayleigh,
-    #     aspectRatio=aspectRatio, meshRatio=meshRatio, resFactor=resFactor)
-
+    # dirName = "run_3D_A4_M0.5_R1_Ra1e6"
     dirName = "run_3D_A4_M0.5_R1_Ra1e6"
-    dirName = "run_3D_A4_M1_R1"
-    # dirName = "run_M4_R2"
+    # dirName = "run_M4_R1"
+    # dirName = "test_M4_R2"
     OutputFiles.VERBOSE = True
     output = OutputFiles(dirName)
 
-    if False:
-        series = output.getTimeSeries()
+    if True:
+        series = output.getTimeSeries(which=["NuV", "NuT", "NuB"])
 
         plt.figure("series")
-        plt.plot(output.times, series["ke"], label="ke")
+        for name, values in series.items():
+            plt.plot(output.times, values, label=name)
         plt.legend()
 
-    if False:
-        profiles = output.getProfiles(which="all", batchSize=None)
+    start = 40
 
-        deltas = output.getBoundaryLayers(which="all", profiles=profiles)
+    if True:
+        which = ["bRMS"]
+
+
+        Nu = series["NuV"][start:].mean()
+
+        profiles = output.getProfiles(
+            which, start=start, batchSize=None)
+        deltas = output.getBoundaryLayers(
+            which, start=start, profiles=profiles)
 
         for name, p in profiles.items():
             if "Mean" in name:
                 plt.figure("Mean profiles")
                 plt.plot(p, output.z, label=name)
-                if name in deltas:
-                    plt.hlines(deltas[name], p.min(), p.max(), linestyles="--", colors="black")
             if "RMS" in name:
                 plt.figure("RMS profiles")
                 plt.plot(p, output.z, label=name)
@@ -901,12 +937,31 @@ if __name__ == "__main__":
             plt.xlabel("profile")
             plt.ylabel("z coord")
 
-    spectrum = output.getSpectrum(
-        which=["b"], zVal="all", start=30, stop=None, batchSize=25)
-    kappa = output.kappa
+        zLog = np.logspace(np.log10(1/(100*Nu)), np.log(0.5), num=200)
+        approx = LagrangeApproximation(output.z)
+        mPz = approx.getInterpolationMatrix(zLog)
 
-    plt.figure("spectrum")
-    for name, vals in spectrum.items():
-        plt.loglog(kappa, vals, label=name)
-    plt.loglog(kappa, kappa**(-5/3), '--k')
-    plt.legend()
+        bMean = (profiles["bMean"] + (1-profiles["bMean"][-1::-1]))/2
+        bMean = mPz @ bMean
+
+        bRMS = (profiles["bRMS"] + profiles["bRMS"][-1::-1])/2
+        bRMS = mPz @ bRMS
+
+        plt.figure("mean-log")
+        plt.semilogx(zLog*Nu, bMean, label=dirName)
+        plt.legend()
+
+        plt.figure("rms-log")
+        plt.semilogx(zLog*Nu, bRMS, label=dirName)
+        plt.legend()
+
+    if True:
+        spectrum = output.getSpectrum(
+            which=["b"], zVal="all", start=start, batchSize=None)
+        kappa = output.kappa
+
+        plt.figure("spectrum")
+        for name, vals in spectrum.items():
+            plt.loglog(kappa[1:], vals[1:], label=name)
+        plt.loglog(kappa[1:], kappa[1:]**(-5/3), '--k')
+        plt.legend()
