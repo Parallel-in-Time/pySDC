@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 import argparse
 
-from pySDC.helpers.fieldsIO import FieldsIO
-from pySDC.playgrounds.dedalus.problems.rbc import RBCProblem2D, RBCProblem3D, OutputFiles
+from pySDC.playgrounds.dedalus.problems.rbc import RBCProblem2D, RBCProblem3D
 
 parser = argparse.ArgumentParser(
     description='Run RBC simulation using Dedalus',
@@ -25,10 +24,10 @@ parser.add_argument(
     "--resFactor", "-rf", help="resolution factor, Nz = 64*rf (2D) or 32*rf (3D)",
     default=1, type=float)
 parser.add_argument(
-    "--Rayleigh", "-ra", help="Rayleigh number",
+    "--Rayleigh", "-Ra", help="Rayleigh number",
     default=1e7, type=float)
 parser.add_argument(
-    "--Prandtl", "-pr", help="Prandtl number",
+    "--Prandtl", "-Pr", help="Prandtl number",
     default=1, type=float)
 parser.add_argument(
     "--initField", "-if", help="path for the initial field",
@@ -47,7 +46,7 @@ parser.add_argument(
     "--logEvery", "-l", help="log every [...] time-steps",
     default=100, type=int)
 
-args = parser.parse_args(["test"])
+args = parser.parse_args()
 params = args.__dict__
 
 dim = params.pop("dim")

@@ -2,3 +2,6 @@
 demos/*.png
 problems/test_*
 problems/run_*
+
+scripts/*.sh
+scripts/run_*

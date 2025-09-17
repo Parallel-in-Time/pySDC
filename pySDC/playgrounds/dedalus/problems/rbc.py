@@ -30,6 +30,11 @@ class RBCProblem2D():
     BASE_RESOLUTION = 64
     """Base number of mesh points in z direction"""
 
+
+    @staticmethod
+    def log(msg):
+        if MPI_RANK == 0: print(msg)
+
     def __init__(self, Rayleigh=1e7, Prandtl=1,
                  resFactor=1, aspectRatio=4, meshRatio=1,
                  sComm=COMM_WORLD, mpiBlocks=None, printSpaceDistr=False,
@@ -43,9 +48,16 @@ class RBCProblem2D():
             "Pr": Prandtl,
             }
 
+        self.log(" -- building grid ...")
         self.buildGrid(aspectRatio, meshRatio, sComm, mpiBlocks)
+        self.log(f" -- {self.dim}D grid done !")
+
         if printSpaceDistr: self.printSpaceDistr()
+
+        self.log(" -- building problem ...")
         self.buildProblem()
+        self.log(" -- done !")
+
         self.initField(initField, seed)
 
 
@@ -100,7 +112,6 @@ class RBCProblem2D():
     def grids(self):
         return  {c: b.local_grid(self.dist, scale=1)
                  for c, b in zip(self.axes, self.bases)}
-
 
     @property
     def dim(self):
@@ -159,14 +170,14 @@ class RBCProblem2D():
         z, Lz = self.z, self.Lz
 
         if initPath is None:  # linear buoyancy with random noise
-            if MPI_RANK == 0: print(" -- generating randomly perturbed initial field")
+            self.log(" -- generating randomly perturbed initial field ...")
             b.fill_random('g', seed=seed, distribution='normal', scale=1e-3) # Random noise
             b['g'] *= z * (Lz - z) # Damp noise at walls
             b['g'] += Lz - z # Add linear background
         else:
             if os.path.isdir(initPath): # use OutputFiles format
                 initPath = OutputFiles(initPath)
-                if MPI_RANK == 0: print(" -- reading field from HDF5 file")
+                self.log(" -- reading field from HDF5 file ...")
                 uInit = initPath.file['tasks']
                 for name, field in self.fields.items():
                     localSlices = (slice(None),) * len(field.tensorsig) \
@@ -174,10 +185,10 @@ class RBCProblem2D():
                     try:
                         field['g'] = uInit[name][(-1, *localSlices)]
                     except KeyError:
-                        # field not present in file, put zeros instead
+                        self.log(f" -- {name} not present in file, putting zeros instead")
                         field['g'] = 0
             elif initPath.lower().endswith(".pysdc"):
-                if MPI_RANK == 0: print(" -- reading field from pySDC file")
+                self.log(" -- reading field from pySDC file ...")
                 initPath = Rectilinear.fromFile(initPath)
                 sFields = {
                     "buoyancy": self.dim,
@@ -194,11 +205,11 @@ class RBCProblem2D():
                     try:
                         field['g'] = uInit[sFields[name]]
                     except KeyError:
-                        # field not present in file, put zeros instead
+                        self.log(f" -- {name} not present in file, putting zeros instead")
                         field['g'] = 0
             else:
                 raise ValueError(f"unknown type for initField ({initPath})")
-        if MPI_RANK == 0: print(" -- done !")
+        self.log(" -- done !")
         self.fields0 = {name: field.copy() for name, field in self.fields.items()}
 
     @classmethod
@@ -206,6 +217,8 @@ class RBCProblem2D():
                       dtWrite=None, writeVort=False, writeTau=False,
                       timeScheme="RK443", timeParallel=False, groupTimeProcs=False,
                       **pParams):
+
+        cls.log(f"RBC simulation in {runDir}")
 
         if timeScheme == "RK443":
             timeStepper = d3.RK443
@@ -217,6 +230,7 @@ class RBCProblem2D():
             timeStepper = SDCIMEX
         else:
             raise NotImplementedError(f"{timeStepper=}")
+        cls.log(f" -- selected time-stepper : {timeStepper}")
 
         if timeParallel:
             assert timeScheme == "SDC", "need timeScheme=SDC for timeParallel"
@@ -228,6 +242,7 @@ class RBCProblem2D():
                 timeScheme = SDCIMEX_MPI2
             else:
                 raise NotImplementedError(f"{timeParallel=}")
+            cls.log(f" -- activated PinT for SDC : {timeParallel}")
 
         p = cls(**pParams)
 
@@ -239,22 +254,21 @@ class RBCProblem2D():
         p.infos.update(tEnd=tEnd, dt=dt, nSteps=nSteps)
 
         if os.path.isfile(f"{runDir}/01_finalized.txt"):
-            if MPI_RANK == 0:
-                print(" -- simulation already finalized, skipping !")
+            cls.log(" -- simulation already finalized, skipping !")
             return p
         os.makedirs(runDir, exist_ok=True)
         p.infos.update(dirName=runDir)
 
         # Solver
-        if MPI_RANK == 0: print(" -- building dedalus solver ...")
+        cls.log(" -- building dedalus solver ...")
         solver = p.problem.build_solver(timeStepper)
         solver.sim_time = tBeg
         solver.stop_sim_time = tEnd
-        if MPI_RANK == 0: print(" -- finished building dedalus solver")
+        cls.log(" -- done !")
 
         # Fields IO
         if dtWrite:
-            if MPI_RANK == 0: print(" -- setup fields IO")
+            cls.log(" -- setting up fields output ...")
             iterWrite = dtWrite/dt
             if int(iterWrite) != round(iterWrite, ndigits=3):
                 raise ValueError(f"{dtWrite=} is not divisible by {dt=} ({iterWrite=})")
@@ -269,7 +283,7 @@ class RBCProblem2D():
             if writeVort:
                 u = p.fields["velocity"]
                 snapshots.add_task(-d3.div(d3.skew(u)), name='vorticity')
-            if MPI_RANK == 0: print(" -- done !")
+            cls.log(" -- done !")
 
 
         if MPI_RANK == 0:
@@ -292,6 +306,7 @@ class RBCProblem2D():
         if nSteps == 0:
             return p
         try:
+            cls.log(f" -- starting simulation (see {runDir}/simu.log) ...")
             log('Starting main loop')
             solver.step(dt)   # don't count first time-step in timings
             log('Finished first time-step')
@@ -312,6 +327,7 @@ class RBCProblem2D():
             if MPI_RANK == 0:
                 with open(f"{runDir}/01_finalized.txt", "w") as f:
                     f.write("Done !")
+            cls.log(" -- done !")
         except:
             log('Exception raised, triggering end of main loop.')
             raise
@@ -354,7 +370,7 @@ class RBCProblem3D(RBCProblem2D):
             else:
                 blocks = BlockDecomposition(nProcs, [Ny, Nz])
                 mpiBlocks = blocks.nBlocks[-1::-1]
-        if MPI_RANK == 0: print(f" -- {mpiBlocks = }")
+        self.log(f" -- {mpiBlocks = }")
 
         coords = d3.CartesianCoordinates('x', 'y', 'z')
         dist = d3.Distributor(coords, dtype=dtype, mesh=mpiBlocks, comm=sComm)
@@ -386,8 +402,6 @@ class RBCProblem3D(RBCProblem2D):
               f"\tz: {z.shape}, [{z.min(initial=np.inf)}, {z.max(initial=-np.inf)}]\n"
               f"\tcpu: {os.sched_getaffinity(0)}, on {socket.gethostname()}", flush=True)
         MPI.COMM_WORLD.Barrier()
-
-
 
 
 class OutputFiles():
@@ -444,10 +458,9 @@ class OutputFiles():
         elif self.dim == 3:
             return (5, self.nX, self.nY, self.nZ)
 
-    def getK(self, kRes=1) -> np.ndarray:
-        size = self.nX//2
-        dk = 1/kRes
-        return np.arange(0, size, dk) + 0.5
+    @property
+    def kappa(self) -> np.ndarray:
+        return np.arange(self.nX//2) + 0.5
 
     @property
     def vData(self):
@@ -677,7 +690,7 @@ class OutputFiles():
 
         return deltas
 
-    def getSpectrum(self, which=["uv", "uh"], zVal="all", kRes=1,
+    def getSpectrum(self, which=["uv", "uh"], zVal="all",
                     start=0, stop=None, step=1, batchSize=None):
         if stop is None:
             stop = self.nFields
@@ -686,11 +699,8 @@ class OutputFiles():
         else:
             which = list(which)
 
-        if self.dim == 2:
-            assert kRes == 1, "cannot have kRes != 1 for 2D case"
-
-        k = self.getK(kRes)
-        spectrum = {name: np.zeros(k.size) for name in which}
+        kappa = self.kappa
+        spectrum = {name: np.zeros(kappa.size) for name in which}
 
         approx = LagrangeApproximation(self.z, weightComputation="STABLE")
         if zVal == "all":
@@ -714,7 +724,8 @@ class OutputFiles():
                         field = u[:, :-1]
                 if name == "b":
                     field = self.readFields("buoyancy", r.start, r.stop, r.step)[:, None, ...]
-                    field -= field.mean(axis=(2, 3))[:, :, None, None]
+                    avgDir = 2 if self.dim == 2 else (2, 3)
+                    field -= field.mean(axis=avgDir)[:, :, None, None]
                 # field.shape = (nT,nVar,nX[,nY],nZ)
 
                 if zVal != "all":
@@ -742,15 +753,14 @@ class OutputFiles():
                     assert self.nX == self.nY, "nX != nY, that will be some weird spectrum"
                     nT, nVar, nX, nY, nZ = field.shape
 
-                    size = k.size
-                    dk = 1/kRes
+                    size = kappa.size
 
                     # compute 2D mode disks
                     k1D = np.fft.fftfreq(nX, 1/nX)**2
                     kMod = k1D[:, None] + k1D[None, :]
                     kMod **= 0.5
 
-                    idx = kMod/dk
+                    idx = kMod.copy()
                     np.trunc(idx, out=idx)
                     idx *= (kMod < size)
                     idx -= (kMod >= size)
@@ -855,8 +865,8 @@ if __name__ == "__main__":
     #     Rayleigh=Rayleigh,
     #     aspectRatio=aspectRatio, meshRatio=meshRatio, resFactor=resFactor)
 
-    dirName = "run_3D_A4_M0.5_R1_Ra1e5"
-    # dirName = "run_3D_A4_M1_R1"
+    dirName = "run_3D_A4_M0.5_R1_Ra1e6"
+    dirName = "run_3D_A4_M1_R1"
     # dirName = "run_M4_R2"
     OutputFiles.VERBOSE = True
     output = OutputFiles(dirName)
@@ -891,10 +901,9 @@ if __name__ == "__main__":
             plt.xlabel("profile")
             plt.ylabel("z coord")
 
-    kRes = 1
     spectrum = output.getSpectrum(
-        which=["b"], zVal="all", start=30, stop=None, kRes=kRes)
-    kappa = output.getK(kRes)
+        which=["b"], zVal="all", start=30, stop=None, batchSize=25)
+    kappa = output.kappa
 
     plt.figure("spectrum")
     for name, vals in spectrum.items():
