@@ -889,18 +889,91 @@ class OutputFiles():
             u = self.readFieldAt(i)
             writeToVTR(template.format(i), u, coords, varNames)
 
+def checkDNS(spectrum:np.ndarray, kappa:np.ndarray, sRatio:int=4, nThrow:int=0):
+    r"""
+    Check for a well-resolved DNS, by looking at an energy spectrum
+    :math:`s(\kappa)` and doing a quadratic regression in log space
+    on its tail :
+
+    .. math::
+        \log(s_{tail}) \simeq
+        a\log(\kappa_{tail})^2 + b\log(\kappa_{tail}) + c
+
+    where :math:`(\kappa_{tail},s_{tail})` is continuous subset of the
+    mapping :math:`(\kappa,s)` for large values of :math:`\kappa`
+    (i.e spectrum tail).
+    If the quadratic regression produces a convex polynomial
+    (i.e :math:`a > 0`) then the simulation is considered as under-resolved
+    (no DNS).
+    Per default, the tail is built considering the
+    **last quarter of the spectrum**.
+
+    Parameters
+    ----------
+    spectrum : np.ndarray
+        Vector of the spectrum values :math:`s(\kappa)`.
+    kappa : np.ndarray
+        Vector of the wavenumber values :math:`\kappa`.
+    sRatio : int, optional
+        Spectrum ratio used to define the tail: if the spectrum has
+        N values, then the tail is defined with the last N/sRatio values.
+        The default is 4.
+    nThrow : int, optional
+        Number of higher kappa extremity spectrum values to not consider
+        when defining the tail. The default is 1.
+
+    Returns
+    -------
+    results : dict
+        Dictionnary containing the results, with keys :
+
+        - `DNS` : boolean indicating if the simulation is well resolved
+        - `coeffs` : the :math:`a,b,c` regression coefficients, stored in a tuple
+        - `kTail` : the :math:`\kappa_{tail}` values used for the regression
+        - `sTail` : the :math:`s_{tail}` values used for the regression
+
+    """
+    spectrum = np.asarray(spectrum)
+    kappa = np.asarray(kappa)
+    assert spectrum.ndim == 1, "spectrum must be a 1D vector"
+    assert kappa.shape == spectrum.shape, "kappa and spectrum must have the same shape"
+
+    nValues = kappa.size//sRatio
+    sl = slice(-nValues-nThrow, -nThrow if nThrow else None)
+
+    kTail = kappa[sl]
+    sTail = spectrum[sl]
+
+    y = np.log(sTail)
+    x = np.log(kTail)
+
+    def fun(coeffs):
+        a, b, c = coeffs
+        return np.linalg.norm(y - a*x**2 - b*x - c)
+
+    res = sco.minimize(fun, [0, 0, 0])
+    a, b, c = res.x
+
+    results = {
+        "DNS": not a > 0,
+        "coeffs": (a, b, c),
+        "kTail": kTail,
+        "sTail": sTail,
+    }
+
+    return results
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     # dirName = "run_3D_A4_M0.5_R1_Ra1e6"
-    dirName = "run_3D_A4_M0.5_R1_Ra1e6"
-    # dirName = "run_M4_R1"
+    dirName = "run_3D_A4_M1_R1_Ra1e6"
+    # dirName = "run_M4_R2"
     # dirName = "test_M4_R2"
     OutputFiles.VERBOSE = True
     output = OutputFiles(dirName)
 
-    if True:
+    if False:
         series = output.getTimeSeries(which=["NuV", "NuT", "NuB"])
 
         plt.figure("series")
@@ -908,9 +981,9 @@ if __name__ == "__main__":
             plt.plot(output.times, values, label=name)
         plt.legend()
 
-    start = 40
+    start = 60
 
-    if True:
+    if False:
         which = ["bRMS"]
 
 
@@ -957,11 +1030,20 @@ if __name__ == "__main__":
 
     if True:
         spectrum = output.getSpectrum(
-            which=["b"], zVal="all", start=start, batchSize=None)
+            which=["uh"], zVal="all", start=start, batchSize=None)
         kappa = output.kappa
+
+        check = checkDNS(spectrum["uh"], kappa)
+        print(f"DNS : {check['DNS']}")
+        a, b, c = check["coeffs"]
+        kTail = check["kTail"]
+        sTail = check["sTail"]
 
         plt.figure("spectrum")
         for name, vals in spectrum.items():
             plt.loglog(kappa[1:], vals[1:], label=name)
+        plt.loglog(kTail, sTail, '.', c="black")
+        kTL = np.log(kTail)
+        plt.loglog(kTail, np.exp(a*kTL**2 + b*kTL + c), c="gray")
         plt.loglog(kappa[1:], kappa[1:]**(-5/3), '--k')
         plt.legend()

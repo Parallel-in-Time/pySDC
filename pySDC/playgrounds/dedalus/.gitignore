@@ -5,3 +5,4 @@ problems/run_*
 
 scripts/*.sh
 scripts/run_*
+scripts/init_*
