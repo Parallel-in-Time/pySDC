@@ -16,6 +16,7 @@ import h5py
 import scipy.optimize as sco
 
 from qmat.lagrange import LagrangeApproximation
+from qmat.nodes import NodesGenerator
 from pySDC.helpers.fieldsIO import Rectilinear
 from pySDC.helpers.blocks import BlockDecomposition
 from pySDC.playgrounds.dedalus.timestepper import SDCIMEX, SDCIMEX_MPI, SDCIMEX_MPI2
@@ -889,6 +890,138 @@ class OutputFiles():
             u = self.readFieldAt(i)
             writeToVTR(template.format(i), u, coords, varNames)
 
+
+    def toPySDC(self, fileName:str, iField:int=-1, interpolate=False):
+        """
+        Convert a given field into a pySDC format,
+        eventually interpolating to twice the space resolution.
+
+
+        Parameters
+        ----------
+        fileName : str
+            Name of the output file.
+        iField : int, optional
+            Index of the field to write in file. The default is -1.
+        interpolate : TYPE, optional
+            Wether or not interpolate the field. The default is False.
+        """
+        fields = self.file["tasks"]
+
+        velocity = fields["velocity"][iField]
+        buoyancy = fields["buoyancy"][iField]
+        pressure = fields["pressure"][iField]
+
+        uAll = np.concat([velocity, buoyancy[None, ...], pressure[None, ...]])
+
+        if self.dim == 3:
+            if interpolate:
+                uAll = rbc3dInterpolation(uAll)
+            nX, nY, nZ = uAll.shape[1:]
+            xCoord = np.linspace(0, 1, nX, endpoint=False)
+            yCoord = np.linspace(0, 1, nY, endpoint=False)
+            zCoord = NodesGenerator("CHEBY-1", "GAUSS").getNodes(nZ)
+            header = (5, [xCoord, yCoord, zCoord])
+
+        elif self.dim == 2:
+            if interpolate:
+                uAll = rbc2dInterpolation(uAll)
+            nX, nZ = uAll.shape[1:]
+            xCoord = np.linspace(0, 1, nX, endpoint=False)
+            zCoord = NodesGenerator("CHEBY-1", "GAUSS").getNodes(nZ)
+            header = (4, [xCoord, zCoord])
+        else:
+            raise NotImplementedError(f"dim={self.dim}")
+
+        output = Rectilinear(np.float64, fileName)
+        output.setHeader(*header)
+        output.initialize()
+        output.addField(0, uAll)
+
+
+def rbc3dInterpolation(coarseFields):
+    """
+    Interpolate a RBC 3D field to twice its space resolution
+
+    Parameters
+    ----------
+    coarseFields : np.4darray
+        The fields values on the coarse grid, with shape [nV,nX,nY,nZ].
+        The last dimension (z) uses a chebychev grid, while x and y are
+        uniform periodic.
+
+    Returns
+    -------
+    fineFields : np.4darray
+        The interpolated fields, with shape [nV,2*nX,2*nY,2*nZ]
+    """
+    coarseFields = np.asarray(coarseFields)
+    assert coarseFields.ndim == 4, "requires 4D array"
+
+    nV, nX, nY, nZ = coarseFields.shape
+
+    # Chebychev grids and interpolation matrix for z
+    zC = NodesGenerator("CHEBY-1", "GAUSS").getNodes(nZ)
+    zF = NodesGenerator("CHEBY-1", "GAUSS").getNodes(2*nZ)
+    Pz = LagrangeApproximation(zC, weightComputation="STABLE").getInterpolationMatrix(zF)
+
+    # Fourier interpolation in x and y
+    print(" -- computing 2D FFT ...")
+    uFFT = np.fft.fftshift(np.fft.fft2(coarseFields, axes=(1, 2)), axes=(1, 2))
+    print(" -- padding in Fourier space ...")
+    uPadded = np.zeros_like(uFFT, shape=(nV, 2*nX, 2*nY, nZ))
+    uPadded[:, nX//2:-nX//2, nY//2:-nY//2] = uFFT
+    print(" -- computing 2D IFFT ...")
+    uXY = np.fft.ifft2(np.fft.ifftshift(uPadded, axes=(1, 2)), axes=(1, 2)).real*4
+
+    # Polynomial interpolation in z
+    print(" -- interpolating in z direction ...")
+    fineFields = (Pz @ uXY.reshape(-1, nZ).T).T.reshape(nV, 2*nX, 2*nY, 2*nZ)
+
+    return fineFields
+
+
+def rbc2dInterpolation(coarseFields):
+    """
+    Interpolate a RBC 2D field to twice its space resolution
+
+    Parameters
+    ----------
+    coarseFields : np.3darray
+        The fields values on the coarse grid, with shape [nV,nX,nZ].
+        The last dimension (z) uses a chebychev grid,
+        while x is uniform periodic.
+
+    Returns
+    -------
+    fineFields : np.4darray
+        The interpolated fields, with shape [nV,2*nX,2*nZ]
+    """
+    coarseFields = np.asarray(coarseFields)
+    assert coarseFields.ndim == 3, "requires 3D array"
+
+    nV, nX, nZ = coarseFields.shape
+
+    # Chebychev grids and interpolation matrix for z
+    zC = NodesGenerator("CHEBY-1", "GAUSS").getNodes(nZ)
+    zF = NodesGenerator("CHEBY-1", "GAUSS").getNodes(2*nZ)
+    Pz = LagrangeApproximation(zC, weightComputation="STABLE").getInterpolationMatrix(zF)
+
+    # Fourier interpolation in x
+    print(" -- computing 1D FFT ...")
+    uFFT = np.fft.fftshift(np.fft.fft(coarseFields, axis=1), axes=1)
+    print(" -- padding in Fourier space ...")
+    uPadded = np.zeros_like(uFFT, shape=(nV, 2*nX, nZ))
+    uPadded[:, nX//2:-nX//2] = uFFT
+    print(" -- computing 1D IFFT ...")
+    uXY = np.fft.ifft(np.fft.ifftshift(uPadded, axes=1), axis=1).real*2
+
+    # Polynomial interpolation in z
+    print(" -- interpolating in z direction ...")
+    fineFields = (Pz @ uXY.reshape(-1, nZ).T).T.reshape(nV, 2*nX, 2*nZ)
+
+    return fineFields
+
 def checkDNS(spectrum:np.ndarray, kappa:np.ndarray, sRatio:int=4, nThrow:int=0):
     r"""
     Check for a well-resolved DNS, by looking at an energy spectrum
@@ -967,13 +1100,13 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     # dirName = "run_3D_A4_M0.5_R1_Ra1e6"
-    dirName = "run_3D_A4_M1_R1_Ra1e6"
+    dirName = "run_3D_A4_M1_R1_Ra2e5"
     # dirName = "run_M4_R2"
     # dirName = "test_M4_R2"
     OutputFiles.VERBOSE = True
     output = OutputFiles(dirName)
 
-    if False:
+    if True:
         series = output.getTimeSeries(which=["NuV", "NuT", "NuB"])
 
         plt.figure("series")
@@ -981,7 +1114,7 @@ if __name__ == "__main__":
             plt.plot(output.times, values, label=name)
         plt.legend()
 
-    start = 60
+    start = 20
 
     if False:
         which = ["bRMS"]
