@@ -35,9 +35,14 @@
    :alt: PyPI - Downloads
 
 
-.. image:: https://img.shields.io/badge/Promo-8db427?style=plastic&label=HiRSE&labelColor=005aa0&link=https%3A%2F%2Fgo.fzj.de%2FCodePromo
+.. image:: https://img.shields.io/badge/Promo-8db427?label=HiRSE&labelColor=005aa0&link=https%3A%2F%2Fgo.fzj.de%2FCodePromo
    :target: https://go.fzj.de/CodePromo
    :alt: HiRSE Code Promo Badge
+
+
+.. image:: https://archive.softwareheritage.org/badge/origin/https://github.com/Parallel-in-Time/pySDC/
+   :target: https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/Parallel-in-Time/pySDC
+   :alt: SWH
 
 
 Welcome to pySDC!
