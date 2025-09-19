@@ -1,8 +1,11 @@
 *.pdf
 demos/*.png
+
 problems/test_*
 problems/run_*
+problems/runInit_*
 
 scripts/*.sh
 scripts/run_*
 scripts/init_*
+scripts/runInit_*

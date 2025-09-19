@@ -419,6 +419,7 @@ class OutputFiles():
         fileNames = glob.glob(f"{self.folder}/*.h5")
         fileNames.sort(key=lambda f: int(f.split("_s")[-1].split(".h5")[0]))
 
+        assert len(fileNames) != 0, f"no file to read in ({folder})"
         assert len(fileNames) == 1, "cannot read fields splitted in several files"
         self.fileName = fileNames[0]
 
@@ -564,7 +565,7 @@ class OutputFiles():
 
 
         if which == "all":
-            which = ["ke", "NuV", "NuT", "NuB"]
+            which = ["ke", "keH", "keV", "NuV", "NuT", "NuB"]
         else:
             which = list(which)
 
@@ -602,10 +603,21 @@ class OutputFiles():
                 nuB = - mDzB @ b.mean(axis=avgAxes)[..., None]
                 series["NuB"].append(nuB.ravel())
 
+            u **= 2
             if "ke" in which:
-                u **= 2
                 ke = mIz @ u.sum(axis=1).mean(axis=avgAxes)[..., None]
+                ke /= 2
                 series["ke"].append(ke.ravel())
+
+            if "keH" in which:
+                keH = mIz @ u[:, :2].sum(axis=1).mean(axis=avgAxes)[..., None]
+                keH /= 2
+                series["keH"].append(keH.ravel())
+
+            if "keV" in which:
+                keV = mIz @ u[:,-1:].sum(axis=1).mean(axis=avgAxes)[..., None]
+                keV /= 2
+                series["keV"].append(keV.ravel())
 
         for key, val in series.items():
             series[key] = np.array(val).ravel()
@@ -729,12 +741,12 @@ class OutputFiles():
 
         return deltas
 
-    def getSpectrum(self, which=["uv", "uh"], zVal="all",
+    def getSpectrum(self, which=["uV", "uH"], zVal="all",
                     start=0, stop=None, step=1, batchSize=None):
         if stop is None:
             stop = self.nFields
         if which == "all":
-            which = ["uv", "uh", "b"]
+            which = ["u", "uV", "uH", "b", "p"]
         else:
             which = list(which)
 
@@ -752,22 +764,29 @@ class OutputFiles():
 
             bSize = len(r)
 
+            if set(which).intersection(["u", "uV", "uH"]):
+                u = self.readFields("velocity", r.start, r.stop, r.step)
+
             for name in which:
 
-                # read fields
-                if name in ["uv", "uh"]:
-                    u = self.readFields("velocity", r.start, r.stop, r.step)
-                    if name == "uv":
+                # define fields with shape (nT,nComp,nX[,nY],nZ)
+                if name in ["u", "uV", "uH"]:
+                    if name == "uV":
                         field = u[:, -1:]
-                    if name == "uh":
+                    if name == "uH":
                         field = u[:, :-1]
-                if name == "b":
+                    if name == "u":
+                        field = u
+                elif name == "b":
                     field = self.readFields("buoyancy", r.start, r.stop, r.step)[:, None, ...]
                     if self.dim == 3:
                         field -= field.mean(axis=(2, 3))[:, :, None, None, :]
                     else:
                         field -= field.mean(axis=2)[:, :, None, :]
-                # field.shape = (nT,nVar,nX[,nY],nZ)
+                elif name == "p":
+                    field = self.readFields("pressure", r.start, r.stop, r.step)[:, None, ...]
+                else:
+                    raise NotImplementedError(f"{name} in which ...")
 
                 if zVal != "all":
                     field = (mPz @ field[..., None])[..., 0]
@@ -778,14 +797,14 @@ class OutputFiles():
                         print(f" -- computing 1D mean spectrum for {name}[{start},{stop},{step}] ...")
                     var = field[:, 0]
 
-                    # RFFT over nX --> (nT, nKx, nZ)
+                    # RFFT over nX --> (nT, nK, nZ)
                     s = np.fft.rfft(var, axis=-2)
                     s *= np.conj(s)
 
                     # scaling
                     s /= self.nX**2
 
-                    # ignore last frequency (zero amplitude)
+                    # ignore last frequency (zero amplitu00de)
                     s = s[:, :-1]
 
                 # 3D case
@@ -835,7 +854,7 @@ class OutputFiles():
                     # scaling
                     s /= 2*(nX*nY)**2
 
-                # integral or mean over nZ --> (nT, Kx)
+                # integral or mean over nZ --> (nT, nK)
                 if zVal == "all":
                     s = (mIz @ s.real[..., None])[..., 0, 0]
                 else:
@@ -1100,25 +1119,24 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     # dirName = "run_3D_A4_M0.5_R1_Ra1e6"
-    dirName = "run_3D_A4_M1_R1_Ra2e5"
+    dirName = "run_3D_A4_M0.5_R1_Ra1e5"
     # dirName = "run_M4_R2"
     # dirName = "test_M4_R2"
     OutputFiles.VERBOSE = True
     output = OutputFiles(dirName)
 
     if True:
-        series = output.getTimeSeries(which=["NuV", "NuT", "NuB"])
+        series = output.getTimeSeries(which=["ke", "keH", "keV", "NuV"])
 
         plt.figure("series")
         for name, values in series.items():
             plt.plot(output.times, values, label=name)
         plt.legend()
 
-    start = 20
+    start = 60
 
-    if False:
+    if True:
         which = ["bRMS"]
-
 
         Nu = series["NuV"][start:].mean()
 
@@ -1163,20 +1181,26 @@ if __name__ == "__main__":
 
     if True:
         spectrum = output.getSpectrum(
-            which=["uh"], zVal="all", start=start, batchSize=None)
+            which=["uH"],
+            zVal="all", start=start, batchSize=None)
         kappa = output.kappa
 
-        check = checkDNS(spectrum["uh"], kappa)
-        print(f"DNS : {check['DNS']}")
+        check = checkDNS(spectrum["uH"], kappa)
         a, b, c = check["coeffs"]
+        print(f"DNS : {check['DNS']} ({a=})")
         kTail = check["kTail"]
         sTail = check["sTail"]
 
         plt.figure("spectrum")
         for name, vals in spectrum.items():
             plt.loglog(kappa[1:], vals[1:], label=name)
-        plt.loglog(kTail, sTail, '.', c="black")
-        kTL = np.log(kTail)
-        plt.loglog(kTail, np.exp(a*kTL**2 + b*kTL + c), c="gray")
+
+        # plt.loglog(kTail, sTail, '.', c="black")
+        # kTL = np.log(kTail)
+        # plt.loglog(kTail, np.exp(a*kTL**2 + b*kTL + c), c="gray")
+
         plt.loglog(kappa[1:], kappa[1:]**(-5/3), '--k')
-        plt.legend()
+        plt.text(10, 0.1, r"$\kappa^{-5/3}$", fontsize=16)
+        plt.legend(); plt.grid(True)
+        plt.ylabel("spectrum"); plt.xlabel(r"wavenumber $\kappa$")
+        plt.tight_layout()
