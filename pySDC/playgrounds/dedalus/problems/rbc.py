@@ -5,6 +5,7 @@ Functions building 2D/3D Rayleigh-Benard Convection problems with Dedalus
 """
 import os
 import socket
+import json
 import glob
 from datetime import datetime
 from time import sleep
@@ -24,6 +25,13 @@ from pySDC.playgrounds.dedalus.timestepper import SDCIMEX, SDCIMEX_MPI, SDCIMEX_
 COMM_WORLD = MPI.COMM_WORLD
 MPI_SIZE = COMM_WORLD.Get_size()
 MPI_RANK = COMM_WORLD.Get_rank()
+
+
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
 
 
 class RBCProblem2D():
@@ -442,6 +450,24 @@ class OutputFiles():
         self.Ra = float(lines[0].split(" : ")[-1])
         self.Pr = float(lines[1].split(" : ")[-1])
 
+        # prepare postData file
+        infosFile = f"{self.folder}/00_infoSimu.txt"
+        if os.path.isfile(infosFile):
+            with open(infosFile, "r") as f:
+                lines = f.readlines()
+            data = {key: val for key, val in [l.split(" : ") for l in lines]}
+            self.setPostData("infos", "Ra", float(data["Ra"]))
+            self.setPostData("infos", "Pr", float(data["Pr"]))
+            self.setPostData("infos", "Lx", int(data["Lx"]))
+            self.setPostData("infos", "Ly", int(data["Ly"]))
+            self.setPostData("infos", "Lz", int(data["Lz"]))
+            self.setPostData("infos", "Nx", int(data["Nx"]))
+            self.setPostData("infos", "Ny", int(data["Ny"]))
+            self.setPostData("infos", "Nz", int(data["Nz"]))
+            self.setPostData("infos", "tEnd", float(data["tEnd"]))
+            self.setPostData("infos", "dt", float(data["dt"]))
+            self.setPostData("infos", "nSteps", int(data["nSteps"]))
+
     def __del__(self):
         try:
             self.file.close()
@@ -560,16 +586,54 @@ class OutputFiles():
         if self.VERBOSE: print(" -- done !")
         return data
 
+    @property
+    def postFile(self):
+        return f"{self.folder}/postData.json"
+
+    @property
+    def postData(self):
+        try:
+            with open(self.postFile, "r") as f:
+                data = json.load(f)
+        except:
+            data = {}
+        return data
+
+    def setPostData(self, *args):
+        data = self.postData
+        dico = data
+        assert len(args) > 1, "requires at least two arguments for setPostData"
+        *keys, value = args
+        for key in keys[:-1]:
+            if key not in dico:
+                dico[key] = {}
+            dico = dico[key]
+        if isinstance(value, np.ndarray):
+            value = value.tolist()
+        dico[keys[-1]] = value
+        with open(self.postFile, "w") as f:
+            json.dump(data, f, cls=NumpyEncoder)
+
 
     def getTimeSeries(self, which=["ke"], batchSize=None):
-
 
         if which == "all":
             which = ["ke", "keH", "keV", "NuV", "NuT", "NuB"]
         else:
             which = list(which)
 
-        series = {name: [] for name in which}
+        data = self.postData.get("series", {})
+        series = {
+            name: data.get(name, []) for name in ["times"] + which
+            }
+        series["times"] = self.times
+
+        which = [name for name in which if name not in data]
+        if len(which) == 0:
+            for key, val in series.items():
+                series[key] = np.array(val)
+            return series
+
         avgAxes = 1 if self.dim==2 else (1, 2)
 
         approx = LagrangeApproximation(self.z)
@@ -622,6 +686,9 @@ class OutputFiles():
         for key, val in series.items():
             series[key] = np.array(val).ravel()
 
+        # Save in postData
+        self.setPostData("series", series)
+
         return series
 
 
@@ -643,11 +710,27 @@ class OutputFiles():
                 + [var+"RMS" for var in formula.keys()]
         else:
             which = list(which)
+
         if "bRMS" in which and "bMean" not in which:
             which.append("bMean")
         if "pRMS" in  which and "pMean" not in which:
             which.append("pMean")
-        profiles = {name: np.zeros(self.nZ) for name in which}
+
+        data = self.postData.get("profiles", {})
+        if data and tuple(data.get("slice", [])) != (start, stop, step):
+            print(f"WARNING : ovewriting profiles data with slice={(start, stop, step)}")
+            data = {}
+        profiles = {
+            name: np.array(data.get(name, np.zeros(self.nZ)))
+            for name in ["slice", "nSamples", "zVals"] + which
+            }
+        profiles["slice"] = (start, stop, step)
+        profiles["nSamples"] = len(range(start, stop, step))
+        profiles["zVals"] = self.z
+
+        which = [name for name in which if name not in data]
+        if len(which) == 0:
+            return profiles
 
         nSamples = 0
         def addSamples(current, new, nNew):
@@ -714,7 +797,10 @@ class OutputFiles():
             if "RMS" in name:
                 val **= 0.5
 
-        profiles["nSamples"] = nSamples
+        # Save in postData
+        assert profiles["nSamples"] == nSamples, "very weird error ..."
+        self.setPostData("profiles", profiles)
+
         return profiles
 
 
@@ -741,17 +827,33 @@ class OutputFiles():
 
         return deltas
 
-    def getSpectrum(self, which=["uV", "uH"], zVal="all",
+
+    def getSpectrum(self, which=["uv", "uh"], zVal="all",
                     start=0, stop=None, step=1, batchSize=None):
         if stop is None:
             stop = self.nFields
         if which == "all":
-            which = ["u", "uV", "uH", "b", "p"]
+            which = ["u", "uv", "uh", "b", "p"]
         else:
             which = list(which)
 
         kappa = self.kappa
-        spectrum = {name: np.zeros(kappa.size) for name in which}
+
+        data = self.postData.get("spectrum", {})
+        if data and tuple(data.get("slice", [])) != (start, stop, step):
+            print(f"WARNING : ovewriting profiles data with slice={(start, stop, step)}")
+            data = {}
+        spectrum = {
+            name: np.array(data.get(name, np.zeros(kappa.size)))
+            for name in ["slice", "nSamples", "kappa"] + which
+            }
+        spectrum["slice"] = (start, stop, step)
+        spectrum["nSamples"] = len(range(start, stop, step))
+        spectrum["kappa"] = kappa
+
+        which = [name for name in which if name not in data]
+        if len(which) == 0:
+            return spectrum
 
         approx = LagrangeApproximation(self.z, weightComputation="STABLE")
         if zVal == "all":
@@ -764,16 +866,16 @@ class OutputFiles():
 
             bSize = len(r)
 
-            if set(which).intersection(["u", "uV", "uH"]):
+            if set(which).intersection(["u", "uv", "uh"]):
                 u = self.readFields("velocity", r.start, r.stop, r.step)
 
             for name in which:
 
                 # define fields with shape (nT,nComp,nX[,nY],nZ)
-                if name in ["u", "uV", "uH"]:
-                    if name == "uV":
+                if name in ["u", "uv", "uh"]:
+                    if name == "uv":
                         field = u[:, -1:]
-                    if name == "uH":
+                    if name == "uh":
                         field = u[:, :-1]
                     if name == "u":
                         field = u
@@ -786,7 +888,7 @@ class OutputFiles():
                 elif name == "p":
                     field = self.readFields("pressure", r.start, r.stop, r.step)[:, None, ...]
                 else:
-                    raise NotImplementedError(f"{name} in which ...")
+                    raise NotImplementedError(f"spectrum computation for {name}")
 
                 if zVal != "all":
                     field = (mPz @ field[..., None])[..., 0]
@@ -871,6 +973,10 @@ class OutputFiles():
                 if self.VERBOSE: print(" -- done !")
 
             nSamples += bSize
+
+        # Save in postData
+        assert spectrum["nSamples"] == nSamples, "very weird error ..."
+        self.setPostData("spectrum", spectrum)
 
         return spectrum
 
@@ -1100,15 +1206,15 @@ def checkDNS(spectrum:np.ndarray, kappa:np.ndarray, sRatio:int=4, nThrow:int=0):
     x = np.log(kTail)
 
     def fun(coeffs):
-        a, b, c = coeffs
-        return np.linalg.norm(y - a*x**2 - b*x - c)
+        c2, c1, c0 = coeffs
+        return np.linalg.norm(y - c2*x**2 - c1*x - c0)
 
     res = sco.minimize(fun, [0, 0, 0])
-    a, b, c = res.x
+    c2, c1, c0 = [float(c) for c in res.x]
 
     results = {
-        "DNS": not a > 0,
-        "coeffs": (a, b, c),
+        "DNS": not c2 > 0,
+        "coeffs": (c2, c1, c0),
         "kTail": kTail,
         "sTail": sTail,
     }
@@ -1119,24 +1225,23 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     # dirName = "run_3D_A4_M0.5_R1_Ra1e6"
-    dirName = "run_3D_A4_M0.5_R1_Ra1e5"
+    dirName = "run_3D_A4_M0.5_R1_Ra5e3"
     # dirName = "run_M4_R2"
     # dirName = "test_M4_R2"
     OutputFiles.VERBOSE = True
     output = OutputFiles(dirName)
 
-    if True:
+    if False:
         series = output.getTimeSeries(which=["ke", "keH", "keV", "NuV"])
 
         plt.figure("series")
-        for name, values in series.items():
-            plt.plot(output.times, values, label=name)
+        plt.plot(output.times, series["NuV"], label=dirName)
         plt.legend()
 
-    start = 60
+    start = 20
 
-    if True:
-        which = ["bRMS"]
+    if False:
+        which = ["bRMS", "uRMS", "uMean"]
 
         Nu = series["NuV"][start:].mean()
 
@@ -1161,7 +1266,7 @@ if __name__ == "__main__":
             plt.xlabel("profile")
             plt.ylabel("z coord")
 
-        zLog = np.logspace(np.log10(1/(100*Nu)), np.log(0.5), num=200)
+        zLog = np.logspace(np.log10(1/(100*Nu)), np.log10(0.5), num=200)
         approx = LagrangeApproximation(output.z)
         mPz = approx.getInterpolationMatrix(zLog)
 
@@ -1171,33 +1276,42 @@ if __name__ == "__main__":
         bRMS = (profiles["bRMS"] + profiles["bRMS"][-1::-1])/2
         bRMS = mPz @ bRMS
 
-        plt.figure("mean-log")
+        plt.figure("bmean-log")
         plt.semilogx(zLog*Nu, bMean, label=dirName)
         plt.legend()
 
-        plt.figure("rms-log")
+        plt.figure("RMS-log")
         plt.semilogx(zLog*Nu, bRMS, label=dirName)
+        plt.legend()
+
+        uRMS = (profiles["uRMS"] + profiles["uRMS"][-1::-1])/2
+        uRMS = mPz @ uRMS
+
+        plt.figure("RMS-log")
+        plt.semilogx(zLog*Nu, uRMS, label=dirName)
         plt.legend()
 
     if True:
         spectrum = output.getSpectrum(
-            which=["uH"],
-            zVal="all", start=start, batchSize=None)
+            which="all", zVal="all",
+            start=start, batchSize=None)
+
         kappa = output.kappa
-
-        check = checkDNS(spectrum["uH"], kappa)
-        a, b, c = check["coeffs"]
-        print(f"DNS : {check['DNS']} ({a=})")
-        kTail = check["kTail"]
-        sTail = check["sTail"]
-
         plt.figure("spectrum")
-        for name, vals in spectrum.items():
+        for name in ["u", "uv", "uh", "b", "p"]:
+            vals = spectrum[name]
+            check = checkDNS(vals, kappa)
+            a, b, c = check["coeffs"]
+            c2 = float(a)
+            print(f"DNS (on {name}): {check['DNS']} ({c2=})")
+            kTail = check["kTail"]
+            sTail = check["sTail"]
+
             plt.loglog(kappa[1:], vals[1:], label=name)
 
-        # plt.loglog(kTail, sTail, '.', c="black")
-        # kTL = np.log(kTail)
-        # plt.loglog(kTail, np.exp(a*kTL**2 + b*kTL + c), c="gray")
+            plt.loglog(kTail, sTail, '.', c="black")
+            kTL = np.log(kTail)
+            plt.loglog(kTail, np.exp(a*kTL**2 + b*kTL + c), c="gray")
 
         plt.loglog(kappa[1:], kappa[1:]**(-5/3), '--k')
         plt.text(10, 0.1, r"$\kappa^{-5/3}$", fontsize=16)

@@ -4,8 +4,10 @@ demos/*.png
 problems/test_*
 problems/run_*
 problems/runInit_*
+problems/initRun_*
 
 scripts/*.sh
 scripts/run_*
 scripts/init_*
 scripts/runInit_*
+scripts/initRun_*
