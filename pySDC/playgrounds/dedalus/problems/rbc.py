@@ -822,7 +822,8 @@ class OutputFiles():
 
         for name in which:
             values = profiles[name]
-            opt = sco.minimize_scalar(lambda z: -approx(z, fValues=values), bounds=[0, 0.5])
+            opt = sco.minimize_scalar(
+                lambda z: -approx(z, fValues=values), bounds=[0, 0.5])
             deltas[name] = opt.x
 
         return deltas
@@ -1225,38 +1226,39 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     # dirName = "run_3D_A4_M0.5_R1_Ra1e6"
-    dirName = "run_3D_A4_M0.5_R1_Ra5e3"
+    dirName = "run_3D_A4_M1_R1_Ra1.5e5"
     # dirName = "run_M4_R2"
     # dirName = "test_M4_R2"
     OutputFiles.VERBOSE = True
     output = OutputFiles(dirName)
 
-    if False:
+    if True:
         series = output.getTimeSeries(which=["ke", "keH", "keV", "NuV"])
 
         plt.figure("series")
-        plt.plot(output.times, series["NuV"], label=dirName)
+        plt.plot(output.times, series["NuV"], label=f"NuV ({dirName})")
         plt.legend()
+        plt.xlabel("Time")
+        plt.tight_layout()
 
     start = 20
 
-    if False:
+    if True:
         which = ["bRMS", "uRMS", "uMean"]
 
         Nu = series["NuV"][start:].mean()
 
         profiles = output.getProfiles(
-            which, start=start, batchSize=None)
-        deltas = output.getBoundaryLayers(
-            which, start=start, profiles=profiles)
+            which, start=start, stop=51, batchSize=None)
+        deltas = output.getBoundaryLayers(which, profiles=profiles)
 
         for name, p in profiles.items():
             if "Mean" in name:
                 plt.figure("Mean profiles")
-                plt.plot(p, output.z, label=name)
+                plt.plot(p, output.z, label=f"{name} ({dirName})")
             if "RMS" in name:
                 plt.figure("RMS profiles")
-                plt.plot(p, output.z, label=name)
+                plt.plot(p, output.z, label=f"{name} ({dirName})")
                 if name in deltas:
                     plt.hlines(deltas[name], p.min(), p.max(), linestyles="--", colors="black")
 
@@ -1264,7 +1266,8 @@ if __name__ == "__main__":
             plt.figure(f"{pType} profiles")
             plt.legend()
             plt.xlabel("profile")
-            plt.ylabel("z coord")
+            plt.ylabel("$z$")
+            plt.tight_layout()
 
         zLog = np.logspace(np.log10(1/(100*Nu)), np.log10(0.5), num=200)
         approx = LagrangeApproximation(output.z)
@@ -1273,32 +1276,32 @@ if __name__ == "__main__":
         bMean = (profiles["bMean"] + (1-profiles["bMean"][-1::-1]))/2
         bMean = mPz @ bMean
 
+        plt.figure("bmean-log")
+        plt.semilogx(zLog*Nu, bMean, label=f"bMean ({dirName})")
+        plt.xlabel("$zNu$")
+        plt.legend()
+        plt.tight_layout()
+
         bRMS = (profiles["bRMS"] + profiles["bRMS"][-1::-1])/2
         bRMS = mPz @ bRMS
-
-        plt.figure("bmean-log")
-        plt.semilogx(zLog*Nu, bMean, label=dirName)
-        plt.legend()
-
-        plt.figure("RMS-log")
-        plt.semilogx(zLog*Nu, bRMS, label=dirName)
-        plt.legend()
-
         uRMS = (profiles["uRMS"] + profiles["uRMS"][-1::-1])/2
         uRMS = mPz @ uRMS
 
         plt.figure("RMS-log")
-        plt.semilogx(zLog*Nu, uRMS, label=dirName)
+        plt.semilogx(zLog*Nu, bRMS, label=f"bRMS ({dirName})")
+        plt.semilogx(zLog*Nu, uRMS, label=f"uRMS({dirName})")
         plt.legend()
+        plt.xlabel("$zNu$")
+        plt.tight_layout()
 
     if True:
         spectrum = output.getSpectrum(
             which="all", zVal="all",
-            start=start, batchSize=None)
+            start=start, stop=51, batchSize=None)
 
         kappa = output.kappa
         plt.figure("spectrum")
-        for name in ["u", "uv", "uh", "b", "p"]:
+        for name in ["u"]:
             vals = spectrum[name]
             check = checkDNS(vals, kappa)
             a, b, c = check["coeffs"]
@@ -1307,7 +1310,7 @@ if __name__ == "__main__":
             kTail = check["kTail"]
             sTail = check["sTail"]
 
-            plt.loglog(kappa[1:], vals[1:], label=name)
+            plt.loglog(kappa[1:], vals[1:], label=f"{name} ({dirName})")
 
             plt.loglog(kTail, sTail, '.', c="black")
             kTL = np.log(kTail)
