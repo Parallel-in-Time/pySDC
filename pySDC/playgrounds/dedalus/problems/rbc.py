@@ -684,7 +684,7 @@ class OutputFiles():
                 series["keV"].append(keV.ravel())
 
         for key, val in series.items():
-            series[key] = np.array(val).ravel()
+            series[key] = np.hstack(val)
 
         # Save in postData
         self.setPostData("series", series)
@@ -1226,14 +1226,19 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     # dirName = "run_3D_A4_M0.5_R1_Ra1e6"
-    dirName = "run_3D_A4_M1_R1_Ra1.5e5"
+    dirName = "run_3D_A4_M1_R2_Ra1e6"
     # dirName = "run_M4_R2"
     # dirName = "test_M4_R2"
     OutputFiles.VERBOSE = True
     output = OutputFiles(dirName)
 
+    start = 20
+    stop = None
+    batchSize = 10
+
     if True:
-        series = output.getTimeSeries(which=["ke", "keH", "keV", "NuV"])
+        series = output.getTimeSeries(
+            which=["ke", "keH", "keV", "NuV"], batchSize=batchSize)
 
         plt.figure("series")
         plt.plot(output.times, series["NuV"], label=f"NuV ({dirName})")
@@ -1241,15 +1246,13 @@ if __name__ == "__main__":
         plt.xlabel("Time")
         plt.tight_layout()
 
-    start = 20
-
     if True:
         which = ["bRMS", "uRMS", "uMean"]
 
         Nu = series["NuV"][start:].mean()
 
         profiles = output.getProfiles(
-            which, start=start, stop=51, batchSize=None)
+            which, start=start, stop=stop, batchSize=batchSize)
         deltas = output.getBoundaryLayers(which, profiles=profiles)
 
         for name, p in profiles.items():
@@ -1297,13 +1300,13 @@ if __name__ == "__main__":
     if True:
         spectrum = output.getSpectrum(
             which="all", zVal="all",
-            start=start, stop=51, batchSize=None)
+            start=start, stop=stop, batchSize=batchSize)
 
         kappa = output.kappa
         plt.figure("spectrum")
         for name in ["u"]:
             vals = spectrum[name]
-            check = checkDNS(vals, kappa)
+            check = checkDNS(vals, kappa, sRatio=3)
             a, b, c = check["coeffs"]
             c2 = float(a)
             print(f"DNS (on {name}): {check['DNS']} ({c2=})")
