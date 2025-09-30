@@ -1156,13 +1156,13 @@ def checkDNS(spectrum:np.ndarray, kappa:np.ndarray, sRatio:int=4, nThrow:int=0):
 
     .. math::
         \log(s_{tail}) \simeq
-        a\log(\kappa_{tail})^2 + b\log(\kappa_{tail}) + c
+        c_2\log(\kappa_{tail})^2 + c_1\log(\kappa_{tail}) + c_0
 
     where :math:`(\kappa_{tail},s_{tail})` is continuous subset of the
     mapping :math:`(\kappa,s)` for large values of :math:`\kappa`
     (i.e spectrum tail).
     If the quadratic regression produces a convex polynomial
-    (i.e :math:`a > 0`) then the simulation is considered as under-resolved
+    (i.e :math:`c_2 > 0`) then the simulation is considered as under-resolved
     (no DNS).
     Per default, the tail is built considering the
     **last quarter of the spectrum**.
@@ -1187,7 +1187,7 @@ def checkDNS(spectrum:np.ndarray, kappa:np.ndarray, sRatio:int=4, nThrow:int=0):
         Dictionnary containing the results, with keys :
 
         - `DNS` : boolean indicating if the simulation is well resolved
-        - `coeffs` : the :math:`a,b,c` regression coefficients, stored in a tuple
+        - `coeffs` : the :math:`c_2,c_1,c_0` regression coefficients, stored in a tuple
         - `kTail` : the :math:`\kappa_{tail}` values used for the regression
         - `sTail` : the :math:`s_{tail}` values used for the regression
 
@@ -1226,7 +1226,7 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     # dirName = "run_3D_A4_M0.5_R1_Ra1e6"
-    dirName = "run_3D_A4_M1_R2_Ra1e6"
+    dirName = "run_3D_A4_M1_R2_Ra1.5e5"
     # dirName = "run_M4_R2"
     # dirName = "test_M4_R2"
     OutputFiles.VERBOSE = True
@@ -1304,7 +1304,7 @@ if __name__ == "__main__":
 
         kappa = output.kappa
         plt.figure("spectrum")
-        for name in ["u"]:
+        for name in ["u", "uv", "uh", "b", "p"]:
             vals = spectrum[name]
             check = checkDNS(vals, kappa, sRatio=3)
             a, b, c = check["coeffs"]

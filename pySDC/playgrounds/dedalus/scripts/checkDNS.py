@@ -21,13 +21,18 @@ simDirs = [
     "run_3D_A4_M0.5_R1_Ra1e5",
     ]
 
-# simDirs = [
-#     "run_3D_A4_M1_R1_Ra5e4",
-#     "run_3D_A4_M1_R1_Ra1e5",
-#     "run_3D_A4_M1_R1_Ra1.5e5",
-#     "run_3D_A4_M1_R1_Ra2e5",
-#     "run_3D_A4_M1_R1_Ra1e6",
-#     ]
+simDirs = [
+    "run_3D_A4_M1_R1_Ra5e4",
+    "run_3D_A4_M1_R1_Ra1e5",
+    "run_3D_A4_M1_R1_Ra1.5e5",
+    "run_3D_A4_M1_R1_Ra2e5",
+    "run_3D_A4_M1_R1_Ra1e6",
+    ]
+
+simDirs = [
+    "run_3D_A4_M1_R2_Ra1.5e5",
+    "run_3D_A4_M1_R2_Ra1e6",
+    ]
 
 df = pd.DataFrame(
     columns=["Ra", "c_2[u]", "c_2[uv]", "c_2[uh]", "c_2[b]", "c_2[p]"])
@@ -38,10 +43,11 @@ for i, dirName in enumerate(simDirs):
     df.loc[i, "Ra"] = float(dirName.split("_Ra")[-1])
 
     # assert len(output.times) == 61, f"not 61 fields for {dirName}"
-    if len(output.times) == 61:
-        start = 20
-    else:
-        start = 60
+    # if len(output.times) == 61:
+    #     start = 20
+    # else:
+    #     start = 60
+    start = 20
 
     spectrum = output.getSpectrum(
             which="all", zVal="all",
