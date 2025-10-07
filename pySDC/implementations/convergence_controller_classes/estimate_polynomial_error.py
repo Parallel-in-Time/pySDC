@@ -37,6 +37,7 @@ class EstimatePolynomialError(ConvergenceController):
         defaults = {
             'control_order': -75,
             'estimate_on_node': num_nodes + 1 if quad_type == 'GAUSS' else num_nodes - 1,
+            'rel_error': False,
             **super().setup(controller, params, description, **kwargs),
         }
         self.comm = description['sweeper_params'].get('comm', None)
@@ -103,6 +104,23 @@ class EstimatePolynomialError(ConvergenceController):
         else:
             return A @ xp.asarray(b)
 
+    def get_interpolated_solution(self, L, xp):
+        """
+        Get the interpolated solution for numpy or cupy data types
+
+        Args:
+            u_vec (array): Vector of solutions
+            prob (pySDC.problem): Problem
+        """
+        coll = L.sweep.coll
+
+        u = [
+            L.u[i].flatten() if L.u[i] is not None else L.u[i]
+            for i in range(coll.num_nodes + 1)
+            if i != self.params.estimate_on_node
+        ]
+        return self.matmul(self.interpolation_matrix, u, xp=xp)[0].reshape(L.prob.init[0])
+
     def post_iteration_processing(self, controller, S, **kwargs):
         """
         Estimate the error
@@ -120,7 +138,11 @@ class EstimatePolynomialError(ConvergenceController):
             coll = L.sweep.coll
             nodes = np.append(np.append(0, coll.nodes), 1.0)
             estimate_on_node = self.params.estimate_on_node
-            xp = L.u[0].xp
+
+            if hasattr(L.u[0], 'xp'):
+                xp = L.u[0].xp
+            else:
+                xp = np
 
             if self.interpolation_matrix is None:
                 interpolator = LagrangeApproximation(
@@ -128,12 +150,7 @@ class EstimatePolynomialError(ConvergenceController):
                 )
                 self.interpolation_matrix = xp.array(interpolator.getInterpolationMatrix([nodes[estimate_on_node]]))
 
-            u = [
-                L.u[i].flatten() if L.u[i] is not None else L.u[i]
-                for i in range(coll.num_nodes + 1)
-                if i != estimate_on_node
-            ]
-            u_inter = self.matmul(self.interpolation_matrix, u, xp=xp)[0].reshape(L.prob.init[0])
+            u_inter = self.get_interpolated_solution(L, xp)
 
             # compute end point if needed
             if estimate_on_node == len(nodes) - 1:
@@ -147,12 +164,14 @@ class EstimatePolynomialError(ConvergenceController):
                 rank = estimate_on_node - 1
                 L.status.order_embedded_estimate = coll.num_nodes * 1
 
+            rescale = float(abs(u_inter)) if self.params.rel_error else 1
+
             if self.comm:
-                buf = np.array(abs(u_inter - high_order_sol) if self.comm.rank == rank else 0.0)
+                buf = np.array(abs(u_inter - high_order_sol) / rescale if self.comm.rank == rank else 0.0)
                 self.comm.Bcast(buf, root=rank)
-                L.status.error_embedded_estimate = buf
+                L.status.error_embedded_estimate = float(buf)
             else:
-                L.status.error_embedded_estimate = abs(u_inter - high_order_sol)
+                L.status.error_embedded_estimate = abs(u_inter - high_order_sol) / rescale
 
             self.debug(
                 f'Obtained error estimate: {L.status.error_embedded_estimate:.2e} of order {L.status.order_embedded_estimate}',
@@ -176,3 +195,59 @@ class EstimatePolynomialError(ConvergenceController):
             return False, 'Need at least two collocation nodes to interpolate to one!'
 
         return True, ""
+
+
+class EstimatePolynomialErrorFiredrake(EstimatePolynomialError):
+    def matmul(self, A, b):
+        """
+        Matrix vector multiplication, possibly MPI parallel.
+        The parallel implementation performs a reduce operation in every row of the matrix. While communicating the
+        entire vector once could reduce the number of communications, this way we never need to store the entire vector
+        on any specific rank.
+
+        Args:
+            A (2d np.ndarray): Matrix
+            b (list): Vector
+
+        Returns:
+            List: Axb
+        """
+
+        if self.comm:
+            res = [A[i, 0] * b[0] if b[i] is not None else None for i in range(A.shape[0])]
+            buf = 0 * b[0]
+            for i in range(0, A.shape[0]):
+                index = self.comm.rank + (1 if self.comm.rank < self.params.estimate_on_node - 1 else 0)
+                send_buf = (
+                    (A[i, index] * b[index]) if self.comm.rank != self.params.estimate_on_node - 1 else 0 * res[0]
+                )
+                self.comm.Allreduce(send_buf, buf, op=self.MPI_SUM)
+                res[i] += buf
+            return res
+        else:
+            res = []
+            for i in range(A.shape[0]):
+                res.append(A[i, 0] * b[0])
+                for j in range(1, A.shape[1]):
+                    res[-1] += A[i, j] * b[j]
+
+            return res
+
+    def get_interpolated_solution(self, L):
+        """
+        Get the interpolated solution for Firedrake data types
+        We are not 100% sure that you don't need to invert the mass matrix here, but should be fine.
+
+        Args:
+            u_vec (array): Vector of solutions
+            prob (pySDC.problem): Problem
+        """
+        coll = L.sweep.coll
+
+        u = [
+            L.u[i] if L.u[i] is not None else L.u[i]
+            for i in range(coll.num_nodes + 1)
+            if i != self.params.estimate_on_node
+        ]
+        return L.prob.dtype_u(self.matmul(self.interpolation_matrix, u)[0])
+        # return L.prob.invert_mass_matrix(self.matmul(self.interpolation_matrix, u)[0])

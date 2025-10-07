@@ -28,7 +28,7 @@ class controller_MPI(Controller):
         super().__init__(controller_params, description, useMPI=True)
 
         # create single step per processor
-        self.S = Step(description)
+        self.S: Step = Step(description)
 
         # pass communicator for future use
         self.comm = comm
@@ -159,6 +159,9 @@ class controller_MPI(Controller):
         # call post-run hook
         for hook in self.hooks:
             hook.post_run(step=self.S, level_number=0)
+
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.post_run_processing(self, self.S, comm=self.comm)
 
         comm_active.Free()
 
@@ -685,8 +688,11 @@ class controller_MPI(Controller):
 
             for hook in self.hooks:
                 hook.pre_sweep(step=self.S, level_number=0)
+
+            self.S.levels[0].sweep.updateVariableCoeffs(k + 1)  # update QDelta coefficients if variable preconditioner
             self.S.levels[0].sweep.update_nodes()
             self.S.levels[0].sweep.compute_residual(stage='IT_FINE')
+
             for hook in self.hooks:
                 hook.post_sweep(step=self.S, level_number=0)
 
@@ -715,6 +721,7 @@ class controller_MPI(Controller):
 
                 for hook in self.hooks:
                     hook.pre_sweep(step=self.S, level_number=l)
+
                 self.S.levels[l].sweep.update_nodes()
                 self.S.levels[l].sweep.compute_residual(stage='IT_DOWN')
                 for hook in self.hooks:

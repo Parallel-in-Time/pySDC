@@ -25,6 +25,7 @@ Tutorial
    tutorial/step_6.rst
    tutorial/step_7.rst
    tutorial/step_8.rst
+   tutorial/step_9.rst
 
 Playgrounds
 -----------
@@ -53,6 +54,7 @@ Projects
    projects/compression.rst
    projects/second_order.rst
    projects/monodomain.rst
+   projects/GPU.rst
 
 
 API documentation

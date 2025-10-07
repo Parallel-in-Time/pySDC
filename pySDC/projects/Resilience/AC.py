@@ -339,7 +339,7 @@ class LivePlot(Hooks):  # pragma: no cover
         self.dt += [step.dt]
         self.axs[2].plot(self.t, self.dt)
         self.axs[2].set_yscale('log')
-        self.axs[2].axhline(step.levels[level_number].prob.eps ** 2, label=r'$\epsilon^2$', color='black', ls='--')
+        self.axs[2].axhline(step.levels[level_number].prob.eps**2, label=r'$\epsilon^2$', color='black', ls='--')
         self.axs[2].legend(frameon=False)
         self.axs[2].set_xlim([0, 0.03])
         self.axs[2].set_title(r'$\Delta t$')

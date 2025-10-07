@@ -121,15 +121,19 @@ class Strategy:
         args['target'] = 0
 
         if problem.__name__ == "run_vdp":
-            args['time'] = 5.25
+            args['time'] = 5.5  # 25
         elif problem.__name__ == "run_Schroedinger":
             args['time'] = 0.3
         elif problem.__name__ == "run_quench":
             args['time'] = 41.0
         elif problem.__name__ == "run_Lorenz":
-            args['time'] = 0.3
+            args['time'] = 10
         elif problem.__name__ == "run_AC":
             args['time'] = 1e-2
+        elif problem.__name__ == "run_RBC":
+            args['time'] = 20.19
+        elif problem.__name__ == "run_GS":
+            args['time'] = 100.0
 
         return args
 
@@ -150,13 +154,18 @@ class Strategy:
         rnd_params['iteration'] = base_params['step_params']['maxiter']
         rnd_params['rank'] = num_procs
 
-        if problem.__name__ in ['run_Schroedinger', 'run_quench', 'run_AC']:
+        if problem.__name__ in ['run_Schroedinger', 'run_quench', 'run_AC', 'run_RBC', 'run_GS']:
             rnd_params['min_node'] = 1
 
         if problem.__name__ == "run_quench":
             rnd_params['iteration'] = 5
         elif problem.__name__ == 'run_Lorenz':
             rnd_params['iteration'] = 5
+        elif problem.__name__ == 'run_RBC':
+            rnd_params['problem_pos'] = [3, 16, 16]
+        elif problem.__name__ == 'run_vdp':
+            rnd_params['iteration'] = 5
+
         return rnd_params
 
     @property
@@ -183,7 +192,7 @@ class Strategy:
         return self.name
 
     @classmethod
-    def get_Tend(cls, problem, num_procs=1):
+    def get_Tend(cls, problem, num_procs=1, resilience_experiment=False):
         '''
         Get the final time of runs for fault stats based on the problem
 
@@ -195,17 +204,24 @@ class Strategy:
             float: Tend to put into the run
         '''
         if problem.__name__ == "run_vdp":
-            return 20  # 11.5
+            if resilience_experiment:
+                return 11.5
+            else:
+                return 20
         elif problem.__name__ == "run_piline":
             return 20.0
         elif problem.__name__ == "run_Lorenz":
-            return 1.5
+            return 20
         elif problem.__name__ == "run_Schroedinger":
             return 1.0
         elif problem.__name__ == "run_quench":
             return 500.0
         elif problem.__name__ == "run_AC":
             return 0.025
+        elif problem.__name__ == "run_RBC":
+            return 21
+        elif problem.__name__ == "run_GS":
+            return 500
         else:
             raise NotImplementedError('I don\'t have a final time for your problem!')
 
@@ -240,7 +256,7 @@ class Strategy:
 
         elif problem.__name__ == "run_Lorenz":
             custom_description['step_params'] = {'maxiter': 5}
-            custom_description['level_params'] = {'dt': 1e-2}
+            custom_description['level_params'] = {'dt': 1e-3}
             custom_description['problem_params'] = {'stop_at_nan': False}
         elif problem.__name__ == "run_Schroedinger":
             custom_description['step_params'] = {'maxiter': 5}
@@ -269,6 +285,12 @@ class Strategy:
                 'nu': 2,
             }
             custom_description['level_params'] = {'restol': -1, 'dt': 0.1 * eps**2}
+        elif problem.__name__ == 'run_RBC':
+            custom_description['level_params']['dt'] = 2.5e-2 if num_procs == 4 else 5e-2
+            custom_description['step_params'] = {'maxiter': 5}
+        elif problem.__name__ == 'run_GS':
+            custom_description['level_params']['dt'] = 1.0
+            custom_description['step_params'] = {'maxiter': 5}
 
         custom_description['convergence_controllers'] = {
             # StepSizeLimiter: {'dt_min': self.get_Tend(problem=problem, num_procs=num_procs) / self.max_steps}
@@ -283,10 +305,12 @@ class Strategy:
 
         max_runtime = {
             'run_vdp': 1000,
-            'run_Lorenz': 60,
+            'run_Lorenz': 500,
             'run_Schroedinger': 150,
             'run_quench': 150,
             'run_AC': 150,
+            'run_RBC': 1000,
+            'run_GS': 100,
         }
 
         custom_description['convergence_controllers'][StopAtMaxRuntime] = {
@@ -308,14 +332,25 @@ class Strategy:
         custom_description = self.get_base_parameters(problem, num_procs)
         return merge_descriptions(custom_description, self.custom_description)
 
-    def get_custom_description_for_faults(self, *args, **kwargs):
+    def get_custom_description_for_faults(self, problem, *args, **kwargs):
         '''
         Get a custom description based on the problem to run the fault stuff
 
         Returns:
             dict: Custom description
         '''
-        return self.get_custom_description(*args, **kwargs)
+        custom_description = self.get_custom_description(problem, *args, **kwargs)
+        if problem.__name__ == "run_vdp":
+            custom_description['step_params'] = {'maxiter': 5}
+            custom_description['problem_params'] = {
+                'u0': np.array([2.0, 0], dtype=np.float64),
+                'mu': 5,
+                'crash_at_maxiter': False,
+                'newton_tol': 1e-11,
+                'stop_at_nan': False,
+            }
+            custom_description['level_params'] = {'dt': 1e-2}
+        return custom_description
 
     def get_reference_value(self, problem, key, op, num_procs=1):
         """
@@ -356,7 +391,9 @@ class InexactBaseStrategy(Strategy):
     def get_custom_description(self, problem, num_procs=1):
         from pySDC.implementations.convergence_controller_classes.inexactness import NewtonInexactness
 
-        preconditioner = 'MIN-SR-NS' if problem.__name__ in ['run_Lorenz'] else 'MIN-SR-S'
+        preconditioner = {
+            'run_Lorenz': 'MIN-SR-NS',
+        }.get(problem.__name__, 'MIN-SR-S')
 
         desc = {}
         desc['sweeper_params'] = {'QI': preconditioner}
@@ -373,7 +410,7 @@ class InexactBaseStrategy(Strategy):
             'maxiter': 15,
         }
 
-        if self.newton_inexactness and problem.__name__ not in ['run_Schroedinger', 'run_AC']:
+        if self.newton_inexactness and problem.__name__ not in ['run_Schroedinger', 'run_AC', 'run_RBC', 'run_GS']:
             if problem.__name__ == 'run_quench':
                 inexactness_params['ratio'] = 1e-1
                 inexactness_params['min_tol'] = 1e-11
@@ -430,10 +467,24 @@ class BaseStrategy(Strategy):
             desc['level_params']['dt'] = 1e-2 * desc['problem_params']['eps'] ** 2
         return desc
 
-    def get_custom_description_for_faults(self, problem, *args, **kwargs):
-        desc = self.get_custom_description(problem, *args, **kwargs)
+    def get_custom_description_for_faults(self, problem, num_procs, *args, **kwargs):
+        desc = self.get_custom_description(problem, num_procs, *args, **kwargs)
         if problem.__name__ == "run_quench":
             desc['level_params']['dt'] = 5.0
+        elif problem.__name__ == "run_AC":
+            desc['level_params']['dt'] = 4e-5 if num_procs == 4 else 8e-5
+        elif problem.__name__ == "run_GS":
+            desc['level_params']['dt'] = 4e-1
+        elif problem.__name__ == "run_vdp":
+            desc['step_params'] = {'maxiter': 5}
+            desc['problem_params'] = {
+                'u0': np.array([2.0, 0], dtype=np.float64),
+                'mu': 5,
+                'crash_at_maxiter': False,
+                'newton_tol': 1e-11,
+                'stop_at_nan': False,
+            }
+            desc['level_params'] = {'dt': 4.5e-2}
         return desc
 
     def get_reference_value(self, problem, key, op, num_procs=1):
@@ -451,9 +502,9 @@ class BaseStrategy(Strategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 2136
+                return 12350
             elif key == 'e_global_post_run' and op == max:
-                return 9.256926357892326e-06
+                return 1.3527453646133836e-07
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -482,24 +533,24 @@ class AdaptivityStrategy(Strategy):
     def label(self):
         return r'$\Delta t$-adaptivity'
 
-    def get_fixable_params(self, maxiter, **kwargs):
-        """
-        Here faults occurring in the last iteration cannot be fixed.
+    # def get_fixable_params(self, maxiter, **kwargs):
+    #     """
+    #     Here faults occurring in the last iteration cannot be fixed.
 
-        Args:
-            maxiter (int): Max. iterations until convergence is declared
+    #     Args:
+    #         maxiter (int): Max. iterations until convergence is declared
 
-        Returns:
-            (list): Contains dictionaries of keyword arguments for `FaultStats.get_mask`
-        """
-        self.fixable += [
-            {
-                'key': 'iteration',
-                'op': 'lt',
-                'val': maxiter,
-            }
-        ]
-        return self.fixable
+    #     Returns:
+    #         (list): Contains dictionaries of keyword arguments for `FaultStats.get_mask`
+    #     """
+    #     self.fixable += [
+    #         {
+    #             'key': 'iteration',
+    #             'op': 'lt',
+    #             'val': maxiter,
+    #         }
+    #     ]
+    #     return self.fixable
 
     def get_custom_description(self, problem, num_procs):
         '''
@@ -521,13 +572,15 @@ class AdaptivityStrategy(Strategy):
 
         dt_max = np.inf
         dt_slope_max = np.inf
+        dt_slope_min = 0
+        beta = 0.9
 
         if problem.__name__ == "run_piline":
             e_tol = 1e-7
         elif problem.__name__ == "run_vdp":
             e_tol = 2e-5
         elif problem.__name__ == "run_Lorenz":
-            e_tol = 2e-5
+            e_tol = 1e-6 if num_procs == 4 else 1e-7
         elif problem.__name__ == "run_Schroedinger":
             e_tol = 4e-7
         elif problem.__name__ == "run_quench":
@@ -545,6 +598,15 @@ class AdaptivityStrategy(Strategy):
         elif problem.__name__ == "run_AC":
             e_tol = 1e-7
             # dt_max = 0.1 * base_params['problem_params']['eps'] ** 2
+        elif problem.__name__ == 'run_RBC':
+            if num_procs == 4:
+                e_tol = 2e-2
+            else:
+                e_tol = 1e-4
+            dt_slope_min = 1
+            beta = 0.5
+        elif problem.__name__ == 'run_GS':
+            e_tol = 1e-5
 
         else:
             raise NotImplementedError(
@@ -555,6 +617,8 @@ class AdaptivityStrategy(Strategy):
         custom_description['convergence_controllers'][Adaptivity] = {
             'e_tol': e_tol,
             'dt_slope_max': dt_slope_max,
+            'dt_rel_min_slope': dt_slope_min,
+            'beta': beta,
         }
         custom_description['convergence_controllers'][StepSizeLimiter] = {
             'dt_max': dt_max,
@@ -576,20 +640,41 @@ class AdaptivityStrategy(Strategy):
         """
         if problem.__name__ == 'run_Lorenz':
             if key == 'work_newton' and op == sum:
-                return 1369
+                return 2989
             elif key == 'e_global_post_run' and op == max:
-                return 9.364841517367495e-06
+                return 5.636767497207984e-08
 
         super().get_reference_value(problem, key, op, num_procs)
 
     def get_custom_description_for_faults(self, problem, num_procs, *args, **kwargs):
         from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeLimiter
         from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+        from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeSlopeLimiter
+        from pySDC.projects.Resilience.RBC import ReachTendExactly
 
         desc = self.get_custom_description(problem, num_procs, *args, **kwargs)
         if problem.__name__ == "run_quench":
             desc['level_params']['dt'] = 1.1e1
             desc['convergence_controllers'][Adaptivity]['e_tol'] = 1e-6
+        elif problem.__name__ == "run_AC":
+            desc['convergence_controllers'][Adaptivity]['e_tol'] = 1e-5
+        elif problem.__name__ == "run_GS":
+            desc['convergence_controllers'][Adaptivity]['e_tol'] = 2e-6
+        elif problem.__name__ == "run_vdp":
+            desc['step_params'] = {'maxiter': 5}
+            desc['sweeper_params'] = {'num_nodes': 3, 'QI': 'LU'}
+            desc['problem_params'] = {
+                'u0': np.array([2.0, 0], dtype=np.float64),
+                'mu': 5,
+                'crash_at_maxiter': True,
+                'newton_tol': 1e-8,
+                'stop_at_nan': True,
+                'relative_tolerance': False,
+            }
+            desc['level_params'] = {'dt': 8e-3}
+            desc['convergence_controllers'][Adaptivity]['e_tol'] = 2e-7
+            desc['convergence_controllers'][ReachTendExactly] = {'Tend': 11.5}
+            # desc['convergence_controllers'][StepSizeSlopeLimiter] = {'dt_slope_min': 1/4, 'dt_slope_max': 4}
         return desc
 
 
@@ -701,7 +786,7 @@ to the strategy'
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 4758
+                return 5092
             elif key == 'e_global_post_run' and op == max:
                 return 4.107116318152748e-06
 
@@ -756,6 +841,10 @@ class IterateStrategy(Strategy):
             restol = 1e-7
         elif problem.__name__ == "run_AC":
             restol = 1e-11
+        elif problem.__name__ == "run_RBC":
+            restol = 1e-4
+        elif problem.__name__ == "run_GS":
+            restol = 1e-4
         else:
             raise NotImplementedError(
                 'I don\'t have a residual tolerance for your problem. Please add one to the \
@@ -804,9 +893,9 @@ strategy'
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 1872
+                return 9200
             elif key == 'e_global_post_run' and op == max:
-                return 2.2362043480939064e-05
+                return 2.139863344829962e-05
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -827,14 +916,36 @@ class kAdaptivityStrategy(IterateStrategy):
         elif problem.__name__ == "run_AC":
             desc['level_params']['restol'] = 1e-11
             desc['level_params']['dt'] = 0.4 * desc['problem_params']['eps'] ** 2 / 8.0
+        elif problem.__name__ == "run_RBC":
+            desc['level_params']['dt'] = 7e-2
+            desc['level_params']['restol'] = 1e-6
+            desc['level_params']['e_tol'] = 1e-7
+        elif problem.__name__ == "run_GS":
+            desc['level_params']['dt'] = 1.0
+            desc['level_params']['restol'] = 1e-9
         return desc
 
-    def get_custom_description_for_faults(self, problem, *args, **kwargs):
-        desc = self.get_custom_description(problem, *args, **kwargs)
+    def get_custom_description_for_faults(self, problem, num_procs, *args, **kwargs):
+        desc = self.get_custom_description(problem, num_procs, *args, **kwargs)
         if problem.__name__ == 'run_quench':
             desc['level_params']['dt'] = 5.0
         elif problem.__name__ == 'run_AC':
-            desc['level_params']['dt'] = 0.6 * desc['problem_params']['eps'] ** 2
+            desc['level_params']['dt'] = 4e-4 if num_procs == 4 else 5e-4
+            desc['level_params']['restol'] = 1e-5 if num_procs == 4 else 1e-11
+        elif problem.__name__ == 'run_RBC':
+            desc['level_params']['restol'] = 1e-3 if num_procs == 4 else 1e-6
+        elif problem.__name__ == 'run_Lorenz':
+            desc['level_params']['dt'] = 8e-3
+        elif problem.__name__ == "run_vdp":
+            desc['sweeper_params'] = {'num_nodes': 3}
+            desc['problem_params'] = {
+                'u0': np.array([2.0, 0], dtype=np.float64),
+                'mu': 5,
+                'crash_at_maxiter': False,
+                'newton_tol': 1e-11,
+                'stop_at_nan': False,
+            }
+            desc['level_params'] = {'dt': 4.0e-2, 'restol': 1e-7}
         return desc
 
     def get_reference_value(self, problem, key, op, num_procs=1):
@@ -852,9 +963,9 @@ class kAdaptivityStrategy(IterateStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 2392
+                return 12350
             elif key == 'e_global_post_run' and op == max:
-                return 4.808610118089973e-06
+                return 1.3527453646133836e-07
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -893,14 +1004,15 @@ class HotRodStrategy(Strategy):
 
         base_params = super().get_custom_description(problem, num_procs)
         if problem.__name__ == "run_vdp":
-            if num_procs == 4:
-                HotRod_tol = 1.800804e-04
-            elif num_procs == 5:
-                HotRod_tol = 9.329361e-05
-            else:  # 1 process
-                HotRod_tol = 1.347949e-06
-            HotRod_tol = 7e-6 if num_procs > 1 else 5e-7
-            maxiter = 4
+            # if num_procs == 4:
+            #     HotRod_tol = 1.800804e-04
+            # elif num_procs == 5:
+            #     HotRod_tol = 9.329361e-05
+            # else:  # 1 process
+            #     HotRod_tol = 1.347949e-06
+            # HotRod_tol = 7e-6 if num_procs > 1 else 5e-7
+            HotRod_tol = 7.2e-05
+            maxiter = 6
         elif problem.__name__ == "run_Lorenz":
             if num_procs == 5:
                 HotRod_tol = 9.539348e-06
@@ -928,6 +1040,12 @@ class HotRodStrategy(Strategy):
         elif problem.__name__ == 'run_AC':
             HotRod_tol = 9.564437e-06
             maxiter = 6
+        elif problem.__name__ == 'run_RBC':
+            HotRod_tol = 3e-4 if num_procs == 4 else 6.34e-6
+            maxiter = 6
+        elif problem.__name__ == 'run_GS':
+            HotRod_tol = 3.22e-5
+            maxiter = 6
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for Hot Rod for your problem. Please add one to the\
@@ -949,13 +1067,27 @@ class HotRodStrategy(Strategy):
             'level_params': {},
         }
         if problem.__name__ == "run_AC":
-            custom_description['level_params']['dt'] = 0.8 * base_params['problem_params']['eps'] ** 2 / 8.0
+            custom_description['level_params']['dt'] = 8e-5
         return merge_descriptions(base_params, custom_description)
 
     def get_custom_description_for_faults(self, problem, *args, **kwargs):
         desc = self.get_custom_description(problem, *args, **kwargs)
         if problem.__name__ == "run_quench":
             desc['level_params']['dt'] = 5.0
+        elif problem.__name__ == "run_AC":
+            desc['level_params']['dt'] = 8e-5
+        elif problem.__name__ == "run_GS":
+            desc['level_params']['dt'] = 4e-1
+        elif problem.__name__ == "run_vdp":
+            desc['step_params'] = {'maxiter': 6}
+            desc['problem_params'] = {
+                'u0': np.array([2.0, 0], dtype=np.float64),
+                'mu': 5,
+                'crash_at_maxiter': False,
+                'newton_tol': 1e-11,
+                'stop_at_nan': False,
+            }
+            desc['level_params'] = {'dt': 4.5e-2}
         return desc
 
     def get_reference_value(self, problem, key, op, num_procs=1):
@@ -973,9 +1105,9 @@ class HotRodStrategy(Strategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 2329
+                return 12350
             elif key == 'e_global_post_run' and op == max:
-                return 9.256926357892326e-06
+                return 1.3527453646133836e-07
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1089,9 +1221,9 @@ class AdaptivityCollocationTypeStrategy(AdaptivityCollocationStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 983
+                return 1025
             elif key == 'e_global_post_run' and op == max:
-                return 3.944880392126038e-06
+                return 4.266975256683736e-06
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1128,7 +1260,7 @@ class AdaptivityCollocationRefinementStrategy(AdaptivityCollocationStrategy):
             if key == 'work_newton' and op == sum:
                 return 917
             elif key == 'e_global_post_run' and op == max:
-                return 1.0587702028885815e-05
+                return 1.0874929465387595e-05
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1159,9 +1291,9 @@ class AdaptivityCollocationDerefinementStrategy(AdaptivityCollocationStrategy):
         """
         if problem.__name__ == 'run_Lorenz':
             if key == 'work_newton' and op == sum:
-                return 1358
+                return 1338
             elif key == 'e_global_post_run' and op == max:
-                return 0.00010316526647002888
+                return 0.0001013999955041811
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1242,9 +1374,9 @@ class DIRKStrategy(AdaptivityStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 1456
+                return 5467
             elif key == 'e_global_post_run' and op == max:
-                return 0.00013730538358736055
+                return 7.049480537091313e-07
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1302,6 +1434,7 @@ class ARKStrategy(AdaptivityStrategy):
             The custom descriptions you can supply to the problem when running it
         '''
         from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK, Adaptivity
+        from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeSlopeLimiter
         from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
         from pySDC.implementations.sweeper_classes.Runge_Kutta import ARK548L2SA
 
@@ -1322,6 +1455,9 @@ class ARKStrategy(AdaptivityStrategy):
                 },
             },
         }
+
+        if problem.__name__ == "run_RBC":
+            rk_params['convergence_controllers'][StepSizeSlopeLimiter] = {'dt_rel_min_slope': 0.25}
 
         custom_description = merge_descriptions(adaptivity_description, rk_params)
 
@@ -1347,6 +1483,63 @@ class ARKStrategy(AdaptivityStrategy):
                 return 3.1786601531890356e-08
 
         super().get_reference_value(problem, key, op, num_procs)
+
+
+class ARK3_CFL_Strategy(BaseStrategy):
+    """
+    This is special for RBC with CFL number for accuracy
+    """
+
+    def __init__(self, **kwargs):
+        '''
+        Initialization routine
+        '''
+        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
+
+        super().__init__(**kwargs)
+        self.color = 'maroon'
+        self.marker = '<'
+        self.name = 'ARK3'
+        self.bar_plot_x_label = 'ARK3'
+        self.precision_parameter = 'cfl'
+        self.precision_parameter_loc = ['convergence_controllers', CFLLimit, 'cfl']
+        self.max_steps = 1e5
+
+    @property
+    def label(self):
+        return 'ARK3'
+
+    def get_custom_description(self, problem, num_procs):
+        '''
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            num_procs (int): Number of processes you intend to run with
+
+        Returns:
+            The custom descriptions you can supply to the problem when running it
+        '''
+        from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
+        from pySDC.implementations.sweeper_classes.Runge_Kutta import ARK3
+        from pySDC.implementations.problem_classes.RayleighBenard import CFLLimit
+        from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeSlopeLimiter
+
+        desc = super().get_custom_description(problem, num_procs)
+
+        rk_params = {
+            'step_params': {'maxiter': 1},
+            'sweeper_class': ARK3,
+            'convergence_controllers': {
+                CFLLimit: {
+                    'cfl': 0.5,
+                    'dt_max': 1.0,
+                },
+                StepSizeSlopeLimiter: {'dt_rel_min_slope': 0.2},
+            },
+        }
+
+        custom_description = merge_descriptions(desc, rk_params)
+
+        return custom_description
 
 
 class ESDIRKStrategy(AdaptivityStrategy):
@@ -1433,9 +1626,9 @@ class ESDIRKStrategy(AdaptivityStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 820
+                return 2963
             elif key == 'e_global_post_run' and op == max:
-                return 3.148061889390874e-06
+                return 4.126039954144289e-09
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1481,7 +1674,7 @@ class ERKStrategy(DIRKStrategy):
 
     @property
     def label(self):
-        return 'CP5(4)'
+        return 'CK5(4)'
 
     def get_random_params(self, problem, num_procs):
         '''
@@ -1526,7 +1719,7 @@ class ERKStrategy(DIRKStrategy):
             if key == 'work_newton' and op == sum:
                 return 0
             elif key == 'e_global_post_run' and op == max:
-                return 3.5085474063834e-05
+                return 1.509206128957885e-07
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1603,9 +1796,9 @@ class DoubleAdaptivityStrategy(AdaptivityStrategy):
         """
         if problem.__name__ == 'run_Lorenz':
             if key == 'work_newton' and op == sum:
-                return 1369
+                return 2989
             elif key == 'e_global_post_run' and op == max:
-                return 9.364841517367495e-06
+                return 5.636763944494305e-08
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1658,9 +1851,9 @@ class AdaptivityAvoidRestartsStrategy(AdaptivityStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 1369
+                return 2989
             elif key == 'e_global_post_run' and op == max:
-                return 9.364841517367495e-06
+                return 5.636763944494305e-08
 
         super().get_reference_value(problem, key, op, num_procs)
 
@@ -1857,6 +2050,7 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         '''
         from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
         from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeLimiter
+        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
 
         base_params = super().get_custom_description(problem, num_procs)
         custom_description = {}
@@ -1864,9 +2058,13 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         dt_max = np.inf
         restol_rel = 1e-4
         restol_min = 1e-12
+        restol_max = 1e-5
+        dt_slope_min = 0
         dt_min = 0
+        abort_at_growing_residual = True
         level_params = {}
         problem_params = {}
+        beta = 0.9
 
         if problem.__name__ == "run_vdp":
             e_tol = 6e-4
@@ -1878,7 +2076,7 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         elif problem.__name__ == "run_piline":
             e_tol = 1e-7
         elif problem.__name__ == "run_Lorenz":
-            e_tol = 7e-4
+            e_tol = 2e-4
         elif problem.__name__ == "run_Schroedinger":
             e_tol = 3e-5
         elif problem.__name__ == "run_quench":
@@ -1888,8 +2086,23 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
             restol_rel = 1e-1
         elif problem.__name__ == "run_AC":
             e_tol = 1.0e-4
-            restol_rel = 1e-3
+            restol_rel = 1e-3 if num_procs == 4 else 1e-3
             # dt_max = 0.1 * base_params['problem_params']['eps'] ** 2
+        elif problem.__name__ == "run_RBC":
+            e_tol = 5e-2 if num_procs == 4 else 5e-3
+            dt_slope_min = 1.0
+            abort_at_growing_residual = False
+            restol_rel = 1e-2 if num_procs == 4 else 1e-4
+            restol_max = 1e-1
+            restol_min = 5e-8
+            self.max_slope = 4
+            beta = 0.5
+            level_params['e_tol'] = 1e-5
+        elif problem.__name__ == 'run_GS':
+            e_tol = 1e-4
+            restol_rel = 4e-3
+            restol_max = 1e-4
+            restol_min = 1e-9
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
@@ -1901,22 +2114,27 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
                 'e_tol': e_tol,
                 'restol_rel': restol_rel if self.use_restol_rel else 1e-11,
                 'restol_min': restol_min if self.use_restol_rel else 1e-12,
+                'restol_max': restol_max if self.use_restol_rel else 1e-5,
                 'restart_at_maxiter': True,
                 'factor_if_not_converged': self.max_slope,
                 'interpolate_between_restarts': self.interpolate_between_restarts,
+                'abort_at_growing_residual': abort_at_growing_residual,
+                'beta': beta,
             },
             StepSizeLimiter: {
                 'dt_max': dt_max,
                 'dt_slope_max': self.max_slope,
                 'dt_min': dt_min,
+                'dt_rel_min_slope': dt_slope_min,
             },
         }
         custom_description['level_params'] = level_params
         custom_description['problem_params'] = problem_params
+
         return merge_descriptions(base_params, custom_description)
 
-    def get_custom_description_for_faults(self, problem, *args, **kwargs):
-        desc = self.get_custom_description(problem, *args, **kwargs)
+    def get_custom_description_for_faults(self, problem, num_procs, *args, **kwargs):
+        desc = self.get_custom_description(problem, num_procs, *args, **kwargs)
         if problem.__name__ == "run_quench":
             from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
 
@@ -1925,7 +2143,31 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         elif problem.__name__ == "run_AC":
             from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
 
-            desc['convergence_controllers'][AdaptivityPolynomialError]['e_tol'] = 1e-3
+            desc['convergence_controllers'][AdaptivityPolynomialError]['e_tol'] = 6e-3 if num_procs == 4 else 1e-3
+            if num_procs == 4:
+                desc['step_params'] = {'maxiter': 50}
+        elif problem.__name__ == "run_Lorenz":
+            from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
+
+            desc['convergence_controllers'][AdaptivityPolynomialError]['e_tol'] = 2e-4
+            desc['convergence_controllers'][AdaptivityPolynomialError]['restol_min'] = 1e-11
+            desc['convergence_controllers'][AdaptivityPolynomialError]['restol_rel'] = 1e-11
+        elif problem.__name__ == "run_vdp":
+            from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
+            from pySDC.implementations.convergence_controller_classes.inexactness import NewtonInexactness
+
+            desc['step_params'] = {'maxiter': 16}
+            desc['problem_params'] = {
+                'u0': np.array([2.0, 0], dtype=np.float64),
+                'mu': 5,
+                'crash_at_maxiter': False,
+                'newton_tol': 1e-11,
+                'stop_at_nan': False,
+            }
+            desc['convergence_controllers'][AdaptivityPolynomialError]['e_tol'] = 5e-4
+            desc['convergence_controllers'][AdaptivityPolynomialError]['restol_rel'] = 8e-5
+            desc['convergence_controllers'].pop(NewtonInexactness)
+            desc['level_params'] = {'dt': 4.5e-2}
         return desc
 
     def get_random_params(self, problem, num_procs):
@@ -1944,7 +2186,7 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         if problem.__name__ == "run_quench":
             rnd_params['iteration'] = 1
         elif problem.__name__ == 'run_Lorenz':
-            rnd_params['iteration'] = 4
+            rnd_params['iteration'] = 5
         return rnd_params
 
     def get_reference_value(self, problem, key, op, num_procs=1):
@@ -1962,9 +2204,9 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         """
         if problem.__name__ == "run_Lorenz":
             if key == 'work_newton' and op == sum:
-                return 2124
+                return 2123
             elif key == 'e_global_post_run' and op == max:
-                return 8.484321512014503e-08
+                return 7.931560830343187e-08
 
         super().get_reference_value(problem, key, op, num_procs)
 

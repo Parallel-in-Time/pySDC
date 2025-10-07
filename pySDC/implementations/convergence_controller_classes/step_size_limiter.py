@@ -146,11 +146,70 @@ class StepSizeSlopeLimiter(ConvergenceController):
                         S,
                     )
                     L.status.dt_new = dt_new
-                elif abs(L.status.dt_new / L.params.dt - 1) < self.params.dt_rel_min_slope:
+                elif abs(L.status.dt_new / L.params.dt - 1) < self.params.dt_rel_min_slope and not S.status.restart:
                     L.status.dt_new = L.params.dt
                     self.log(
                         f"Step size did not change sufficiently to warrant step size change, keeping {L.status.dt_new:.2e}",
                         S,
                     )
+
+        return None
+
+
+class StepSizeRounding(ConvergenceController):
+    """
+    Class to round step size when using adaptive step size selection.
+    """
+
+    def setup(self, controller, params, description, **kwargs):
+        """
+        Define parameters here
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            (dict): The updated params dictionary
+        """
+        defaults = {
+            "control_order": +93,
+            "digits": 1,
+            "fac": 5,
+        }
+        return {**defaults, **super().setup(controller, params, description, **kwargs)}
+
+    @staticmethod
+    def _round_step_size(dt, fac, digits):
+        dt_rounded = None
+        exponent = np.log10(dt) // 1
+
+        dt_norm = dt / 10 ** (exponent - digits)
+        dt_norm_round = (dt_norm // fac) * fac
+        dt_rounded = dt_norm_round * 10 ** (exponent - digits)
+        return dt_rounded
+
+    def get_new_step_size(self, controller, S, **kwargs):
+        """
+        Round step size here
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
+        """
+        for L in S.levels:
+            if L.status.dt_new is not None:
+                dt_rounded = self._round_step_size(L.status.dt_new, self.params.fac, self.params.digits)
+
+                if L.status.dt_new != dt_rounded:
+                    self.log(
+                        f"Step size rounded from {L.status.dt_new:.6e} to {dt_rounded:.6e}",
+                        S,
+                    )
+                    L.status.dt_new = dt_rounded
 
         return None

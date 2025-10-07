@@ -17,12 +17,52 @@ class ButcherTableau(object):
             nodes (numpy.ndarray): Butcher tableau nodes
             matrix (numpy.ndarray): Butcher tableau entries
         """
-        # check if the arguments have the correct form
+        self.check_method(weights, nodes, matrix)
+
+        self.tleft = 0.0
+        self.tright = 1.0
+        self.num_nodes = matrix.shape[0]
+        self.weights = weights
+
+        self.nodes = np.append([0], nodes)
+        self.Qmat = np.zeros([self.num_nodes + 1, self.num_nodes + 1])
+        self.Qmat[1:, 1:] = matrix
+
+        self.left_is_node = True
+        self.right_is_node = self.nodes[-1] == self.tright
+
+        # compute distances between the nodes
+        if self.num_nodes > 1:
+            self.delta_m = self.nodes[1:] - self.nodes[:-1]
+        else:
+            self.delta_m = np.zeros(1)
+        self.delta_m[0] = self.nodes[0] - self.tleft
+
+        # check if the RK scheme is implicit
+        self.implicit = any(matrix[i, i] != 0 for i in range(self.num_nodes))
+
+    def check_method(self, weights, nodes, matrix):
+        """
+        Check that the method is entered in the correct format
+        """
         if type(matrix) != np.ndarray:
             raise ParameterError('Runge-Kutta matrix needs to be supplied as  a numpy array!')
         elif len(np.unique(matrix.shape)) != 1 or len(matrix.shape) != 2:
             raise ParameterError('Runge-Kutta matrix needs to be a square 2D numpy array!')
 
+        if type(nodes) != np.ndarray:
+            raise ParameterError('Nodes need to be supplied as a numpy array!')
+        elif len(nodes.shape) != 1:
+            raise ParameterError(f'Incompatible dimension of nodes! Need 1, got {len(nodes.shape)}')
+        elif len(nodes) != matrix.shape[0]:
+            raise ParameterError(f'Incompatible number of nodes! Need {matrix.shape[0]}, got {len(nodes)}')
+
+        self.check_weights(weights, nodes, matrix)
+
+    def check_weights(self, weights, nodes, matrix):
+        """
+        Check that the weights of the method are entered in the correct format
+        """
         if type(weights) != np.ndarray:
             raise ParameterError('Weights need to be supplied as a numpy array!')
         elif len(weights.shape) != 1:
@@ -30,64 +70,17 @@ class ButcherTableau(object):
         elif len(weights) != matrix.shape[0]:
             raise ParameterError(f'Incompatible number of weights! Need {matrix.shape[0]}, got {len(weights)}')
 
-        if type(nodes) != np.ndarray:
-            raise ParameterError('Nodes need to be supplied as a numpy array!')
-        elif len(nodes.shape) != 1:
-            raise ParameterError(f'Incompatible dimension of nodes! Need 1, got {len(nodes.shape)}')
-        elif len(nodes) != matrix.shape[0]:
-            raise ParameterError(f'Incompatible number of nodes! Need {matrix.shape[0]}, got {len(nodes)}')
-
-        self.globally_stiffly_accurate = np.allclose(matrix[-1], weights)
-
-        self.tleft = 0.0
-        self.tright = 1.0
-        self.num_solution_stages = 0 if self.globally_stiffly_accurate else 1
-        self.num_nodes = matrix.shape[0] + self.num_solution_stages
-        self.weights = weights
-
-        if self.globally_stiffly_accurate:
-            # For globally stiffly accurate methods, the last row of the Butcher tableau is the same as the weights.
-            self.nodes = np.append([0], nodes)
-            self.Qmat = np.zeros([self.num_nodes + 1, self.num_nodes + 1])
-            self.Qmat[1:, 1:] = matrix
-        else:
-            self.nodes = np.append(np.append([0], nodes), [1])
-            self.Qmat = np.zeros([self.num_nodes + 1, self.num_nodes + 1])
-            self.Qmat[1:-1, 1:-1] = matrix
-            self.Qmat[-1, 1:-1] = weights  # this is for computing the solution to the step from the previous stages
-
-        self.left_is_node = True
-        self.right_is_node = self.nodes[-1] == self.tright
-
-        # compute distances between the nodes
-        if self.num_nodes > 1:
-            self.delta_m = self.nodes[1:] - self.nodes[:-1]
-        else:
-            self.delta_m = np.zeros(1)
-        self.delta_m[0] = self.nodes[0] - self.tleft
-
-        # check if the RK scheme is implicit
-        self.implicit = any(matrix[i, i] != 0 for i in range(self.num_nodes - self.num_solution_stages))
+    @property
+    def globally_stiffly_accurate(self):
+        return np.allclose(self.Qmat[-1, 1:], self.weights)
 
 
-class ButcherTableauEmbedded(object):
-    def __init__(self, weights, nodes, matrix):
+class ButcherTableauEmbedded(ButcherTableau):
+
+    def check_weights(self, weights, nodes, matrix):
         """
-        Initialization routine to get a quadrature matrix out of a Butcher tableau for embedded RK methods.
-
-        Be aware that the method that generates the final solution should be in the first row of the weights matrix.
-
-        Args:
-            weights (numpy.ndarray): Butcher tableau weights
-            nodes (numpy.ndarray): Butcher tableau nodes
-            matrix (numpy.ndarray): Butcher tableau entries
+        Check that the weights of the method are entered in the correct format
         """
-        # check if the arguments have the correct form
-        if type(matrix) != np.ndarray:
-            raise ParameterError('Runge-Kutta matrix needs to be supplied as  a numpy array!')
-        elif len(np.unique(matrix.shape)) != 1 or len(matrix.shape) != 2:
-            raise ParameterError('Runge-Kutta matrix needs to be a square 2D numpy array!')
-
         if type(weights) != np.ndarray:
             raise ParameterError('Weights need to be supplied as a numpy array!')
         elif len(weights.shape) != 2:
@@ -95,38 +88,9 @@ class ButcherTableauEmbedded(object):
         elif len(weights[0]) != matrix.shape[0]:
             raise ParameterError(f'Incompatible number of weights! Need {matrix.shape[0]}, got {len(weights[0])}')
 
-        if type(nodes) != np.ndarray:
-            raise ParameterError('Nodes need to be supplied as a numpy array!')
-        elif len(nodes.shape) != 1:
-            raise ParameterError(f'Incompatible dimension of nodes! Need 1, got {len(nodes.shape)}')
-        elif len(nodes) != matrix.shape[0]:
-            raise ParameterError(f'Incompatible number of nodes! Need {matrix.shape[0]}, got {len(nodes)}')
-
-        # Set number of nodes, left and right interval boundaries
-        self.num_solution_stages = 2
-        self.num_nodes = matrix.shape[0] + self.num_solution_stages
-        self.tleft = 0.0
-        self.tright = 1.0
-
-        self.nodes = np.append(np.append([0], nodes), [1, 1])
-        self.weights = weights
-        self.Qmat = np.zeros([self.num_nodes + 1, self.num_nodes + 1])
-        self.Qmat[1:-2, 1:-2] = matrix
-        self.Qmat[-1, 1:-2] = weights[0]  # this is for computing the higher order solution
-        self.Qmat[-2, 1:-2] = weights[1]  # this is for computing the lower order solution
-
-        self.left_is_node = True
-        self.right_is_node = self.nodes[-1] == self.tright
-
-        # compute distances between the nodes
-        if self.num_nodes > 1:
-            self.delta_m = self.nodes[1:] - self.nodes[:-1]
-        else:
-            self.delta_m = np.zeros(1)
-        self.delta_m[0] = self.nodes[0] - self.tleft
-
-        # check if the RK scheme is implicit
-        self.implicit = any(matrix[i, i] != 0 for i in range(self.num_nodes - self.num_solution_stages))
+    @property
+    def globally_stiffly_accurate(self):
+        return np.allclose(self.Qmat[-1, 1:], self.weights[0])
 
 
 class RungeKutta(Sweeper):
@@ -161,12 +125,13 @@ class RungeKutta(Sweeper):
     The entries of the Butcher tableau are stored as class attributes.
     """
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """
         Initialization routine for the custom sweeper
 
         Args:
             params: parameters for the sweeper
+            level (pySDC.Level.level): the level that uses this sweeper
         """
         # set up logger
         self.logger = logging.getLogger('sweeper')
@@ -192,8 +157,9 @@ class RungeKutta(Sweeper):
 
         self.params = _Pars(params)
 
-        # This will be set as soon as the sweeper is instantiated at the level
+        # set level using the setter in order to adapt residual tolerance if needed
         self.__level = None
+        self.level = level
 
         self.parallelizable = False
         self.QI = self.coll.Qmat
@@ -225,9 +191,9 @@ class RungeKutta(Sweeper):
         Returns:
             mesh: Full right hand side as a mesh
         """
-        if type(f).__name__ in ['mesh', 'cupy_mesh']:
+        if type(f).__name__ in ['mesh', 'cupy_mesh', 'firedrake_mesh']:
             return f
-        elif type(f).__name__ in ['imex_mesh', 'imex_cupy_mesh']:
+        elif type(f).__name__.lower() in ['imex_mesh', 'imex_cupy_mesh', 'imex_firedrake_mesh']:
             return f.impl + f.expl
         elif f is None:
             prob = self.level.prob
@@ -285,15 +251,14 @@ class RungeKutta(Sweeper):
 
             # implicit solve with prefactor stemming from the diagonal of Qd, use previous stage as initial guess
             if self.QI[m + 1, m + 1] != 0:
-                lvl.u[m + 1][:] = prob.solve_system(
+                lvl.u[m + 1] = prob.solve_system(
                     rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m], lvl.time + lvl.dt * self.coll.nodes[m + 1]
                 )
             else:
-                lvl.u[m + 1][:] = rhs[:]
+                lvl.u[m + 1] = rhs
 
             # update function values (we don't usually need to evaluate the RHS at the solution of the step)
-            if m < M - self.coll.num_solution_stages or self.params.eval_rhs_at_right_boundary:
-                lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m + 1])
+            lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m + 1])
 
         # indicate presence of new values at this level
         lvl.status.updated = True
@@ -304,7 +269,28 @@ class RungeKutta(Sweeper):
         """
         In this Runge-Kutta implementation, the solution to the step is always stored in the last node
         """
-        self.level.uend = self.level.u[-1]
+        lvl = self.level
+
+        if lvl.f[1] is None:
+            lvl.uend = lvl.prob.dtype_u(lvl.u[0])
+            if type(self.coll) == ButcherTableauEmbedded:
+                self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
+        elif self.coll.globally_stiffly_accurate:
+            lvl.uend = lvl.prob.dtype_u(lvl.u[-1])
+            if type(self.coll) == ButcherTableauEmbedded:
+                self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
+                for w2, k in zip(self.coll.weights[1], lvl.f[1:]):
+                    self.u_secondary += lvl.dt * w2 * k
+        else:
+            lvl.uend = lvl.prob.dtype_u(lvl.u[0])
+            if type(self.coll) == ButcherTableau:
+                for w, k in zip(self.coll.weights, lvl.f[1:]):
+                    lvl.uend += lvl.dt * w * k
+            elif type(self.coll) == ButcherTableauEmbedded:
+                self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
+                for w1, w2, k in zip(self.coll.weights[0], self.coll.weights[1], lvl.f[1:]):
+                    lvl.uend += lvl.dt * w1 * k
+                    self.u_secondary += lvl.dt * w2 * k
 
     @property
     def level(self):
@@ -356,16 +342,19 @@ class RungeKuttaIMEX(RungeKutta):
     """
 
     matrix_explicit = None
+    weights_explicit = None
     ButcherTableauClass_explicit = ButcherTableau
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """
         Initialization routine
 
         Args:
             params: parameters for the sweeper
+            level (pySDC.Level.level): the level that uses this sweeper
         """
-        super().__init__(params)
+        super().__init__(params, level)
+        type(self).weights_explicit = self.weights if self.weights_explicit is None else self.weights_explicit
         self.coll_explicit = self.get_Butcher_tableau_explicit()
         self.QE = self.coll_explicit.Qmat
 
@@ -388,7 +377,7 @@ class RungeKuttaIMEX(RungeKutta):
 
     @classmethod
     def get_Butcher_tableau_explicit(cls):
-        return cls.ButcherTableauClass_explicit(cls.weights, cls.nodes, cls.matrix_explicit)
+        return cls.ButcherTableauClass_explicit(cls.weights_explicit, cls.nodes, cls.matrix_explicit)
 
     def integrate(self):
         """
@@ -441,18 +430,53 @@ class RungeKuttaIMEX(RungeKutta):
                 rhs += lvl.dt * (self.QI[m + 1, j] * lvl.f[j].impl + self.QE[m + 1, j] * lvl.f[j].expl)
 
             # implicit solve with prefactor stemming from the diagonal of Qd, use previous stage as initial guess
-            lvl.u[m + 1][:] = prob.solve_system(
-                rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m], lvl.time + lvl.dt * self.coll.nodes[m + 1]
-            )
+            if self.QI[m + 1, m + 1] != 0:
+                lvl.u[m + 1] = prob.solve_system(
+                    rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m], lvl.time + lvl.dt * self.coll.nodes[m + 1]
+                )
+            else:
+                lvl.u[m + 1] = rhs[:]
 
-            # update function values (we don't usually need to evaluate the RHS at the solution of the step)
-            if m < M - self.coll.num_solution_stages or self.params.eval_rhs_at_right_boundary:
-                lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m + 1])
+            # update function values
+            lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m + 1])
 
         # indicate presence of new values at this level
         lvl.status.updated = True
 
         return None
+
+    def compute_end_point(self):
+        """
+        In this Runge-Kutta implementation, the solution to the step is always stored in the last node
+        """
+        lvl = self.level
+
+        if lvl.f[1] is None:
+            lvl.uend = lvl.prob.dtype_u(lvl.u[0])
+            if type(self.coll) == ButcherTableauEmbedded:
+                self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
+        elif self.coll.globally_stiffly_accurate and self.coll_explicit.globally_stiffly_accurate:
+            lvl.uend = lvl.u[-1]
+            if type(self.coll) == ButcherTableauEmbedded:
+                self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
+                for w2, w2E, k in zip(self.coll.weights[1], self.coll_explicit.weights[1], lvl.f[1:]):
+                    self.u_secondary += lvl.dt * (w2 * k.impl + w2E * k.expl)
+        else:
+            lvl.uend = lvl.prob.dtype_u(lvl.u[0])
+            if type(self.coll) == ButcherTableau:
+                for w, wE, k in zip(self.coll.weights, self.coll_explicit.weights, lvl.f[1:]):
+                    lvl.uend += lvl.dt * (w * k.impl + wE * k.expl)
+            elif type(self.coll) == ButcherTableauEmbedded:
+                self.u_secondary = lvl.u[0].copy()
+                for w1, w2, w1E, w2E, k in zip(
+                    self.coll.weights[0],
+                    self.coll.weights[1],
+                    self.coll_explicit.weights[0],
+                    self.coll_explicit.weights[1],
+                    lvl.f[1:],
+                ):
+                    lvl.uend += lvl.dt * (w1 * k.impl + w1E * k.expl)
+                    self.u_secondary += lvl.dt * (w2 * k.impl + w2E * k.expl)
 
 
 class ForwardEuler(RungeKutta):
@@ -475,6 +499,14 @@ class BackwardEuler(RungeKutta):
 
     generator = RK_SCHEMES["BE"]()
     nodes, weights, matrix = generator.genCoeffs()
+
+
+class IMEXEuler(RungeKuttaIMEX):
+    nodes = BackwardEuler.nodes
+    weights = BackwardEuler.weights
+
+    matrix = BackwardEuler.matrix
+    matrix_explicit = ForwardEuler.matrix
 
 
 class CrankNicolson(RungeKutta):
@@ -518,8 +550,13 @@ class Heun_Euler(RungeKutta):
     Second order explicit embedded Runge-Kutta method.
     """
 
+    ButcherTableauClass = ButcherTableauEmbedded
+
     generator = RK_SCHEMES["HEUN"]()
-    nodes, weights, matrix = generator.genCoeffs()
+    nodes, _weights, matrix = generator.genCoeffs()
+    weights = np.zeros((2, len(_weights)))
+    weights[0] = _weights
+    weights[1] = matrix[-1]
 
     @classmethod
     def get_update_order(cls):
@@ -694,3 +731,59 @@ class ARK548L2SA(RungeKuttaIMEX):
     @classmethod
     def get_update_order(cls):
         return 5
+
+
+class ARK324L2SAERK(RungeKutta):
+    generator = RK_SCHEMES["ARK324L2SAERK"]()
+    nodes, weights, matrix = generator.genCoeffs(embedded=True)
+    ButcherTableauClass = ButcherTableauEmbedded
+
+    @classmethod
+    def get_update_order(cls):
+        return 3
+
+
+class ARK324L2SAESDIRK(ARK324L2SAERK):
+    generator = RK_SCHEMES["ARK324L2SAESDIRK"]()
+    matrix = generator.Q
+
+
+class ARK32(RungeKuttaIMEX):
+    ButcherTableauClass = ButcherTableauEmbedded
+    ButcherTableauClass_explicit = ButcherTableauEmbedded
+
+    nodes = ARK324L2SAESDIRK.nodes
+    weights = ARK324L2SAESDIRK.weights
+
+    matrix = ARK324L2SAESDIRK.matrix
+    matrix_explicit = ARK324L2SAERK.matrix
+
+    @classmethod
+    def get_update_order(cls):
+        return 3
+
+
+class ARK2(RungeKuttaIMEX):
+    """
+    Second order two stage singly diagonally implicit globally stiffly accurate IMEX RK method with explicit first stage.
+    Can be used to integrate simple DAEs because explicit and implicit part are both stiffly accurate.
+    """
+
+    generator_IMP = RK_SCHEMES["ARK222EDIRK"]()
+    generator_EXP = RK_SCHEMES["ARK222ERK"]()
+
+    nodes, weights, matrix = generator_IMP.genCoeffs()
+    _, weights_explicit, matrix_explicit = generator_EXP.genCoeffs()
+
+
+class ARK3(RungeKuttaIMEX):
+    """
+    Third order four stage singly diagonally implicit globally stiffly accurate IMEX RK method with explicit first stage.
+    Can be used to integrate simple DAEs because explicit and implicit part are both stiffly accurate.
+    """
+
+    generator_IMP = RK_SCHEMES["ARK443ESDIRK"]()
+    generator_EXP = RK_SCHEMES["ARK443ERK"]()
+
+    nodes, weights, matrix = generator_IMP.genCoeffs()
+    _, weights_explicit, matrix_explicit = generator_EXP.genCoeffs()

@@ -73,11 +73,9 @@ class CheckConvergence(ConvergenceController):
 
         # get residual and check against prescribed tolerance (plus check number of iterations)
         iter_converged = S.status.iter >= S.params.maxiter
-        res_converged = L.status.residual <= L.params.restol
+        res_converged = L.status.residual <= L.params.restol and (S.status.iter > 0 or L.status.sweep > 0)
         e_tol_converged = (
-            L.status.error_embedded_estimate < L.params.e_tol
-            if (L.params.get('e_tol') and L.status.get('error_embedded_estimate'))
-            else False
+            L.status.increment < L.params.e_tol if (L.params.get('e_tol') and L.status.get('increment')) else False
         )
         converged = (
             iter_converged or res_converged or e_tol_converged or S.status.force_done

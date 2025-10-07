@@ -80,6 +80,18 @@ class Problem(RegisterParams):
     def get_default_sweeper_class(cls):
         raise NotImplementedError(f'No default sweeper class implemented for {cls} problem!')
 
+    def setUpFieldsIO(self):
+        """
+        Set up FieldsIO for MPI with the space decomposition of this problem
+        """
+        pass
+
+    def getOutputFile(self, fileName):
+        raise NotImplementedError(f'No output implemented file for {type(self).__name__}')
+
+    def processSolutionForOutput(self, u):
+        return u
+
     def eval_f(self, u, t):
         """
         Abstract interface to RHS computation of the ODE
@@ -164,3 +176,35 @@ class Problem(RegisterParams):
         None
         """
         raise NotImplementedError
+
+    def solve_system(self, rhs, dt, u0, t):
+        """
+        Perform an Euler step.
+
+        Args:
+            rhs: Right hand side for the Euler step
+            dt (float): Step size for the Euler step
+            u0: Initial guess
+            t (float): Current time
+
+        Returns:
+            solution to the Euler step
+        """
+        raise NotImplementedError
+
+    def solve_jacobian(self, rhs, dt, u=None, u0=None, t=0, **kwargs):
+        """
+        Solve the Jacobian for an Euler step, linearized around u.
+        This defaults to an Euler step to accommodate linear problems.
+
+        Args:
+            rhs: Right hand side for the Euler step
+            dt (float): Step size for the Euler step
+            u: Solution to linearize around
+            u0: Initial guess
+            t (float): Current time
+
+        Returns:
+            Solution
+        """
+        return self.solve_system(rhs, dt, u0=u, t=t, **kwargs)

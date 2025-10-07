@@ -22,13 +22,20 @@ class SweeperMPI(Sweeper):
     `generic_implicit`.
     """
 
-    def __init__(self, params):
+    def __init__(self, params, level):
+        """
+        Initialization routine for the sweeper
+
+        Args:
+            params: parameters for the sweeper
+            level (pySDC.Level.level): the level that uses this sweeper
+        """
         self.logger = logging.getLogger('sweeper')
 
         if 'comm' not in params.keys():
             params['comm'] = MPI.COMM_WORLD
             self.logger.debug('Using MPI.COMM_WORLD for the communicator because none was supplied in the params.')
-        super().__init__(params)
+        super().__init__(params, level)
 
         if self.params.comm.size != self.coll.num_nodes:
             raise NotImplementedError(
@@ -55,14 +62,15 @@ class SweeperMPI(Sweeper):
 
         L = self.level
         P = L.prob
-        L.uend = P.dtype_u(P.init, val=0.0)
 
         # check if Mth node is equal to right point and do_coll_update is false, perform a simple copy
         if self.coll.right_is_node and not self.params.do_coll_update:
             # a copy is sufficient
             root = self.comm.Get_size() - 1
             if self.comm.rank == root:
-                L.uend[:] = L.u[-1]
+                L.uend = P.dtype_u(L.u[-1])
+            else:
+                L.uend = P.dtype_u(L.u[0])
             self.comm.Bcast(L.uend, root=root)
         else:
             raise NotImplementedError('require last node to be identical with right interval boundary')
@@ -201,9 +209,6 @@ class generic_implicit_MPI(SweeperMPI, generic_implicit):
         # only if the level has been touched before
         assert L.status.unlocked
 
-        # update the MIN-SR-FLEX preconditioner
-        self.updateVariableCoeffs(L.status.sweep)
-
         # gather all terms which are known already (e.g. from the previous iteration)
         # this corresponds to u0 + QF(u^k) - QdF(u^k) + tau
 
@@ -221,7 +226,7 @@ class generic_implicit_MPI(SweeperMPI, generic_implicit):
         # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
 
         # implicit solve with prefactor stemming from the diagonal of Qd
-        L.u[self.rank + 1][:] = P.solve_system(
+        L.u[self.rank + 1] = P.solve_system(
             rhs,
             L.dt * self.QI[self.rank + 1, self.rank + 1],
             L.u[self.rank + 1],
@@ -247,7 +252,6 @@ class generic_implicit_MPI(SweeperMPI, generic_implicit):
 
         L = self.level
         P = L.prob
-        L.uend = P.dtype_u(P.init, val=0.0)
 
         # check if Mth node is equal to right point and do_coll_update is false, perform a simple copy
         if self.coll.right_is_node and not self.params.do_coll_update:

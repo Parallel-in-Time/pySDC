@@ -15,8 +15,8 @@ def test_eval_f(nx, nz, direction, spectral_space):
     X, Z = P.X, P.Z
     cos, sin = np.cos, np.sin
 
-    kappa = (P.Rayleigh * P.Prandl) ** (-1 / 2)
-    nu = (P.Rayleigh / P.Prandl) ** (-1 / 2)
+    kappa = P.kappa
+    nu = P.nu
 
     if direction == 'x':
         y = sin(X * np.pi)
@@ -105,23 +105,38 @@ def test_vorticity(nx, nz, direction):
 
 @pytest.mark.mpi4py
 @pytest.mark.parametrize('v', [0, 3.14])
-def test_Nusselt_numbers(v, nx=5, nz=4):
+def test_Nusselt_numbers(v, nx=1, nz=10):
     import numpy as np
     from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
 
     BCs = {
-        'v_top': v,
-        'v_bottom': v,
+        'v_top': 0,
+        'v_bottom': 0,
     }
 
-    P = RayleighBenard(nx=nx, nz=nz, BCs=BCs)
+    P = RayleighBenard(nx=nx, nz=nz, BCs=BCs, dealiasing=1.0, Rayleigh=1, spectral_space=False)
+    prob = P
+    xp = prob.xp
+    iv, iT = prob.index(['v', 'T'])
 
-    u = P.u_exact(noise_level=0)
+    u = prob.u_init
+    u[iT, ...] = prob.Z
+    Nu = prob.compute_Nusselt_numbers(u)
+    for key, expect in zip(['t', 'b', 'V'], [-1, -1, -1]):
+        assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
 
-    nusselt = P.compute_Nusselt_numbers(u)
-    expect = {'V': 1 + v, 't': 1, 'b': +1 + 2 * v, 'b_no_v': 1, 't_no_v': 1}
-    for key in nusselt.keys():
-        assert np.isclose(nusselt[key], expect[key])
+    u = prob.u_init
+    u[iT, ...] = 3 * prob.Z**2 + 1
+    Nu = prob.compute_Nusselt_numbers(u)
+    for key, expect in zip(['t', 'b', 'V'], [-6, 0, -3]):
+        assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
+
+    u = prob.u_init
+    u[iT, ...] = 3 * prob.Z**2 + 1
+    u[iv] = v * (1 + xp.sin(prob.X / prob.axes[0].L * 2 * xp.pi))
+    Nu = prob.compute_Nusselt_numbers(u)
+    for key, expect in zip(['t', 'b', 'V'], [prob.Lz * (3 + 1) * v - 6, v, v * (1 + 1) - 3]):
+        assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
 
 
 def test_viscous_dissipation(nx=2**5 + 1, nz=2**3 + 1):
@@ -181,7 +196,9 @@ def test_Poisson_problems(nx, component):
         'T_top': 0,
         'T_bottom': 0,
     }
-    P = RayleighBenard(nx=nx, nz=6, BCs=BCs, Rayleigh=1.0)
+    P = RayleighBenard(
+        nx=nx, nz=6, BCs=BCs, Rayleigh=(max([abs(BCs['T_top'] - BCs['T_bottom']), np.finfo(float).eps]) * 2**3), Lz=2
+    )
     rhs = P.u_init
 
     idx = P.index(f'{component}')
@@ -219,7 +236,7 @@ def test_Poisson_problem_v():
         'v_top': 0,
         'v_bottom': 0,
         'T_top': 0,
-        'T_bottom': 2,
+        'T_bottom': 1,
     }
     P = RayleighBenard(nx=2, nz=2**3, BCs=BCs, Rayleigh=1.0)
     iv = P.index('v')
@@ -254,7 +271,7 @@ def test_CFL():
     from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard, CFLLimit
     import numpy as np
 
-    P = RayleighBenard(nx=5, nz=2, spectral_space=False)
+    P = RayleighBenard(nx=5, nz=2, spectral_space=False, Lz=2)
     iu, iv = P.index(['u', 'v'])
 
     u = P.u_init
@@ -286,12 +303,38 @@ def test_Nyquist_mode_elimination():
     assert np.allclose(u[:, Nyquist_mode_index, :], 0)
 
 
+@pytest.mark.mpi4py
+def test_apply_BCs():
+    from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
+    import numpy as np
+
+    BCs = {
+        'u_top': np.random.rand(),
+        'u_bottom': np.random.rand(),
+        'v_top': np.random.rand(),
+        'v_bottom': np.random.rand(),
+        'T_top': np.random.rand(),
+        'T_bottom': np.random.rand(),
+    }
+    P = RayleighBenard(nx=5, nz=2**2, BCs=BCs)
+
+    u_in = P.u_init
+    u_in[...] = np.random.rand(*u_in.shape)
+    u_in_hat = P.transform(u_in)
+
+    u_hat = P.apply_BCs(u_in_hat)
+    u = P.itransform(u_hat)
+
+    P.check_BCs(u)
+
+
 if __name__ == '__main__':
     # test_eval_f(2**0, 2**2, 'z', True)
-    # test_Poisson_problem(1, 'T')
-    test_Poisson_problem_v()
+    # test_Poisson_problems(1, 'T')
+    # test_Poisson_problem_v()
+    # test_apply_BCs()
     # test_Nusselt_numbers(1)
     # test_buoyancy_computation()
     # test_viscous_dissipation()
-    # test_CFL()
+    test_CFL()
     # test_Nyquist_mode_elimination()

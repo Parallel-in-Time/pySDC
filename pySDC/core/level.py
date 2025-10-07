@@ -1,3 +1,6 @@
+from pySDC.core.sweeper import Sweeper
+from pySDC.core.problem import Problem
+
 from pySDC.helpers.pysdc_helper import FrozenClass
 
 
@@ -67,13 +70,13 @@ class Level(FrozenClass):
             level_index (int): custom name for this level
         """
 
-        # instantiate sweeper, problem and hooks
-        self.__sweep = sweeper_class(sweeper_params)
-        self.__prob = problem_class(**problem_params)
-
         # set level parameters and status
         self.params = _Pars(level_params)
         self.status = _Status()
+
+        # instantiate sweeper, problem and hooks
+        self.__sweep: Sweeper = sweeper_class(sweeper_params, self)
+        self.__prob: Problem = problem_class(**problem_params)
 
         # set name
         self.level_index = level_index
@@ -82,13 +85,13 @@ class Level(FrozenClass):
         self.uend = None
         self.u = [None] * (self.sweep.coll.num_nodes + 1)
         self.uold = [None] * (self.sweep.coll.num_nodes + 1)
+        self.u_avg = [None] * self.sweep.coll.num_nodes
+        self.residual = [None] * self.sweep.coll.num_nodes
+        self.increment = [None] * self.sweep.coll.num_nodes
         self.f = [None] * (self.sweep.coll.num_nodes + 1)
         self.fold = [None] * (self.sweep.coll.num_nodes + 1)
 
         self.tau = [None] * self.sweep.coll.num_nodes
-
-        # pass this level to the sweeper for easy access
-        self.sweep.level = self
 
         self.__tag = None
 
@@ -119,7 +122,7 @@ class Level(FrozenClass):
         self.tau = [None] * self.sweep.coll.num_nodes
 
     @property
-    def sweep(self):
+    def sweep(self) -> Sweeper:
         """
         Getter for the sweeper
 
@@ -129,7 +132,7 @@ class Level(FrozenClass):
         return self.__sweep
 
     @property
-    def prob(self):
+    def prob(self) -> Problem:
         """
         Getter for the problem
 

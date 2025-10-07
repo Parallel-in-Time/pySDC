@@ -79,7 +79,7 @@ def test_differentiation_matrix(N):
     from pySDC.helpers.spectral_helper import ChebychevHelper
 
     cheby = ChebychevHelper(N)
-    x = np.cos(np.pi / N * (np.arange(N) + 0.5))
+    x = cheby.get_1dgrid()
     coeffs = np.random.random(N)
     norm = cheby.get_norm()
 
@@ -89,6 +89,36 @@ def test_differentiation_matrix(N):
     exact = np.polynomial.Chebyshev(coeffs).deriv(1)(x)
 
     assert np.allclose(exact, du)
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('N', [4, 7, 32])
+@pytest.mark.parametrize('x0', [-1, 0])
+@pytest.mark.parametrize('x1', [0.789, 1])
+@pytest.mark.parametrize('p', [1, 2])
+def test_differentiation_non_standard_domain_size(N, x0, x1, p):
+    import numpy as np
+    import scipy
+    from pySDC.helpers.spectral_helper import ChebychevHelper
+
+    cheby = ChebychevHelper(N, x0=x0, x1=x1)
+    x = cheby.get_1dgrid()
+    assert all(x > x0)
+    assert all(x < x1)
+
+    coeffs = np.random.random(N)
+    u = np.polynomial.Chebyshev(coeffs)(x)
+    u_hat = cheby.transform(u)
+    du_exact = np.polynomial.Chebyshev(coeffs).deriv(p)(x)
+    du_hat_exact = cheby.transform(du_exact)
+
+    D = cheby.get_differentiation_matrix(p)
+
+    du_hat = D @ u_hat
+    du = cheby.itransform(du_hat, axes=(-1,))
+
+    assert np.allclose(du_hat_exact, du_hat), np.linalg.norm(du_hat_exact - du_hat)
+    assert np.allclose(du, du_exact), np.linalg.norm(du_exact - du)
 
 
 @pytest.mark.base
@@ -112,26 +142,43 @@ def test_integration_matrix(N):
 @pytest.mark.base
 @pytest.mark.parametrize('N', [4])
 @pytest.mark.parametrize('d', [1, 2, 3])
-@pytest.mark.parametrize('transform_type', ['dct', 'fft'])
-def test_transform(N, d, transform_type):
+def test_transform(N, d):
     import scipy
     import numpy as np
     from pySDC.helpers.spectral_helper import ChebychevHelper
 
-    cheby = ChebychevHelper(N, transform_type=transform_type)
+    cheby = ChebychevHelper(N)
     u = np.random.random((d, N))
     norm = cheby.get_norm()
-    x = cheby.get_1dgrid()
+    x = (cheby.get_1dgrid() - cheby.lin_trf_off) / cheby.lin_trf_fac
 
-    itransform = cheby.itransform(u, axis=-1).real
+    itransform = cheby.itransform(u, axes=(-1,)).real
 
     for i in range(d):
         assert np.allclose(np.polynomial.Chebyshev(u[i])(x), itransform[i])
     assert np.allclose(u.shape, itransform.shape)
-    assert np.allclose(scipy.fft.dct(u, axis=-1) * norm, cheby.transform(u, axis=-1).real)
+    assert np.allclose(scipy.fft.dct(u, axis=-1) * norm, cheby.transform(u, axes=(-1,)).real)
     assert np.allclose(scipy.fft.idct(u / norm, axis=-1), itransform)
-    assert np.allclose(cheby.transform(cheby.itransform(u)), u)
-    assert np.allclose(cheby.itransform(cheby.transform(u)), u)
+    assert np.allclose(cheby.transform(cheby.itransform(u, axes=(-1,)), axes=(-1,)), u)
+    assert np.allclose(cheby.itransform(cheby.transform(u, axes=(-1,)), axes=(-1,)), u)
+
+
+@pytest.mark.cupy
+def test_transform_cupy(N=8):
+    import numpy as np
+    import cupy as cp
+    from pySDC.helpers.spectral_helper import ChebychevHelper
+
+    u = cp.random.random(N).astype('D')
+
+    helper_CPU = ChebychevHelper(N=N, useGPU=False)
+    u_hat_CPU = helper_CPU.transform(u.get())
+
+    helper = ChebychevHelper(N=N, useGPU=True)
+    u_hat = helper.transform(u)
+
+    assert cp.allclose(u, helper.itransform(u_hat))
+    assert np.allclose(u_hat.get(), u_hat_CPU)
 
 
 @pytest.mark.base
@@ -239,7 +286,7 @@ def test_tau_method2D(bc, nz, nx, bc_val, plotting=False):
     bcs = np.sin(bc_val * x)
     rhs = np.zeros_like(X)
     rhs[:, -1] = bcs
-    rhs_hat = fft.transform(rhs, axis=-2)  # the rhs is already in Chebychev spectral space
+    rhs_hat = fft.transform(rhs, axes=(-2,))  # the rhs is already in Chebychev spectral space
 
     # generate matrices
     Dx = fft.get_differentiation_matrix(p=2) * 1e-1 + fft.get_differentiation_matrix()
@@ -258,8 +305,8 @@ def test_tau_method2D(bc, nz, nx, bc_val, plotting=False):
     sol_hat = (sp.linalg.spsolve(A, rhs_hat.flatten())).reshape(rhs.shape)
 
     # transform back to real space
-    _sol = fft.itransform(sol_hat, axis=-2).real
-    sol = cheby.itransform(_sol, axis=-1)
+    _sol = fft.itransform(sol_hat, axes=(-2,)).real
+    sol = cheby.itransform(_sol, axes=(-1,))
 
     # construct polynomials for testing
     polys = [np.polynomial.Chebyshev(_sol[i, :]) for i in range(nx)]
@@ -315,7 +362,7 @@ def test_tau_method2D_diffusion(nz, nx, bc_val, plotting=False):
     rhs = np.zeros((2, nx, nz))  # components u and u_x
     rhs[0, :, -1] = np.sin(bc_val * x) + 1
     rhs[1, :, -1] = 3 * np.exp(-((x - 3.6) ** 2)) + np.cos(x)
-    rhs_hat = fft.transform(rhs, axis=-2)  # the rhs is already in Chebychev spectral space
+    rhs_hat = fft.transform(rhs, axes=(-2,))  # the rhs is already in Chebychev spectral space
 
     # generate 1D matrices
     Dx = fft.get_differentiation_matrix()
@@ -348,8 +395,8 @@ def test_tau_method2D_diffusion(nz, nx, bc_val, plotting=False):
     sol_hat = (sp.linalg.spsolve(A, rhs_hat.flatten())).reshape(rhs.shape)
 
     # transform back to real space
-    _sol = fft.itransform(sol_hat, axis=-2).real
-    sol = cheby.itransform(_sol, axis=-1)
+    _sol = fft.itransform(sol_hat, axes=(-2,)).real
+    sol = cheby.itransform(_sol, axes=(-1,))
 
     polys = [np.polynomial.Chebyshev(_sol[0, i, :]) for i in range(nx)]
 
@@ -372,13 +419,25 @@ def test_tau_method2D_diffusion(nz, nx, bc_val, plotting=False):
         ), f'Solution is incorrectly transformed back to real space at x={x[i]}'
 
 
-if __name__ == '__main__':
-    test_differentiation_matrix(4, 'T2U')
-    # test_transform(6, 1, 'fft')
-    # test_tau_method('T2U', -1.0, N=4, bc_val=3.0)
-    # test_tau_method2D('T2T', -1, nx=2**7, nz=2**6, bc_val=4.0, plotting=True)
-    # test_integration_matrix(5, 'T2U')
-    # test_integration_matrix2D(2**0, 2**2, 'T2U', 'z')
-    # test_differentiation_matrix2D(2**7, 2**7, 'T2U', 'mixed')
-    # test_integration_BC(6)
-    # test_filter(12, 2, 5, 'T2U')
+@pytest.mark.base
+@pytest.mark.parametrize('N', [4, 7, 32])
+@pytest.mark.parametrize('x', [-1, 1])
+@pytest.mark.parametrize('v', [2, 3])
+def test_Neumann_BCs(N, x, v):
+    from pySDC.helpers.spectral_helper import ChebychevHelper
+    import numpy as np
+
+    helper = ChebychevHelper(N)
+
+    BC = helper.get_BC('Neumann', x=x)
+
+    grid = helper.get_1dgrid()
+    u = grid**v
+
+    u_hat = helper.transform(u)
+
+    value_at_BC = np.sum(u_hat * BC, axis=0)
+    if v % 2 == 1:
+        assert np.isclose(value_at_BC, v)
+    else:
+        assert np.isclose(value_at_BC, x * v)

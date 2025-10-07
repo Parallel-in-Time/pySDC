@@ -5,6 +5,11 @@ try:
 except ImportError:
     MPI = None
 
+try:
+    from pySDC.helpers.NCCL_communicator import NCCLComm
+except ImportError:
+    NCCLComm = None
+
 
 class cupy_mesh(cp.ndarray):
     """
@@ -31,7 +36,7 @@ class cupy_mesh(cp.ndarray):
             obj[:] = init[:]
         elif (
             isinstance(init, tuple)
-            and (init[1] is None or isinstance(init[1], MPI.Intracomm))
+            and (init[1] is None or isinstance(init[1], MPI.Intracomm) or isinstance(init[1], NCCLComm))
             and isinstance(init[2], cp.dtype)
         ):
             obj = cp.ndarray.__new__(cls, init[0], dtype=init[2], **kwargs)
@@ -62,12 +67,15 @@ class cupy_mesh(cp.ndarray):
             float: absolute maximum of all mesh values
         """
         # take absolute values of the mesh values
-        local_absval = float(cp.amax(cp.ndarray.__abs__(self)))
+        local_absval = cp.max(cp.ndarray.__abs__(self))
 
         if self.comm is not None:
             if self.comm.Get_size() > 1:
-                global_absval = 0.0
-                global_absval = max(self.comm.allreduce(sendobj=local_absval, op=MPI.MAX), global_absval)
+                global_absval = local_absval * 0
+                if isinstance(self.comm, NCCLComm):
+                    self.comm.Allreduce(sendbuf=local_absval, recvbuf=global_absval, op=MPI.MAX)
+                else:
+                    global_absval = self.comm.allreduce(sendobj=float(local_absval), op=MPI.MAX)
             else:
                 global_absval = local_absval
         else:

@@ -4,11 +4,11 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 
 class imex_1st_order_MPI(SweeperMPI, imex_1st_order):
-    def __init__(self, params):
-        super().__init__(params)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         assert (
             self.params.QE == 'PIC'
-        ), f"Only Picard is implemented for explicit precondioner so far in {type(self).__name__}! You chose \"{self.params.QE}\""
+        ), f"Only Picard is implemented for explicit preconditioner so far in {type(self).__name__}! You chose \"{self.params.QE}\""
 
     def integrate(self, last_only=False):
         """
@@ -92,7 +92,6 @@ class imex_1st_order_MPI(SweeperMPI, imex_1st_order):
 
         L = self.level
         P = L.prob
-        L.uend = P.dtype_u(P.init, val=0.0)
 
         # check if Mth node is equal to right point and do_coll_update is false, perform a simple copy
         if self.coll.right_is_node and not self.params.do_coll_update:

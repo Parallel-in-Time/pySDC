@@ -57,6 +57,7 @@ class EstimateEmbeddedError(ConvergenceController):
         return {
             "control_order": -80,
             "sweeper_type": sweeper_type,
+            "rel_error": False,
             **super().setup(controller, params, description, **kwargs),
         }
 
@@ -93,14 +94,25 @@ class EstimateEmbeddedError(ConvergenceController):
             dtype_u: The embedded error estimate
         """
         if self.params.sweeper_type == "RK":
-            # lower order solution is stored in the second to last entry of L.u
-            return abs(L.u[-2] - L.u[-1])
+            L.sweep.compute_end_point()
+            if self.params.rel_error:
+                return abs(L.uend - L.sweep.u_secondary) / abs(L.uend)
+            else:
+                return abs(L.uend - L.sweep.u_secondary)
         elif self.params.sweeper_type == "SDC":
-            # order rises by one between sweeps, making this so ridiculously easy
-            return abs(L.uold[-1] - L.u[-1])
+            # order rises by one between sweeps
+            if self.params.rel_error:
+                return abs(L.uold[-1] - L.u[-1]) / abs(L.u[-1])
+            else:
+                return abs(L.uold[-1] - L.u[-1])
         elif self.params.sweeper_type == 'MPI':
             comm = L.sweep.comm
-            return comm.bcast(abs(L.uold[comm.rank + 1] - L.u[comm.rank + 1]), root=comm.size - 1)
+            if self.params.rel_error:
+                return comm.bcast(
+                    abs(L.uold[comm.rank + 1] - L.u[comm.rank + 1]) / abs(L.u[comm.rank + 1]), root=comm.size - 1
+                )
+            else:
+                return comm.bcast(abs(L.uold[comm.rank + 1] - L.u[comm.rank + 1]), root=comm.size - 1)
         else:
             raise NotImplementedError(
                 f"Don't know how to estimate embedded error for sweeper type \
@@ -109,12 +121,13 @@ class EstimateEmbeddedError(ConvergenceController):
 
     def setup_status_variables(self, controller, **kwargs):
         """
-        Add the embedded error variable to the error function.
+        Add the embedded error to the level status
 
         Args:
             controller (pySDC.Controller): The controller
         """
         self.add_status_variable_to_level('error_embedded_estimate')
+        self.add_status_variable_to_level('increment')
 
     def post_iteration_processing(self, controller, S, **kwargs):
         """
@@ -134,6 +147,7 @@ class EstimateEmbeddedError(ConvergenceController):
         if S.status.iter > 0 or self.params.sweeper_type == "RK":
             for L in S.levels:
                 L.status.error_embedded_estimate = max([self.estimate_embedded_error_serial(L), np.finfo(float).eps])
+                L.status.increment = L.status.error_embedded_estimate * 1
                 self.debug(f'L.status.error_embedded_estimate={L.status.error_embedded_estimate:.5e}', S)
 
         return None

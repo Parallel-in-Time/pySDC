@@ -9,19 +9,19 @@ class generic_implicit(Sweeper):
         QI: lower triangular matrix
     """
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """
         Initialization routine for the custom sweeper
 
         Args:
             params: parameters for the sweeper
+            level (pySDC.Level.level): the level that uses this sweeper
         """
 
         if 'QI' not in params:
             params['QI'] = 'IE'
 
-        # call parent's initialization routine
-        super().__init__(params)
+        super().__init__(params, level)
 
         # get QI matrix
         self.QI = self.get_Qdelta_implicit(qd_type=self.params.QI)
@@ -64,9 +64,6 @@ class generic_implicit(Sweeper):
 
         # get number of collocation nodes for easier access
         M = self.coll.num_nodes
-
-        # update the MIN-SR-FLEX preconditioner
-        self.updateVariableCoeffs(L.status.sweep)
 
         # gather all terms which are known already (e.g. from the previous iteration)
         # this corresponds to u0 + QF(u^k) - QdF(u^k) + tau

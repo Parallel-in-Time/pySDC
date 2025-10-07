@@ -3,8 +3,8 @@ import numpy as np
 
 from pySDC.core.collocation import CollBase
 
-t_start = float(np.random.rand(1) * 0.2)
-t_end = float(0.8 + np.random.rand(1) * 0.2)
+t_start = float(np.random.rand(1)[0] * 0.2)
+t_end = float(0.8 + np.random.rand(1)[0] * 0.2)
 
 tolQuad = 1e-13
 
@@ -25,6 +25,7 @@ def test_benchmark_collocation(benchmark):
     benchmark(wrapper)
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("node_type", node_types)
 @pytest.mark.parametrize("quad_type", quad_types)
 def test_canintegratepolynomials(node_type, quad_type):
@@ -61,6 +62,7 @@ def test_canintegratepolynomials(node_type, quad_type):
         )
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("node_type", node_types)
 @pytest.mark.parametrize("quad_type", quad_types)
 def test_relateQandSmat(node_type, quad_type):
@@ -82,6 +84,7 @@ def test_relateQandSmat(node_type, quad_type):
             )
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("node_type", node_types)
 @pytest.mark.parametrize("quad_type", quad_types)
 def test_partialquadraturewithQ(node_type, quad_type):
@@ -104,6 +107,7 @@ def test_partialquadraturewithQ(node_type, quad_type):
             )
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("node_type", node_types)
 @pytest.mark.parametrize("quad_type", quad_types)
 def test_partialquadraturewithS(node_type, quad_type):

@@ -27,24 +27,8 @@ prepare_JUWELS:
     - shell
   script:
     - mkdir -p benchmarks
-    - module --force purge
-    - module load Stages/2024
-    - module load GCC
-    - module load OpenMPI
-    - module load FFTW
-    - module load mpi4py
-    - module load SciPy-Stack
-    - module load CuPy
     - jutil env activate -p ${JUWELS_PROJECT}
-    - python -m venv --clear $SCRATCH/.venv/pySDC
-    - source $SCRATCH/.venv/pySDC/bin/activate
-    - pip install -e .
-    - pip install pytest-benchmark coverage
-    - git submodule add -f https://github.com/brownbaerchen/mpi4py-fft.git
-    - cd mpi4py-fft
-    - git checkout cupy_implementation
-    - FFTW_LIBRARY_DIR="/p/software/juwels/stages/2024/software/FFTW/3.3.10-GCC-12.3.0/lib64" pip install --force-reinstall .
-    - cd ../
+    - source ./etc/venv_juwels/setup.sh
 
 
 test_JUWELS:
@@ -77,16 +61,8 @@ test_JUWELS:
       - sbatch.out
   before_script:
     - mkdir -p benchmarks
-    - module --force purge
-    - module load Stages/2024
-    - module load GCC
-    - module load OpenMPI
-    - module load FFTW
-    - module load mpi4py
-    - module load SciPy-Stack
-    - module load CuPy
     - jutil env activate -p ${JUWELS_PROJECT}
-    - source $SCRATCH/.venv/pySDC/bin/activate
+    - source ./etc/venv_juwels/activate.sh
   script:
     - bash etc/check_node_avail.sh || PARTITION_AVAIL=$?
     - if [ -n "$PARTITION_AVAIL" ] ; then exit $PARTITION_AVAIL ; fi

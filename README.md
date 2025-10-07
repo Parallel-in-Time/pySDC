@@ -5,6 +5,8 @@
 [![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green)](https://fair-software.eu)
 [![SQAaaS badge shields.io](https://img.shields.io/badge/sqaaas%20software-silver-lightgrey)](https://api.eu.badgr.io/public/assertions/aS8J0NDTTjCyYP6iVufviQ "SQAaaS silver badge achieved")
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/pySDC?logo=pypi)](https://pypistats.org/packages/pysdc)
+[![HiRSE Code Promo Badge](https://img.shields.io/badge/Promo-8db427?label=HiRSE&labelColor=005aa0&link=https%3A%2F%2Fgo.fzj.de%2FCodePromo)](https://go.fzj.de/CodePromo)
+[![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/Parallel-in-Time/pySDC/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/Parallel-in-Time/pySDC)
 
 # Welcome to pySDC!
 
@@ -19,8 +21,8 @@ implemented.
 
 -   Variants of SDC: explicit, implicit, IMEX, multi-implicit, Verlet,
     multi-level, diagonal, multi-step
--   Variants of PFASST: virtual parallel or MPI-based parallel,
-    classical of multigrid perspective
+-   Variants of PFASST: virtually parallel or MPI-based parallel,
+    classical or multigrid perspective
 -   8 tutorials: from setting up a first collocation problem to SDC,
     PFASST and advanced topics
 -   Projects: many documented projects with defined and tested outcomes
@@ -43,12 +45,11 @@ The code is hosted on GitHub, see
 will give you a core version of `pySDC` to work with,
 working with the developer version is most often the better choice. We
 thus recommend to checkout the code from GitHub and install the
-dependencies e.g. by using a [conda](https://conda.io/en/latest/)
-environment. For this, `pySDC` ships with environment files
-which can be found in the folder `etc/`. Use these as e.g.
+dependencies e.g. by using [micromamba](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html). For this, `pySDC` ships with environment files
+which can be found in the folder `etc/` or within the projects. Use these as e.g.
 
 ``` bash
-conda env create -f etc/environment-base.yml
+micromamba create -f etc/environment-base.yml
 ```
 
 If you want to install the developer version using `pip` directly from the GitHub repository, use this:
@@ -102,7 +103,8 @@ The current software release can be cited using Zenodo:
 
 `pySDC` code was originally developed by [Robert Speck (@pancetta)](https://github.com/pancetta),
 and is now maintained and developed by a small community of scientists interested in SDC methods.
-Checkout the [Changelog](./CHANGELOG.md) to see pySDC's evolution since 2016.
+Checkout the [Changelog](./CHANGELOG.md) to see pySDC's evolution since 2016. It has a
+software management plan (SWP), too, see [here](https://smw.dsw.elixir-europe.org/wizard/projects/c3dda921-b7b0-4f4d-b5dc-778b9780552d).
 
 Any contribution is dearly welcome! If you want to contribute, please take the time to read our [Contribution Guidelines](./CONTRIBUTING.md)
 (and don't forget to take a peek at our nice [Code of Conduct](./CODE_OF_CONDUCT.md) :wink:).
@@ -112,13 +114,13 @@ Any contribution is dearly welcome! If you want to contribute, please take the t
 This project has received funding from the [European High-Performance
 Computing Joint Undertaking](https://eurohpc-ju.europa.eu/) (JU) under
 grant agreement No 955701 ([TIME-X](https://www.time-x-eurohpc.eu/))
-and grant agreement No 101118139.
+and grant agreement No 101118139. 
 The JU receives support from the European Union's Horizon 2020 research
 and innovation programme and Belgium, France, Germany, and Switzerland.
 This project also received funding from the [German Federal Ministry of
 Education and Research](https://www.bmbf.de/bmbf/en/home/home_node.html)
 (BMBF) grants  16HPC047 and 16ME0679K. Supported by the European Union - NextGenerationEU. 
-The project also received help from the [Helmholtz Platform for Research Software Engineering - Preparatory Study (HiRSE_PS)](https://www.helmholtz-hirse.de/).
+The project also received help from the [Joint Lab "Helmholtz Information -  Research Software Engineering" (HiRSE)](https://www.helmholtz-hirse.de/).
 
 <p align="center">
   <img src="./docs/img/EuroHPC.jpg" height="105"/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

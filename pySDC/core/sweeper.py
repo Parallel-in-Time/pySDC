@@ -1,11 +1,16 @@
 import logging
 import numpy as np
-from qmat import QDELTA_GENERATORS
+from qmat.qdelta import QDeltaGenerator, QDELTA_GENERATORS
 
 from pySDC.core.errors import ParameterError
-from pySDC.core.level import Level
 from pySDC.core.collocation import CollBase
 from pySDC.helpers.pysdc_helper import FrozenClass
+
+
+# Organize QDeltaGenerator class in dict[type(QDeltaGenerator),set(str)] to retrieve aliases
+QDELTA_GENERATORS_ALIASES = {v: set() for v in set(QDELTA_GENERATORS.values())}
+for k, v in QDELTA_GENERATORS.items():
+    QDELTA_GENERATORS_ALIASES[v].add(k)
 
 
 # short helper class to add params as attributes
@@ -44,16 +49,15 @@ class Sweeper(object):
         coll (pySDC.Collocation.CollBase): collocation object
     """
 
-    def __init__(self, params):
+    def __init__(self, params, level):
         """
         Initialization routine for the base sweeper
 
         Args:
             params (dict): parameter object
-
+            level (pySDC.Level.level): the level that uses this sweeper
         """
 
-        # set up logger
         self.logger = logging.getLogger('sweeper')
 
         essential_keys = ['num_nodes']
@@ -81,35 +85,20 @@ class Sweeper(object):
             )
             self.params.do_coll_update = True
 
-        # This will be set as soon as the sweeper is instantiated at the level
-        self.__level = None
-
+        self.__level = level
         self.parallelizable = False
+        for name in ["genQI", "genQE"]:
+            if hasattr(self, name):
+                delattr(self, name)
 
-    def setupGenerator(self, qd_type):
-        coll = self.coll
-        try:
-            assert QDELTA_GENERATORS[qd_type] == type(self.generator)
-            assert self.generator.QDelta.shape[0] == coll.Qmat.shape[0] - 1
-        except (AssertionError, AttributeError):
-            self.generator = QDELTA_GENERATORS[qd_type](
-                # for algebraic types (LU, ...)
-                Q=coll.generator.Q,
-                # for MIN in tables, MIN-SR-S ...
-                nNodes=coll.num_nodes,
-                nodeType=coll.node_type,
-                quadType=coll.quad_type,
-                # for time-stepping types, MIN-SR-NS
-                nodes=coll.nodes,
-                tLeft=coll.tleft,
-            )
-        except Exception as e:
-            raise ValueError(f"could not generate {qd_type=!r} with qmat, got error : {e}") from e
+    def buildGenerator(self, qdType: str) -> QDeltaGenerator:
+        return QDELTA_GENERATORS[qdType](qGen=self.coll.generator, tLeft=self.coll.tleft)
 
     def get_Qdelta_implicit(self, qd_type, k=None):
         QDmat = np.zeros_like(self.coll.Qmat)
-        self.setupGenerator(qd_type)
-        QDmat[1:, 1:] = self.generator.genCoeffs(k=k)
+        if not hasattr(self, "genQI") or qd_type not in QDELTA_GENERATORS_ALIASES[type(self.genQI)]:
+            self.genQI: QDeltaGenerator = self.buildGenerator(qd_type)
+        QDmat[1:, 1:] = self.genQI.genCoeffs(k=k)
 
         err_msg = 'Lower triangular matrix expected!'
         np.testing.assert_array_equal(np.triu(QDmat, k=1), np.zeros(QDmat.shape), err_msg=err_msg)
@@ -120,8 +109,9 @@ class Sweeper(object):
     def get_Qdelta_explicit(self, qd_type, k=None):
         coll = self.coll
         QDmat = np.zeros(coll.Qmat.shape, dtype=float)
-        self.setupGenerator(qd_type)
-        QDmat[1:, 1:], QDmat[1:, 0] = self.generator.genCoeffs(k=k, dTau=True)
+        if not hasattr(self, "genQE") or qd_type not in QDELTA_GENERATORS_ALIASES[type(self.genQE)]:
+            self.genQE: QDeltaGenerator = self.buildGenerator(qd_type)
+        QDmat[1:, 1:], QDmat[1:, 0] = self.genQE.genCoeffs(k=k, dTau=True)
 
         err_msg = 'Strictly lower triangular matrix expected!'
         np.testing.assert_array_equal(np.triu(QDmat, k=0), np.zeros(QDmat.shape), err_msg=err_msg)
@@ -192,14 +182,14 @@ class Sweeper(object):
 
         # build QF(u)
         res_norm = []
-        res = self.integrate()
+        L.residual = self.integrate()
         for m in range(self.coll.num_nodes):
-            res[m] += L.u[0] - L.u[m + 1]
+            L.residual[m] += L.u[0] - L.u[m + 1]
             # add tau if associated
             if L.tau[m] is not None:
-                res[m] += L.tau[m]
+                L.residual[m] += L.tau[m]
             # use abs function from data type here
-            res_norm.append(abs(res[m]))
+            res_norm.append(abs(L.residual[m]))
 
         # find maximal residual over the nodes
         if L.params.residual_type == 'full_abs':
@@ -257,6 +247,8 @@ class Sweeper(object):
         Args:
             L (pySDC.Level.level): current level
         """
+        from pySDC.core.level import Level
+
         assert isinstance(L, Level)
         self.__level = L
 
@@ -273,5 +265,9 @@ class Sweeper(object):
         k : int
             Index of the sweep (0 for initial sweep, 1 for the first one, ...).
         """
-        if self.params.QI == 'MIN-SR-FLEX':
-            self.QI = self.get_Qdelta_implicit(qd_type="MIN-SR-FLEX", k=k)
+        if hasattr(self, "genQI") and self.genQI.isKDependent():
+            qdType = type(self.genQI).__name__
+            self.QI = self.get_Qdelta_implicit(qdType, k=k)
+        if hasattr(self, "genQE") and self.genQE.isKDependent():
+            qdType = type(self.genQE).__name__
+            self.QE = self.get_Qdelta_explicit(qdType, k=k)

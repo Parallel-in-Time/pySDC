@@ -292,6 +292,19 @@ class ConvergenceController(object):
         """
         pass
 
+    def post_run_processing(self, controller, S, **kwargs):
+        """
+        Do whatever you want to after the run here.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
+        """
+        pass
+
     def prepare_next_block(self, controller, S, size, time, Tend, **kwargs):
         """
         Prepare stuff like spreading step sizes or whatever.

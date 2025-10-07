@@ -6,6 +6,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 from pySDC.core.convergence_controller import ConvergenceController
 from pySDC.core.hooks import Hooks
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+from pySDC.core.problem import WorkCounter
 
 
 class RayleighBenard(GenericSpectralLinear):
@@ -20,7 +21,7 @@ class RayleighBenard(GenericSpectralLinear):
         v_t - nu (v_xx + v_zz) + p_z - T = -uv_x - vv_z
 
     with u the horizontal velocity, v the vertical velocity (in z-direction), T the temperature, p the pressure, indices
-    denoting derivatives, kappa=(Rayleigh * Prandl)**(-1/2) and nu = (Rayleigh / Prandl)**(-1/2). Everything on the left
+    denoting derivatives, kappa=(Rayleigh * Prandtl)**(-1/2) and nu = (Rayleigh / Prandtl)**(-1/2). Everything on the left
     hand side, that is the viscous part, the pressure gradient and the buoyancy due to temperature are treated
     implicitly, while the non-linear convection part on the right hand side is integrated explicitly.
 
@@ -36,7 +37,7 @@ class RayleighBenard(GenericSpectralLinear):
     facilitate the Dirichlet BCs.
 
     Parameters:
-        Prandl (float): Prandl number
+        Prandtl (float): Prandtl number
         Rayleigh (float): Rayleigh number
         nx (int): Horizontal resolution
         nz (int): Vertical resolution
@@ -50,31 +51,37 @@ class RayleighBenard(GenericSpectralLinear):
 
     def __init__(
         self,
-        Prandl=1,
+        Prandtl=1,
         Rayleigh=2e6,
         nx=256,
         nz=64,
         BCs=None,
         dealiasing=3 / 2,
         comm=None,
+        Lx=4,
+        Lz=1,
+        z0=0,
         **kwargs,
     ):
         """
         Constructor. `kwargs` are forwarded to parent class constructor.
 
         Args:
-            Prandl (float): Prandtl number
+            Prandtl (float): Prandtl number
             Rayleigh (float): Rayleigh number
             nx (int): Resolution in x-direction
             nz (int): Resolution in z direction
             BCs (dict): Vertical boundary conditions
             dealiasing (float): Dealiasing for evaluating the non-linear part in real space
             comm (mpi4py.Intracomm): Space communicator
+            Lx (float): Horizontal length of the domain
+            Lz (float): Vertical length of the domain
+            z0 (float): Position of lower boundary
         """
         BCs = {} if BCs is None else BCs
         BCs = {
             'T_top': 0,
-            'T_bottom': 2,
+            'T_bottom': 1,
             'v_top': 0,
             'v_bottom': 0,
             'u_top': 0,
@@ -90,23 +97,29 @@ class RayleighBenard(GenericSpectralLinear):
             except ModuleNotFoundError:
                 pass
         self._makeAttributeAndRegister(
-            'Prandl',
+            'Prandtl',
             'Rayleigh',
             'nx',
             'nz',
             'BCs',
             'dealiasing',
             'comm',
+            'Lx',
+            'Lz',
+            'z0',
             localVars=locals(),
             readOnly=True,
         )
 
-        bases = [{'base': 'fft', 'N': nx, 'x0': 0, 'x1': 8}, {'base': 'ultraspherical', 'N': nz}]
+        bases = [
+            {'base': 'fft', 'N': nx, 'x0': 0, 'x1': self.Lx},
+            {'base': 'ultraspherical', 'N': nz, 'x0': self.z0, 'x1': self.Lz},
+        ]
         components = ['u', 'v', 'T', 'p']
         super().__init__(bases, components, comm=comm, **kwargs)
 
-        self.Z, self.X = self.get_grid()
-        self.Kz, self.Kx = self.get_wavenumbers()
+        self.X, self.Z = self.get_grid()
+        self.Kx, self.Kz = self.get_wavenumbers()
 
         # construct 2D matrices
         Dzz = self.get_differentiation_matrix(axes=(1,), p=2)
@@ -127,15 +140,17 @@ class RayleighBenard(GenericSpectralLinear):
         self.Dz = S1 @ Dz
         self.Dzz = S2 @ Dzz
 
-        kappa = (Rayleigh * Prandl) ** (-1 / 2.0)
-        nu = (Rayleigh / Prandl) ** (-1 / 2.0)
+        # compute rescaled Rayleigh number to extract viscosity and thermal diffusivity
+        Ra = Rayleigh / (max([abs(BCs['T_top'] - BCs['T_bottom']), np.finfo(float).eps]) * self.axes[1].L ** 3)
+        self.kappa = (Ra * Prandtl) ** (-1 / 2.0)
+        self.nu = (Ra / Prandtl) ** (-1 / 2.0)
 
         # construct operators
         L_lhs = {
             'p': {'u': U01 @ Dx, 'v': Dz},  # divergence free constraint
-            'u': {'p': U02 @ Dx, 'u': -nu * (U02 @ Dxx + Dzz)},
-            'v': {'p': U12 @ Dz, 'v': -nu * (U02 @ Dxx + Dzz), 'T': -U02 @ Id},
-            'T': {'T': -kappa * (U02 @ Dxx + Dzz)},
+            'u': {'p': U02 @ Dx, 'u': -self.nu * (U02 @ Dxx + Dzz)},
+            'v': {'p': U12 @ Dz, 'v': -self.nu * (U02 @ Dxx + Dzz), 'T': -U02 @ Id},
+            'T': {'T': -self.kappa * (U02 @ Dxx + Dzz)},
         }
         self.setup_L(L_lhs)
 
@@ -152,7 +167,7 @@ class RayleighBenard(GenericSpectralLinear):
         )
         self.add_BC(component='T', equation='T', axis=1, x=-1, v=self.BCs['T_bottom'], kind='Dirichlet', line=-1)
         self.add_BC(component='T', equation='T', axis=1, x=1, v=self.BCs['T_top'], kind='Dirichlet', line=-2)
-        self.add_BC(component='v', equation='v', axis=1, x=1, v=self.BCs['v_bottom'], kind='Dirichlet', line=-1)
+        self.add_BC(component='v', equation='v', axis=1, x=1, v=self.BCs['v_top'], kind='Dirichlet', line=-1)
         self.add_BC(component='v', equation='v', axis=1, x=-1, v=self.BCs['v_bottom'], kind='Dirichlet', line=-2)
         self.remove_BC(component='v', equation='v', axis=1, x=-1, kind='Dirichlet', line=-2, scalar=True)
         self.add_BC(component='u', equation='u', axis=1, v=self.BCs['u_top'], x=1, kind='Dirichlet', line=-2)
@@ -175,6 +190,8 @@ class RayleighBenard(GenericSpectralLinear):
                 )
         self.setup_BCs()
 
+        self.work_counters['rhs'] = WorkCounter()
+
     def eval_f(self, u, *args, **kwargs):
         f = self.f_init
 
@@ -191,22 +208,26 @@ class RayleighBenard(GenericSpectralLinear):
         iu, iv, iT, ip = self.index(['u', 'v', 'T', 'p'])
 
         # evaluate implicit terms
-        f_impl_hat = -(self.base_change @ self.L @ u_hat.flatten()).reshape(u_hat.shape)
+        if not hasattr(self, '_L_T_base'):
+            self._L_T_base = self.base_change @ self.L
+        f_impl_hat = -(self._L_T_base @ u_hat.flatten()).reshape(u_hat.shape)
 
         if self.spectral_space:
             f.impl[:] = f_impl_hat
         else:
             f.impl[:] = self.itransform(f_impl_hat).real
 
+        # -------------------------------------------
         # treat convection explicitly with dealiasing
-        Dx_u_hat = self.u_init_forward
-        for i in [iu, iv, iT]:
-            Dx_u_hat[i][:] = (Dx @ u_hat[i].flatten()).reshape(Dx_u_hat[i].shape)
-        Dz_u_hat = self.u_init_forward
-        for i in [iu, iv, iT]:
-            Dz_u_hat[i][:] = (Dz @ u_hat[i].flatten()).reshape(Dz_u_hat[i].shape)
 
-        padding = [self.dealiasing, self.dealiasing]
+        # start by computing derivatives
+        if not hasattr(self, '_Dx_expanded') or not hasattr(self, '_Dz_expanded'):
+            self._Dx_expanded = self._setup_operator({'u': {'u': Dx}, 'v': {'v': Dx}, 'T': {'T': Dx}, 'p': {}})
+            self._Dz_expanded = self._setup_operator({'u': {'u': Dz}, 'v': {'v': Dz}, 'T': {'T': Dz}, 'p': {}})
+        Dx_u_hat = (self._Dx_expanded @ u_hat.flatten()).reshape(u_hat.shape)
+        Dz_u_hat = (self._Dz_expanded @ u_hat.flatten()).reshape(u_hat.shape)
+
+        padding = (self.dealiasing, self.dealiasing)
         Dx_u_pad = self.itransform(Dx_u_hat, padding=padding).real
         Dz_u_pad = self.itransform(Dz_u_hat, padding=padding).real
         u_pad = self.itransform(u_hat, padding=padding).real
@@ -221,6 +242,7 @@ class RayleighBenard(GenericSpectralLinear):
         else:
             f.expl[:] = self.itransform(self.transform(fexpl_pad, padding=padding)).real
 
+        self.work_counters['rhs']()
         return f
 
     def u_exact(self, t=0, noise_level=1e-3, seed=99):
@@ -234,8 +256,8 @@ class RayleighBenard(GenericSpectralLinear):
 
         # linear temperature gradient
         for comp in ['T', 'v', 'u']:
-            a = (self.BCs[f'{comp}_top'] - self.BCs[f'{comp}_bottom']) / 2
-            b = (self.BCs[f'{comp}_top'] + self.BCs[f'{comp}_bottom']) / 2
+            a = (self.BCs[f'{comp}_top'] - self.BCs[f'{comp}_bottom']) / self.Lz
+            b = self.BCs[f'{comp}_bottom'] - a * self.z0
             me[self.index(comp)] = a * self.Z + b
 
         # perturb slightly
@@ -244,7 +266,7 @@ class RayleighBenard(GenericSpectralLinear):
         noise = self.spectral.u_init
         noise[iT] = rng.random(size=me[iT].shape)
 
-        me[iT] += noise[iT].real * noise_level * (self.Z - 1) * (self.Z + 1)
+        me[iT] += noise[iT].real * noise_level * (self.Z - self.z0) * (self.Z - self.z0 + self.Lz)
 
         if self.spectral_space:
             me_hat = self.spectral.u_init_forward
@@ -252,6 +274,45 @@ class RayleighBenard(GenericSpectralLinear):
             return me_hat
         else:
             return me
+
+    def apply_BCs(self, sol):
+        """
+        Enforce the Dirichlet BCs at the top and bottom for arbitrary solution.
+        The function modifies the last two modes of u, v, and T in order to achieve this.
+        Note that the pressure is not modified here and the Nyquist mode is not altered either.
+
+        Args:
+            sol: Some solution that does not need to enforce boundary conditions
+
+        Returns:
+            Modified version of the solution that satisfies Dirichlet BCs.
+        """
+        ultraspherical = self.spectral.axes[-1]
+
+        if self.spectral_space:
+            sol_half_hat = self.itransform(sol, axes=(-2,))
+        else:
+            sol_half_hat = self.transform(sol, axes=(-1,))
+
+        BC_bottom = ultraspherical.get_BC(x=-1, kind='dirichlet')
+        BC_top = ultraspherical.get_BC(x=1, kind='dirichlet')
+
+        M = np.array([BC_top[-2:], BC_bottom[-2:]])
+        M_I = np.linalg.inv(M)
+        rhs = np.empty((2, self.nx), dtype=complex)
+        for component in ['u', 'v', 'T']:
+            i = self.index(component)
+            rhs[0] = self.BCs[f'{component}_top'] - self.xp.sum(sol_half_hat[i, :, :-2] * BC_top[:-2], axis=1)
+            rhs[1] = self.BCs[f'{component}_bottom'] - self.xp.sum(sol_half_hat[i, :, :-2] * BC_bottom[:-2], axis=1)
+
+            BC_vals = M_I @ rhs
+
+            sol_half_hat[i, :, -2:] = BC_vals.T
+
+        if self.spectral_space:
+            return self.transform(sol_half_hat, axes=(-2,))
+        else:
+            return self.itransform(sol_half_hat, axes=(-1,))
 
     def get_fig(self):  # pragma: no cover
         """
@@ -318,13 +379,40 @@ class RayleighBenard(GenericSpectralLinear):
             u_hat = u.copy()
         else:
             u_hat = self.transform(u)
+
         Dz = self.Dz
         Dx = self.Dx
         iu, iv = self.index(['u', 'v'])
 
         vorticity_hat = self.spectral.u_init_forward
-        vorticity_hat[0] = (Dx * u_hat[iv].flatten() + Dz @ u_hat[iu].flatten()).reshape(u[iu].shape)
+        vorticity_hat[0] = (Dx * u_hat[iv].flatten() + Dz @ u_hat[iu].flatten()).reshape(u_hat[iu].shape)
         return self.itransform(vorticity_hat)[0].real
+
+    def getOutputFile(self, fileName):
+        from pySDC.helpers.fieldsIO import Rectilinear
+
+        self.setUpFieldsIO()
+
+        coords = [me.get_1dgrid() for me in self.spectral.axes]
+        assert np.allclose([len(me) for me in coords], self.spectral.global_shape[1:])
+
+        fOut = Rectilinear(np.float64, fileName=fileName)
+        fOut.setHeader(nVar=len(self.components) + 1, coords=coords)
+        fOut.initialize()
+        return fOut
+
+    def processSolutionForOutput(self, u):
+        vorticity = self.compute_vorticity(u)
+
+        if self.spectral_space:
+            u_real = self.itransform(u).real
+        else:
+            u_real = u.real
+
+        me = np.empty(shape=(u_real.shape[0] + 1, *vorticity.shape))
+        me[:-1] = u_real
+        me[-1] = vorticity
+        return me
 
     def compute_Nusselt_numbers(self, u):
         """
@@ -340,52 +428,46 @@ class RayleighBenard(GenericSpectralLinear):
             dict: Nusselt number averaged over the entire volume and horizontally averaged at the top and bottom.
         """
         iv, iT = self.index(['v', 'T'])
-
-        DzT_hat = self.spectral.u_init_forward
+        zAxis = self.spectral.axes[-1]
 
         if self.spectral_space:
             u_hat = u.copy()
         else:
             u_hat = self.transform(u)
 
-        DzT_hat[iT] = (self.Dz @ u_hat[iT].flatten()).reshape(DzT_hat[iT].shape)
+        DzT_hat = (self.Dz @ u_hat[iT].flatten()).reshape(u_hat[iT].shape)
 
         # compute vT with dealiasing
-        padding = [self.dealiasing, self.dealiasing]
+        padding = (self.dealiasing, self.dealiasing)
         u_pad = self.itransform(u_hat, padding=padding).real
         _me = self.xp.zeros_like(u_pad)
         _me[0] = u_pad[iv] * u_pad[iT]
-        vT_hat = self.transform(_me, padding=padding)
+        vT_hat = self.transform(_me, padding=padding)[0]
 
-        nusselt_hat = (vT_hat[0] - DzT_hat[iT]) / self.nx
-        nusselt_no_v_hat = (-DzT_hat[iT]) / self.nx
+        if not hasattr(self, '_zInt'):
+            self._zInt = zAxis.get_integration_matrix()
 
-        integral_z = self.xp.sum(nusselt_hat * self.spectral.axes[1].get_BC(kind='integral'), axis=-1).real
-        integral_V = (
-            integral_z[0] * self.axes[0].L
-        )  # only the first Fourier mode has non-zero integral with periodic BCs
+        nusselt_hat = (vT_hat / self.kappa - DzT_hat) * self.axes[-1].L
+
+        # get coefficients for evaluation on the boundary
+        top = zAxis.get_BC(kind='Dirichlet', x=1)
+        bot = zAxis.get_BC(kind='Dirichlet', x=-1)
+
+        integral_V = 0
+        if self.comm.rank == 0:
+
+            integral_z = (self._zInt @ nusselt_hat[0]).real
+            integral_z[0] = zAxis.get_integration_constant(integral_z, axis=-1)
+            integral_V = ((top - bot) * integral_z).sum() * self.axes[0].L / self.nx
+
         Nusselt_V = self.comm.bcast(integral_V / self.spectral.V, root=0)
-
-        Nusselt_t = self.comm.bcast(
-            self.xp.sum(nusselt_hat * self.spectral.axes[1].get_BC(kind='Dirichlet', x=1), axis=-1).real[0], root=0
-        )
-        Nusselt_b = self.comm.bcast(
-            self.xp.sum(nusselt_hat * self.spectral.axes[1].get_BC(kind='Dirichlet', x=-1), axis=-1).real[0], root=0
-        )
-        Nusselt_no_v_t = self.comm.bcast(
-            self.xp.sum(nusselt_no_v_hat * self.spectral.axes[1].get_BC(kind='Dirichlet', x=1), axis=-1).real[0], root=0
-        )
-        Nusselt_no_v_b = self.comm.bcast(
-            self.xp.sum(nusselt_no_v_hat * self.spectral.axes[1].get_BC(kind='Dirichlet', x=-1), axis=-1).real[0],
-            root=0,
-        )
+        Nusselt_t = self.comm.bcast(self.xp.sum(nusselt_hat.real[0] * top, axis=-1) / self.nx, root=0)
+        Nusselt_b = self.comm.bcast(self.xp.sum(nusselt_hat.real[0] * bot, axis=-1) / self.nx, root=0)
 
         return {
             'V': Nusselt_V,
             't': Nusselt_t,
             'b': Nusselt_b,
-            't_no_v': Nusselt_no_v_t,
-            'b_no_v': Nusselt_no_v_b,
         }
 
     def compute_viscous_dissipation(self, u):
@@ -457,8 +539,8 @@ class CFLLimit(ConvergenceController):
         grid_spacing_x = P.X[1, 0] - P.X[0, 0]
 
         cell_wallz = P.xp.zeros(P.nz + 1)
-        cell_wallz[0] = 1
-        cell_wallz[-1] = -1
+        cell_wallz[0] = P.Lz
+        cell_wallz[-1] = 0
         cell_wallz[1:-1] = (P.Z[0, :-1] + P.Z[0, 1:]) / 2
         grid_spacing_z = cell_wallz[:-1] - cell_wallz[1:]
 

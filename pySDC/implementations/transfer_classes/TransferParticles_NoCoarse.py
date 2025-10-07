@@ -5,23 +5,11 @@ from pySDC.implementations.datatype_classes.particles import particles, fields, 
 
 class particles_to_particles(SpaceTransfer):
     """
-    Custon transfer class, implements SpaceTransfer.py
+    Custom transfer class, implements SpaceTransfer.py
 
     This implementation is just a dummy for particles with no direct functionality, i.e. the number of particles is not
     reduced on the coarse problem
     """
-
-    def __init__(self, fine_prob, coarse_prob, params):
-        """
-        Initialization routine
-
-        Args:
-            fine_prob: fine problem
-            coarse_prob: coarse problem
-            params: parameters for the transfer operators
-        """
-        super(particles_to_particles, self).__init__(fine_prob, coarse_prob, params)
-        pass
 
     def restrict(self, F):
         """
