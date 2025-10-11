@@ -14,24 +14,22 @@ from pySDC.playgrounds.dedalus.problems.rbc import RBCProblem3D, OutputFiles
 
 tEnd = 10
 
-nStepsMax = 50
-nStepsMin = 8
-nVals = 19
+nStepsMax = 30
+nStepsMin = 12
+decrement = 1
 
-dtVals = 1/np.arange(nStepsMax, nStepsMin-1, -1)
-intervals = np.linspace(dtVals.min(), dtVals.max(), num=nVals)
-dtVals = np.unique([dtVals[max(np.argwhere(dtVals <= dt))] for dt in intervals])
+nStepsVals = np.arange(nStepsMax, nStepsMin-1, -abs(decrement))
+dtVals = 1/nStepsVals
 
-nStepsVals = [int(n) for n in 1/dtVals]
 
 Rayleigh = 1.5e5
-timeScheme = "SDC"
+timeScheme = "RK443"
 stabDir = f"stab_A4_M1_R1_{timeScheme}"
 initSol = "init_3D_A4_M1_R1.pySDC"
 
 SDCIMEX.setParameters(
     nNodes=4, nodeType="LEGENDRE", quadType="RADAU-RIGHT",
-    nSweeps=4, initSweep="COPY", explSweep="PIC", implSweep="MIN-SR-S",
+    nSweeps=4, initSweep="COPY", explSweep="PIC", implSweep="MIN-SR-FLEX",
     )
 
 os.makedirs(stabDir, exist_ok=True)
@@ -58,6 +56,6 @@ for nSteps in nStepsVals:
 
     if np.any(np.isnan(spectrum["u"])):
         break
-    plt.loglog(spectrum["kappa"], spectrum["u"], label="N"+("{"+fmtSuffix+"}").format(nSteps))
+    plt.loglog(spectrum["kappa"], spectrum["u"], ':', label="N"+("{"+fmtSuffix+"}").format(nSteps))
 
 plt.legend()
