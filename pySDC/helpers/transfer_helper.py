@@ -27,7 +27,7 @@ def next_neighbors_periodic(p, ps, k):
 
     # zip it
     value_index = []
-    for d, i in zip(distance_to_p, range(distance_to_p.size, strict=True)):
+    for d, i in zip(distance_to_p, range(distance_to_p.size), strict=True):
         value_index.append((d, i))
     # sort by distance
     value_index_sorted = sorted(value_index, key=lambda s: s[0])
@@ -53,7 +53,7 @@ def next_neighbors(p, ps, k):
     distance_to_p = np.abs(ps - p)
     # zip it
     value_index = []
-    for d, i in zip(distance_to_p, range(distance_to_p.size, strict=True)):
+    for d, i in zip(distance_to_p, range(distance_to_p.size), strict=True):
         value_index.append((d, i))
     # sort by distance
     value_index_sorted = sorted(value_index, key=lambda s: s[0])

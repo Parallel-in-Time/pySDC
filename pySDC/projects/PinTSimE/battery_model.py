@@ -578,7 +578,7 @@ def getDataDict(stats, prob_cls_name, use_adaptivity, use_detection, recomputed,
         if not all(t is None for t in t_switch_exact):
             event_err = [
                 abs(num_item - ex_item)
-                for (num_item, ex_item) in zip(res['t_switches'], res['t_switch_exact'], strict=True)
+                for (num_item, ex_item) in zip(res['t_switches'], res['t_switch_exact'], strict=False)
             ]
             res['e_event'] = event_err
 

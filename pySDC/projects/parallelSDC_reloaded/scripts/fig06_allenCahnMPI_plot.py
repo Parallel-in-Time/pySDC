@@ -36,7 +36,7 @@ for qDeltaList in config:
     figNameConv = f"{SCRIPT}_conv_1"
     figNameCost = f"{SCRIPT}_cost_1"
 
-    for qDelta, sym in zip(qDeltaList, symList, strict=True):
+    for qDelta, sym in zip(qDeltaList, symList, strict=False):
         if qDelta == "MIN-SR-NS":
             res = timings["MIN-SR-S_MPI"].copy()
             res["errors"] = [np.nan for _ in res["errors"]]
