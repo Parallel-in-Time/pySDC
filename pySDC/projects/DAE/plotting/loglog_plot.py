@@ -68,7 +68,7 @@ def plot_convergence():  # pragma: no cover
         ylim = (sys.float_info.max, sys.float_info.min)
 
         for num_nodes, color, shape, style, order in zip(
-            num_nodes_list, color_list, shape_list, style_list, order_list
+            num_nodes_list, color_list, shape_list, style_list, order_list, strict=True
         ):
             # Plot convergence data
             ax.loglog(
@@ -99,6 +99,7 @@ def plot_convergence():  # pragma: no cover
                 data[qd_type][num_nodes]['dt'],
                 data[qd_type][num_nodes]['position'],
                 data[qd_type][num_nodes]['offset'],
+                strict=True,
             ):
                 ax.annotate(
                     niter,

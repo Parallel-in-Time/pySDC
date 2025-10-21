@@ -255,7 +255,7 @@ class RayleighBenard3D(GenericSpectralLinear):
 
         fexpl_pad = self.xp.zeros_like(u_pad)
         for i in derivative_indices:
-            for i_vel, iD in zip([iu, iv, iw], range(self.ndim)):
+            for i_vel, iD in zip([iu, iv, iw], range(self.ndim), strict=True):
                 fexpl_pad[i] -= u_pad[i_vel] * derivatives[iD][i]
 
         if self.spectral_space:
@@ -398,7 +398,7 @@ class RayleighBenard3D(GenericSpectralLinear):
 
         # compute local spectrum
         local_spectrum = self.xp.empty(shape=(2, energy.shape[3], n_k))
-        for i, k in zip(range(n_k), unique_k):
+        for i, k in zip(range(n_k), unique_k, strict=True):
             mask = xp.logical_or(abs_kx == k, abs_ky == k)
             local_spectrum[..., i] = xp.sum(energy[indices, mask, :], axis=1)
 
@@ -411,7 +411,7 @@ class RayleighBenard3D(GenericSpectralLinear):
 
         spectra = self.comm.allgather(local_spectrum)
         spectrum = self.xp.zeros(shape=(2, self.axes[2].N, n_k_all))
-        for ks, _spectrum in zip(k_all, spectra):
+        for ks, _spectrum in zip(k_all, spectra, strict=True):
             ks = list(ks)
             unique_k_all = list(unique_k_all)
             for k in ks:

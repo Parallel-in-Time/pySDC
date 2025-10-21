@@ -20,7 +20,7 @@ def plot_iter_info(iters_info_list, labels_list, key1, key2, logy, xlabel, ylabe
     if logy:
         plt_helper.plt.yscale("log", base=10)
 
-    for i, (iters_info, label) in enumerate(zip(iters_info_list, labels_list)):
+    for i, (iters_info, label) in enumerate(zip(iters_info_list, labels_list, strict=True)):
         plt_helper.plt.plot(
             iters_info[key1],
             iters_info[key2],

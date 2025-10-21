@@ -65,7 +65,7 @@ class PlotLargeRun:  # pragma: no cover
 
     def plot_work(self):  # pragma: no cover
         fig, ax = self.get_fig()
-        for key, label in zip(['factorizations', 'rhs'], ['LU decompositions', 'rhs evaluations']):
+        for key, label in zip(['factorizations', 'rhs'], ['LU decompositions', 'rhs evaluations'], strict=True):
             work = get_sorted(self.stats, type=f'work_{key}')
             ax.plot([me[0] for me in work], np.cumsum([4 * me[1] for me in work]), label=fr'\#{label}')
         ax.set_yscale('log')
@@ -191,7 +191,7 @@ class PlotRBC(PlotLargeRun):  # pragma: no cover
 
     def plot_work(self):  # pragma: no cover
         fig, ax = self.get_fig()
-        for key, label in zip(['factorizations', 'rhs'], ['LU decompositions', 'rhs evaluations']):
+        for key, label in zip(['factorizations', 'rhs'], ['LU decompositions', 'rhs evaluations'], strict=True):
             work = get_sorted(self.stats, type=f'work_{key}')
             ax.plot([me[0] for me in work], np.cumsum([4 * me[1] for me in work]), label=fr'\#{label}')
         ax.set_yscale('log')
@@ -251,7 +251,7 @@ class PlotRBC(PlotLargeRun):  # pragma: no cover
                 im = ax.pcolormesh(X[r], Z[r], data['u'][2], vmin=0, vmax=2, cmap='plasma', rasterized=True), data['t']
             return im
 
-        for i, ax in zip(indices, axs):
+        for i, ax in zip(indices, axs, strict=True):
             im, t = plot_single(i, ax)
             fig.colorbar(im, caxs[ax], label=f'$T(t={{{t:.1f}}})$')
 
