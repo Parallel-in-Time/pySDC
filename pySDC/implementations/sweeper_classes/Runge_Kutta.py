@@ -279,16 +279,16 @@ class RungeKutta(Sweeper):
             lvl.uend = lvl.prob.dtype_u(lvl.u[-1])
             if type(self.coll) == ButcherTableauEmbedded:
                 self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
-                for w2, k in zip(self.coll.weights[1], lvl.f[1:]):
+                for w2, k in zip(self.coll.weights[1], lvl.f[1:], strict=True):
                     self.u_secondary += lvl.dt * w2 * k
         else:
             lvl.uend = lvl.prob.dtype_u(lvl.u[0])
             if type(self.coll) == ButcherTableau:
-                for w, k in zip(self.coll.weights, lvl.f[1:]):
+                for w, k in zip(self.coll.weights, lvl.f[1:], strict=True):
                     lvl.uend += lvl.dt * w * k
             elif type(self.coll) == ButcherTableauEmbedded:
                 self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
-                for w1, w2, k in zip(self.coll.weights[0], self.coll.weights[1], lvl.f[1:]):
+                for w1, w2, k in zip(self.coll.weights[0], self.coll.weights[1], lvl.f[1:], strict=True):
                     lvl.uend += lvl.dt * w1 * k
                     self.u_secondary += lvl.dt * w2 * k
 
@@ -459,12 +459,12 @@ class RungeKuttaIMEX(RungeKutta):
             lvl.uend = lvl.u[-1]
             if type(self.coll) == ButcherTableauEmbedded:
                 self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
-                for w2, w2E, k in zip(self.coll.weights[1], self.coll_explicit.weights[1], lvl.f[1:]):
+                for w2, w2E, k in zip(self.coll.weights[1], self.coll_explicit.weights[1], lvl.f[1:], strict=True):
                     self.u_secondary += lvl.dt * (w2 * k.impl + w2E * k.expl)
         else:
             lvl.uend = lvl.prob.dtype_u(lvl.u[0])
             if type(self.coll) == ButcherTableau:
-                for w, wE, k in zip(self.coll.weights, self.coll_explicit.weights, lvl.f[1:]):
+                for w, wE, k in zip(self.coll.weights, self.coll_explicit.weights, lvl.f[1:], strict=True):
                     lvl.uend += lvl.dt * (w * k.impl + wE * k.expl)
             elif type(self.coll) == ButcherTableauEmbedded:
                 self.u_secondary = lvl.u[0].copy()
@@ -474,6 +474,7 @@ class RungeKuttaIMEX(RungeKutta):
                     self.coll_explicit.weights[0],
                     self.coll_explicit.weights[1],
                     lvl.f[1:],
+                    strict=True,
                 ):
                     lvl.uend += lvl.dt * (w1 * k.impl + w1E * k.expl)
                     self.u_secondary += lvl.dt * (w2 * k.impl + w2E * k.expl)

@@ -714,7 +714,7 @@ def writeFields_MPI(fileName, dtypeIdx, algo, nSteps, nVar, gridSizes):
 
     iLoc, nLoc = blocks.localBounds
     Rectilinear.setupMPI(comm, iLoc, nLoc)
-    s = [slice(i, i + n) for i, n in zip(iLoc, nLoc)]
+    s = [slice(i, i + n) for i, n in zip(iLoc, nLoc, strict=True)]
     u0 = u0[(slice(None), *s)]
 
     f1 = Rectilinear(DTYPES[dtypeIdx], fileName)

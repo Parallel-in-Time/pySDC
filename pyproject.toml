@@ -92,7 +92,7 @@ ignore = ["E203", # Whitespace before punctuation
           # Newly added
           "C901", # Complex name
           "E501", # Line length, as enforced by black, but black ignores comments
-          "E721" # Type comparison
+          "E721", # Type comparison
           ]
 # W504 is not supported by ruff and does not need to be excluded
 

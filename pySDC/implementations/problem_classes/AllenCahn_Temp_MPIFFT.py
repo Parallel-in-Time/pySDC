@@ -134,7 +134,7 @@ class allencahn_temp_imex(Problem):
         N = self.fft.global_shape()
         k = [np.fft.fftfreq(n, 1.0 / n).astype(int) for n in N[:-1]]
         k.append(np.fft.rfftfreq(N[-1], 1.0 / N[-1]).astype(int))
-        K = [ki[si] for ki, si in zip(k, s)]
+        K = [ki[si] for ki, si in zip(k, s, strict=True)]
         Ks = list(np.meshgrid(*K, indexing='ij', sparse=True))
         Lp = 2 * np.pi / L
         for i in range(ndim):

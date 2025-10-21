@@ -69,7 +69,7 @@ def getError(uNum, uRef):
 
 
 config = ["PIC", "MIN-SR-NS"]
-for qDelta, sym in zip(config, symList):
+for qDelta, sym in zip(config, symList, strict=False):
     figName = f"{SCRIPT}_conv_{qDelta}"
     plt.figure(figName)
 
@@ -132,7 +132,7 @@ for qDeltaList, nSweeps in config:
     i += 1
     plt.figure(figName)
 
-    for qDelta, sym in zip(qDeltaList, symList):
+    for qDelta, sym in zip(qDeltaList, symList, strict=False):
         try:
             params = getParamsRK(qDelta)
         except KeyError:

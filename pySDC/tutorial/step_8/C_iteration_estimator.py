@@ -259,7 +259,7 @@ def run_simulations(type=None, ndim_list=None, Tend=None, nsteps_list=None, ml=F
             # filter statistics by type (error after time-step)
             PDE_errors = get_sorted(stats, type='PDE_error_after_step', sortby='time')
             coll_errors = get_sorted(stats, type='coll_error_after_step', sortby='time')
-            for iters, PDE_err, coll_err in zip(iter_counts, PDE_errors, coll_errors):
+            for iters, PDE_err, coll_err in zip(iter_counts, PDE_errors, coll_errors, strict=True):
                 assert coll_err[1] < description['step_params']['errtol'], f'Error too high, got {coll_err[1]:8.4e}'
                 out = (
                     f'   Errors after step {PDE_err[0]:8.4f} with {iters[1]} iterations: '

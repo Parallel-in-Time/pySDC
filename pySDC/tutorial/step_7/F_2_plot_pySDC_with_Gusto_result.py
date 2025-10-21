@@ -77,7 +77,14 @@ def plot_williamson_5(
     time_idx = 0
 
     for i, (field_name, colour_scheme, field_label, contour_to_remove, contours) in enumerate(
-        zip(init_field_names, init_colour_schemes, init_field_labels, init_contours_to_remove, init_contours)
+        zip(
+            init_field_names,
+            init_colour_schemes,
+            init_field_labels,
+            init_contours_to_remove,
+            init_contours,
+            strict=True,
+        )
     ):
 
         # Make axes
@@ -150,7 +157,14 @@ def plot_williamson_5(
     time_idx = -1
 
     for i, (field_name, colour_scheme, field_label, contours, contour_to_remove) in enumerate(
-        zip(final_field_names, final_colour_schemes, final_field_labels, final_contours, final_contours_to_remove)
+        zip(
+            final_field_names,
+            final_colour_schemes,
+            final_field_labels,
+            final_contours,
+            final_contours_to_remove,
+            strict=True,
+        )
     ):
 
         # Make axes

@@ -33,7 +33,7 @@ def compute_and_plot_specrad(Nnodes, lam):
     color_list = ['red', 'blue']
     marker_list = ['s', 'o']
 
-    setup_list = zip(Nsteps_list, color_list, marker_list)
+    setup_list = zip(Nsteps_list, color_list, marker_list, strict=True)
 
     xlist = [0.1**i for i in range(11)]
 
