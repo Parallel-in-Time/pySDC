@@ -113,6 +113,36 @@ def test_integration_matrix(N, plot=False):
 
 
 @pytest.mark.base
+@pytest.mark.parametrize('x0', [-1, 0])
+@pytest.mark.parametrize('x1', [0.789, 1])
+@pytest.mark.parametrize('N', [32, 45])
+def test_integral_whole_interval(x0, x1, N):
+    import numpy as np
+    from pySDC.helpers.spectral_helper import FFTHelper
+    from qmat.lagrange import LagrangeApproximation
+
+    helper = FFTHelper(N, x0=x0, x1=x1)
+    x = helper.get_1dgrid()
+
+    u = np.zeros_like(x)
+
+    num_coef = N // 2 - 1
+    coeffs = np.random.random((2, N))
+    u += coeffs[0, 0]
+    for i in range(1, num_coef + 1):
+        u += coeffs[0, i] * np.sin(2 * np.pi * i * x / helper.L)
+        u += coeffs[1, i] * np.cos(2 * np.pi * i * x / helper.L)
+
+    u_hat = helper.transform(u)
+
+    weights = helper.get_integration_weights()
+    integral = weights @ u_hat
+    integral_ref = coeffs[0, 0] * helper.L
+
+    assert np.isclose(integral, integral_ref, atol=1e-7), abs(integral_ref - integral)
+
+
+@pytest.mark.base
 @pytest.mark.parametrize('N', [4, 32])
 @pytest.mark.parametrize('v', [0, 4.78])
 def test_tau_method(N, v):
@@ -141,4 +171,5 @@ if __name__ == '__main__':
     # test_tau_method(6, 1)
     # test_transform(True)
     # test_transform(False)
-    test_transform_cupy(4)
+    # test_transform_cupy(4)
+    test_integral_whole_interval(0, 2, 90)

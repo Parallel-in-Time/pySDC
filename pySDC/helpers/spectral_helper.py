@@ -384,6 +384,7 @@ class ChebychevHelper(SpectralHelper1D):
         return S
 
     def get_integration_weights(self):
+        """Weights for integration across entire domain"""
         n = self.xp.arange(self.N, dtype=float)
 
         weights = (-1) ** n + 1
@@ -820,6 +821,12 @@ class FFTHelper(SpectralHelper1D):
         k = self.xp.array(self.get_wavenumbers(), dtype='complex128')
         k[0] = 1j * self.L
         return self.linalg.matrix_power(self.sparse_lib.diags(1 / (1j * k)), p)
+
+    def get_integration_weights(self):
+        """Weights for integration across entire domain"""
+        weights = self.xp.zeros(self.N)
+        weights[0] = self.L / self.N
+        return weights
 
     def get_plan(self, u, forward, *args, **kwargs):
         if self.fft_lib.__name__ == 'mpi4py_fft.fftw':
