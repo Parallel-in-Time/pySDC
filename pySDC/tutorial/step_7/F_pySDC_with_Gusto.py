@@ -157,13 +157,12 @@ def williamson_5(
     # Equation: coriolis
     parameters = ShallowWaterParameters(mesh, H=mean_depth, g=g)
     Omega = parameters.Omega
-    fexpr = 2 * Omega * z / radius
 
     # Equation: topography
     rsq = min_value(R0**2, (lamda - lamda_c) ** 2 + (phi - phi_c) ** 2)
     r = sqrt(rsq)
     tpexpr = mountain_height * (1 - r / R0)
-    eqns = ShallowWaterEquations(domain, parameters, fexpr=fexpr, topog_expr=tpexpr)
+    eqns = ShallowWaterEquations(domain, parameters, topog_expr=tpexpr)
 
     eqns.label_terms(lambda t: not t.has_label(time_derivative), implicit)
 
