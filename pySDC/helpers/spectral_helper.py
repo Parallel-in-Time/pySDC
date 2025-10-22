@@ -161,6 +161,10 @@ class SpectralHelper1D:
     def get_integration_matrix(self):
         raise NotImplementedError()
 
+    def get_integration_weights(self):
+        """Weights for integration across entire domain"""
+        raise NotImplementedError()
+
     def get_wavenumbers(self):
         """
         Get the grid in spectral space
@@ -378,6 +382,15 @@ class ChebychevHelper(SpectralHelper1D):
         else:
             raise NotImplementedError(f'This function allows to integrate only from x=0, you attempted from x={lbnd}.')
         return S
+
+    def get_integration_weights(self):
+        n = self.xp.arange(self.N, dtype=float)
+
+        weights = (-1) ** n + 1
+        weights[2:] /= 1 - (n**2)[2:]
+
+        weights /= 2 / self.L
+        return weights
 
     def get_differentiation_matrix(self, p=1):
         '''
