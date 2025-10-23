@@ -161,6 +161,10 @@ class SpectralHelper1D:
     def get_integration_matrix(self):
         raise NotImplementedError()
 
+    def get_integration_weights(self):
+        """Weights for integration across entire domain"""
+        raise NotImplementedError()
+
     def get_wavenumbers(self):
         """
         Get the grid in spectral space
@@ -378,6 +382,16 @@ class ChebychevHelper(SpectralHelper1D):
         else:
             raise NotImplementedError(f'This function allows to integrate only from x=0, you attempted from x={lbnd}.')
         return S
+
+    def get_integration_weights(self):
+        """Weights for integration across entire domain"""
+        n = self.xp.arange(self.N, dtype=float)
+
+        weights = (-1) ** n + 1
+        weights[2:] /= 1 - (n**2)[2:]
+
+        weights /= 2 / self.L
+        return weights
 
     def get_differentiation_matrix(self, p=1):
         '''
@@ -807,6 +821,12 @@ class FFTHelper(SpectralHelper1D):
         k = self.xp.array(self.get_wavenumbers(), dtype='complex128')
         k[0] = 1j * self.L
         return self.linalg.matrix_power(self.sparse_lib.diags(1 / (1j * k)), p)
+
+    def get_integration_weights(self):
+        """Weights for integration across entire domain"""
+        weights = self.xp.zeros(self.N)
+        weights[0] = self.L / self.N
+        return weights
 
     def get_plan(self, u, forward, *args, **kwargs):
         if self.fft_lib.__name__ == 'mpi4py_fft.fftw':
