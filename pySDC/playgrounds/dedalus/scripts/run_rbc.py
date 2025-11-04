@@ -60,9 +60,6 @@ parser.add_argument(
     "--nNodesSDC", help="number of time nodes per step for SDC",
     default=4, type=int)
 parser.add_argument(
-    "--nNodesSDC", help="number of time nodes per step for SDC",
-    default=4, type=int)
-parser.add_argument(
     "--nSweepSDC", help="number of sweep per step for SDC",
     default=4, type=int)
 parser.add_argument(
