@@ -12,3 +12,7 @@ scripts/init_*
 scripts/runInit_*
 scripts/initRun_*
 scripts/stab_*
+scripts/_*
+scripts/dedalus.cfg
+scripts/scratch
+scripts/postData
