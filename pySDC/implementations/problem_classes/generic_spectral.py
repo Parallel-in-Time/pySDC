@@ -132,21 +132,29 @@ class GenericSpectralLinear(Problem):
         if self.heterogeneous:
             self.__heterogeneous_setup = False
 
+        self.logger.debug('Finished GenericSpectralLinear __init__')
+
     def heterogeneous_setup(self):
         if self.heterogeneous and not self.__heterogeneous_setup:
+
             CPU_only = ['BC_line_zero_matrix', 'BCs']
             both = ['Pl', 'Pr', 'L', 'M']
 
+            self.logger.debug(f'Starting heterogeneous setup. Moving {CPU_only} and copying {both} to CPU')
+
             if self.useGPU:
                 for key in CPU_only:
+                    self.logger.debug(f'Moving {key} to CPU')
                     setattr(self.spectral, key, getattr(self.spectral, key).get())
 
                 for key in both:
+                    self.logger.debug(f'Copying {key} to CPU')
                     setattr(self, f'{key}_CPU', getattr(self, key).get())
             else:
                 for key in both:
                     setattr(self, f'{key}_CPU', getattr(self, key))
 
+            self.logger.debug('Done with heterogeneous setup')
         self.__heterogeneous_setup = True
 
     def __getattr__(self, name):
@@ -195,6 +203,7 @@ class GenericSpectralLinear(Problem):
             LHS (dict): Dictionary containing the equations.
         """
         self.L = self._setup_operator(LHS)
+        self.logger.debug('Set up L matrix')
 
     def setup_M(self, LHS):
         '''
@@ -203,6 +212,7 @@ class GenericSpectralLinear(Problem):
         diff_index = list(LHS.keys())
         self.diff_mask = [me in diff_index for me in self.components]
         self.M = self._setup_operator(LHS)
+        self.logger.debug('Set up M matrix')
 
     def setup_preconditioner(self, Dirichlet_recombination=True, left_preconditioner=True):
         """
@@ -213,8 +223,14 @@ class GenericSpectralLinear(Problem):
             left_preconditioner (bool): If True, it will interleave the variables and reverse the Kronecker product
         """
         N = np.prod(self.init[0][1:])
+        if self.useGPU:
+            from cupy_backends.cuda.libs.cusparse import CuSparseError as MemError
+        else:
+            MemError = MemoryError
 
         if left_preconditioner:
+            self.logger.debug(f'Setting up left preconditioner with {N} local degrees of freedom')
+
             # reverse Kronecker product
             if self.spectral.useGPU:
                 import scipy.sparse as sp
@@ -228,18 +244,27 @@ class GenericSpectralLinear(Problem):
                     R[i * self.ncomponents + j, j * N + i] = 1
 
             self.Pl = self.spectral.sparse_lib.csc_matrix(R, dtype=complex)
+
+            self.logger.debug('Finished setup of left preconditioner')
         else:
             Id = self.spectral.sparse_lib.eye(N)
             Pl_lhs = {comp: {comp: Id} for comp in self.components}
             self.Pl = self._setup_operator(Pl_lhs)
 
         if Dirichlet_recombination and type(self.axes[-1]).__name__ in ['ChebychevHelper', 'UltrasphericalHelper']:
+            self.logger.debug('Using Dirichlet recombination as right preconditioner')
             _Pr = self.spectral.get_Dirichlet_recombination_matrix(axis=-1)
         else:
             _Pr = self.spectral.sparse_lib.eye(N)
 
         Pr_lhs = {comp: {comp: _Pr} for comp in self.components}
-        self.Pr = self._setup_operator(Pr_lhs) @ self.Pl.T
+        operator = self._setup_operator(Pr_lhs)
+
+        try:
+            self.Pr = operator @ self.Pl.T
+        except MemError:
+            self.logger.debug('Setting up right preconditioner on CPU due to memory error')
+            self.Pr = self.spectral.sparse_lib.csc_matrix(operator.get() @ self.Pl.T.get())
 
     def solve_system(self, rhs, dt, u0=None, *args, skip_itransform=False, **kwargs):
         """
@@ -330,6 +355,7 @@ class GenericSpectralLinear(Problem):
                     import scipy.sparse as sp
 
                     cpu_decomp = sp.linalg.splu(A)
+
                     if self.useGPU:
                         from cupyx.scipy.sparse.linalg import SuperLU
 
