@@ -331,7 +331,8 @@ class RBCProblem2D():
                 tComp=t1-t0,
                 MPI_SIZE=MPI_SIZE,
                 MPI_BLOCKS=p.mpiBlocks,
-                tCompAll=(t1-t0)*MPI_SIZE)
+                tCompAll=(t1-t0)*MPI_SIZE
+                )
             log('End of simulation')
             if MPI_RANK == 0:
                 with open(f"{runDir}/01_finalized.txt", "w") as f:
