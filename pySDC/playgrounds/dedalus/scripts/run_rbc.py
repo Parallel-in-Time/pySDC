@@ -41,7 +41,7 @@ parser.add_argument(
 
 parser.add_argument(
     "--dtWrite", "-dtw", help="time-step for writing solution output",
-    default=1, type=float)
+    type=float)
 parser.add_argument(
     "--logEvery", "-l", help="log every [...] time-steps",
     default=100, type=int)
