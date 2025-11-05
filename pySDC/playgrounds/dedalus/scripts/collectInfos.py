@@ -23,9 +23,9 @@ outFolder = prefix if args.outFolder is None else args.outFolder
 print(f"Collecting {prefix}*/infos.json into {outFolder}")
 os.makedirs(outFolder, exist_ok=True)
 
-folders = glob.glob(args.prefix)
+folders = glob.glob(args.prefix+"*")
 for folder in folders:
-    src = f"{folders}/infos.json"
+    src = f"{folder}/infos.json"
     if not os.path.isfile(src):
         print(f" -- {folder} does not contain infos.json, ignoring ...")
         continue
