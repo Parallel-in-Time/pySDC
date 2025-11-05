@@ -382,6 +382,9 @@ class RBCProblem3D(RBCProblem2D):
             else:
                 blocks = BlockDecomposition(nProcs, [Ny, Nz])
                 mpiBlocks = blocks.nBlocks[-1::-1]
+                if mpiBlocks[-1] > Nz:
+                    # limit number of blocks in z direction
+                    mpiBlocks = [nProcs//Nz, Nz]
         self.log(f" -- {mpiBlocks = }")
 
         coords = d3.CartesianCoordinates('x', 'y', 'z')

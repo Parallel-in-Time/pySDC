@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Plot string scaling results stored in a given folder
+"""
+import json
+import glob
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+folder = "_benchJusuf"
+
+methods = ["RK443", "SDC"]
+res = 2
+
+useNSpS = False
+nSpS = {
+    "RK443": 23,
+    "SDC": 17,
+    }
+
+results = {}
+
+for scheme in methods:
+
+    files = glob.glob(f"{folder}/R{res}_{scheme}*.json")
+
+    results[scheme] = []
+
+    for file in files:
+
+        with open(file, "r") as f:
+            infos = json.load(f)
+
+        nDOF = 5*infos["Nx"]*infos["Ny"]*infos["Nz"]
+        nSteps = infos["nSteps"]
+        tSim = infos["tComp"]/nDOF/nSteps
+        nP = infos["MPI_SIZE"]
+        if useNSpS:
+            tSim *= nSpS[scheme]
+        if scheme == "SDC" and useNSpS:
+            tSim /= 3
+            nP *= 4
+        results[scheme].append([nP, tSim])
+
+    results[scheme].sort(key=lambda p: p[0])
+
+symbols = ["o", "^", "s"]
+plt.figure("scaling"+"-nSpS"*useNSpS)
+for scheme, sym in zip(results.keys(), symbols):
+    res = np.array(results[scheme]).T
+    plt.loglog(*res, sym+'-', label=scheme)
+    plt.loglog(res[0], np.prod(res[:, 0])/res[0], "--", c="gray")
+plt.legend()
+plt.grid(True)
+plt.xlabel("$N_{p}$")
+if useNSpS:
+    plt.ylabel("$t_{wall}/N_{DoF}/T_{sim}$")
+else:
+    plt.ylabel("$t_{wall}/N_{DoF}/N_{steps}$")
+plt.tight_layout()
