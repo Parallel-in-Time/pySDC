@@ -230,25 +230,25 @@ class RBCProblem2D():
         cls.log(f"RBC simulation in {runDir}")
 
         if timeScheme == "RK443":
-            timeStepper = d3.RK443
+            TimeStepper = d3.RK443
         elif timeScheme == "RK111":
-            timeStepper = d3.RK111
+            TimeStepper = d3.RK111
         elif timeScheme == "RK222":
-            timeStepper = d3.RK222
+            TimeStepper = d3.RK222
         elif timeScheme == "SDC":
-            timeStepper = SDCIMEX
+            TimeStepper = SDCIMEX
         else:
-            raise NotImplementedError(f"{timeStepper=}")
-        cls.log(f" -- selected time-stepper : {timeStepper}")
+            raise NotImplementedError(f"{timeScheme=}")
+        cls.log(f" -- selected time-stepper : {TimeStepper}")
 
         if timeParallel:
             assert timeScheme == "SDC", "need timeScheme=SDC for timeParallel"
             _, sComm, _ = SDCIMEX_MPI.initSpaceTimeComms(groupTime=groupTimeProcs)
             pParams.update(sComm=sComm)
             if timeParallel == "MPI":
-                timeScheme = SDCIMEX_MPI
+                TimeStepper = SDCIMEX_MPI
             elif timeParallel == "MPI2":
-                timeScheme = SDCIMEX_MPI2
+                TimeStepper = SDCIMEX_MPI2
             else:
                 raise NotImplementedError(f"{timeParallel=}")
             cls.log(f" -- activated PinT for SDC : {timeParallel}")
@@ -270,7 +270,7 @@ class RBCProblem2D():
 
         # Solver
         cls.log(" -- building dedalus solver ...")
-        solver = p.problem.build_solver(timeStepper)
+        solver = p.problem.build_solver(TimeStepper)
         solver.sim_time = tBeg
         solver.stop_sim_time = tEnd
         cls.log(" -- done !")

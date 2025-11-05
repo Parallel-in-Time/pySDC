@@ -11,20 +11,21 @@ import matplotlib.pyplot as plt
 
 folder = "_benchJusuf"
 
-methods = ["RK443", "SDC"]
-res = 2
+methods = ["RK443", "SDC", "SDC-MPI"]
+R = 2
 
 useNSpS = False
 nSpS = {
     "RK443": 23,
     "SDC": 17,
+    "SDC-MPI": 17,
     }
 
 results = {}
 
 for scheme in methods:
 
-    files = glob.glob(f"{folder}/R{res}_{scheme}*.json")
+    files = glob.glob(f"{folder}/R{R}_{scheme}_*.json")
 
     results[scheme] = []
 
@@ -39,9 +40,6 @@ for scheme in methods:
         nP = infos["MPI_SIZE"]
         if useNSpS:
             tSim *= nSpS[scheme]
-        if scheme == "SDC" and useNSpS:
-            tSim /= 3
-            nP *= 4
         results[scheme].append([nP, tSim])
 
     results[scheme].sort(key=lambda p: p[0])
