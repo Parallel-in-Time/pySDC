@@ -141,6 +141,10 @@ class RayleighBenard3D(GenericSpectralLinear):
         U01 = self.get_basis_change_matrix(p_in=0, p_out=1)
         U12 = self.get_basis_change_matrix(p_in=1, p_out=2)
         U02 = self.get_basis_change_matrix(p_in=0, p_out=2)
+        self.eliminate_zeros(S1)
+        self.eliminate_zeros(S2)
+        self.eliminate_zeros(Dz)
+        self.eliminate_zeros(Dzz)
 
         self.Dx = Dx
         self.Dxx = Dxx
@@ -158,13 +162,12 @@ class RayleighBenard3D(GenericSpectralLinear):
 
         # construct operators
         _D = U02 @ (Dxx + Dyy) + Dzz
-        L_lhs = {
-            'p': {'u': U01 @ Dx, 'v': U01 @ Dy, 'w': Dz},  # divergence free constraint
-            'u': {'p': U02 @ Dx, 'u': -self.nu * _D},
-            'v': {'p': U02 @ Dy, 'v': -self.nu * _D},
-            'w': {'p': U12 @ Dz, 'w': -self.nu * _D, 'T': -U02 @ Id},
-            'T': {'T': -self.kappa * _D},
-        }
+        L_lhs = {}
+        L_lhs['p'] = {'u': U01 @ Dx, 'v': U01 @ Dy, 'w': Dz}  # divergence free constraint
+        L_lhs['u'] = {'p': U02 @ Dx, 'u': -self.nu * _D}
+        L_lhs['v'] = {'p': U02 @ Dy, 'v': -self.nu * _D}
+        L_lhs['w'] = {'p': U12 @ Dz, 'w': -self.nu * _D, 'T': -U02 @ Id}
+        L_lhs['T'] = {'T': -self.kappa * _D}
         self.setup_L(L_lhs)
 
         # mass matrix
@@ -255,7 +258,7 @@ class RayleighBenard3D(GenericSpectralLinear):
 
         fexpl_pad = self.xp.zeros_like(u_pad)
         for i in derivative_indices:
-            for i_vel, iD in zip([iu, iv, iw], range(self.ndim)):
+            for i_vel, iD in zip([iu, iv, iw], range(self.ndim), strict=True):
                 fexpl_pad[i] -= u_pad[i_vel] * derivatives[iD][i]
 
         if self.spectral_space:
@@ -308,15 +311,29 @@ class RayleighBenard3D(GenericSpectralLinear):
             u: The solution you want to compute the Nusselt numbers of
 
         Returns:
-            dict: Nusselt number averaged over the entire volume and horizontally averaged at the top and bottom.
+            dict: Nusselt number averaged over the entire volume and horizontally averaged at the top and bottom as well
+                  as computed from thermal and kinetic dissipation.
         """
-        iw, iT = self.index(['w', 'T'])
+        iu, iv, iw, iT = self.index(['u', 'v', 'w', 'T'])
         zAxis = self.spectral.axes[-1]
 
         if self.spectral_space:
             u_hat = u.copy()
         else:
             u_hat = self.transform(u)
+
+        # evaluate derivatives in x, y, and z for u, v, w, and T
+        derivatives = []
+        derivative_indices = [iu, iv, iw, iT]
+        u_hat_flat = [u_hat[i].flatten() for i in derivative_indices]
+        _D_u_hat = self.u_init_forward
+        for D in [self.Dx, self.Dy, self.Dz]:
+            _D_u_hat *= 0
+            for i in derivative_indices:
+                self.xp.copyto(_D_u_hat[i], (D @ u_hat_flat[i]).reshape(_D_u_hat[i].shape))
+            derivatives.append(
+                self.itransform(_D_u_hat).real
+            )  # derivatives[0] contains x derivatives, [2] is y and [3] is z
 
         DzT_hat = (self.Dz @ u_hat[iT].flatten()).reshape(u_hat[iT].shape)
 
@@ -327,31 +344,56 @@ class RayleighBenard3D(GenericSpectralLinear):
         _me[0] = u_pad[iw] * u_pad[iT]
         wT_hat = self.transform(_me, padding=padding)[0]
 
+        # compute Nusselt number
         nusselt_hat = (wT_hat / self.kappa - DzT_hat) * self.axes[-1].L
 
-        if not hasattr(self, '_zInt'):
-            self._zInt = zAxis.get_integration_matrix()
+        # compute thermal dissipation
+        thermal_dissipation = self.u_init_physical
+        thermal_dissipation[0, ...] = (
+            self.kappa * (derivatives[0][iT].real + derivatives[1][iT].real + derivatives[2][iT].real) ** 2
+        )
+        thermal_dissipation_hat = self.transform(thermal_dissipation)[0]
 
-        # get coefficients for evaluation on the boundary
+        # compute kinetic energy dissipation
+        kinetic_energy_dissipation = self.u_init_physical
+        for i in [iu, iv, iw]:
+            kinetic_energy_dissipation[0, ...] += (
+                self.nu * (derivatives[0][i].real + derivatives[1][i].real + derivatives[2][i].real) ** 2
+            )
+        kinetic_energy_dissipation_hat = self.transform(kinetic_energy_dissipation)[0]
+
+        # get coefficients for evaluation on the boundary and vertical integration
+        zInt = zAxis.get_integration_weights()
         top = zAxis.get_BC(kind='Dirichlet', x=1)
         bot = zAxis.get_BC(kind='Dirichlet', x=-1)
 
+        # compute volume averages
         integral_V = 0
+        integral_V_th = 0
+        integral_V_kin = 0
         if self.comm.rank == 0:
 
-            integral_z = (self._zInt @ nusselt_hat[0, 0]).real
-            integral_z[0] = zAxis.get_integration_constant(integral_z, axis=-1)
-            integral_V = ((top - bot) * integral_z).sum() * self.axes[0].L * self.axes[1].L / self.nx / self.ny
+            integral_V = (zInt @ nusselt_hat[0, 0]).real * self.axes[0].L * self.axes[1].L / self.nx / self.ny
+            integral_V_th = (
+                (zInt @ thermal_dissipation_hat[0, 0]).real * self.axes[0].L * self.axes[1].L / self.nx / self.ny
+            )
+            integral_V_kin = (
+                (zInt @ kinetic_energy_dissipation_hat[0, 0]).real * self.axes[0].L * self.axes[1].L / self.nx / self.ny
+            )
 
+        # communicate result across all tasks
         Nusselt_V = self.comm.bcast(integral_V / self.spectral.V, root=0)
-
         Nusselt_t = self.comm.bcast(self.xp.sum(nusselt_hat.real[0, 0, :] * top, axis=-1) / self.nx / self.ny, root=0)
         Nusselt_b = self.comm.bcast(self.xp.sum(nusselt_hat.real[0, 0] * bot / self.nx / self.ny, axis=-1), root=0)
+        Nusselt_thermal = self.comm.bcast(1 / self.kappa * integral_V_th / self.spectral.V, root=0)
+        Nusselt_kinetic = self.comm.bcast(1 + 1 / self.kappa * integral_V_kin / self.spectral.V, root=0)
 
         return {
             'V': Nusselt_V,
             't': Nusselt_t,
             'b': Nusselt_b,
+            'thermal': Nusselt_thermal,
+            'kinetic': Nusselt_kinetic,
         }
 
     def get_frequency_spectrum(self, u):
@@ -398,7 +440,7 @@ class RayleighBenard3D(GenericSpectralLinear):
 
         # compute local spectrum
         local_spectrum = self.xp.empty(shape=(2, energy.shape[3], n_k))
-        for i, k in zip(range(n_k), unique_k):
+        for i, k in zip(range(n_k), unique_k, strict=True):
             mask = xp.logical_or(abs_kx == k, abs_ky == k)
             local_spectrum[..., i] = xp.sum(energy[indices, mask, :], axis=1)
 
@@ -411,7 +453,7 @@ class RayleighBenard3D(GenericSpectralLinear):
 
         spectra = self.comm.allgather(local_spectrum)
         spectrum = self.xp.zeros(shape=(2, self.axes[2].N, n_k_all))
-        for ks, _spectrum in zip(k_all, spectra):
+        for ks, _spectrum in zip(k_all, spectra, strict=True):
             ks = list(ks)
             unique_k_all = list(unique_k_all)
             for k in ks:

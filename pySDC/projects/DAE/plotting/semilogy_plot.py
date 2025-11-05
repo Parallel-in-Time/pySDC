@@ -29,7 +29,7 @@ def plot_convergence():  # pragma: no cover
         lns1 = list()
         lns2 = list()
 
-        for num_nodes, color, shape in zip(num_nodes_list, color_list, shape_list):
+        for num_nodes, color, shape in zip(num_nodes_list, color_list, shape_list, strict=True):
             # Plot convergence data
             lns1.append(
                 ax1.semilogy(

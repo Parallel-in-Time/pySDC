@@ -5,6 +5,8 @@
 [![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green)](https://fair-software.eu)
 [![SQAaaS badge shields.io](https://img.shields.io/badge/sqaaas%20software-silver-lightgrey)](https://api.eu.badgr.io/public/assertions/aS8J0NDTTjCyYP6iVufviQ "SQAaaS silver badge achieved")
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/pySDC?logo=pypi)](https://pypistats.org/packages/pysdc)
+[![HiRSE Code Promo Badge](https://img.shields.io/badge/Promo-8db427?label=HiRSE&labelColor=005aa0&link=https%3A%2F%2Fgo.fzj.de%2FCodePromo)](https://go.fzj.de/CodePromo)
+[![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/Parallel-in-Time/pySDC/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/Parallel-in-Time/pySDC)
 
 # Welcome to pySDC!
 
@@ -33,7 +35,7 @@ implemented.
 -   Continuous integration via [GitHub
     Actions](https://github.com/Parallel-in-Time/pySDC/actions) and
     [Gitlab CI](https://gitlab.hzdr.de/r.speck/pysdc/-/pipelines) (through the [GitHub2Gitlab Action](https://github.com/jakob-fritz/github2lab_action))
--   Fully compatible with Python 3.9 - 3.12, runs at least on Ubuntu
+-   Fully compatible with Python 3.10 - 3.13, runs at least on Ubuntu
 
 ## Getting started
 

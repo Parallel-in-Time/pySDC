@@ -99,7 +99,7 @@ def run_estimation_check():
     use_detection = [True, False]
     use_adaptivity = [True, False]
 
-    for problem, sweeper, prob_cls_name in zip(problem_classes, sweeper_classes, prob_class_names):
+    for problem, sweeper, prob_cls_name in zip(problem_classes, sweeper_classes, prob_class_names, strict=True):
         u_num = runSimulation(
             problem=problem,
             sweeper=sweeper,
@@ -251,7 +251,7 @@ def plotStateFunctionAroundEvent(u_num, prob_cls_name, M_fix):  # pragma: no cov
                             dt_list,
                             [
                                 h_item[m]
-                                for (t_item, h_item, t_switch_item) in zip(t, h, t_switch)
+                                for (t_item, h_item, t_switch_item) in zip(t, h, t_switch, strict=True)
                                 for m in range(len(t_item))
                                 if abs(t_item[m] - t_switch_item) <= 2.7961188919789493e-11
                             ],
@@ -266,7 +266,9 @@ def plotStateFunctionAroundEvent(u_num, prob_cls_name, M_fix):  # pragma: no cov
                             dt_list,
                             [
                                 h_item[m - 1]
-                                for (t_item, h_item, t_switch_item) in zip(t_no_handling, h_no_handling, t_switch)
+                                for (t_item, h_item, t_switch_item) in zip(
+                                    t_no_handling, h_no_handling, t_switch, strict=True
+                                )
                                 for m in range(1, len(t_item))
                                 if t_item[m - 1] < t_switch_item < t_item[m]
                             ],
@@ -281,7 +283,9 @@ def plotStateFunctionAroundEvent(u_num, prob_cls_name, M_fix):  # pragma: no cov
                             dt_list,
                             [
                                 h_item[m]
-                                for (t_item, h_item, t_switch_item) in zip(t_no_handling, h_no_handling, t_switch)
+                                for (t_item, h_item, t_switch_item) in zip(
+                                    t_no_handling, h_no_handling, t_switch, strict=True
+                                )
                                 for m in range(1, len(t_item))
                                 if t_item[m - 1] < t_switch_item < t_item[m]
                             ],
@@ -297,7 +301,7 @@ def plotStateFunctionAroundEvent(u_num, prob_cls_name, M_fix):  # pragma: no cov
                             dt_list,
                             [
                                 h_item[m - 1]
-                                for (t_item, h_item, t_switch_item) in zip(t, h, t_switch)
+                                for (t_item, h_item, t_switch_item) in zip(t, h, t_switch, strict=True)
                                 for m in range(1, len(t_item))
                                 if t_item[m - 1] < t_switch_item < t_item[m]
                             ],
@@ -312,7 +316,7 @@ def plotStateFunctionAroundEvent(u_num, prob_cls_name, M_fix):  # pragma: no cov
                             dt_list,
                             [
                                 h_item[m]
-                                for (t_item, h_item, t_switch_item) in zip(t, h, t_switch)
+                                for (t_item, h_item, t_switch_item) in zip(t, h, t_switch, strict=True)
                                 for m in range(1, len(t_item))
                                 if t_item[m - 1] < t_switch_item < t_item[m]
                             ],

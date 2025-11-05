@@ -102,7 +102,7 @@ class BlockDecomposition(object):
     @property
     def localBounds(self):
         iLocList, nLocList = [], []
-        for rank, nPoints, nBlocks in zip(self.ranks, self.gridSizes, self.nBlocks):
+        for rank, nPoints, nBlocks in zip(self.ranks, self.gridSizes, self.nBlocks, strict=True):
             n0 = nPoints // nBlocks
             nRest = nPoints - nBlocks * n0
             nLoc = n0 + 1 * (rank < nRest)

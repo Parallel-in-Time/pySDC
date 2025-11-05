@@ -39,7 +39,7 @@ jobs:
       fail-fast: false
       matrix:
         env: ['base', 'fenics', 'mpi4py', 'petsc', 'pytorch']
-        python: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        python: ['3.10', '3.11', '3.12', '3.13']
     defaults:
       run:
         shell: bash -l {0}

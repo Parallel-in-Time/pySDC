@@ -98,7 +98,7 @@ def main():
     sol_data = np.array(
         [
             [(sol[j][1].diff[id], sol[j][1].alg[ia]) for j in range(len(sol))]
-            for id, ia in zip(range(len(uend.diff)), range(len(uend.alg)))
+            for id, ia in zip(range(len(uend.diff)), range(len(uend.alg)), strict=True)
         ]
     )
     niter = filter_stats(stats, type='niter')

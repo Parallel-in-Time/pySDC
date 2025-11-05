@@ -21,7 +21,7 @@ def plot_data(name=''):
     json_files = sorted(glob.glob(f'./data/{name}_*.json'))
     data_files = sorted(glob.glob(f'./data/{name}_*.dat'))
 
-    for json_file, data_file in zip(json_files, data_files):
+    for json_file, data_file in zip(json_files, data_files, strict=True):
         with open(json_file, 'r') as fp:
             obj = json.load(fp)
 

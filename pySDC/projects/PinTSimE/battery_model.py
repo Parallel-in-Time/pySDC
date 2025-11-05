@@ -249,7 +249,7 @@ def main():
     use_detection = [True, False]
     use_adaptivity = [True, False]
 
-    for problem, sweeper in zip([battery, battery_implicit], [imex_1st_order, generic_implicit]):
+    for problem, sweeper in zip([battery, battery_implicit], [imex_1st_order, generic_implicit], strict=True):
         for defaults in [False, True]:
             # for hardcoded solutions problem parameter defaults should match with parameters here
             if defaults:
@@ -476,7 +476,7 @@ def plotSolution(u_num, prob_cls_name, use_adaptivity, use_detection):  # pragma
 
     unknowns = u_num['unknowns']
     unknowns_labels = u_num['unknowns_labels']
-    for unknown, unknown_label in zip(unknowns, unknowns_labels):
+    for unknown, unknown_label in zip(unknowns, unknowns_labels, strict=True):
         ax.plot(u_num['t'], u_num[unknown], label=unknown_label)
 
     if use_detection:
@@ -577,7 +577,8 @@ def getDataDict(stats, prob_cls_name, use_adaptivity, use_detection, recomputed,
 
         if not all(t is None for t in t_switch_exact):
             event_err = [
-                abs(num_item - ex_item) for (num_item, ex_item) in zip(res['t_switches'], res['t_switch_exact'])
+                abs(num_item - ex_item)
+                for (num_item, ex_item) in zip(res['t_switches'], res['t_switch_exact'], strict=False)
             ]
             res['e_event'] = event_err
 

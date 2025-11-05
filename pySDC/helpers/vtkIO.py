@@ -52,7 +52,7 @@ def writeToVTR(fileName: str, data, coords, varNames):
         return numpy_support.numpy_to_vtk(num_array=u.ravel(order='F'), deep=True, array_type=vtk.VTK_FLOAT)
 
     pointData = vtr.GetPointData()
-    for name, u in zip(varNames, data):
+    for name, u in zip(varNames, data, strict=True):
         uVTK = field(u)
         uVTK.SetName(name)
         pointData.AddArray(uVTK)

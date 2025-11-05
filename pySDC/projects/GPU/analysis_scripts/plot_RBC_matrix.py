@@ -15,7 +15,7 @@ def plot_preconditioners():  # pragma: no cover
 
     fig, axs = plt.subplots(1, 4, figsize=figsize_by_journal('TUHH_thesis', 1, 0.4), sharex=True, sharey=True)
 
-    for M, ax in zip([A, A_b, A_r, A_l], axs):
+    for M, ax in zip([A, A_b, A_r, A_l], axs, strict=True):
         ax.imshow((M / abs(M)).real + (M / abs(M)).imag, rasterized=False, cmap='Spectral')
 
     for ax in axs:

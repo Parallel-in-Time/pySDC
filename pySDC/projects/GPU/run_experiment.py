@@ -124,7 +124,7 @@ def plot_series(args, config):  # pragma: no cover
 
     idxs = np.linspace(0, config.num_frames * 0.9, 9, dtype=int)
 
-    for idx, ax in zip(idxs, axs.flatten()):
+    for idx, ax in zip(idxs, axs.flatten(), strict=True):
         try:
             _fig = config.plot(P=P, idx=idx, n_procs_list=args['procs'], ax=ax)
         except FileNotFoundError:

@@ -46,7 +46,7 @@ styles = [
 # Script execution
 # -----------------------------------------------------------------------------
 plt.figure()
-for (qDelta, nSweeps), style in zip(schemes, styles):
+for (qDelta, nSweeps), style in zip(schemes, styles, strict=False):
     if nSweeps is None:
         params = getParamsRK(qDelta)
         label = None

@@ -66,7 +66,7 @@ for nNodes, quadType, sweepType in config:
     # Figure generation
     figName = f"{sweepType}_{quadType}"
     plt.figure(f"{sweepType}_{quadType}")
-    for (qDelta, nSweeps), style in zip(schemes, styles):
+    for (qDelta, nSweeps), style in zip(schemes, styles, strict=False):
         params = getParamsSDC(quadType, nNodes, qDelta, nSweeps, nodeType)
         label = f"$K={nSweeps}$"
         errors = []

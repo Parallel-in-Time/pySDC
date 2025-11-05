@@ -38,7 +38,7 @@ for mu in muVals:
     muPeriods.append(period)
 
 # Compute and plot solution for each mu on one period, scale time with period
-for mu, tEnd in zip(muVals, muPeriods):
+for mu, tEnd in zip(muVals, muPeriods, strict=True):
     nSteps = 200
     tVals = np.linspace(0, tEnd, nSteps + 1)
 

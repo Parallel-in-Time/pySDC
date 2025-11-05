@@ -274,10 +274,10 @@ def test_banded_matrix(preconditioning):
 
 
 @pytest.mark.cupy
-def test_heterogeneous_implementation():
+def test_heterogeneous_implementation(N=8, useGPU=True):
     from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
 
-    params = {'nx': 2, 'ny': 2, 'nz': 2, 'useGPU': True}
+    params = {'nx': N, 'ny': N, 'nz': N, 'useGPU': useGPU}
     gpu = RayleighBenard3D(**params)
     het = RayleighBenard3D(**params, heterogeneous=True)
 
@@ -293,52 +293,63 @@ def test_heterogeneous_implementation():
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize('w', [0, 1, 3.14])
-def test_Nusselt_number_computation(w, N=6):
+@pytest.mark.parametrize('c', [0, 1, 3.14])
+def test_Nusselt_number_computation(c, N=6):
     from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
 
     prob = RayleighBenard3D(nx=N, ny=N, nz=N, dealiasing=1.0, spectral_space=False, Rayleigh=1.0, Prandtl=1.0)
     xp = prob.xp
-    iw, iT = prob.index(['w', 'T'])
+    iu, iw, iT = prob.index(['u', 'w', 'T'])
 
-    # constant temperature and perturbed velocity
+    # temperature gradient and perturbed velocity
     u = prob.u_init
     u[iT, ...] = 3 * prob.Z**2 + 1
-    u[iw] = w * (1 + xp.sin(prob.Y / prob.axes[1].L * 2 * xp.pi))
+    u[iw] = c * (1 + xp.sin(prob.Y / prob.axes[1].L * 2 * xp.pi))
     Nu = prob.compute_Nusselt_numbers(u)
 
-    for key, expect in zip(['t', 'b', 'V'], [prob.Lz * (3 + 1) * w - 6, w, w * (1 + 1) - 3]):
+    for key, expect in zip(['t', 'b', 'V', 'thermal'], [prob.Lz * (3 + 1) * c - 6, c, c * (1 + 1) - 3, 12]):
         assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
 
     # zero
     u = prob.u_init
     Nu = prob.compute_Nusselt_numbers(u)
-    assert xp.allclose(list(Nu.values()), 0)
+    for key in ['t', 'b', 'V', 'thermal']:
+        assert xp.isclose(Nu[key], 0), f'Unexpected non-zero Nusselt number in {key} in constant zero profile'
+    assert xp.isclose(Nu['kinetic'], 1), 'Unexpected non-one kinetic Nusselt number in constant zero profile'
 
     # constant gradient
     u = prob.u_init
     u[iT] = prob.Z**2 + 1
+    u[iu] = c * xp.sqrt(5) / 3 * prob.Z**3 + c
     Nu = prob.compute_Nusselt_numbers(u)
 
-    for key, expect in zip(['t', 'b', 'V'], [-prob.Lz * 2, 0, -1]):
+    for key, expect in zip(['t', 'b', 'V', 'thermal', 'kinetic'], [-prob.Lz * 2, 0, -1, 4 / 3, 1 + c**2]):
         assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]} with T=z**2!'
 
     # gradient plus fluctuations
     u = prob.u_init
-    u[iT] = prob.Z * 1 + (xp.sin(prob.X / prob.axes[0].L * 2 * xp.pi) * xp.sin(prob.Y / prob.axes[1].L * 2 * xp.pi))
+    u[iT] = prob.Z * (1 + xp.sin(prob.X / prob.axes[0].L * 2 * xp.pi) * xp.sin(prob.Y / prob.axes[1].L * 2 * xp.pi))
     Nu = prob.compute_Nusselt_numbers(u)
 
-    for key in ['t', 'b', 'V']:
+    for key in [
+        't',
+        'b',
+        'V',
+    ]:
         assert xp.isclose(Nu[key], -1), f'Expected Nu_{key}=-1, but got {Nu[key]} with T=z*(1+sin(x)+sin(y))!'
+    assert xp.isclose(Nu['kinetic'], 1), f'Expected Nu_kinetic=1, but got {Nu["kinetic"]} with T=z*(1+sin(x)+sin(y))!'
 
     # constant temperature and perturbed velocity
     u = prob.u_init
     u[iT, ...] = 1
-    u[iw] = w * (1 + xp.sin(prob.Y / prob.axes[1].L * 2 * xp.pi))
+    u[iw] = c * (1 + xp.sin(prob.Y / prob.axes[1].L * 2 * xp.pi))
     Nu = prob.compute_Nusselt_numbers(u)
 
     for key in ['t', 'b', 'V']:
-        assert xp.isclose(Nu[key], w), f'Expected Nu_{key}={w}, but got {Nu[key]} with constant T and perturbed w!'
+        assert xp.isclose(Nu[key], c), f'Expected Nu_{key}={c}, but got {Nu[key]} with constant T and perturbed w!'
+    assert xp.isclose(
+        Nu['thermal'], 0
+    ), f'Expected Nu_thermal=0, but got {Nu["thermal"]} with constant T and perturbed w!'
 
 
 @pytest.mark.mpi4py
@@ -388,11 +399,12 @@ def test_spectrum_computation(mpi_ranks):
 
 
 if __name__ == '__main__':
-    test_eval_f(2**2, 2**1, 'x', False)
+    # test_eval_f(2**2, 2**1, 'x', False)
     # test_libraries()
     # test_Poisson_problems(4, 'u')
     # test_Poisson_problem_w()
     # test_solver_convergence('bicgstab+ilu', 32, False, True)
     # test_banded_matrix(False)
     # test_heterogeneous_implementation()
-    # test_Nusselt_number_computation(N=4, w=3.14)
+    test_Nusselt_number_computation(N=6, c=3)
+    # test_spectrum_computation(None)
