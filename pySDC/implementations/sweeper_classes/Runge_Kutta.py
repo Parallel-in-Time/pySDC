@@ -510,6 +510,15 @@ class IMEXEuler(RungeKuttaIMEX):
     matrix_explicit = ForwardEuler.matrix
 
 
+class IMEXEulerStifflyAccurate(RungeKuttaIMEX):
+    nodes = np.array([0, 1])
+    weights = np.array([0, 1])
+    weights_explicit = np.array([1, 0])
+
+    matrix = np.array([[0, 0], [0, 1]])
+    matrix_explicit = np.array([[0, 0], [1, 0]])
+
+
 class CrankNicolson(RungeKutta):
     """
     Implicit Runge-Kutta method of second order, A-stable.

@@ -25,6 +25,7 @@ IMEX_SWEEPERS = [
     'ARK54',
     'ARK548L2SA',
     'IMEXEuler',
+    'IMEXEulerStifflyAccurate',
     'ARK32',
     'ARK2',
     'ARK3',
@@ -168,6 +169,7 @@ def test_order(sweeper_name, useGPU=False):
         'ARK54': 6,
         'ARK548L2SA': 6,
         'IMEXEuler': 2,
+        'IMEXEulerStifflyAccurate': 2,
         'ARK2': 3,
         'ARK3': 4,
         'ARK32': 4,
@@ -185,6 +187,7 @@ def test_order(sweeper_name, useGPU=False):
         'ARK54': 5e-2,
         'ARK548L2SA': 5e-2,
         'IMEXEuler': 1e-2,
+        'IMEXEulerStifflyAccurate': 6e-2,
     }
 
     lambdas = [[-1.0e-1 + 0j]]

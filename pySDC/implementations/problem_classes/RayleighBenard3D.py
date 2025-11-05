@@ -462,3 +462,20 @@ class RayleighBenard3D(GenericSpectralLinear):
                 spectrum[..., index_global] += _spectrum[..., index_local]
 
         return xp.array(unique_k_all), spectrum
+
+    def get_vertical_profiles(self, u, components):
+        if self.spectral_space:
+            u_hat = u.copy()
+        else:
+            u_hat = self.transform(u)
+
+        _u_hat = self.axes[-1].itransform(u_hat, axes=(-1,))
+
+        avgs = {}
+        for c in components:
+            i = self.index(c)
+            avg = self.xp.ascontiguousarray(_u_hat[i, 0, 0, :].real) / self.axes[0].N / self.axes[1].N
+            self.comm.Bcast(avg, root=0)
+            avgs[c] = avg
+
+        return avgs
