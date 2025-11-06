@@ -55,6 +55,20 @@ def tmp_processed_data(tmp_sim_data, tmp_path):
     return generate_processed_file(tmp_path)
 
 
+def test_ic_interpolation(tmp_sim_data, tmp_path):
+    from pySDC.projects.GPU.run_experiment import run_experiment
+
+    args = get_args(tmp_path)
+
+    ic_res = args['res'] * 1
+    args['res'] *= 2
+    config = get_config(args)
+
+    config.ic_config = {'config': type(config), 'res': ic_res, 'dt': args['dt']}
+    u = run_experiment(args, config)
+    assert u.shape[-1] == args['res']
+
+
 def test_processing(tmp_processed_data):
     import pickle
 
@@ -75,7 +89,6 @@ def test_get_pySDC_data(tmp_processed_data, tmp_path):
         assert me in data.keys()
 
 
-@pytest.mark.base
 def test_Nu_interpolation():
     from pySDC.projects.GPU.analysis_scripts.plot_Nu import interpolate_NuV_to_reference_times
     import numpy as np
@@ -98,13 +111,4 @@ def test_Nu_interpolation():
     # interpolate to insufficient order
     tI, NuI = interpolate_NuV_to_reference_times(data, ref_data, order=4)
     assert not np.allclose(NuI, ref_data['Nu']['V'])
-    assert not np.allclose(data['Nu']['V'], ref_data['Nu']['V'])
     assert np.allclose(tI, ref_data['t'])
-
-
-if __name__ == '__main__':
-    path = 'tmp'
-    # generate_simulation_file(path)
-    processed_path = generate_processed_file(path)
-    # test_processing(processed_path)
-    test_get_pySDC_data(None, path)

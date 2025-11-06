@@ -59,20 +59,7 @@ def plot_Nu_over_time_Ra1e5():  # pragma: no cover
 
     ref_data = get_pySDC_data(res=res, dt=0.01, config_name='RBC3DG4R4Ra1e5')
 
-    _Nu_axs = {'SDC 3': Nu_axs[1], 'SDC': Nu_axs[0], 'RK': Nu_axs[2], 'Euler': Nu_axs[3]}
-
-    plot_Nu(
-        32,
-        [
-            0.06,
-            0.04,
-            0.02,
-        ],
-        'RBC3DG4R4SDC34Ra1e5',
-        ref_data,
-        Nu_axs[0],
-        'SDC34',
-    )
+    plot_Nu(32, [0.06, 0.04, 0.02], 'RBC3DG4R4SDC34Ra1e5', ref_data, Nu_axs[0], 'SDC34')
     plot_Nu(32, [0.06, 0.05, 0.02, 0.01], 'RBC3DG4R4SDC23Ra1e5', ref_data, Nu_axs[1], 'SDC23')
     plot_Nu(32, [0.05, 0.04, 0.02, 0.01, 0.005], 'RBC3DG4R4RKRa1e5', ref_data, Nu_axs[2], 'RK443')
     plot_Nu(32, [0.02, 0.01, 0.005], 'RBC3DG4R4EulerRa1e5', ref_data, Nu_axs[3], 'RK111')

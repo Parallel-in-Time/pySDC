@@ -121,7 +121,11 @@ class RayleighBenard3DRegular(Config):
 class RBC3Dverification(RayleighBenard3DRegular):
     converged = 0
     dt = 1e-2
-    ic_config = None
+    ic_config = {
+        'config': None,
+        'res': -1,
+        'dt': -1,
+    }
     res = None
     Ra = None
     Tend = 100
@@ -159,14 +163,16 @@ class RBC3Dverification(RayleighBenard3DRegular):
         return desc
 
     def get_initial_condition(self, P, *args, restart_idx=0, **kwargs):
-        if self.ic_config is None or restart_idx != 0:
+        if self.ic_config['config'] is None or restart_idx != 0:
             return super().get_initial_condition(P, *args, restart_idx=restart_idx, **kwargs)
 
         # read initial conditions
         from pySDC.helpers.fieldsIO import FieldsIO
 
-        ic_config = self.ic_config(args={**self.args, 'res': -1, 'dt': -1})
-        desc = ic_config.get_description()
+        ic_config = self.ic_config['config'](
+            args={**self.args, 'res': self.ic_config['res'], 'dt': self.ic_config['dt']}
+        )
+        desc = ic_config.get_description(res=self.ic_config['res'], dt=self.ic_config['dt'])
         ic_nx = desc['problem_params']['nx']
         ic_ny = desc['problem_params']['ny']
         ic_nz = desc['problem_params']['nz']
@@ -180,6 +186,7 @@ class RBC3Dverification(RayleighBenard3DRegular):
 
         # interpolate the initial conditions using padded transforms
         padding = (P.nx / ic_nx, P.ny / ic_ny, P.nz / ic_nz)
+        P.logger.info(f'Interpolating initial conditions from {ic_nx}x{ic_ny}x{ic_nz} to {P.nx}x{P.ny}x{P.nz}')
 
         ics = _P.xp.array(ics)
         _ics_hat = _P.transform(ics)
@@ -243,7 +250,6 @@ class RBC3DverificationEuler(RBC3DverificationRK):
 class RBC3DG4R4Ra1e5(RBC3Dverification):
     Tend = 200
     dt = 6e-2
-    ic_config = None
     res = 32
     converged = 50
 
@@ -251,7 +257,6 @@ class RBC3DG4R4Ra1e5(RBC3Dverification):
 class RBC3DG4R4SDC23Ra1e5(RBC3DM2K3):
     Tend = 200
     dt = 6e-2
-    ic_config = None
     res = 32
     converged = 50
 
@@ -259,7 +264,6 @@ class RBC3DG4R4SDC23Ra1e5(RBC3DM2K3):
 class RBC3DG4R4SDC34Ra1e5(RBC3DM3K4):
     Tend = 200
     dt = 6e-2
-    ic_config = None
     res = 32
     converged = 50
 
@@ -267,7 +271,6 @@ class RBC3DG4R4SDC34Ra1e5(RBC3DM3K4):
 class RBC3DG4R4RKRa1e5(RBC3DverificationRK):
     Tend = 200
     dt = 8e-2
-    ic_config = None
     res = 32
     converged = 50
 
@@ -275,6 +278,5 @@ class RBC3DG4R4RKRa1e5(RBC3DverificationRK):
 class RBC3DG4R4EulerRa1e5(RBC3DverificationEuler):
     Tend = 200
     dt = 8e-2
-    ic_config = None
     res = 32
     converged = 50
