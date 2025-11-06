@@ -272,7 +272,7 @@ class RBCProblem2D():
         if writeDecomposition:
             decompFile = f"{runDir}/decomp.txt"
             if MPI_RANK == 0:
-                with open(decompFile, "r") as f:
+                with open(decompFile, "w") as f:
                     f.write("Parallel distribution on compute cores\n")
                     f.write(f" -- space parallelization on {p.sComm.Get_size()} procs\n")
                     if timeParallel:
