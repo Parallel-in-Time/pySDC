@@ -256,6 +256,19 @@ class RBCProblem2D():
 
         p = cls(**pParams)
 
+        dt = baseDt/p.resFactor
+        nSteps = round(float(tEnd-tBeg)/dt, ndigits=3)
+        if float(tEnd-tBeg) != round(nSteps*dt, ndigits=3):
+            raise ValueError(f"{tEnd=} is not divisible by timestep {dt=} ({nSteps=})")
+        nSteps = int(nSteps)
+        p.infos.update(tEnd=tEnd, dt=dt, nSteps=nSteps)
+
+        if os.path.isfile(f"{runDir}/01_finalized.txt"):
+            cls.log(" -- simulation already finalized, skipping !")
+            return p
+        os.makedirs(runDir, exist_ok=True)
+        p.infos.update(dirName=runDir)
+
         if writeDecomposition:
             decompFile = f"{runDir}/decomp.txt"
             if MPI_RANK == 0:
@@ -280,19 +293,6 @@ class RBCProblem2D():
                     for d, c in zip(labels, coords)
                     )
             COMM_WORLD.Barrier()
-
-        dt = baseDt/p.resFactor
-        nSteps = round(float(tEnd-tBeg)/dt, ndigits=3)
-        if float(tEnd-tBeg) != round(nSteps*dt, ndigits=3):
-            raise ValueError(f"{tEnd=} is not divisible by timestep {dt=} ({nSteps=})")
-        nSteps = int(nSteps)
-        p.infos.update(tEnd=tEnd, dt=dt, nSteps=nSteps)
-
-        if os.path.isfile(f"{runDir}/01_finalized.txt"):
-            cls.log(" -- simulation already finalized, skipping !")
-            return p
-        os.makedirs(runDir, exist_ok=True)
-        p.infos.update(dirName=runDir)
 
         # Solver
         cls.log(" -- building dedalus solver ...")
