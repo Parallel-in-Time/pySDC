@@ -511,6 +511,12 @@ class IMEXEuler(RungeKuttaIMEX):
 
 
 class IMEXEulerStifflyAccurate(RungeKuttaIMEX):
+    """
+    This implements u = fI^-1(u0 + fE(u0)) rather than u = fI^-1(u0) + fE(u0) + u0.
+    This implementation is slightly inefficient with two stages, but the last stage is the solution, making it stiffly
+    accurate and suitable for some DAEs.
+    """
+
     nodes = np.array([0, 1])
     weights = np.array([0, 1])
     weights_explicit = np.array([1, 0])
