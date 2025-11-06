@@ -7,15 +7,8 @@ from pySDC.helpers.plot_helper import figsize_by_journal, setup_mpl
 setup_mpl()
 
 
-def get_pySDC_data(Ra, RK=False, res=-1, dt=-1, config_name='RBC3DG4'):
-    assert type(Ra) == str
-
-    base_path = 'data/RBC_time_averaged'
-
-    if RK:
-        config_name = f'{config_name}RK'
-
-    path = f'{base_path}/{config_name}Ra{Ra}-res{res}-dt{dt:.0e}.pickle'
+def get_pySDC_data(res=-1, dt=-1, config_name='RBC3DG4', base_path='data/RBC_time_averaged'):
+    path = f'{base_path}/{config_name}-res{res}-dt{dt:.0e}.pickle'
     with open(path, 'rb') as file:
         data = pickle.load(file)
 
@@ -32,13 +25,13 @@ def interpolate_NuV_to_reference_times(data, reference_data, order=12):
     return interpolation_matrix @ t_in, interpolation_matrix @ data['Nu']['V']
 
 
-def plot_Nu(Ra, res, dts, config_name, ref, ax, title):  # pragma: no cover
+def plot_Nu(res, dts, config_name, ref, ax, title):  # pragma: no cover
     ax.plot(ref['t'], ref['Nu']['V'], color='black', ls='--')
     ax.set_title(title)
     Nu_ref = np.array(ref['Nu']['V'])
 
     for dt in dts:
-        data = get_pySDC_data(Ra=Ra, res=res, dt=dt, config_name=config_name)
+        data = get_pySDC_data(res=res, dt=dt, config_name=config_name)
         t_i, Nu_i = interpolate_NuV_to_reference_times(data, ref)
         ax.plot(t_i, Nu_i, label=rf'$\Delta t={{{dt}}}$')
 
@@ -62,29 +55,27 @@ def plot_Nu(Ra, res, dts, config_name, ref, ax, title):  # pragma: no cover
 def plot_Nu_over_time_Ra1e5():  # pragma: no cover
     Nu_fig, Nu_axs = plt.subplots(4, 1, sharex=True, sharey=True, figsize=figsize_by_journal('Nature_CS', 1, 1.4))
 
-    Ra = '1e5'
     res = 32
 
-    ref_data = get_pySDC_data(Ra, res=res, dt=0.01, config_name='RBC3DG4R4')
+    ref_data = get_pySDC_data(res=res, dt=0.01, config_name='RBC3DG4R4Ra1e5')
 
     _Nu_axs = {'SDC 3': Nu_axs[1], 'SDC': Nu_axs[0], 'RK': Nu_axs[2], 'Euler': Nu_axs[3]}
 
     plot_Nu(
-        '1e5',
         32,
         [
             0.06,
             0.04,
             0.02,
         ],
-        'RBC3DG4R4SDC34',
+        'RBC3DG4R4SDC34Ra1e5',
         ref_data,
         Nu_axs[0],
         'SDC34',
     )
-    plot_Nu('1e5', 32, [0.06, 0.05, 0.02, 0.01], 'RBC3DG4R4SDC23', ref_data, Nu_axs[1], 'SDC23')
-    plot_Nu('1e5', 32, [0.05, 0.04, 0.02, 0.01, 0.005], 'RBC3DG4R4RK', ref_data, Nu_axs[2], 'RK443')
-    plot_Nu('1e5', 32, [0.02, 0.01, 0.005], 'RBC3DG4R4Euler', ref_data, Nu_axs[3], 'RK111')
+    plot_Nu(32, [0.06, 0.05, 0.02, 0.01], 'RBC3DG4R4SDC23Ra1e5', ref_data, Nu_axs[1], 'SDC23')
+    plot_Nu(32, [0.05, 0.04, 0.02, 0.01, 0.005], 'RBC3DG4R4RKRa1e5', ref_data, Nu_axs[2], 'RK443')
+    plot_Nu(32, [0.02, 0.01, 0.005], 'RBC3DG4R4EulerRa1e5', ref_data, Nu_axs[3], 'RK111')
 
     Nu_axs[-1].set_xlabel('$t$')
     Nu_axs[-1].set_ylabel('$Nu$')
