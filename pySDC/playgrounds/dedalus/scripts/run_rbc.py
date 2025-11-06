@@ -55,12 +55,15 @@ parser.add_argument(
 parser.add_argument(
     "--groupTimeProcs", help="wether or not grouping the time processes",
     action="store_true")
+parser.add_argument(
+    "--writeDecomposition", help="write the parallel space-time decomposition in a file",
+    action="store_true")
 
 parser.add_argument(
     "--nNodesSDC", help="number of time nodes per step for SDC",
     default=4, type=int)
 parser.add_argument(
-    "--nSweepSDC", help="number of sweep per step for SDC",
+    "--nSweepsSDC", help="number of sweeps per time step for SDC",
     default=4, type=int)
 parser.add_argument(
     "--implSweepSDC", help="implicit sweep type for SDC",
@@ -80,9 +83,9 @@ params = args.__dict__
 dim = params.pop("dim")
 ProblemClass = RBCProblem2D if dim == 2 else RBCProblem3D
 SDCIMEX.setParameters(
-    nNodes=params.pop("nNodesSDC"), 
+    nNodes=params.pop("nNodesSDC"),
     nodeType="LEGENDRE", quadType="RADAU-RIGHT",
-    nSweeps=params.pop("nSweepSDC"), 
+    nSweeps=params.pop("nSweepsSDC"),
     initSweep="COPY",
     implSweep=params.pop("implSweepSDC"), explSweep=params.pop("explSweepSDC"),
 )

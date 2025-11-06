@@ -225,6 +225,7 @@ class RBCProblem2D():
     def runSimulation(cls, runDir, tEnd, baseDt, tBeg=0, logEvery=100,
                       dtWrite=None, writeVort=False, writeTau=False,
                       timeScheme="RK443", timeParallel=False, groupTimeProcs=False,
+                      writeDecomposition=False,
                       **pParams):
 
         cls.log(f"RBC simulation in {runDir}")
@@ -243,7 +244,7 @@ class RBCProblem2D():
 
         if timeParallel:
             assert timeScheme == "SDC", "need timeScheme=SDC for timeParallel"
-            _, sComm, _ = SDCIMEX_MPI.initSpaceTimeComms(groupTime=groupTimeProcs)
+            tComm, sComm, gComm = SDCIMEX_MPI.initSpaceTimeComms(groupTime=groupTimeProcs)
             pParams.update(sComm=sComm)
             if timeParallel == "MPI":
                 TimeStepper = SDCIMEX_MPI
@@ -254,6 +255,30 @@ class RBCProblem2D():
             cls.log(f" -- activated PinT for SDC : {timeParallel}")
 
         p = cls(**pParams)
+
+        if writeDecomposition:
+            if MPI_RANK == 0:
+                with open("{runDir}/distrib.txt", "r") as f:
+                    f.write("Parallel distribution on compute cores\n")
+                    f.write(f" -- space parallelization on {p.sComm.Get_size()} procs\n")
+                    if timeParallel:
+                        f.write(f" -- time parallelization on {tComm.Get_size()} procs\n")
+                        f.write(f" -- global parallelization on {gComm.Get_size()} procs\n")
+            coords = [p.grids[axis] for axis in p.axes]
+            labels = ["x", "y", "z"]
+            COMM_WORLD.Barrier()
+            sleep(0.0001*MPI_RANK)
+            with open("{runDir}/distrib.txt", "a") as f:
+                if timeParallel:
+                    out = f"P{gComm.Get_rank()}-S{sComm.Get_rank()}-T{tComm.Get_rank()} :\n"
+                else:
+                    out = f"P{MPI_RANK} :\n"
+                out += f" -- cpu {os.sched_getaffinity(0)} on {socket.gethostname()}\n"
+                out += "\n".join(
+                    f" -- {d} {c.shape} : [{c.min(initial=np.inf)}, {c.max(initial=-np.inf)}]"
+                    for d, c in zip(labels, coords)
+                    )
+            COMM_WORLD.Barrier()
 
         dt = baseDt/p.resFactor
         nSteps = round(float(tEnd-tBeg)/dt, ndigits=3)
