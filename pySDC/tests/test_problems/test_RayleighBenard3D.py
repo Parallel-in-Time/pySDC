@@ -398,6 +398,25 @@ def test_spectrum_computation(mpi_ranks):
     assert xp.allclose(spectrum[iu, :, 0], 0)
 
 
+@pytest.mark.mpi4py
+def test_vertical_profiles():
+    from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
+
+    N = 4
+    prob = RayleighBenard3D(nx=N, ny=N, nz=4, dealiasing=1.0, spectral_space=False, Rayleigh=1.0)
+    xp = prob.xp
+    iu, iv = prob.index(['u', 'v'])
+    X, Y, Z = prob.X, prob.Y, prob.Z
+    z = Z[0, 0]
+
+    u = prob.u_init_physical
+    u[iu] = (Z**2) * (1 + xp.sin(X * 2 * xp.pi / prob.Lx) + xp.sin(Y * 2 * xp.pi / prob.Ly))
+    expect = z**2
+
+    profile = prob.get_vertical_profiles(u, 'u')
+    assert xp.allclose(expect, profile['u'])
+
+
 if __name__ == '__main__':
     # test_eval_f(2**2, 2**1, 'x', False)
     # test_libraries()
@@ -406,5 +425,6 @@ if __name__ == '__main__':
     # test_solver_convergence('bicgstab+ilu', 32, False, True)
     # test_banded_matrix(False)
     # test_heterogeneous_implementation()
-    test_Nusselt_number_computation(N=6, c=3)
+    # test_Nusselt_number_computation(N=6, c=3)
+    test_vertical_profiles()
     # test_spectrum_computation(None)

@@ -22,6 +22,7 @@ def parse_args():
     parser.add_argument('--restart_idx', type=int, help='Restart from file by index', default=0)
     parser.add_argument('--procs', type=str_to_procs, help='Processes in steps/sweeper/space', default='1/1/1')
     parser.add_argument('--res', type=int, help='Space resolution along first axis', default=-1)
+    parser.add_argument('--dt', type=float, help='(Starting) Step size', default=-1)
     parser.add_argument(
         '--logger_level', type=int, help='Logger level on the first rank in space and in the sweeper', default=15
     )
@@ -42,7 +43,7 @@ def run_experiment(args, config, **kwargs):
     os.makedirs(f'{args["o"]}/data', exist_ok=True)
 
     description = config.get_description(
-        useGPU=args['useGPU'], MPIsweeper=args['procs'][1] > 1, res=args['res'], **kwargs
+        useGPU=args['useGPU'], MPIsweeper=args['procs'][1] > 1, res=args['res'], dt=args['dt'], **kwargs
     )
     controller_params = config.get_controller_params(logger_level=args['logger_level'])
 
