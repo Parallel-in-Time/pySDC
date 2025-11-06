@@ -292,6 +292,7 @@ class RBCProblem2D():
                     f" -- {d} {c.shape} : [{c.min(initial=np.inf)}, {c.max(initial=-np.inf)}]"
                     for d, c in zip(labels, coords)
                     )
+                f.write(out)
             COMM_WORLD.Barrier()
 
         # Solver
