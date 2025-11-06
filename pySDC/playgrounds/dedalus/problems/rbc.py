@@ -244,7 +244,7 @@ class RBCProblem2D():
 
         if timeParallel:
             assert timeScheme == "SDC", "need timeScheme=SDC for timeParallel"
-            tComm, sComm, gComm = SDCIMEX_MPI.initSpaceTimeComms(groupTime=groupTimeProcs)
+            gComm, sComm, tComm = SDCIMEX_MPI.initSpaceTimeComms(groupTime=groupTimeProcs)
             pParams.update(sComm=sComm)
             if timeParallel == "MPI":
                 TimeStepper = SDCIMEX_MPI
@@ -292,7 +292,7 @@ class RBCProblem2D():
                     f" -- {d} {c.shape} : [{c.min(initial=np.inf)}, {c.max(initial=-np.inf)}]"
                     for d, c in zip(labels, coords)
                     )
-                f.write(out)
+                f.write(out+"\n")
             COMM_WORLD.Barrier()
 
         # Solver
