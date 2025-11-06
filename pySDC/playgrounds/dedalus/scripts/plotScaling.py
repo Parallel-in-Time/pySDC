@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 folder = "_benchJusuf"
 
-schemes = ["RK443", "SDC", "SDC-MPI", "SDC-MPI2"]
+schemes = ["RK443", "SDC", "SDC-MPI", "SDC-MPI2", "SDC-MPI2-GT"]
 R = 2
 
 useNSpS = False
@@ -20,6 +20,7 @@ nSpS = {
     "SDC": 17,
     "SDC-MPI": 17,
     "SDC-MPI2": 17,
+    "SDC-MPI2-GT": 17,
     }
 
 results = {}
@@ -45,7 +46,7 @@ for scheme in schemes:
 
     results[scheme].sort(key=lambda p: p[0])
 
-symbols = ["o", "^", "s", "p"]
+symbols = ["o", "^", "s", "p", "*"]
 
 
 plt.figure("scaling"+"-nSpS"*useNSpS)
@@ -64,12 +65,11 @@ plt.tight_layout()
 
 
 plt.figure("PinT-speedup")
-schemes = ["SDC-MPI", "SDC-MPI2"]
 nProcSpace, tSDC = np.array(results["SDC"]).T
-for scheme, sym in zip(schemes, symbols):
+for scheme, sym in zip(schemes[2:], symbols):
     _, tSDCPinT = np.array(results[scheme]).T
     speedup = tSDC[:-2]/tSDCPinT
-    plt.semilogx(nProcSpace[:-2], speedup, label=scheme)
+    plt.semilogx(nProcSpace[:-2], speedup, sym+"-", label=scheme)
 plt.legend()
 plt.grid(True)
 plt.xlabel("$N_{p,S}$"), plt.ylabel("PinT Speedup")
