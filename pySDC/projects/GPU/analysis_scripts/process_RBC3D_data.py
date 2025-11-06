@@ -8,6 +8,7 @@ import numpy as np
 import pickle
 import os
 
+
 def process_RBC3D_data(base_path='./data/RBC_time_averaged', plot=True, args=None, config=None):
     # prepare problem instance
     args = args if args else parse_args()
@@ -30,9 +31,8 @@ def process_RBC3D_data(base_path='./data/RBC_time_averaged', plot=True, args=Non
     # prepare paths
     os.makedirs(base_path, exist_ok=True)
     fname = config.get_file_name()
-    fname_trim = fname[fname.index('RBC3D'):fname.index('.pySDC')]
+    fname_trim = fname[fname.index('RBC3D') : fname.index('.pySDC')]
     path = f'{base_path}/{fname_trim}.pickle'
-
 
     # open simulation data
     data = FieldsIO.fromFile(fname)
@@ -50,7 +50,6 @@ def process_RBC3D_data(base_path='./data/RBC_time_averaged', plot=True, args=Non
     rms_profiles = {key: [] for key in profiles.keys()}
     spectrum = []
     spectrum_all = []
-
 
     # try to load time averaged values
     u_mean_profile = P.u_exact()
@@ -97,7 +96,6 @@ def process_RBC3D_data(base_path='./data/RBC_time_averaged', plot=True, args=Non
         spectrum.append(s_mean)
         spectrum_all.append(s)
 
-
     # make a plot of the results
     t = xp.array(t)
     z = P.axes[-1].get_1dgrid()
@@ -136,7 +134,6 @@ def process_RBC3D_data(base_path='./data/RBC_time_averaged', plot=True, args=Non
             f'With Ra={P.Rayleigh:.0e} got Nu={avg_Nu["V"]:.2f}+-{std_Nu["V"]:.2f} with errors: Top {rel_error["t"]:.2e}, bottom: {rel_error["b"]:.2e}, thermal: {rel_error["thermal"]:.2e}, kinetic: {rel_error["kinetic"]:.2e}'
         )
 
-
     # compute average profiles
     avg_profiles = {}
     for key, values in profiles.items():
@@ -148,7 +145,6 @@ def process_RBC3D_data(base_path='./data/RBC_time_averaged', plot=True, args=Non
     for key, values in rms_profiles.items():
         values_from_convergence = [values[i] for i in range(len(values)) if t[i] >= config.converged]
         avg_rms_profiles[key] = xp.sqrt(xp.mean(values_from_convergence, axis=0))
-
 
     # average T
     avg_T = avg_profiles['T']
@@ -163,7 +159,9 @@ def process_RBC3D_data(base_path='./data/RBC_time_averaged', plot=True, args=Non
     res_in_boundary_layer = max_idx if max_idx < len(z) / 2 else len(z) - max_idx
     boundary_layer = z[max_idx] if max_idx > len(z) / 2 else P.axes[-1].L - z[max_idx]
     if comm.rank == 0:
-        print(f'Thermal boundary layer of thickness {boundary_layer:.2f} is resolved with {res_in_boundary_layer} points')
+        print(
+            f'Thermal boundary layer of thickness {boundary_layer:.2f} is resolved with {res_in_boundary_layer} points'
+        )
     axs[2].axhline(z[max_idx], color='black')
     axs[2].plot(avg_T, z)
     axs[2].scatter(avg_T, z)
@@ -204,6 +202,7 @@ def process_RBC3D_data(base_path='./data/RBC_time_averaged', plot=True, args=Non
             fig.savefig(f'{base_path}/{fname_trim}.pdf')
             plt.show()
     return path
+
 
 if __name__ == '__main__':
     process_RBC3D_data()
