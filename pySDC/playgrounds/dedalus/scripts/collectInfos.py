@@ -22,7 +22,7 @@ args = parser.parse_args()
 
 prefix = args.prefix
 outFolder = prefix if args.outFolder is None else args.outFolder
-fileName = parser.fileName
+fileName = args.fileName
 
 print(f"Collecting {prefix}*/{fileName} into {outFolder}")
 os.makedirs(outFolder, exist_ok=True)
