@@ -257,8 +257,9 @@ class RBCProblem2D():
         p = cls(**pParams)
 
         if writeDecomposition:
+            decompFile = f"{runDir}/decomp.txt"
             if MPI_RANK == 0:
-                with open("{runDir}/distrib.txt", "r") as f:
+                with open(decompFile, "r") as f:
                     f.write("Parallel distribution on compute cores\n")
                     f.write(f" -- space parallelization on {p.sComm.Get_size()} procs\n")
                     if timeParallel:
@@ -268,7 +269,7 @@ class RBCProblem2D():
             labels = ["x", "y", "z"]
             COMM_WORLD.Barrier()
             sleep(0.0001*MPI_RANK)
-            with open("{runDir}/distrib.txt", "a") as f:
+            with open(decompFile, "a") as f:
                 if timeParallel:
                     out = f"P{gComm.Get_rank()}-S{sComm.Get_rank()}-T{tComm.Get_rank()} :\n"
                 else:
