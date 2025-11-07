@@ -9,10 +9,13 @@ import glob
 import numpy as np
 import matplotlib.pyplot as plt
 
-folder = "_benchJusuf"
+folder = "_benchJureca"
 
-schemes = ["RK443", "SDC", "SDC-MPI", "SDC-MPI2", "SDC-MPI2-GT"]
 R = 2
+if R == 2:
+    schemes = ["RK443", "SDC", "SDC-MPI2-GT"] # + ["SDC-MPI", "SDC-MPI2"]
+elif R == 1:
+    schemes = ["RK443", "SDC", "SDC-MPI2-GT"]
 
 useNSpS = False
 nSpS = {
@@ -47,13 +50,14 @@ for scheme in schemes:
     results[scheme].sort(key=lambda p: p[0])
 
 symbols = ["o", "^", "s", "p", "*"]
+colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+ls = "--" if "64tpc" in folder else "-"
 
-
-plt.figure("scaling"+"-nSpS"*useNSpS)
-for scheme, sym in zip(results.keys(), symbols):
+plt.figure("scaling"+"-nSpS"*useNSpS+f"-R{R}")
+for scheme, sym, col in zip(results.keys(), symbols, colors):
     res = np.array(results[scheme]).T
-    plt.loglog(*res, sym+'-', label=scheme)
-    plt.loglog(res[0], np.prod(res[:, 0])/res[0], "--", c="gray")
+    plt.loglog(*res, sym+ls, label=scheme, c=col)
+    # plt.loglog(res[0], np.prod(res[:, 0])/res[0], "--", c="gray")
 plt.legend()
 plt.grid(True)
 plt.xlabel("$N_{p}$")
@@ -64,12 +68,12 @@ else:
 plt.tight_layout()
 
 
-plt.figure("PinT-speedup")
+plt.figure(f"PinT-speedup-R{R}")
 nProcSpace, tSDC = np.array(results["SDC"]).T
-for scheme, sym in zip(schemes[2:], symbols):
+for scheme, sym, col in zip(schemes[2:], symbols, colors):
     _, tSDCPinT = np.array(results[scheme]).T
-    speedup = tSDC[:-2]/tSDCPinT
-    plt.semilogx(nProcSpace[:-2], speedup, sym+"-", label=scheme)
+    speedup = tSDC[:len(tSDCPinT)]/tSDCPinT
+    plt.semilogx(nProcSpace[:len(tSDCPinT)], speedup, sym+ls, c=col, label=scheme)
 plt.legend()
 plt.grid(True)
 plt.xlabel("$N_{p,S}$"), plt.ylabel("PinT Speedup")

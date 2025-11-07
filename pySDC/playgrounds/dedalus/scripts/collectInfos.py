@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
+import json
 import glob
 import shutil
 import argparse
@@ -37,6 +38,12 @@ for folder in folders:
     ext = fileName.split(".")[-1]
     dst = f"{outFolder}/{folder[len(prefix):]}.{ext}"
     print(f" -- copying {src} into {dst}")
-    shutil.copy(src, dst)
+    if ext == "json":
+        with open(src, "r") as f:
+            content = json.load(f)
+        with open(dst, "w") as f:
+            json.dump(content, f, indent=4)
+    else:
+        shutil.copy(src, dst)
 
 print(" -- all done !")
