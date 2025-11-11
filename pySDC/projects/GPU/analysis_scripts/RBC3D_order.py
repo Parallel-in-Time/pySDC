@@ -9,8 +9,12 @@ import matplotlib.pyplot as plt
 
 step_sizes = {
     'RBC3DG4R4Ra1e5': [8e-2, 4e-2, 2e-2, 1e-2, 5e-3],
-    'RBC3DG4R4SDC23Ra1e5': [8e-2, 4e-2, 2e-2, 1e-2, 5e-3, 2.5e-3],
-    'RBC3DG4R4SDC34Ra1e5': [8e-2, 4e-2, 2e-2, 1e-2, 5e-3],
+    # 'RBC3DG4R4SDC23Ra1e5': [8e-2, 4e-2, 2e-2, 1e-2, 5e-3, 2.5e-3],
+    # 'RBC3DG4R4SDC34Ra1e5': [8e-2, 4e-2, 2e-2, 1e-2, 5e-3],
+    'RBC3DG4R4SDC23Ra1e5': [5e-3 * 2**i for i in range(5)],
+    'RBC3DG4R4SDC44Ra1e5': [5e-3 * 2**i for i in range(5)],
+    # 'RBC3DG4R4SDC44Ra1e5': [1e-3 * 2**i for i in range(8)],
+    'RBC3DG4R4SDC34Ra1e5': [1e-3 * 2**i for i in range(10)],
     'RBC3DG4R4RKRa1e5': [8e-2, 4e-2, 2e-2, 1e-2, 5e-3, 2.5e-3],
     # 'RBC3DG4R4EulerRa1e5': [8e-2, 4e-2, 2e-2, 1e-2, 5e-3],
     'RBC3DG4R4EulerRa1e5': [1e-3 * 2**i for i in range(5)],
@@ -30,7 +34,7 @@ def get_path(args):
 
 def compute_errors(args, dts, Tend):
     errors = {'u': [], 'v': [], 'w': [], 'T': [], 'p': [], 'dt': []}
-    prob = RayleighBenard3D(nx=4, ny=4, nz=4)
+    prob = RayleighBenard3D(nx=4, ny=4, nz=4, comm=MPI.COMM_SELF)
 
     dts = np.sort(dts)[::-1]
     ref = run(args, dts[-1], Tend)
@@ -104,7 +108,7 @@ def run(args, dt, Tend):
     config.Tend = n_freefall_times.get(type(config).__name__, 3)
 
     ic_config_name = type(config).__name__
-    for name in ['RK', 'Euler', 'O3', 'O4', 'SDC23', 'SDC34']:
+    for name in ['RK', 'Euler', 'O3', 'O4', 'SDC23', 'SDC34', 'SDC44']:
         ic_config_name = ic_config_name.replace(name, '')
     ic_config = get_config({**args, 'config': ic_config_name})
     config.ic_config['config'] = type(ic_config)
