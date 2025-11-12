@@ -6,6 +6,7 @@ from pySDC.projects.GPU.configs.base_config import get_config
 from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
 from mpi4py import MPI
 import matplotlib.pyplot as plt
+from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
 
 step_sizes = {
     'RBC3DG4R4Ra1e5': [8e-2, 4e-2, 2e-2, 1e-2, 5e-3],
@@ -56,6 +57,7 @@ def compute_errors(args, dts, Tend):
 
 
 def plot_error_all_components(args):
+    setup_mpl()
     fig, ax = plt.subplots()
     with open(get_path(args), 'rb') as file:
         errors = pickle.load(file)
@@ -74,27 +76,37 @@ def plot_error_all_components(args):
 
 
 def compare_order(Ra):
-    fig, ax = plt.subplots()
-    ls = {'SDC': '-', 'RK': '--', 'Euler': '-.'}
+    setup_mpl()
+    fig, ax = plt.subplots(figsize=figsize_by_journal('Nature_CS', 1, 0.6))
+    ls = {'SD': '-', 'RK': '--', 'Eu': '-.'}
     if Ra == 1e5:
-        paths = [f'./data/RBC3DG4R4{me}Ra1e5-res-1-order.pickle' for me in ['', 'RK', 'Euler', 'SDC23']]
-        labels = ['SDC', 'RK', 'Euler', 'SDC']
+        labels = ['RK443', 'Euler', 'SDC23', 'SDC34', 'SDC44'][::-1]
+        names = ['RK', 'Euler', 'SDC23', 'SDC34', 'SDC44'][::-1]
+        markers = ['>', '.', 'o', '<', 'x'][::-1]
+        paths = [f'./data/RBC3DG4R4{me}Ra1e5-res-1-order.pickle' for me in names]
 
     else:
         raise NotImplementedError
 
-    for path, label in zip(paths, labels, strict=True):
+    for path, label, marker in zip(paths, labels, markers, strict=True):
         with open(path, 'rb') as file:
             errors = pickle.load(file)
 
         e = np.array(errors['T'])
         dt = np.array(errors['dt'])
         order = np.log(e[1:] / e[:-1]) / np.log(dt[1:] / dt[:-1])
-        ax.loglog(dt, e, label=f'{label} order {np.mean(order):.1f}', ls=ls[label])
+        print(f'{label}: order: mean={np.mean(order):.1f} / median={np.median(order):.1f}')
+        ax.loglog(dt, e, label=f'{label}', ls=ls[label[:2]], marker=marker, markersize=6)
+
+    for _dt in dt:
+        for i in [1, 3, 4]:
+            ax.text(_dt, _dt**i, i, fontweight='bold', fontsize=14, ha='center', va='center')
+            ax.loglog(dt, dt**i, ls=':', color='black')
 
     ax.legend(frameon=False)
     ax.set_xlabel(r'$\Delta t$')
     ax.set_ylabel(r'$e$')
+    fig.savefig('plots/SDC_order_Ra1e5.pdf', bbox_inches='tight')
 
 
 def run(args, dt, Tend):
@@ -107,6 +119,9 @@ def run(args, dt, Tend):
     config = get_config(args)
     config.Tend = n_freefall_times.get(type(config).__name__, 3)
 
+    desc = config.get_description()
+    prob = desc['problem_class'](**desc['problem_params'])
+
     ic_config_name = type(config).__name__
     for name in ['RK', 'Euler', 'O3', 'O4', 'SDC23', 'SDC34', 'SDC44']:
         ic_config_name = ic_config_name.replace(name, '')
@@ -118,7 +133,8 @@ def run(args, dt, Tend):
     config.get_LogToFile = no_logging_hook
     config.Tend = Tend
 
-    u = run_experiment(args, config)
+    u_hat = run_experiment(args, config)
+    u = prob.itransform(u_hat)
     return u
 
 
