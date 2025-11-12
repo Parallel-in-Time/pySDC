@@ -10,15 +10,11 @@ from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
 
 step_sizes = {
     'RBC3DG4R4Ra1e5': [8e-2, 4e-2, 2e-2, 1e-2, 5e-3],
-    # 'RBC3DG4R4SDC23Ra1e5': [8e-2, 4e-2, 2e-2, 1e-2, 5e-3, 2.5e-3],
-    # 'RBC3DG4R4SDC34Ra1e5': [8e-2, 4e-2, 2e-2, 1e-2, 5e-3],
-    'RBC3DG4R4SDC23Ra1e5': [5e-3 * 2**i for i in range(5)],
-    'RBC3DG4R4SDC44Ra1e5': [5e-3 * 2**i for i in range(5)],
-    # 'RBC3DG4R4SDC44Ra1e5': [1e-3 * 2**i for i in range(8)],
-    'RBC3DG4R4SDC34Ra1e5': [1e-3 * 2**i for i in range(10)],
-    'RBC3DG4R4RKRa1e5': [8e-2, 4e-2, 2e-2, 1e-2, 5e-3, 2.5e-3],
-    # 'RBC3DG4R4EulerRa1e5': [8e-2, 4e-2, 2e-2, 1e-2, 5e-3],
-    'RBC3DG4R4EulerRa1e5': [1e-3 * 2**i for i in range(5)],
+    'RBC3DG4R4SDC23Ra1e5': [5e-3 * 2**i for i in range(8)],
+    'RBC3DG4R4SDC34Ra1e5': [5e-3 * 2**i for i in range(8)],
+    'RBC3DG4R4SDC44Ra1e5': [5e-3 * 2**i for i in range(8)],
+    'RBC3DG4R4RKRa1e5': [5e-3 * 2**i for i in range(8)],
+    'RBC3DG4R4EulerRa1e5': [5e-3 * 2**i for i in range(8)],
 }
 n_freefall_times = {}
 
@@ -44,7 +40,7 @@ def compute_errors(args, dts, Tend):
         e = u - ref
         for comp in ['u', 'v', 'w', 'T', 'p']:
             i = prob.index(comp)
-            e_comp = np.max(np.abs(e[i]))
+            e_comp = np.max(np.abs(e[i])) / np.max(np.abs(ref[i]))
             e_comp = MPI.COMM_WORLD.allreduce(e_comp, op=MPI.MAX)
             errors[comp].append(e_comp)
         errors['dt'].append(dt)
@@ -135,6 +131,7 @@ def run(args, dt, Tend):
 
     u_hat = run_experiment(args, config)
     u = prob.itransform(u_hat)
+
     return u
 
 
