@@ -42,7 +42,7 @@ def compute_errors(args, dts, Tend):
             i = prob.index(comp)
             e_comp = np.max(np.abs(e[i])) / np.max(np.abs(ref[i]))
             e_comp = MPI.COMM_WORLD.allreduce(e_comp, op=MPI.MAX)
-            errors[comp].append(e_comp)
+            errors[comp].append(float(e_comp))
         errors['dt'].append(dt)
 
     path = get_path(args)
@@ -52,7 +52,7 @@ def compute_errors(args, dts, Tend):
             print(f'Saved errors to {path}', flush=True)
 
 
-def plot_error_all_components(args):
+def plot_error_all_components(args):  # pragma: no cover
     setup_mpl()
     fig, ax = plt.subplots()
     with open(get_path(args), 'rb') as file:
@@ -71,7 +71,7 @@ def plot_error_all_components(args):
     ax.set_ylabel(r'$e$')
 
 
-def compare_order(Ra):
+def compare_order(Ra):  # pragma: no cover
     setup_mpl()
     fig, ax = plt.subplots(figsize=figsize_by_journal('Nature_CS', 1, 0.6))
     ls = {'SD': '-', 'RK': '--', 'Eu': '-.'}
@@ -115,12 +115,13 @@ def run(args, dt, Tend):
     config = get_config(args)
     config.Tend = n_freefall_times.get(type(config).__name__, 3)
 
-    desc = config.get_description()
+    desc = config.get_description(res=args['res'])
     prob = desc['problem_class'](**desc['problem_params'])
 
     ic_config_name = type(config).__name__
     for name in ['RK', 'Euler', 'O3', 'O4', 'SDC23', 'SDC34', 'SDC44']:
-        ic_config_name = ic_config_name.replace(name, '')
+        ic_config_name = ic_config_name.replace(name, 'SDC34')
+
     ic_config = get_config({**args, 'config': ic_config_name})
     config.ic_config['config'] = type(ic_config)
     config.ic_config['res'] = ic_config.res
