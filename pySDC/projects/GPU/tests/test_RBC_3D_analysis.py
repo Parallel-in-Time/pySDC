@@ -114,7 +114,7 @@ def test_Nu_interpolation():
     assert np.allclose(tI, ref_data['t'])
 
 
-def test_order_computation(tmp_sim_data, tmp_path):
+def test_error_computation(tmp_sim_data, tmp_path):
     from pySDC.projects.GPU.analysis_scripts.RBC3D_order import compute_errors, get_path
     from pySDC.projects.GPU.configs.RBC3D_configs import RBC3DG4R4SDC34Ra1e5
     import numpy as np

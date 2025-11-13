@@ -4,7 +4,7 @@ import warnings
 setup_mpl()
 
 
-def get_plotting_style(config):
+def get_plotting_style(config):  # pragma: no cover
 
     args = {'color': None, 'ls': None, 'marker': None, 'markersize': 6, 'label': None}
 
@@ -39,7 +39,7 @@ def get_plotting_style(config):
     return args
 
 
-def savefig(fig, name, format='pdf', base_path='./plots', **kwargs):
+def savefig(fig, name, format='pdf', base_path='./plots', **kwargs):  # pragma: no cover
     path = f'{base_path}/{name}.{format}'
     fig.savefig(path, bbox_inches='tight', **kwargs)
     print(f'Saved figure {path!r}')
