@@ -6,7 +6,8 @@ from pySDC.projects.GPU.configs.base_config import get_config
 from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
 from mpi4py import MPI
 import matplotlib.pyplot as plt
-from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
+from pySDC.helpers.plot_helper import figsize_by_journal
+from pySDC.projects.GPU.analysis_scripts.RBC3D_plotting_utils import get_plotting_style, savefig
 
 step_sizes = {
     'RBC3DG4R4Ra1e5': [8e-2, 4e-2, 2e-2, 1e-2, 5e-3],
@@ -53,7 +54,6 @@ def compute_errors(args, dts, Tend):
 
 
 def plot_error_all_components(args):  # pragma: no cover
-    setup_mpl()
     fig, ax = plt.subplots()
     with open(get_path(args), 'rb') as file:
         errors = pickle.load(file)
@@ -72,27 +72,24 @@ def plot_error_all_components(args):  # pragma: no cover
 
 
 def compare_order(Ra):  # pragma: no cover
-    setup_mpl()
     fig, ax = plt.subplots(figsize=figsize_by_journal('Nature_CS', 1, 0.6))
-    ls = {'SD': '-', 'RK': '--', 'Eu': '-.'}
     if Ra == 1e5:
-        labels = ['RK443', 'Euler', 'SDC23', 'SDC34', 'SDC44'][::-1]
         names = ['RK', 'Euler', 'SDC23', 'SDC34', 'SDC44'][::-1]
-        markers = ['>', '.', 'o', '<', 'x'][::-1]
+        configs = [f'RBC3DG4R4{me}Ra1e5' for me in names]
         paths = [f'./data/RBC3DG4R4{me}Ra1e5-res-1-order.pickle' for me in names]
 
     else:
         raise NotImplementedError
 
-    for path, label, marker in zip(paths, labels, markers, strict=True):
+    for path, config in zip(paths, configs, strict=True):
         with open(path, 'rb') as file:
             errors = pickle.load(file)
 
         e = np.array(errors['T'])
         dt = np.array(errors['dt'])
         order = np.log(e[1:] / e[:-1]) / np.log(dt[1:] / dt[:-1])
-        print(f'{label}: order: mean={np.mean(order):.1f} / median={np.median(order):.1f}')
-        ax.loglog(dt, e, label=f'{label}', ls=ls[label[:2]], marker=marker, markersize=6)
+        print(f'{config}: order: mean={np.mean(order):.1f} / median={np.median(order):.1f}')
+        ax.loglog(dt, e, **get_plotting_style(config))
 
     for _dt in dt:
         for i in [1, 3, 4]:
@@ -102,7 +99,7 @@ def compare_order(Ra):  # pragma: no cover
     ax.legend(frameon=False)
     ax.set_xlabel(r'$\Delta t$')
     ax.set_ylabel(r'$e$')
-    fig.savefig('plots/SDC_order_Ra1e5.pdf', bbox_inches='tight')
+    savefig(fig, 'RBC3D_order_Ra1e5')
 
 
 def run(args, dt, Tend):
@@ -140,13 +137,15 @@ if __name__ == '__main__':
     from pySDC.projects.GPU.run_experiment import parse_args
 
     args = parse_args()
-    config = get_config(args)
 
-    dts = step_sizes[type(config).__name__]
     if args['mode'] == 'run':
+        config = get_config(args)
+        dts = step_sizes[type(config).__name__]
         compute_errors(args, dts, max(dts))
 
-    plot_error_all_components(args)
+    if args['config'] is not None:
+        plot_error_all_components(args)
+
     compare_order(1e5)
     if MPI.COMM_WORLD.rank == 0:
         plt.show()

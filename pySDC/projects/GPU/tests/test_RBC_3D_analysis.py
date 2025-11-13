@@ -80,7 +80,7 @@ def test_processing(tmp_processed_data):
 
 
 def test_get_pySDC_data(tmp_processed_data, tmp_path):
-    from pySDC.projects.GPU.analysis_scripts.plot_Nu import get_pySDC_data
+    from pySDC.projects.GPU.analysis_scripts.process_RBC3D_data import get_pySDC_data
 
     args = get_args(tmp_path)
     data = get_pySDC_data(res=args['res'], dt=args['dt'], config_name=args['config'], base_path=tmp_path)
