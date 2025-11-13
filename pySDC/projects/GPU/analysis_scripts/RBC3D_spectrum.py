@@ -20,7 +20,7 @@ def plot_spectra_Ra1e5():  # pragma: no cover
     dts = [0.06, 0.06, 0.06, 0.02, 0.04]
     res = 32
 
-    for config, dt in zip(configs, dts):
+    for config, dt in zip(configs, dts, strict=True):
         plot_spectrum(res, dt, config, ax)
 
     ax.legend(frameon=False)
