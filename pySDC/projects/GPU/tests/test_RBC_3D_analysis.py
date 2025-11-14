@@ -26,10 +26,10 @@ def get_config(args):
     return config
 
 
-def generate_simulation_file(path):
+def generate_simulation_file(path, args=None):
     from pySDC.projects.GPU.run_experiment import run_experiment
 
-    args = get_args(path)
+    args = {**get_args(path), **args} if args is not None else get_args(path)
     config = get_config(args)
 
     run_experiment(args, config)
@@ -80,7 +80,7 @@ def test_processing(tmp_processed_data):
 
 
 def test_get_pySDC_data(tmp_processed_data, tmp_path):
-    from pySDC.projects.GPU.analysis_scripts.plot_Nu import get_pySDC_data
+    from pySDC.projects.GPU.analysis_scripts.process_RBC3D_data import get_pySDC_data
 
     args = get_args(tmp_path)
     data = get_pySDC_data(res=args['res'], dt=args['dt'], config_name=args['config'], base_path=tmp_path)
@@ -112,3 +112,24 @@ def test_Nu_interpolation():
     tI, NuI = interpolate_NuV_to_reference_times(data, ref_data, order=4)
     assert not np.allclose(NuI, ref_data['Nu']['V'])
     assert np.allclose(tI, ref_data['t'])
+
+
+def test_error_computation(tmp_sim_data, tmp_path):
+    from pySDC.projects.GPU.analysis_scripts.RBC3D_order import compute_errors, get_path
+    from pySDC.projects.GPU.configs.RBC3D_configs import RBC3DG4R4SDC34Ra1e5
+    import numpy as np
+    import pickle
+
+    args = get_args(tmp_path)
+
+    generate_simulation_file(tmp_path, args={'config': args['config'].replace('SDC23', 'SDC34')})
+    RBC3DG4R4SDC34Ra1e5.res = args['res']
+    RBC3DG4R4SDC34Ra1e5.dt = args['dt']
+
+    dts = [1e-2, 5e-4]
+    compute_errors(args, dts, np.max(dts))
+
+    with open(get_path(args), 'rb') as file:
+        errors = pickle.load(file)
+    for comp in ['T', 'p']:
+        assert max(errors[comp]) < 1e-12

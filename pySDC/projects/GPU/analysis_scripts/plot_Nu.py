@@ -3,16 +3,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import integrate
 from pySDC.helpers.plot_helper import figsize_by_journal, setup_mpl
+from pySDC.projects.GPU.analysis_scripts.process_RBC3D_data import get_pySDC_data
 
 setup_mpl()
-
-
-def get_pySDC_data(res=-1, dt=-1, config_name='RBC3DG4', base_path='data/RBC_time_averaged'):
-    path = f'{base_path}/{config_name}-res{res}-dt{dt:.0e}.pickle'
-    with open(path, 'rb') as file:
-        data = pickle.load(file)
-
-    return data
 
 
 def interpolate_NuV_to_reference_times(data, reference_data, order=12):

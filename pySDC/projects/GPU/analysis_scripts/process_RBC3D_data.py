@@ -204,5 +204,13 @@ def process_RBC3D_data(base_path='./data/RBC_time_averaged', plot=True, args=Non
     return path
 
 
+def get_pySDC_data(res=-1, dt=-1, config_name='RBC3DG4', base_path='data/RBC_time_averaged'):
+    path = f'{base_path}/{config_name}-res{res}-dt{dt:.0e}.pickle'
+    with open(path, 'rb') as file:
+        data = pickle.load(file)
+
+    return data
+
+
 if __name__ == '__main__':
     process_RBC3D_data()
