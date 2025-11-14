@@ -8,7 +8,7 @@ def get_config(args):
     if name[:2] == 'GS':
         from pySDC.projects.GPU.configs.GS_configs import get_config as _get_config
     elif name[:5] == 'RBC3D':
-        from pySDC.projects.GPU.configs.RBC3D_configs import get_config as _get_config
+        from pySDC.projects.RayleighBenard.RBC3D_configs import get_config as _get_config
     elif name[:3] == 'RBC':
         from pySDC.projects.GPU.configs.RBC_configs import get_config as _get_config
     else:

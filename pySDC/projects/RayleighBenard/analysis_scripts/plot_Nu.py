@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import integrate
 from pySDC.helpers.plot_helper import figsize_by_journal, setup_mpl
-from pySDC.projects.GPU.analysis_scripts.process_RBC3D_data import get_pySDC_data
+from pySDC.projects.RayleighBenard.analysis_scripts.process_RBC3D_data import get_pySDC_data
 
 setup_mpl()
 

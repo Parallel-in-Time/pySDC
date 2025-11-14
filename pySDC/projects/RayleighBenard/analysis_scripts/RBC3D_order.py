@@ -7,7 +7,7 @@ from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenar
 from mpi4py import MPI
 import matplotlib.pyplot as plt
 from pySDC.helpers.plot_helper import figsize_by_journal
-from pySDC.projects.GPU.analysis_scripts.RBC3D_plotting_utils import get_plotting_style, savefig
+from pySDC.projects.RayleighBenard.analysis_scripts.plotting_utils import get_plotting_style, savefig
 
 step_sizes = {
     'RBC3DG4R4Ra1e5': [8e-2, 4e-2, 2e-2, 1e-2, 5e-3],

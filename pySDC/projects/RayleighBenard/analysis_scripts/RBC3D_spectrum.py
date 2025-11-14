@@ -1,5 +1,9 @@
-from pySDC.projects.GPU.analysis_scripts.process_RBC3D_data import get_pySDC_data
-from pySDC.projects.GPU.analysis_scripts.RBC3D_plotting_utils import figsize_by_journal, get_plotting_style, savefig
+from pySDC.projects.RayleighBenard.analysis_scripts.process_RBC3D_data import get_pySDC_data
+from pySDC.projects.RayleighBenard.analysis_scripts.plotting_utils import (
+    figsize_by_journal,
+    get_plotting_style,
+    savefig,
+)
 import matplotlib.pyplot as plt
 
 
