@@ -219,7 +219,7 @@ class pySDC_integrator(TimeDiscretisation):
         # update time of the Gusto stepper.
         # After this step, the Gusto stepper updates its time again to arrive at the correct time
         if self.timestepper is not None:
-            self.timestepper.t = fd.Constant(self.t - self.dt)
+            self.timestepper.t = fd.Constant(float(self.t) - float(self.dt))
 
         self.dt = fd.Constant(self.level.params.dt * self.n_steps)
 

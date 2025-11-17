@@ -154,16 +154,12 @@ def williamson_5(
     x, y, z = SpatialCoordinate(mesh)
     lamda, phi, _ = lonlatr_from_xyz(x, y, z)
 
-    # Equation: coriolis
-    parameters = ShallowWaterParameters(mesh, H=mean_depth, g=g)
-    Omega = parameters.Omega
-    fexpr = 2 * Omega * z / radius
-
     # Equation: topography
     rsq = min_value(R0**2, (lamda - lamda_c) ** 2 + (phi - phi_c) ** 2)
     r = sqrt(rsq)
     tpexpr = mountain_height * (1 - r / R0)
-    eqns = ShallowWaterEquations(domain, parameters, fexpr=fexpr, topog_expr=tpexpr)
+    parameters = ShallowWaterParameters(mesh, H=mean_depth, g=g, topog_expr=tpexpr)
+    eqns = ShallowWaterEquations(domain, parameters)
 
     eqns.label_terms(lambda t: not t.has_label(time_derivative), implicit)
 
@@ -328,7 +324,7 @@ def williamson_5(
     u0 = stepper.fields('u')
     D0 = stepper.fields('D')
     uexpr = as_vector([-u_max * y / radius, u_max * x / radius, 0.0])
-    Dexpr = mean_depth - tpexpr - (radius * Omega * u_max + 0.5 * u_max**2) * (z / radius) ** 2 / g
+    Dexpr = mean_depth - tpexpr - (radius * parameters.Omega * u_max + 0.5 * u_max**2) * (z / radius) ** 2 / g
 
     u0.project(uexpr)
     D0.interpolate(Dexpr)
