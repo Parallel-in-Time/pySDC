@@ -18,7 +18,7 @@ def get_args(path):
 
 
 def get_config(args):
-    from pySDC.projects.GPU.configs.base_config import get_config
+    from pySDC.projects.RayleighBenard.RBC3D_configs import get_config
 
     config = get_config(args)
     config.Tend = 1
@@ -27,7 +27,7 @@ def get_config(args):
 
 
 def generate_simulation_file(path, args=None):
-    from pySDC.projects.GPU.run_experiment import run_experiment
+    from pySDC.projects.RayleighBenard.run_experiment import run_experiment
 
     args = {**get_args(path), **args} if args is not None else get_args(path)
     config = get_config(args)
@@ -56,7 +56,7 @@ def tmp_processed_data(tmp_sim_data, tmp_path):
 
 
 def test_ic_interpolation(tmp_sim_data, tmp_path):
-    from pySDC.projects.GPU.run_experiment import run_experiment
+    from pySDC.projects.RayleighBenard.run_experiment import run_experiment
 
     args = get_args(tmp_path)
 

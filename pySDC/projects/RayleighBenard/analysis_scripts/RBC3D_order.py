@@ -2,7 +2,7 @@ import os
 import pickle
 import numpy as np
 from pySDC.helpers.fieldsIO import FieldsIO
-from pySDC.projects.GPU.configs.base_config import get_config
+from pySDC.projects.RayleighBenard.RBC3D_configs import get_config
 from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
 from mpi4py import MPI
 import matplotlib.pyplot as plt
@@ -103,7 +103,7 @@ def compare_order(Ra):  # pragma: no cover
 
 
 def run(args, dt, Tend):
-    from pySDC.projects.GPU.run_experiment import run_experiment
+    from pySDC.projects.RayleighBenard.run_experiment import run_experiment
     from pySDC.core.errors import ConvergenceError
 
     args['mode'] = 'run'
@@ -134,7 +134,7 @@ def run(args, dt, Tend):
 
 
 if __name__ == '__main__':
-    from pySDC.projects.GPU.run_experiment import parse_args
+    from pySDC.projects.RayleighBenard.run_experiment import parse_args
 
     args = parse_args()
 

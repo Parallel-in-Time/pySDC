@@ -1,5 +1,5 @@
-from pySDC.projects.GPU.configs.base_config import get_config
-from pySDC.projects.GPU.run_experiment import parse_args
+from pySDC.projects.RayleighBenard.RBC3D_configs import get_config
+from pySDC.projects.RayleighBenard.run_experiment import parse_args
 from pySDC.helpers.fieldsIO import FieldsIO
 import matplotlib.pyplot as plt
 from tqdm import tqdm
