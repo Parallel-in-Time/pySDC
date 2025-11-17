@@ -154,7 +154,8 @@ class FieldsIO:
         fieldsIO : :class:`FieldsIO`
             The specialized `FieldsIO` adapted to the file.
         """
-        assert os.path.isfile(fileName), f"not a file ({fileName})"
+        if not os.path.isfile(fileName):
+            raise FileNotFoundError(f"not a file ({fileName})")
         with open(fileName, "rb") as f:
             STRUCT, DTYPE = np.fromfile(f, dtype=H_DTYPE, count=2)
             fieldsIO: FieldsIO = cls.STRUCTS[STRUCT](DTYPES[DTYPE], fileName)
