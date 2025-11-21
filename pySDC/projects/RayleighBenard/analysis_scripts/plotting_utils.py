@@ -1,5 +1,6 @@
 from pySDC.helpers.plot_helper import figsize_by_journal, setup_mpl
 import warnings
+import os
 
 setup_mpl()
 
@@ -8,7 +9,12 @@ def get_plotting_style(config):  # pragma: no cover
 
     args = {'color': None, 'ls': None, 'marker': None, 'markersize': 6, 'label': None}
 
-    if config == 'RBC3DG4R4SDC23Ra1e5':
+    if config == 'RBC3DG4R4SDC22Ra1e5':
+        args['color'] = 'tab:brown'
+        args['ls'] = '-'
+        args['marker'] = '3'
+        args['label'] = 'SDC22'
+    elif config == 'RBC3DG4R4SDC23Ra1e5':
         args['color'] = 'tab:blue'
         args['ls'] = '-'
         args['marker'] = 'o'
@@ -18,7 +24,7 @@ def get_plotting_style(config):  # pragma: no cover
         args['ls'] = '-'
         args['marker'] = '<'
         args['label'] = 'SDC34'
-    elif config in ['RBC3DG4R4SDC44Ra1e5', 'RBC3DG4R4Ra1e5']:
+    elif config == 'RBC3DG4R4SDC44Ra1e5':
         args['color'] = 'tab:green'
         args['ls'] = '-'
         args['marker'] = 'x'
@@ -40,6 +46,8 @@ def get_plotting_style(config):  # pragma: no cover
 
 
 def savefig(fig, name, format='pdf', base_path='./plots', **kwargs):  # pragma: no cover
+    os.makedirs(base_path, exist_ok=True)
+
     path = f'{base_path}/{name}.{format}'
     fig.savefig(path, bbox_inches='tight', **kwargs)
     print(f'Saved figure {path!r}')

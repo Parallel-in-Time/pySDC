@@ -10,7 +10,6 @@ from pySDC.helpers.plot_helper import figsize_by_journal
 from pySDC.projects.RayleighBenard.analysis_scripts.plotting_utils import get_plotting_style, savefig
 
 step_sizes = {
-    'RBC3DG4R4Ra1e5': [8e-2, 4e-2, 2e-2, 1e-2, 5e-3],
     'RBC3DG4R4SDC23Ra1e5': [5e-3 * 2**i for i in range(8)],
     'RBC3DG4R4SDC34Ra1e5': [5e-3 * 2**i for i in range(8)],
     'RBC3DG4R4SDC44Ra1e5': [5e-3 * 2**i for i in range(8)],
@@ -74,7 +73,7 @@ def plot_error_all_components(args):  # pragma: no cover
 def compare_order(Ra):  # pragma: no cover
     fig, ax = plt.subplots(figsize=figsize_by_journal('Nature_CS', 1, 0.6))
     if Ra == 1e5:
-        names = ['RK', 'Euler', 'SDC23', 'SDC34', 'SDC44'][::-1]
+        names = ['RK', 'Euler', 'SDC22', 'SDC23', 'SDC34', 'SDC44'][::-1]
         configs = [f'RBC3DG4R4{me}Ra1e5' for me in names]
         paths = [f'./data/RBC3DG4R4{me}Ra1e5-res-1-order.pickle' for me in names]
 
@@ -92,7 +91,7 @@ def compare_order(Ra):  # pragma: no cover
         ax.loglog(dt, e, **get_plotting_style(config))
 
     for _dt in dt:
-        for i in [1, 3, 4]:
+        for i in [1, 2, 3, 4]:
             ax.text(_dt, _dt**i, i, fontweight='bold', fontsize=14, ha='center', va='center')
             ax.loglog(dt, dt**i, ls=':', color='black')
 

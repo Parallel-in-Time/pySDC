@@ -15,8 +15,8 @@ def parse_args():
         '--mode',
         type=str,
         help='Mode for this script',
-        default='run',
-        choices=['run'],
+        default=None,
+        choices=['run', 'plot'],
     )
     parser.add_argument('--config', type=str, help='Configuration to load', default=None)
     parser.add_argument('--restart_idx', type=int, help='Restart from file by index', default=0)

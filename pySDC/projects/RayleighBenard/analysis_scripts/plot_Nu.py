@@ -39,9 +39,9 @@ def plot_Nu(res, dts, config_name, ref, ax, title):  # pragma: no cover
         if any(error > 1e-2):
             deviates = min(t_i[error > 1e-2])
             ax.axvline(deviates, color=last_line.get_color(), ls=':')
-            print(f'{title} dt={dt} Nu={Nu_mean:.3f}+={Nu_std:.3f}, deviates more than 1% from t={deviates:.2f}')
+            print(f'{title} dt={dt:.4f} Nu={Nu_mean:.3f}+={Nu_std:.3f}, deviates more than 1% from t={deviates:.2f}')
         else:
-            print(f'{title} dt={dt} Nu={Nu_mean:.3f}+={Nu_std:.3f}')
+            print(f'{title} dt={dt:.4f} Nu={Nu_mean:.3f}+={Nu_std:.3f}')
         ax.legend(frameon=True, loc='upper left')
 
 
@@ -50,12 +50,13 @@ def plot_Nu_over_time_Ra1e5():  # pragma: no cover
 
     res = 32
 
-    ref_data = get_pySDC_data(res=res, dt=0.01, config_name='RBC3DG4R4Ra1e5')
+    ref_data = get_pySDC_data(res=res, dt=0.01, config_name='RBC3DG4R4SDC44Ra1e5')
 
     plot_Nu(32, [0.06, 0.04, 0.02], 'RBC3DG4R4SDC34Ra1e5', ref_data, Nu_axs[0], 'SDC34')
     plot_Nu(32, [0.06, 0.05, 0.02, 0.01], 'RBC3DG4R4SDC23Ra1e5', ref_data, Nu_axs[1], 'SDC23')
     plot_Nu(32, [0.05, 0.04, 0.02, 0.01, 0.005], 'RBC3DG4R4RKRa1e5', ref_data, Nu_axs[2], 'RK443')
     plot_Nu(32, [0.02, 0.01, 0.005], 'RBC3DG4R4EulerRa1e5', ref_data, Nu_axs[3], 'RK111')
+    plot_Nu(32, [0.04, 0.02], 'RBC3DG4R4SDC22Ra1e5', ref_data, Nu_axs[3], 'SDC22')
 
     Nu_axs[-1].set_xlabel('$t$')
     Nu_axs[-1].set_ylabel('$Nu$')
