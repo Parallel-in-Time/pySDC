@@ -212,6 +212,15 @@ class RBC3DM2K3(RBC3Dverification):
         return desc
 
 
+class RBC3DM2K2(RBC3Dverification):
+
+    def get_description(self, *args, **kwargs):
+        desc = super().get_description(*args, **kwargs)
+        desc['level_params']['nsweeps'] = 2
+        desc['sweeper_params']['num_nodes'] = 2
+        return desc
+
+
 class RBC3DM3K4(RBC3Dverification):
 
     def get_description(self, *args, **kwargs):
@@ -256,9 +265,9 @@ class RBC3DverificationEuler(RBC3DverificationRK):
         return desc
 
 
-class RBC3DG4R4Ra1e5(RBC3Dverification):
+class RBC3DG4R4SDC22Ra1e5(RBC3DM2K2):
     Tend = 200
-    dt = 6e-2
+    dt = 4e-2
     res = 32
     converged = 50
 

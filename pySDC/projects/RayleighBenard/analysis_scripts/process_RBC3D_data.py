@@ -13,6 +13,7 @@ def process_RBC3D_data(base_path='./data/processed', plot=True, args=None, confi
     # prepare problem instance
     args = args if args else parse_args()
     comm = MPI.COMM_WORLD
+    args['procs'] = [1, 1, comm.size]
     config = config if config else get_config(args)
     desc = config.get_description(**args)
     P = desc['problem_class'](

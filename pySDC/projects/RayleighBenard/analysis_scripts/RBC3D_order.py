@@ -10,6 +10,7 @@ from pySDC.helpers.plot_helper import figsize_by_journal
 from pySDC.projects.RayleighBenard.analysis_scripts.plotting_utils import get_plotting_style, savefig
 
 step_sizes = {
+    'RBC3DG4R4SDC22Ra1e5': [5e-3 * 2**i for i in range(8)],
     'RBC3DG4R4SDC23Ra1e5': [5e-3 * 2**i for i in range(8)],
     'RBC3DG4R4SDC34Ra1e5': [5e-3 * 2**i for i in range(8)],
     'RBC3DG4R4SDC44Ra1e5': [5e-3 * 2**i for i in range(8)],
@@ -115,7 +116,7 @@ def run(args, dt, Tend):
     prob = desc['problem_class'](**desc['problem_params'])
 
     ic_config_name = type(config).__name__
-    for name in ['RK', 'Euler', 'O3', 'O4', 'SDC23', 'SDC34', 'SDC44']:
+    for name in ['RK', 'Euler', 'O3', 'O4', 'SDC23', 'SDC34', 'SDC44', 'SDC22']:
         ic_config_name = ic_config_name.replace(name, 'SDC34')
 
     ic_config = get_config({**args, 'config': ic_config_name})
