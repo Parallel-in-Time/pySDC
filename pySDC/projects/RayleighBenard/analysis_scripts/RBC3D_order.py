@@ -2,15 +2,15 @@ import os
 import pickle
 import numpy as np
 from pySDC.helpers.fieldsIO import FieldsIO
-from pySDC.projects.GPU.configs.base_config import get_config
+from pySDC.projects.RayleighBenard.RBC3D_configs import get_config
 from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
 from mpi4py import MPI
 import matplotlib.pyplot as plt
 from pySDC.helpers.plot_helper import figsize_by_journal
-from pySDC.projects.GPU.analysis_scripts.RBC3D_plotting_utils import get_plotting_style, savefig
+from pySDC.projects.RayleighBenard.analysis_scripts.plotting_utils import get_plotting_style, savefig
 
 step_sizes = {
-    'RBC3DG4R4Ra1e5': [8e-2, 4e-2, 2e-2, 1e-2, 5e-3],
+    'RBC3DG4R4SDC22Ra1e5': [5e-3 * 2**i for i in range(8)],
     'RBC3DG4R4SDC23Ra1e5': [5e-3 * 2**i for i in range(8)],
     'RBC3DG4R4SDC34Ra1e5': [5e-3 * 2**i for i in range(8)],
     'RBC3DG4R4SDC44Ra1e5': [5e-3 * 2**i for i in range(8)],
@@ -74,7 +74,7 @@ def plot_error_all_components(args):  # pragma: no cover
 def compare_order(Ra):  # pragma: no cover
     fig, ax = plt.subplots(figsize=figsize_by_journal('Nature_CS', 1, 0.6))
     if Ra == 1e5:
-        names = ['RK', 'Euler', 'SDC23', 'SDC34', 'SDC44'][::-1]
+        names = ['RK', 'Euler', 'SDC22', 'SDC23', 'SDC34', 'SDC44'][::-1]
         configs = [f'RBC3DG4R4{me}Ra1e5' for me in names]
         paths = [f'./data/RBC3DG4R4{me}Ra1e5-res-1-order.pickle' for me in names]
 
@@ -92,7 +92,7 @@ def compare_order(Ra):  # pragma: no cover
         ax.loglog(dt, e, **get_plotting_style(config))
 
     for _dt in dt:
-        for i in [1, 3, 4]:
+        for i in [1, 2, 3, 4]:
             ax.text(_dt, _dt**i, i, fontweight='bold', fontsize=14, ha='center', va='center')
             ax.loglog(dt, dt**i, ls=':', color='black')
 
@@ -103,7 +103,7 @@ def compare_order(Ra):  # pragma: no cover
 
 
 def run(args, dt, Tend):
-    from pySDC.projects.GPU.run_experiment import run_experiment
+    from pySDC.projects.RayleighBenard.run_experiment import run_experiment
     from pySDC.core.errors import ConvergenceError
 
     args['mode'] = 'run'
@@ -116,7 +116,7 @@ def run(args, dt, Tend):
     prob = desc['problem_class'](**desc['problem_params'])
 
     ic_config_name = type(config).__name__
-    for name in ['RK', 'Euler', 'O3', 'O4', 'SDC23', 'SDC34', 'SDC44']:
+    for name in ['RK', 'Euler', 'O3', 'O4', 'SDC23', 'SDC34', 'SDC44', 'SDC22']:
         ic_config_name = ic_config_name.replace(name, 'SDC34')
 
     ic_config = get_config({**args, 'config': ic_config_name})
@@ -134,7 +134,7 @@ def run(args, dt, Tend):
 
 
 if __name__ == '__main__':
-    from pySDC.projects.GPU.run_experiment import parse_args
+    from pySDC.projects.RayleighBenard.run_experiment import parse_args
 
     args = parse_args()
 

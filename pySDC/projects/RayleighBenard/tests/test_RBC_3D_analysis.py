@@ -18,7 +18,7 @@ def get_args(path):
 
 
 def get_config(args):
-    from pySDC.projects.GPU.configs.base_config import get_config
+    from pySDC.projects.RayleighBenard.RBC3D_configs import get_config
 
     config = get_config(args)
     config.Tend = 1
@@ -27,7 +27,7 @@ def get_config(args):
 
 
 def generate_simulation_file(path, args=None):
-    from pySDC.projects.GPU.run_experiment import run_experiment
+    from pySDC.projects.RayleighBenard.run_experiment import run_experiment
 
     args = {**get_args(path), **args} if args is not None else get_args(path)
     config = get_config(args)
@@ -37,7 +37,7 @@ def generate_simulation_file(path, args=None):
 
 
 def generate_processed_file(path):
-    from pySDC.projects.GPU.analysis_scripts.process_RBC3D_data import process_RBC3D_data
+    from pySDC.projects.RayleighBenard.analysis_scripts.process_RBC3D_data import process_RBC3D_data
 
     args = get_args(path)
     config = get_config(args)
@@ -56,7 +56,7 @@ def tmp_processed_data(tmp_sim_data, tmp_path):
 
 
 def test_ic_interpolation(tmp_sim_data, tmp_path):
-    from pySDC.projects.GPU.run_experiment import run_experiment
+    from pySDC.projects.RayleighBenard.run_experiment import run_experiment
 
     args = get_args(tmp_path)
 
@@ -80,7 +80,7 @@ def test_processing(tmp_processed_data):
 
 
 def test_get_pySDC_data(tmp_processed_data, tmp_path):
-    from pySDC.projects.GPU.analysis_scripts.process_RBC3D_data import get_pySDC_data
+    from pySDC.projects.RayleighBenard.analysis_scripts.process_RBC3D_data import get_pySDC_data
 
     args = get_args(tmp_path)
     data = get_pySDC_data(res=args['res'], dt=args['dt'], config_name=args['config'], base_path=tmp_path)
@@ -90,7 +90,7 @@ def test_get_pySDC_data(tmp_processed_data, tmp_path):
 
 
 def test_Nu_interpolation():
-    from pySDC.projects.GPU.analysis_scripts.plot_Nu import interpolate_NuV_to_reference_times
+    from pySDC.projects.RayleighBenard.analysis_scripts.plot_Nu import interpolate_NuV_to_reference_times
     import numpy as np
 
     t = sorted(np.random.rand(128))
@@ -115,8 +115,8 @@ def test_Nu_interpolation():
 
 
 def test_error_computation(tmp_sim_data, tmp_path):
-    from pySDC.projects.GPU.analysis_scripts.RBC3D_order import compute_errors, get_path
-    from pySDC.projects.GPU.configs.RBC3D_configs import RBC3DG4R4SDC34Ra1e5
+    from pySDC.projects.RayleighBenard.analysis_scripts.RBC3D_order import compute_errors, get_path
+    from pySDC.projects.RayleighBenard.RBC3D_configs import RBC3DG4R4SDC34Ra1e5
     import numpy as np
     import pickle
 

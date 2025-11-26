@@ -1,5 +1,5 @@
-from pySDC.projects.GPU.configs.base_config import get_config
-from pySDC.projects.GPU.run_experiment import parse_args
+from pySDC.projects.RayleighBenard.RBC3D_configs import get_config
+from pySDC.projects.RayleighBenard.run_experiment import parse_args
 from pySDC.helpers.fieldsIO import FieldsIO
 import matplotlib.pyplot as plt
 from tqdm import tqdm
@@ -9,10 +9,11 @@ import pickle
 import os
 
 
-def process_RBC3D_data(base_path='./data/RBC_time_averaged', plot=True, args=None, config=None):
+def process_RBC3D_data(base_path='./data/processed', plot=True, args=None, config=None):
     # prepare problem instance
     args = args if args else parse_args()
     comm = MPI.COMM_WORLD
+    args['procs'] = [1, 1, comm.size]
     config = config if config else get_config(args)
     desc = config.get_description(**args)
     P = desc['problem_class'](
@@ -204,7 +205,7 @@ def process_RBC3D_data(base_path='./data/RBC_time_averaged', plot=True, args=Non
     return path
 
 
-def get_pySDC_data(res=-1, dt=-1, config_name='RBC3DG4', base_path='data/RBC_time_averaged'):
+def get_pySDC_data(res=-1, dt=-1, config_name='RBC3DG4', base_path='data/processed'):
     path = f'{base_path}/{config_name}-res{res}-dt{dt:.0e}.pickle'
     with open(path, 'rb') as file:
         data = pickle.load(file)
