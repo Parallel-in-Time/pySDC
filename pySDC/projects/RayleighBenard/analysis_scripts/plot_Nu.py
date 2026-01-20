@@ -103,7 +103,7 @@ def plot_Nusselt_Ra1e5_same_dt():  # pragma: no cover
     ax.set_title(r'$Ra=10^5 \quad \Delta t=0.02$')
 
     lines = ax.get_lines()
-    for line, label in zip(lines[1::3], ['SDC44', 'SDC23', 'RK443', 'RK111']):
+    for line, label in zip(lines[1::3], ['SDC44', 'SDC23', 'RK443', 'RK111'], strict=True):
         line.set_label(label)
     ax.legend(frameon=False)
 
