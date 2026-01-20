@@ -1,44 +1,50 @@
-from pySDC.helpers.plot_helper import figsize_by_journal, setup_mpl
+from functools import partial
 import warnings
 import os
 
+from pySDC.helpers.plot_helper import figsize_by_journal, setup_mpl
+
 setup_mpl()
+
+figsize = partial(figsize_by_journal, journal='Nature_CS')
 
 
 def get_plotting_style(config):  # pragma: no cover
 
     args = {'color': None, 'ls': None, 'marker': None, 'markersize': 6, 'label': None}
 
-    if config == 'RBC3DG4R4SDC22Ra1e5':
+    config_no_Ra = config[: config.index('Ra')]
+
+    if config_no_Ra == 'RBC3DG4R4SDC22':
         args['color'] = 'tab:brown'
         args['ls'] = '-'
         args['marker'] = '3'
         args['label'] = 'SDC22'
-    elif config == 'RBC3DG4R4SDC23Ra1e5':
+    elif config_no_Ra == 'RBC3DG4R4SDC23':
         args['color'] = 'tab:blue'
         args['ls'] = '-'
         args['marker'] = 'o'
         args['label'] = 'SDC23'
-    elif config == 'RBC3DG4R4SDC34Ra1e5':
+    elif config_no_Ra == 'RBC3DG4R4SDC34':
         args['color'] = 'tab:orange'
         args['ls'] = '-'
         args['marker'] = '<'
         args['label'] = 'SDC34'
-    elif config == 'RBC3DG4R4SDC44Ra1e5':
+    elif config_no_Ra == 'RBC3DG4R4SDC44':
         args['color'] = 'tab:green'
         args['ls'] = '-'
         args['marker'] = 'x'
         args['label'] = 'SDC44'
-    elif config == 'RBC3DG4R4EulerRa1e5':
+    elif config_no_Ra == 'RBC3DG4R4Euler':
         args['color'] = 'tab:purple'
         args['ls'] = '--'
         args['marker'] = '.'
-        args['label'] = 'Euler'
-    elif config == 'RBC3DG4R4RKRa1e5':
+        args['label'] = 'RK111'
+    elif config_no_Ra == 'RBC3DG4R4RK':
         args['color'] = 'tab:red'
         args['ls'] = '--'
         args['marker'] = '>'
-        args['label'] = 'RK444'
+        args['label'] = 'RK443'
     else:
         warnings.warn(f'No plotting style for {config=!r}')
 
