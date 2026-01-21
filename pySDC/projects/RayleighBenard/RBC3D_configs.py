@@ -101,6 +101,7 @@ class RayleighBenard3DRegular(Config):
             outfile = FieldsIO.fromFile(self.get_file_name())
 
             t0, solution = outfile.readField(restart_idx)
+            solution = solution[: P.spectral.ncomponents, ...]
 
             u0 = P.u_init
 
@@ -182,6 +183,7 @@ class RBC3Dverification(RayleighBenard3DRegular):
         filename = ic_config.get_file_name()
         ic_file = FieldsIO.fromFile(filename)
         t0, ics = ic_file.readField(-1)
+        ics = ics[: P.spectral.ncomponents, ...]
         P.logger.info(f'Loaded initial conditions from {filename!r} at t={t0}.')
 
         # interpolate the initial conditions using padded transforms
@@ -265,6 +267,7 @@ class RBC3DverificationEuler(RBC3DverificationRK):
         return desc
 
 
+# --- Ra 1e5 ---
 class RBC3DG4R4SDC22Ra1e5(RBC3DM2K2):
     Tend = 200
     dt = 4e-2
@@ -305,3 +308,36 @@ class RBC3DG4R4EulerRa1e5(RBC3DverificationEuler):
     dt = 8e-2
     res = 32
     converged = 50
+
+
+# --- Ra 1e6 ---
+class RBC3DG4R4SDC44Ra1e6(RBC3DM4K4):
+    Tend = 75
+    dt = 2e-2
+    res = 64
+    # converged = 22
+    ic_config = {'config': RBC3DG4R4SDC34Ra1e5, 'res': 32, 'dt': 0.02}
+
+
+class RBC3DG4R4SDC23Ra1e6(RBC3DM2K3):
+    Tend = 75
+    dt = 1e-2
+    res = 64
+    converged = 22
+    ic_config = {'config': RBC3DG4R4SDC34Ra1e5, 'res': 32, 'dt': 0.02}
+
+
+class RBC3DG4R4RKRa1e6(RBC3DverificationRK):
+    Tend = 75
+    dt = 1e-2
+    res = 64
+    ic_config = {'config': RBC3DG4R4SDC34Ra1e5, 'res': 32, 'dt': 0.02}
+    # converged = 22
+
+
+class RBC3DG4R4EulerRa1e6(RBC3DverificationEuler):
+    Tend = 75
+    dt = 1e-2
+    res = 64
+    ic_config = {'config': RBC3DG4R4SDC34Ra1e5, 'res': 32, 'dt': 0.02}
+    # converged = 22
