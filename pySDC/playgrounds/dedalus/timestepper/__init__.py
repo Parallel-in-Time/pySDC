@@ -598,10 +598,16 @@ class SDCIMEX(SDCIMEXCore):
                 # Add LX terms from iteration k and current nodes
                 axpy(a=dt*qI[k, m, m], x=LXk[m].data, y=RHS.data)
 
+            # Avoid redundant linear solve
+            if (self.diagonal and
+                k == self.nSweeps-1 and m < self.M - 1
+                and self.initSweep != "NN"):
+                continue
+
             # Solve system and store node solution in solver state
             self._solveAndStoreState(k, m)
 
-            # Avoid non necessary RHS evaluations work
+            # Avoid redundant RHS evaluations
             if not self.forceProl and k == self.nSweeps-1 and self.initSweep != "NN":
                 if self.diagonal:
                     continue
@@ -934,8 +940,9 @@ class SDCIMEX_MPI(SDCIMEX):
             # Add LX terms from iteration k and current nodes
             axpy(a=dt*qI[k], x=LXk.data, y=RHS.data)
 
-        # Solve system and store node solution in solver state
-        self._solveAndStoreState(k)
+        if k < self.nSweeps-1 or m == self.M-1:
+            # Solve system and store node solution in solver state
+            self._solveAndStoreState(k)
 
         if k < self.nSweeps-1:
             tEval = t0+dt*tau
