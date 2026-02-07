@@ -67,9 +67,6 @@ class Controller(object):
 
         self.base_convergence_controllers: List[Type[Any]] = [CheckConvergence]
         self.setup_convergence_controllers(description)
-        
-        self.convergence_controllers: List[Any] = []
-        self.convergence_controller_order: np.ndarray = np.array([])
 
     @staticmethod
     def __setup_custom_logger(level: Optional[int] = None, log_to_file: Optional[bool] = None, fname: Optional[str] = None) -> None:
@@ -290,8 +287,8 @@ class Controller(object):
         Returns:
             None
         '''
-        self.convergence_controllers = []
-        self.convergence_controller_order = []
+        self.convergence_controllers: List[Any] = []
+        self.convergence_controller_order: np.ndarray = np.array([], dtype=int)
         conv_classes = description.get('convergence_controllers', {})
 
         # instantiate the convergence controllers
