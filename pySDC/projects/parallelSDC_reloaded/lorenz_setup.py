@@ -5,6 +5,7 @@ Created on Tue Dec  5 10:08:04 2023
 
 Script to numerically compute number revolution periods for the Lorenz system
 """
+
 import numpy as np
 from scipy import signal
 import matplotlib.pyplot as plt

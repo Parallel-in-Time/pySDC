@@ -6,6 +6,7 @@ Created on Fri Dec 22 17:17:14 2023
 Evaluate the nilpotency of diagonal preconditioners MIN-SR-S and MIN-SR-NS
 with increasing number of nodes.
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 

@@ -6,6 +6,7 @@ Created on Sun Nov 12 21:35:05 2023
 Script to numerically determine periods of Van der Pol oscillation for
 different mu parameters.
 """
+
 import numpy as np
 from scipy import signal
 import matplotlib.pyplot as plt
