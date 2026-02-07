@@ -70,7 +70,41 @@ Some style rules that are automatically enforced :
 - lines should be not longer than 120 characters
 - arithmetic operators (`+`, `*`, ...) should be separated with variables by one empty space
 
-You can automate linting somewhat by using git hooks.
+### Using pre-commit hooks
+
+You can automate linting by using [pre-commit](https://pre-commit.com/), which will run the linters automatically before each commit.
+
+To set up pre-commit hooks:
+
+```bash
+# Install pre-commit (works also with conda/mamba)
+pip install pre-commit
+# Install the git hooks
+pre-commit install
+```
+
+Once installed, the hooks will run automatically before each commit. The hooks will:
+- Automatically format your code with `black`
+- Check your code with `ruff` and attempt to fix issues automatically
+- Run additional checks (trailing whitespace, file endings, etc.)
+
+You can also run the hooks manually on all files:
+
+```bash
+pre-commit run --all-files
+```
+
+Or on specific files:
+
+```bash
+pre-commit run --files path/to/file.py
+```
+
+The pre-commit configuration is defined in `.pre-commit-config.yaml` at the root of the repository.
+
+### Manual git hooks (alternative)
+
+If you prefer not to use pre-commit, you can set up manual git hooks.
 In order to run black automatically, we want to do a pre-commit hook which adds the modified files to the commit after reformatting.
 To this end, just add the following to a possibly new file in the path `<pySDC-root-directory>/.git/hooks/pre-commit`:
 
