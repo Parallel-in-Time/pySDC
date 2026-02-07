@@ -152,7 +152,30 @@ This stage allows to checks how much of the `pySDC` code is tested by the previo
 - `pySDC/tutorial`
 
 This analysis is done in parallel to the test each time a pull is done on any branch (main repository or fork).
-You can look at the current [coverage report for the master branch](https://parallel-in-time.org/pySDC/coverage/index.html) or [compare the results with previous builds](https://app.codecov.io/gh/Parallel-in-Time/pySDC). Codecov will also comment on any pull request, indicating the change of coverage.
+
+### Viewing Coverage Reports
+
+There are multiple ways to view test coverage for pySDC:
+
+1. **HTML Coverage Report** (recommended for detailed analysis)
+   - View the current [coverage report for the master branch](https://parallel-in-time.org/pySDC/coverage/index.html)
+   - Shows line-by-line coverage with color coding
+   - Updated automatically with each push to master
+
+2. **Codecov Dashboard** (for trends and PR analysis)
+   - [Compare results with previous builds](https://app.codecov.io/gh/Parallel-in-Time/pySDC)
+   - View coverage trends over time
+   - See coverage impact of specific commits
+   - Codecov automatically comments on pull requests with coverage changes
+
+3. **Coverage Badge** (quick status check)
+   - Displayed in the [README](../../README.md)
+   - Shows current coverage percentage for master branch
+
+4. **PR Coverage Comments** (for contributors)
+   - Codecov comments on each pull request
+   - Shows coverage changes introduced by the PR
+   - Highlights uncovered lines in modified files
 
 During developments, you can also run the coverage tests locally, using :
 
@@ -175,6 +198,11 @@ This will generate the coverage report in a `htmlcov` folder, and you can open t
 > :warning: Coverage can be lower if some tests fails (for instance, if you did not install all required python package to run all the tests).
 
 ### Coverage exceptions
+
+The coverage configuration is defined in two places:
+
+1. **Runtime configuration** (`pyproject.toml`) - Controls what coverage measures during test execution
+2. **Codecov configuration** (`codecov.yml`) - Controls how Codecov reports and displays coverage
 
 Some types of code lines will be ignored by the coverage analysis (_e.g_ lines starting with `raise`, ...), see the `[tool.coverage.report]` section in `pyproject.toml`.
 Part of code (functions, conditionaly, for loops, etc ...) can be ignored by coverage analysis using the `# pragma: no cover`, for instance
