@@ -65,7 +65,7 @@ jobs:
           override_commit: ${{ github.event.workflow_run.head_sha }}
           override_branch: ${{ github.event.workflow_run.head_branch }}
       - name: Upload coverage reports to Codecov (Push)
-        if: steps.get_pr.outputs.is_pr != 'true'
+        if: steps.get_pr.outputs.is_pr == 'false'
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
