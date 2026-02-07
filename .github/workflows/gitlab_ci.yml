@@ -2,7 +2,7 @@
 
 name: Mirror to Gitlab to trigger CI
 
-# Disabled: GitLab mirror is currently failing expectedly
+# Disabled: GitLab mirror is temporarily disabled due to known issues
 # To re-enable, uncomment the triggers below
 on:
   workflow_dispatch:  # Manual trigger only
