@@ -53,4 +53,3 @@ The project uses in particular these implementations from the ``implementations`
 - ``mesh.py`` in the ``datatype_classes``: contains numpy-based data with a communicator
 - ``AllenCahn_MPIFFT.py`` in the ``problem_classes``: contains the implementation of the problem for simple forcing terms
 - ``AllenCahn_Temp_MPIFFT.py`` in the ``problem_classes``: contains the implementation of the problem for temperature-based forcing
-

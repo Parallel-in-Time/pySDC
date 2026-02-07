@@ -135,5 +135,3 @@ class particles_output(Hooks):
         plt.pause(0.001)
 
         return None
-
-

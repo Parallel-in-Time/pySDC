@@ -1,7 +1,7 @@
 Exponential SDC for the Monodomain Equation in Cardiac Electrophysiology
 ==============================================================================
 This project implements the exponential spectral deferred correction (ESDC) method for the monodomain equation in cardiac electrophysiology.
-The method proposed here is an adaptation of the `ESDC method proposed by T. Buvoli  <https://doi.org/10.1137/19M1256166>`_ to the monodomain equation. 
+The method proposed here is an adaptation of the `ESDC method proposed by T. Buvoli  <https://doi.org/10.1137/19M1256166>`_ to the monodomain equation.
 In particular, the implicit-explicit Rush-Larsen method is used as correction scheme. Moreover, not all model components have exponential terms, therefore the resulting method is an hybrid between ESDC and the standard SDC method.
 
 Monodomain equation
@@ -14,16 +14,16 @@ The monodomain equation models the electrical activity in the heart. It is a rea
     \frac{\partial z_E}{\partial t} &= g_E(V,z_E,z_e) & \quad \text{in } &\Omega \times (0,T), \\
     \frac{\partial z_e}{\partial t} &= \Lambda_e(V)(z_e-z_{e,\infty}(V)) & \quad \text{in } &\Omega \times (0,T), \\
     \end{align}
-    
-plus the boundary conditions, where :math:`V(t,x)\in\mathbb{R}` is the transmembrane potential and :math:`z_E(t,x)\in\mathbb{R}^n`, :math:`z_e(t,x)\in\mathbb{R}^m` are the ionic model state variables. 
-The ionic model right-hand side :math:`g_E` is a general nonlinear term, while :math:`\Lambda_e` is a diagonal matrix. The typical range for the number of unknowns :math:`N=1+n+m` is :math:`N\in [4,50]` and depends on the ionic model of choice. 
+
+plus the boundary conditions, where :math:`V(t,x)\in\mathbb{R}` is the transmembrane potential and :math:`z_E(t,x)\in\mathbb{R}^n`, :math:`z_e(t,x)\in\mathbb{R}^m` are the ionic model state variables.
+The ionic model right-hand side :math:`g_E` is a general nonlinear term, while :math:`\Lambda_e` is a diagonal matrix. The typical range for the number of unknowns :math:`N=1+n+m` is :math:`N\in [4,50]` and depends on the ionic model of choice.
 
 Spatial discretization yields a system of ODEs which can be written in compact form as
 
 .. math::
     \mathbf y'=f_I(\mathbf y)+f_E(\mathbf y)+f_e(\mathbf y),
 
-where :math:`\mathbf y(t)\in\mathbb{R}^{M N}` is the vector of unknowns and :math:`M` the number of mesh nodes. 
+where :math:`\mathbf y(t)\in\mathbb{R}^{M N}` is the vector of unknowns and :math:`M` the number of mesh nodes.
 Concerning the right-hand sides, :math:`f_I` is a linear term for the discrete diffusion, :math:`f_E` is a nonlinear but non-stiff term for :math:`I_{ion},g_E`, and :math:`f_e` is a severely stiff term for :math:`\Lambda_e(V)(z_e-z_{e,\infty}(V))`.
 
 The standard (serial) way of integrating the monodomain equation is by using a splitting method, where :math:`f_I` is integrated implicitly, :math:`f_E` explicitly, and :math:`f_e` using the exponential Euler method (which is inexpensive due to the diagonal structure of :math:`\Lambda_e`). We denote this method as IMEXEXP.
@@ -31,8 +31,8 @@ The standard (serial) way of integrating the monodomain equation is by using a s
 The ESDC method for the monodomain equation
 -------------------------------------------
 A possible way to parallelize the integration of the monodomain equation is by employing the SDC method in combination with the IMEXEXP approach for the correction scheme (preconditioner).
-However, this approach is unstable due to the severe stiffness of :math:`f_e`. 
-Therefore we propose a hybrid method, where we employ SDC for the :math:`f_I,f_E` terms and ESDC for the :math:`f_e` term. For the correcttion scheme we still use the IMEXEXP method. 
+However, this approach is unstable due to the severe stiffness of :math:`f_e`.
+Therefore we propose a hybrid method, where we employ SDC for the :math:`f_I,f_E` terms and ESDC for the :math:`f_e` term. For the correcttion scheme we still use the IMEXEXP method.
 The resulting method can be seen as a particular case of ESDC and will be denoted by ESDC in the next figures, for simplicity.
 
 Running the code
@@ -53,11 +53,11 @@ Then an example can be run:
 
 Stability
 ---------
-We display here the stability domain of the ESDC and SDC methods, both with IMEXEXP as correction scheme, applied to the test problem 
+We display here the stability domain of the ESDC and SDC methods, both with IMEXEXP as correction scheme, applied to the test problem
 
-.. math:: 
-    y'=\lambda_I y+\lambda_E y+\lambda_e y, 
-    
+.. math::
+    y'=\lambda_I y+\lambda_E y+\lambda_e y,
+
 with :math:`\lambda_I,\lambda_E,\lambda_e` representing :math:`f_I,f_E,f_e`, respectively.
 We fix :math:`\lambda_E=-1` and vary the stiff terms :math:`\lambda_I,\lambda_e` only. We see that the ESDC method is stable for all tested values of :math:`\lambda_I,\lambda_e`, while SDC is not.
 
@@ -68,10 +68,10 @@ We fix :math:`\lambda_E=-1` and vary the stiff terms :math:`\lambda_I,\lambda_e`
 
 Convergence
 -----------
-Here we verify convergence of the ESDC method for the monodomain equation. 
+Here we verify convergence of the ESDC method for the monodomain equation.
 We fix the number of collocation nodes to :math:`m=6` and perform a convergence experiment fixing the number of sweeps to either :math:`k=3` or :math:`k=6`.
 We use the ten Tusscher-Panfilov ionic model, which is employed in practical applications.
-We see that we gain one order of accuracy per sweep, as expected. 
+We see that we gain one order of accuracy per sweep, as expected.
 
 .. image:: ../../../data_monodomain/convergence_ESDC_fixed_iter.png
    :scale: 100 %

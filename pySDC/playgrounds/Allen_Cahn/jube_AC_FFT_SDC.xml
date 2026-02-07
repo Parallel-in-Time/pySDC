@@ -28,7 +28,7 @@
       <pattern name="error_pat" type="float">Error vs. reference solution: $jube_pat_fp</pattern>
       <pattern name="niter_pat" type="float">Mean number of iterations: $jube_pat_fp</pattern>
     </patternset>
-    
+
     <!-- Operation -->
     <step name="sub_step" iterations="5">
       <use>param_set_nsweeps</use> <!-- use existing parameterset -->

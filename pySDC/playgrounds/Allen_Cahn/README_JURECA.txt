@@ -10,4 +10,3 @@ http://www.fz-juelich.de/ias/jsc/EN/Expertise/Supercomputers/JURECA/JURECA_node.
 > pip install --user dill pyfftw
 
 > git clone https://github.com/Parallel-in-Time/pySDC.git
-

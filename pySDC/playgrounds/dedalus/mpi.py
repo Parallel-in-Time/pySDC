@@ -7,7 +7,7 @@ from mpi4py import MPI
 import sys
 
 def initSpaceTimeCommunicators(nProcSpace=None, nProcTime=None, groupSpace=True):
-    
+
     gComm = MPI.COMM_WORLD
     gRank = gComm.Get_rank()
     gSize = gComm.Get_size()
@@ -40,8 +40,8 @@ def initSpaceTimeCommunicators(nProcSpace=None, nProcTime=None, groupSpace=True)
                 f' is not equal to the total number of MPI processes ({gSize})')
         else:
             sys.exit(0)
-            
-    
+
+
     # Information message
     if gSize == 1:
         log(" - no parallelization at all")
@@ -93,4 +93,3 @@ if __name__ == "__main__":
 
     print(f"Global rank {gRank} ({gSize}), space rank {sRank} ({sSize}),"
           f" time rank {tRank} ({tRank}) running on CPU core {coreNum}")
-    

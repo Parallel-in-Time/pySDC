@@ -30,4 +30,3 @@ Workflow:
 * scorep-score -c N $SCOREP_EXPERIMENT_DIRECTORY/profile.cubex
 * Check memory requirements, adapt in job script (export SCOREP_TOTAL_MEMORY=XXX) and restart job with tracing (export SCOREP_ENABLE_TRACING=1)
 * square $SCOREP_EXPERIMENT_DIRECTORY
-

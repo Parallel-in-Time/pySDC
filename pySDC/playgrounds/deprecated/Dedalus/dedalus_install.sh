@@ -180,4 +180,3 @@ python3 -m pip install --no-cache --no-binary :all: dedalus
 
 echo "Installation complete in conda environment '${CONDA_ENV}'"
 conda deactivate
-

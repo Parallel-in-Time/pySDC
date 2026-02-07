@@ -9,6 +9,6 @@ echo "Install pySDC"
 source /pySDC/pySDC/projects/compression/Docker/install_pySDC.sh
 
 echo "Done"
- 
+
 # open a new shell to keep the container running
 /bin/bash "${allparams[@]}"

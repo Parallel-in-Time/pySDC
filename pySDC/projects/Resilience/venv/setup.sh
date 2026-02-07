@@ -15,4 +15,3 @@ source "${ABSOLUTE_PATH}"/activate.sh
 FFTW_LIBRARY_DIR="/p/software/jusuf/stages/2024/software/FFTW/3.3.10-GCC-12.3.0/lib64" python3 -m pip install mpi4py-fft
 python3 -m pip install --upgrade -r "${ABSOLUTE_PATH}"/requirements.txt
 python3 -m pip install --upgrade -e /p/project/ccstma/baumann7/pySDC/
-

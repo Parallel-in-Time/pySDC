@@ -16,7 +16,7 @@ def get_Nek5000_Data(Ra, base_path='data/Nek5000'):  # pragma: no cover
 
     # append relative path to base path
     path = __file__
-    base_path = f'{path[::-1][path[::-1].index('/'):][::-1]}../{base_path}'
+    base_path = f'{path[::-1][path[::-1].index(' / '):][::-1]}../{base_path}'
     Pr = 0.7
 
     if Ra == '1e5':

@@ -25,4 +25,3 @@ we now derive the full propagation matrix, which takes the initial value u0 and 
 over all steps, iterations and sweeps. This matrix can be used to analyze PFASST in yet another exciting way.
 
 .. include:: doc_matrixPFASST_propagator.rst
-

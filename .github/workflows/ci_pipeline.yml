@@ -84,7 +84,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        env: 
+        env:
           - AllenCahn_Bayreuth
           - AsympConv
           - DAE
@@ -151,7 +151,7 @@ jobs:
         run: |
           source /opt/spack/share/spack/setup-env.sh
           spack load libpressio
-           
+
           coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/compression/tests -m libpressio
       - name: Make coverage report
         run: |
@@ -187,7 +187,7 @@ jobs:
         run: echo "HOME=/home/firedrake" >> "$GITHUB_ENV"
       - name: Checkout pySDC
         uses: actions/checkout@v4
-        with: 
+        with:
           path: ./pySDC
       - name: Checkout gusto
         uses: actions/checkout@v4
@@ -231,7 +231,7 @@ jobs:
           path: |
             data_firedrake
             coverage_firedrake.dat
-         
+
   user_monodomain_tests_linux:
     runs-on: ubuntu-latest
     defaults:

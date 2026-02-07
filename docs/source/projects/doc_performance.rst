@@ -12,4 +12,3 @@ Results:
    :scale: 100 %
 .. image:: ../../../pySDC/projects/Performance/vampir_traces_pySDC_AC_4x2_ps_v2.png
    :scale: 100 %
-

@@ -120,7 +120,7 @@ MASK=`echo $MASK | sed 's/:,/:/'`
 echo $MASK
 }
 
-if [ $MCA == "CLS" ] 
+if [ $MCA == "CLS" ]
 then
    pin_cluster
 elif [ $MCA == "BOO" ]

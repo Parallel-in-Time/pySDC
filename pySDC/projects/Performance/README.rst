@@ -31,4 +31,3 @@ The project already contains some output files, where traces have been visualize
 For this, there is also a VAMPIR settings file available to help reproducing the pictures.
 
 .. include:: doc_performance.rst
-

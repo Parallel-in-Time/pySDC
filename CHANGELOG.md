@@ -6,8 +6,8 @@
     Also, pySDC is now compatible with the finite element library [Firedrake](https://github.com/firedrakeproject/firedrake) and the geophysical fluid dynamics library
     [Gusto](https://github.com/firedrakeproject/gusto), thanks to [\@jshipton](https://github.com/jshipton) and [\@brownbaerchen](https://github.com/brownbaerchen).
     The former allows to setup PDEs with finite element discretizations in pySDC and then solve in time with SDC and PFASST, while the latter allows to setup a geophysical fluid dynamics problem and then use pySDC with any SDC setup as a timestepper in Gusto.
--   June 24, 2024: Major summer cleanup with Version 5.5. [\@tlunet](https://github.com/tlunet) extracted all quadrature-related stuff into his new standalone code 
-    [qmat](https://github.com/Parallel-in-Time/qmat), which makes pySDC much more focussed and both parts easier to maintain. 
+-   June 24, 2024: Major summer cleanup with Version 5.5. [\@tlunet](https://github.com/tlunet) extracted all quadrature-related stuff into his new standalone code
+    [qmat](https://github.com/Parallel-in-Time/qmat), which makes pySDC much more focussed and both parts easier to maintain.
     [\@lisawim](https://github.com/lisawim) worked a lot on the DAE sweepers (including an MPI-parallel version), while [\@brownbaerchen](https://github.com/brownbaerchen) has fun with GPUs.
     We also appreciate [\@jakob-fritz](https://github.com/jakob-fritz) working hard on improving the CI pipeline.
 -   January 24, 2024: Version 5.4.0 contains the code for the [second order SDC paper](https://arxiv.org/abs/2310.08352) by [\@ikrom96git](https://github.com/ikrom96git). It also has some changes to the FEniCS
@@ -16,16 +16,16 @@
     [\@tlunet](https://github.com/tlunet), [\@lisawim](https://github.com/lisawim), [\@ikrom96git](https://github.com/ikrom96git) for all the contributions.
     Besides the usual bugfixing and polishing, `pySDC` now comes with linear multistep methods, classical Runge Kutta methods, DAE sweepers, and more/improved projects.
     We have second-order SDC on board, the brand-new switch estimator, a testing ground for compression with [libpressio](https://github.com/robertu94/libpressio), and more.
--   March 24, 2023: Version 5.2 is out and improves the code in multiple directions. The problem class can now define their 
+-   March 24, 2023: Version 5.2 is out and improves the code in multiple directions. The problem class can now define their
     parameters explicitly with the constructor, and not with a dictionary. `params` is now a property of the problem class, that returns the problem parameters into a dictionary,
     and parameters are also automatically stored as problem attribute using the `_makeAttributeAndRegister` method, allowing to define readonly paramters
     (warning: **not backward compatible**).
-    The resilience project now comes with the quench problem, resulting a collaboration between @brownbaerchen and @eschnaubelt during the 
+    The resilience project now comes with the quench problem, resulting a collaboration between @brownbaerchen and @eschnaubelt during the
     TIME-X Apps Hackathon at USI Lugano. Many of the other changes under the hood prepare `pySDC` for Version 6.
--   January 23, 2023: Version 5.1 brings a lot of changes to the documentation, both on Github and on the website. 
-    We revived the [codecov](https://app.codecov.io/gh/Parallel-in-Time/pySDC) connection and started the 
-    [OpenSFF Best Practices](https://bestpractices.coreinfrastructure.org/en/projects/6909) guide. 
-    The hook classes and the way they are handled has changed (without breaking the API, hooray), the battery model 
+-   January 23, 2023: Version 5.1 brings a lot of changes to the documentation, both on Github and on the website.
+    We revived the [codecov](https://app.codecov.io/gh/Parallel-in-Time/pySDC) connection and started the
+    [OpenSFF Best Practices](https://bestpractices.coreinfrastructure.org/en/projects/6909) guide.
+    The hook classes and the way they are handled has changed (without breaking the API, hooray), the battery model
     got quite an update and adaptivity plays a more prominent role now. Thanks to [\@brownbaerchen](https://github.com/brownbaerchen),
     [\@tlunet](https://github.com/tlunet), [\@lisawim](https://github.com/lisawim)!
 -   October 7, 2022: Version 5 comes with many changes, both visible and

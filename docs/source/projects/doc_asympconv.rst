@@ -11,4 +11,3 @@ Results:
 
 .. image:: ../../../data/conv_test_niter_Linf_advection.png
    :width: 19%
-

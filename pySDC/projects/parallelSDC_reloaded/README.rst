@@ -15,7 +15,7 @@ Python scripts of the numerical experiment for the following paper:
 Figures for the manuscript
 --------------------------
 
-See the `scripts` folder, all python scripts have the `fig0[...]` prefix, and each script generate several figures 
+See the `scripts` folder, all python scripts have the `fig0[...]` prefix, and each script generate several figures
 from the manuscript.
 One can run everything with the `run.sh` script, and crop the pdf figures to the format used in the manuscript with the `crop.sh` script.
 

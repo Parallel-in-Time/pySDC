@@ -15,4 +15,3 @@ Results:
 
 .. image:: ../../../data/parallelSDC_preconditioner_MPI_fisher.png
    :scale: 100 %
-

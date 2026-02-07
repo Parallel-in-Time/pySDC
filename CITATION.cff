@@ -1,5 +1,5 @@
 abstract: "The pySDC project is a Python implementation of the spectral deferred correction (SDC) approach and its flavors, esp. the multilevel extension MLSDC and PFASST. It is intended for rapid prototyping and educational purposes. New ideas like e.g. sweepers or predictors can be tested and first toy problems can be easily implemented."
-authors: 
+authors:
   - family-names: Speck
     given-names: Robert
     orcid: https://orcid.org/0000-0002-3879-1210
@@ -37,7 +37,7 @@ authors:
 version: 5.6
 doi: 10.5281/zenodo.594191
 date-released: 2025-04-11
-keywords: 
+keywords:
   - "parallel-in-time"
   - "spectral deferred corrections"
   - "parallel full approximation scheme in space and time"

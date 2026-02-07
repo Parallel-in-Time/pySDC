@@ -76,4 +76,3 @@ Then, if you want to run stuff in parallel (but locally), start an ``ipcluster``
 .. code-block:: bash
 
     ipcluster start --engines=MPI -n 4
-

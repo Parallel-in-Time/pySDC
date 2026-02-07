@@ -30,15 +30,15 @@ From the root directory of `pySDC`, you can run
 .. code-block:: bash
 
     cd <pySDC-root-dir>/pySDC/playgrounds/12th_PinT_Workshop
-     
+
 Now, create the virtual environment with the following command. If you are using ``conda`` instead of ``micromamba``, you can just replace ``micromamba`` with ``conda`` in the commands, or run first run ``conda install -c conda-forge micromamba``.
- 
+
 .. code-block:: bash
 
     micromamba env create -f environment-tutorial.yml
     micromamba activate pySDC_tutorial
 
-     
+
 This may take a while...
 Note that this folder and all changes in it will remain even if you leave the virtual environment.
 Only installations made with ``micromamba`` or ``pip`` are affected by changing the environment.

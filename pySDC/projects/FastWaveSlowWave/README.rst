@@ -41,4 +41,3 @@ In a second, even more complex example, we test FWSW-SDC for the 2D Boussinesq e
 In particular, we are interested in the number of `GMRES iterations <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/FastWaveSlowWave/rungmrescounter_boussinesq.py>`_ each time integrator needs to achieve a certain error.
 
 .. include:: doc_fwsw_boussinesq.rst
-

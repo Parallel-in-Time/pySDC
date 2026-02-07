@@ -6,10 +6,10 @@ As docker desktop is no longer available for commercial use for free, you may ne
 If you haven't done this already, build the container using
 
 .. code-block:: bash
-    
+
     cd <local_path_to_pySDC>/pySDC/projects/compression/Docker
     docker build -t libpressio .
- 
+
 This creates an image with the name 'libpressio'.
 Please pay attention to the platform you are using and you intend to run on. If you use this command on an ARM machine and try to use the image in a GitHub action, it will not run because it requires AMD architecture. You can build a platform specific version for GitHub using
 
@@ -19,7 +19,7 @@ Please pay attention to the platform you are using and you intend to run on. If 
 
 
 If you are on an ARM machine like me, replace `amd64` by `arm64` to build an image for your local machine. Remember to replace the tag with something useful, such as  ``-t libpressio:arm64``.
- 
+
 Start the image using
 
 .. code-block:: bash

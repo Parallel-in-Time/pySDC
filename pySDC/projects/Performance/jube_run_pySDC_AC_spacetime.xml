@@ -37,7 +37,7 @@
       <pattern name="timing_pat" type="float">Time to solution: $jube_pat_fp sec.</pattern>
       <pattern name="niter_pat" type="float">Mean number of iterations: $jube_pat_fp</pattern>
     </patternset>
-    
+
     <!-- Operation -->
     <step name="sub_step">
       <use>param_set</use> <!-- use existing parameterset -->

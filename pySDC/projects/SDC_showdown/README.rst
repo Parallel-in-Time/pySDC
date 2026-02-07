@@ -13,4 +13,3 @@ The results are gathered, stored and shown in comparison.
 Note that on standard machines the inexact semi-implicit variant wins each time (may be different for the CI testing).
 
 .. include:: doc_SDC_showdown.rst
-

@@ -53,4 +53,3 @@ a commercial solver for black-box optimization which aggregates several state-of
 The objective function in this case is the sum over 17^2 values of lamdt, real and imaginary. This works surprisingly well!
 
 .. include:: doc_parallelSDC_preconditioner_MPI.rst
-

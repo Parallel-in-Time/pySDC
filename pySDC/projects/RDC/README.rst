@@ -20,4 +20,3 @@ The obvious next step is to try the multi-level variant of RDC as well as a PFAS
 Both are not straightforward and it seems that only for smaller numbers of nodes multi-level RDC does actually converge,
 at least if collocation-based coarsening is used. Yet, in ``vanderpol_MLSDC_PFASST_test.py`` we show one example where the errors as well as the mean number of iterations look fine.
 Note that we use very aggressive node coarsening here, going from 20 to 2 nodes.
-

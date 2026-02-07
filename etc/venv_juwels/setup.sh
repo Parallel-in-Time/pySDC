@@ -20,4 +20,3 @@ python3 -m pip install -r "${ABSOLUTE_PATH}"/requirements.txt
 FFTW_LIBRARY_DIR="/p/software/juwels/stages/2025/software/FFTW/3.3.10-GCC-13.3.0/lib64/" python3 -m pip install git+https://github.com/brownbaerchen/mpi4py-fft.git@cupy_implementation
 
 python3 -m pip install -e "${ABSOLUTE_PATH}"/../../
-

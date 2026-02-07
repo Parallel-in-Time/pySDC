@@ -71,7 +71,7 @@ You can customize the behavior by editing:
 - **Trigger conditions** in `auto_fix_failures.yml`:
   ```yaml
   if: >-
-    ${{ github.event.workflow_run.conclusion == 'failure' 
+    ${{ github.event.workflow_run.conclusion == 'failure'
     && github.event.workflow_run.event == 'schedule' }}
   ```
 

@@ -18,4 +18,3 @@ FFTW_LIBRARY_DIR="/p/software/juwelsbooster/stages/2024/software/FFTW/3.3.10-GCC
 python3 -m pip install -e /p/project1/ccstma/baumann7/qmat
 python3 -m pip install -r "${ABSOLUTE_PATH}"/requirements.txt
 python3 -m pip install -e /p/project1/ccstma/baumann7/pySDC/
-

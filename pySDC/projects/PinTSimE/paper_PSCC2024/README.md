@@ -15,7 +15,7 @@ In order to reproduce the plots for the discontinuous test DAE, the following se
 is simulated over the time domain with `t0=3.0` and `Tend=5.4` for different step sizes `dt_list = [1 / (2 ** m) for m in range(2, 9)]`. The fully implicit SDC-DAE sweeper `fully_implicit_DAE` solves the problem for different number of collocation
 nodes `nnodes=[2, 3, 4, 5]` at Radau IIa nodes `quad_type='RADAU-RIGHT` with LU preconditioner `QI='LU'` using `tol_hybr=1e-6` to solve the nonlinear system.
 SDC terminates if the maximum number of iterations `maxiter=45` or the residual tolerance `restol=1e-13` is satisfied.
-For event detection, if an event is found the step sizes will be adapted using the factor `alpha=0.95`. A found event should satisfy the tolerance `epsilon_SE=1e-10`. 
+For event detection, if an event is found the step sizes will be adapted using the factor `alpha=0.95`. A found event should satisfy the tolerance `epsilon_SE=1e-10`.
 
 Then, executing `make_plots_for_test_DAE()` creates the plots, where functions in the script
 
@@ -28,7 +28,7 @@ not used in the publication. The interested applicant is referred to also consid
 
 ## Plots for the WSCC 9-bus test case
 To reproduce the plots for the WSCC 9-bus system, enable the function `make_plots_for_WSCC9_test_case()`. It is recomended to execute the script generating the plots for the WSCC 9-bus test case on a cluster, since the execution takes several hours. Use the following setup: The DAE `WSCC9BusSystem` is simulated over the time domain with `t0=0.0` and `Tend=0.7` for different step sizes `dt_list = [1 / (2 ** m) for m in range(5, 11)]`. The fully implicit SDC-DAE sweeper `fully_implicit_DAE` solves the problem for different number of collocation nodes `nnodes=[2, 3, 4, 5]` at Radau IIa nodes `quad_type='RADAU-RIGHT` with LU preconditioner `QI='LU'` using `tol_hybr=1e-10` to solve the nonlinear system.
-SDC terminates if the maximum number of iterations `maxiter=50` or the residual tolerance `restol=5e-13` is satisfied. For event detection, if an event is found the step sizes will be adapted using the factor `alpha=0.95`. A found event should satisfy the tolerance `epsilon_SE=1e-10`. 
+SDC terminates if the maximum number of iterations `maxiter=50` or the residual tolerance `restol=5e-13` is satisfied. For event detection, if an event is found the step sizes will be adapted using the factor `alpha=0.95`. A found event should satisfy the tolerance `epsilon_SE=1e-10`.
 
 Then, executing `make_plots_for_WSCC9_test_case()` creates the plots, where functions in the script
 

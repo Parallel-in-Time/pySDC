@@ -19,15 +19,15 @@ Now you have to change a little bit in the problem_classes. The first and easy s
 To use pySDC on the GPU with CuPy you must use the [cupy-datatype](../../implementations/datatype_classes/cupy_mesh.py).
 The next step is to import cupy in the problem_class. In the following you have to exchange the NumPy/SciPy functions with the CuPy functions.
 A [Comparison Table](https://docs.cupy.dev/en/latest/reference/comparison.html) is given from CuPy to do that.
-For example: The above steps can be traced using the files 
-[HeatEquation_ND_FD_forced_periodic.py](../../implementations/problem_classes/HeatEquation_ND_FD_forced_periodic.py) 
+For example: The above steps can be traced using the files
+[HeatEquation_ND_FD_forced_periodic.py](../../implementations/problem_classes/HeatEquation_ND_FD_forced_periodic.py)
 and [HeatEquation_ND_FD_forced_periodic_gpu.py](../../implementations/problem_classes/HeatEquation_ND_FD_forced_periodic.py)
-Now you are ready to run `pySDC` on the GPU. 
+Now you are ready to run `pySDC` on the GPU.
 
 Run pySDC on the GPU
 --------------------
-You have to configure a script to run it. You can see at the file [heat.py](heat.py) that the parameters are the 
-same for GPU and CPU. Only the import for the problem_class changed.  
+You have to configure a script to run it. You can see at the file [heat.py](heat.py) that the parameters are the
+same for GPU and CPU. Only the import for the problem_class changed.
 
 More examples
 -------------
@@ -44,7 +44,7 @@ The main file is `run_experiment` and can be configured using command line argum
 For instance, use
 
 .. code-block:: bash
- 
+
     srun -n 4 python run_experiment.pyy --config=GS_USkate --procs=1/1/4 --useGPU=True --mode=run
     mpirun -np 8 python run_experiment.py --config=GS_USkate --procs=1/1/4 --useGPU=True --mode=plot
     python run_experiment.py --config=GS_USkate --procs=1/1/4 --useGPU=True --mode=video
@@ -123,6 +123,6 @@ After modifying the paths as earlier, run the following commands:
     python analysis_scripts/large_simulations.py --mode=plot --problem=RBC --XPU=CPU
     python analysis_scripts/large_simulations.py --mode=video --problem=RBC --XPU=CPU
     python analysis_scripts/plot_large_simulations.py --problem=RBC
-    
+
 Run scripts with `--help` to learn more about parameters.
 Keep in mind that not all features are supported with all problems.

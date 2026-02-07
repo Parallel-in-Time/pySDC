@@ -1,11 +1,11 @@
 Solving differential algebraic equations with SDC
 ==================================================
 
-This project contains the sweepers, hooks, example problems, plotting and simulation scripts for a Master's thesis investigating the usage of SDC methods to solve differential algebraic equations (DAEs). 
+This project contains the sweepers, hooks, example problems, plotting and simulation scripts for a Master's thesis investigating the usage of SDC methods to solve differential algebraic equations (DAEs).
 
-To run the scripts contained in this project a standard installation of pySDC should suffice. 
+To run the scripts contained in this project a standard installation of pySDC should suffice.
 
-Project overview 
+Project overview
 ----------------
 - misc
     - | ``meshDAE.py``
@@ -21,7 +21,7 @@ Project overview
     - | ``loglog_plot.py``
       | Reads a previously generated data file in `.npy` format and generates a plot on logarithmic axis of the specified parameters. Commonly used to generate convergence plots.
     - | ``semilogy_plot.py``
-      | Reads a previously generated data file in `.npy` format and generates a plot on logarithmic y-axis and linear x-axis. 
+      | Reads a previously generated data file in `.npy` format and generates a plot on logarithmic y-axis and linear x-axis.
 
 - problems
     - | ``discontinousTestDAE.py``
@@ -30,29 +30,29 @@ Project overview
       | Example of the pendulum described by a semi-implicit DAE of index 3.
     - | ``problematicF.py``
       | Fully-implicit DAE of index 2 which is not solvable for numerically solvable for certain choices of parameter :math:`\eta`.
-    - | ``simpleDAE.py`` 
+    - | ``simpleDAE.py``
       | Linear semi-explicit index-2 system of Hessenberg form with known analytical solution.
-    - | ``synchronousMachine.py`` 
-      | Synchronous machine model attached to an infinite bus undergoing torque disturbance test. Results in an index-1 system. 
+    - | ``synchronousMachine.py``
+      | Synchronous machine model attached to an infinite bus undergoing torque disturbance test. Results in an index-1 system.
     - | ``transistorAmplifier.py``
       | A two transistor amplifier model that results in an index-1 differential algebraic system. A nice example of a system resulting from a common real world situation.
     - | ``wscc9BusSystem.py``
       | Large power system test case with three reduced model synchronous machines and nine buses. It is also part of the `PinTSimE project <https://github.com/Parallel-in-Time/pySDC/tree/master/pySDC/projects/PinTSimE>`_.
 
 - run
-    - | ``run_convergence_test.py`` 
-      | Script to generate convergence data of applying SDC to the simple linear index-2 differential algebraic system mentioned above. 
-    - | ``run_iteration_test.py`` 
-      | Script to generate data describing behaviour of error and residual of applying SDC to the simple linear index-2 differential algebraic system mentioned above. 
+    - | ``run_convergence_test.py``
+      | Script to generate convergence data of applying SDC to the simple linear index-2 differential algebraic system mentioned above.
+    - | ``run_iteration_test.py``
+      | Script to generate data describing behaviour of error and residual of applying SDC to the simple linear index-2 differential algebraic system mentioned above.
     - | ``fully_implicit_dae_playground.py``
-      | Testing arena for the fully implicit sweeper. 
+      | Testing arena for the fully implicit sweeper.
     - | ``synchronous_machine_playground.py``
       | Testing arena for the synchronous machine model.
     - | ``accuracy_check_MPI.py``
       | Script checking the order of accuracy of MPI sweepers for DAEs of different indices.
 
 - sweepers
-    - | ``fullyImplicitDAE.py`` 
+    - | ``fullyImplicitDAE.py``
       | Sweeper that accepts a fully implicit formulation of a system of differential equations and applies to it a modified version of spectral deferred correction
     - | ``semiImplicitDAE.py``
       | SDC sweeper especially for semi-explicit DAEs. This sweeper is based on ideas mentioned in `Huang et al. (2007) <https://www.sciencedirect.com/science/article/abs/pii/S0021999106003147>`_.
@@ -65,41 +65,41 @@ Project overview
 
 - tests
     Here, all tests for the project can be found.
- 
-Theoretical details 
+
+Theoretical details
 -------------------
-A fully implicit representation of a system of differential equations takes the form 
+A fully implicit representation of a system of differential equations takes the form
 
 .. math::
-  
+
   \begin{eqnarray}
      F(u(t), u'(t), t) = 0.
   \end{eqnarray}
 
-A special case of such an implicit differential equation arises when the Jacobian :math:`\partial_{u'}F` is singular. This implies that the derivative of some of the components of :math:`u(t)` do not appear in the system of equations. The system is thus denoted a differential algebraic system of equations. 
+A special case of such an implicit differential equation arises when the Jacobian :math:`\partial_{u'}F` is singular. This implies that the derivative of some of the components of :math:`u(t)` do not appear in the system of equations. The system is thus denoted a differential algebraic system of equations.
 
-Since the derivative :math:`u'(t)` cannot be isolated the Picard formulation used in SDC for ordinary differential equations (ODEs) cannot be used here. Instead the derivative, henceforth denoted by :math:`U(t)`, is cast as the new unknown solution and the implicit system of equations is written as 
+Since the derivative :math:`u'(t)` cannot be isolated the Picard formulation used in SDC for ordinary differential equations (ODEs) cannot be used here. Instead the derivative, henceforth denoted by :math:`U(t)`, is cast as the new unknown solution and the implicit system of equations is written as
 
 .. math::
-  
+
   \begin{eqnarray}
      F\left(u_0+\int_0^tU(\tau)d\tau, U(t), t\right) = 0.
   \end{eqnarray}
 
 The solution :math:`u(t)` can then be recovered using an quadrature step. This approach is also called the *yp-formulation*.
 
-Based on this equation and an initial approximate solution :math:`\tilde{U}`, the following error equation is formed 
+Based on this equation and an initial approximate solution :math:`\tilde{U}`, the following error equation is formed
 
 .. math::
-  
+
   \begin{eqnarray}
      F\left(u_0+\int_0^t(\tilde{U}(t)+\delta(\tau))d\tau,\;\tilde{U}(t)+\delta(t)\;\right)=0.
   \end{eqnarray}
 
-This results directly in 
+This results directly in
 
 .. math::
-  
+
   \begin{eqnarray}
      F\left(u_0+\int_0^{t_{m+1}}\tilde{U}(\tau)d\tau +\left(\int_0^{t_m} + \int_{t_m}^{t_{m+1}}\right)\delta(\tau)d\tau ,\;\tilde{U}(t_{m+1})+\delta(t_{m+1}),\;t_{m+1}\right)=0
   \end{eqnarray}
@@ -107,21 +107,21 @@ This results directly in
 from which the following time marching discretisation becomes obvious
 
 .. math::
-  
+
   \begin{eqnarray}
      F\left(u_0+[\Delta t\mathbf{Q}\tilde{U}]_{m+1} + \sum_{l=1}^{m+1}\Delta t\tilde{\delta}_l,\;\tilde{U}_{m+1}+\tilde{\delta}_{m+1},\;t_{m+1}\right) = 0.
   \end{eqnarray}
 
 The spectral integration matrix :math:`\mathbf{Q}` is used to approximate the integral of the current approximation :math:`\tilde{U}` and a low order approximation, in this case implicit Euler, is used for the unknown error :math:`\delta(t)`.
-Combining each step in the time marching scheme into a vector results in the following matrix formulation 
+Combining each step in the time marching scheme into a vector results in the following matrix formulation
 
 .. math::
-  
+
   \begin{eqnarray}
      \mathbf{F}\left(\mathbf{u}_0+\Delta t\mathbf{Q}\tilde{\mathbf{U}} + \Delta t\mathbf{Q}_\Delta\tilde{\mathbf{\delta}},\;\tilde{\mathbf{U}}+\tilde{\mathbf{\delta}},\;\mathbf{t}\right) = \mathbf{0}
   \end{eqnarray}
 
-with the integration matrix of the implicit Euler method 
+with the integration matrix of the implicit Euler method
 
 .. math::
 
@@ -134,10 +134,10 @@ with the integration matrix of the implicit Euler method
     \Delta t_1&\Delta t_2&\dots&\Delta t_{M-2}&\Delta t_{M-1}\\
     \end{pmatrix}
 
-Finally, the iterative nature of the method is made clear by considering that the approximate solution can be updated repeatedly with a :math:`\tilde{\mathbf{\delta}}` that is recalculated after each iteration and using the previously updated solution as the initial condition for the next iteration. In this way, reformulation of the previous equation as 
+Finally, the iterative nature of the method is made clear by considering that the approximate solution can be updated repeatedly with a :math:`\tilde{\mathbf{\delta}}` that is recalculated after each iteration and using the previously updated solution as the initial condition for the next iteration. In this way, reformulation of the previous equation as
 
 .. math::
-  
+
   \begin{eqnarray}
      \mathbf{F}\left(\mathbf{u}_0+\Delta t(\mathbf{Q}-\mathbf{Q}_\Delta)\tilde{\mathbf{U}} + \Delta t\mathbf{Q}_\Delta(\tilde{\mathbf{U}} + \tilde{\mathbf{\delta}}),\;\tilde{\mathbf{U}}+\tilde{\mathbf{\delta}},\;\mathbf{t}\right) = \mathbf{0}
   \end{eqnarray}
@@ -145,9 +145,9 @@ Finally, the iterative nature of the method is made clear by considering that th
 results in the following iterative scheme
 
 .. math::
-  
+
   \begin{eqnarray}
-     \mathbf{F}\left(\mathbf{u}_0+\Delta t(\mathbf{Q}-\mathbf{Q}_\Delta)\mathbf{U}^{k}+ \Delta t\mathbf{Q}_\Delta\mathbf{U}^{k+1},\;\mathbf{U}^{k+1},\;\mathbf{t}\right) = \mathbf{0}. 
+     \mathbf{F}\left(\mathbf{u}_0+\Delta t(\mathbf{Q}-\mathbf{Q}_\Delta)\mathbf{U}^{k}+ \Delta t\mathbf{Q}_\Delta\mathbf{U}^{k+1},\;\mathbf{U}^{k+1},\;\mathbf{t}\right) = \mathbf{0}.
   \end{eqnarray}
 
 In practice each iteration is carried out line by line and the resulting implicit equation for :math:`U_{m+1}^{k+1}` is solved using the familiar ``scipy.optimize.root()`` function.
@@ -166,7 +166,7 @@ Let us consider the fully-implicit DAE
 which is of the general form
 
 .. math::
-  
+
   \begin{eqnarray}
      F\left(u (t), u' (t), t\right) = 0
   \end{eqnarray}
@@ -189,7 +189,7 @@ Implementing this system of equations the problem class also requires the ``eval
 
 Since the exact solution is known for this problem, the method ``u_exact`` returns it for each time `t`.
 
-For Runge-Kutta methods, an initial condition for the derivatives at initial time :math:`t_0` :math:`y'(t_0)` and :math:`z'(t_0)` are needed as well. They are implemented using the ``du_exact`` method. 
+For Runge-Kutta methods, an initial condition for the derivatives at initial time :math:`t_0` :math:`y'(t_0)` and :math:`z'(t_0)` are needed as well. They are implemented using the ``du_exact`` method.
 
 The second large class of DAEs is the one of semi-explicit form
 

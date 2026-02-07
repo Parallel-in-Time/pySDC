@@ -6,7 +6,7 @@ on:
   workflow_run:
     workflows: ["CI pipeline for pySDC"]
     types: ["completed"]
-  
+
 jobs:
   build_website:
     runs-on: ubuntu-latest
@@ -45,7 +45,7 @@ jobs:
           files: ./coverage.xml
           fail_ci_if_error: false
           verbose: true
-        
+
 #      - name: Generate benchmark report
 #        uses: pancetta/github-action-benchmark@v1
 #        if: ${{ (!contains(github.event.head_commit.message, '[CI-no-benchmarks]')) && (github.event_name == 'push') }}

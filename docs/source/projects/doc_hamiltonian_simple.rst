@@ -9,5 +9,3 @@ Results:
 
 .. image:: ../../../data/henonheiles_hamiltonian.png
    :scale: 50 %
-
-

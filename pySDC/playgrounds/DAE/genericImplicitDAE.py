@@ -87,7 +87,7 @@ class genericImplicitConstrained(generic_implicit):
 
     .. math::
         0 = g(y, z).
-    
+
     The SDC scheme applied to semi-explicit DAEs where no quadrature is applied to the constrains reads
 
     .. math::
@@ -142,7 +142,7 @@ class genericImplicitConstrained(generic_implicit):
                 me[-1].diff[:] += L.dt * self.coll.Qmat[m, j] * L.f[j].diff[:]
 
         return me
-    
+
     def update_nodes(self):
         """
         Update the u- and f-values at the collocation nodes -> corresponds to a single sweep over all nodes.
@@ -272,7 +272,7 @@ class genericImplicitEmbedded(generic_implicit):
 
     .. math::
         0 = g(y, z).
-    
+
     When the :math:`\varepsilon`-embedding is applied to the SDC scheme for a singular
     perturbed problem we end up with the scheme
 

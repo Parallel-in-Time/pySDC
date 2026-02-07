@@ -6,7 +6,7 @@ For each version update (a.k.a **releases**), we use [semantic versioning](https
 
 - **patch** (from `*.*.{i}` to `*.*.{i+1}`): minor modifications, bugfixes, code reformating, small new features, new projects or playgrounds, new tests
 - **minor** (from `*.{i}.*` to `*.{i+1}.0`): addition of new major features, minor code structure changes without too much impact on the API (backward compatible)
-- **major** (from `{i}.*.*` to `{i+1}.0.0`): major changes in code structure, design, and API, with changes potentially breaking backward compatibility 
+- **major** (from `{i}.*.*` to `{i+1}.0.0`): major changes in code structure, design, and API, with changes potentially breaking backward compatibility
 
 ## Release Pipeline
 
@@ -17,7 +17,7 @@ First, create a `new-release` branch (or choose a similar name), either on your 
 3. modify the version number, release date and, if necessary, the list of authors  in `CITATION.cff`
 4. (for minor and major release **only**) add the release description in the `CHANGELOG.md` file, following the level of details you can find there
 
-Commit with the message: `bump version to x.x.x` where `x.x.x` is the new version. 
+Commit with the message: `bump version to x.x.x` where `x.x.x` is the new version.
 Then create a pull request, and once all tests passed, you can `Merge and Squash`,
 possibly adding your initials as prefix of the final commit message.
 
@@ -28,7 +28,7 @@ git push -d origin new-release  # delete on remote
 git branch -D new-release       # delete locally
 ```
 
-Finally, [draft a new release](https://github.com/Parallel-in-Time/pySDC/releases/new) associated to a new tag 
+Finally, [draft a new release](https://github.com/Parallel-in-Time/pySDC/releases/new) associated to a new tag
 `v*.*.*` (with `*.*.*` the new version, and the ` + Create new tag: ... on publish` button).
 Add a comprehensive summary of the main changes, with appropriate thanks to all the contributors (cf previous releases), and publish it. This will trigger automatically a release update on [Zenodo](https://zenodo.org/doi/10.5281/zenodo.594191).
 For uploading the new release on [PyPI](https://pypi.org/project/pySDC/), this is done manually so you'll have to ask [Robert Speck (@pancetta)](https://github.com/pancetta) for support (ideally send him a quick email).

@@ -32,7 +32,7 @@ These plots were generated with serial SDC.
 
 We also have an implementation for Block Gauss-Seidel multi-step SDC in a simulated parallelism version without MPI.
 You can see the results below, except for the solution, which looks the same as the serial solution to the naked eye.
- 
+
 .. image:: ../../../data/piline_hotrod_adaptive_4procs.png
     :width: 24%
 .. image:: ../../../data/piline_hotrod_4procs.png
@@ -45,9 +45,9 @@ Reproduction of the plots in the adaptive SDC paper
 ---------------------------------------------------
 To reproduce the plots you need to install pySDC using this project's `environment.yml` file, which is in the same directory as this README.
 Then, run the following commands in the same directory:
- 
+
 .. code-block:: bash
- 
+
     mpirun -np 4 python work_precision.py --mode=compare_strategies --problem=vdp
     mpirun -np 4 python work_precision.py --mode=compare_strategies --problem=quench
     mpirun -np 4 python work_precision.py --mode=compare_strategies --problem=Schroedinger
@@ -73,7 +73,7 @@ To reproduce the plots you need to install pySDC using this project's `environme
 Then, run the following commands in the same directory:
 
 .. code-block:: bash
- 
+
     mpirun -np 4 python fault_stats.py prob run_Lorenz
     mpirun -np 4 python fault_stats.py prob run_Schroedinger
     mpirun -np 4 python fault_stats.py prob run_AC
@@ -89,7 +89,7 @@ To reproduce the plots you need to install pySDC using this project's `environme
 To run the resilience experiments, run
 
 .. code-block:: bash
- 
+
     mpirun -np 4 python fault_stats.py prob run_Lorenz
     mpirun -np 4 python fault_stats.py prob run_vdp
     mpirun -np 4 python fault_stats.py prob run_GS

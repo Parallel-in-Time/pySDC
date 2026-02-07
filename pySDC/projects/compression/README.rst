@@ -9,7 +9,7 @@ Introduction
 ____________
 PDE solvers provide ample opportunity for compression to improve certain aspects of the code.
 See for instance `Sebastian Goetschel's and Martin Weiser's nice review <https://doi.org/10.3390/a12090197>`_ on the topic.
- 
+
 Due to current hardware trends, codes are often memory bound rather than compute bound, which means computational resources are perhaps more wisely spent on compression such that memory access can be reduced and more performance can be leveraged.
 This applies, in particular, to distributed systems where interconnect speeds are yet slower than memory access speeds.
 As PinT algorithms target large scale distributed systems because concurrency in the time direction usually comes with lower parallel efficiency than in the space direction and is hence best implemented on top of spatial parallelism, it is an ideal candidate to benefit from compression.
@@ -51,7 +51,7 @@ While this provides no benefit, it should capture the downsides of compression.
 We measure the local order of accuracy in time and verify that it increases by one with each sweep for an advection problem.
 While the order is typically only maintained up to machine precision or the discretization error, we find now that accuracy now stalls at the error bound that we set for the compressor.
 See below for corresponding figures, where the difference between the colored lines is the number of SDC iterations and the dashed line marks the error bound for SZ3.
- 
+
 .. image:: ../../../data_libpressio/compression_order_time_advection_d=1.00e-06_n=1_MPI=False.png
     :width: 45%
 

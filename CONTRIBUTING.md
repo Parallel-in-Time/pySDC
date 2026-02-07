@@ -22,7 +22,7 @@ This follows a specific OOP framework, you can look at the page on
 for more details. Additional guideline are also given on how to
 [document the code](./docs/contrib/05_documenting_code.md) in `pySDC`.
 
-> 📣 Some core components (collocation matrix, $Q-\Delta$ coefficients, Lagrange barycentric interpolation)  
+> 📣 Some core components (collocation matrix, $Q-\Delta$ coefficients, Lagrange barycentric interpolation)
 > are implemented and developed in the [`qmat` companion package](https://github.com/Parallel-in-Time/qmat).
 > Checkout its own [contributing guide](https://qmat.readthedocs.io/en/latest/contributing.html)
 > to add any new coefficient / feature on this part.

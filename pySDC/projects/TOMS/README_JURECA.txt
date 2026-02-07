@@ -19,4 +19,3 @@ Currently, only 4 ntasks are requested and 1 space-rank per time-step, i.e. 4=1x
 
 The file pySDC/projects/TOMS/run_pySDC_with_PETSc.tmpl can be used to work with JUBE. You need to change
 "param_set_spacetime" in pySDC/projects/TOMS/jube_pySDC_with_PETSc.xml accordingly.
-

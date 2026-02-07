@@ -12,10 +12,11 @@ from pathlib import Path
 # Add the scripts directory to path
 sys.path.insert(0, str(Path(__file__).parent))
 
+
 def test_error_extraction():
     """Test the error extraction function."""
     from analyze_failures import extract_error_summary
-    
+
     # Mock log with various error patterns
     mock_log = """
 2024-01-01 10:00:00 Running tests...
@@ -29,30 +30,30 @@ AssertionError: 5 != 6
 2024-01-01 10:00:15 ModuleNotFoundError: No module named 'some_package'
 2024-01-01 10:00:20 Continuing with other tests...
 """
-    
+
     errors = extract_error_summary(mock_log, "test_job")
-    
+
     print("✓ Error extraction test")
     print(f"  Found {len(errors)} error patterns")
     assert len(errors) > 0, "Should extract at least one error"
-    
+
     # Check that we captured the traceback
     traceback_found = any('Traceback' in error for error in errors)
     assert traceback_found, "Should capture traceback"
     print("  ✓ Traceback captured")
-    
+
     # Check that we captured other errors
     module_error_found = any('ModuleNotFoundError' in error for error in errors)
     assert module_error_found, "Should capture ModuleNotFoundError"
     print("  ✓ Module error captured")
-    
+
     return True
 
 
 def test_report_generation():
     """Test the report generation function."""
     from analyze_failures import generate_failure_report
-    
+
     # Mock analysis data
     mock_analysis = {
         'total_jobs': 10,
@@ -65,8 +66,8 @@ def test_report_generation():
                 'html_url': 'https://github.com/example/repo/actions/runs/123/jobs/12345',
                 'errors': [
                     'ERROR: Something went wrong',
-                    'Traceback (most recent call last):\n  File "test.py", line 1\n    raise Exception("test")'
-                ]
+                    'Traceback (most recent call last):\n  File "test.py", line 1\n    raise Exception("test")',
+                ],
             },
             {
                 'name': 'test_job_2',
@@ -74,15 +75,15 @@ def test_report_generation():
                 'started_at': '2024-01-01T10:00:00Z',
                 'completed_at': '2024-01-01T10:06:00Z',
                 'html_url': 'https://github.com/example/repo/actions/runs/123/jobs/12346',
-                'errors': []
-            }
+                'errors': [],
+            },
         ],
-        'timestamp': '2024-01-01T10:10:00Z'
+        'timestamp': '2024-01-01T10:10:00Z',
     }
-    
+
     run_url = 'https://github.com/example/repo/actions/runs/123'
     report = generate_failure_report(mock_analysis, run_url)
-    
+
     print("✓ Report generation test")
     assert '# Automated Test Failure Analysis' in report, "Should have title"
     print("  ✓ Report has title")
@@ -95,36 +96,32 @@ def test_report_generation():
     print("  ✓ Lists all failed jobs")
     assert 'ERROR: Something went wrong' in report, "Should include error details"
     print("  ✓ Includes error details")
-    
+
     return True
 
 
 def test_pr_body_generation():
     """Test PR body generation."""
     from create_failure_pr import generate_pr_body
-    
+
     # Create a temporary analysis file
     temp_dir = Path('/tmp/test_failure_analysis')
     temp_dir.mkdir(exist_ok=True)
-    
+
     analysis_file = temp_dir / 'failure_analysis.json'
     mock_analysis = {
         'total_jobs': 15,
-        'failed_jobs': [
-            {'name': 'job1', 'id': 1},
-            {'name': 'job2', 'id': 2},
-            {'name': 'job3', 'id': 3}
-        ],
-        'timestamp': '2024-01-01T10:00:00Z'
+        'failed_jobs': [{'name': 'job1', 'id': 1}, {'name': 'job2', 'id': 2}, {'name': 'job3', 'id': 3}],
+        'timestamp': '2024-01-01T10:00:00Z',
     }
-    
+
     with open(analysis_file, 'w') as f:
         json.dump(mock_analysis, f)
-    
+
     workflow_url = 'https://github.com/example/repo/actions/runs/123'
     branch_name = 'auto-fix/test-failure-20240101-100000'
     pr_body = generate_pr_body(workflow_url, str(analysis_file), branch_name)
-    
+
     print("✓ PR body generation test")
     assert '🔴 Automated Test Failure Report' in pr_body, "Should have title"
     print("  ✓ Has title")
@@ -136,10 +133,10 @@ def test_pr_body_generation():
     print("  ✓ Mentions weekly run")
     assert branch_name in pr_body, "Should include branch name in instructions"
     print("  ✓ Includes branch name")
-    
+
     # Clean up
     analysis_file.unlink()
-    
+
     return True
 
 
@@ -149,16 +146,16 @@ def main():
     print("Testing Automated Failure Analysis Scripts")
     print("=" * 60)
     print()
-    
+
     tests = [
         ("Error Extraction", test_error_extraction),
         ("Report Generation", test_report_generation),
         ("PR Body Generation", test_pr_body_generation),
     ]
-    
+
     passed = 0
     failed = 0
-    
+
     for test_name, test_func in tests:
         try:
             print(f"\nRunning: {test_name}")
@@ -170,13 +167,14 @@ def main():
             failed += 1
             print(f"✗ {test_name} FAILED: {e}")
             import traceback
+
             traceback.print_exc()
-    
+
     print()
     print("=" * 60)
     print(f"Results: {passed} passed, {failed} failed")
     print("=" * 60)
-    
+
     return 0 if failed == 0 else 1
 
 

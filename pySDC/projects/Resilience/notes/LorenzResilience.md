@@ -44,7 +44,7 @@ These don't propagate to the solution of the step since the quadrature rule incl
 We find that Hot Rod will fix all faults that it can, which is nice!
 
 ### Adaptivity
-Adaptivity struggles with some faults in bit 2. 
+Adaptivity struggles with some faults in bit 2.
 Apparently, there is some memory overflow which causes mild mayhem that doesn't crash the code, but causes unexpected behaviour.
 Looking in detail at a run with such a fault revealed that the residual was `nan` and adaptivity decided to increase the step size dramatically after the fault occurred.
 

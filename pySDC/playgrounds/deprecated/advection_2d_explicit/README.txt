@@ -1,4 +1,4 @@
-This example requires a working installation of the Clawpack software to run. Please visit 
+This example requires a working installation of the Clawpack software to run. Please visit
 
 http://www.clawpack.org/
 
