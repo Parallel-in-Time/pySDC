@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional, Type, Callable
+from typing import Any, Dict, List, Optional, Type, Callable, Tuple
 
 from pySDC.core.level import Level
 from pySDC.core.base_transfer import BaseTransfer
@@ -72,7 +72,7 @@ class Step(FrozenClass):
         self.logger: logging.Logger = logging.getLogger('step')
 
         # empty attributes
-        self.__transfer_dict: Dict[tuple, Callable] = {}
+        self.__transfer_dict: Dict[Tuple[Level, Level], Callable] = {}
         self.base_transfer: Optional[BaseTransfer] = None
         self.levels: List[Level] = []
         self.__prev: Optional['Step'] = None
