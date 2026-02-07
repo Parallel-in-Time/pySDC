@@ -5,6 +5,7 @@ Created on Thu Dec  7 19:29:46 2023
 
 Setup script for the Kaps problem
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 

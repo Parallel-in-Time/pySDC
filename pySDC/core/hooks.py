@@ -1,7 +1,6 @@
 import logging
 from collections import namedtuple
 
-
 # metadata with defaults
 meta_data = {
     'process': None,

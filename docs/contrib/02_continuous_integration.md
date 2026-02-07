@@ -112,6 +112,8 @@ pytest -v pySDC/tests
 
 ## Running CI on HPC from pull requests
 
+> :warning: **Note:** The GitLab mirror integration is currently disabled due to technical issues. This section describes functionality that is temporarily unavailable.
+
 By syncing the GitHub repository to a certain Gitlab instance, CI-Jobs can be run on HPC machines. This can be helpful for benchmarks or when running on accelerators that are not available as GitHub runners.
 
 For security and accounting reasons, a few extra steps are needed in order to run the contents of a pull request on HPC:

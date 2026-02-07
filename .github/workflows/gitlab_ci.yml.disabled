@@ -1,13 +1,27 @@
 ---
 
+# WORKFLOW DISABLED
+# This workflow has been disabled to prevent skipped check runs from appearing in pull requests.
+# The file has been renamed from gitlab_ci.yml to gitlab_ci.yml.disabled
+#
+# To re-enable this workflow:
+# 1. Rename this file back to gitlab_ci.yml
+# 2. Uncomment the desired triggers below (push, pull_request_target, schedule)
+#
+# Note: Even with only workflow_dispatch enabled, GitHub creates skipped check runs
+# for the jobs when they have conditional 'if' statements that evaluate to false.
+
 name: Mirror to Gitlab to trigger CI
 
+# Disabled: GitLab mirror is temporarily disabled due to known issues
+# To re-enable, uncomment the triggers below
 on:
-  push:
-  pull_request_target:
-    types: [opened, synchronize, reopened, labeled]
-  schedule:
-    - cron: '2 5 * * 1'
+  workflow_dispatch:  # Manual trigger only
+  # push:
+  # pull_request_target:
+  #   types: [opened, synchronize, reopened, labeled]
+  # schedule:
+  #   - cron: '2 5 * * 1'
 
 jobs:
   check_permission:

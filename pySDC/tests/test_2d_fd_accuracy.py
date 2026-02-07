@@ -2,7 +2,6 @@ from collections import namedtuple
 import pytest
 import numpy as np
 
-
 # setup id for gathering the results (will sort by nvars)
 ID = namedtuple('ID', 'nvars')
 
