@@ -273,10 +273,13 @@ jobs:
             data_monodomain
             coverage_monodomain.dat
 
-  upload_coverage_to_codecov:
+  coverage_comment_on_pr:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && !cancelled()
     needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_monodomain_tests_linux]
+    permissions:
+      contents: read
+      pull-requests: write
     defaults:
       run:
         shell: bash -l {0}
@@ -298,10 +301,10 @@ jobs:
         run: |
           python -m coverage combine coverage_*.dat
           python -m coverage xml
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+          python -m coverage report
+      - name: Post coverage comment on PR
+        uses: py-cov-action/python-coverage-comment-action@v3
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage.xml
-          fail_ci_if_error: false
-          verbose: true
+          GITHUB_TOKEN: ${{ github.token }}
+          MINIMUM_GREEN: 70
+          MINIMUM_ORANGE: 50
