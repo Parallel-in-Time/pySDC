@@ -39,9 +39,11 @@ jobs:
         run: |
           genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV }}
+          fail_ci_if_error: true
+          verbose: true
         
 #      - name: Generate benchmark report
 #        uses: pancetta/github-action-benchmark@v1
