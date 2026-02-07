@@ -2,12 +2,15 @@
 
 name: Mirror to Gitlab to trigger CI
 
+# Disabled: GitLab mirror is currently failing expectedly
+# To re-enable, uncomment the triggers below
 on:
-  push:
-  pull_request_target:
-    types: [opened, synchronize, reopened, labeled]
-  schedule:
-    - cron: '2 5 * * 1'
+  workflow_dispatch:  # Manual trigger only
+  # push:
+  # pull_request_target:
+  #   types: [opened, synchronize, reopened, labeled]
+  # schedule:
+  #   - cron: '2 5 * * 1'
 
 jobs:
   check_permission:
