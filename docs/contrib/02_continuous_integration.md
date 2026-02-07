@@ -4,6 +4,16 @@ Any commit in `pySDC` are tested by GitHub continuous integration (CI). You can 
 Those tests are currently divided in three main categories : [code linting](#code-linting), [code testing](#code-testing) and [code coverage](#code-coverage).
 Finally, the CI also build artifacts that are used to generate the documentation website (see http://parallel-in-time.org/pySDC/), more details given in the [documentation generation](#documentation-generation) section.
 
+## CI Workflow Triggers
+
+The CI pipeline is configured to avoid redundant runs. The workflow is triggered:
+
+- **On pull requests**: CI runs for all pull request events (opened, synchronized, reopened, etc.)
+- **On push to master**: CI runs when code is pushed directly to the `master` branch
+- **On schedule**: CI runs weekly on Monday at 5:01 AM UTC (via cron schedule)
+
+This configuration ensures that when you push commits to a pull request branch, the CI runs only once for the pull request event, not twice (once for the PR and once for the push). Direct pushes to the master branch will still trigger the CI to ensure the main branch is always tested.
+
 ## Code linting
 
 Code style linting is performed using [black](https://black.readthedocs.io/en/stable/) and [ruff](https://docs.astral.sh/ruff/) for code syntax checking. In particular, `black` is used to check compliance with (most of) [PEP-8 guidelines](https://peps.python.org/pep-0008/).
