@@ -50,6 +50,42 @@ Finally, the CI also build artifacts that are used to generate the documentation
 <li><p><strong>On schedule</strong>: CI runs weekly on Monday at 5:01 AM UTC (via cron schedule)</p></li>
 </ul>
 <p>This configuration ensures that when you push commits to a pull request branch, the CI runs only once for the pull request event, not twice (once for the PR and once for the push). Direct pushes to the master branch will still trigger the CI to ensure the main branch is always tested.</p>
+<section id="automated-failure-handling">
+<span id="docs-contrib-02-continuous-integration-automated-failure-handling"></span><h3>Automated Failure Handling<a class="headerlink" href="#automated-failure-handling" title="Link to this heading">¶</a></h3>
+<p>When the weekly scheduled CI run fails, an automated workflow is triggered to help investigate and resolve the issues:</p>
+<ol class="arabic simple">
+<li><p><strong>Automatic Detection</strong>: The <code class="docutils literal notranslate"><span class="pre">auto_fix_failures.yml</span></code> workflow detects failures from the scheduled Monday morning runs</p></li>
+<li><p><strong>Failure Analysis</strong>: The system analyzes failed jobs and extracts:</p>
+<ul class="simple">
+<li><p>Error messages and stack traces</p></li>
+<li><p>Links to failed workflow runs and job logs</p></li>
+<li><p>Summary of all failed jobs</p></li>
+</ul>
+</li>
+<li><p><strong>Pull Request Creation</strong>: A PR is automatically created with:</p>
+<ul class="simple">
+<li><p>Detailed failure analysis report</p></li>
+<li><p>Recommendations for investigation</p></li>
+<li><p>Instructions for applying fixes</p></li>
+<li><p>Labels: <code class="docutils literal notranslate"><span class="pre">automated</span></code>, <code class="docutils literal notranslate"><span class="pre">test-failure</span></code>, <code class="docutils literal notranslate"><span class="pre">needs-investigation</span></code></p></li>
+</ul>
+</li>
+</ol>
+<p><strong>How to Handle Automated Failure PRs:</strong></p>
+<p>When you receive an automated failure PR:</p>
+<ol class="arabic simple">
+<li><p>Review the <code class="docutils literal notranslate"><span class="pre">failure_analysis.md</span></code> file attached to the PR</p></li>
+<li><p>Check the linked workflow run and job logs for full details</p></li>
+<li><p>Investigate the root cause (dependency issues, flaky tests, code bugs, etc.)</p></li>
+<li><p>Push fixes directly to the PR branch or close if it’s a transient failure</p></li>
+<li><p>Test fixes locally or wait for CI to verify</p></li>
+<li><p>Merge when the issue is confirmed resolved</p></li>
+</ol>
+<p>For more details, see the <span class="xref std std-doc">automated failure handling documentation</span>.</p>
+<blockquote>
+<div><p>🔔 <strong>Note:</strong> These automated PRs are informational and require manual review. They help centralize failure information but don’t automatically fix issues. If you can identify and fix the problem, push commits to the auto-generated branch.</p>
+</div></blockquote>
+</section>
 </section>
 <section id="code-linting">
 <span id="docs-contrib-02-continuous-integration-code-linting"></span><h2>Code linting<a class="headerlink" href="#code-linting" title="Link to this heading">¶</a></h2>
@@ -306,7 +342,10 @@ This approach can be considered for local testing of your contribution when it d
     <h3><a href="../../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">Continuous Integration in pySDC</a><ul>
-<li><a class="reference internal" href="#ci-workflow-triggers">CI Workflow Triggers</a></li>
+<li><a class="reference internal" href="#ci-workflow-triggers">CI Workflow Triggers</a><ul>
+<li><a class="reference internal" href="#automated-failure-handling">Automated Failure Handling</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#code-linting">Code linting</a></li>
 <li><a class="reference internal" href="#code-testing">Code testing</a></li>
 <li><a class="reference internal" href="#running-ci-on-hpc-from-pull-requests">Running CI on HPC from pull requests</a><ul>
