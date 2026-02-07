@@ -11,8 +11,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -50,7 +50,7 @@
 <span id="implementations-problem-classes-burgers-module"></span><h1>implementations.problem_classes.Burgers module<a class="headerlink" href="#module-implementations.problem_classes.Burgers" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.Burgers.Burgers1D">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Burgers1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BCl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BCr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T2U'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Burgers.html#Burgers1D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Burgers.Burgers1D" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Burgers1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BCl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BCr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T2U'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Burgers.html#Burgers1D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Burgers.Burgers1D" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericSpectralLinear</span></code></p>
 <p>See <a class="reference external" href="https://en.wikipedia.org/wiki/Burgers'_equation">https://en.wikipedia.org/wiki/Burgers’_equation</a> for the equation that is solved.
 Discretization is done with a Chebychev method, which requires a first order derivative formulation.
@@ -86,7 +86,7 @@ Feel free to do a more efficient implementation using an ultraspherical method t
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.Burgers.Burgers1D.dtype_u" title="implementations.problem_classes.Burgers.Burgers1D.dtype_u"><em>dtype_u</em></a>) – Current values.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
 </ul>
 </dd>
@@ -94,7 +94,7 @@ Feel free to do a more efficient implementation using an ultraspherical method t
 <dd class="field-even"><p><strong>f</strong> – The RHS values.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.Burgers.Burgers1D.dtype_f" title="implementations.problem_classes.Burgers.Burgers1D.dtype_f">dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -120,7 +120,7 @@ Feel free to do a more efficient implementation using an ultraspherical method t
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Solution to be plotted</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.Burgers.Burgers1D.dtype_u" title="implementations.problem_classes.Burgers.Burgers1D.dtype_u"><em>dtype_u</em></a>) – Solution to be plotted</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Time to display at the top of the figure</p></li>
 <li><p><strong>fig</strong> (<em>matplotlib.pyplot.figure.Figure</em><em>, </em><em>optional</em>) – Figure with the same structure as a figure generated by <cite>self.get_fig</cite>. If none is supplied, a new figure will be generated.</p></li>
 </ul>
@@ -140,7 +140,7 @@ Feel free to do a more efficient implementation using an ultraspherical method t
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.Burgers.Burgers2D">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Burgers2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fuz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T2U'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Burgers.html#Burgers2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Burgers.Burgers2D" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Burgers2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fuz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T2U'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Burgers.html#Burgers2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Burgers.Burgers2D" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericSpectralLinear</span></code></p>
 <p>See <a class="reference external" href="https://en.wikipedia.org/wiki/Burgers'_equation">https://en.wikipedia.org/wiki/Burgers’_equation</a> for the equation that is solved.
 This implementation is discretized with FFTs in x and Chebychev in z.</p>
@@ -182,7 +182,7 @@ This implementation is discretized with FFTs in x and Chebychev in z.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.Burgers.Burgers2D.dtype_u" title="implementations.problem_classes.Burgers.Burgers2D.dtype_u"><em>dtype_u</em></a>) – Current values.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
 </ul>
 </dd>
@@ -190,7 +190,7 @@ This implementation is discretized with FFTs in x and Chebychev in z.</p>
 <dd class="field-even"><p><strong>f</strong> – The RHS values.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.Burgers.Burgers2D.dtype_f" title="implementations.problem_classes.Burgers.Burgers2D.dtype_f">dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -216,7 +216,7 @@ This implementation is discretized with FFTs in x and Chebychev in z.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Solution to be plotted</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.Burgers.Burgers2D.dtype_u" title="implementations.problem_classes.Burgers.Burgers2D.dtype_u"><em>dtype_u</em></a>) – Solution to be plotted</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Time to display at the top of the figure</p></li>
 <li><p><strong>fig</strong> (<em>matplotlib.pyplot.figure.Figure</em>) – Figure with the correct structure</p></li>
 </ul>
@@ -325,7 +325,7 @@ This implementation is discretized with FFTs in x and Chebychev in z.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

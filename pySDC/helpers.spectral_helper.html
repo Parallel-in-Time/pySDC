@@ -11,8 +11,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -49,7 +49,7 @@
 <span id="helpers-spectral-helper-module"></span><h1>helpers.spectral_helper module<a class="headerlink" href="#module-helpers.spectral_helper" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ChebychevHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ChebychevHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D" title="helpers.spectral_helper.SpectralHelper1D"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpectralHelper1D</span></code></a></p>
 <p>The Chebychev base consists of special kinds of polynomials, with the main advantage that you can easily transform
 between physical and spectral space by discrete cosine transform.
@@ -229,6 +229,12 @@ It returns the values of the integrals of T polynomials over the entire interval
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_integration_weights">
+<span class="sig-name descname"><span class="pre">get_integration_weights</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_integration_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_integration_weights" title="Link to this definition">¶</a></dt>
+<dd><p>Weights for integration across entire domain</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.ChebychevHelper.get_norm">
 <span class="sig-name descname"><span class="pre">get_norm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#ChebychevHelper.get_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.ChebychevHelper.get_norm" title="Link to this definition">¶</a></dt>
 <dd><p>Get normalization for converting Chebychev coefficients and DCT</p>
@@ -289,11 +295,11 @@ It returns the values of the integrals of T polynomials over the entire interval
 
 <dl class="py class">
 <dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FFTHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.283185307179586</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">FFTHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.283185307179586</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D" title="helpers.spectral_helper.SpectralHelper1D"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpectralHelper1D</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.distributable">
-<span class="sig-name descname"><span class="pre">distributable</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.distributable" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">distributable</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.distributable" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -373,6 +379,12 @@ after.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.get_integration_weights">
+<span class="sig-name descname"><span class="pre">get_integration_weights</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.get_integration_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.get_integration_weights" title="Link to this definition">¶</a></dt>
+<dd><p>Weights for integration across entire domain</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.get_plan">
 <span class="sig-name descname"><span class="pre">get_plan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.get_plan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.get_plan" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -421,7 +433,7 @@ after.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SpectralHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useGPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SpectralHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useGPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="simple">
 <dt>This class has three functions:</dt><dd><ul class="simple">
@@ -615,7 +627,7 @@ after.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.V">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">V</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.V" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">V</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.V" title="Link to this definition">¶</a></dt>
 <dd><p>Get domain volume</p>
 </dd></dl>
 
@@ -738,17 +750,17 @@ Therefore, this function copies the matrix to host, eliminates the zeros there a
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.fft_backend">
-<span class="sig-name descname"><span class="pre">fft_backend</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'scipy'</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.fft_backend" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">fft_backend</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'scipy'</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.fft_backend" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.fft_comm_backend">
-<span class="sig-name descname"><span class="pre">fft_comm_backend</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'MPI'</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.fft_comm_backend" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">fft_comm_backend</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'MPI'</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.fft_comm_backend" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.fft_lib">
-<span class="sig-name descname"><span class="pre">fft_lib</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.fft'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.13/site-packages/scipy/fft/__init__.py'&gt;</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.fft_lib" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">fft_lib</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.fft'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.14/site-packages/scipy/fft/__init__.py'&gt;</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.fft_lib" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -961,7 +973,7 @@ use this method to get the part corresponding to the modes carried by this rank.
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.linalg">
-<span class="sig-name descname"><span class="pre">linalg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.sparse.linalg'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.13/site-packages/scipy/sparse/linalg/__init__.py'&gt;</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.linalg" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">linalg</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.sparse.linalg'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.14/site-packages/scipy/sparse/linalg/__init__.py'&gt;</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.linalg" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -971,12 +983,12 @@ use this method to get the part corresponding to the modes carried by this rank.
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.ncomponents">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ncomponents</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.ncomponents" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ncomponents</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.ncomponents" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.ndim">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.ndim" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.ndim" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1059,13 +1071,13 @@ condition. This method sets up a suitable sparse matrix to do this.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.setup_CPU">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setup_CPU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">useFFTW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.setup_CPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.setup_CPU" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">setup_CPU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">useFFTW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.setup_CPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.setup_CPU" title="Link to this definition">¶</a></dt>
 <dd><p>switch to CPU modules</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.setup_GPU">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setup_GPU</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.setup_GPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.setup_GPU" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">setup_GPU</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.setup_GPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.setup_GPU" title="Link to this definition">¶</a></dt>
 <dd><p>switch to GPU modules</p>
 </dd></dl>
 
@@ -1083,13 +1095,13 @@ This must also be called before setting up any BCs.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.shape">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.shape" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.shape" title="Link to this definition">¶</a></dt>
 <dd><p>Get shape of individual solution component</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.sparse_lib">
-<span class="sig-name descname"><span class="pre">sparse_lib</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.sparse'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.13/site-packages/scipy/sparse/__init__.py'&gt;</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.sparse_lib" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sparse_lib</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.sparse'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.14/site-packages/scipy/sparse/__init__.py'&gt;</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.sparse_lib" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1099,32 +1111,32 @@ This must also be called before setting up any BCs.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.u_init">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">u_init</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.u_init" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">u_init</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.u_init" title="Link to this definition">¶</a></dt>
 <dd><p>Get empty data container in physical space</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.u_init_forward">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">u_init_forward</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.u_init_forward" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">u_init_forward</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.u_init_forward" title="Link to this definition">¶</a></dt>
 <dd><p>Get empty data container in spectral space</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.u_init_physical">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">u_init_physical</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.u_init_physical" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">u_init_physical</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.u_init_physical" title="Link to this definition">¶</a></dt>
 <dd><p>Get empty data container in physical space</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.xp">
-<span class="sig-name descname"><span class="pre">xp</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'numpy'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.13/site-packages/numpy/__init__.py'&gt;</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.xp" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">xp</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'numpy'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.14/site-packages/numpy/__init__.py'&gt;</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.xp" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SpectralHelper1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useGPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useFFTW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SpectralHelper1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useGPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useFFTW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Abstract base class for 1D spectral discretizations. Defines a common interface with parameters and functions that
 all bases need to have.</p>
@@ -1187,12 +1199,12 @@ the code for GPUs.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.distributable">
-<span class="sig-name descname"><span class="pre">distributable</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.distributable" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">distributable</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.distributable" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.fft_lib">
-<span class="sig-name descname"><span class="pre">fft_lib</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.fft'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.13/site-packages/scipy/fft/__init__.py'&gt;</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.fft_lib" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">fft_lib</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.fft'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.14/site-packages/scipy/fft/__init__.py'&gt;</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.fft_lib" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1306,6 +1318,12 @@ you want. This is what the <cite>SpectralHelper</cite> does when you call the me
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.get_integration_weights">
+<span class="sig-name descname"><span class="pre">get_integration_weights</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.get_integration_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.get_integration_weights" title="Link to this definition">¶</a></dt>
+<dd><p>Weights for integration across entire domain</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.get_wavenumbers">
 <span class="sig-name descname"><span class="pre">get_wavenumbers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.get_wavenumbers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.get_wavenumbers" title="Link to this definition">¶</a></dt>
 <dd><p>Get the grid in spectral space</p>
@@ -1324,36 +1342,36 @@ you want. This is what the <cite>SpectralHelper</cite> does when you call the me
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.linalg">
-<span class="sig-name descname"><span class="pre">linalg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.sparse.linalg'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.13/site-packages/scipy/sparse/linalg/__init__.py'&gt;</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.linalg" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">linalg</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.sparse.linalg'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.14/site-packages/scipy/sparse/linalg/__init__.py'&gt;</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.linalg" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.setup_CPU">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setup_CPU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">useFFTW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.setup_CPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.setup_CPU" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">setup_CPU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">useFFTW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.setup_CPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.setup_CPU" title="Link to this definition">¶</a></dt>
 <dd><p>switch to CPU modules</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.setup_GPU">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setup_GPU</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.setup_GPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.setup_GPU" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">setup_GPU</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.setup_GPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.setup_GPU" title="Link to this definition">¶</a></dt>
 <dd><p>switch to GPU modules</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.sparse_lib">
-<span class="sig-name descname"><span class="pre">sparse_lib</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.sparse'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.13/site-packages/scipy/sparse/__init__.py'&gt;</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.sparse_lib" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sparse_lib</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'scipy.sparse'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.14/site-packages/scipy/sparse/__init__.py'&gt;</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.sparse_lib" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.xp">
-<span class="sig-name descname"><span class="pre">xp</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'numpy'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.13/site-packages/numpy/__init__.py'&gt;</span></em><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.xp" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">xp</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'numpy'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.14/site-packages/numpy/__init__.py'&gt;</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.xp" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="helpers.spectral_helper.UltrasphericalHelper">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UltrasphericalHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#UltrasphericalHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.UltrasphericalHelper" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">UltrasphericalHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#UltrasphericalHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.UltrasphericalHelper" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper" title="helpers.spectral_helper.ChebychevHelper"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChebychevHelper</span></code></a></p>
 <p>This implementation follows <a class="reference external" href="https://doi.org/10.1137/120865458">https://doi.org/10.1137/120865458</a>.
 The ultraspherical method works in Chebychev polynomials as well, but also uses various Gegenbauer polynomials.
@@ -1509,6 +1527,7 @@ This is very similar to <cite>functools.cache</cite>, but without the memory lea
 <li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_differentiation_matrix"><code class="docutils literal notranslate"><span class="pre">get_differentiation_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_integ_BC_row"><code class="docutils literal notranslate"><span class="pre">get_integ_BC_row()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_integration_matrix"><code class="docutils literal notranslate"><span class="pre">get_integration_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_integration_weights"><code class="docutils literal notranslate"><span class="pre">get_integration_weights()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_norm"><code class="docutils literal notranslate"><span class="pre">get_norm()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.get_wavenumbers"><code class="docutils literal notranslate"><span class="pre">get_wavenumbers()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.ChebychevHelper.itransform"><code class="docutils literal notranslate"><span class="pre">itransform()</span></code></a></li>
@@ -1523,6 +1542,7 @@ This is very similar to <cite>functools.cache</cite>, but without the memory lea
 <li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_differentiation_matrix"><code class="docutils literal notranslate"><span class="pre">get_differentiation_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_integ_BC_row"><code class="docutils literal notranslate"><span class="pre">get_integ_BC_row()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_integration_matrix"><code class="docutils literal notranslate"><span class="pre">get_integration_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_integration_weights"><code class="docutils literal notranslate"><span class="pre">get_integration_weights()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_plan"><code class="docutils literal notranslate"><span class="pre">get_plan()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.get_wavenumbers"><code class="docutils literal notranslate"><span class="pre">get_wavenumbers()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.FFTHelper.itransform"><code class="docutils literal notranslate"><span class="pre">itransform()</span></code></a></li>
@@ -1617,6 +1637,7 @@ This is very similar to <cite>functools.cache</cite>, but without the memory lea
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_empty_operator_matrix"><code class="docutils literal notranslate"><span class="pre">get_empty_operator_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_filter_matrix"><code class="docutils literal notranslate"><span class="pre">get_filter_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_integration_matrix"><code class="docutils literal notranslate"><span class="pre">get_integration_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_integration_weights"><code class="docutils literal notranslate"><span class="pre">get_integration_weights()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_wavenumbers"><code class="docutils literal notranslate"><span class="pre">get_wavenumbers()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.get_zero"><code class="docutils literal notranslate"><span class="pre">get_zero()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.spectral_helper.SpectralHelper1D.linalg"><code class="docutils literal notranslate"><span class="pre">linalg</span></code></a></li>
@@ -1693,7 +1714,7 @@ This is very similar to <cite>functools.cache</cite>, but without the memory lea
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

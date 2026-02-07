@@ -11,9 +11,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -51,7 +51,7 @@
 <span id="implementations-problem-classes-generalizedfisher-1d-petsc-module"></span><h1>implementations.problem_classes.GeneralizedFisher_1D_PETSc module<a class="headerlink" href="#module-implementations.problem_classes.GeneralizedFisher_1D_PETSc" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_full">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Fisher_full</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GeneralizedFisher_1D_PETSc.html#Fisher_full"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_full" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Fisher_full</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GeneralizedFisher_1D_PETSc.html#Fisher_full"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_full" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Helper class to generate residual and Jacobian matrix for PETSc’s nonlinear solver SNES.</p>
 <dl class="field-list simple">
@@ -167,7 +167,7 @@ in the solution.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_reaction">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Fisher_reaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GeneralizedFisher_1D_PETSc.html#Fisher_reaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_reaction" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Fisher_reaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GeneralizedFisher_1D_PETSc.html#Fisher_reaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_reaction" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Helper class to generate residual and Jacobian matrix for <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>’s nonlinear solver SNES.</p>
 <dl class="field-list simple">
@@ -239,7 +239,7 @@ in the solution.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_fullyimplicit">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">petsc_fisher_fullyimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">petsc4py.PETSc.COMM_WORLD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlsol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlsol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GeneralizedFisher_1D_PETSc.html#petsc_fisher_fullyimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_fullyimplicit" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">petsc_fisher_fullyimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">petsc4py.PETSc.COMM_WORLD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlsol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlsol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GeneralizedFisher_1D_PETSc.html#petsc_fisher_fullyimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_fullyimplicit" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit" title="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">petsc_fisher_multiimplicit</span></code></a></p>
 <p>The following one-dimensional problem is an example of a reaction-diffusion equation with traveling waves, and can
 be seen as a generalized Fisher equation. This class implements a special case of the Kolmogorov-Petrovskii-Piskunov
@@ -273,7 +273,7 @@ problem <a class="footnote-reference brackets" href="#id7" id="id1" role="doc-no
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time the numerical solution is computed.</p></li>
 </ul>
 </dd>
@@ -281,7 +281,7 @@ problem <a class="footnote-reference brackets" href="#id7" id="id1" role="doc-no
 <dd class="field-even"><p><strong>f</strong> – Right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_fullyimplicit.dtype_f" title="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_fullyimplicit.dtype_f">dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -293,9 +293,9 @@ problem <a class="footnote-reference brackets" href="#id7" id="id1" role="doc-no
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>rhs</strong> (<a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_fullyimplicit.dtype_f" title="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_fullyimplicit.dtype_f"><em>dtype_f</em></a>) – Right-hand side for the linear system.</p></li>
 <li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>u0</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
@@ -303,7 +303,7 @@ problem <a class="footnote-reference brackets" href="#id7" id="id1" role="doc-no
 <dd class="field-even"><p><strong>me</strong> – Solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -312,7 +312,7 @@ problem <a class="footnote-reference brackets" href="#id7" id="id1" role="doc-no
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">petsc_fisher_multiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">petsc4py.PETSc.COMM_WORLD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlsol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlsol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GeneralizedFisher_1D_PETSc.html#petsc_fisher_multiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">petsc_fisher_multiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">petsc4py.PETSc.COMM_WORLD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlsol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlsol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GeneralizedFisher_1D_PETSc.html#petsc_fisher_multiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
 <p>The following one-dimensional problem is an example of a reaction-diffusion equation with traveling waves, and can
 be seen as a generalized Fisher equation. This class implements a special case of the Kolmogorov-Petrovskii-Piskunov
@@ -475,7 +475,7 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dtype_u" title="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time the numerical solution is computed.</p></li>
 </ul>
 </dd>
@@ -483,7 +483,7 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dd class="field-even"><p><strong>f</strong> – Right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dtype_f" title="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dtype_f">dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -512,9 +512,9 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>rhs</strong> (<a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dtype_f" title="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dtype_f"><em>dtype_f</em></a>) – Right-hand side for the linear system.</p></li>
 <li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>u0</strong> (<a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dtype_u" title="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
@@ -522,7 +522,7 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dd class="field-even"><p><strong>me</strong> – Solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dtype_u" title="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -534,9 +534,9 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>rhs</strong> (<a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dtype_f" title="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dtype_f"><em>dtype_f</em></a>) – Right-hand side for the linear system.</p></li>
 <li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>u0</strong> (<a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dtype_u" title="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
@@ -544,7 +544,7 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dd class="field-even"><p><strong>me</strong> – Solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dtype_u" title="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -561,7 +561,7 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dd class="field-even"><p><strong>me</strong> – Exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dtype_u" title="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -570,7 +570,7 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_semiimplicit">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">petsc_fisher_semiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">petsc4py.PETSc.COMM_WORLD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlsol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlsol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GeneralizedFisher_1D_PETSc.html#petsc_fisher_semiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_semiimplicit" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">petsc_fisher_semiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">petsc4py.PETSc.COMM_WORLD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlsol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlsol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GeneralizedFisher_1D_PETSc.html#petsc_fisher_semiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_semiimplicit" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit" title="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">petsc_fisher_multiimplicit</span></code></a></p>
 <p>The following one-dimensional problem is an example of a reaction-diffusion equation with traveling waves, and can
 be seen as a generalized Fisher equation. This class implements a special case of the Kolmogorov-Petrovskii-Piskunov
@@ -604,7 +604,7 @@ solved in a <em>semi-implicit</em> way.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time the numerical solution is computed.</p></li>
 </ul>
 </dd>
@@ -612,7 +612,7 @@ solved in a <em>semi-implicit</em> way.</p>
 <dd class="field-even"><p><strong>f</strong> – Right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_semiimplicit.dtype_f" title="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_semiimplicit.dtype_f">dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -624,9 +624,9 @@ solved in a <em>semi-implicit</em> way.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>rhs</strong> (<a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_semiimplicit.dtype_f" title="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_semiimplicit.dtype_f"><em>dtype_f</em></a>) – Right-hand side for the linear system.</p></li>
 <li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>u0</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
@@ -634,7 +634,7 @@ solved in a <em>semi-implicit</em> way.</p>
 <dd class="field-even"><p><strong>me</strong> – Solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -757,7 +757,7 @@ solved in a <em>semi-implicit</em> way.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

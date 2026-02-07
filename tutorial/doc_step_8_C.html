@@ -11,8 +11,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -298,7 +298,7 @@
             <span class="c1"># filter statistics by type (error after time-step)</span>
             <span class="n">PDE_errors</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;PDE_error_after_step&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
             <span class="n">coll_errors</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;coll_error_after_step&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">iters</span><span class="p">,</span> <span class="n">PDE_err</span><span class="p">,</span> <span class="n">coll_err</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">iter_counts</span><span class="p">,</span> <span class="n">PDE_errors</span><span class="p">,</span> <span class="n">coll_errors</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">iters</span><span class="p">,</span> <span class="n">PDE_err</span><span class="p">,</span> <span class="n">coll_err</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">iter_counts</span><span class="p">,</span> <span class="n">PDE_errors</span><span class="p">,</span> <span class="n">coll_errors</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
                 <span class="k">assert</span> <span class="n">coll_err</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">][</span><span class="s1">&#39;errtol&#39;</span><span class="p">],</span> <span class="sa">f</span><span class="s1">&#39;Error too high, got </span><span class="si">{</span><span class="n">coll_err</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">8.4e</span><span class="si">}</span><span class="s1">&#39;</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="sa">f</span><span class="s1">&#39;   Errors after step </span><span class="si">{</span><span class="n">PDE_err</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">8.4f</span><span class="si">}</span><span class="s1"> with </span><span class="si">{</span><span class="n">iters</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> iterations: &#39;</span>
@@ -321,9 +321,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span>
-        <span class="n">mean_number_of_iterations</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">),</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-2</span>
-    <span class="p">),</span> <span class="sa">f</span><span class="s1">&#39;Expected </span><span class="se">\</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">mean_number_of_iterations</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">),</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">),</span> <span class="sa">f</span><span class="s1">&#39;Expected </span><span class="se">\</span>
 <span class="si">{</span><span class="n">mean_number_of_iterations</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> mean iterations, but got </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span>
 
 
@@ -355,7 +353,7 @@
    Errors after step   0.8750 with 6 iterations: 3.6530e-08 / 2.6684e-13
    Errors after step   1.0000 with 6 iterations: 3.6478e-08 / 1.6026e-13
 
-...done, took 0.34192614799997045 seconds!
+...done, took 0.3389637440000115 seconds!
 -----------------------------------------------------------------------------
 Running diffusion in 1 dimensions with time-step size 0.125...
 
@@ -369,7 +367,7 @@ Running diffusion in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 3 iterations: 3.5502e-08 / 3.3862e-13
    Errors after step   1.0000 with 3 iterations: 3.6813e-08 / 2.4698e-13
 
-...done, took 0.7710299400000054 seconds!
+...done, took 0.7690100429999802 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
@@ -383,7 +381,7 @@ Running advection in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 4 iterations: 2.5517e-08 / 5.5511e-16
    Errors after step   1.0000 with 4 iterations: 2.9147e-08 / 4.4409e-16
 
-...done, took 0.20697575700000925 seconds!
+...done, took 0.2056907390000049 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
@@ -397,7 +395,7 @@ Running advection in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 2 iterations: 2.5987e-08 / 3.1875e-13
    Errors after step   1.0000 with 2 iterations: 2.9666e-08 / 3.1808e-13
 
-...done, took 0.6084953490000089 seconds!
+...done, took 0.6030236149999837 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -411,7 +409,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 6 iterations: 2.8266e-08 / 0.0000e+00
    Errors after step   1.0000 with 6 iterations: 2.8338e-08 / 0.0000e+00
 
-...done, took 0.13936675899998363 seconds!
+...done, took 0.13359903899998926 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -425,7 +423,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 4 iterations: 3.1486e-08 / 0.0000e+00
    Errors after step   1.0000 with 4 iterations: 3.3802e-08 / 0.0000e+00
 
-...done, took 0.16292713600000752 seconds!
+...done, took 0.15987907600000995 seconds!
 -----------------------------------------------------------------------------
 </pre></div>
 </div>
@@ -473,7 +471,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

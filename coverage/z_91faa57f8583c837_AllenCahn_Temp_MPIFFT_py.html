@@ -3,21 +3,21 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Coverage for pySDC/implementations/problem_classes/AllenCahn_Temp_MPIFFT.py: 81%</title>
-    <link rel="icon" sizes="32x32" href="favicon_32_cb_58284776.png">
-    <link rel="stylesheet" href="style_cb_6b508a39.css" type="text/css">
-    <script src="coverage_html_cb_6fb7b396.js" defer></script>
+    <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
+    <link rel="stylesheet" href="style_cb_9ff733b0.css" type="text/css">
+    <script src="coverage_html_cb_dd2e7eb5.js" defer></script>
 </head>
 <body class="pyfile">
 <header>
     <div class="content">
         <h1>
-            <span class="text">Coverage for </span><b>pySDC/implementations/problem_classes/AllenCahn_Temp_MPIFFT.py</b>:
+            <span class="text">Coverage for </span><b>pySDC&#8201;/&#8201;implementations&#8201;/&#8201;problem_classes&#8201;/&#8201;AllenCahn_Temp_MPIFFT.py</b>:
             <span class="pc_cov">81%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
             <label for="help_panel_state">
-                <img id="keyboard_icon" src="keybd_closed_cb_ce680311.png" alt="Show/hide keyboard shortcuts">
+                <img id="keyboard_icon" src="keybd_closed_cb_900cfef5.png" alt="Show/hide keyboard shortcuts">
             </label>
             <div id="help_panel">
                 <p class="legend">Shortcuts on this page</p>
@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_91faa57f8583c837_Auzinger_implicit_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.10.6">coverage.py v7.10.6</a>,
-            created at 2025-09-18 07:07 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.13.3">coverage.py v7.13.3</a>,
+            created at 2026-02-07 13:00 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -216,7 +216,7 @@
     <p class="run"><span class="n"><a id="t134" href="#t134">134</a></span><span class="t">        <span class="nam">N</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">fft</span><span class="op">.</span><span class="nam">global_shape</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t135" href="#t135">135</a></span><span class="t">        <span class="nam">k</span> <span class="op">=</span> <span class="op">[</span><span class="nam">np</span><span class="op">.</span><span class="nam">fft</span><span class="op">.</span><span class="nam">fftfreq</span><span class="op">(</span><span class="nam">n</span><span class="op">,</span> <span class="num">1.0</span> <span class="op">/</span> <span class="nam">n</span><span class="op">)</span><span class="op">.</span><span class="nam">astype</span><span class="op">(</span><span class="nam">int</span><span class="op">)</span> <span class="key">for</span> <span class="nam">n</span> <span class="key">in</span> <span class="nam">N</span><span class="op">[</span><span class="op">:</span><span class="op">-</span><span class="num">1</span><span class="op">]</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t136" href="#t136">136</a></span><span class="t">        <span class="nam">k</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="nam">np</span><span class="op">.</span><span class="nam">fft</span><span class="op">.</span><span class="nam">rfftfreq</span><span class="op">(</span><span class="nam">N</span><span class="op">[</span><span class="op">-</span><span class="num">1</span><span class="op">]</span><span class="op">,</span> <span class="num">1.0</span> <span class="op">/</span> <span class="nam">N</span><span class="op">[</span><span class="op">-</span><span class="num">1</span><span class="op">]</span><span class="op">)</span><span class="op">.</span><span class="nam">astype</span><span class="op">(</span><span class="nam">int</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t137" href="#t137">137</a></span><span class="t">        <span class="nam">K</span> <span class="op">=</span> <span class="op">[</span><span class="nam">ki</span><span class="op">[</span><span class="nam">si</span><span class="op">]</span> <span class="key">for</span> <span class="nam">ki</span><span class="op">,</span> <span class="nam">si</span> <span class="key">in</span> <span class="nam">zip</span><span class="op">(</span><span class="nam">k</span><span class="op">,</span> <span class="nam">s</span><span class="op">)</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t137" href="#t137">137</a></span><span class="t">        <span class="nam">K</span> <span class="op">=</span> <span class="op">[</span><span class="nam">ki</span><span class="op">[</span><span class="nam">si</span><span class="op">]</span> <span class="key">for</span> <span class="nam">ki</span><span class="op">,</span> <span class="nam">si</span> <span class="key">in</span> <span class="nam">zip</span><span class="op">(</span><span class="nam">k</span><span class="op">,</span> <span class="nam">s</span><span class="op">,</span> <span class="nam">strict</span><span class="op">=</span><span class="key">True</span><span class="op">)</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t138" href="#t138">138</a></span><span class="t">        <span class="nam">Ks</span> <span class="op">=</span> <span class="nam">list</span><span class="op">(</span><span class="nam">np</span><span class="op">.</span><span class="nam">meshgrid</span><span class="op">(</span><span class="op">*</span><span class="nam">K</span><span class="op">,</span> <span class="nam">indexing</span><span class="op">=</span><span class="str">'ij'</span><span class="op">,</span> <span class="nam">sparse</span><span class="op">=</span><span class="key">True</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t139" href="#t139">139</a></span><span class="t">        <span class="nam">Lp</span> <span class="op">=</span> <span class="num">2</span> <span class="op">*</span> <span class="nam">np</span><span class="op">.</span><span class="nam">pi</span> <span class="op">/</span> <span class="nam">L</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t140" href="#t140">140</a></span><span class="t">        <span class="key">for</span> <span class="nam">i</span> <span class="key">in</span> <span class="nam">range</span><span class="op">(</span><span class="nam">ndim</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -487,8 +487,8 @@
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_91faa57f8583c837_Auzinger_implicit_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.10.6">coverage.py v7.10.6</a>,
-            created at 2025-09-18 07:07 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.13.3">coverage.py v7.13.3</a>,
+            created at 2026-02-07 13:00 +0000
         </p>
     </div>
 </footer>

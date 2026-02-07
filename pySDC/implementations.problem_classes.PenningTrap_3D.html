@@ -11,9 +11,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -51,7 +51,7 @@
 <span id="implementations-problem-classes-penningtrap-3d-module"></span><h1>implementations.problem_classes.PenningTrap_3D module<a class="headerlink" href="#module-implementations.problem_classes.PenningTrap_3D" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.PenningTrap_3D.penningtrap">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">penningtrap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">omega_B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega_E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nparts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/PenningTrap_3D.html#penningtrap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.PenningTrap_3D.penningtrap" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">penningtrap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">omega_B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega_E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nparts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/PenningTrap_3D.html#penningtrap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.PenningTrap_3D.penningtrap" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
 <p>This class implements a standard Penning trap problem on the time interval <span class="math notranslate nohighlight">\([0, t_{end}]\)</span>
 fully investigated in <a class="footnote-reference brackets" href="#id5" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. The equations are given by the following equation of motion</p>
@@ -131,11 +131,11 @@ Journal of Computational Physics (2015).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>c</strong> (<em>dtype_u</em>) – The c term gathering the known values from the previous iteration.</p></li>
+<li><p><strong>c</strong> (<a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_u" title="implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_u"><em>dtype_u</em></a>) – The c term gathering the known values from the previous iteration.</p></li>
 <li><p><strong>dt</strong> (<em>float</em>) – The (probably scaled) time step size.</p></li>
-<li><p><strong>old_fields</strong> (<em>dtype_f</em>) – The field values at the previous node <span class="math notranslate nohighlight">\(m\)</span>.</p></li>
-<li><p><strong>new_fields</strong> (<em>dtype_f</em>) – The field values at the current node <span class="math notranslate nohighlight">\(m+1\)</span>.</p></li>
-<li><p><strong>old_parts</strong> (<em>dtype_u</em>) – The particles at the previous node <span class="math notranslate nohighlight">\(m\)</span>.</p></li>
+<li><p><strong>old_fields</strong> (<a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_f" title="implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_f"><em>dtype_f</em></a>) – The field values at the previous node <span class="math notranslate nohighlight">\(m\)</span>.</p></li>
+<li><p><strong>new_fields</strong> (<a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_f" title="implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_f"><em>dtype_f</em></a>) – The field values at the current node <span class="math notranslate nohighlight">\(m+1\)</span>.</p></li>
+<li><p><strong>old_parts</strong> (<a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_u" title="implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_u"><em>dtype_u</em></a>) – The particles at the previous node <span class="math notranslate nohighlight">\(m\)</span>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -154,8 +154,8 @@ Journal of Computational Physics (2015).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>f</strong> (<em>dtype_f</em>) – The field values.</p></li>
-<li><p><strong>part</strong> (<em>dtype_u</em>) – The current particles data.</p></li>
+<li><p><strong>f</strong> (<a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_f" title="implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_f"><em>dtype_f</em></a>) – The field values.</p></li>
+<li><p><strong>part</strong> (<a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_u" title="implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_u"><em>dtype_u</em></a>) – The current particles data.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – The current time.</p></li>
 </ul>
 </dd>
@@ -187,7 +187,7 @@ Journal of Computational Physics (2015).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>part</strong> (<em>dtype_u</em>) – The particles.</p></li>
+<li><p><strong>part</strong> (<a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_u" title="implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_u"><em>dtype_u</em></a>) – The particles.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time of the particles (not used here).</p></li>
 </ul>
 </dd>
@@ -195,14 +195,14 @@ Journal of Computational Physics (2015).</p>
 <dd class="field-even"><p><strong>f</strong> – Fields for the particles (internal and external), i.e., the right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_f" title="implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_f">dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.PenningTrap_3D.penningtrap.fast_interactions">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fast_interactions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/PenningTrap_3D.html#penningtrap.fast_interactions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.fast_interactions" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fast_interactions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/PenningTrap_3D.html#penningtrap.fast_interactions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.fast_interactions" title="Link to this definition">¶</a></dt>
 <dd><p>Computes the fast interactions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -228,7 +228,7 @@ Journal of Computational Physics (2015).</p>
 <dd><p>Routine to compute the particle-particle interaction, assuming <span class="math notranslate nohighlight">\(q = 1\)</span> for all particles.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>part</strong> (<em>dtype_u</em>) – The particles.</p>
+<dd class="field-odd"><p><strong>part</strong> (<a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_u" title="implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_u"><em>dtype_u</em></a>) – The particles.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>Efield</strong> – The internal E field for each particle.</p>
@@ -251,7 +251,7 @@ Journal of Computational Physics (2015).</p>
 <dd class="field-even"><p><strong>u</strong> – Particle type containing the exact position and velocity.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_u" title="implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -265,7 +265,7 @@ Journal of Computational Physics (2015).</p>
 <dd class="field-odd"><p><strong>u</strong> – Particle set filled with initial data.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>dtype_u</p>
+<dd class="field-even"><p><a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_u" title="implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -357,7 +357,7 @@ Journal of Computational Physics (2015).</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

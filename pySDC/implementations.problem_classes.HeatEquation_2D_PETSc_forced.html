@@ -11,9 +11,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -51,7 +51,7 @@
 <span id="implementations-problem-classes-heatequation-2d-petsc-forced-module"></span><h1>implementations.problem_classes.HeatEquation_2D_PETSc_forced module<a class="headerlink" href="#module-implementations.problem_classes.HeatEquation_2D_PETSc_forced" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">heat2d_petsc_forced</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cnvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">petsc4py.PETSc.COMM_WORLD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_2D_PETSc_forced.html#heat2d_petsc_forced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">heat2d_petsc_forced</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cnvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">petsc4py.PETSc.COMM_WORLD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_2D_PETSc_forced.html#heat2d_petsc_forced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
 <p>Example implementing the forced two-dimensional heat equation with Dirichlet boundary conditions
 <span class="math notranslate nohighlight">\((x, y) \in [0,1]^2\)</span></p>
@@ -185,7 +185,7 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dtype_u" title="implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time at which the numerical solution is computed at.</p></li>
 </ul>
 </dd>
@@ -193,7 +193,7 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dd class="field-even"><p><strong>f</strong> – Right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dtype_f" title="implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dtype_f">dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -205,9 +205,9 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>rhs</strong> (<a class="reference internal" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dtype_f" title="implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dtype_f"><em>dtype_f</em></a>) – Right-hand side for the linear system.</p></li>
 <li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>u0</strong> (<a class="reference internal" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dtype_u" title="implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
@@ -215,7 +215,7 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dd class="field-even"><p><strong>me</strong> – Solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dtype_u" title="implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -232,7 +232,7 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dd class="field-even"><p><strong>me</strong> – Exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dtype_u" title="implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -326,7 +326,7 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

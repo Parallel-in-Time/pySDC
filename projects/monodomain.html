@@ -11,9 +11,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -95,9 +95,9 @@ c++ -O3 -Wall -shared -std=c++11 -fPIC -fvisibility=hidden $(python3 -m pybind11
 \[y'=\lambda_I y+\lambda_E y+\lambda_e y,\]</div>
 <p>with <span class="math notranslate nohighlight">\(\lambda_I,\lambda_E,\lambda_e\)</span> representing <span class="math notranslate nohighlight">\(f_I,f_E,f_e\)</span>, respectively.
 We fix <span class="math notranslate nohighlight">\(\lambda_E=-1\)</span> and vary the stiff terms <span class="math notranslate nohighlight">\(\lambda_I,\lambda_e\)</span> only. We see that the ESDC method is stable for all tested values of <span class="math notranslate nohighlight">\(\lambda_I,\lambda_e\)</span>, while SDC is not.</p>
-<a class="reference internal image-reference" href="../_images/stability_domain_IMEXEXP_EXPRK.png"><img alt="../_images/stability_domain_IMEXEXP_EXPRK.png" src="../_images/stability_domain_IMEXEXP_EXPRK.png" style="width: 327.59999999999997px; height: 255.0px;" />
+<a class="reference internal image-reference" href="../_images/stability_domain_IMEXEXP_EXPRK.png"><img alt="../_images/stability_domain_IMEXEXP_EXPRK.png" height="255" src="../_images/stability_domain_IMEXEXP_EXPRK.png" width="328" />
 </a>
-<a class="reference internal image-reference" href="../_images/stability_domain_IMEXEXP.png"><img alt="../_images/stability_domain_IMEXEXP.png" src="../_images/stability_domain_IMEXEXP.png" style="width: 327.59999999999997px; height: 255.0px;" />
+<a class="reference internal image-reference" href="../_images/stability_domain_IMEXEXP.png"><img alt="../_images/stability_domain_IMEXEXP.png" height="255" src="../_images/stability_domain_IMEXEXP.png" width="328" />
 </a>
 </section>
 <section id="convergence">
@@ -106,7 +106,7 @@ We fix <span class="math notranslate nohighlight">\(\lambda_E=-1\)</span> and va
 We fix the number of collocation nodes to <span class="math notranslate nohighlight">\(m=6\)</span> and perform a convergence experiment fixing the number of sweeps to either <span class="math notranslate nohighlight">\(k=3\)</span> or <span class="math notranslate nohighlight">\(k=6\)</span>.
 We use the ten Tusscher-Panfilov ionic model, which is employed in practical applications.
 We see that we gain one order of accuracy per sweep, as expected.</p>
-<a class="reference internal image-reference" href="../_images/convergence_ESDC_fixed_iter.png"><img alt="../_images/convergence_ESDC_fixed_iter.png" src="../_images/convergence_ESDC_fixed_iter.png" style="width: 287.0px; height: 183.0px;" />
+<a class="reference internal image-reference" href="../_images/convergence_ESDC_fixed_iter.png"><img alt="../_images/convergence_ESDC_fixed_iter.png" height="183" src="../_images/convergence_ESDC_fixed_iter.png" width="287" />
 </a>
 </section>
 <section id="iterations">
@@ -119,9 +119,9 @@ We see that we gain one order of accuracy per sweep, as expected.</p>
 </ul>
 <p>We display the number of iterations required by each method to reach a given tolerance and the residual at convergence. As ionic model we use again the ten Tusscher-Panfilov model.
 We see that PFASST requires a reasonalbly small number of iterations, comparable to the serial counterparts ESDC and MLESDC.</p>
-<a class="reference internal image-reference" href="../_images/niter_VS_time.png"><img alt="../_images/niter_VS_time.png" src="../_images/niter_VS_time.png" style="width: 269.0px; height: 198.0px;" />
+<a class="reference internal image-reference" href="../_images/niter_VS_time.png"><img alt="../_images/niter_VS_time.png" height="198" src="../_images/niter_VS_time.png" width="269" />
 </a>
-<a class="reference internal image-reference" href="../_images/res_VS_time.png"><img alt="../_images/res_VS_time.png" src="../_images/res_VS_time.png" style="width: 294.0px; height: 198.0px;" />
+<a class="reference internal image-reference" href="../_images/res_VS_time.png"><img alt="../_images/res_VS_time.png" height="198" src="../_images/res_VS_time.png" width="294" />
 </a>
 </section>
 </section>
@@ -200,7 +200,7 @@ We see that PFASST requires a reasonalbly small number of iterations, comparable
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

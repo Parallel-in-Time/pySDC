@@ -11,8 +11,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -53,15 +53,15 @@
 </section>
 <dl class="py class">
 <dt class="sig sig-object py" id="core.problem.Problem">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Problem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/problem.html#Problem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.problem.Problem" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Problem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/problem.html#Problem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.problem.Problem" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">RegisterParams</span></code></p>
 <p>Prototype class for problems, just defines the attributes essential to get started.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>init</strong> (<em>list</em><em> of </em><em>args</em>) – Argument(s) used to initialize data types.</p></li>
-<li><p><strong>dtype_u</strong> (<em>type</em>) – Variable data type. Should generate a data variable using dtype_u(init).</p></li>
-<li><p><strong>dtype_f</strong> (<em>type</em>) – RHS data type. Should generate a data variable using dtype_f(init).</p></li>
+<li><p><strong>dtype_u</strong> (<a class="reference internal" href="core.hooks.html#core.hooks.Entry.type" title="core.hooks.Entry.type"><em>type</em></a>) – Variable data type. Should generate a data variable using dtype_u(init).</p></li>
+<li><p><strong>dtype_f</strong> (<a class="reference internal" href="core.hooks.html#core.hooks.Entry.type" title="core.hooks.Entry.type"><em>type</em></a>) – RHS data type. Should generate a data variable using dtype_f(init).</p></li>
 </ul>
 </dd>
 </dl>
@@ -84,12 +84,12 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.problem.Problem.dtype_f">
-<span class="sig-name descname"><span class="pre">dtype_f</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#core.problem.Problem.dtype_f" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#core.problem.Problem.dtype_f" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.problem.Problem.dtype_u">
-<span class="sig-name descname"><span class="pre">dtype_u</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#core.problem.Problem.dtype_u" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#core.problem.Problem.dtype_u" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -99,7 +99,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Current values.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
 </ul>
 </dd>
@@ -107,14 +107,14 @@
 <dd class="field-even"><p><strong>f</strong> – The RHS values.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dd class="field-odd"><p><a class="reference internal" href="#core.problem.Problem.dtype_f" title="core.problem.Problem.dtype_f">dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="core.problem.Problem.f_init">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">f_init</span></span><a class="headerlink" href="#core.problem.Problem.f_init" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">f_init</span></span><a class="headerlink" href="#core.problem.Problem.f_init" title="Link to this definition">¶</a></dt>
 <dd><p>Generate a data variable for RHS</p>
 </dd></dl>
 
@@ -153,7 +153,7 @@ as <cite>jac=jac</cite>.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.problem.Problem.get_default_sweeper_class">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_default_sweeper_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/problem.html#Problem.get_default_sweeper_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.problem.Problem.get_default_sweeper_class" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_default_sweeper_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/problem.html#Problem.get_default_sweeper_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.problem.Problem.get_default_sweeper_class" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -172,7 +172,7 @@ as <cite>jac=jac</cite>.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">logger</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;Logger</span> <span class="pre">problem</span> <span class="pre">(WARNING)&gt;</span></em><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">logger</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;Logger</span> <span class="pre">problem</span> <span class="pre">(WARNING)&gt;</span></span><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -182,7 +182,7 @@ as <cite>jac=jac</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Solution to be plotted</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Solution to be plotted</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Time to display at the top of the figure</p></li>
 <li><p><strong>fig</strong> (<em>matplotlib.pyplot.figure.Figure</em>) – Figure with the correct structure</p></li>
 </ul>
@@ -246,7 +246,7 @@ This defaults to an Euler step to accommodate linear problems.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="core.problem.Problem.u_init">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">u_init</span></span><a class="headerlink" href="#core.problem.Problem.u_init" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">u_init</span></span><a class="headerlink" href="#core.problem.Problem.u_init" title="Link to this definition">¶</a></dt>
 <dd><p>Generate a data variable for u</p>
 </dd></dl>
 
@@ -254,7 +254,7 @@ This defaults to an Euler step to accommodate linear problems.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="core.problem.WorkCounter">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">WorkCounter</span></span><a class="reference internal" href="../_modules/core/problem.html#WorkCounter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.problem.WorkCounter" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">WorkCounter</span></span><a class="reference internal" href="../_modules/core/problem.html#WorkCounter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.problem.WorkCounter" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Utility class for counting iterations.</p>
 <p>Contains one attribute <cite>niter</cite> initialized to zero during
@@ -368,7 +368,7 @@ a function, e.g</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

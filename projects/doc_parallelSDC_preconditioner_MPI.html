@@ -11,8 +11,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -245,7 +245,7 @@
 
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt_helper</span><span class="o">.</span><span class="n">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="o">=</span><span class="mf">238.96</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.89</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">qd_type</span><span class="p">,</span> <span class="n">marker</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">qd_type_list</span><span class="p">,</span> <span class="n">marker_list</span><span class="p">,</span> <span class="n">color_list</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">qd_type</span><span class="p">,</span> <span class="n">marker</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">qd_type_list</span><span class="p">,</span> <span class="n">marker_list</span><span class="p">,</span> <span class="n">color_list</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">niter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
@@ -315,13 +315,13 @@
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_heat.png"><img alt="../_images/parallelSDC_preconditioner_MPI_heat.png" src="../_images/parallelSDC_preconditioner_MPI_heat.png" style="width: 269.0px; height: 197.0px;" />
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_heat.png"><img alt="../_images/parallelSDC_preconditioner_MPI_heat.png" height="197" src="../_images/parallelSDC_preconditioner_MPI_heat.png" width="269" />
 </a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_advection.png"><img alt="../_images/parallelSDC_preconditioner_MPI_advection.png" src="../_images/parallelSDC_preconditioner_MPI_advection.png" style="width: 269.0px; height: 197.0px;" />
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_advection.png"><img alt="../_images/parallelSDC_preconditioner_MPI_advection.png" height="197" src="../_images/parallelSDC_preconditioner_MPI_advection.png" width="269" />
 </a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" src="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" style="width: 269.0px; height: 199.0px;" />
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" height="199" src="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" width="269" />
 </a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../_images/parallelSDC_preconditioner_MPI_fisher.png" src="../_images/parallelSDC_preconditioner_MPI_fisher.png" style="width: 269.0px; height: 201.0px;" />
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../_images/parallelSDC_preconditioner_MPI_fisher.png" height="201" src="../_images/parallelSDC_preconditioner_MPI_fisher.png" width="269" />
 </a>
 
 
@@ -367,7 +367,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

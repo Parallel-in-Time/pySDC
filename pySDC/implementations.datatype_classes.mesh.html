@@ -11,8 +11,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -50,7 +50,7 @@
 <span id="implementations-datatype-classes-mesh-module"></span><h1>implementations.datatype_classes.mesh module<a class="headerlink" href="#module-implementations.datatype_classes.mesh" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.datatype_classes.mesh.MultiComponentMesh">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultiComponentMesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#MultiComponentMesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.MultiComponentMesh" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">MultiComponentMesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#MultiComponentMesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.MultiComponentMesh" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.datatype_classes.mesh.mesh" title="implementations.datatype_classes.mesh.mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></a></p>
 <p>Generic mesh with multiple components.</p>
 <p>To make a specific multi-component mesh, derive from this class and list the components as strings in the class
@@ -86,36 +86,36 @@ leads to all kinds of trouble throughout the code. But here you really cannot ge
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.datatype_classes.mesh.MultiComponentMesh.components">
-<span class="sig-name descname"><span class="pre">components</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#implementations.datatype_classes.mesh.MultiComponentMesh.components" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">components</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></span><a class="headerlink" href="#implementations.datatype_classes.mesh.MultiComponentMesh.components" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.datatype_classes.mesh.comp2_mesh">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">comp2_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#comp2_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.comp2_mesh" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">comp2_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#comp2_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.comp2_mesh" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.datatype_classes.mesh.MultiComponentMesh" title="implementations.datatype_classes.mesh.MultiComponentMesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiComponentMesh</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.datatype_classes.mesh.comp2_mesh.components">
-<span class="sig-name descname"><span class="pre">components</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['comp1',</span> <span class="pre">'comp2']</span></em><a class="headerlink" href="#implementations.datatype_classes.mesh.comp2_mesh.components" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">components</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['comp1',</span> <span class="pre">'comp2']</span></span><a class="headerlink" href="#implementations.datatype_classes.mesh.comp2_mesh.components" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.datatype_classes.mesh.imex_mesh">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">imex_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#imex_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.imex_mesh" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">imex_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#imex_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.imex_mesh" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.datatype_classes.mesh.MultiComponentMesh" title="implementations.datatype_classes.mesh.MultiComponentMesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiComponentMesh</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.datatype_classes.mesh.imex_mesh.components">
-<span class="sig-name descname"><span class="pre">components</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['impl',</span> <span class="pre">'expl']</span></em><a class="headerlink" href="#implementations.datatype_classes.mesh.imex_mesh.components" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">components</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['impl',</span> <span class="pre">'expl']</span></span><a class="headerlink" href="#implementations.datatype_classes.mesh.imex_mesh.components" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.datatype_classes.mesh.mesh">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
 <p>Numpy-based datatype for serial or parallel meshes.
 Can include a communicator and expects a dtype to allow complex data.</p>
@@ -144,7 +144,7 @@ Can include a communicator and expects a dtype to allow complex data.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">comm</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">comm</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -185,7 +185,7 @@ Can include a communicator and expects a dtype to allow complex data.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.datatype_classes.mesh.mesh.xp">
-<span class="sig-name descname"><span class="pre">xp</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'numpy'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.13/site-packages/numpy/__init__.py'&gt;</span></em><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh.xp" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">xp</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'numpy'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.14/site-packages/numpy/__init__.py'&gt;</span></span><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh.xp" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -283,7 +283,7 @@ Can include a communicator and expects a dtype to allow complex data.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

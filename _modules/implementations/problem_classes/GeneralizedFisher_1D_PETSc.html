@@ -10,8 +10,8 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
     <script src="../../../_static/documentation_options.js?v=81710850"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -231,7 +231,7 @@
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
         <span class="n">mx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getSizes</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getRanges</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">xs</span><span class="p">,</span> <span class="n">xe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getRanges</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">==</span> <span class="n">mx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -266,7 +266,7 @@
         <span class="n">P</span><span class="o">.</span><span class="n">zeroEntries</span><span class="p">()</span>
         <span class="n">row</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Mat</span><span class="o">.</span><span class="n">Stencil</span><span class="p">()</span>
         <span class="n">mx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getSizes</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getRanges</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">xs</span><span class="p">,</span> <span class="n">xe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getRanges</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">):</span>
             <span class="n">row</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="n">i</span>
             <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
@@ -400,7 +400,7 @@
 
         <span class="c1"># compute dx and get local ranges</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xe</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getRanges</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getRanges</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># compute discretization matrix A and identity</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_A</span><span class="p">()</span>
@@ -460,7 +460,7 @@
         <span class="n">row</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Mat</span><span class="o">.</span><span class="n">Stencil</span><span class="p">()</span>
         <span class="n">col</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Mat</span><span class="o">.</span><span class="n">Stencil</span><span class="p">()</span>
         <span class="n">mx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getSizes</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getRanges</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">xs</span><span class="p">,</span> <span class="n">xe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getRanges</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">):</span>
             <span class="n">row</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="n">i</span>
             <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
@@ -508,7 +508,7 @@
         <span class="n">row</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Mat</span><span class="o">.</span><span class="n">Stencil</span><span class="p">()</span>
         <span class="n">col</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Mat</span><span class="o">.</span><span class="n">Stencil</span><span class="p">()</span>
         <span class="n">mx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getSizes</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getRanges</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">xs</span><span class="p">,</span> <span class="n">xe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getRanges</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">):</span>
             <span class="n">row</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="n">i</span>
             <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
@@ -918,7 +918,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

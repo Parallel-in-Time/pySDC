@@ -11,8 +11,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -194,16 +194,12 @@ Find a suitable plotting script here: <a class="reference external" href="https:
     <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
     <span class="n">lamda</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lonlatr_from_xyz</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
 
-    <span class="c1"># Equation: coriolis</span>
-    <span class="n">parameters</span> <span class="o">=</span> <span class="n">ShallowWaterParameters</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">H</span><span class="o">=</span><span class="n">mean_depth</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">g</span><span class="p">)</span>
-    <span class="n">Omega</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">Omega</span>
-    <span class="n">fexpr</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">Omega</span> <span class="o">*</span> <span class="n">z</span> <span class="o">/</span> <span class="n">radius</span>
-
     <span class="c1"># Equation: topography</span>
     <span class="n">rsq</span> <span class="o">=</span> <span class="n">min_value</span><span class="p">(</span><span class="n">R0</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">lamda</span> <span class="o">-</span> <span class="n">lamda_c</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">phi</span> <span class="o">-</span> <span class="n">phi_c</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">rsq</span><span class="p">)</span>
     <span class="n">tpexpr</span> <span class="o">=</span> <span class="n">mountain_height</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">r</span> <span class="o">/</span> <span class="n">R0</span><span class="p">)</span>
-    <span class="n">eqns</span> <span class="o">=</span> <span class="n">ShallowWaterEquations</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">fexpr</span><span class="o">=</span><span class="n">fexpr</span><span class="p">,</span> <span class="n">topog_expr</span><span class="o">=</span><span class="n">tpexpr</span><span class="p">)</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="n">ShallowWaterParameters</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">H</span><span class="o">=</span><span class="n">mean_depth</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">g</span><span class="p">,</span> <span class="n">topog_expr</span><span class="o">=</span><span class="n">tpexpr</span><span class="p">)</span>
+    <span class="n">eqns</span> <span class="o">=</span> <span class="n">ShallowWaterEquations</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
 
     <span class="n">eqns</span><span class="o">.</span><span class="n">label_terms</span><span class="p">(</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="ow">not</span> <span class="n">t</span><span class="o">.</span><span class="n">has_label</span><span class="p">(</span><span class="n">time_derivative</span><span class="p">),</span> <span class="n">implicit</span><span class="p">)</span>
 
@@ -368,7 +364,7 @@ Find a suitable plotting script here: <a class="reference external" href="https:
     <span class="n">u0</span> <span class="o">=</span> <span class="n">stepper</span><span class="o">.</span><span class="n">fields</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)</span>
     <span class="n">D0</span> <span class="o">=</span> <span class="n">stepper</span><span class="o">.</span><span class="n">fields</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
     <span class="n">uexpr</span> <span class="o">=</span> <span class="n">as_vector</span><span class="p">([</span><span class="o">-</span><span class="n">u_max</span> <span class="o">*</span> <span class="n">y</span> <span class="o">/</span> <span class="n">radius</span><span class="p">,</span> <span class="n">u_max</span> <span class="o">*</span> <span class="n">x</span> <span class="o">/</span> <span class="n">radius</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
-    <span class="n">Dexpr</span> <span class="o">=</span> <span class="n">mean_depth</span> <span class="o">-</span> <span class="n">tpexpr</span> <span class="o">-</span> <span class="p">(</span><span class="n">radius</span> <span class="o">*</span> <span class="n">Omega</span> <span class="o">*</span> <span class="n">u_max</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">u_max</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">z</span> <span class="o">/</span> <span class="n">radius</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">g</span>
+    <span class="n">Dexpr</span> <span class="o">=</span> <span class="n">mean_depth</span> <span class="o">-</span> <span class="n">tpexpr</span> <span class="o">-</span> <span class="p">(</span><span class="n">radius</span> <span class="o">*</span> <span class="n">parameters</span><span class="o">.</span><span class="n">Omega</span> <span class="o">*</span> <span class="n">u_max</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">u_max</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">z</span> <span class="o">/</span> <span class="n">radius</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">g</span>
 
     <span class="n">u0</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">uexpr</span><span class="p">)</span>
     <span class="n">D0</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">Dexpr</span><span class="p">)</span>
@@ -495,7 +491,7 @@ Find a suitable plotting script here: <a class="reference external" href="https:
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

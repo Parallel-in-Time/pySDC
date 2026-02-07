@@ -2,22 +2,22 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/implementations/transfer_classes/TransferMesh_MPIFFT.py: 89%</title>
-    <link rel="icon" sizes="32x32" href="favicon_32_cb_58284776.png">
-    <link rel="stylesheet" href="style_cb_6b508a39.css" type="text/css">
-    <script src="coverage_html_cb_6fb7b396.js" defer></script>
+    <title>Coverage for pySDC/implementations/transfer_classes/TransferMesh_MPIFFT.py: 86%</title>
+    <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
+    <link rel="stylesheet" href="style_cb_9ff733b0.css" type="text/css">
+    <script src="coverage_html_cb_dd2e7eb5.js" defer></script>
 </head>
 <body class="pyfile">
 <header>
     <div class="content">
         <h1>
-            <span class="text">Coverage for </span><b>pySDC/implementations/transfer_classes/TransferMesh_MPIFFT.py</b>:
-            <span class="pc_cov">89%</span>
+            <span class="text">Coverage for </span><b>pySDC&#8201;/&#8201;implementations&#8201;/&#8201;transfer_classes&#8201;/&#8201;TransferMesh_MPIFFT.py</b>:
+            <span class="pc_cov">86%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
             <label for="help_panel_state">
-                <img id="keyboard_icon" src="keybd_closed_cb_ce680311.png" alt="Show/hide keyboard shortcuts">
+                <img id="keyboard_icon" src="keybd_closed_cb_900cfef5.png" alt="Show/hide keyboard shortcuts">
             </label>
             <div id="help_panel">
                 <p class="legend">Shortcuts on this page</p>
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">70 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">62<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">8<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">60<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">10<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">4<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_716c1644203275a5_TransferMesh_NoCoarse_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.10.6">coverage.py v7.10.6</a>,
-            created at 2025-09-18 07:07 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.13.3">coverage.py v7.13.3</a>,
+            created at 2026-02-07 13:00 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -111,14 +111,14 @@
     <p class="pln"><span class="n"><a id="t29" href="#t29">29</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t30" href="#t30">30</a></span><span class="t">        <span class="nam">Nf</span> <span class="op">=</span> <span class="nam">list</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">fine_prob</span><span class="op">.</span><span class="nam">fft</span><span class="op">.</span><span class="nam">global_shape</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t31" href="#t31">31</a></span><span class="t">        <span class="nam">Nc</span> <span class="op">=</span> <span class="nam">list</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">coarse_prob</span><span class="op">.</span><span class="nam">fft</span><span class="op">.</span><span class="nam">global_shape</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t32" href="#t32">32</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">ratio</span> <span class="op">=</span> <span class="op">[</span><span class="nam">int</span><span class="op">(</span><span class="nam">nf</span> <span class="op">/</span> <span class="nam">nc</span><span class="op">)</span> <span class="key">for</span> <span class="nam">nf</span><span class="op">,</span> <span class="nam">nc</span> <span class="key">in</span> <span class="nam">zip</span><span class="op">(</span><span class="nam">Nf</span><span class="op">,</span> <span class="nam">Nc</span><span class="op">)</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t32" href="#t32">32</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">ratio</span> <span class="op">=</span> <span class="op">[</span><span class="nam">int</span><span class="op">(</span><span class="nam">nf</span> <span class="op">/</span> <span class="nam">nc</span><span class="op">)</span> <span class="key">for</span> <span class="nam">nf</span><span class="op">,</span> <span class="nam">nc</span> <span class="key">in</span> <span class="nam">zip</span><span class="op">(</span><span class="nam">Nf</span><span class="op">,</span> <span class="nam">Nc</span><span class="op">,</span> <span class="nam">strict</span><span class="op">=</span><span class="key">True</span><span class="op">)</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t33" href="#t33">33</a></span><span class="t">        <span class="nam">axes</span> <span class="op">=</span> <span class="nam">tuple</span><span class="op">(</span><span class="nam">range</span><span class="op">(</span><span class="nam">len</span><span class="op">(</span><span class="nam">Nf</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t35" href="#t35">35</a></span><span class="t">        <span class="nam">fft_args</span> <span class="op">=</span> <span class="op">{</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t36" href="#t36">36</a></span><span class="t">        <span class="nam">useGPU</span> <span class="op">=</span> <span class="str">'cupy'</span> <span class="key">in</span> <span class="nam">self</span><span class="op">.</span><span class="nam">fine_prob</span><span class="op">.</span><span class="nam">dtype_u</span><span class="op">.</span><span class="nam">__name__</span><span class="op">.</span><span class="nam">lower</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t37" href="#t37">37</a></span><span class="t">        <span class="key">if</span> <span class="nam">useGPU</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t38" href="#t38">38</a></span><span class="t">            <span class="nam">fft_args</span><span class="op">[</span><span class="str">'backend'</span><span class="op">]</span> <span class="op">=</span> <span class="str">'cupy'</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t39" href="#t39">39</a></span><span class="t">            <span class="nam">fft_args</span><span class="op">[</span><span class="str">'comm_backend'</span><span class="op">]</span> <span class="op">=</span> <span class="str">'NCCL'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t38" href="#t38">38</a></span><span class="t">            <span class="nam">fft_args</span><span class="op">[</span><span class="str">'backend'</span><span class="op">]</span> <span class="op">=</span> <span class="str">'cupy'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t39" href="#t39">39</a></span><span class="t">            <span class="nam">fft_args</span><span class="op">[</span><span class="str">'comm_backend'</span><span class="op">]</span> <span class="op">=</span> <span class="str">'NCCL'</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t40" href="#t40">40</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t41" href="#t41">41</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">fft_pad</span> <span class="op">=</span> <span class="nam">PFFT</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t42" href="#t42">42</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">coarse_prob</span><span class="op">.</span><span class="nam">comm</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
@@ -224,8 +224,8 @@
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_716c1644203275a5_TransferMesh_NoCoarse_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.10.6">coverage.py v7.10.6</a>,
-            created at 2025-09-18 07:07 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.13.3">coverage.py v7.13.3</a>,
+            created at 2026-02-07 13:00 +0000
         </p>
     </div>
 </footer>

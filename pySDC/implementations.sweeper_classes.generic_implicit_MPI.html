@@ -11,8 +11,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -50,7 +50,7 @@
 <span id="implementations-sweeper-classes-generic-implicit-mpi-module"></span><h1>implementations.sweeper_classes.generic_implicit_MPI module<a class="headerlink" href="#module-implementations.sweeper_classes.generic_implicit_MPI" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SweeperMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit_MPI.html#SweeperMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SweeperMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit_MPI.html#SweeperMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Sweeper</span></code></p>
 <p>MPI based sweeper where each rank administers one collocation node. Adapt sweepers to MPI by use of multiple inheritance.
 See for example the <cite>generic_implicit_MPI</cite> sweeper, which has a class definition:</p>
@@ -65,7 +65,7 @@ class, but the <cite>SweeperMPI</cite> class adds parameters to the <cite>params
 <cite>generic_implicit</cite>.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.comm">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">comm</span></span><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.comm" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">comm</span></span><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.comm" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -106,14 +106,14 @@ and evaluates the RHS of the ODE there</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.rank">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rank</span></span><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.rank" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rank</span></span><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.rank" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generic_implicit_MPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit_MPI.html#generic_implicit_MPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">generic_implicit_MPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit_MPI.html#generic_implicit_MPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI" title="implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI"><code class="xref py py-class docutils literal notranslate"><span class="pre">SweeperMPI</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">generic_implicit</span></code></p>
 <p>Generic implicit sweeper parallelized across the nodes.
 Please supply a communicator as <cite>comm</cite> to the parameters!</p>
@@ -152,7 +152,7 @@ Please supply a communicator as <cite>comm</cite> to the parameters!</p>
 <dd class="field-even"><p>containing the integral as values</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list of dtype_u</p>
+<dd class="field-odd"><p>list of <a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -258,7 +258,7 @@ Please supply a communicator as <cite>comm</cite> to the parameters!</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

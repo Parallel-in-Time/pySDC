@@ -11,8 +11,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -92,17 +92,17 @@ Also, <cite>Rectilinear.setHeader</cite> <strong>must be given the global grids 
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FieldsIO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#FieldsIO"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.FieldsIO" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">FieldsIO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#FieldsIO"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.FieldsIO" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Abstract IO file handler</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.ALLOW_OVERWRITE">
-<span class="sig-name descname"><span class="pre">ALLOW_OVERWRITE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.ALLOW_OVERWRITE" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">ALLOW_OVERWRITE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.ALLOW_OVERWRITE" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.STRUCTS">
-<span class="sig-name descname"><span class="pre">STRUCTS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{0:</span> <span class="pre">&lt;class</span> <span class="pre">'helpers.fieldsIO.Scalar'&gt;,</span> <span class="pre">1:</span> <span class="pre">&lt;class</span> <span class="pre">'helpers.fieldsIO.Rectilinear'&gt;}</span></em><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.STRUCTS" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">STRUCTS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{0:</span> <span class="pre">&lt;class</span> <span class="pre">'helpers.fieldsIO.Scalar'&gt;,</span> <span class="pre">1:</span> <span class="pre">&lt;class</span> <span class="pre">'helpers.fieldsIO.Rectilinear'&gt;}</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.STRUCTS" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -121,13 +121,13 @@ Also, <cite>Rectilinear.setHeader</cite> <strong>must be given the global grids 
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.fSize">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fSize</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.fSize" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fSize</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.fSize" title="Link to this definition">¶</a></dt>
 <dd><p>Full size of a field (in bytes)</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.fileSize">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fileSize</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.fileSize" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fileSize</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.fileSize" title="Link to this definition">¶</a></dt>
 <dd><p>Current size of the file (in bytes)</p>
 </dd></dl>
 
@@ -139,7 +139,7 @@ Also, <cite>Rectilinear.setHeader</cite> <strong>must be given the global grids 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.fromFile">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fromFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#FieldsIO.fromFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.fromFile" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fromFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#FieldsIO.fromFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.fromFile" title="Link to this definition">¶</a></dt>
 <dd><p>Read a file storing fields, and return the <cite>FieldsIO</cite> of the appropriate
 field type (structure).</p>
 <dl class="field-list simple">
@@ -157,19 +157,19 @@ field type (structure).</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.hBase">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hBase</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.hBase" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">hBase</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.hBase" title="Link to this definition">¶</a></dt>
 <dd><p>Base header into numpy array format</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.hInfos">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hInfos</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.hInfos" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">hInfos</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.hInfos" title="Link to this definition">¶</a></dt>
 <dd><p>(Abstract) Array representing the grid structure to be written in the binary file.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.hSize">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hSize</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.hSize" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">hSize</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.hSize" title="Link to this definition">¶</a></dt>
 <dd><p>Size of the full header (in bytes)</p>
 </dd></dl>
 
@@ -181,13 +181,13 @@ field type (structure).</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.itemSize">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">itemSize</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.itemSize" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">itemSize</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.itemSize" title="Link to this definition">¶</a></dt>
 <dd><p>Size of one field value (in bytes)</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.nFields">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nFields</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.nFields" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">nFields</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.nFields" title="Link to this definition">¶</a></dt>
 <dd><p>Number of fields currently stored in the binary file</p>
 </dd></dl>
 
@@ -223,7 +223,7 @@ time index.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.register">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#FieldsIO.register"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.register" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#FieldsIO.register"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.register" title="Link to this definition">¶</a></dt>
 <dd><p>Decorator used to register a new class FieldsIO specialized class</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -249,7 +249,7 @@ it must be between -128 and 127</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.sID">
-<span class="sig-name descname"><span class="pre">sID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.sID" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sID</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.sID" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -260,7 +260,7 @@ it must be between -128 and 127</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.tSize">
-<span class="sig-name descname"><span class="pre">tSize</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.tSize" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">tSize</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.tSize" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -271,7 +271,7 @@ it must be between -128 and 127</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.fieldsIO.FieldsIO.times">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">times</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.times" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">times</span></span><a class="headerlink" href="#helpers.fieldsIO.FieldsIO.times" title="Link to this definition">¶</a></dt>
 <dd><p>Vector of all times stored in the binary file</p>
 </dd></dl>
 
@@ -279,7 +279,7 @@ it must be between -128 and 127</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="helpers.fieldsIO.Rectilinear">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Rectilinear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Rectilinear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Rectilinear" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Rectilinear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Rectilinear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Rectilinear" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#helpers.fieldsIO.Scalar" title="helpers.fieldsIO.Scalar"><code class="xref py py-class docutils literal notranslate"><span class="pre">Scalar</span></code></a></p>
 <p>FieldsIO handler storing a given number of scalar variables on a N-dimensional rectilinear grid</p>
 <dl class="py method">
@@ -296,7 +296,7 @@ it must be between -128 and 127</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.fieldsIO.Rectilinear.MPI_ON">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MPI_ON</span></span><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.MPI_ON" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">MPI_ON</span></span><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.MPI_ON" title="Link to this definition">¶</a></dt>
 <dd><p>Wether or not MPI is activated</p>
 </dd></dl>
 
@@ -317,7 +317,7 @@ it must be between -128 and 127</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.fieldsIO.Rectilinear.MPI_ROOT">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MPI_ROOT</span></span><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.MPI_ROOT" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">MPI_ROOT</span></span><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.MPI_ROOT" title="Link to this definition">¶</a></dt>
 <dd><p>Wether or not the process is MPI Root</p>
 </dd></dl>
 
@@ -369,24 +369,24 @@ possibly using MPI.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.fieldsIO.Rectilinear.comm">
-<span class="sig-name descname"><span class="pre">comm</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">mpi4py.MPI.Intracomm</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.comm" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">comm</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">mpi4py.MPI.Intracomm</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.comm" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.fieldsIO.Rectilinear.dim">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dim</span></span><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.dim" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dim</span></span><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.dim" title="Link to this definition">¶</a></dt>
 <dd><p>Number of grid dimensions</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.fieldsIO.Rectilinear.gridSizes">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gridSizes</span></span><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.gridSizes" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">gridSizes</span></span><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.gridSizes" title="Link to this definition">¶</a></dt>
 <dd><p>Number of points in y direction</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.fieldsIO.Rectilinear.hInfos">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hInfos</span></span><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.hInfos" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">hInfos</span></span><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.hInfos" title="Link to this definition">¶</a></dt>
 <dd><p>Array representing the grid structure to be written in the binary file.</p>
 </dd></dl>
 
@@ -398,7 +398,7 @@ possibly using MPI.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.fieldsIO.Rectilinear.nDoF">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nDoF</span></span><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.nDoF" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">nDoF</span></span><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.nDoF" title="Link to this definition">¶</a></dt>
 <dd><p>Number of degrees of freedom for one variable</p>
 </dd></dl>
 
@@ -444,7 +444,7 @@ time index, using MPI in the eventuality of space parallel decomposition.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.fieldsIO.Rectilinear.sID">
-<span class="sig-name descname"><span class="pre">sID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.sID" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sID</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.sID" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -467,13 +467,13 @@ time index, using MPI in the eventuality of space parallel decomposition.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.fieldsIO.Rectilinear.setupCoords">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setupCoords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">coords</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Rectilinear.setupCoords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.setupCoords" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">setupCoords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">coords</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Rectilinear.setupCoords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.setupCoords" title="Link to this definition">¶</a></dt>
 <dd><p>Utility function to setup grids in multiple dimensions, given the keyword arguments</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.fieldsIO.Rectilinear.setupMPI">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setupMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">mpi4py.MPI.Intracomm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iLoc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nLoc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Rectilinear.setupMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.setupMPI" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">setupMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">mpi4py.MPI.Intracomm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iLoc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nLoc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Rectilinear.setupMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Rectilinear.setupMPI" title="Link to this definition">¶</a></dt>
 <dd><p>Setup the MPI mode for the files IO, considering a decomposition
 of the 1D grid into contiguous subintervals.</p>
 <dl class="field-list simple">
@@ -518,18 +518,18 @@ The default is “{:06d}”.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="helpers.fieldsIO.Scalar">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Scalar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Scalar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Scalar" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Scalar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#Scalar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.Scalar" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#helpers.fieldsIO.FieldsIO" title="helpers.fieldsIO.FieldsIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">FieldsIO</span></code></a></p>
 <p>FieldsIO handler storing a given number of scalar</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.fieldsIO.Scalar.hInfos">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hInfos</span></span><a class="headerlink" href="#helpers.fieldsIO.Scalar.hInfos" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">hInfos</span></span><a class="headerlink" href="#helpers.fieldsIO.Scalar.hInfos" title="Link to this definition">¶</a></dt>
 <dd><p>Array representing the grid structure to be written in the binary file.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.fieldsIO.Scalar.nVar">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nVar</span></span><a class="headerlink" href="#helpers.fieldsIO.Scalar.nVar" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">nVar</span></span><a class="headerlink" href="#helpers.fieldsIO.Scalar.nVar" title="Link to this definition">¶</a></dt>
 <dd><p>Number of variables in a fields, as described in the header</p>
 </dd></dl>
 
@@ -546,7 +546,7 @@ The default is “{:06d}”.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.fieldsIO.Scalar.sID">
-<span class="sig-name descname"><span class="pre">sID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#helpers.fieldsIO.Scalar.sID" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sID</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#helpers.fieldsIO.Scalar.sID" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -710,7 +710,7 @@ The default is “{:06d}”.</p></li>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

@@ -11,9 +11,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -51,7 +51,7 @@
 <span id="implementations-problem-classes-fermipastaulamtsingou-module"></span><h1>implementations.problem_classes.FermiPastaUlamTsingou module<a class="headerlink" href="#module-implementations.problem_classes.FermiPastaUlamTsingou" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fermi_pasta_ulam_tsingou</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">npart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2048</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_modes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FermiPastaUlamTsingou.html#fermi_pasta_ulam_tsingou"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fermi_pasta_ulam_tsingou</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">npart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2048</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_modes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FermiPastaUlamTsingou.html#fermi_pasta_ulam_tsingou"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
 <p>The Fermi-Pasta-Ulam-Tsingou (FPUT) problem was one of the first computer experiments.  E. Fermi, J. Pasta
 and S. Ulam investigated the behavior of a vibrating spring with a weak correction term (which is quadratic
@@ -139,7 +139,7 @@ Collected Papers of Enrico Fermi, E. Segré (Ed.), University of Chicago Press (
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.dtype_u" title="implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
 </ul>
 </dd>
@@ -147,7 +147,7 @@ Collected Papers of Enrico Fermi, E. Segré (Ed.), University of Chicago Press (
 <dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.dtype_f" title="implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.dtype_f">dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -158,7 +158,7 @@ Collected Papers of Enrico Fermi, E. Segré (Ed.), University of Chicago Press (
 <dd><p>Routine to compute the Hamiltonian.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>u</strong> (<em>dtype_u</em>) – The particles.</p>
+<dd class="field-odd"><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.dtype_u" title="implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.dtype_u"><em>dtype_u</em></a>) – The particles.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ham</strong> – The Hamiltonian.</p>
@@ -175,7 +175,7 @@ Collected Papers of Enrico Fermi, E. Segré (Ed.), University of Chicago Press (
 <dd><p>Routine to compute the energy following <a class="footnote-reference brackets" href="#id3" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>u</strong> (<em>dtype_u</em>) – Particles.</p>
+<dd class="field-odd"><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.dtype_u" title="implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.dtype_u"><em>dtype_u</em></a>) – Particles.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>energy</strong> – Energies.</p>
@@ -198,7 +198,7 @@ Collected Papers of Enrico Fermi, E. Segré (Ed.), University of Chicago Press (
 <dd class="field-even"><p><strong>me</strong> – The exact/initial position and velocity.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.dtype_u" title="implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -289,7 +289,7 @@ Collected Papers of Enrico Fermi, E. Segré (Ed.), University of Chicago Press (
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

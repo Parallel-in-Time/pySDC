@@ -11,9 +11,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -51,7 +51,7 @@
 <span id="implementations-problem-classes-discontinuoustestode-module"></span><h1>implementations.problem_classes.DiscontinuousTestODE module<a class="headerlink" href="#module-implementations.problem_classes.DiscontinuousTestODE" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DiscontinuousTestODE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#DiscontinuousTestODE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">DiscontinuousTestODE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#DiscontinuousTestODE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
 <p>This class implements a very simple test case of a ordinary differential equation consisting of one discrete event. The dynamics of
 the solution changes when the state function <span class="math notranslate nohighlight">\(h(u) := u - 5\)</span> changes the sign. The problem is defined by:</p>
@@ -136,7 +136,7 @@ the solution changes when the state function <span class="math notranslate nohig
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_u" title="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
 </ul>
 </dd>
@@ -144,7 +144,7 @@ the solution changes when the state function <span class="math notranslate nohig
 <dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_f" title="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_f">dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -159,7 +159,7 @@ step.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_u" title="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution.</p></li>
 </ul>
 </dd>
@@ -181,9 +181,9 @@ step.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>rhs</strong> (<a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_f" title="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_f"><em>dtype_f</em></a>) – Right-hand side for the linear system.</p></li>
 <li><p><strong>dt</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>u0</strong> (<a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_u" title="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
@@ -191,7 +191,7 @@ step.</p>
 <dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_u" title="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -204,7 +204,7 @@ step.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p></li>
-<li><p><strong>u_init</strong> (<em>dtype_u</em>) – Initial conditions for getting the exact solution.</p></li>
+<li><p><strong>u_init</strong> (<a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_u" title="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_u"><em>dtype_u</em></a>) – Initial conditions for getting the exact solution.</p></li>
 <li><p><strong>t_init</strong> (<em>float</em>) – The starting time.</p></li>
 </ul>
 </dd>
@@ -212,7 +212,7 @@ step.</p>
 <dd class="field-even"><p><strong>me</strong> – The exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_u" title="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -221,7 +221,7 @@ step.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.ExactDiscontinuousTestODE">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ExactDiscontinuousTestODE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#ExactDiscontinuousTestODE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.ExactDiscontinuousTestODE" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ExactDiscontinuousTestODE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#ExactDiscontinuousTestODE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.ExactDiscontinuousTestODE" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE" title="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiscontinuousTestODE</span></code></a></p>
 <p>Dummy ODE problem for testing the <code class="docutils literal notranslate"><span class="pre">SwitchEstimator</span></code> class. The problem contains the exact dynamics
 of the problem class <code class="docutils literal notranslate"><span class="pre">DiscontinuousTestODE</span></code>.</p>
@@ -232,7 +232,7 @@ of the problem class <code class="docutils literal notranslate"><span class="pre
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Exact value of u.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Exact value of u.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Time <span class="math notranslate nohighlight">\(t\)</span>.</p></li>
 </ul>
 </dd>
@@ -240,7 +240,7 @@ of the problem class <code class="docutils literal notranslate"><span class="pre
 <dd class="field-even"><p><strong>f</strong> – Derivative.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_f" title="core.problem.Problem.dtype_f">dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -252,9 +252,9 @@ of the problem class <code class="docutils literal notranslate"><span class="pre
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>rhs</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_f" title="core.problem.Problem.dtype_f"><em>dtype_f</em></a>) – Right-hand side for the linear system.</p></li>
 <li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>u0</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
@@ -262,7 +262,7 @@ of the problem class <code class="docutils literal notranslate"><span class="pre
 <dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -360,7 +360,7 @@ of the problem class <code class="docutils literal notranslate"><span class="pre
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

@@ -11,8 +11,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -248,7 +248,7 @@
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/parallelSDC_fisher.png"><img alt="../_images/parallelSDC_fisher.png" src="../_images/parallelSDC_fisher.png" style="width: 407.0px; height: 259.0px;" />
+<a class="reference internal image-reference" href="../_images/parallelSDC_fisher.png"><img alt="../_images/parallelSDC_fisher.png" height="259" src="../_images/parallelSDC_fisher.png" width="407" />
 </a>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/parallelSDC/newton_vs_sdc.py">pySDC/projects/parallelSDC/newton_vs_sdc.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
@@ -376,7 +376,7 @@
         <span class="k">elif</span> <span class="n">sweeper</span> <span class="o">==</span> <span class="s1">&#39;linearized_implicit_fixed_parallel_prec&#39;</span><span class="p">:</span>
             <span class="n">label_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Inexact Newton&#39;</span><span class="p">)</span>
 
-    <span class="n">setups</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sweeper_list</span><span class="p">,</span> <span class="n">color_list</span><span class="p">,</span> <span class="n">marker_list</span><span class="p">,</span> <span class="n">label_list</span><span class="p">)</span>
+    <span class="n">setups</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sweeper_list</span><span class="p">,</span> <span class="n">color_list</span><span class="p">,</span> <span class="n">marker_list</span><span class="p">,</span> <span class="n">label_list</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="n">plt_helper</span><span class="o">.</span><span class="n">setup_mpl</span><span class="p">()</span>
 
@@ -420,7 +420,7 @@
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/parallelSDC_fisher_newton.png"><img alt="../_images/parallelSDC_fisher_newton.png" src="../_images/parallelSDC_fisher_newton.png" style="width: 293.0px; height: 186.0px;" />
+<a class="reference internal image-reference" href="../_images/parallelSDC_fisher_newton.png"><img alt="../_images/parallelSDC_fisher_newton.png" height="186" src="../_images/parallelSDC_fisher_newton.png" width="293" />
 </a>
 
 
@@ -466,7 +466,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

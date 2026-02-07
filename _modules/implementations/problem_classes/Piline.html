@@ -10,8 +10,8 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
     <script src="../../../_static/documentation_options.js?v=81710850"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -197,10 +197,8 @@
         <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">u_init</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">t_init</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s1">&#39;Please supply `t_init` when you want to get the exact solution from a point that </span><span class="se">\</span>
-<span class="s1">is not 0!&#39;</span>
-                    <span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Please supply `t_init` when you want to get the exact solution from a point that </span><span class="se">\</span>
+<span class="s1">is not 0!&#39;</span><span class="p">)</span>
                 <span class="n">me</span> <span class="o">=</span> <span class="n">u_init</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">t_init</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -254,7 +252,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

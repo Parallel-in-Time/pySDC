@@ -10,8 +10,8 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
     <script src="../../../_static/documentation_options.js?v=81710850"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -131,10 +131,8 @@
 <span class="sd">            str: Error message</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">HotRod_tol</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">:</span>
-            <span class="n">controller</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;Hot Rod needs a detection threshold, which is now set to infinity, such that a </span><span class="se">\</span>
-<span class="s2">restart is never triggered!&quot;</span>
-            <span class="p">)</span>
+            <span class="n">controller</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Hot Rod needs a detection threshold, which is now set to infinity, such that a </span><span class="se">\</span>
+<span class="s2">restart is never triggered!&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">description</span><span class="p">[</span><span class="s2">&quot;step_params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;restol&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span>
@@ -249,7 +247,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

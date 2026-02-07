@@ -11,8 +11,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -50,7 +50,7 @@
 <span id="implementations-problem-classes-polynomial-test-problem-module"></span><h1>implementations.problem_classes.polynomial_test_problem module<a class="headerlink" href="#module-implementations.problem_classes.polynomial_test_problem" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.polynomial_test_problem.polynomial_testequation">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">polynomial_testequation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">26266</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useGPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/polynomial_test_problem.html#polynomial_testequation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">polynomial_testequation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">26266</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useGPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/polynomial_test_problem.html#polynomial_testequation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
 <p>Dummy problem for tests only! In particular, the <cite>solve_system</cite> function just returns the exact solution instead of
 solving an appropriate system. This class is indented to be used for tests of operations that are exact on polynomials.</p>
@@ -73,7 +73,7 @@ solving an appropriate system. This class is indented to be used for tests of op
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_u" title="implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
 </ul>
 </dd>
@@ -81,7 +81,7 @@ solving an appropriate system. This class is indented to be used for tests of op
 <dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_f" title="implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_f">dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -93,9 +93,9 @@ solving an appropriate system. This class is indented to be used for tests of op
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>rhs</strong> (<a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_f" title="implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_f"><em>dtype_f</em></a>) – Right-hand side for the linear system.</p></li>
 <li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>u0</strong> (<a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_u" title="implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
@@ -103,7 +103,7 @@ solving an appropriate system. This class is indented to be used for tests of op
 <dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_u" title="implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -124,21 +124,21 @@ solving an appropriate system. This class is indented to be used for tests of op
 <dd class="field-even"><p><strong>me</strong> – The exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_u" title="implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.polynomial_test_problem.polynomial_testequation.xp">
-<span class="sig-name descname"><span class="pre">xp</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'numpy'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.13/site-packages/numpy/__init__.py'&gt;</span></em><a class="headerlink" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.xp" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">xp</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'numpy'</span> <span class="pre">from</span> <span class="pre">'/home/runner/micromamba/envs/pySDC/lib/python3.14/site-packages/numpy/__init__.py'&gt;</span></span><a class="headerlink" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.xp" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">polynomial_testequation_IMEX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">26266</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useGPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/polynomial_test_problem.html#polynomial_testequation_IMEX"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">polynomial_testequation_IMEX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">26266</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useGPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/polynomial_test_problem.html#polynomial_testequation_IMEX"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation" title="implementations.problem_classes.polynomial_test_problem.polynomial_testequation"><code class="xref py py-class docutils literal notranslate"><span class="pre">polynomial_testequation</span></code></a></p>
 <p>IMEX version of the polynomial test problem that assigns half the derivative to the implicit part and the other half to the explicit part.
 Keep in mind that you still cannot Really perform any solves.</p>
@@ -155,7 +155,7 @@ Keep in mind that you still cannot Really perform any solves.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
 </ul>
 </dd>
@@ -163,7 +163,7 @@ Keep in mind that you still cannot Really perform any solves.</p>
 <dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX.dtype_f" title="implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX.dtype_f">dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -256,7 +256,7 @@ Keep in mind that you still cannot Really perform any solves.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

@@ -73,9 +73,8 @@ Features
   `PETSc <http://www.mcs.anl.gov/petsc/>`_ (through
   `petsc4py <https://bitbucket.org/petsc/petsc4py>`_\ )
 * Continuous integration via `GitHub
-  Actions <https://github.com/Parallel-in-Time/pySDC/actions>`_ and
-  `Gitlab CI <https://gitlab.hzdr.de/r.speck/pysdc/-/pipelines>`_ (through the `GitHub2Gitlab Action <https://github.com/jakob-fritz/github2lab_action>`_\ )
-* Fully compatible with Python 3.9 - 3.12, runs at least on Ubuntu
+  Actions <https://github.com/Parallel-in-Time/pySDC/actions>`_
+* Fully compatible with Python 3.10 - 3.13, runs at least on Ubuntu
 
 Getting started
 ---------------

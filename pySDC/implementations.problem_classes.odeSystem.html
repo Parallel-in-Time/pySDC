@@ -11,9 +11,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -56,7 +56,7 @@ on parallel computers. SIAM journal on scientific and statistical computing,
 12(5), 1000-1028.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeSystem.ChemicalReaction3Var">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ChemicalReaction3Var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5e-11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#ChemicalReaction3Var"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.ChemicalReaction3Var" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ChemicalReaction3Var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5e-11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#ChemicalReaction3Var"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.ChemicalReaction3Var" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
 <p>Chemical reaction with three components, modeled by the non-linear system:</p>
 <div class="math notranslate nohighlight">
@@ -106,7 +106,7 @@ on parallel computers. SIAM journal on scientific and statistical computing,
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.odeSystem.ChemicalReaction3Var.dtype_u" title="implementations.problem_classes.odeSystem.ChemicalReaction3Var.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed (not used here).</p></li>
 </ul>
 </dd>
@@ -114,7 +114,7 @@ on parallel computers. SIAM journal on scientific and statistical computing,
 <dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem (one component).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.odeSystem.ChemicalReaction3Var.dtype_f" title="implementations.problem_classes.odeSystem.ChemicalReaction3Var.dtype_f">dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -126,9 +126,9 @@ on parallel computers. SIAM journal on scientific and statistical computing,
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the nonlinear system.</p></li>
+<li><p><strong>rhs</strong> (<a class="reference internal" href="#implementations.problem_classes.odeSystem.ChemicalReaction3Var.dtype_f" title="implementations.problem_classes.odeSystem.ChemicalReaction3Var.dtype_f"><em>dtype_f</em></a>) – Right-hand side for the nonlinear system.</p></li>
 <li><p><strong>dt</strong> (<em>float</em>) – Abbrev. for the node-to-node stepsize (or any other factor required).</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>u0</strong> (<a class="reference internal" href="#implementations.problem_classes.odeSystem.ChemicalReaction3Var.dtype_u" title="implementations.problem_classes.odeSystem.ChemicalReaction3Var.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
@@ -136,7 +136,7 @@ on parallel computers. SIAM journal on scientific and statistical computing,
 <dd class="field-even"><p><strong>u</strong> – The solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.odeSystem.ChemicalReaction3Var.dtype_u" title="implementations.problem_classes.odeSystem.ChemicalReaction3Var.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -157,7 +157,7 @@ on parallel computers. SIAM journal on scientific and statistical computing,
 <dd class="field-even"><p><strong>me</strong> – The approximated exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.odeSystem.ChemicalReaction3Var.dtype_u" title="implementations.problem_classes.odeSystem.ChemicalReaction3Var.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -166,7 +166,7 @@ on parallel computers. SIAM journal on scientific and statistical computing,
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeSystem.JacobiElliptic">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">JacobiElliptic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5e-11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#JacobiElliptic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.JacobiElliptic" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">JacobiElliptic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5e-11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#JacobiElliptic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.JacobiElliptic" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
 <p>Implement the Jacobi Elliptic non-linear problem:</p>
 <div class="math notranslate nohighlight">
@@ -216,7 +216,7 @@ on parallel computers. SIAM journal on scientific and statistical computing,
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.odeSystem.JacobiElliptic.dtype_u" title="implementations.problem_classes.odeSystem.JacobiElliptic.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed (not used here).</p></li>
 </ul>
 </dd>
@@ -224,7 +224,7 @@ on parallel computers. SIAM journal on scientific and statistical computing,
 <dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem (one component).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.odeSystem.JacobiElliptic.dtype_f" title="implementations.problem_classes.odeSystem.JacobiElliptic.dtype_f">dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -236,9 +236,9 @@ on parallel computers. SIAM journal on scientific and statistical computing,
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the nonlinear system.</p></li>
+<li><p><strong>rhs</strong> (<a class="reference internal" href="#implementations.problem_classes.odeSystem.JacobiElliptic.dtype_f" title="implementations.problem_classes.odeSystem.JacobiElliptic.dtype_f"><em>dtype_f</em></a>) – Right-hand side for the nonlinear system.</p></li>
 <li><p><strong>dt</strong> (<em>float</em>) – Abbrev. for the node-to-node stepsize (or any other factor required).</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>u0</strong> (<a class="reference internal" href="#implementations.problem_classes.odeSystem.JacobiElliptic.dtype_u" title="implementations.problem_classes.odeSystem.JacobiElliptic.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
@@ -246,7 +246,7 @@ on parallel computers. SIAM journal on scientific and statistical computing,
 <dd class="field-even"><p><strong>u</strong> – The solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.odeSystem.JacobiElliptic.dtype_u" title="implementations.problem_classes.odeSystem.JacobiElliptic.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -267,7 +267,7 @@ on parallel computers. SIAM journal on scientific and statistical computing,
 <dd class="field-even"><p><strong>me</strong> – The approximated exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.odeSystem.JacobiElliptic.dtype_u" title="implementations.problem_classes.odeSystem.JacobiElliptic.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -276,7 +276,7 @@ on parallel computers. SIAM journal on scientific and statistical computing,
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeSystem.Kaps">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Kaps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5e-11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#Kaps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.Kaps" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Kaps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5e-11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#Kaps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.Kaps" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
 <p>Implement the Kaps problem:</p>
 <div class="math notranslate nohighlight">
@@ -326,7 +326,7 @@ Exact solution is given by <span class="math notranslate nohighlight">\(u(t)=e^{
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.odeSystem.Kaps.dtype_u" title="implementations.problem_classes.odeSystem.Kaps.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed (not used here).</p></li>
 </ul>
 </dd>
@@ -334,7 +334,7 @@ Exact solution is given by <span class="math notranslate nohighlight">\(u(t)=e^{
 <dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem (one component).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.odeSystem.Kaps.dtype_f" title="implementations.problem_classes.odeSystem.Kaps.dtype_f">dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -346,9 +346,9 @@ Exact solution is given by <span class="math notranslate nohighlight">\(u(t)=e^{
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the nonlinear system.</p></li>
+<li><p><strong>rhs</strong> (<a class="reference internal" href="#implementations.problem_classes.odeSystem.Kaps.dtype_f" title="implementations.problem_classes.odeSystem.Kaps.dtype_f"><em>dtype_f</em></a>) – Right-hand side for the nonlinear system.</p></li>
 <li><p><strong>dt</strong> (<em>float</em>) – Abbrev. for the node-to-node stepsize (or any other factor required).</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>u0</strong> (<a class="reference internal" href="#implementations.problem_classes.odeSystem.Kaps.dtype_u" title="implementations.problem_classes.odeSystem.Kaps.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
@@ -356,7 +356,7 @@ Exact solution is given by <span class="math notranslate nohighlight">\(u(t)=e^{
 <dd class="field-even"><p><strong>u</strong> – The solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.odeSystem.Kaps.dtype_u" title="implementations.problem_classes.odeSystem.Kaps.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -369,7 +369,7 @@ Exact solution is given by <span class="math notranslate nohighlight">\(u(t)=e^{
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> (<em>float</em>) – Time at which the exact solution is computed.</p></li>
-<li><p><strong>u_init</strong> (<em>dtype_u</em>) – Initial conditions for getting the exact solution.</p></li>
+<li><p><strong>u_init</strong> (<a class="reference internal" href="#implementations.problem_classes.odeSystem.Kaps.dtype_u" title="implementations.problem_classes.odeSystem.Kaps.dtype_u"><em>dtype_u</em></a>) – Initial conditions for getting the exact solution.</p></li>
 <li><p><strong>t_init</strong> (<em>float</em>) – The starting time.</p></li>
 </ul>
 </dd>
@@ -377,7 +377,7 @@ Exact solution is given by <span class="math notranslate nohighlight">\(u(t)=e^{
 <dd class="field-even"><p><strong>u</strong> – The exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.odeSystem.Kaps.dtype_u" title="implementations.problem_classes.odeSystem.Kaps.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -386,7 +386,7 @@ Exact solution is given by <span class="math notranslate nohighlight">\(u(t)=e^{
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ProtheroRobinsonAutonomous</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonLinear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5e-11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#ProtheroRobinsonAutonomous"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ProtheroRobinsonAutonomous</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonLinear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5e-11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#ProtheroRobinsonAutonomous"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
 <p>Implement the Prothero-Robinson problem into autonomous form:</p>
 <div class="math notranslate nohighlight">
@@ -480,7 +480,7 @@ to use <span class="math notranslate nohighlight">\(g(t)=e^{-0.2t}\)</span>, def
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dtype_u" title="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed (not used here).</p></li>
 </ul>
 </dd>
@@ -488,7 +488,7 @@ to use <span class="math notranslate nohighlight">\(g(t)=e^{-0.2t}\)</span>, def
 <dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem (one component).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dtype_f" title="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dtype_f">dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -520,9 +520,9 @@ to use <span class="math notranslate nohighlight">\(g(t)=e^{-0.2t}\)</span>, def
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the nonlinear system.</p></li>
+<li><p><strong>rhs</strong> (<a class="reference internal" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dtype_f" title="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dtype_f"><em>dtype_f</em></a>) – Right-hand side for the nonlinear system.</p></li>
 <li><p><strong>dt</strong> (<em>float</em>) – Abbrev. for the node-to-node stepsize (or any other factor required).</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>u0</strong> (<a class="reference internal" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dtype_u" title="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Time of the updated solution (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
@@ -530,7 +530,7 @@ to use <span class="math notranslate nohighlight">\(g(t)=e^{-0.2t}\)</span>, def
 <dd class="field-even"><p><strong>u</strong> – The solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dtype_u" title="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -543,7 +543,7 @@ to use <span class="math notranslate nohighlight">\(g(t)=e^{-0.2t}\)</span>, def
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> (<em>float</em>) – Time at which the exact solution is computed.</p></li>
-<li><p><strong>u_init</strong> (<em>dtype_u</em>) – Initial conditions for getting the exact solution.</p></li>
+<li><p><strong>u_init</strong> (<a class="reference internal" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dtype_u" title="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dtype_u"><em>dtype_u</em></a>) – Initial conditions for getting the exact solution.</p></li>
 <li><p><strong>t_init</strong> (<em>float</em>) – The starting time.</p></li>
 </ul>
 </dd>
@@ -551,7 +551,7 @@ to use <span class="math notranslate nohighlight">\(g(t)=e^{-0.2t}\)</span>, def
 <dd class="field-even"><p><strong>u</strong> – The exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dtype_u" title="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -671,7 +671,7 @@ to use <span class="math notranslate nohighlight">\(g(t)=e^{-0.2t}\)</span>, def
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

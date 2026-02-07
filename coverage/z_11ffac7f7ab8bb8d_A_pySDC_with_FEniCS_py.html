@@ -3,21 +3,21 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Coverage for pySDC/tutorial/step_7/A_pySDC_with_FEniCS.py: 100%</title>
-    <link rel="icon" sizes="32x32" href="favicon_32_cb_58284776.png">
-    <link rel="stylesheet" href="style_cb_6b508a39.css" type="text/css">
-    <script src="coverage_html_cb_6fb7b396.js" defer></script>
+    <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
+    <link rel="stylesheet" href="style_cb_9ff733b0.css" type="text/css">
+    <script src="coverage_html_cb_dd2e7eb5.js" defer></script>
 </head>
 <body class="pyfile">
 <header>
     <div class="content">
         <h1>
-            <span class="text">Coverage for </span><b>pySDC/tutorial/step_7/A_pySDC_with_FEniCS.py</b>:
+            <span class="text">Coverage for </span><b>pySDC&#8201;/&#8201;tutorial&#8201;/&#8201;step_7&#8201;/&#8201;A_pySDC_with_FEniCS.py</b>:
             <span class="pc_cov">100%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
             <label for="help_panel_state">
-                <img id="keyboard_icon" src="keybd_closed_cb_ce680311.png" alt="Show/hide keyboard shortcuts">
+                <img id="keyboard_icon" src="keybd_closed_cb_900cfef5.png" alt="Show/hide keyboard shortcuts">
             </label>
             <div id="help_panel">
                 <p class="legend">Shortcuts on this page</p>
@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_11ffac7f7ab8bb8d_B_pySDC_with_mpi4pyfft_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.10.6">coverage.py v7.10.6</a>,
-            created at 2025-09-18 07:07 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.13.3">coverage.py v7.13.3</a>,
+            created at 2026-02-07 13:00 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -238,12 +238,12 @@
     <p class="run"><span class="n"><a id="t156" href="#t156">156</a></span><span class="t">    <span class="key">if</span> <span class="nam">num_procs</span> <span class="op">==</span> <span class="num">1</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t157" href="#t157">157</a></span><span class="t">        <span class="key">assert</span> <span class="nam">np</span><span class="op">.</span><span class="nam">mean</span><span class="op">(</span><span class="nam">niters</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="num">6.0</span><span class="op">,</span> <span class="str">'Mean number of iterations is too high, got %s'</span> <span class="op">%</span> <span class="nam">np</span><span class="op">.</span><span class="nam">mean</span><span class="op">(</span><span class="nam">niters</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t158" href="#t158">158</a></span><span class="t">        <span class="key">if</span> <span class="nam">variant</span> <span class="op">==</span> <span class="str">'mass'</span> <span class="key">or</span> <span class="nam">variant</span> <span class="op">==</span> <span class="str">'mass_inv'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t159" href="#t159">159</a></span><span class="t">            <span class="key">assert</span> <span class="nam">err</span> <span class="op">&lt;=</span> <span class="num">1.14e-08</span><span class="op">,</span> <span class="str">'Error is too high, got %s'</span> <span class="op">%</span> <span class="nam">err</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t159" href="#t159">159</a></span><span class="t">            <span class="key">assert</span> <span class="nam">err</span> <span class="op">&lt;=</span> <span class="num">1.15e-08</span><span class="op">,</span> <span class="str">'Error is too high, got %s'</span> <span class="op">%</span> <span class="nam">err</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t160" href="#t160">160</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t161" href="#t161">161</a></span><span class="t">            <span class="key">assert</span> <span class="nam">err</span> <span class="op">&lt;=</span> <span class="num">3.25e-07</span><span class="op">,</span> <span class="str">'Error is too high, got %s'</span> <span class="op">%</span> <span class="nam">err</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t162" href="#t162">162</a></span><span class="t">    <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t163" href="#t163">163</a></span><span class="t">        <span class="key">assert</span> <span class="nam">np</span><span class="op">.</span><span class="nam">mean</span><span class="op">(</span><span class="nam">niters</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="num">11.6</span><span class="op">,</span> <span class="str">'Mean number of iterations is too high, got %s'</span> <span class="op">%</span> <span class="nam">np</span><span class="op">.</span><span class="nam">mean</span><span class="op">(</span><span class="nam">niters</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t164" href="#t164">164</a></span><span class="t">        <span class="key">assert</span> <span class="nam">err</span> <span class="op">&lt;=</span> <span class="num">1.14e-08</span><span class="op">,</span> <span class="str">'Error is too high, got %s'</span> <span class="op">%</span> <span class="nam">err</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t164" href="#t164">164</a></span><span class="t">        <span class="key">assert</span> <span class="nam">err</span> <span class="op">&lt;=</span> <span class="num">1.15e-08</span><span class="op">,</span> <span class="str">'Error is too high, got %s'</span> <span class="op">%</span> <span class="nam">err</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t165" href="#t165">165</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t166" href="#t166">166</a></span><span class="t">    <span class="nam">f</span><span class="op">.</span><span class="nam">write</span><span class="op">(</span><span class="str">'\n'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t167" href="#t167">167</a></span><span class="t">    <span class="nam">print</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -275,8 +275,8 @@
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_11ffac7f7ab8bb8d_B_pySDC_with_mpi4pyfft_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.10.6">coverage.py v7.10.6</a>,
-            created at 2025-09-18 07:07 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.13.3">coverage.py v7.13.3</a>,
+            created at 2026-02-07 13:00 +0000
         </p>
     </div>
 </footer>

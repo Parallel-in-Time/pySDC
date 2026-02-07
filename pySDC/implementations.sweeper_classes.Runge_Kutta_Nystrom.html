@@ -11,8 +11,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -50,14 +50,14 @@
 <span id="implementations-sweeper-classes-runge-kutta-nystrom-module"></span><h1>implementations.sweeper_classes.Runge_Kutta_Nystrom module<a class="headerlink" href="#module-implementations.sweeper_classes.Runge_Kutta_Nystrom" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.ButcherTableauNoCollUpdate">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ButcherTableauNoCollUpdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#ButcherTableauNoCollUpdate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.ButcherTableauNoCollUpdate" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ButcherTableauNoCollUpdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#ButcherTableauNoCollUpdate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.ButcherTableauNoCollUpdate" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Version of Butcher Tableau that does not need a collocation update because the weights are put in the last line of Q</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RKN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RKN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">RKN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RKN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom" title="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKuttaNystrom</span></code></a></p>
 <p>Runge-Kutta-Nystrom method
 <a class="reference external" href="https://link.springer.com/book/10.1007/978-3-540-78862-1">https://link.springer.com/book/10.1007/978-3-540-78862-1</a>
@@ -65,34 +65,34 @@ page: 284
 Chapter: II.14 Numerical methods for Second order differential equations</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN.matrix">
-<span class="sig-name descname"><span class="pre">matrix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.5,</span> <span class="pre">0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.</span> <span class="pre">,</span> <span class="pre">0.5,</span> <span class="pre">0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">,</span> <span class="pre">1.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">]])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN.matrix" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">matrix</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.5,</span> <span class="pre">0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.</span> <span class="pre">,</span> <span class="pre">0.5,</span> <span class="pre">0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">,</span> <span class="pre">1.</span> <span class="pre">,</span> <span class="pre">0.</span> <span class="pre">]])</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN.matrix" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN.matrix_bar">
-<span class="sig-name descname"><span class="pre">matrix_bar</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[0.</span>&#160;&#160; <span class="pre">,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.125,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.125,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.</span>&#160;&#160; <span class="pre">,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">,</span> <span class="pre">0.5</span>&#160; <span class="pre">,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">]])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN.matrix_bar" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">matrix_bar</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[0.</span>&#160;&#160; <span class="pre">,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.125,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.125,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.</span>&#160;&#160; <span class="pre">,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">,</span> <span class="pre">0.5</span>&#160; <span class="pre">,</span> <span class="pre">0.</span>&#160;&#160; <span class="pre">]])</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN.matrix_bar" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN.nodes">
-<span class="sig-name descname"><span class="pre">nodes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.</span> <span class="pre">,</span> <span class="pre">0.5,</span> <span class="pre">0.5,</span> <span class="pre">1.</span> <span class="pre">])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN.nodes" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">nodes</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.</span> <span class="pre">,</span> <span class="pre">0.5,</span> <span class="pre">0.5,</span> <span class="pre">1.</span> <span class="pre">])</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN.nodes" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN.weights">
-<span class="sig-name descname"><span class="pre">weights</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.16666667,</span> <span class="pre">0.33333333,</span> <span class="pre">0.33333333,</span> <span class="pre">0.16666667])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN.weights" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">weights</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.16666667,</span> <span class="pre">0.33333333,</span> <span class="pre">0.33333333,</span> <span class="pre">0.16666667])</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN.weights" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN.weights_bar">
-<span class="sig-name descname"><span class="pre">weights_bar</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.16666667,</span> <span class="pre">0.16666667,</span> <span class="pre">0.16666667,</span> <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN.weights_bar" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">weights_bar</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.16666667,</span> <span class="pre">0.16666667,</span> <span class="pre">0.16666667,</span> <span class="pre">0.</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">])</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN.weights_bar" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RungeKuttaNystrom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">RungeKuttaNystrom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></p>
 <p>Runge-Kutta scheme that fits the interface of a sweeper.
 Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions
@@ -132,7 +132,7 @@ method, which does not require us to solve a system of equations to compute the 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.get_Butcher_tableau_bar">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_Butcher_tableau_bar</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom.get_Butcher_tableau_bar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.get_Butcher_tableau_bar" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_Butcher_tableau_bar</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom.get_Butcher_tableau_bar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.get_Butcher_tableau_bar" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -141,7 +141,7 @@ method, which does not require us to solve a system of equations to compute the 
 <dd><p>Test the right hand side function is the correct type</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>f</strong> (<em>dtype_f</em>) – Right hand side at a single node</p>
+<dd class="field-odd"><p><strong>f</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_f" title="core.problem.Problem.dtype_f"><em>dtype_f</em></a>) – Right hand side at a single node</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Full right hand side as a mesh</p>
@@ -154,7 +154,7 @@ method, which does not require us to solve a system of equations to compute the 
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.matrix_bar">
-<span class="sig-name descname"><span class="pre">matrix_bar</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.matrix_bar" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">matrix_bar</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.matrix_bar" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -170,40 +170,40 @@ method, which does not require us to solve a system of equations to compute the 
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.weights_bar">
-<span class="sig-name descname"><span class="pre">weights_bar</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.weights_bar" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">weights_bar</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.weights_bar" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Velocity_Verlet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#Velocity_Verlet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Velocity_Verlet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#Velocity_Verlet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom" title="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKuttaNystrom</span></code></a></p>
 <p>Velocity-Verlet scheme
 <a class="reference external" href="https://de.wikipedia.org/wiki/Verlet-Algorithmus">https://de.wikipedia.org/wiki/Verlet-Algorithmus</a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet.matrix">
-<span class="sig-name descname"><span class="pre">matrix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[0.,</span> <span class="pre">0.],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.,</span> <span class="pre">1.]])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet.matrix" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">matrix</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[0.,</span> <span class="pre">0.],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.,</span> <span class="pre">1.]])</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet.matrix" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet.matrix_bar">
-<span class="sig-name descname"><span class="pre">matrix_bar</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[0.,</span> <span class="pre">0.],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.,</span> <span class="pre">0.]])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet.matrix_bar" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">matrix_bar</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[0.,</span> <span class="pre">0.],</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">[0.,</span> <span class="pre">0.]])</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet.matrix_bar" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet.nodes">
-<span class="sig-name descname"><span class="pre">nodes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([1.,</span> <span class="pre">1.])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet.nodes" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">nodes</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([1.,</span> <span class="pre">1.])</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet.nodes" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet.weights">
-<span class="sig-name descname"><span class="pre">weights</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.5,</span> <span class="pre">0.</span> <span class="pre">])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet.weights" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">weights</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.5,</span> <span class="pre">0.</span> <span class="pre">])</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet.weights" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet.weights_bar">
-<span class="sig-name descname"><span class="pre">weights_bar</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.5,</span> <span class="pre">0.</span> <span class="pre">])</span></em><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet.weights_bar" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">weights_bar</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0.5,</span> <span class="pre">0.</span> <span class="pre">])</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet.weights_bar" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -307,7 +307,7 @@ method, which does not require us to solve a system of equations to compute the 
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

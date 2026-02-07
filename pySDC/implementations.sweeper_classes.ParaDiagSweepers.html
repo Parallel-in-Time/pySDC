@@ -11,8 +11,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
     <script src="../_static/documentation_options.js?v=81710850"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -51,7 +51,7 @@
 <p>These sweepers are made for use with ParaDiag. They can be used to some degree with SDC as well, but unless you know what you are doing, you probably want another sweeper.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QDiagonalization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/ParaDiagSweepers.html#QDiagonalization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">QDiagonalization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/ParaDiagSweepers.html#QDiagonalization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">generic_implicit</span></code></p>
 <p>Sweeper solving the collocation problem directly via diagonalization of Q. Mainly made for ParaDiag.
 Can be reconfigured for use with SDC.</p>
@@ -66,7 +66,7 @@ evaluate the right hand side directly after. By default, this is not done! Set <
 parameters if you want to use this sweeper in SDC.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.computeDiagonalization">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computeDiagonalization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/ParaDiagSweepers.html#QDiagonalization.computeDiagonalization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.computeDiagonalization" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">computeDiagonalization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/ParaDiagSweepers.html#QDiagonalization.computeDiagonalization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.computeDiagonalization" title="Link to this definition">¶</a></dt>
 <dd><p>Compute diagonalization of dense matrix A = S diag(w) S^-1</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -154,7 +154,7 @@ numpy.ndarray: Inverse of S</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalizationIMEX">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QDiagonalizationIMEX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/ParaDiagSweepers.html#QDiagonalizationIMEX"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalizationIMEX" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">QDiagonalizationIMEX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/ParaDiagSweepers.html#QDiagonalizationIMEX"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalizationIMEX" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization" title="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization"><code class="xref py py-class docutils literal notranslate"><span class="pre">QDiagonalization</span></code></a></p>
 <p>Use as sweeper class for ParaDiag with IMEX splitting. Note that it will not work with SDC.</p>
 <dl class="py method">
@@ -166,7 +166,7 @@ numpy.ndarray: Inverse of S</p>
 <dd class="field-odd"><p>containing the integral as values</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>list of dtype_u</p>
+<dd class="field-even"><p>list of <a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -259,7 +259,7 @@ numpy.ndarray: Inverse of S</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

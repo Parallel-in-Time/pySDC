@@ -10,8 +10,8 @@
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
     
     <script src="../../_static/documentation_options.js?v=81710850"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -143,7 +143,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">localBounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">iLocList</span><span class="p">,</span> <span class="n">nLocList</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">rank</span><span class="p">,</span> <span class="n">nPoints</span><span class="p">,</span> <span class="n">nBlocks</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ranks</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gridSizes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nBlocks</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">rank</span><span class="p">,</span> <span class="n">nPoints</span><span class="p">,</span> <span class="n">nBlocks</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ranks</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gridSizes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nBlocks</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
             <span class="n">n0</span> <span class="o">=</span> <span class="n">nPoints</span> <span class="o">//</span> <span class="n">nBlocks</span>
             <span class="n">nRest</span> <span class="o">=</span> <span class="n">nPoints</span> <span class="o">-</span> <span class="n">nBlocks</span> <span class="o">*</span> <span class="n">n0</span>
             <span class="n">nLoc</span> <span class="o">=</span> <span class="n">n0</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">*</span> <span class="p">(</span><span class="n">rank</span> <span class="o">&lt;</span> <span class="n">nRest</span><span class="p">)</span>
@@ -212,7 +212,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>

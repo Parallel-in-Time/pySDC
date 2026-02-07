@@ -10,8 +10,8 @@
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
     
     <script src="../../_static/documentation_options.js?v=81710850"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -86,6 +86,7 @@
 <span class="sd">To use MPI collective writing, you need to call first the class methods :class:`Rectilinear.setupMPI` (cf their docstring).</span>
 <span class="sd">Also, `Rectilinear.setHeader` **must be given the global grids coordinates**, whether the code is run in parallel or not.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span>
@@ -197,7 +198,8 @@
 <span class="sd">        fieldsIO : :class:`FieldsIO`</span>
 <span class="sd">            The specialized `FieldsIO` adapted to the file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fileName</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;not a file (</span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fileName</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;not a file (</span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">STRUCT</span><span class="p">,</span> <span class="n">DTYPE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">H_DTYPE</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="n">fieldsIO</span><span class="p">:</span> <span class="n">FieldsIO</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">STRUCTS</span><span class="p">[</span><span class="n">STRUCT</span><span class="p">](</span><span class="n">DTYPES</span><span class="p">[</span><span class="n">DTYPE</span><span class="p">],</span> <span class="n">fileName</span><span class="p">)</span>
@@ -848,7 +850,7 @@
 
     <span class="n">iLoc</span><span class="p">,</span> <span class="n">nLoc</span> <span class="o">=</span> <span class="n">blocks</span><span class="o">.</span><span class="n">localBounds</span>
     <span class="n">Rectilinear</span><span class="o">.</span><span class="n">setupMPI</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">iLoc</span><span class="p">,</span> <span class="n">nLoc</span><span class="p">)</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">iLoc</span><span class="p">,</span> <span class="n">nLoc</span><span class="p">)]</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">iLoc</span><span class="p">,</span> <span class="n">nLoc</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
     <span class="n">u0</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="o">*</span><span class="n">s</span><span class="p">)]</span>
 
     <span class="n">f1</span> <span class="o">=</span> <span class="n">Rectilinear</span><span class="p">(</span><span class="n">DTYPES</span><span class="p">[</span><span class="n">dtypeIdx</span><span class="p">],</span> <span class="n">fileName</span><span class="p">)</span>
@@ -924,7 +926,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>
