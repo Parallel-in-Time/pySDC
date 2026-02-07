@@ -4,7 +4,7 @@ name: Create Website for pySDC
 
 on:
   workflow_run:
-    workflows: ["Mirror to Gitlab to trigger CI"]
+    workflows: ["CI pipeline for pySDC"]
     types: ["completed"]
   
 jobs:
