@@ -40,7 +40,7 @@ When you receive an automated failure PR:
 5. Test fixes locally or wait for CI to verify
 6. Merge when the issue is confirmed resolved
 
-For more details, see the [automated failure handling documentation](.github/scripts/README.md).
+For more details, see the [automated failure handling documentation](../../.github/scripts/README.md).
 
 > :bell: **Note:** These automated PRs are informational and require manual review. They help centralize failure information but don't automatically fix issues. If you can identify and fix the problem, push commits to the auto-generated branch.
 
