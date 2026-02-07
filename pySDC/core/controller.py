@@ -288,7 +288,7 @@ class Controller(object):
             None
         '''
         self.convergence_controllers: List[Any] = []
-        self.convergence_controller_order: Union[List[int], np.ndarray] = []  # Starts as list, converted to ndarray after controllers are sorted by control_order
+        self.convergence_controller_order: Union[List[int], np.ndarray] = []  # Converted to ndarray after sorting
         conv_classes = description.get('convergence_controllers', {})
 
         # instantiate the convergence controllers
