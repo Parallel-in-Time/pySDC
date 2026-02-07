@@ -44,8 +44,14 @@ def create_pull_request(
     return response.json()
 
 
-def generate_pr_body(workflow_run_url: str, analysis_file: str, head_branch: str = "auto-fix/test-failure-*") -> str:
-    """Generate the pull request body."""
+def generate_pr_body(workflow_run_url: str, analysis_file: str, head_branch: str) -> str:
+    """Generate the pull request body.
+    
+    Args:
+        workflow_run_url: URL to the failed workflow run
+        analysis_file: Path to the failure analysis JSON file
+        head_branch: Name of the branch containing the analysis (required)
+    """
     # Try to load the analysis
     try:
         with open(analysis_file, 'r') as f:

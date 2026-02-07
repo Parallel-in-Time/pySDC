@@ -7,8 +7,13 @@ import os
 import sys
 import json
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Any, Optional
+
+# Constants for error processing
+ERROR_UNIQUENESS_KEY_LENGTH = 100  # Characters to use for error deduplication
+MAX_ERROR_LENGTH = 500  # Maximum characters to include per error in report
+MAX_ERRORS_PER_JOB = 10  # Maximum unique errors to extract per job
 
 
 def get_github_headers(token: str) -> Dict[str, str]:
@@ -90,15 +95,15 @@ def extract_error_summary(logs: str, job_name: str) -> List[str]:
                     errors.append(context)
                     break
     
-    # Limit to unique errors and first 10
+    # Limit to unique errors and first MAX_ERRORS_PER_JOB
     unique_errors = []
     seen = set()
     for error in errors:
-        error_key = error[:100]  # Use first 100 chars as key
+        error_key = error[:ERROR_UNIQUENESS_KEY_LENGTH]  # Use first N chars as key
         if error_key not in seen:
             seen.add(error_key)
             unique_errors.append(error)
-            if len(unique_errors) >= 10:
+            if len(unique_errors) >= MAX_ERRORS_PER_JOB:
                 break
     
     return unique_errors
@@ -112,7 +117,7 @@ def analyze_failures(repo: str, run_id: str, token: str) -> Dict[str, Any]:
         'total_jobs': len(jobs),
         'failed_jobs': [],
         'error_summary': [],
-        'timestamp': datetime.utcnow().isoformat()
+        'timestamp': datetime.now(timezone.utc).isoformat()
     }
     
     for job in jobs:
@@ -181,7 +186,7 @@ def generate_failure_report(analysis: Dict[str, Any], run_url: str) -> str:
                 report.extend([
                     f"**Error {j}:**",
                     "```",
-                    error[:500],  # Limit error length
+                    error[:MAX_ERROR_LENGTH],  # Limit error length
                     "```",
                     "",
                 ])
