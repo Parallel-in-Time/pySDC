@@ -5,6 +5,10 @@ Created on Thu Jan 11 10:21:47 2024
 
 Figures with experiment on the Prothero-Robinson problem
 """
+<<<<<<< HEAD
+=======
+
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 import os
 import numpy as np
 

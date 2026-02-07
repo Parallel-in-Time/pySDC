@@ -10,6 +10,10 @@ Van der Houwen, P. J., & Sommeijer, B. P. (1991). Iterated Runge–Kutta methods
 on parallel computers. SIAM journal on scientific and statistical computing,
 12(5), 1000-1028.
 """
+<<<<<<< HEAD
+=======
+
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 import numpy as np
 
 from pySDC.core.errors import ProblemError

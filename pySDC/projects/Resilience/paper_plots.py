@@ -26,7 +26,10 @@ from pySDC.projects.Resilience.strategies import (
 from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
 from pySDC.helpers.stats_helper import get_sorted
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 cm = 1 / 2.5
 TEXTWIDTH = 11.9446244611 * cm
 JOURNAL = 'Springer_Numerical_Algorithms'

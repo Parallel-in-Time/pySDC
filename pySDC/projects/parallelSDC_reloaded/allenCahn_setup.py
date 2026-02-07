@@ -5,6 +5,10 @@ Created on Thu Dec  7 21:22:52 2023
 
 Setup script for the Allen-Cahn problem
 """
+<<<<<<< HEAD
+=======
+
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 import numpy as np
 import matplotlib.pyplot as plt
 

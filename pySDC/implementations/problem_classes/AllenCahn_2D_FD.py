@@ -7,7 +7,10 @@ from pySDC.core.problem import Problem, WorkCounter
 from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_mesh
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
 
 

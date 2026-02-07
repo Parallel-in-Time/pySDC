@@ -3,6 +3,10 @@
 """
 Created on Fri Feb  9 20:14:06 2024
 """
+<<<<<<< HEAD
+=======
+
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 import os
 import warnings
 import pytest

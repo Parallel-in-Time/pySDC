@@ -5,6 +5,10 @@ Created on Sun Feb  4 09:53:34 2024
 
 Testing scripts for the parallel_SDC_reloaded project
 """
+<<<<<<< HEAD
+=======
+
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 import sys
 import pytest
 

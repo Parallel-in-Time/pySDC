@@ -5,6 +5,10 @@ Created on Sun Nov 12 18:50:39 2023
 
 Utility functions to investigate parallel SDC on non-linear problems
 """
+<<<<<<< HEAD
+=======
+
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 import os
 import json
 import numpy as np

@@ -5,6 +5,10 @@ Created on Wed Jan 10 12:02:55 2024
 
 Stability plots (on Dahlquist) for the article
 """
+<<<<<<< HEAD
+=======
+
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 import os
 import numpy as np
 

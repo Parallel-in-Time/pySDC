@@ -5,7 +5,10 @@ from pySDC.core.common import RegisterParams
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.projects.Monodomain.datatype_classes.my_mesh import imexexp_mesh
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 """
 Here we define the problems classes for the multirate Dahlquist test equation y'=lambda_I*y + lambda_E*y + lambda_e*y
 Things are done so that it is compatible witht the sweepers.

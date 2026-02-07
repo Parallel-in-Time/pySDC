@@ -47,6 +47,10 @@ Warning
 To use MPI collective writing, you need to call first the class methods :class:`Rectilinear.setupMPI` (cf their docstring).
 Also, `Rectilinear.setHeader` **must be given the global grids coordinates**, whether the code is run in parallel or not.
 """
+<<<<<<< HEAD
+=======
+
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 import os
 import numpy as np
 from typing import Type, TypeVar

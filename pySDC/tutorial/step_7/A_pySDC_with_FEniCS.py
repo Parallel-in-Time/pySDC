@@ -156,12 +156,20 @@ def run_variants(variant=None, ml=None, num_procs=None):
     if num_procs == 1:
         assert np.mean(niters) <= 6.0, 'Mean number of iterations is too high, got %s' % np.mean(niters)
         if variant == 'mass' or variant == 'mass_inv':
+<<<<<<< HEAD
             assert err <= 1.14e-08, 'Error is too high, got %s' % err
+=======
+            assert err <= 1.15e-08, 'Error is too high, got %s' % err
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
         else:
             assert err <= 3.25e-07, 'Error is too high, got %s' % err
     else:
         assert np.mean(niters) <= 11.6, 'Mean number of iterations is too high, got %s' % np.mean(niters)
+<<<<<<< HEAD
         assert err <= 1.14e-08, 'Error is too high, got %s' % err
+=======
+        assert err <= 1.15e-08, 'Error is too high, got %s' % err
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 
     f.write('\n')
     print()

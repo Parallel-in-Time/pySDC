@@ -6,7 +6,10 @@ from pySDC.core.errors import ParameterError
 from pySDC.core.collocation import CollBase
 from pySDC.helpers.pysdc_helper import FrozenClass
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 # Organize QDeltaGenerator class in dict[type(QDeltaGenerator),set(str)] to retrieve aliases
 QDELTA_GENERATORS_ALIASES = {v: set() for v in set(QDELTA_GENERATORS.values())}
 for k, v in QDELTA_GENERATORS.items():

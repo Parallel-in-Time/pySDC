@@ -20,7 +20,10 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
 from pySDC.projects.TOMS.AllenCahn_monitor import monitor
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
 
 

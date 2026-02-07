@@ -14,7 +14,10 @@ from pySDC.playgrounds.Allen_Cahn.AllenCahn_monitor import monitor
 from pySDC.implementations.transfer_classes.BaseTransferMPI import base_transfer_MPI
 from pySDC.implementations.sweeper_classes.generic_implicit_MPI import generic_implicit_MPI
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
 
 

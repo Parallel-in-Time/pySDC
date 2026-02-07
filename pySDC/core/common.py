@@ -7,6 +7,10 @@ Description
 Module containing utility classe(s) from which inherit some of the pySDC base
 classes.
 """
+<<<<<<< HEAD
+=======
+
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 from pySDC.core.errors import ReadOnlyError
 
 

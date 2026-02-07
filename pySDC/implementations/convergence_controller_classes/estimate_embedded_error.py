@@ -114,10 +114,15 @@ class EstimateEmbeddedError(ConvergenceController):
             else:
                 return comm.bcast(abs(L.uold[comm.rank + 1] - L.u[comm.rank + 1]), root=comm.size - 1)
         else:
+<<<<<<< HEAD
             raise NotImplementedError(
                 f"Don't know how to estimate embedded error for sweeper type \
 \"{self.params.sweeper_type}\""
             )
+=======
+            raise NotImplementedError(f"Don't know how to estimate embedded error for sweeper type \
+\"{self.params.sweeper_type}\"")
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 
     def setup_status_variables(self, controller, **kwargs):
         """
@@ -209,10 +214,15 @@ class EstimateEmbeddedErrorLinearizedNonMPI(EstimateEmbeddedError):
             None
         """
         if len(S.levels) > 1 and len(controller.MS) > 1:
+<<<<<<< HEAD
             raise NotImplementedError(
                 "Embedded error estimate only works for serial multi-level or parallel single \
 level"
             )
+=======
+            raise NotImplementedError("Embedded error estimate only works for serial multi-level or parallel single \
+level")
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 
         if S.status.iter > 0 or self.params.sweeper_type == "RK":
             if self.params.averaged:

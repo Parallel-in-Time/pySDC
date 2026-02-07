@@ -11,6 +11,10 @@ in particular with graphs such as :
 
 Note : implementation in progress ...
 """
+<<<<<<< HEAD
+=======
+
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 import numpy as np
 import matplotlib.pyplot as plt
 

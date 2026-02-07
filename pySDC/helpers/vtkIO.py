@@ -3,6 +3,10 @@
 """
 Helper functions for VTK files IO (to be used with Paraview or PyVista)
 """
+<<<<<<< HEAD
+=======
+
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 import os
 import vtk
 from vtkmodules.util import numpy_support

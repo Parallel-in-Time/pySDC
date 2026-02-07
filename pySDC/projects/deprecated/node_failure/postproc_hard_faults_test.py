@@ -2,7 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pylab import rcParams
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 # import os
 
 

@@ -5,6 +5,10 @@ Created on Thu Jan 11 11:14:01 2024
 
 Figures with experiments on the Allen-Cahn problem (MPI runs)
 """
+<<<<<<< HEAD
+=======
+
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 import os
 import json
 import numpy as np

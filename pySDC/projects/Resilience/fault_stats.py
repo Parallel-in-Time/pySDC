@@ -1009,10 +1009,15 @@ class FaultStats:
         print('-------+-----+------+------+----------+----------+----------+----------')
         for i in index:
             e_em, e_glob = self.analyse_adaptivity_single(int(i))
+<<<<<<< HEAD
             print(
                 f' {i:5d} | {dat["bit"][i]:3.0f} | {dat["node"][i]:4.0f} | {dat["iteration"][i]:4.0f} | {e_em[1]:.2e}\
  | {e_em[0]:.2e} | {e_glob[1]:.2e} | {e_glob[0]:.2e}'
             )
+=======
+            print(f' {i:5d} | {dat["bit"][i]:3.0f} | {dat["node"][i]:4.0f} | {dat["iteration"][i]:4.0f} | {e_em[1]:.2e}\
+ | {e_em[0]:.2e} | {e_glob[1]:.2e} | {e_glob[0]:.2e}')
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 
         e_tol = AdaptivityStrategy().get_custom_description(self.prob, self.num_procs)['convergence_controllers'][
             Adaptivity
@@ -1070,6 +1075,7 @@ class FaultStats:
         dat = self.load()
 
         # make a header
+<<<<<<< HEAD
         print(
             '  run  | bit | node | iter |  e_ex^*  |   e_ex   |  e_em^*  |   e_em   |   diff*  |   diff   | e_glob^* \
 |  e_glob  '
@@ -1085,6 +1091,17 @@ class FaultStats:
  | {e_ex[0]:.2e} | {e_em[1]:.2e} | {e_em[0]:.2e} | {abs(e_em[1]-e_ex[1]):.2e} | {abs(e_em[0]-e_ex[0]):.2e} | \
 {e_glob[1]:.2e} | {e_glob[0]:.2e}'
             )
+=======
+        print('  run  | bit | node | iter |  e_ex^*  |   e_ex   |  e_em^*  |   e_em   |   diff*  |   diff   | e_glob^* \
+|  e_glob  ')
+        print('-------+-----+------+------+----------+----------+----------+----------+----------+----------+----------\
++----------')
+        for i in index:
+            e_em, e_ex, e_glob = self.analyse_HotRod_single(int(i))
+            print(f' {i:5d} | {dat["bit"][i]:3.0f} | {dat["node"][i]:4.0f} | {dat["iteration"][i]:4.0f} | {e_ex[1]:.2e}\
+ | {e_ex[0]:.2e} | {e_em[1]:.2e} | {e_em[0]:.2e} | {abs(e_em[1]-e_ex[1]):.2e} | {abs(e_em[0]-e_ex[0]):.2e} | \
+{e_glob[1]:.2e} | {e_glob[0]:.2e}')
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 
         tol = HotRodStrategy().get_custom_description(self.prob, self.num_procs)['convergence_controllers'][HotRod][
             'HotRod_tol'

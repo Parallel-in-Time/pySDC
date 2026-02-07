@@ -1,0 +1,236 @@
+---
+
+# WORKFLOW DISABLED
+# This workflow has been disabled to prevent skipped check runs from appearing in pull requests.
+# The file has been renamed from gitlab_ci.yml to gitlab_ci.yml.disabled
+#
+# To re-enable this workflow:
+# 1. Rename this file back to gitlab_ci.yml
+# 2. Uncomment the desired triggers below (push, pull_request_target, schedule)
+#
+# Note: Even with only workflow_dispatch enabled, GitHub creates skipped check runs
+# for the jobs when they have conditional 'if' statements that evaluate to false.
+
+name: Mirror to Gitlab to trigger CI
+
+# Disabled: GitLab mirror is temporarily disabled due to known issues
+# To re-enable, uncomment the triggers below
+on:
+  workflow_dispatch:  # Manual trigger only
+  # push:
+  # pull_request_target:
+  #   types: [opened, synchronize, reopened, labeled]
+  # schedule:
+  #   - cron: '2 5 * * 1'
+
+jobs:
+  check_permission:
+    runs-on: ubuntu-latest
+    if: >-
+        (github.repository_owner == 'Parallel-in-Time') &&
+        ((github.event_name == 'push') ||
+         (github.event_name == 'schedule') ||
+         ((github.event_name == 'pull_request_target') &&
+          (contains(github.event.pull_request.labels.*.name, 'gitlab-mirror'))
+         )
+        )
+    steps:
+      - name: Query permissions of triggering actor
+        id: query_permission_triggering_actor
+        if: github.event_name == 'pull_request_target'
+        uses: actions-cool/check-user-permission@v2
+        with:
+          username: ${{ github.triggering_actor }}
+          require: 'write'
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Interpret the queried result
+        if: github.event_name == 'pull_request_target'
+        run: |
+          echo "Current permission level is ${{ steps.query_permission_triggering_actor.outputs.user-permission }}"
+          echo "Job originally triggered by ${{ github.actor }}"
+          echo "Checking permission returned ${{ steps.query_permission_triggering_actor.outputs.require-result }}"
+          if ${{ steps.query_permission_triggering_actor.outputs.require-result }}
+            then
+              echo 'Permissions granted'
+              exit 0
+            else
+              echo 'Not enough permissions. Please ask a member of Parallel-in-Time to rerun the job.'
+              exit 1
+          fi
+      - name: Pass if workflow from push or schedule
+        if: >-
+          (github.event_name == 'push') ||
+          (github.event_name == 'schedule')
+        run: exit 0
+      # - name: Fail for other triggers
+      #   if: >-
+      #     (github.event_name != 'push') &&
+      #     (github.event_name != 'schedule') &&
+      #     (github.event_name != 'pull_request_target')
+      #   run: exit 1
+
+  mirror_to_gitlab:
+    runs-on: ubuntu-latest
+    if: >-
+        (github.repository_owner == 'Parallel-in-Time') &&
+        ((github.event_name == 'push') ||
+         (github.event_name == 'schedule') ||
+         ((github.event_name == 'pull_request_target') &&
+          (contains(github.event.pull_request.labels.*.name, 'gitlab-mirror'))
+         )
+        )
+    needs:
+      - check_permission
+    steps:
+      - name: set proper sha
+        run: |
+          echo "${{ github.event_name }}"
+          if [ "${{ github.event_name }}" == 'push' ] || [ "${{ github.event_name }}" == 'schedule' ]
+          then
+            echo "USED_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
+          fi
+          if [ "${{ github.event_name }}" == 'pull_request_target' ]
+          then
+            echo "USED_SHA=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
+          fi
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: "${{ env.USED_SHA }}"
+          persist-credentials: false
+      - name: check if merge is possible (merge is used for testing)
+        if: github.event_name == 'pull_request_target'
+        run: |
+          if $(git rev-parse --is-shallow-repository); then
+            git fetch --unshallow
+          else
+            git fetch
+          fi
+          echo "Checkout of ${{ github.base_ref }}"
+          git checkout "${{ github.base_ref }}"
+          echo "Git pull"
+          git pull
+          MIRROR_BRANCH="TEMPORARY_MERGE_PR_${{ github.event.number }}"
+          echo MIRROR_BRANCH="$MIRROR_BRANCH" >> $GITHUB_ENV
+          echo "Create new branch $MIRROR_BRANCH and check it out"
+          git checkout -b "$MIRROR_BRANCH"
+          echo "Setting git committer info, so that merge-commit can be created"
+          git config user.email "unused@example.com"
+          git config user.name "Sync bot"
+          echo "Merge the two parts of the Merge-Request to test the resulting version"
+          git merge "${{ github.event.pull_request.head.sha }}"
+      - name: Mirror and wait for Gitlab-CI
+        uses: jakob-fritz/github2lab_action@v0.8.1
+        env:
+          MODE: 'all'  # Either 'mirror', 'get_status', 'get_artifact', or 'all'
+          GITLAB_TOKEN: ${{ secrets.GITLAB_SECRET }}
+          FORCE_PUSH: "true"
+          GITLAB_HOSTNAME: "gitlab.jsc.fz-juelich.de"
+          GITLAB_PROJECT_ID: "6029"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MIRROR_BRANCH: ${{ env.MIRROR_BRANCH }}
+      - name: Unzip downloaded artifacts
+        run: |
+          pwd
+          ls -lah
+          cd artifacts
+          find . -name "*.zip" -type f -exec unzip -o {} \;
+          ls -lah
+          rm *.zip
+          cd ..
+          ls -lah
+      - name: Uploading artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gitlab-Action_artifacts
+          path: |
+            ./artifacts/*
+
+  get_artifacts_from_other_workflow:
+    runs-on: ubuntu-latest
+    needs:
+      - mirror_to_gitlab
+    steps:
+      - name: Download artifacts from this workflow
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: ./github_ci_artifacts
+      - name: Set env-var
+        id: get_id
+        uses: actions/github-script@v7
+        env:
+          workflow_filename: 'ci_pipeline.yml'
+        with:
+          script: |
+            if (context.eventName == "pull_request_target") {
+              var used_sha = context.payload.pull_request.head.sha;
+              var used_event = "pull_request";
+            } else {
+              var used_sha = context.sha;
+              var used_event = context.eventName;
+            }
+            const result = await github.request('GET /repos/{owner}/{repo}/actions/workflows/{workflow_id}/runs', {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: process.env.workflow_filename,
+              headers: {
+                'X-GitHub-Api-Version': '2022-11-28',
+                'accept': 'application/vnd.github+json'
+              },
+              head_sha: used_sha,
+              event: used_event
+            })
+            console.log("SHA of commit " + used_sha);
+            console.log("Found runs of workflow: " + result.data.total_count);
+            if (result.data.total_count == 1) {
+              console.log("Found workflow has id: " + result.data.workflow_runs[0].id);
+              return result.data.workflow_runs[0].id
+            } else {
+              console.log("Logging all found workflow ids:");
+              for (var i = 0; i < result.data.workflow_runs.length; i++) {
+                console.log(result.data.workflow_runs[i].id);
+              }
+              console.log("Returned workflow id is: " + result.data.workflow_runs[0].id);
+              return result.data.workflow_runs[0].id
+            }
+      - name: Wait for other workflow to finish
+        env:
+          RUN_ID: ${{ steps.get_id.outputs.result }}
+          POLL_TIMEOUT: 10
+        run: |
+          ci_conclusion="pending"
+          echo "Querying status of workflow $RUN_ID for repo $GITHUB_REPOSITORY"
+          until [ "$ci_conclusion" != "pending" ] && [ "$ci_conclusion" != "in_progress" ] && [ "$ci_conclusion" != "null" ]
+          do
+            # Wait some seconds
+            sleep "$POLL_TIMEOUT"
+            # Get the current state of the pipeline and the url of the website
+            run_reply=$(curl --header "'X-GitHub-Api-Version': '2022-11-28', 'accept': 'application/vnd.github+json'" --silent "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID")
+            ci_conclusion=$(jq -n "$run_reply" | jq -r .conclusion)
+            echo "Current pipeline status: ${ci_conclusion}"
+            http_status=$(jq -n "$run_reply" | jq -r .status)
+            if [ "$http_status" != 200 ] && [[ "$http_status" =~ ^[0-9]+$ ]]; then
+              echo "Request returned status: ${http_status}"
+              exit 1
+            fi
+          done
+          # Set exit code for success or failure  (everything non-success)
+          if [ "$ci_conclusion" = "success" ]; then
+            exit 0
+          else
+            exit 1
+          fi
+      - name: Download artifacts from other workflow
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          run-id: ${{ steps.get_id.outputs.result }}
+          github-token: ${{ secrets.ACTION_READ_TOKEN }}
+          path: ./github_ci_artifacts
+      - name: Uploading artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Github_CI_artifacts
+          path: |
+            ./github_ci_artifacts/*

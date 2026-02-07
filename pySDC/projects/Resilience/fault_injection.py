@@ -189,10 +189,15 @@ class FaultInjector(Hooks):
         elif type(self.random_generator) == np.random.RandomState:
             self.add_random_fault(args, rnd_args)
         else:
+<<<<<<< HEAD
             raise NotImplementedError(
                 f'Don\'t know how to add fault with generator of type \
 {type(self.random_generator)}'
             )
+=======
+            raise NotImplementedError(f'Don\'t know how to add fault with generator of type \
+{type(self.random_generator)}')
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 
     def add_stored_faults(self):
         '''
@@ -335,10 +340,15 @@ class FaultInjector(Hooks):
         super().pre_run(step, level_number)
 
         if not type(step.levels[level_number].u[0]) == mesh:
+<<<<<<< HEAD
             raise NotImplementedError(
                 f'Fault insertion is only implemented for type mesh, not \
 {type(step.levels[level_number].u[0])}'
             )
+=======
+            raise NotImplementedError(f'Fault insertion is only implemented for type mesh, not \
+{type(step.levels[level_number].u[0])}')
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 
         dtype = step.levels[level_number].prob.u_exact(t=0).dtype
         if dtype in [float, np.float64]:

@@ -16,7 +16,10 @@ from pySDC.core.hooks import Hooks
 from pySDC.implementations.hooks.log_errors import LogLocalErrorPostIter
 from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimatePostIter
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 # define global parameters for running problems and plotting
 CMAP = list(TABLEAU_COLORS.values())
 

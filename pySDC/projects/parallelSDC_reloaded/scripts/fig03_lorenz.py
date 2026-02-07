@@ -5,6 +5,10 @@ Created on Wed Jan 10 15:34:24 2024
 
 Figures with experiment on the Lorenz problem
 """
+<<<<<<< HEAD
+=======
+
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 import os
 import numpy as np
 import scipy as sp

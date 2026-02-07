@@ -5,6 +5,10 @@ Created on Tue Jan  9 10:12:09 2024
 
 Compute stability regions for SDC wit given parameters
 """
+<<<<<<< HEAD
+=======
+
+>>>>>>> d3e0bb943e63560d7b018cac8a624c1883aa0c7b
 import numpy as np
 from pySDC.projects.parallelSDC_reloaded.utils import getParamsRK, getParamsSDC, solutionSDC, plotStabContour, plt
 
