@@ -6,6 +6,7 @@ if TYPE_CHECKING:
     from pySDC.core.controller import Controller
     from pySDC.core.step import Step
 
+
 # short helper class to add params as attributes
 class Pars(FrozenClass):
     def __init__(self, params: Dict[str, Any]) -> None:
@@ -106,7 +107,9 @@ class ConvergenceController(object):
         self.log(msg=msg, S=S, level=10, **kwargs)
         return None
 
-    def setup(self, controller: 'Controller', params: Dict[str, Any], description: Dict[str, Any], **kwargs: Any) -> Dict[str, Any]:
+    def setup(
+        self, controller: 'Controller', params: Dict[str, Any], description: Dict[str, Any], **kwargs: Any
+    ) -> Dict[str, Any]:
         """
         Setup various variables that only need to be set once in the beginning.
         If the convergence controller is added automatically, you can give it params by adding it manually.
@@ -151,7 +154,9 @@ class ConvergenceController(object):
         """
         pass
 
-    def check_parameters(self, controller: 'Controller', params: Dict[str, Any], description: Dict[str, Any], **kwargs: Any) -> Tuple[bool, str]:
+    def check_parameters(
+        self, controller: 'Controller', params: Dict[str, Any], description: Dict[str, Any], **kwargs: Any
+    ) -> Tuple[bool, str]:
         """
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
 

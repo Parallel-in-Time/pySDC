@@ -115,7 +115,9 @@ class Problem(RegisterParams):
         """Default mass matrix : identity"""
         return u
 
-    def generate_scipy_reference_solution(self, eval_rhs: Callable, t: float, u_init: Optional[Any] = None, t_init: Optional[float] = None, **kwargs: Any) -> Any:
+    def generate_scipy_reference_solution(
+        self, eval_rhs: Callable, t: float, u_init: Optional[Any] = None, t_init: Optional[float] = None, **kwargs: Any
+    ) -> Any:
         """
         Compute a reference solution using `scipy.solve_ivp` with very small tolerances.
         Keep in mind that scipy needs the solution to be a one dimensional array. If you are solving something higher
@@ -193,7 +195,9 @@ class Problem(RegisterParams):
         """
         raise NotImplementedError
 
-    def solve_jacobian(self, rhs: Any, dt: float, u: Optional[Any] = None, u0: Optional[Any] = None, t: float = 0, **kwargs: Any) -> Any:
+    def solve_jacobian(
+        self, rhs: Any, dt: float, u: Optional[Any] = None, u0: Optional[Any] = None, t: float = 0, **kwargs: Any
+    ) -> Any:
         """
         Solve the Jacobian for an Euler step, linearized around u.
         This defaults to an Euler step to accommodate linear problems.

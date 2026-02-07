@@ -36,7 +36,9 @@ class RegisterParams(metaclass=_MetaRegisterParams):
         Names of all the parameters registered as read-only.
     """
 
-    def _makeAttributeAndRegister(self, *names: str, localVars: Optional[Dict[str, Any]] = None, readOnly: bool = False) -> None:
+    def _makeAttributeAndRegister(
+        self, *names: str, localVars: Optional[Dict[str, Any]] = None, readOnly: bool = False
+    ) -> None:
         """
         Register a list of attribute name as parameters of the class.
 

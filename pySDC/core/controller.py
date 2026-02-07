@@ -69,7 +69,9 @@ class Controller(object):
         self.setup_convergence_controllers(description)
 
     @staticmethod
-    def __setup_custom_logger(level: Optional[int] = None, log_to_file: Optional[bool] = None, fname: Optional[str] = None) -> None:
+    def __setup_custom_logger(
+        level: Optional[int] = None, log_to_file: Optional[bool] = None, fname: Optional[str] = None
+    ) -> None:
         """
         Helper function to set main parameters for the logging facility
 
@@ -375,7 +377,11 @@ class Controller(object):
 class ParaDiagController(Controller):
 
     def __init__(
-        self, controller_params: Dict[str, Any], description: Dict[str, Any], n_steps: int, useMPI: Optional[bool] = None
+        self,
+        controller_params: Dict[str, Any],
+        description: Dict[str, Any],
+        n_steps: int,
+        useMPI: Optional[bool] = None,
     ) -> None:
         """
         Initialization routine for ParaDiag controllers

@@ -11,6 +11,7 @@ from qmat.lagrange import LagrangeApproximation
 if TYPE_CHECKING:
     from pySDC.core.level import Level
 
+
 # short helper class to add params as attributes
 class _Pars(FrozenClass):
     def __init__(self, pars: Dict[str, Any]) -> None:
