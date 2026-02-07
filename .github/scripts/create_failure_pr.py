@@ -44,7 +44,7 @@ def create_pull_request(
     return response.json()
 
 
-def generate_pr_body(workflow_run_url: str, analysis_file: str) -> str:
+def generate_pr_body(workflow_run_url: str, analysis_file: str, head_branch: str = "auto-fix/test-failure-*") -> str:
     """Generate the pull request body."""
     # Try to load the analysis
     try:
@@ -130,7 +130,7 @@ def main():
         print("Creating PR without detailed analysis")
     
     # Generate PR body
-    pr_body = generate_pr_body(args.workflow_run_url, analysis_file)
+    pr_body = generate_pr_body(args.workflow_run_url, analysis_file, args.branch)
     
     # Create PR title
     pr_title = f"🔴 Auto-fix: Weekly test failures ({args.workflow_run_id})"
