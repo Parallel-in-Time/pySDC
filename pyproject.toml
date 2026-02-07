@@ -51,7 +51,8 @@ dev = [
     'ruff',
     'pytest',
     'pytest-cov',
-    'sphinx'
+    'sphinx',
+    'pre-commit'
     ]
 
 [tool.pytest.ini_options]

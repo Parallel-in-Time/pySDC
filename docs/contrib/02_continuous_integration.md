@@ -122,6 +122,27 @@ fi
 ```
 Don't forget to assign execution rights.
 
+### Using pre-commit hooks (Recommended)
+
+For a more robust and automated approach, you can use the [pre-commit](https://pre-commit.com/) framework, which manages git hooks for you. The repository includes a `.pre-commit-config.yaml` file that is configured to run the exact same linting checks as the CI pipeline.
+
+To set up pre-commit hooks:
+
+```bash
+# Install pre-commit (can also be done with conda/mamba or as part of pip install -e .[dev])
+pip install pre-commit
+
+# Install the git hooks
+pre-commit install
+
+# (Optional) Run against all files to check current state
+pre-commit run --all-files
+```
+
+Once installed, the hooks will automatically run `black` and `ruff` on staged files before each commit. The hooks are configured to check only files in the `pySDC` directory, matching exactly what the CI pipeline checks.
+
+> :bell: **Note:** The pre-commit hooks run in `--check` mode by default (same as CI), meaning they will prevent commits if formatting issues are found. You can fix formatting issues by running `black pySDC` directly, then staging and committing again.
+
 As a final note, make sure to regularly update linting related packages, as they constantly introduce checking of more PEP8 guidelines.
 This might cause the linting to fail in the GitHub action, which uses the most up to date versions available on the conda-forge channel, even though it passed locally.
 
