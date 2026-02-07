@@ -5,15 +5,42 @@ from pySDC.core.sweeper import Sweeper
 
 class verlet(Sweeper):
     """
-    Custom sweeper class, implements Sweeper.py
-
-    Second-order sweeper using velocity-Verlet as base integrator
+    Velocity-Verlet integrator for second-order problems in position/velocity formulation.
+    
+    This sweeper implements SDC using velocity-Verlet as the base integrator, designed for
+    second-order ODEs of the form d²u/dt² = f(u, v, t) where v = du/dt. The method is
+    particularly suited for Hamiltonian systems and particle dynamics.
+    
+    **When to use:**
+    - Particle dynamics and N-body simulations
+    - Hamiltonian systems requiring symplectic integration
+    - Second-order ODEs in position/velocity form
+    - Molecular dynamics, celestial mechanics
+    
+    **Key Parameters:**
+    - ``QI`` (str): Implicit integration matrix, default: 'IE' (Implicit Euler)
+    - ``QE`` (str): Explicit integration matrix, default: 'EE' (Explicit Euler)
+    - ``num_nodes`` (int): Number of collocation nodes (required)
+    - ``quad_type`` (str): Quadrature type, recommended: 'LOBATTO' for endpoint inclusion
+    
+    **Requirements:**
+    Problem must provide position and velocity components in dtype_u, typically as
+    a particles or mesh data structure with position (.pos) and velocity (.vel) attributes.
+    
+    **Example:**
+        >>> sweeper_params = {
+        ...     'quad_type': 'LOBATTO',
+        ...     'num_nodes': 3,
+        ... }
+        >>> description = {'sweeper_class': verlet, 'sweeper_params': sweeper_params}
 
     Attributes:
-        QQ: 0-to-node collocation matrix (second order)
-        QT: 0-to-node trapezoidal matrix
-        Qx: 0-to-node Euler half-step for position update
-        qQ: update rule for final value (if needed)
+        QI (numpy.ndarray): Implicit Euler integration matrix
+        QE (numpy.ndarray): Explicit Euler integration matrix
+        QT (numpy.ndarray): 0-to-node trapezoidal matrix
+        Qx (numpy.ndarray): 0-to-node Euler half-step for position update
+        QQ (numpy.ndarray): 0-to-node collocation matrix (second order)
+        qQ (numpy.ndarray): Update rule for final value
     """
 
     def __init__(self, params, level):

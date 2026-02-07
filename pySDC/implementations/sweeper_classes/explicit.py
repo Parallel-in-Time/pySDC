@@ -3,10 +3,36 @@ from pySDC.core.sweeper import Sweeper
 
 class explicit(Sweeper):
     """
-    Custom sweeper class, implements Sweeper.py
+    Explicit-only sweeper using explicit Euler as the base integrator.
+    
+    This sweeper implements fully explicit SDC methods, suitable for non-stiff problems
+    where explicit time integration is stable. No implicit solves are required, making
+    this sweeper very fast per iteration.
+    
+    **When to use:**
+    - Non-stiff problems where explicit methods are stable
+    - Fast computations without implicit system solves
+    - Problems where CFL-type stability conditions are easily satisfied
+    - Hyperbolic PDEs, wave equations, or advection-dominated problems
+    
+    **Key Parameters:**
+    - ``QE`` (str): Type of explicit integration matrix, default: 'EE' (Explicit Euler)
+    - ``num_nodes`` (int): Number of collocation nodes (required)
+    - ``quad_type`` (str): Quadrature type, default: 'RADAU-RIGHT'
+    
+    **Note:**
+    May require smaller time steps than implicit sweepers for stability.
+    
+    **Example:**
+        >>> sweeper_params = {
+        ...     'quad_type': 'RADAU-RIGHT',
+        ...     'num_nodes': 3,
+        ...     'QE': 'EE'
+        ... }
+        >>> description = {'sweeper_class': explicit, 'sweeper_params': sweeper_params}
 
     Attributes:
-        QE: explicit Euler integration matrix
+        QE (numpy.ndarray): Strictly lower triangular explicit integration matrix
     """
 
     def __init__(self, params, level):
