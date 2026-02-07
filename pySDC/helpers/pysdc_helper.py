@@ -42,7 +42,7 @@ class FrozenClass(object):
         if key in type(self).attrs:
             return None
         else:
-            super().__getattribute__(key)
+            return super().__getattribute__(key)
 
     @classmethod
     def add_attr(cls, key, raise_error_if_exists=False):
