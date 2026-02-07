@@ -41,6 +41,16 @@
 <p>Any commit in <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> are tested by GitHub continuous integration (CI). You can see in in the <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/actions">action panel</a> the tests for each branches.
 Those tests are currently divided in three main categories : <a class="reference internal" href="#docs-contrib-02-continuous-integration-code-linting"><span class="std std-ref">code linting</span></a>, <a class="reference internal" href="#docs-contrib-02-continuous-integration-code-testing"><span class="std std-ref">code testing</span></a> and <a class="reference internal" href="#docs-contrib-02-continuous-integration-code-coverage"><span class="std std-ref">code coverage</span></a>.
 Finally, the CI also build artifacts that are used to generate the documentation website (see <a class="reference external" href="http://parallel-in-time.org/pySDC/">http://parallel-in-time.org/pySDC/</a>), more details given in the <a class="reference internal" href="#docs-contrib-02-continuous-integration-documentation-generation"><span class="std std-ref">documentation generation</span></a> section.</p>
+<section id="ci-workflow-triggers">
+<span id="docs-contrib-02-continuous-integration-ci-workflow-triggers"></span><h2>CI Workflow Triggers<a class="headerlink" href="#ci-workflow-triggers" title="Link to this heading">¶</a></h2>
+<p>The CI pipeline is configured to avoid redundant runs. The workflow is triggered:</p>
+<ul class="simple">
+<li><p><strong>On pull requests</strong>: CI runs for all pull request events (opened, synchronized, reopened, etc.)</p></li>
+<li><p><strong>On push to master</strong>: CI runs when code is pushed directly to the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch</p></li>
+<li><p><strong>On schedule</strong>: CI runs weekly on Monday at 5:01 AM UTC (via cron schedule)</p></li>
+</ul>
+<p>This configuration ensures that when you push commits to a pull request branch, the CI runs only once for the pull request event, not twice (once for the PR and once for the push). Direct pushes to the master branch will still trigger the CI to ensure the main branch is always tested.</p>
+</section>
 <section id="code-linting">
 <span id="docs-contrib-02-continuous-integration-code-linting"></span><h2>Code linting<a class="headerlink" href="#code-linting" title="Link to this heading">¶</a></h2>
 <p>Code style linting is performed using <a class="reference external" href="https://black.readthedocs.io/en/stable/">black</a> and <a class="reference external" href="https://docs.astral.sh/ruff/">ruff</a> for code syntax checking. In particular, <code class="docutils literal notranslate"><span class="pre">black</span></code> is used to check compliance with (most of) <a class="reference external" href="https://peps.python.org/pep-0008/">PEP-8 guidelines</a>.</p>
@@ -179,8 +189,40 @@ As a starting point it is recommended to copy and adapt an existing file (e.g. <
 <li><p><code class="docutils literal notranslate"><span class="pre">pySDC/projects</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">pySDC/tutorial</span></code></p></li>
 </ul>
-<p>This analysis is done in parallel to the test each time a pull is done on any branch (main repository or fork).
-You can look at the current <a class="reference external" href="https://parallel-in-time.org/pySDC/coverage/index.html">coverage report for the master branch</a> or <a class="reference external" href="https://app.codecov.io/gh/Parallel-in-Time/pySDC">compare the results with previous builds</a>. Codecov will also comment on any pull request, indicating the change of coverage.</p>
+<p>This analysis is done in parallel to the test each time a pull is done on any branch (main repository or fork).</p>
+<section id="viewing-coverage-reports">
+<span id="docs-contrib-02-continuous-integration-viewing-coverage-reports"></span><h3>Viewing Coverage Reports<a class="headerlink" href="#viewing-coverage-reports" title="Link to this heading">¶</a></h3>
+<p>There are multiple ways to view test coverage for pySDC:</p>
+<ol class="arabic simple">
+<li><p><strong>HTML Coverage Report</strong> (recommended for detailed analysis)</p>
+<ul class="simple">
+<li><p>View the current <a class="reference external" href="https://parallel-in-time.org/pySDC/coverage/index.html">coverage report for the master branch</a></p></li>
+<li><p>Shows line-by-line coverage with color coding</p></li>
+<li><p>Updated automatically with each push to master</p></li>
+</ul>
+</li>
+<li><p><strong>Codecov Dashboard</strong> (for trends and PR analysis)</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://app.codecov.io/gh/Parallel-in-Time/pySDC">Compare results with previous builds</a></p></li>
+<li><p>View coverage trends over time</p></li>
+<li><p>See coverage impact of specific commits</p></li>
+<li><p>Codecov automatically comments on pull requests with coverage changes</p></li>
+</ul>
+</li>
+<li><p><strong>Coverage Badge</strong> (quick status check)</p>
+<ul class="simple">
+<li><p>Displayed in the <a class="reference internal" href="../../README.html"><span class="doc">README</span></a></p></li>
+<li><p>Shows current coverage percentage for master branch</p></li>
+</ul>
+</li>
+<li><p><strong>PR Coverage Comments</strong> (for contributors)</p>
+<ul class="simple">
+<li><p>Codecov comments on each pull request</p></li>
+<li><p>Shows coverage changes introduced by the PR</p></li>
+<li><p>Highlights uncovered lines in modified files</p></li>
+</ul>
+</li>
+</ol>
 <p>During developments, you can also run the coverage tests locally, using :</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;print(&#39;Loading sitecustomize.py...&#39;);import coverage;coverage.process_startup()&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>sitecustomize.py
 coverage<span class="w"> </span>run<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>--continue-on-collection-errors<span class="w"> </span>-v<span class="w"> </span>--durations<span class="o">=</span><span class="m">0</span><span class="w"> </span>pySDC/tests
@@ -198,8 +240,14 @@ python<span class="w"> </span>-m<span class="w"> </span>coverage<span class="w">
 <blockquote>
 <div><p>⚠️ Coverage can be lower if some tests fails (for instance, if you did not install all required python package to run all the tests).</p>
 </div></blockquote>
+</section>
 <section id="coverage-exceptions">
 <span id="docs-contrib-02-continuous-integration-coverage-exceptions"></span><h3>Coverage exceptions<a class="headerlink" href="#coverage-exceptions" title="Link to this heading">¶</a></h3>
+<p>The coverage configuration is defined in two places:</p>
+<ol class="arabic simple">
+<li><p><strong>Runtime configuration</strong> (<code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>) - Controls what coverage measures during test execution</p></li>
+<li><p><strong>Codecov configuration</strong> (<code class="docutils literal notranslate"><span class="pre">codecov.yml</span></code>) - Controls how Codecov reports and displays coverage</p></li>
+</ol>
 <p>Some types of code lines will be ignored by the coverage analysis (<em>e.g</em> lines starting with <code class="docutils literal notranslate"><span class="pre">raise</span></code>, …), see the <code class="docutils literal notranslate"><span class="pre">[tool.coverage.report]</span></code> section in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>.
 Part of code (functions, conditionaly, for loops, etc …) can be ignored by coverage analysis using the <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">pragma:</span> <span class="pre">no</span> <span class="pre">cover</span></code>, for instance</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ...</span>
@@ -258,6 +306,7 @@ This approach can be considered for local testing of your contribution when it d
     <h3><a href="../../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">Continuous Integration in pySDC</a><ul>
+<li><a class="reference internal" href="#ci-workflow-triggers">CI Workflow Triggers</a></li>
 <li><a class="reference internal" href="#code-linting">Code linting</a></li>
 <li><a class="reference internal" href="#code-testing">Code testing</a></li>
 <li><a class="reference internal" href="#running-ci-on-hpc-from-pull-requests">Running CI on HPC from pull requests</a><ul>
@@ -265,6 +314,7 @@ This approach can be considered for local testing of your contribution when it d
 </ul>
 </li>
 <li><a class="reference internal" href="#code-coverage">Code coverage</a><ul>
+<li><a class="reference internal" href="#viewing-coverage-reports">Viewing Coverage Reports</a></li>
 <li><a class="reference internal" href="#coverage-exceptions">Coverage exceptions</a></li>
 </ul>
 </li>
