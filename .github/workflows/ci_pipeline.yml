@@ -34,6 +34,10 @@ jobs:
       - name: Linting with ruff
         run: |
           ruff check pySDC
+      - name: Type checking with mypy (report only)
+        continue-on-error: true
+        run: |
+          mypy pySDC/core pySDC/implementations pySDC/helpers --no-error-summary || echo "::warning::Type checking found issues. This is informational only and does not fail the build."
 
   user_cpu_tests_linux:
     runs-on: ubuntu-latest
