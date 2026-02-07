@@ -148,10 +148,8 @@ class piline(Problem):
         if t > 0.0:
             if u_init is not None:
                 if t_init is None:
-                    raise ValueError(
-                        'Please supply `t_init` when you want to get the exact solution from a point that \
-is not 0!'
-                    )
+                    raise ValueError('Please supply `t_init` when you want to get the exact solution from a point that \
+is not 0!')
                 me = u_init
             else:
                 t_init = 0.0

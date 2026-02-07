@@ -609,10 +609,8 @@ class AdaptivityStrategy(Strategy):
             e_tol = 1e-5
 
         else:
-            raise NotImplementedError(
-                'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
- strategy'
-            )
+            raise NotImplementedError('I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
+ strategy')
 
         custom_description['convergence_controllers'][Adaptivity] = {
             'e_tol': e_tol,
@@ -754,10 +752,8 @@ class AdaptiveHotRodStrategy(Strategy):
             maxiter = 4
             HotRod_tol = 2e-6
         else:
-            raise NotImplementedError(
-                'I don\'t have a tolerance for adaptive Hot Rod for your problem. Please add one \
-to the strategy'
-            )
+            raise NotImplementedError('I don\'t have a tolerance for adaptive Hot Rod for your problem. Please add one \
+to the strategy')
 
         no_storage = num_procs > 1
 
@@ -846,10 +842,8 @@ class IterateStrategy(Strategy):
         elif problem.__name__ == "run_GS":
             restol = 1e-4
         else:
-            raise NotImplementedError(
-                'I don\'t have a residual tolerance for your problem. Please add one to the \
-strategy'
-            )
+            raise NotImplementedError('I don\'t have a residual tolerance for your problem. Please add one to the \
+strategy')
 
         custom_description = {
             'step_params': {'maxiter': 99},
@@ -1047,10 +1041,8 @@ class HotRodStrategy(Strategy):
             HotRod_tol = 3.22e-5
             maxiter = 6
         else:
-            raise NotImplementedError(
-                'I don\'t have a tolerance for Hot Rod for your problem. Please add one to the\
- strategy'
-            )
+            raise NotImplementedError('I don\'t have a tolerance for Hot Rod for your problem. Please add one to the\
+ strategy')
 
         no_storage = False  # num_procs > 1
 
@@ -1175,10 +1167,8 @@ class AdaptivityCollocationStrategy(InexactBaseStrategy):
         elif problem.__name__ == "run_AC":
             e_tol = 1e-4
         else:
-            raise NotImplementedError(
-                'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
- strategy'
-            )
+            raise NotImplementedError('I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
+ strategy')
 
         custom_description['convergence_controllers'] = {
             AdaptivityCollocation: {
@@ -1975,10 +1965,8 @@ class AdaptivityExtrapolationWithinQStrategy(InexactBaseStrategy):
         elif problem.__name__ == "run_AC":
             e_tol = 1e-4
         else:
-            raise NotImplementedError(
-                'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
- strategy'
-            )
+            raise NotImplementedError('I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
+ strategy')
 
         custom_description['convergence_controllers'] = {
             AdaptivityExtrapolationWithinQ: {
@@ -2104,10 +2092,8 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
             restol_max = 1e-4
             restol_min = 1e-9
         else:
-            raise NotImplementedError(
-                'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
- strategy'
-            )
+            raise NotImplementedError('I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
+ strategy')
 
         custom_description['convergence_controllers'] = {
             AdaptivityPolynomialError: {

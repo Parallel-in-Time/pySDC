@@ -179,7 +179,7 @@ class Fisher_reaction(object):
         x = self.da.getVecArray(self.localX)
         f = self.da.getVecArray(F)
         mx = self.da.getSizes()[0]
-        (xs, xe) = self.da.getRanges()[0]
+        xs, xe = self.da.getRanges()[0]
         for i in range(xs, xe):
             if i == 0 or i == mx - 1:
                 f[i] = x[i]
@@ -211,7 +211,7 @@ class Fisher_reaction(object):
         P.zeroEntries()
         row = PETSc.Mat.Stencil()
         mx = self.da.getSizes()[0]
-        (xs, xe) = self.da.getRanges()[0]
+        xs, xe = self.da.getRanges()[0]
         for i in range(xs, xe):
             row.i = i
             row.field = 0
@@ -341,7 +341,7 @@ class petsc_fisher_multiimplicit(Problem):
 
         # compute dx and get local ranges
         self.dx = (self.interval[1] - self.interval[0]) / (self.nvars - 1)
-        (self.xs, self.xe) = self.init.getRanges()[0]
+        self.xs, self.xe = self.init.getRanges()[0]
 
         # compute discretization matrix A and identity
         self.A = self.__get_A()
@@ -401,7 +401,7 @@ class petsc_fisher_multiimplicit(Problem):
         row = PETSc.Mat.Stencil()
         col = PETSc.Mat.Stencil()
         mx = self.init.getSizes()[0]
-        (xs, xe) = self.init.getRanges()[0]
+        xs, xe = self.init.getRanges()[0]
         for i in range(xs, xe):
             row.i = i
             row.field = 0
@@ -447,7 +447,7 @@ class petsc_fisher_multiimplicit(Problem):
         row = PETSc.Mat.Stencil()
         col = PETSc.Mat.Stencil()
         mx = self.init.getSizes()[0]
-        (xs, xe) = self.init.getRanges()[0]
+        xs, xe = self.init.getRanges()[0]
         for i in range(xs, xe):
             row.i = i
             row.field = 0
