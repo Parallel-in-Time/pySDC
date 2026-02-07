@@ -38,6 +38,13 @@ jobs:
       - name: Generate Coverage badge
         run: |
           genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
+      - name: Get PR number
+        id: get_pr
+        if: github.event.workflow_run.event == 'pull_request'
+        run: |
+          PR_NUMBER=$(jq -r '.workflow_run.pull_requests[0].number' <<< '${{ toJson(github.event) }}')
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          echo "PR Number: $PR_NUMBER"
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
@@ -45,6 +52,9 @@ jobs:
           files: ./coverage.xml
           fail_ci_if_error: false
           verbose: true
+          override_pr: ${{ steps.get_pr.outputs.pr_number }}
+          override_commit: ${{ github.event.workflow_run.head_sha }}
+          override_branch: ${{ github.event.workflow_run.head_branch }}
         
 #      - name: Generate benchmark report
 #        uses: pancetta/github-action-benchmark@v1
