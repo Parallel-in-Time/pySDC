@@ -80,4 +80,3 @@ if __name__ == '__main__':
     test_frozen_class()
     test_frozen_class_isolation()
     print("All tests passed!")
-
