@@ -53,6 +53,7 @@ dev = [
     'pytest-cov',
     'sphinx',
     'mypy'
+    'pre-commit'
     ]
 
 [tool.pytest.ini_options]
