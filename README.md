@@ -83,6 +83,8 @@ decent installation of this is needed in order to run those examples.
 When using `fenics` or `petsc4py`, a C++
 compiler is required (although installation may go through at first).
 
+**Dependency Management:** pySDC uses automated dependency management with lock files and upper bounds. See the [Dependency Quick Reference](./DEPENDENCY_QUICKREF.md) for common tasks, or the [complete dependency management guide](./docs/contrib/08_dependency_management.md) for details.
+
 For more details on `pySDC`, check out http://www.parallel-in-time.org/pySDC.
 
 ## How to cite
