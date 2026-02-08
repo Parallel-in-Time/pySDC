@@ -5,7 +5,7 @@ channels:
   - conda-forge
 dependencies:
   - numpy>=1.15.4,<3.0
-  - scipy>=0.17.1,<2.0
+  - scipy>=0.17.1,<1.15
   - dill>=0.2.6
   - mpich
   - mpi4py>=3.0.0,<4.0
