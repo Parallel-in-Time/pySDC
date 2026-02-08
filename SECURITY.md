@@ -21,11 +21,11 @@ Instead, please report them via email to:
 
 - **r.speck@fz-juelich.de** (Robert Speck, Project Maintainer)
 
-You should receive a response within 48 hours. If for some reason you do not, please follow up via email to ensure we received your original message.
+You should receive a response within 5 business days. If for some reason you do not, please follow up via email to ensure we received your original message.
 
 Please include the following information in your report (as much as you can provide):
 
-- Type of issue (e.g., buffer overflow, SQL injection, cross-site scripting, etc.)
+- Type of issue (e.g., arbitrary code execution, unsafe deserialization, path traversal, etc.)
 - Full paths of source file(s) related to the manifestation of the issue
 - The location of the affected source code (tag/branch/commit or direct URL)
 - Any special configuration required to reproduce the issue
