@@ -45,7 +45,7 @@ Security updates will be released as soon as possible after a vulnerability is c
 
 ## Dependencies
 
-pySDC uses several third-party dependencies. We use [Dependabot](https://docs.github.com/en/code-security/dependabot) to monitor our dependencies for known security vulnerabilities. If you discover a security issue in one of our dependencies, please also report it to the respective maintainers of that dependency.
+pySDC uses several third-party dependencies. We monitor our dependencies for known security vulnerabilities and update them as needed. If you discover a security issue in one of our dependencies, please also report it to the respective maintainers of that dependency.
 
 ## Comments on This Policy
 
