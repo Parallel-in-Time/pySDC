@@ -37,7 +37,8 @@
           <div class="body" role="main">
             
   <h1>Source code for core.level</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.sweeper</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sweeper</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.sweeper</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sweeper</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.problem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Problem</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.pysdc_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrozenClass</span>
@@ -45,12 +46,12 @@
 
 <span class="c1"># short helper class to add params as attributes</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">_Pars</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dt_initial</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">restol</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nsweeps</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">=</span> <span class="s1">&#39;full_abs&#39;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt_initial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nsweeps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residual_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;full_abs&#39;</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
         <span class="c1"># freeze class, no further attributes allowed from this point</span>
@@ -66,13 +67,13 @@
 <span class="sd">    initialized here.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">unlocked</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dt_new</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sweep</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residual</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unlocked</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updated</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt_new</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># freeze class, no further attributes allowed from this point</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_freeze</span><span class="p">()</span>
 
@@ -98,7 +99,15 @@
 <span class="sd">        tau (list of dtype_u): FAS correction, allocated via step class if necessary</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_class</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">sweeper_class</span><span class="p">,</span> <span class="n">sweeper_params</span><span class="p">,</span> <span class="n">level_params</span><span class="p">,</span> <span class="n">level_index</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">problem_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Problem</span><span class="p">],</span>
+        <span class="n">problem_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">sweeper_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Sweeper</span><span class="p">],</span>
+        <span class="n">sweeper_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">level_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">level_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
@@ -112,36 +121,36 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># set level parameters and status</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">_Pars</span><span class="p">(</span><span class="n">level_params</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">_Status</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span> <span class="n">_Pars</span> <span class="o">=</span> <span class="n">_Pars</span><span class="p">(</span><span class="n">level_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">:</span> <span class="n">_Status</span> <span class="o">=</span> <span class="n">_Status</span><span class="p">()</span>
 
         <span class="c1"># instantiate sweeper, problem and hooks</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__sweep</span><span class="p">:</span> <span class="n">Sweeper</span> <span class="o">=</span> <span class="n">sweeper_class</span><span class="p">(</span><span class="n">sweeper_params</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__prob</span><span class="p">:</span> <span class="n">Problem</span> <span class="o">=</span> <span class="n">problem_class</span><span class="p">(</span><span class="o">**</span><span class="n">problem_params</span><span class="p">)</span>
 
         <span class="c1"># set name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">level_index</span> <span class="o">=</span> <span class="n">level_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">level_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">level_index</span>
 
         <span class="c1"># empty data at the nodes, the right end point and tau</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">uold</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">u_avg</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">increment</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fold</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uold</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u_avg</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residual</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">increment</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fold</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__tag</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tag</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># freeze class, no further attributes allowed from this point</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_freeze</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Level.reset_level">
 <a class="viewcode-back" href="../../pySDC/core.level.html#core.level.Level.reset_level">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">reset_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reset_status</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reset_status</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to clean-up the level for the next time step</span>
 
@@ -186,7 +195,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__prob</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Meta-getter for the current time</span>
 
@@ -196,7 +205,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">time</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">dt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Meta-getter for the time-step size</span>
 
@@ -206,7 +215,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tag</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter for tag</span>
 
@@ -216,7 +225,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tag</span>
 
     <span class="nd">@tag</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Setter for tag</span>
 

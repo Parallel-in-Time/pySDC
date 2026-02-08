@@ -38,18 +38,23 @@
             
   <h1>Source code for core.base_transfer</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">UnlockError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.pysdc_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrozenClass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">qmat.lagrange</span><span class="w"> </span><span class="kn">import</span> <span class="n">LagrangeApproximation</span>
 
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.level</span><span class="w"> </span><span class="kn">import</span> <span class="n">Level</span>
+
 
 <span class="c1"># short helper class to add params as attributes</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">_Pars</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pars</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">finter</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pars</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">finter</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 
@@ -69,7 +74,14 @@
 <span class="sd">        coarse (pySDC.Level.level): reference to the coarse level</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fine_level</span><span class="p">,</span> <span class="n">coarse_level</span><span class="p">,</span> <span class="n">base_transfer_params</span><span class="p">,</span> <span class="n">space_transfer_class</span><span class="p">,</span> <span class="n">space_transfer_params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">fine_level</span><span class="p">:</span> <span class="s1">&#39;Level&#39;</span><span class="p">,</span>
+        <span class="n">coarse_level</span><span class="p">:</span> <span class="s1">&#39;Level&#39;</span><span class="p">,</span>
+        <span class="n">base_transfer_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">space_transfer_class</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">space_transfer_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
@@ -81,33 +93,33 @@
 <span class="sd">            space_transfer_params (dict): parameters for the space_transfer operations</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">_Pars</span><span class="p">(</span><span class="n">base_transfer_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span> <span class="n">_Pars</span> <span class="o">=</span> <span class="n">_Pars</span><span class="p">(</span><span class="n">base_transfer_params</span><span class="p">)</span>
 
         <span class="c1"># set up logger</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;transfer&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;transfer&#39;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">fine</span> <span class="o">=</span> <span class="n">fine_level</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coarse</span> <span class="o">=</span> <span class="n">coarse_level</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fine</span><span class="p">:</span> <span class="s1">&#39;Level&#39;</span> <span class="o">=</span> <span class="n">fine_level</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coarse</span><span class="p">:</span> <span class="s1">&#39;Level&#39;</span> <span class="o">=</span> <span class="n">coarse_level</span>
 
         <span class="n">fine_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span>
         <span class="n">coarse_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fine_grid</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">coarse_grid</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">Pcoll</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fine_grid</span><span class="p">))</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">Rcoll</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fine_grid</span><span class="p">))</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Pcoll</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fine_grid</span><span class="p">))</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Rcoll</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fine_grid</span><span class="p">))</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Pcoll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_transfer_matrix_Q</span><span class="p">(</span><span class="n">fine_grid</span><span class="p">,</span> <span class="n">coarse_grid</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Rcoll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_transfer_matrix_Q</span><span class="p">(</span><span class="n">coarse_grid</span><span class="p">,</span> <span class="n">fine_grid</span><span class="p">)</span>
 
         <span class="c1"># set up spatial transfer</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">space_transfer</span> <span class="o">=</span> <span class="n">space_transfer_class</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">space_transfer</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">space_transfer_class</span><span class="p">(</span>
             <span class="n">fine_prob</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fine</span><span class="o">.</span><span class="n">prob</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse</span><span class="o">.</span><span class="n">prob</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">space_transfer_params</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="BaseTransfer.get_transfer_matrix_Q">
 <a class="viewcode-back" href="../../pySDC/core.base_transfer.html#core.base_transfer.BaseTransfer.get_transfer_matrix_Q">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_transfer_matrix_Q</span><span class="p">(</span><span class="n">f_nodes</span><span class="p">,</span> <span class="n">c_nodes</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_transfer_matrix_Q</span><span class="p">(</span><span class="n">f_nodes</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">c_nodes</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper routine to quickly define transfer matrices from a coarse set</span>
 <span class="sd">        to a fine set of nodes (fully Lagrangian)</span>
@@ -124,7 +136,7 @@
 
 <div class="viewcode-block" id="BaseTransfer.restrict">
 <a class="viewcode-back" href="../../pySDC/core.base_transfer.html#core.base_transfer.BaseTransfer.restrict">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Space-time restriction routine</span>
 
@@ -212,7 +224,7 @@
 
 <div class="viewcode-block" id="BaseTransfer.prolong">
 <a class="viewcode-back" href="../../pySDC/core.base_transfer.html#core.base_transfer.BaseTransfer.prolong">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Space-time prolongation routine</span>
 
@@ -254,7 +266,7 @@
 
 <div class="viewcode-block" id="BaseTransfer.prolong_f">
 <a class="viewcode-back" href="../../pySDC/core.base_transfer.html#core.base_transfer.BaseTransfer.prolong_f">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">prolong_f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prolong_f</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Space-time prolongation routine w.r.t. the rhs f</span>
 

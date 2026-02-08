@@ -49,7 +49,7 @@
 <span id="core-sweeper-module"></span><h1>core.sweeper module<a class="headerlink" href="#module-core.sweeper" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Sweeper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Sweeper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core.level.html#core.level.Level" title="core.level.Level"><span class="pre">Level</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Base abstract sweeper class, provides two base methods to generate QDelta matrices:</p>
 <ul class="simple">
@@ -104,13 +104,13 @@ check it out to see all available coefficient types.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.compute_end_point">
-<span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.compute_end_point" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.compute_end_point" title="Link to this definition">¶</a></dt>
 <dd><p>Abstract interface to end-node computation</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.compute_residual">
-<span class="sig-name descname"><span class="pre">compute_residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.compute_residual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.compute_residual" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compute_residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.compute_residual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.compute_residual" title="Link to this definition">¶</a></dt>
 <dd><p>Computation of the residual using the collocation matrix Q</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -121,23 +121,23 @@ check it out to see all available coefficient types.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.get_Qdelta_explicit">
-<span class="sig-name descname"><span class="pre">get_Qdelta_explicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qd_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.get_Qdelta_explicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.get_Qdelta_explicit" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_Qdelta_explicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qd_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.get_Qdelta_explicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.get_Qdelta_explicit" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.get_Qdelta_implicit">
-<span class="sig-name descname"><span class="pre">get_Qdelta_implicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qd_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.get_Qdelta_implicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.get_Qdelta_implicit" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_Qdelta_implicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qd_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.get_Qdelta_implicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.get_Qdelta_implicit" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.integrate">
-<span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.integrate" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.integrate" title="Link to this definition">¶</a></dt>
 <dd><p>Abstract interface to right-hand side integration</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.level">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">level</span></span><a class="headerlink" href="#core.sweeper.Sweeper.level" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">level</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="core.level.html#core.level.Level" title="core.level.Level"><span class="pre">Level</span></a></span><a class="headerlink" href="#core.sweeper.Sweeper.level" title="Link to this definition">¶</a></dt>
 <dd><p>Returns the current level</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -151,7 +151,7 @@ check it out to see all available coefficient types.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.predict" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.predict" title="Link to this definition">¶</a></dt>
 <dd><p>Predictor to fill values at nodes before first sweep</p>
 <p>Default prediction for the sweepers, only copies the values to all collocation nodes
 and evaluates the RHS of the ODE there</p>
@@ -159,12 +159,12 @@ and evaluates the RHS of the ODE there</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.rank">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rank</span></span><a class="headerlink" href="#core.sweeper.Sweeper.rank" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rank</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#core.sweeper.Sweeper.rank" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.updateVariableCoeffs">
-<span class="sig-name descname"><span class="pre">updateVariableCoeffs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.updateVariableCoeffs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.updateVariableCoeffs" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">updateVariableCoeffs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.updateVariableCoeffs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.updateVariableCoeffs" title="Link to this definition">¶</a></dt>
 <dd><p>Potentially update QDelta implicit coefficients if variable …</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -175,7 +175,7 @@ and evaluates the RHS of the ODE there</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.update_nodes">
-<span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.update_nodes" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.update_nodes" title="Link to this definition">¶</a></dt>
 <dd><p>Abstract interface to node update</p>
 </dd></dl>
 
