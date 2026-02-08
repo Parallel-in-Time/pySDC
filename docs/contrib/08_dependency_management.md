@@ -272,6 +272,29 @@ When creating a new project in `pySDC/projects/`:
 
 See [Adding a Project](./06_new_project.md) for more details.
 
+### Project-Specific Constraints
+
+Some projects have **tighter version constraints** than the general guidelines due to specific requirements:
+
+**Example: DAE Project**
+```yaml
+dependencies:
+  - scipy>=0.17.1,<1.15  # Tighter than general <2.0 constraint
+```
+
+**Reason**: The DAE project contains tests for fully implicit index-2 differential-algebraic equation solvers that are sensitive to numerical precision changes. Scipy versions >= 1.15 introduce minor numerical differences that cause test failures in convergence order tests.
+
+**When to use tighter constraints**:
+- Numerical precision requirements in scientific computing
+- Known compatibility issues with specific version ranges
+- Project relies on deprecated features being removed in newer versions
+
+**Best practices**:
+- Document the reason in the project README or environment file
+- Add a comment explaining why the constraint is tighter
+- Periodically review if the constraint can be relaxed
+- Consider opening an issue to track updating code for newer versions
+
 ## Examples
 
 ### Good Dependency Specification
@@ -292,6 +315,8 @@ dependencies:
   - pip:
     - qmat>=0.1.8
 ```
+
+**Note**: Some projects may require tighter constraints due to numerical precision requirements. For example, the DAE project uses `scipy>=0.17.1,<1.15` because newer scipy versions introduce numerical differences that affect the fully implicit index-2 DAE solver tests. Always respect project-specific constraints when they exist.
 
 ### Version Constraint Patterns
 

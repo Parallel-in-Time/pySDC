@@ -5,6 +5,8 @@ channels:
   - conda-forge
 dependencies:
   - numpy>=1.15.4,<3.0
+  # scipy<1.15 required: newer versions cause numerical precision differences
+  # in fully implicit index-2 DAE solver tests (convergence order tests)
   - scipy>=0.17.1,<1.15
   - dill>=0.2.6
   - mpich
