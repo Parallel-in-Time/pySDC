@@ -1,0 +1,149 @@
+---
+name: Update Dependency Lock Files
+
+on:
+  # Run weekly on Sunday (before Monday CI run)
+  schedule:
+    - cron: '0 2 * * 0'
+  # Allow manual triggering
+  workflow_dispatch:
+  # Run when environment files change
+  push:
+    paths:
+      - 'etc/environment-*.yml'
+      - 'pySDC/projects/*/environment.yml'
+      - 'pyproject.toml'
+
+jobs:
+  update-lockfiles:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Micromamba
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-name: lockfile-env
+          create-args: >-
+            python=3.11
+            conda-lock
+            pip-tools
+      
+      - name: Generate lock files for etc environments
+        shell: bash -l {0}
+        run: |
+          mkdir -p etc/lockfiles
+          
+          for env_file in etc/environment-*.yml; do
+            if [[ -f "$env_file" ]]; then
+              base_name=$(basename "$env_file" .yml)
+              echo "Generating lock file for $env_file..."
+              
+              # Generate unified lock file (works across platforms)
+              conda-lock lock --file "$env_file" \
+                --platform linux-64 \
+                --lockfile "etc/lockfiles/${base_name}-lock.yml" \
+                || echo "Warning: Failed to generate lock file for $env_file"
+            fi
+          done
+      
+      - name: Generate lock files for project environments
+        shell: bash -l {0}
+        run: |
+          for env_file in pySDC/projects/*/environment.yml; do
+            if [[ -f "$env_file" ]]; then
+              project_dir=$(dirname "$env_file")
+              project_name=$(basename "$project_dir")
+              
+              echo "Generating lock file for $project_name..."
+              
+              # Create lockfiles directory in project
+              mkdir -p "$project_dir/lockfiles"
+              
+              # Generate lock file
+              conda-lock lock --file "$env_file" \
+                --platform linux-64 \
+                --lockfile "$project_dir/lockfiles/environment-lock.yml" \
+                || echo "Warning: Failed to generate lock file for $project_name"
+            fi
+          done
+      
+      - name: Generate pip lock file from pyproject.toml
+        shell: bash -l {0}
+        run: |
+          # Generate pinned requirements from pyproject.toml
+          pip-compile pyproject.toml --resolver=backtracking -o requirements-lock.txt \
+            || echo "Warning: Failed to generate pip lock file"
+      
+      - name: Check for changes
+        id: check_changes
+        run: |
+          git add -A
+          if git diff --staged --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No lock file changes detected"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Lock files have been updated"
+          fi
+      
+      - name: Create Pull Request
+        if: steps.check_changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: Update dependency lock files'
+          title: '🔒 Automated dependency lock file update'
+          body: |
+            ## Automated Lock File Update
+            
+            This PR updates the dependency lock files with the latest compatible versions.
+            
+            ### What changed
+            
+            Lock files have been regenerated from the source environment files and pyproject.toml.
+            This ensures we're using the latest compatible versions of all dependencies while
+            maintaining reproducibility.
+            
+            ### Testing
+            
+            The CI pipeline will test these lock files to ensure all tests pass with the updated dependencies.
+            
+            ### Action Required
+            
+            - [ ] Review the lock file changes
+            - [ ] Check CI test results
+            - [ ] Merge if all tests pass, or investigate failures
+            
+            ### Related Documentation
+            
+            See [Dependency Management Guide](./docs/contrib/08_dependency_management.md) for details on our dependency strategy.
+            
+            ---
+            
+            This PR was automatically created by the `update_lockfiles.yml` workflow.
+            
+            **Trigger**: ${{ github.event_name }}
+            **Workflow Run**: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          branch: automated/update-lockfiles
+          delete-branch: true
+          labels: |
+            automated
+            dependencies
+            maintenance
+          draft: false
+      
+      - name: Summary
+        run: |
+          if [[ "${{ steps.check_changes.outputs.has_changes }}" == "true" ]]; then
+            echo "✅ Lock files updated and PR created"
+          else
+            echo "ℹ️ No changes to lock files"
+          fi

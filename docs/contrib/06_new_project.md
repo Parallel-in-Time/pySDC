@@ -23,7 +23,10 @@ name: pySDC
 channels:
   - conda-forge
 dependencies:
-  - numpy
+  - numpy>=1.15.4,<3.0
+  - scipy>=0.17.1,<2.0
+  - matplotlib>=3.0,<4.0
+  - dill>=0.2.6
   - pip
   - pip:
     - qmat>=0.1.8
@@ -33,6 +36,11 @@ The list of dependencies can be extended as needed.
 The name should stay `pySDC`. The channels cover most of the usual packages.
 If a package is needed that cannot be found in those channels by conda (or mamba),
 please add the correct channel to the list.
+
+**Important**: Follow the [dependency management guidelines](./08_dependency_management.md) when specifying version constraints:
+- Include both **lower** and **upper** bounds for major dependencies (e.g., `numpy>=1.15.4,<3.0`)
+- This prevents unexpected breaking changes from major version updates while allowing minor updates
+- See the [dependency management guide](./08_dependency_management.md) for detailed recommendations
 
 ## Add tests to the project
 
