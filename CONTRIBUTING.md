@@ -34,5 +34,7 @@ for more details. Additional guideline are also given on how to
 5. [Custom Implementations](./docs/contrib/04_custom_implementations.md)
 6. [Documenting Code](./docs/contrib/05_documenting_code.md)
 7. [Adding a project](./docs/contrib/06_new_project.md)
+8. [Release Guide](./docs/contrib/07_release_guide.md)
+9. [Dependency Management](./docs/contrib/08_dependency_management.md)
 
 :arrow_left: [Back to main page](./README.md)

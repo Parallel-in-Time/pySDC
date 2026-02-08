@@ -36,13 +36,14 @@ When you receive an automated failure PR:
 1. Review the `failure_analysis.md` file attached to the PR
 2. Check the linked workflow run and job logs for full details
 3. Investigate the root cause (dependency issues, flaky tests, code bugs, etc.)
-4. Push fixes directly to the PR branch or close if it's a transient failure
-5. Test fixes locally or wait for CI to verify
-6. Merge when the issue is confirmed resolved
+4. **For dependency-related failures**: See the [dependency management guide](./08_dependency_management.md) for strategies to handle version conflicts
+5. Push fixes directly to the PR branch or close if it's a transient failure
+6. Test fixes locally or wait for CI to verify
+7. Merge when the issue is confirmed resolved
 
 For more details, see the [automated failure handling documentation](../../.github/scripts/README.md).
 
-> :bell: **Note:** These automated PRs are informational and require manual review. They help centralize failure information but don't automatically fix issues. If you can identify and fix the problem, push commits to the auto-generated branch.
+> :bell: **Note:** These automated PRs are informational and require manual review. They help centralize failure information but don't automatically fix issues. If you can identify and fix the problem, push commits to the auto-generated branch. Common causes of weekly failures include dependency updates—see the [dependency management guide](./08_dependency_management.md) for how to handle these.
 
 ## Code linting
 
