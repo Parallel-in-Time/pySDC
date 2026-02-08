@@ -95,6 +95,18 @@ dependencies:
 - Requires knowledge of semantic versioning practices of each dependency
 - May block beneficial updates
 - Still allows minor/patch updates that could break things
+- **Can break Python version compatibility**: Upper bounds may prevent packages from being updated to support new Python versions
+
+**When NOT to use upper bounds**:
+- Packages that need to support latest Python versions (e.g., `mpi4py`, `mpi4py-fft`, `petsc4py`)
+- Build tools and CI-only dependencies
+- Packages with good backward compatibility track record
+- When the package explicitly supports the semantic versioning spec
+
+**When to use upper bounds**:
+- Core scientific libraries with known breaking changes (numpy, scipy, matplotlib)
+- Packages with specific version requirements (see DAE project example)
+- Dependencies that have deprecated pySDC-used features in newer versions
 
 ### Option 3: Exact Version Pinning (Not Recommended)
 
@@ -148,9 +160,12 @@ For pySDC, we use a combination of strategies:
 
 ### 1. Source Files (pyproject.toml, environment.yml)
 - **Keep loose lower bounds** for flexibility: `numpy>=1.15.4`
-- **Add conservative upper bounds** for major versions: `numpy>=1.15.4,<3.0`
+- **Add conservative upper bounds** for stable core libraries: `numpy>=1.15.4,<3.0`
+- **DO NOT add upper bounds** for packages that need to support latest Python versions (e.g., `mpi4py`, `mpi4py-fft`)
 - **Review bounds annually** or when major dependency releases occur
 - These serve as the "specification" of what versions are supported
+
+**Important**: Upper bounds can prevent newer package versions that support new Python versions. Only add upper bounds to core libraries (numpy, scipy, matplotlib) where major version changes are well-known to break compatibility. For other packages, use lower bounds only unless there's a specific reason.
 
 ### 2. Automated Lock Files (New!)
 - **Weekly automated updates** via GitHub Actions workflow
@@ -320,10 +335,12 @@ dependencies:
 
 ### Version Constraint Patterns
 
-- **Stable, mature libraries**: `numpy>=1.15.4,<3.0` (allow minor updates within major version)
-- **Rapidly evolving libraries**: `pytorch>=2.0,<2.2` (tighter constraints)
+- **Core scientific libraries**: `numpy>=1.15.4,<3.0`, `scipy>=0.17.1,<2.0` (conservative upper bounds)
+- **Python-version dependent packages**: `mpi4py>=3.0.0`, `mpi4py-fft>=2.0.2` (NO upper bounds - need flexibility for new Python versions)
+- **Rapidly evolving libraries**: `pytorch>=2.0` (lower bound only unless specific issues)
 - **Internal dependencies**: `qmat>=0.1.8` (trust semantic versioning)
-- **System packages**: `mpich>=3.0` (broader range acceptable)
+- **System packages**: `mpich` (no version constraint if any recent version works)
+- **Project-specific exceptions**: `scipy>=0.17.1,<1.15` (see DAE project - document why!)
 
 ## Troubleshooting
 

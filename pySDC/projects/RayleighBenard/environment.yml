@@ -9,8 +9,8 @@ dependencies:
   - matplotlib>=3.0,<4.0
   - dill>=0.2.6
   - mpich
-  - mpi4py-fft>=2.0.2,<3.0
-  - mpi4py>=3.0.0,<4.0
+  - mpi4py-fft>=2.0.2
+  - mpi4py>=3.0.0
   - tqdm
   - pip
   - pip:

@@ -10,7 +10,7 @@ dependencies:
   - dill>=0.2.6
   - mpich
   - petsc4py>=3.10.0,<3.22
-  - mpi4py>=3.0.0,<4.0
+  - mpi4py>=3.0.0
   - pip
   - pip:
     - qmat>=0.1.8
