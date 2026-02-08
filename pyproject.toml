@@ -52,7 +52,7 @@ dev = [
     'pytest',
     'pytest-cov',
     'sphinx',
-    'mypy'
+    'mypy',
     'pre-commit'
     ]
 
