@@ -57,7 +57,6 @@ def setup(t0=None):
     
     description['problem_class'] = fenics_heat2D_mass
     description['sweeper_class'] = imex_1st_order_mass
-    description['base_transfer_class'] = base_transfer_mass
 
     description['problem_params'] = problem_params
     description['sweeper_params'] = sweeper_params
