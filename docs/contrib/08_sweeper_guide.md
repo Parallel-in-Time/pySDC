@@ -27,7 +27,7 @@ Common QDelta types:
 - `'IE'`: Implicit Euler
 - `'EE'`: Explicit Euler  
 - `'LU'`: LU decomposition
-- `'MIN'`: Minimal correction
+- `'MIN'`: Diagonal
 - And many more (see [qmat documentation](https://qmat.readthedocs.io))
 
 ## Available Sweeper Implementations
@@ -79,11 +79,11 @@ description = {
 **When to Use**:
 - Non-stiff problems where explicit methods are stable
 - Fast computations without implicit solves
-- Problems where CFL conditions are easily satisfied
 
 **Key Parameters**:
 - `QE`: Type of explicit integration matrix (default: `'EE'` for Explicit Euler)
 - `num_nodes`: Number of collocation nodes (required)
+- `quad_type`: Quadrature type (default: `'RADAU-RIGHT'`)
 
 **Usage Example**:
 ```python
@@ -121,6 +121,7 @@ description = {
 - `QI`: Type of implicit integration matrix (default: `'IE'`)
 - `QE`: Type of explicit integration matrix (default: `'EE'`)
 - `num_nodes`: Number of collocation nodes (required)
+- `quad_type`: Quadrature type (default: `'RADAU-RIGHT'`)
 
 **Usage Example**:
 ```python
@@ -191,13 +192,13 @@ description = {
 
 **When to Use**:
 - Two-component systems with different physics (fast/slow, particle/field)
-- Multi-physics coupling requiring different integration strategies
-- Problems where components need different implicit matrices
+- Multi-physics coupling where each component may benefit from different preconditioners
 
 **Key Parameters**:
 - `Q1`: Integration matrix for first component (default: `'IE'`)
 - `Q2`: Integration matrix for second component (default: `'IE'`)
 - `num_nodes`: Number of collocation nodes (required)
+- `quad_type`: Quadrature type (default: `'RADAU-RIGHT'`)
 
 **Usage Example**:
 ```python
@@ -216,7 +217,7 @@ description = {
 }
 ```
 
-**Requirements**: Problem must return `dtype_f` with `.comp1` and `.comp2` attributes.
+**Requirements**: Problem must return `dtype_f` with `.comp1` and `.comp2` attributes. See `pySDC.implementations.datatype_classes.particles` for an example implementation.
 
 ---
 
@@ -232,9 +233,10 @@ description = {
 - Second-order ODEs: `d²u/dt² = f(u, v, t)` where `v = du/dt`
 
 **Key Parameters**:
-- `QI`: Implicit integration matrix (default: `'IE'`)
-- `QE`: Explicit integration matrix (default: `'EE'`)
+- `QI`: Preconditioner for implicit part (default: `'IE'`)
+- `QE`: Preconditioner for explicit part (default: `'EE'`)
 - `num_nodes`: Number of collocation nodes (required)
+- `quad_type`: Quadrature type (recommended: `'LOBATTO'` for endpoint inclusion)
 
 **Usage Example**:
 ```python
@@ -243,18 +245,21 @@ from pySDC.implementations.sweeper_classes.verlet import verlet
 sweeper_params = {
     'quad_type': 'LOBATTO',
     'num_nodes': 3,
+    'QI': 'IE',
+    'QE': 'EE',
 }
 
 description = {
     'sweeper_class': verlet,
     'sweeper_params': sweeper_params,
 }
+}
 ```
 
 **Requirements**: Problem must provide position and velocity components in `dtype_u`.
 
 **Key Attributes**:
-- `self.QI`, `self.QE`: Base integration matrices
+- `self.QI`, `self.QE`: Base preconditioners
 - `self.QQ`, `self.Qx`, `self.QT`: Derived matrices for position/velocity updates
 
 ---
@@ -271,9 +276,10 @@ description = {
 - When Lorentz force requires special treatment for stability
 
 **Key Parameters**:
-- `QI`: Implicit integration matrix (default: `'IE'`)
-- `QE`: Explicit integration matrix (default: `'EE'`)
+- `QI`: Preconditioner for implicit part (default: `'IE'`)
+- `QE`: Preconditioner for explicit part (default: `'EE'`)
 - `num_nodes`: Number of collocation nodes (required)
+- `quad_type`: Quadrature type (recommended: `'LOBATTO'`)
 
 **Usage Example**:
 ```python
@@ -282,6 +288,8 @@ from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_orde
 sweeper_params = {
     'quad_type': 'LOBATTO',
     'num_nodes': 3,
+    'QI': 'IE',
+    'QE': 'EE',
 }
 
 description = {
@@ -306,7 +314,6 @@ description = {
 **When to Use**:
 - When you want a classical RK method within the pySDC framework
 - Benchmarking against standard methods
-- Embedded methods for error estimation
 
 **Available RK Schemes**:
 - **Explicit**: `ForwardEuler`, `ExplicitMidpointMethod`, `RK4`, `Heun_Euler`, `Cash_Karp`, `DOPRI5`, `DOPRI853`, `Bogacki_Shampine`
@@ -328,7 +335,7 @@ description = {
 
 **Important Notes**:
 - RK methods are **one-pass** solvers - SDC iteration won't improve them
-- Set `maxiter = 1` in level parameters when using RK sweepers
+- Set `maxiter = 1` in step parameters and `nsweeps = 1` in level parameters when using RK sweepers
 - Some methods are embedded (provide error estimates)
 
 ---
@@ -386,7 +393,7 @@ description = {
 from pySDC.implementations.sweeper_classes.Multistep import AdamsBashforthExplicit1Step
 
 sweeper_params = {
-    'num_nodes': 1,  # Multistep methods typically use single node
+    'num_nodes': 1,  # Multistep methods use a single node per step
 }
 
 description = {
@@ -394,6 +401,8 @@ description = {
     'sweeper_params': sweeper_params,
 }
 ```
+
+**Note**: In pySDC, multistep methods are implemented with `num_nodes=1` since they use information from previous steps rather than multiple collocation nodes within a step.
 
 **Key Attributes**:
 - `self.alpha`: Coefficients for solution history
@@ -433,7 +442,7 @@ MPI-parallelized IMEX sweeper.
    - **Standard ODE**: → `generic_implicit` or `explicit`
    - **Stiff + Non-stiff split**: → `imex_1st_order`
    - **Second-order (position/velocity)**: → `verlet` or `boris_2nd_order` (if EM fields)
-   - **Two separate components**: → `multi_implicit`
+   - **Two separate components**: → `multi_implicit` or `imex_1st_order`
    - **Mass matrix**: → `imex_1st_order_mass`
 
 2. **Do you need a specific method rather than SDC?**
@@ -455,7 +464,7 @@ MPI-parallelized IMEX sweeper.
 
 ## Common Parameters
 
-All sweepers support these common parameters:
+All SDC sweepers (not RK or Multistep) support these common parameters:
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
@@ -541,7 +550,10 @@ The `qmat` library provides many QDelta matrix types. Common ones:
 
 - **IE (Implicit Euler)**: Simple, robust, first-order
 - **LU**: LU decomposition-based
-- **MIN**: Minimal correction
+- **MIN**: Diagonal
+- **MIN-SR-S**: Diagonal, optimized for stiff problems
+- **MIN-SR-NS**: Diagonal, optimized for non-stiff problems
+- **MIN-SR-FLEX**: Diagonal, optimized for stiff problems, coefficients change between iterations
 - **MIN3**: Minimal correction variant  
 - **TRAP**: Trapezoidal rule
 - **BEPAR**: Backward Euler parallelizable

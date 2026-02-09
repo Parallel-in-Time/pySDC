@@ -36,8 +36,8 @@ class imex_1st_order(Sweeper):
         >>> description = {'sweeper_class': imex_1st_order, 'sweeper_params': sweeper_params}
 
     Attributes:
-        QI (numpy.ndarray): Implicit Euler integration matrix for implicit terms
-        QE (numpy.ndarray): Explicit Euler integration matrix for explicit terms
+        QI (numpy.ndarray): Preconditioner for implicit terms
+        QE (numpy.ndarray): Preconditioner for explicit terms
     """
 
     def __init__(self, params, level):
