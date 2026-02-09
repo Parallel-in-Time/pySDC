@@ -128,7 +128,8 @@ def run_postprocessing(description, problem, stats, Tend):
     Returns: None
     """
     # Get the data directory
-    path = "data/heat_equation/"
+    import os
+    path = f"{os.path.dirname(__file__)}/data/heat_equation/"
 
     # If it does not exist, create the 'data' directory at the specified path, including any necessary parent directories
     Path(path).mkdir(parents=True, exist_ok=True)
