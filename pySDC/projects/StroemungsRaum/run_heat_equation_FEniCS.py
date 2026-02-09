@@ -148,7 +148,7 @@ def run_postprocessing(description, problem, stats, Tend):
     
     
     for i in range(len(Solutions)):
-        time = (i + 1) * description['level_params']['dt']
+        time = Solutions[i][0]
         #
         un = Solutions[i][1]
         ux = problem.u_exact(time)
