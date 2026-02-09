@@ -1,9 +1,4 @@
 import pytest
-"""
-This test checks the functionality of the problem class for the heat equation implemented in FEniCS. 
-It runs a short simulation and checks if the relative error at the final time is below a certain threshold,
- indicating that the problem class is correctly implemented and can be used for time integration.
-"""
 
 @pytest.mark.fenics
 @pytest.mark.mpi4py
