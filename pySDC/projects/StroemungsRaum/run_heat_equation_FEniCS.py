@@ -53,7 +53,6 @@ def setup(t0=None):
     controller_params['logger_level'] = 20
     controller_params['hook_class'] = LogSolution
 
-    # Fill description dictionary for easy hierarchy creation
     description = dict()
     
     description['problem_class'] = fenics_heat2D_mass
