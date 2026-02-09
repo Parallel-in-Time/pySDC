@@ -147,7 +147,7 @@ def run_postprocessing(description, problem, stats, Tend):
     Solutions = get_sorted(stats, type='u', sortby='time')
     
     
-    for i in range(int(Tend / description['level_params']['dt'])):
+    for i in range(len(Solutions)):
         time = (i + 1) * description['level_params']['dt']
         #
         un = Solutions[i][1]
