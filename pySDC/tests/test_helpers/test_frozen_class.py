@@ -31,11 +31,8 @@ def test_frozen_class():
     you.bar = 5
     # With the fix, 'bar' should NOT be accessible on Dummy instances at all
     # because it was only added to Dummy2, not Dummy
-    try:
+    with pytest.raises(AttributeError):  # bar is not an attribute of Dummy
         _ = me.bar
-        raise AssertionError('Attribute was accessible across classes (should raise AttributeError)')
-    except AttributeError:
-        pass  # This is expected - bar is not an attribute of Dummy
 
 
 @pytest.mark.base
