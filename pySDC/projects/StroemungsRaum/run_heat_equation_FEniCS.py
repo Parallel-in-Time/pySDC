@@ -5,8 +5,6 @@ import dolfin as df
 from pySDC.projects.StroemungsRaum.problem_classes.HeatEquation_2D_FEniCS import fenics_heat2D_mass
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
-from pySDC.implementations.transfer_classes.BaseTransfer_mass import base_transfer_mass
-from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.hooks.log_solution import LogSolution
