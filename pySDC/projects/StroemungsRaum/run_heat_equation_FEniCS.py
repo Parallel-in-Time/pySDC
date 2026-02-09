@@ -63,7 +63,6 @@ def setup(t0=None):
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
-    description['space_transfer_class'] = mesh_to_mesh_fenics
 
     return description, controller_params
 
