@@ -84,11 +84,7 @@ class fenics_heat2D_mass(Problem):
         # define the Dirichlet boundary
         def Boundary(x, on_boundary):
             return on_boundary
-
-        # set logger level for FFC and dolfin
-        logging.getLogger('FFC').setLevel(logging.WARNING)
-        logging.getLogger('UFL').setLevel(logging.WARNING)
-
+            
         # set solver and form parameters
         df.parameters["form_compiler"]["optimize"] = True
         df.parameters["form_compiler"]["cpp_optimize"] = True
