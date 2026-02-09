@@ -2,7 +2,6 @@ import pytest
 
 @pytest.mark.fenics
 @pytest.mark.mpi4py
-
 def test_problem_class():
 
     from pySDC.projects.StroemungsRaum.run_heat_equation_FEniCS import setup, run_simulation
