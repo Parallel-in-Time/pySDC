@@ -1,15 +1,16 @@
 import logging
+from typing import Any, Dict
 
 from pySDC.helpers.pysdc_helper import FrozenClass
 
 
 # short helper class to add params as attributes
 class _Pars(FrozenClass):
-    def __init__(self, pars):
-        self.periodic = False
-        self.equidist_nested = True
-        self.iorder = 2
-        self.rorder = 2
+    def __init__(self, pars: Dict[str, Any]) -> None:
+        self.periodic: bool = False
+        self.equidist_nested: bool = True
+        self.iorder: int = 2
+        self.rorder: int = 2
         for k, v in pars.items():
             setattr(self, k, v)
         # freeze class, no further attributes allowed from this point
@@ -27,7 +28,7 @@ class SpaceTransfer(object):
         coarse_prob (pySDC.Problem.ptype): reference to the coarse problem
     """
 
-    def __init__(self, fine_prob, coarse_prob, params):
+    def __init__(self, fine_prob: Any, coarse_prob: Any, params: Dict[str, Any]) -> None:
         """
         Initialization routine
 
@@ -37,16 +38,16 @@ class SpaceTransfer(object):
             params (dict): user-defined parameters
         """
 
-        self.params = _Pars(params)
+        self.params: _Pars = _Pars(params)
 
         # set up logger
-        self.logger = logging.getLogger('space-transfer')
+        self.logger: logging.Logger = logging.getLogger('space-transfer')
 
         # just copy by object
-        self.fine_prob = fine_prob
-        self.coarse_prob = coarse_prob
+        self.fine_prob: Any = fine_prob
+        self.coarse_prob: Any = coarse_prob
 
-    def restrict(self, F):
+    def restrict(self, F: Any) -> Any:
         """
         Abstract interface for restriction in space
 
@@ -55,7 +56,7 @@ class SpaceTransfer(object):
         """
         raise NotImplementedError('ERROR: space_transfer has to implement restrict(self, F)')
 
-    def prolong(self, G):
+    def prolong(self, G: Any) -> Any:
         """
         Abstract interface for prolongation in space
 

@@ -1,6 +1,9 @@
 import logging
+from typing import Any, Dict, Optional, TYPE_CHECKING
 from collections import namedtuple
 
+if TYPE_CHECKING:
+    from pySDC.core.step import Step
 
 # metadata with defaults
 meta_data = {
@@ -35,18 +38,18 @@ class Hooks(object):
     entry = Entry
     meta_data = meta_data
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialization routine
         """
-        self.__num_restarts = 0
+        self.__num_restarts: int = 0
 
-        self.logger = logging.getLogger('hooks')
+        self.logger: logging.Logger = logging.getLogger('hooks')
 
         # create statistics and entry elements
-        self.__stats = {}
+        self.__stats: Dict[Entry, Any] = {}
 
-    def add_to_stats(self, value, **kwargs):
+    def add_to_stats(self, value: Any, **kwargs: Any) -> None:
         """
         Routine to add data to the statistics dict. Please supply the metadata as keyword arguments in accordance with
         the entry class.
@@ -62,7 +65,7 @@ class Hooks(object):
         }
         self.__stats[self.entry(**meta)] = value
 
-    def increment_stats(self, value, initialize=None, **kwargs):
+    def increment_stats(self, value: Any, initialize: Optional[Any] = None, **kwargs: Any) -> None:
         """
         Routine to increment data to the statistics dict. If the data is not yet created, it will be initialized to
         initialize if applicable and to value otherwise. Please supply metadata as keyword arguments in accordance with
@@ -85,7 +88,7 @@ class Hooks(object):
         else:
             self.__stats[key] = value
 
-    def return_stats(self):
+    def return_stats(self) -> Dict[Entry, Any]:
         """
         Getter for the stats
 
@@ -94,13 +97,13 @@ class Hooks(object):
         """
         return self.__stats
 
-    def reset_stats(self):
+    def reset_stats(self) -> None:
         """
         Function to reset the stats for multiple runs
         """
         self.__stats = {}
 
-    def pre_setup(self, step, level_number):
+    def pre_setup(self, step: Optional['Step'], level_number: int) -> None:
         """
         Default routine called before setup starts
 
@@ -110,7 +113,7 @@ class Hooks(object):
         """
         self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
 
-    def pre_run(self, step, level_number):
+    def pre_run(self, step: Optional['Step'], level_number: int) -> None:
         """
         Default routine called before time-loop starts
 
@@ -120,7 +123,7 @@ class Hooks(object):
         """
         self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
 
-    def pre_predict(self, step, level_number):
+    def pre_predict(self, step: Optional['Step'], level_number: int) -> None:
         """
         Default routine called before predictor starts
 
@@ -130,7 +133,7 @@ class Hooks(object):
         """
         self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
 
-    def pre_step(self, step, level_number):
+    def pre_step(self, step: Optional['Step'], level_number: int) -> None:
         """
         Hook called before each step
 
@@ -140,7 +143,7 @@ class Hooks(object):
         """
         self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
 
-    def pre_iteration(self, step, level_number):
+    def pre_iteration(self, step: Optional['Step'], level_number: int) -> None:
         """
         Default routine called before iteration starts
 
@@ -150,7 +153,7 @@ class Hooks(object):
         """
         self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
 
-    def pre_sweep(self, step, level_number):
+    def pre_sweep(self, step: Optional['Step'], level_number: int) -> None:
         """
         Default routine called before sweep starts
 
@@ -160,7 +163,7 @@ class Hooks(object):
         """
         self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
 
-    def pre_comm(self, step, level_number):
+    def pre_comm(self, step: Optional['Step'], level_number: int) -> None:
         """
         Default routine called before communication starts
 
@@ -170,7 +173,7 @@ class Hooks(object):
         """
         self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
 
-    def post_comm(self, step, level_number, add_to_stats=False):
+    def post_comm(self, step: Optional['Step'], level_number: int, add_to_stats: bool = False) -> None:
         """
         Default routine called after each communication
 
@@ -181,7 +184,7 @@ class Hooks(object):
         """
         self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
 
-    def post_sweep(self, step, level_number):
+    def post_sweep(self, step: Optional['Step'], level_number: int) -> None:
         """
         Default routine called after each sweep
 
@@ -191,7 +194,7 @@ class Hooks(object):
         """
         self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
 
-    def post_iteration(self, step, level_number):
+    def post_iteration(self, step: Optional['Step'], level_number: int) -> None:
         """
         Default routine called after each iteration
 
@@ -201,7 +204,7 @@ class Hooks(object):
         """
         self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
 
-    def post_step(self, step, level_number):
+    def post_step(self, step: Optional['Step'], level_number: int) -> None:
         """
         Default routine called after each step or block
 
@@ -211,7 +214,7 @@ class Hooks(object):
         """
         self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
 
-    def post_predict(self, step, level_number):
+    def post_predict(self, step: Optional['Step'], level_number: int) -> None:
         """
         Default routine called after each predictor
 
@@ -221,7 +224,7 @@ class Hooks(object):
         """
         self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
 
-    def post_run(self, step, level_number):
+    def post_run(self, step: Optional['Step'], level_number: int) -> None:
         """
         Default routine called after each run
 
@@ -231,7 +234,7 @@ class Hooks(object):
         """
         self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
 
-    def post_setup(self, step, level_number):
+    def post_setup(self, step: Optional['Step'], level_number: int) -> None:
         """
         Default routine called after setup
 

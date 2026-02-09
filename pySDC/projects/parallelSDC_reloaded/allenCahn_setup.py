@@ -5,6 +5,7 @@ Created on Thu Dec  7 21:22:52 2023
 
 Setup script for the Allen-Cahn problem
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 

@@ -9,9 +9,16 @@ class FrozenClass(object):
         __isfrozen: Flag to freeze a class
     """
 
-    attrs = []
-
     __isfrozen = False
+
+    def __init_subclass__(cls, **kwargs):
+        """
+        Called when a class inherits from FrozenClass.
+        Creates a separate attrs list for each subclass.
+        """
+        super().__init_subclass__(**kwargs)
+        # Create a new attrs list for this specific subclass
+        cls.attrs = []
 
     def __setattr__(self, key, value):
         """
@@ -23,7 +30,7 @@ class FrozenClass(object):
         """
 
         # check if attribute exists and if class is frozen
-        if self.__isfrozen and not (key in self.attrs or hasattr(self, key)):
+        if self.__isfrozen and not (key in type(self).attrs or hasattr(self, key)):
             raise TypeError(f'{type(self).__name__!r} is a frozen class, cannot add attribute {key!r}')
 
         object.__setattr__(self, key, value)
@@ -32,10 +39,10 @@ class FrozenClass(object):
         """
         This is needed in case the variables have not been initialized after adding.
         """
-        if key in self.attrs:
+        if key in type(self).attrs:
             return None
         else:
-            super().__getattribute__(key)
+            return super().__getattribute__(key)
 
     @classmethod
     def add_attr(cls, key, raise_error_if_exists=False):
@@ -79,4 +86,4 @@ class FrozenClass(object):
         """
         My hope is that some editors can use this for dynamic autocompletion.
         """
-        return super().__dir__() + self.attrs
+        return super().__dir__() + type(self).attrs

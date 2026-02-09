@@ -4,6 +4,46 @@ Any commit in `pySDC` are tested by GitHub continuous integration (CI). You can 
 Those tests are currently divided in three main categories : [code linting](#code-linting), [code testing](#code-testing) and [code coverage](#code-coverage).
 Finally, the CI also build artifacts that are used to generate the documentation website (see http://parallel-in-time.org/pySDC/), more details given in the [documentation generation](#documentation-generation) section.
 
+## CI Workflow Triggers
+
+The CI pipeline is configured to avoid redundant runs. The workflow is triggered:
+
+- **On pull requests**: CI runs for all pull request events (opened, synchronized, reopened, etc.)
+- **On push to master**: CI runs when code is pushed directly to the `master` branch
+- **On schedule**: CI runs weekly on Monday at 5:01 AM UTC (via cron schedule)
+
+This configuration ensures that when you push commits to a pull request branch, the CI runs only once for the pull request event, not twice (once for the PR and once for the push). Direct pushes to the master branch will still trigger the CI to ensure the main branch is always tested.
+
+### Automated Failure Handling
+
+When the weekly scheduled CI run fails, an automated workflow is triggered to help investigate and resolve the issues:
+
+1. **Automatic Detection**: The `auto_fix_failures.yml` workflow detects failures from the scheduled Monday morning runs
+2. **Failure Analysis**: The system analyzes failed jobs and extracts:
+   - Error messages and stack traces
+   - Links to failed workflow runs and job logs
+   - Summary of all failed jobs
+3. **Pull Request Creation**: A PR is automatically created with:
+   - Detailed failure analysis report
+   - Recommendations for investigation
+   - Instructions for applying fixes
+   - Labels: `automated`, `test-failure`, `needs-investigation`
+
+**How to Handle Automated Failure PRs:**
+
+When you receive an automated failure PR:
+
+1. Review the `failure_analysis.md` file attached to the PR
+2. Check the linked workflow run and job logs for full details
+3. Investigate the root cause (dependency issues, flaky tests, code bugs, etc.)
+4. Push fixes directly to the PR branch or close if it's a transient failure
+5. Test fixes locally or wait for CI to verify
+6. Merge when the issue is confirmed resolved
+
+For more details, see the [automated failure handling documentation](../../.github/scripts/README.md).
+
+> :bell: **Note:** These automated PRs are informational and require manual review. They help centralize failure information but don't automatically fix issues. If you can identify and fix the problem, push commits to the auto-generated branch.
+
 ## Code linting
 
 Code style linting is performed using [black](https://black.readthedocs.io/en/stable/) and [ruff](https://docs.astral.sh/ruff/) for code syntax checking. In particular, `black` is used to check compliance with (most of) [PEP-8 guidelines](https://peps.python.org/pep-0008/).
@@ -82,6 +122,27 @@ fi
 ```
 Don't forget to assign execution rights.
 
+### Using pre-commit hooks (Recommended)
+
+For a more robust and automated approach, you can use the [pre-commit](https://pre-commit.com/) framework, which manages git hooks for you. The repository includes a `.pre-commit-config.yaml` file that is configured to run the exact same linting checks as the CI pipeline.
+
+To set up pre-commit hooks:
+
+```bash
+# Install pre-commit (can also be done with conda/mamba or as part of pip install -e .[dev])
+pip install pre-commit
+
+# Install the git hooks
+pre-commit install
+
+# (Optional) Run against all files to check current state
+pre-commit run --all-files
+```
+
+Once installed, the hooks will automatically run `black` and `ruff` on staged files before each commit. The hooks are configured to check only files in the `pySDC` directory, matching exactly what the CI pipeline checks.
+
+> :bell: **Note:** The pre-commit hooks run in `--check` mode by default (same as CI), meaning they will prevent commits if formatting issues are found. You can fix formatting issues by running `black pySDC` directly, then staging and committing again.
+
 As a final note, make sure to regularly update linting related packages, as they constantly introduce checking of more PEP8 guidelines.
 This might cause the linting to fail in the GitHub action, which uses the most up to date versions available on the conda-forge channel, even though it passed locally.
 
@@ -111,6 +172,8 @@ pytest -v pySDC/tests
 > ```
 
 ## Running CI on HPC from pull requests
+
+> :warning: **Note:** The GitLab mirror integration is currently disabled due to technical issues. This section describes functionality that is temporarily unavailable.
 
 By syncing the GitHub repository to a certain Gitlab instance, CI-Jobs can be run on HPC machines. This can be helpful for benchmarks or when running on accelerators that are not available as GitHub runners.
 
@@ -150,7 +213,30 @@ This stage allows to checks how much of the `pySDC` code is tested by the previo
 - `pySDC/tutorial`
 
 This analysis is done in parallel to the test each time a pull is done on any branch (main repository or fork).
-You can look at the current [coverage report for the master branch](https://parallel-in-time.org/pySDC/coverage/index.html) or [compare the results with previous builds](https://app.codecov.io/gh/Parallel-in-Time/pySDC). Codecov will also comment on any pull request, indicating the change of coverage.
+
+### Viewing Coverage Reports
+
+There are multiple ways to view test coverage for pySDC:
+
+1. **HTML Coverage Report** (recommended for detailed analysis)
+   - View the current [coverage report for the master branch](https://parallel-in-time.org/pySDC/coverage/index.html)
+   - Shows line-by-line coverage with color coding
+   - Updated automatically with each push to master
+
+2. **Codecov Dashboard** (for trends and PR analysis)
+   - [Compare results with previous builds](https://app.codecov.io/gh/Parallel-in-Time/pySDC)
+   - View coverage trends over time
+   - See coverage impact of specific commits
+   - Codecov automatically comments on pull requests with coverage changes
+
+3. **Coverage Badge** (quick status check)
+   - Displayed in the [README](../../README.md)
+   - Shows current coverage percentage for master branch
+
+4. **PR Coverage Comments** (for contributors)
+   - Codecov comments on each pull request
+   - Shows coverage changes introduced by the PR
+   - Highlights uncovered lines in modified files
 
 During developments, you can also run the coverage tests locally, using :
 
@@ -173,6 +259,11 @@ This will generate the coverage report in a `htmlcov` folder, and you can open t
 > :warning: Coverage can be lower if some tests fails (for instance, if you did not install all required python package to run all the tests).
 
 ### Coverage exceptions
+
+The coverage configuration is defined in two places:
+
+1. **Runtime configuration** (`pyproject.toml`) - Controls what coverage measures during test execution
+2. **Codecov configuration** (`codecov.yml`) - Controls how Codecov reports and displays coverage
 
 Some types of code lines will be ignored by the coverage analysis (_e.g_ lines starting with `raise`, ...), see the `[tool.coverage.report]` section in `pyproject.toml`.
 Part of code (functions, conditionaly, for loops, etc ...) can be ignored by coverage analysis using the `# pragma: no cover`, for instance

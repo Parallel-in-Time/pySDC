@@ -4,7 +4,7 @@ name: Create Website for pySDC
 
 on:
   workflow_run:
-    workflows: ["Mirror to Gitlab to trigger CI"]
+    workflows: ["CI pipeline for pySDC"]
     types: ["completed"]
   
 jobs:
@@ -39,9 +39,12 @@ jobs:
         run: |
           genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
-          token: ${{ secrets.CODECOV }}
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          fail_ci_if_error: false
+          verbose: true
         
 #      - name: Generate benchmark report
 #        uses: pancetta/github-action-benchmark@v1

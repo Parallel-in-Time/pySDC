@@ -8,6 +8,7 @@ Module containing the base Problem class for pySDC
 """
 
 import logging
+from typing import Any, Dict, Optional, Type, Callable
 
 from pySDC.core.common import RegisterParams
 
@@ -25,17 +26,17 @@ class WorkCounter(object):
     >>> count()                # => niter = 2
     """
 
-    def __init__(self):
-        self.niter = 0
+    def __init__(self) -> None:
+        self.niter: int = 0
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args: Any, **kwargs: Any) -> None:
         # *args and **kwargs are necessary for gmres
         self.niter += 1
 
-    def decrement(self):
+    def decrement(self) -> None:
         self.niter -= 1
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'{self.niter}'
 
 
@@ -58,41 +59,41 @@ class Problem(RegisterParams):
         custom logger for problem-related logging.
     """
 
-    logger = logging.getLogger('problem')
-    dtype_u = None
-    dtype_f = None
+    logger: logging.Logger = logging.getLogger('problem')
+    dtype_u: Optional[Type[Any]] = None
+    dtype_f: Optional[Type[Any]] = None
 
-    def __init__(self, init):
-        self.work_counters = {}  # Dictionary to store WorkCounter objects
-        self.init = init  # Initialization parameter to instantiate data types
+    def __init__(self, init: Any) -> None:
+        self.work_counters: Dict[str, WorkCounter] = {}  # Dictionary to store WorkCounter objects
+        self.init: Any = init  # Initialization parameter to instantiate data types
 
     @property
-    def u_init(self):
+    def u_init(self) -> Any:
         """Generate a data variable for u"""
         return self.dtype_u(self.init)
 
     @property
-    def f_init(self):
+    def f_init(self) -> Any:
         """Generate a data variable for RHS"""
         return self.dtype_f(self.init)
 
     @classmethod
-    def get_default_sweeper_class(cls):
+    def get_default_sweeper_class(cls) -> Type[Any]:
         raise NotImplementedError(f'No default sweeper class implemented for {cls} problem!')
 
-    def setUpFieldsIO(self):
+    def setUpFieldsIO(self) -> None:
         """
         Set up FieldsIO for MPI with the space decomposition of this problem
         """
         pass
 
-    def getOutputFile(self, fileName):
+    def getOutputFile(self, fileName: str) -> Any:
         raise NotImplementedError(f'No output implemented file for {type(self).__name__}')
 
-    def processSolutionForOutput(self, u):
+    def processSolutionForOutput(self, u: Any) -> Any:
         return u
 
-    def eval_f(self, u, t):
+    def eval_f(self, u: Any, t: float) -> Any:
         """
         Abstract interface to RHS computation of the ODE
 
@@ -110,11 +111,13 @@ class Problem(RegisterParams):
         """
         raise NotImplementedError('ERROR: problem has to implement eval_f(self, u, t)')
 
-    def apply_mass_matrix(self, u):  # pragma: no cover
+    def apply_mass_matrix(self, u: Any) -> Any:  # pragma: no cover
         """Default mass matrix : identity"""
         return u
 
-    def generate_scipy_reference_solution(self, eval_rhs, t, u_init=None, t_init=None, **kwargs):
+    def generate_scipy_reference_solution(
+        self, eval_rhs: Callable, t: float, u_init: Optional[Any] = None, t_init: Optional[float] = None, **kwargs: Any
+    ) -> Any:
         """
         Compute a reference solution using `scipy.solve_ivp` with very small tolerances.
         Keep in mind that scipy needs the solution to be a one dimensional array. If you are solving something higher
@@ -148,7 +151,7 @@ class Problem(RegisterParams):
         u_shape = u_init.shape
         return solve_ivp(eval_rhs, (t_init, t), u_init.flatten(), **kwargs).y[:, -1].reshape(u_shape)
 
-    def get_fig(self):
+    def get_fig(self) -> Any:
         """
         Get a figure suitable to plot the solution of this problem
 
@@ -158,7 +161,7 @@ class Problem(RegisterParams):
         """
         raise NotImplementedError
 
-    def plot(self, u, t=None, fig=None):
+    def plot(self, u: Any, t: Optional[float] = None, fig: Optional[Any] = None) -> None:
         r"""
         Plot the solution. Please supply a figure with the same structure as returned by ``self.get_fig``.
 
@@ -177,7 +180,7 @@ class Problem(RegisterParams):
         """
         raise NotImplementedError
 
-    def solve_system(self, rhs, dt, u0, t):
+    def solve_system(self, rhs: Any, dt: float, u0: Any, t: float) -> Any:
         """
         Perform an Euler step.
 
@@ -192,7 +195,9 @@ class Problem(RegisterParams):
         """
         raise NotImplementedError
 
-    def solve_jacobian(self, rhs, dt, u=None, u0=None, t=0, **kwargs):
+    def solve_jacobian(
+        self, rhs: Any, dt: float, u: Optional[Any] = None, u0: Optional[Any] = None, t: float = 0, **kwargs: Any
+    ) -> Any:
         """
         Solve the Jacobian for an Euler step, linearized around u.
         This defaults to an Euler step to accommodate linear problems.

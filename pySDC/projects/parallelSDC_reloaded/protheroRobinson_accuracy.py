@@ -11,6 +11,7 @@ Script to investigate diagonal SDC on the ProtheroRobinson
 
 Note : implementation in progress ...
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
