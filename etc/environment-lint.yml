@@ -6,4 +6,3 @@ channels:
 dependencies:
   - black
   - ruff
-  - mypy

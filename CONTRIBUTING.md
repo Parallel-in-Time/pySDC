@@ -37,6 +37,5 @@ is also available to help you choose and use the right time integration method.
 6. [Documenting Code](./docs/contrib/05_documenting_code.md)
 7. [Adding a project](./docs/contrib/06_new_project.md)
 8. [Sweeper Implementations Guide](./docs/contrib/08_sweeper_guide.md)
-9. [Type Checking with mypy](./docs/contrib/09_type_checking.md)
 
 :arrow_left: [Back to main page](./README.md)

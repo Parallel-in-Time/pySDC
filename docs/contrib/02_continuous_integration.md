@@ -50,9 +50,8 @@ Code quality checks are performed in the lint stage of the CI pipeline:
 
 - **Code Formatting**: [black](https://black.readthedocs.io/en/stable/) ensures compliance with (most of) [PEP-8 guidelines](https://peps.python.org/pep-0008/)
 - **Code Linting**: [ruff](https://docs.astral.sh/ruff/) checks for code syntax issues, potential bugs, and style violations
-- **Type Checking**: [mypy](https://mypy.readthedocs.io/) performs static type checking (informational only, does not block builds)
 
-All three tools run on Python 3.13 and check the `pySDC` package. See [Type Checking with mypy](./09_type_checking.md) for details on type hints.
+Both tools run on Python 3.13 and check the `pySDC` package.
 
 Those tests are conducted for each commit (even for forks), but you can also run it locally in the root folder of `pySDC` before pushing any commit :
 
