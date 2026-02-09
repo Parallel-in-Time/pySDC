@@ -38,7 +38,7 @@ def setup(t0=None):
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
-    sweeper_params['num_nodes'] = [2]
+    sweeper_params['num_nodes'] = 2
 
     problem_params = dict()
     problem_params['nu'] = 0.1
