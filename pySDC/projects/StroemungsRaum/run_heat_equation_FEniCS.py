@@ -146,7 +146,6 @@ def run_postprocessing(description, problem, stats, Tend):
     # Get the solution at every time step sorted by time
     Solutions = get_sorted(stats, type='u', sortby='time')
     
-    
     for i in range(len(Solutions)):
         time = Solutions[i][0]
         #
