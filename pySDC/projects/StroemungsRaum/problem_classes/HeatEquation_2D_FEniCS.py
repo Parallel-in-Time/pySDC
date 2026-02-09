@@ -7,7 +7,6 @@ from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_fenics_mesh
 
 
-# noinspection PyUnusedLocal
 class fenics_heat2D_mass(Problem):
     r"""
     Example implementing the forced two-dimensional heat equation with Dirichlet boundary conditions
