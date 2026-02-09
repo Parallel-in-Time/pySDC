@@ -45,7 +45,7 @@ def setup(t0=None):
     problem_params['t0'] = t0  
     problem_params['c_nvars'] = 64
     problem_params['family'] = 'CG'
-    problem_params['order'] = [2]
+    problem_params['order'] = 2
     problem_params['c'] = 0.0
 
     # initialize controller parameters
