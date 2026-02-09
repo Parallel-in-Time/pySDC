@@ -1,1 +1,0 @@
-{"nu": 0.1, "t0": 0, "c_nvars": [64], "family": "CG", "order": [2], "c": 0.0, "refinements": [1], "restol": 1e-10, "dt": 0.2, "Tend": 1.0}
