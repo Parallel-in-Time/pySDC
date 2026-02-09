@@ -11,7 +11,6 @@ from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_me
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.hooks.log_solution import LogSolution
 
-#def run_simulation():
 def setup(t0=None):
     """
     Helper routine to set up parameters
