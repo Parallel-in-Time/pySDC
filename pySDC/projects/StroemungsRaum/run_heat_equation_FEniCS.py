@@ -133,12 +133,12 @@ def run_postprocessing(description, problem, stats, Tend):
     parameters = description['problem_params']
     parameters.update(description['level_params'])
     parameters['Tend'] = Tend
-    json.dump(parameters, open(path + "heat_equation_FEniCS_parameters.json", 'w'))
+    json.dump(parameters, open("data/heat_equation/heat_equation_FEniCS_parameters.json", 'w'))
 
     # Create XDMF file for visualization output
-    xdmffile_u = df.XDMFFile(path + 'heat_equation_FEniCS_Temperature.xdmf')
+    xdmffile_u = df.XDMFFile("data/heat_equation/heat_equation_FEniCS_Temperature.xdmf")
 
-    # Get the solution at every time step sorted by time
+    # Get the solution at every time step, sorted by time
     Solutions = get_sorted(stats, type='u', sortby='time')
     
     for i in range(len(Solutions)):
