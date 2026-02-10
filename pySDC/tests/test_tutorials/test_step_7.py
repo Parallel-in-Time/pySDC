@@ -124,8 +124,8 @@ def test_C_2x2():
 
 @pytest.mark.pytorch
 def test_D():
-    import torch
     import numpy as np
+    import torch
 
     torch.manual_seed(42)
     np.random.seed(42)
