@@ -10,7 +10,7 @@ dependencies:
   - dill>=0.2.6
   - fenics>=2019.1.0
   - mpi4py
-  - setuptools<70.0
+  - setuptools>=40.0,<70.0
   - pip
   - pip:
     - qmat>=0.1.8
