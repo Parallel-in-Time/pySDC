@@ -9,14 +9,15 @@ from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_o
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.hooks.log_solution import LogSolution
 
+
 def setup(t0=None):
     """
     Helper routine to set up parameters
-    
+
     Args:
         t0: float,
             initial time
-    
+
     Returns:
         description: dict,
             pySDC description dictionary containing problem and method parameters.
@@ -42,7 +43,7 @@ def setup(t0=None):
 
     problem_params = dict()
     problem_params['nu'] = 0.1
-    problem_params['t0'] = t0  
+    problem_params['t0'] = t0
     problem_params['c_nvars'] = 64
     problem_params['family'] = 'CG'
     problem_params['order'] = 2
@@ -54,7 +55,7 @@ def setup(t0=None):
     controller_params['hook_class'] = LogSolution
 
     description = dict()
-    
+
     description['problem_class'] = fenics_heat2D_mass
     description['sweeper_class'] = imex_1st_order_mass
 
@@ -64,6 +65,7 @@ def setup(t0=None):
     description['step_params'] = step_params
 
     return description, controller_params
+
 
 def run_simulation(description, controller_params, Tend):
     """
@@ -79,32 +81,33 @@ def run_simulation(description, controller_params, Tend):
 
     Returns:
         P: problem instance,
-           Problem instance containing the final solution and other problem-related information. 
+           Problem instance containing the final solution and other problem-related information.
         stats: dict,
-           collected runtime statistics, 
+           collected runtime statistics,
         rel_err: float,
            relative final-time error.
     """
     # get initial time from description
     t0 = description['problem_params']['t0']
-       
+
     # quickly generate block of steps
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
- 
+
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
-    
+
     # get exact solution at final time for error calculation
     uex = P.u_exact(Tend)
-    
+
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # compute relative error at final time
     rel_err = abs(uex - uend) / abs(uex)
-    
+
     return P, stats, rel_err
+
 
 def run_postprocessing(description, problem, stats, Tend):
     """
@@ -116,14 +119,15 @@ def run_postprocessing(description, problem, stats, Tend):
         problem: Problem instance,
             Problem instance containing the final solution and other problem-related information.
         stats: dict,
-            collected runtime statistics, 
+            collected runtime statistics,
         Tend: float,
             Final simulation time.
-    
+
     Returns: None
     """
     # Get the data directory
     import os
+
     path = f"{os.path.dirname(__file__)}/data/heat_equation/"
 
     # If it does not exist, create the 'data' directory at the specified path, including any necessary parent directories
@@ -133,14 +137,14 @@ def run_postprocessing(description, problem, stats, Tend):
     parameters = description['problem_params']
     parameters.update(description['level_params'])
     parameters['Tend'] = Tend
-    json.dump(parameters, open("data/heat_equation/heat_equation_FEniCS_parameters.json", 'w'))
+    json.dump(parameters, open(path + "heat_equation_FEniCS_parameters.json", 'w'))
 
     # Create XDMF file for visualization output
-    xdmffile_u = df.XDMFFile("data/heat_equation/heat_equation_FEniCS_Temperature.xdmf")
+    xdmffile_u = df.XDMFFile(path + "heat_equation_FEniCS_Temperature.xdmf")
 
     # Get the solution at every time step, sorted by time
     Solutions = get_sorted(stats, type='u', sortby='time')
-    
+
     for i in range(len(Solutions)):
         time = Solutions[i][0]
         #
@@ -162,11 +166,10 @@ if __name__ == "__main__":
 
     # run the setup to get description and controller parameters
     description, controller_params = setup(t0=t0)
-    
+
     # run the simulation and get the problem, stats and relative error
     problem, stats, rel_err = run_simulation(description, controller_params, Tend)
     print('The relative error at time ', Tend, 'is ', rel_err)
-    
+
     # run postprocessing to save parameters and solution for visualization
     run_postprocessing(description, problem, stats, Tend)
-
