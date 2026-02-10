@@ -21,6 +21,11 @@ def single_test(name, useMPI=False):
     """
     import numpy as np
 
+    if name == 'Tensor':
+        import torch
+        torch.manual_seed(42)
+        np.random.seed(42)
+
     dtype_cls = get_dtype(name)
 
     shape = (5,)
