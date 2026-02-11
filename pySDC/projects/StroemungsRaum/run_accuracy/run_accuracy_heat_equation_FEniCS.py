@@ -72,7 +72,7 @@ def plot_accuracy(results, p=3):  # pragma: no cover
     suffix = "th" if 10 <= p % 100 <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(p % 10, "th")
 
     # get the list of dt and errors from the results dictionary
-    dt_list = sorted(list(results.keys()))
+    dt_list = sorted(results.keys())
     err_list = list(results.values())
     err_list.reverse()  # reverse the error list to match the order of dt_list (from largest to smallest)
 
