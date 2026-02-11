@@ -16,7 +16,8 @@ def plot_solutions():  # pragma: no cover
     xdmffile_u = df.XDMFFile(path + 'heat_equation_FEniCS_Temperature.xdmf')
 
     # load parameters
-    parameters = json.load(open(path + "heat_equation_FEniCS_parameters.json", 'r'))
+    with open(path + "heat_equation_FEniCS_parameters.json", 'r') as f:
+        parameters = json.load(f)
 
     # Get the simulation parameters
     dt = parameters['dt']
@@ -25,8 +26,8 @@ def plot_solutions():  # pragma: no cover
     family = parameters['family']
     order = parameters['order']
 
-    # Compute the number of time steps
-    nsteps = int(Tend / dt)
+    # Compute the number of time steps (robust to floating-point rounding)
+    nsteps = int(round(Tend / dt))
 
     # set mesh
     mesh = df.UnitSquareMesh(c_nvars, c_nvars)
@@ -91,17 +92,17 @@ def plot_solutions():  # pragma: no cover
         plt.legend()
 
         plt.pause(0.1)
-        if t == Tend:
-            plt.savefig(path + '/heat_equation_FEniCS_Results', bbox_inches='tight')
-            # plt.show()
+        if s == nsteps - 1:
+            plt.savefig(path + '/heat_equation_FEniCS_Results.png', bbox_inches='tight')
         plt.clf()
+
     fig = plt.figure(figsize=(8, 11))
 
     ax = fig.add_subplot(221)
     df.plot(un, cmap=cm.jet)
     ax.set_xlabel('Distance x')
     ax.set_ylabel('Distance y')
-    ax.set_title('SDC-FEniCS Solution')
+    ax.set_title('Numerical Solution')
     plt.draw()
 
     ax = fig.add_subplot(222)
@@ -113,21 +114,22 @@ def plot_solutions():  # pragma: no cover
 
     ax = fig.add_subplot(223)
     df.plot(un, mode="contour", levels=30, cmap=plt.cm.jet)
-    plt.axis('scaled')
-    plt.xlabel('Distance x')
-    plt.ylabel('Distance y')
-    plt.title('SDC-FEniCS Solution')
+    ax.axis('scaled')
+    ax.set_xlabel('Distance x')
+    ax.set_ylabel('Distance y')
+    ax.set_title('Numerical Solution')
     plt.draw()
 
     ax = fig.add_subplot(224)
     df.plot(ux, mode="contour", levels=30, cmap=plt.cm.jet)
-    plt.axis('scaled')
-    plt.xlabel('Distance x')
-    plt.ylabel('Distance y')
-    plt.title('Analytical Solution')
+    ax.axis('scaled')
+    ax.set_xlabel('Distance x')
+    ax.set_ylabel('Distance y')
+    ax.set_title('Analytical Solution')
     plt.draw()
 
-    plt.savefig(path + '/heat_equation_FEniCS_Contours', bbox_inches='tight')
+    plt.savefig(path + '/heat_equation_FEniCS_Contours.png', bbox_inches='tight')
+    xdmffile_u.close()
 
 
 if __name__ == '__main__':

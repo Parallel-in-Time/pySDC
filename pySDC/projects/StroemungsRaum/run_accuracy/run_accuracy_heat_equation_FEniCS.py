@@ -1,14 +1,13 @@
 from pathlib import Path
 import numpy as np
-from collections import namedtuple
-
 from pySDC.projects.StroemungsRaum.run_heat_equation_FEniCS import setup, run_simulation
 import matplotlib.pyplot as plt
 
 
 def run_accuracy(c_nvars=64, num_nodes=2):
     """
-    Docstring for run_accuracy
+    Routine to run the accuracy test for the heat equation with FEniCS. It runs the simulation
+    for different dt values, collects the errors, computes, and plots the observed order of accuracy.
 
     Args:
     -----
@@ -24,15 +23,11 @@ def run_accuracy(c_nvars=64, num_nodes=2):
     order: float
         The observed order of accuracy, obtained by fitting a line in the log-log space to the errors and dts.
     """
-
-    # setup id for gathering the results (will sort by dt)
-    ID = namedtuple('ID', 'dt')
-
+    # set parameters
     Tend = 1.0
     t0 = 0.0
 
     description, controller_params = setup(t0=t0)
-
     description['problem_params']['c_nvars'] = c_nvars
     description['sweeper_params']['num_nodes'] = num_nodes
 
@@ -49,15 +44,11 @@ def run_accuracy(c_nvars=64, num_nodes=2):
         # run the simulation and get the error
         _, _, err = run_simulation(description, controller_params, Tend)
 
-        # get id for this dt and store error in results
-        id = ID(dt=dt)
-        results[id] = err
-
-    # add list of dt to results for easier access
-    results['dt_list'] = dt_list
+        # store the error in the results dictionary
+        results[dt] = err
 
     # errors in the correct order
-    err_list = [results[ID(dt=dt)] for dt in dt_list]
+    err_list = [results[dt] for dt in results.keys()]
 
     # global slope (fit in log-log)
     order, _ = np.polyfit(np.log(dt_list), np.log(err_list), 1)
@@ -80,12 +71,10 @@ def plot_accuracy(results, p=3):  # pragma: no cover
     # get suffix for order (e.g. 1st, 2nd, 3rd, 4th, etc.)
     suffix = "th" if 10 <= p % 100 <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(p % 10, "th")
 
-    # setup id for gathering the results (will sort by dt)
-    ID = namedtuple('ID', 'dt')
-
-    # retrieve the list of dt from results
-    assert 'dt_list' in results, 'ERROR: expecting the list of dt values in the results dictionary'
-    dt_list = sorted(results['dt_list'])
+    # get the list of dt and errors from the results dictionary
+    dt_list = sorted(list(results.keys()))
+    err_list = list(results.values())
+    err_list.reverse()  # reverse the error list to match the order of dt_list (from largest to smallest)
 
     # Set up plotting parameters
     params = {
@@ -108,22 +97,13 @@ def plot_accuracy(results, p=3):  # pragma: no cover
     plt.grid()
 
     # get error for last entry in dt_list
-    id = ID(dt=dt_list[-1])
-    base_error = results[id]
+    base_error = results[dt_list[-1]]
 
     # assemble optimal errors for 3rd order method and plot
     order_guide_space = [base_error / (2 ** (p * i)) for i in range(0, len(dt_list))]
     order_guide_space = sorted(order_guide_space)
     plt.loglog(dt_list, order_guide_space, color='k', ls='--', label=f"{p}{suffix} order")
 
-    min_err = 1e99
-    max_err = 0e00
-    err_list = []
-    # loop over dt values, get errors and find min/max error for y-axis limits
-    for dt in dt_list:
-        id = ID(dt=dt)
-        err = results[id]
-        err_list.append(err)
     plt.loglog(dt_list, err_list, ls=' ', marker='o', markersize=10, label='experiment')
 
     min_err = min(order_guide_space)
@@ -143,8 +123,6 @@ def plot_accuracy(results, p=3):  # pragma: no cover
 
     # if it does not exist, create the 'data' directory at the specified path, including any necessary parent directories
     Path(path).mkdir(parents=True, exist_ok=True)
-
-    # save plot as PDF, beautify
     fname = path + f'heat_equation_{p}{suffix}_order_time_FEniCS.png'
     plt.savefig(fname, bbox_inches='tight')
 
