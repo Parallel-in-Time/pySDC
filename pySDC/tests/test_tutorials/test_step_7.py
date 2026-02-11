@@ -124,6 +124,12 @@ def test_C_2x2():
 
 @pytest.mark.pytorch
 def test_D():
+    import numpy as np
+    import torch
+
+    torch.manual_seed(42)
+    np.random.seed(42)
+
     from pySDC.tutorial.step_7.D_pySDC_with_PyTorch import train_at_collocation_nodes
 
     train_at_collocation_nodes()
