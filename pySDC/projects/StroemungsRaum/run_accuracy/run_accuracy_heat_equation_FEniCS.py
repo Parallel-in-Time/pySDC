@@ -74,7 +74,7 @@ def plot_accuracy(results, p=3):  # pragma: no cover
     # get the list of dt and errors from the results dictionary
     dt_list = sorted(results.keys())
     err_list = [results[dt] for dt in dt_list]
-    
+
     # Set up plotting parameters
     params = {
         'legend.fontsize': 20,
