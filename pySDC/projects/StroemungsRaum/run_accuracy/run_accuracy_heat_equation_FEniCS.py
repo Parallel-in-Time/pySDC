@@ -96,7 +96,7 @@ def plot_accuracy(results, p=3):  # pragma: no cover
     plt.grid()
 
     # assemble optimal errors for 3rd order method and plot
-    order_guide = [err_list[np.argmax(dt_list)] / (dt_list[np.argmax(dt_list)] / dt)**p for dt in dt_list]
+    order_guide = [err_list[np.argmax(dt_list)] / (dt_list[np.argmax(dt_list)] / dt) ** p for dt in dt_list]
 
     plt.loglog(dt_list, order_guide, color='k', ls='--', label=f"{p}{suffix} order")
     plt.loglog(dt_list, err_list, ls=' ', marker='o', markersize=10, label='experiment')
