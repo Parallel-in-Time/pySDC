@@ -73,9 +73,8 @@ def plot_accuracy(results, p=3):  # pragma: no cover
 
     # get the list of dt and errors from the results dictionary
     dt_list = sorted(results.keys())
-    err_list = list(results.values())
-    err_list.reverse()  # reverse the error list to match the order of dt_list (from largest to smallest)
-
+    err_list = [results[dt] for dt in dt_list]
+    
     # Set up plotting parameters
     params = {
         'legend.fontsize': 20,
@@ -96,21 +95,14 @@ def plot_accuracy(results, p=3):  # pragma: no cover
     plt.ylabel('abs. error')
     plt.grid()
 
-    # get error for last entry in dt_list
-    base_error = results[dt_list[-1]]
-
     # assemble optimal errors for 3rd order method and plot
-    order_guide_space = [base_error / (2 ** (p * i)) for i in range(0, len(dt_list))]
-    order_guide_space = sorted(order_guide_space)
-    plt.loglog(dt_list, order_guide_space, color='k', ls='--', label=f"{p}{suffix} order")
+    order_guide = [err_list[np.argmax(dt_list)] / (dt_list[np.argmax(dt_list)] / dt)**p for dt in dt_list]
 
+    plt.loglog(dt_list, order_guide, color='k', ls='--', label=f"{p}{suffix} order")
     plt.loglog(dt_list, err_list, ls=' ', marker='o', markersize=10, label='experiment')
 
-    min_err = min(order_guide_space)
-    max_err = max(order_guide_space)
-
     # adjust y-axis limits, add legend
-    plt.ylim([min_err / 2, max_err * 2])
+    plt.ylim([min(order_guide) / 2, max(order_guide) * 2])
     plt.legend(loc=2, ncol=1, numpoints=1)
 
     plt.grid(True, which="minor", ls="--", color='0.8')
