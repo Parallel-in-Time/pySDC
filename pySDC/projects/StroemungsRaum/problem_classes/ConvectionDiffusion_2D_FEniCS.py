@@ -3,7 +3,6 @@ from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_fenics_mesh
 
 
-# noinspection PyUnusedLocal
 class fenics_ConvDiff2D_mass(Problem):
     r"""
     Example implementing a forced two-dimensional convection-diffusion equation using Dirichlet
@@ -35,23 +34,22 @@ class fenics_ConvDiff2D_mass(Problem):
     effects of convection and diffusion. The analytical solution for the scalar field .. math:`u is given by:
 
     .. math::
-        u(x,y,t) = \frac{\sigma^2}{\sigma^2 + \omega\nu t}*\exp(- \frac{(\hat{x}-x_0)^2 + (\hat{y}-y_0)^2}{\sigma^2 + \omega\nu t}
-
+        u(x,y,t) = \frac{\sigma^2}{\sigma^2 + 4 \nu t} \exp\left( - \frac{(\hat{x}-x_0)^2 + (\hat{y}-y_0)^2}{\sigma^2 + 4 \nu t} \right)
 
     where:
       .. math:`\sigma` is the initial standard deviation of the Gaussian.
-      .. math:`\omega` is the angular velocity of the rotation.
+      .. math:`\omega` is the angular velocity of the rotation (in this example, :math:`\omega = 4`).
       .. math:`(\hat{x}, \hat{y})` are the rotated coordinates defined by:
       .. math::
-          \hat{x} = \cos(\omega t) x + \sin(\omega t) y
-          \hat{y} = -\sin(\omega t) x + \cos(\omega t) y
+          \hat{x} = \cos(4 t) x + \sin(4 t) y \\
+          \hat{y} = -\sin(4 t) x + \cos(4 t) y
       .. math:`(x_0, y_0)` is the center of the Gaussian, given as .. math:`(-0.25, 0.0)`.
 
 
     The velocity field .. math:`U` for the rotating Gaussian is defined as:
 
     .. math::
-        U = (u,v) = (-\omega*y, \omega*x)
+        U = (u,v) = (-4*y, 4*x)
 
     This represents a counter-clockwise rotation around the origin with angular velocity .. math:`\omega`.
     The flow causes the scalar field .. math:`u` to be advected in a circular pattern, simulating the rotation of the Gaussian.
@@ -69,12 +67,10 @@ class fenics_ConvDiff2D_mass(Problem):
         of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
     order : int, optional
         Defines the order of the elements in the function space.
-    refinements : int, optional
-        Denotes the refinement of the mesh. ``refinements=2`` refines the mesh by factor :math:`2`.
+    sigma : float, optional
+        Coefficient associated with the mass term or reaction term in the equation.
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
-    c: float, optional
-        Constant for the Dirichlet boundary condition :math: `c`
 
     Attributes
     ----------
@@ -123,13 +119,12 @@ class fenics_ConvDiff2D_mass(Problem):
         self.VC = df.VectorFunctionSpace(mesh, family, order)
         self.U = df.interpolate(df.Expression(('-4*x[1]', '4*x[0]'), degree=order), self.VC)
 
-        # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(self.V)
         self._makeAttributeAndRegister(
             'c_nvars', 't0', 'family', 'order', 'nu', 'sigma', localVars=locals(), readOnly=True
         )
 
-        # Stiffness term (Laplace)
+        # define trial and test functions
         u = df.TrialFunction(self.V)
         v = df.TestFunction(self.V)
 
@@ -143,7 +138,7 @@ class fenics_ConvDiff2D_mass(Problem):
         self.K = df.assemble(a_K)
         self.C = df.assemble(a_C)
 
-        # set boundary values
+        # set exact solution for boundary conditions
         self.u_D = df.Expression(
             'pow(s,2)/(pow(s,2)+4*nu*t)*exp(-(pow(((cos(4*t)*x[0]+sin(4*t)*x[1])-x0),2)\
             +pow(((-sin(4*t)*x[0]+cos(4*t)*x[1])-y0),2))/(pow(s,2)+4*nu*t))',
@@ -246,7 +241,7 @@ class fenics_ConvDiff2D_mass(Problem):
             degree=self.order,
         )
 
-        me = self.dtype_u(df.interpolate(u0, self.V), val=self.V)
+        me = self.dtype_u(df.interpolate(u0, self.V))
 
         return me
 

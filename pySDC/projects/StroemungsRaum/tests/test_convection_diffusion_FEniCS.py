@@ -2,9 +2,6 @@ import numpy as np
 import pytest
 import dolfin as df
 
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh
 from pySDC.projects.StroemungsRaum.problem_classes.ConvectionDiffusion_2D_FEniCS import fenics_ConvDiff2D_mass
 
@@ -26,8 +23,7 @@ def test_solve_system():
     # Initial guess for the solver (not used by the direct solver, but required by the interface)
     u0 = fenics_mesh(prob.V)
 
-    # Define a manufactured right-hand side such that the exact solution
-    # satisfies (M - factor * K) u = rhs
+    # Define a manufactured right-hand side such that the exact solution satisfies (M - factor * K) u = rhs
     g = df.Expression(
         'pow(s,2)/(pow(s,2)+4*nu*t)*exp(-( '
         'pow((cos(4*t)*x[0]+sin(4*t)*x[1]-x0),2)'
@@ -69,10 +65,7 @@ def test_eval_f():
     # Physical and numerical parameters used in the test
     s = 0.05
     nu = 0.01
-    x0 = -0.25
-    y0 = 0.0
     t = 0.1
-    factor = 0.05
 
     # Instantiate the convection-diffusion problem
     prob = fenics_ConvDiff2D_mass(c_nvars=64, t0=0.0, family='CG', order=2, nu=nu, sigma=s)
@@ -103,16 +96,16 @@ def test_eval_f():
     # Since g = 0 in the problem class, f.expl should reduce to the convection contribution
     # ------------------------------------------------------------------
 
-    # Analytical expression for U · grad(u) with U = (-4y, 4x)
+    # Analytical expression for -U · grad(u) with U = (-4y, 4x)
     Ugrad_u = df.Expression(
         "-4*pi*( x[0]*sin(pi*x[0])*cos(pi*x[1]) - x[1]*cos(pi*x[0])*sin(pi*x[1]) )", degree=5, pi=np.pi
     )
 
-    # Apply mass matrix to obtain M * (U · grad(u))
-    MUgad_u = prob.apply_mass_matrix(prob.dtype_u(df.interpolate(Ugrad_u, prob.V)))
+    # Apply mass matrix to obtain M * (-U · grad(u))
+    MUgrad_u = prob.apply_mass_matrix(prob.dtype_u(df.interpolate(Ugrad_u, prob.V)))
 
     # Relative error between computed explicit term and reference
-    err_conv = abs(f.expl - MUgad_u) / abs(MUgad_u)
+    err_conv = abs(f.expl - MUgrad_u) / abs(MUgrad_u)
     assert err_conv < 5e-4, f"Relative error {err_conv} exceeds tolerance"
 
 

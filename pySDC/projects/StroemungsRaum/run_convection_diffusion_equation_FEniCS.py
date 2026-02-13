@@ -69,7 +69,7 @@ def setup(t0=None):
 
 def run_simulation(description, controller_params, Tend):
     """
-    Run the time integration for the heat equation problem.
+    Run the time integration for the 2D convection–diffusion benchmark problem.
 
      Args:
         description: dict,
@@ -90,17 +90,16 @@ def run_simulation(description, controller_params, Tend):
     # get initial time from description
     t0 = description['problem_params']['t0']
 
-    # quickly generate block of steps
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
-    # get initial values on finest level
+    # get the initial value
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
     # get exact solution at final time for error calculation
     uex = P.u_exact(Tend)
 
-    # call main function to get things done...
+    # run the simulation, which returns the final solution and collected statistics
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # compute relative error at final time
@@ -133,7 +132,7 @@ def run_postprocessing(description, problem, stats):
     # If it does not exist, create the 'data' directory at the specified path, including any necessary parent directories
     Path(path).mkdir(parents=True, exist_ok=True)
 
-    # Get the solution at every time step, sorted by time
+    # get the solution at every time step, sorted by time
     Solutions = get_sorted(stats, type='u', sortby='time')
 
     # Save parameters
@@ -141,7 +140,8 @@ def run_postprocessing(description, problem, stats):
     parameters.update(description['level_params'])
     parameters['Tend'] = Solutions[-1][0]
 
-    json.dump(parameters, open(path + "convection_diffusion_FEniCS_parameters.json", 'w'))
+    with open(path + "convection_diffusion_FEniCS_parameters.json", 'w') as f:
+        json.dump(parameters, f)
 
     # Create XDMF file for visualization output
     xdmffile_u = df.XDMFFile(path + "convection_diffusion_FEniCS_solutions.xdmf")
