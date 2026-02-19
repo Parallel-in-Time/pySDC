@@ -21,6 +21,8 @@ This follows a specific OOP framework, you can look at the page on
 [custom implementations](./docs/contrib/04_custom_implementations.md)
 for more details. Additional guideline are also given on how to
 [document the code](./docs/contrib/05_documenting_code.md) in `pySDC`.
+A comprehensive guide on [sweeper implementations](./docs/contrib/08_sweeper_guide.md)
+is also available to help you choose and use the right time integration method.
 
 > 📣 Some core components (collocation matrix, $Q-\Delta$ coefficients, Lagrange barycentric interpolation)  
 > are implemented and developed in the [`qmat` companion package](https://github.com/Parallel-in-Time/qmat).
@@ -34,5 +36,6 @@ for more details. Additional guideline are also given on how to
 5. [Custom Implementations](./docs/contrib/04_custom_implementations.md)
 6. [Documenting Code](./docs/contrib/05_documenting_code.md)
 7. [Adding a project](./docs/contrib/06_new_project.md)
+8. [Sweeper Implementations Guide](./docs/contrib/08_sweeper_guide.md)
 
 :arrow_left: [Back to main page](./README.md)

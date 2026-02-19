@@ -5,13 +5,39 @@ from pySDC.core.sweeper import Sweeper
 
 class imex_1st_order(Sweeper):
     """
-    Custom sweeper class, implements Sweeper.py
-
-    First-order IMEX sweeper using implicit/explicit Euler as base integrator
+    First-order IMEX (Implicit-Explicit) sweeper with additive splitting.
+    
+    This sweeper implements SDC for problems with an additive splitting of the right-hand side:
+    du/dt = f_impl(u) + f_expl(u), where stiff terms are treated implicitly and non-stiff 
+    terms are treated explicitly.
+    
+    **When to use:**
+    - Advection-diffusion problems (diffusion implicit, advection explicit)
+    - Reaction-diffusion equations
+    - Any problem with clearly separable stiff and non-stiff components
+    - When you want to avoid solving fully implicit systems
+    
+    **Key Parameters:**
+    - ``QI`` (str): Type of implicit integration matrix, default: 'IE' (Implicit Euler)
+    - ``QE`` (str): Type of explicit integration matrix, default: 'EE' (Explicit Euler)
+    - ``num_nodes`` (int): Number of collocation nodes (required)
+    - ``quad_type`` (str): Quadrature type, default: 'RADAU-RIGHT'
+    
+    **Requirements:**
+    Your problem class must return dtype_f objects with ``.impl`` and ``.expl`` attributes.
+    
+    **Example:**
+        >>> sweeper_params = {
+        ...     'quad_type': 'RADAU-RIGHT',
+        ...     'num_nodes': 5,
+        ...     'QI': 'LU',  # For stiff implicit part
+        ...     'QE': 'EE'   # For non-stiff explicit part
+        ... }
+        >>> description = {'sweeper_class': imex_1st_order, 'sweeper_params': sweeper_params}
 
     Attributes:
-        QI: implicit Euler integration matrix
-        QE: explicit Euler integration matrix
+        QI (numpy.ndarray): Preconditioner for implicit terms
+        QE (numpy.ndarray): Preconditioner for explicit terms
     """
 
     def __init__(self, params, level):
