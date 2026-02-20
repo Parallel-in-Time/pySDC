@@ -193,12 +193,16 @@ def test_transform(N, d):
 
 
 @pytest.mark.cupy
-def test_transform_cupy(N=8):
+@pytest.mark.parametrize('is_complex', [True, False])
+@pytest.mark.parametrize('N', [8, 12])
+def test_transform_cupy(N, is_complex):
     import numpy as np
     import cupy as cp
     from pySDC.helpers.spectral_helper import ChebychevHelper
 
     u = cp.random.random(N).astype('D')
+    if is_complex:
+        u += 1j * cp.random.random(N).astype('D')
 
     helper_CPU = ChebychevHelper(N=N, useGPU=False)
     u_hat_CPU = helper_CPU.transform(u.get())
