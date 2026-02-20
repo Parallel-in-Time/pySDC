@@ -480,6 +480,8 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.cached_factorizations">cached_factorizations (GenericSpectralLinear attribute)</a>
 </li>
+      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.vkFFT.cached_plans">cached_plans (vkFFT attribute)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.helper_classes.html#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback">Callback (class in implementations.problem_classes.boussinesq_helpers.helper_classes)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Cash_Karp">Cash_Karp (class in implementations.sweeper_classes.Runge_Kutta)</a>
@@ -812,6 +814,8 @@
       <li><a href="pySDC/helpers.testing.html#helpers.testing.DataChecker">DataChecker (class in helpers.testing)</a>
 </li>
       <li><a href="pySDC/core.errors.html#core.errors.DataError">DataError</a>
+</li>
+      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.vkFFT.dctn">dctn() (vkFFT static method)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.html#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.ddx">ddx (advectiondiffusion1d_imex attribute)</a>
 </li>
@@ -1583,10 +1587,10 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.fft_backend">(SpectralHelper attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.fft_cache">fft_cache (SpectralHelper attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.generic_MPIFFT_Laplacian.html#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.fft_comm_backend">fft_comm_backend (IMEX_Laplacian_MPIFFT attribute)</a>
 
       <ul>
@@ -1606,6 +1610,8 @@
       <li><a href="pySDC/implementations.transfer_classes.TransferMesh_MPIFFT.html#implementations.transfer_classes.TransferMesh_MPIFFT.fft_to_fft">fft_to_fft (class in implementations.transfer_classes.TransferMesh_MPIFFT)</a>
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper">FFTHelper (class in helpers.spectral_helper)</a>
+</li>
+      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.vkFFT.fftn">fftn() (vkFFT static method)</a>
 </li>
       <li><a href="pySDC/implementations.datatype_classes.particles.html#implementations.datatype_classes.particles.fields">fields (class in implementations.datatype_classes.particles)</a>
 </li>
@@ -1963,8 +1969,6 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.UltrasphericalHelper.get_integration_matrix">(UltrasphericalHelper method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_integration_weights">get_integration_weights() (ChebychevHelper method)</a>
 
       <ul>
@@ -1973,6 +1977,8 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.get_integration_weights">(SpectralHelper1D method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.get_interactions">get_interactions() (penningtrap method)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.html#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.get_interpolated_solution">get_interpolated_solution() (EstimatePolynomialError method)</a>
@@ -2042,7 +2048,11 @@
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_pfft">get_pfft() (SpectralHelper method)</a>
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper.get_plan">get_plan() (FFTHelper method)</a>
+
+      <ul>
+        <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.vkFFT.get_plan">(vkFFT static method)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.get_problem_dict">get_problem_dict() (battery_n_capacitors method)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_Q_matrix">get_Q_matrix() (RungeKutta class method)</a>
@@ -2409,7 +2419,11 @@
         <li><a href="pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench.Id">(Quench attribute)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.vkFFT.idctn">idctn() (vkFFT static method)</a>
+</li>
       <li><a href="pySDC/core.controller.html#core.controller.ParaDiagController.iFFT_in_time">iFFT_in_time() (ParaDiagController method)</a>
+</li>
+      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.vkFFT.ifftn">ifftn() (vkFFT static method)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order">imex_1st_order (class in implementations.sweeper_classes.imex_1st_order)</a>
 </li>
@@ -3312,6 +3326,8 @@
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.transfer_classes.TransferMesh_FFT.html#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.irfft_object_fine">irfft_object_fine (mesh_to_mesh_fft attribute)</a>
+</li>
+      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.vkFFT.is_complex">is_complex() (vkFFT static method)</a>
 </li>
       <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.cupy_mesh.isend">isend() (cupy_mesh method)</a>
 
@@ -5451,6 +5467,8 @@
       <li><a href="pySDC/implementations.sweeper_classes.verlet.html#implementations.sweeper_classes.verlet.verlet">verlet (class in implementations.sweeper_classes.verlet)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.standard_integrators.html#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.VerletLin">VerletLin() (SplitExplicit method)</a>
+</li>
+      <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.vkFFT">vkFFT (class in helpers.spectral_helper)</a>
 </li>
   </ul></td>
 </tr></table>

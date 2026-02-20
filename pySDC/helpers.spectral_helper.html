@@ -1503,6 +1503,49 @@ This is very similar to <cite>functools.cache</cite>, but without the memory lea
 </dl>
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="helpers.spectral_helper.vkFFT">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">vkFFT</span></span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#vkFFT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.vkFFT" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>pyVkFFT FFT backend.
+The special feature of vkFFT is fast DCT on GPU with cached plans.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helpers.spectral_helper.vkFFT.cached_plans">
+<span class="sig-name descname"><span class="pre">cached_plans</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#helpers.spectral_helper.vkFFT.cached_plans" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.vkFFT.dctn">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dctn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#vkFFT.dctn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.vkFFT.dctn" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.vkFFT.fftn">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fftn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'backward'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#vkFFT.fftn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.vkFFT.fftn" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.vkFFT.get_plan">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_plan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transform_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#vkFFT.get_plan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.vkFFT.get_plan" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.vkFFT.idctn">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">idctn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#vkFFT.idctn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.vkFFT.idctn" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.vkFFT.ifftn">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ifftn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'forward'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#vkFFT.ifftn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.vkFFT.ifftn" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.spectral_helper.vkFFT.is_complex">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_complex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#vkFFT.is_complex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.vkFFT.is_complex" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 
 
@@ -1656,6 +1699,16 @@ This is very similar to <cite>functools.cache</cite>, but without the memory lea
 </ul>
 </li>
 <li><a class="reference internal" href="#helpers.spectral_helper.cache"><code class="docutils literal notranslate"><span class="pre">cache()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.vkFFT"><code class="docutils literal notranslate"><span class="pre">vkFFT</span></code></a><ul>
+<li><a class="reference internal" href="#helpers.spectral_helper.vkFFT.cached_plans"><code class="docutils literal notranslate"><span class="pre">cached_plans</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.vkFFT.dctn"><code class="docutils literal notranslate"><span class="pre">dctn()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.vkFFT.fftn"><code class="docutils literal notranslate"><span class="pre">fftn()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.vkFFT.get_plan"><code class="docutils literal notranslate"><span class="pre">get_plan()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.vkFFT.idctn"><code class="docutils literal notranslate"><span class="pre">idctn()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.vkFFT.ifftn"><code class="docutils literal notranslate"><span class="pre">ifftn()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.spectral_helper.vkFFT.is_complex"><code class="docutils literal notranslate"><span class="pre">is_complex()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
