@@ -124,6 +124,7 @@ def single_run(sweeper_name, dt, lambdas, use_RK_sweeper=True, Tend=None, useGPU
         sweeper.coll = rk_sweeper.get_Butcher_tableau()
         _compute_end_point = type(sweeper).compute_end_point
         type(sweeper).compute_end_point = rk_sweeper.compute_end_point
+        sweeper.is_embedded = lambda: sweeper_name == 'Cash_Karp'
 
     prob = controller.MS[0].levels[0].prob
     ic = prob.u_exact(0)
@@ -305,10 +306,18 @@ def test_rhs_evals(sweeper_name, useGPU=False):
 
     rhs_evaluations = [me[1] for me in get_sorted(stats, type='work_rhs')]
 
+    sweeper = get_sweeper(sweeper_name)
+    expect_rhs_evals = num_stages
+    stiffly_accurate = sweeper.get_Butcher_tableau().globally_stiffly_accurate
+    if hasattr(sweeper, 'get_Butcher_tableau_explicit'):
+        stiffly_accurate = stiffly_accurate and sweeper.get_Butcher_tableau_explicit().globally_stiffly_accurate
+    if stiffly_accurate and not sweeper.is_embedded():
+        expect_rhs_evals -= 1
+
     assert len(rhs_evaluations) > 0, 'Did not register any right hand side evaluations!'
     assert all(
-        me == num_stages for me in rhs_evaluations
-    ), f'Did not perform one RHS evaluation per step and stage in {sweeper_name} method! Expected {num_stages}, but got {rhs_evaluations}.'
+        me == expect_rhs_evals for me in rhs_evaluations
+    ), f'Did not perform one RHS evaluation per step and stage in {sweeper_name} method! Expected {expect_rhs_evals}, but got {rhs_evaluations}.'
 
 
 @pytest.mark.base
@@ -387,7 +396,8 @@ def test_RK_sweepers_with_GPU(test_name, sweeper_name):
 
 if __name__ == '__main__':
     # test_rhs_evals('ARK54')
-    test_order('ARK2')
+    # test_order('ARK2')
+    # test_rhs_evals('IMEXEuler')
     # test_order('ARK54')
-    # test_sweeper_equivalence('Cash_Karp')
+    test_sweeper_equivalence('Cash_Karp')
     # test_order('ARK54')
