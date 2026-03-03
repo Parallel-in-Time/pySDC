@@ -164,7 +164,7 @@ class EstimatePolynomialError(ConvergenceController):
                 rank = estimate_on_node - 1
                 L.status.order_embedded_estimate = coll.num_nodes * 1
 
-            rescale = float(abs(u_inter)) if self.params.rel_error else 1
+            rescale = float(abs(u_inter).max()) if self.params.rel_error else 1
 
             if self.comm:
                 buf = np.array(abs(u_inter - high_order_sol) / rescale if self.comm.rank == rank else 0.0)
