@@ -119,8 +119,6 @@ def run_postprocessing(description, problem, stats):
             Problem instance containing the final solution and other problem-related information.
         stats: dict,
             collected runtime statistics,
-        Tend: float,
-            Final simulation time.
 
     Returns: None
     """
