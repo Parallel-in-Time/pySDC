@@ -182,10 +182,9 @@ class fenics_ConvDiff2D_mass(Problem):
 
         u = self.dtype_u(u0)
         T = self.M - factor * self.K
-        b = self.dtype_u(rhs)
 
-        self.bc.apply(T, b.values.vector())
-        df.solve(T, u.values.vector(), b.values.vector())
+        self.bc.apply(T, rhs.values.vector())
+        df.solve(T, u.values.vector(), rhs.values.vector())
 
         return u
 
