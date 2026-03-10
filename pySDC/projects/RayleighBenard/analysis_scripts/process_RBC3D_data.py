@@ -101,14 +101,18 @@ def process_RBC3D_data(base_path='./data/processed', plot=True, args=None, confi
     t = xp.array(t)
     z = P.axes[-1].get_1dgrid()
 
+    converged = config.converged
     if config.converged == 0:
         print('Warning: no convergence has been set for this configuration!')
+    if max(t) < converged:
+        converged = 0
+        print(f'Warning: Convergence time {config.converged} has not beed reached! Simulation only goes to {max(t)}')
 
     fig, axs = plt.subplots(1, 4, figsize=(18, 4))
     for key in Nu.keys():
         axs[0].plot(t, Nu[key], label=f'$Nu_{{{key}}}$')
-        if config.converged > 0:
-            axs[0].axvline(config.converged, color='black')
+        if converged > 0:
+            axs[0].axvline(converged, color='black')
     axs[0].set_ylabel('$Nu$')
     axs[0].set_xlabel('$t$')
     axs[0].legend(frameon=False)
@@ -117,7 +121,7 @@ def process_RBC3D_data(base_path='./data/processed', plot=True, args=None, confi
     avg_Nu = {}
     std_Nu = {}
     for key in Nu.keys():
-        _Nu = [Nu[key][i] for i in range(len(Nu[key])) if t[i] > config.converged]
+        _Nu = [Nu[key][i] for i in range(len(Nu[key])) if t[i] > converged]
         avg_Nu[key] = xp.mean(_Nu)
         std_Nu[key] = xp.std(_Nu)
 
@@ -138,13 +142,13 @@ def process_RBC3D_data(base_path='./data/processed', plot=True, args=None, confi
     # compute average profiles
     avg_profiles = {}
     for key, values in profiles.items():
-        values_from_convergence = [values[i] for i in range(len(values)) if t[i] >= config.converged]
+        values_from_convergence = [values[i] for i in range(len(values)) if t[i] >= converged]
 
         avg_profiles[key] = xp.mean(values_from_convergence, axis=0)
 
     avg_rms_profiles = {}
     for key, values in rms_profiles.items():
-        values_from_convergence = [values[i] for i in range(len(values)) if t[i] >= config.converged]
+        values_from_convergence = [values[i] for i in range(len(values)) if t[i] >= converged]
         avg_rms_profiles[key] = xp.sqrt(xp.mean(values_from_convergence, axis=0))
 
     # average T
@@ -171,7 +175,7 @@ def process_RBC3D_data(base_path='./data/processed', plot=True, args=None, confi
 
     # spectrum
     _s = xp.array(spectrum)
-    avg_spectrum = xp.mean(_s[t >= config.converged], axis=0)
+    avg_spectrum = xp.mean(_s[t >= converged], axis=0)
     axs[3].loglog(k[avg_spectrum > 1e-15], avg_spectrum[avg_spectrum > 1e-15])
     axs[3].set_xlabel('$k$')
     axs[3].set_ylabel(r'$\|\hat{u}_x\|$')

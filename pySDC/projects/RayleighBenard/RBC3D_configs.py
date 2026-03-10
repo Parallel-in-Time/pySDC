@@ -18,6 +18,15 @@ class RayleighBenard3DRegular(Config):
     res_ratio = 1
     dealiasing = 3.0 / 2.0
 
+    def get_sweeper(self, useMPI):
+        if useMPI:
+            from pySDC.projects.RayleighBenard.sweepers import imex_1st_order_MPI_fixed_k as sweeper
+        elif not useMPI:
+            from pySDC.projects.RayleighBenard.sweepers import imex_1st_order_diagonal_serial as sweeper
+        else:
+            raise NotImplementedError(f'Don\'t know the sweeper for {self.sweeper_type=}')
+        return sweeper
+
     def get_file_name(self):
         res = self.args['res']
         return f'{self.base_path}/data/{type(self).__name__}-res{res}.pySDC'

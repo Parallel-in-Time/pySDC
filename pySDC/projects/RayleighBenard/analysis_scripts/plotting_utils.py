@@ -1,10 +1,12 @@
 from functools import partial
 import warnings
 import os
+import matplotlib.pyplot as plt
 
 from pySDC.helpers.plot_helper import figsize_by_journal, setup_mpl
 
 setup_mpl()
+plt.rcParams['markers.fillstyle'] = 'none'
 
 figsize = partial(figsize_by_journal, journal='Nature_CS')
 
