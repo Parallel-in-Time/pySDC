@@ -26,7 +26,7 @@ def plot_spectra_Ra1e5():  # pragma: no cover
     fig, ax = plt.subplots(figsize=figsize(scale=1, ratio=0.6))
 
     configs = [f'RBC3DG4R4{name}Ra1e5' for name in ['SDC23', 'SDC44', 'Euler', 'RK']]
-    dts = [0.06, 0.06, 0.02, 0.04]
+    dts = [0.02, 0.02, 0.02, 0.02]
     res = 32
 
     for config, dt in zip(configs, dts, strict=True):
@@ -53,14 +53,18 @@ def plot_spectra_Ra1e6():  # pragma: no cover
 def plot_all_spectra():  # pragma: no cover
     fig, ax = plt.subplots(figsize=figsize(scale=1, ratio=0.6))
 
-    Ras = ['1e5', '1e6']
-    dts = [0.06, 0.01]
-    res = [32, 64]
-    colors = ['tab:blue', 'tab:orange']
-    markers = ['x', 'o']
+    Ras = ['1e5', '1e6', '1e7']
+    dts = [0.06, 0.01, 0.005]
+    res = [32, 64, 128]
+    colors = [
+        'tab:blue',
+        'tab:orange',
+        'tab:green',
+    ]
+    markers = ['x', 'o', '.']
 
     for Ra, dt, _res, color, marker in zip(Ras, dts, res, colors, markers, strict=True):
-        config = f'RBC3DG4R4SDC44Ra{Ra}'
+        config = f'RBC3DG4R4SDC23Ra{Ra}'
         plot_spectrum(_res, dt, config, ax, label=f'$Ra$={Ra}', color=color, marker=marker)
 
     ax.legend(frameon=False)
@@ -68,8 +72,8 @@ def plot_all_spectra():  # pragma: no cover
 
 
 if __name__ == '__main__':
-    # plot_spectra_Ra1e5()
+    plot_spectra_Ra1e5()
     # plot_spectra_Ra1e6()
-    plot_all_spectra()
+    # plot_all_spectra()
 
     plt.show()
