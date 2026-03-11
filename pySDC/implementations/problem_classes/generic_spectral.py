@@ -370,6 +370,7 @@ class GenericSpectralLinear(Problem):
                 self.work_counters['factorizations']()
 
             _sol_hat = self.cached_factorizations[dt](rhs_hat)
+            self.work_counters[self.solver_type]()
             self.logger.debug(f'Used cached matrix factorization for {dt=:.6f}')
 
         elif self.solver_type.lower() == 'direct':
