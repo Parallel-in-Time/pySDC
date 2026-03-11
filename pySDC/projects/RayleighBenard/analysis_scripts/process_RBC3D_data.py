@@ -106,7 +106,7 @@ def process_RBC3D_data(base_path='./data/processed', plot=True, args=None, confi
         print('Warning: no convergence has been set for this configuration!')
     if max(t) < converged:
         converged = 0
-        print(f'Warning: Convergence time {config.converged} has not beed reached! Simulation only goes to {max(t)}')
+        print(f'Warning: Convergence time {config.converged} has not been reached! Simulation only goes to {max(t)}')
 
     fig, axs = plt.subplots(1, 4, figsize=(18, 4))
     for key in Nu.keys():
