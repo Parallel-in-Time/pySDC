@@ -2,8 +2,6 @@ import pytest
 
 
 def run_simulation(sweeper_class, nsteps, nsweeps, nnodes, sweeper_comm=None):
-    from mpi4py import MPI
-
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.implementations.hooks.log_work import LogWork
 
@@ -62,9 +60,7 @@ def test_serial_optimized_sweeper(nsweeps, nnodes):
 def test_RK_sweeper(sweeper_name):
     import numpy as np
     from pySDC.helpers.stats_helper import get_sorted
-    from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
     from pySDC.implementations.sweeper_classes.Runge_Kutta import ARK3, IMEXEulerStifflyAccurate
-    from pySDC.projects.RayleighBenard.sweepers import imex_1st_order_diagonal_serial
 
     sweepers = {'ARK3': ARK3, 'IMEXEulerStifflyAccurate': IMEXEulerStifflyAccurate}
     expected_work = {'ARK3': 4, 'IMEXEulerStifflyAccurate': 1}

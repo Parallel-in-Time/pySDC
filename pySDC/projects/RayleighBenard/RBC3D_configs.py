@@ -21,10 +21,8 @@ class RayleighBenard3DRegular(Config):
     def get_sweeper(self, useMPI):
         if useMPI:
             from pySDC.projects.RayleighBenard.sweepers import imex_1st_order_MPI_fixed_k as sweeper
-        elif not useMPI:
-            from pySDC.projects.RayleighBenard.sweepers import imex_1st_order_diagonal_serial as sweeper
         else:
-            raise NotImplementedError(f'Don\'t know the sweeper for {self.sweeper_type=}')
+            from pySDC.projects.RayleighBenard.sweepers import imex_1st_order_diagonal_serial as sweeper
         return sweeper
 
     def get_file_name(self):
