@@ -69,10 +69,18 @@ class Config(object):
         self.args = args
         self.comm_world = MPI.COMM_WORLD if comm_world is None else comm_world
         self.n_procs_list = args["procs"]
-        if args['mode'] == 'run':
-            self.comms = get_comms(
-                n_procs_list=self.n_procs_list[::-1], useGPU=args['useGPU'], comm_world=self.comm_world
-            )[::-1]
+        if args['mode'] in ['run', 'benchmark']:
+            distribution = args.get('distribution', 'time_first')
+            if distribution in ['space_first', 'space_major']:
+                self.comms = get_comms(
+                    n_procs_list=self.n_procs_list[::-1], useGPU=args['useGPU'], comm_world=self.comm_world
+                )[::-1]
+            elif distribution in ['time_first', 'time_major']:
+                self.comms = get_comms(
+                    n_procs_list=self.n_procs_list, useGPU=args['useGPU'], comm_world=self.comm_world
+                )
+            else:
+                raise NotImplementedError
         else:
             self.comms = [MPI.COMM_SELF, MPI.COMM_SELF, MPI.COMM_SELF]
         self.ranks = [me.rank for me in self.comms]

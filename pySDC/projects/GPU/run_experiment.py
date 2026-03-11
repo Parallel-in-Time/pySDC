@@ -27,6 +27,13 @@ def parse_args():
         '--logger_level', type=int, help='Logger level on the first rank in space and in the sweeper', default=15
     )
     parser.add_argument('-o', type=str, help='output path', default='./')
+    parser.add_argument(
+        '--distribution',
+        type=str,
+        help='distribute tasks',
+        default='space_first',
+        choices=['space_first', 'space_major', 'time_first', 'time_major'],
+    )
 
     return vars(parser.parse_args())
 
