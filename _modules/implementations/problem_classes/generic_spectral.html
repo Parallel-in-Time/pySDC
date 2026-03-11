@@ -428,6 +428,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;factorizations&#39;</span><span class="p">]()</span>
 
             <span class="n">_sol_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_factorizations</span><span class="p">[</span><span class="n">dt</span><span class="p">](</span><span class="n">rhs_hat</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="p">]()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Used cached matrix factorization for </span><span class="si">{</span><span class="n">dt</span><span class="si">=:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;direct&#39;</span><span class="p">:</span>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/projects/GPU/configs/base_config.py: 73%</title>
+    <title>Coverage for pySDC/projects/GPU/configs/base_config.py: 71%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
     <link rel="stylesheet" href="style_cb_9ff733b0.css" type="text/css">
     <script src="coverage_html_cb_dd2e7eb5.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC&#8201;/&#8201;projects&#8201;/&#8201;GPU&#8201;/&#8201;configs&#8201;/&#8201;base_config.py</b>:
-            <span class="pc_cov">73%</span>
+            <span class="pc_cov">71%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">167 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">122<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">45<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">118<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">49<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">4<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_f7d64113b0673500_heat_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.13.4">coverage.py v7.13.4</a>,
-            created at 2026-03-07 10:19 +0000
+            created at 2026-03-11 09:30 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -207,10 +207,10 @@
     <p class="run"><span class="n"><a id="t125" href="#t125">125</a></span><span class="t">        <span class="key">return</span> <span class="nam">controller_params</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t126" href="#t126">126</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t127" href="#t127">127</a></span><span class="t">    <span class="key">def</span> <span class="nam">get_sweeper</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">useMPI</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t128" href="#t128">128</a></span><span class="t">        <span class="key">if</span> <span class="nam">useMPI</span> <span class="key">and</span> <span class="nam">self</span><span class="op">.</span><span class="nam">sweeper_type</span> <span class="op">==</span> <span class="str">'IMEX'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t128" href="#t128">128</a></span><span class="t">        <span class="key">if</span> <span class="nam">useMPI</span> <span class="key">and</span> <span class="nam">self</span><span class="op">.</span><span class="nam">sweeper_type</span> <span class="op">==</span> <span class="str">'IMEX'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t129" href="#t129">129</a></span><span class="t">            <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">sweeper_classes</span><span class="op">.</span><span class="nam">imex_1st_order_MPI</span> <span class="key">import</span> <span class="nam">imex_1st_order_MPI</span> <span class="key">as</span> <span class="nam">sweeper</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t130" href="#t130">130</a></span><span class="t">        <span class="key">elif</span> <span class="key">not</span> <span class="nam">useMPI</span> <span class="key">and</span> <span class="nam">self</span><span class="op">.</span><span class="nam">sweeper_type</span> <span class="op">==</span> <span class="str">'IMEX'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t131" href="#t131">131</a></span><span class="t">            <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">sweeper_classes</span><span class="op">.</span><span class="nam">imex_1st_order</span> <span class="key">import</span> <span class="nam">imex_1st_order</span> <span class="key">as</span> <span class="nam">sweeper</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t130" href="#t130">130</a></span><span class="t">        <span class="key">elif</span> <span class="key">not</span> <span class="nam">useMPI</span> <span class="key">and</span> <span class="nam">self</span><span class="op">.</span><span class="nam">sweeper_type</span> <span class="op">==</span> <span class="str">'IMEX'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t131" href="#t131">131</a></span><span class="t">            <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">sweeper_classes</span><span class="op">.</span><span class="nam">imex_1st_order</span> <span class="key">import</span> <span class="nam">imex_1st_order</span> <span class="key">as</span> <span class="nam">sweeper</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t132" href="#t132">132</a></span><span class="t">        <span class="key">elif</span> <span class="nam">useMPI</span> <span class="key">and</span> <span class="nam">self</span><span class="op">.</span><span class="nam">sweeper_type</span> <span class="op">==</span> <span class="str">'generic_implicit'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t133" href="#t133">133</a></span><span class="t">            <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">sweeper_classes</span><span class="op">.</span><span class="nam">generic_implicit_MPI</span> <span class="key">import</span> <span class="nam">generic_implicit_MPI</span> <span class="key">as</span> <span class="nam">sweeper</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t134" href="#t134">134</a></span><span class="t">        <span class="key">elif</span> <span class="key">not</span> <span class="nam">useMPI</span> <span class="key">and</span> <span class="nam">self</span><span class="op">.</span><span class="nam">sweeper_type</span> <span class="op">==</span> <span class="str">'generic_implicit'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -218,7 +218,7 @@
     <p class="pln"><span class="n"><a id="t136" href="#t136">136</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t137" href="#t137">137</a></span><span class="t">            <span class="key">raise</span> <span class="nam">NotImplementedError</span><span class="op">(</span><span class="fst">f'</span><span class="fst">Don\'t know the sweeper for </span><span class="op">{</span><span class="nam">self</span><span class="op">.</span><span class="nam">sweeper_type</span><span class="op">=</span><span class="op">}</span><span class="fst">'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t138" href="#t138">138</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t139" href="#t139">139</a></span><span class="t">        <span class="key">return</span> <span class="nam">sweeper</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t139" href="#t139">139</a></span><span class="t">        <span class="key">return</span> <span class="nam">sweeper</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t140" href="#t140">140</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t141" href="#t141">141</a></span><span class="t">    <span class="key">def</span> <span class="nam">prepare_caches</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">prob</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t142" href="#t142">142</a></span><span class="t">        <span class="key">pass</span>&nbsp;</span><span class="r"></span></p>
@@ -349,7 +349,7 @@
             <a class="nav" href="z_f7d64113b0673500_heat_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.13.4">coverage.py v7.13.4</a>,
-            created at 2026-03-07 10:19 +0000
+            created at 2026-03-11 09:30 +0000
         </p>
     </div>
 </footer>
