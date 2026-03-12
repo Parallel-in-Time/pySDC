@@ -139,10 +139,8 @@ el multistep mode!",
         elif type(f) == mesh:
             self.prev.f[oldest_val] = f
         else:
-            raise DataError(
-                f"Unable to store f from datatype {type(f)}, extrapolation based error estimate only\
- works with types imex_mesh and mesh"
-            )
+            raise DataError(f"Unable to store f from datatype {type(f)}, extrapolation based error estimate only\
+ works with types imex_mesh and mesh")
 
         # store the rest of the values
         self.prev.u[oldest_val] = S.levels[0].u[-1]
@@ -481,10 +479,8 @@ class EstimateExtrapolationErrorWithinQ(EstimateExtrapolationErrorBase):
         elif type(lvl.f[0]) == mesh:
             f = [lvl.f[i] if self.coeff.f[i] else 0.0 for i in range(len(lvl.f) - 1)]
         else:
-            raise DataError(
-                f"Unable to store f from datatype {type(lvl.f[0])}, extrapolation based error estimate only\
- works with types imex_mesh and mesh"
-            )
+            raise DataError(f"Unable to store f from datatype {type(lvl.f[0])}, extrapolation based error estimate only\
+ works with types imex_mesh and mesh")
 
         # compute the error with the weighted sum
         if self.comm:

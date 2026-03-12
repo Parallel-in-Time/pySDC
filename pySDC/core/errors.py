@@ -75,5 +75,5 @@ class ReadOnlyError(Exception):  # pragma: no cover
     Exception thrown when setting a read-only class attribute
     """
 
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         super().__init__(f'cannot set read-only attribute {name}')

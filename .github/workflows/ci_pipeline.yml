@@ -94,6 +94,7 @@ jobs:
           - PinTSimE
           - RDC
           - Resilience
+          - RayleighBenard
           - SDC_showdown
           - Second_orderSDC
           - soft_failure

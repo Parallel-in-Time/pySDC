@@ -1,4 +1,5 @@
 import logging
+from typing import Any, Dict, List, Optional, Type, Callable, Tuple
 
 from pySDC.core.level import Level
 from pySDC.core.base_transfer import BaseTransfer
@@ -8,8 +9,8 @@ from pySDC.helpers.pysdc_helper import FrozenClass
 
 # short helper class to add params as attributes
 class _Pars(FrozenClass):
-    def __init__(self, params):
-        self.maxiter = None
+    def __init__(self, params: Dict[str, Any]) -> None:
+        self.maxiter: Optional[int] = None
         for k, v in params.items():
             setattr(self, k, v)
         # freeze class, no further attributes allowed from this point
@@ -23,20 +24,20 @@ class _Status(FrozenClass):
     initialized here.
     """
 
-    def __init__(self):
-        self.iter = None
-        self.stage = None
-        self.slot = None
-        self.first = None
-        self.last = None
-        self.pred_cnt = None
-        self.done = None
-        self.force_done = None
-        self.force_continue = False
-        self.prev_done = None
-        self.time_size = None
-        self.diff_old_loc = None
-        self.diff_first_loc = None
+    def __init__(self) -> None:
+        self.iter: Optional[int] = None
+        self.stage: Optional[str] = None
+        self.slot: Optional[int] = None
+        self.first: Optional[bool] = None
+        self.last: Optional[bool] = None
+        self.pred_cnt: Optional[int] = None
+        self.done: Optional[bool] = None
+        self.force_done: Optional[bool] = None
+        self.force_continue: bool = False
+        self.prev_done: Optional[bool] = None
+        self.time_size: Optional[int] = None
+        self.diff_old_loc: Optional[float] = None
+        self.diff_first_loc: Optional[float] = None
         # freeze class, no further attributes allowed from this point
         self._freeze()
 
@@ -55,7 +56,7 @@ class Step(FrozenClass):
         levels (list): list of levels
     """
 
-    def __init__(self, description):
+    def __init__(self, description: Dict[str, Any]) -> None:
         """
         Initialization routine
 
@@ -64,18 +65,18 @@ class Step(FrozenClass):
         """
 
         # set params and status
-        self.params = _Pars(description.get('step_params', {}))
-        self.status = _Status()
+        self.params: _Pars = _Pars(description.get('step_params', {}))
+        self.status: _Status = _Status()
 
         # set up logger
-        self.logger = logging.getLogger('step')
+        self.logger: logging.Logger = logging.getLogger('step')
 
         # empty attributes
-        self.__transfer_dict = {}
-        self.base_transfer = None
-        self.levels: list[Level] = []
-        self.__prev = None
-        self.__next = None
+        self.__transfer_dict: Dict[Tuple[Level, Level], Callable] = {}
+        self.base_transfer: Optional[BaseTransfer] = None
+        self.levels: List[Level] = []
+        self.__prev: Optional['Step'] = None
+        self.__next: Optional['Step'] = None
 
         # freeze class, no further attributes allowed from this point
         self._freeze()
@@ -83,7 +84,7 @@ class Step(FrozenClass):
         # create hierarchy of levels
         self.__generate_hierarchy(description)
 
-    def __generate_hierarchy(self, descr):
+    def __generate_hierarchy(self, descr: Dict[str, Any]) -> None:
         """
         Routine to generate the level hierarchy for a single step
 
@@ -171,7 +172,7 @@ class Step(FrozenClass):
                 )
 
     @staticmethod
-    def __dict_to_list(in_dict):
+    def __dict_to_list(in_dict: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
         Straightforward helper function to convert dictionary of list to list of dictionaries
 
@@ -199,13 +200,13 @@ class Step(FrozenClass):
 
     def connect_levels(
         self,
-        base_transfer_class,
-        base_transfer_params,
-        space_transfer_class,
-        space_transfer_params,
-        fine_level,
-        coarse_level,
-    ):
+        base_transfer_class: Type[BaseTransfer],
+        base_transfer_params: Dict[str, Any],
+        space_transfer_class: Any,
+        space_transfer_params: Dict[str, Any],
+        fine_level: Level,
+        coarse_level: Level,
+    ) -> None:
         """
         Routine to couple levels with base_transfer operators
 
@@ -230,7 +231,7 @@ class Step(FrozenClass):
         else:
             self.__transfer_dict[(coarse_level, fine_level)] = self.base_transfer.prolong
 
-    def transfer(self, source, target):
+    def transfer(self, source: Level, target: Level) -> None:
         """
         Wrapper routine to ease the call of the transfer functions
 
@@ -244,7 +245,7 @@ class Step(FrozenClass):
         """
         self.__transfer_dict[(source, target)]()
 
-    def reset_step(self):
+    def reset_step(self) -> None:
         """
         Routine so clean-up step structure and the corresp. levels for further uses
         """
@@ -252,7 +253,7 @@ class Step(FrozenClass):
         for l in self.levels:
             l.reset_level()
 
-    def init_step(self, u0):
+    def init_step(self, u0: Any) -> None:
         """
         Initialization routine for a new step.
 
@@ -270,7 +271,7 @@ class Step(FrozenClass):
         self.levels[0].u[0] = P.dtype_u(u0)
 
     @property
-    def prev(self):
+    def prev(self) -> Optional['Step']:
         """
         Getter for previous step
 
@@ -280,7 +281,7 @@ class Step(FrozenClass):
         return self.__prev
 
     @prev.setter
-    def prev(self, p):
+    def prev(self, p: Optional['Step']) -> None:
         """
         Setter for previous step
 
@@ -290,7 +291,7 @@ class Step(FrozenClass):
         self.__prev = p
 
     @property
-    def next(self):
+    def next(self) -> Optional['Step']:
         """
         Getter for next step
 
@@ -300,7 +301,7 @@ class Step(FrozenClass):
         return self.__next
 
     @next.setter
-    def next(self, p):
+    def next(self, p: Optional['Step']) -> None:
         """
         Setter for next step
 
@@ -310,7 +311,7 @@ class Step(FrozenClass):
         self.__next = p
 
     @property
-    def dt(self):
+    def dt(self) -> Optional[float]:
         """
         Getter for current time-step size
 
@@ -320,7 +321,7 @@ class Step(FrozenClass):
         return self.levels[0].dt
 
     @property
-    def time(self):
+    def time(self) -> Optional[float]:
         """
         Getter for current time
 

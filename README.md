@@ -33,8 +33,7 @@ implemented.
     [PETSc](http://www.mcs.anl.gov/petsc/) (through
     [petsc4py](https://bitbucket.org/petsc/petsc4py))
 -   Continuous integration via [GitHub
-    Actions](https://github.com/Parallel-in-Time/pySDC/actions) and
-    [Gitlab CI](https://gitlab.hzdr.de/r.speck/pysdc/-/pipelines) (through the [GitHub2Gitlab Action](https://github.com/jakob-fritz/github2lab_action))
+    Actions](https://github.com/Parallel-in-Time/pySDC/actions)
 -   Fully compatible with Python 3.10 - 3.13, runs at least on Ubuntu
 
 ## Getting started

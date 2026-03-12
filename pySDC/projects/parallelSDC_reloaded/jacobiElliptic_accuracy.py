@@ -10,6 +10,7 @@ Script to investigate diagonal SDC on the JacobianElliptic problem
 
 Note : implementation in progress ...
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 

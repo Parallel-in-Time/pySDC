@@ -11,6 +11,7 @@ in particular with graphs such as :
 
 Note : implementation in progress ...
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 

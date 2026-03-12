@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Type
 from pySDC.core.sweeper import Sweeper
 from pySDC.core.problem import Problem
 
@@ -6,12 +7,12 @@ from pySDC.helpers.pysdc_helper import FrozenClass
 
 # short helper class to add params as attributes
 class _Pars(FrozenClass):
-    def __init__(self, params):
-        self.dt = None
-        self.dt_initial = None
-        self.restol = -1.0
-        self.nsweeps = 1
-        self.residual_type = 'full_abs'
+    def __init__(self, params: Dict[str, Any]) -> None:
+        self.dt: Optional[float] = None
+        self.dt_initial: Optional[float] = None
+        self.restol: float = -1.0
+        self.nsweeps: int = 1
+        self.residual_type: str = 'full_abs'
         for k, v in params.items():
             setattr(self, k, v)
         # freeze class, no further attributes allowed from this point
@@ -27,13 +28,13 @@ class _Status(FrozenClass):
     initialized here.
     """
 
-    def __init__(self):
-        self.residual = None
-        self.unlocked = False
-        self.updated = False
-        self.time = None
-        self.dt_new = None
-        self.sweep = None
+    def __init__(self) -> None:
+        self.residual: Optional[float] = None
+        self.unlocked: bool = False
+        self.updated: bool = False
+        self.time: Optional[float] = None
+        self.dt_new: Optional[float] = None
+        self.sweep: Optional[int] = None
         # freeze class, no further attributes allowed from this point
         self._freeze()
 
@@ -57,7 +58,15 @@ class Level(FrozenClass):
         tau (list of dtype_u): FAS correction, allocated via step class if necessary
     """
 
-    def __init__(self, problem_class, problem_params, sweeper_class, sweeper_params, level_params, level_index):
+    def __init__(
+        self,
+        problem_class: Type[Problem],
+        problem_params: Dict[str, Any],
+        sweeper_class: Type[Sweeper],
+        sweeper_params: Dict[str, Any],
+        level_params: Dict[str, Any],
+        level_index: int,
+    ) -> None:
         """
         Initialization routine
 
@@ -71,34 +80,34 @@ class Level(FrozenClass):
         """
 
         # set level parameters and status
-        self.params = _Pars(level_params)
-        self.status = _Status()
+        self.params: _Pars = _Pars(level_params)
+        self.status: _Status = _Status()
 
         # instantiate sweeper, problem and hooks
         self.__sweep: Sweeper = sweeper_class(sweeper_params, self)
         self.__prob: Problem = problem_class(**problem_params)
 
         # set name
-        self.level_index = level_index
+        self.level_index: int = level_index
 
         # empty data at the nodes, the right end point and tau
-        self.uend = None
-        self.u = [None] * (self.sweep.coll.num_nodes + 1)
-        self.uold = [None] * (self.sweep.coll.num_nodes + 1)
-        self.u_avg = [None] * self.sweep.coll.num_nodes
-        self.residual = [None] * self.sweep.coll.num_nodes
-        self.increment = [None] * self.sweep.coll.num_nodes
-        self.f = [None] * (self.sweep.coll.num_nodes + 1)
-        self.fold = [None] * (self.sweep.coll.num_nodes + 1)
+        self.uend: Optional[Any] = None
+        self.u: List[Optional[Any]] = [None] * (self.sweep.coll.num_nodes + 1)
+        self.uold: List[Optional[Any]] = [None] * (self.sweep.coll.num_nodes + 1)
+        self.u_avg: List[Optional[Any]] = [None] * self.sweep.coll.num_nodes
+        self.residual: List[Optional[Any]] = [None] * self.sweep.coll.num_nodes
+        self.increment: List[Optional[Any]] = [None] * self.sweep.coll.num_nodes
+        self.f: List[Optional[Any]] = [None] * (self.sweep.coll.num_nodes + 1)
+        self.fold: List[Optional[Any]] = [None] * (self.sweep.coll.num_nodes + 1)
 
-        self.tau = [None] * self.sweep.coll.num_nodes
+        self.tau: List[Optional[Any]] = [None] * self.sweep.coll.num_nodes
 
-        self.__tag = None
+        self.__tag: Optional[Any] = None
 
         # freeze class, no further attributes allowed from this point
         self._freeze()
 
-    def reset_level(self, reset_status=True):
+    def reset_level(self, reset_status: bool = True) -> None:
         """
         Routine to clean-up the level for the next time step
 
@@ -142,7 +151,7 @@ class Level(FrozenClass):
         return self.__prob
 
     @property
-    def time(self):
+    def time(self) -> Optional[float]:
         """
         Meta-getter for the current time
 
@@ -152,7 +161,7 @@ class Level(FrozenClass):
         return self.status.time
 
     @property
-    def dt(self):
+    def dt(self) -> Optional[float]:
         """
         Meta-getter for the time-step size
 
@@ -162,7 +171,7 @@ class Level(FrozenClass):
         return self.params.dt
 
     @property
-    def tag(self):
+    def tag(self) -> Optional[Any]:
         """
         Getter for tag
 
@@ -172,7 +181,7 @@ class Level(FrozenClass):
         return self.__tag
 
     @tag.setter
-    def tag(self, t):
+    def tag(self, t: Any) -> None:
         """
         Setter for tag
 

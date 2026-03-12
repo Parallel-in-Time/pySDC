@@ -5,6 +5,7 @@ Created on Wed Jan 10 15:34:24 2024
 
 Figures with experiment on the Lorenz problem
 """
+
 import os
 import numpy as np
 import scipy as sp

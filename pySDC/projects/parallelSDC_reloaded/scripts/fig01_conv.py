@@ -5,6 +5,7 @@ Created on Tue Jan  9 16:00:41 2024
 
 Convergence plots (on Dahlquist) for the article
 """
+
 import os
 import numpy as np
 

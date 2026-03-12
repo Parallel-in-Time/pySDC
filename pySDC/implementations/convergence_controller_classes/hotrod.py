@@ -82,10 +82,8 @@ class HotRod(ConvergenceController):
             str: Error message
         """
         if self.params.HotRod_tol == np.inf:
-            controller.logger.warning(
-                "Hot Rod needs a detection threshold, which is now set to infinity, such that a \
-restart is never triggered!"
-            )
+            controller.logger.warning("Hot Rod needs a detection threshold, which is now set to infinity, such that a \
+restart is never triggered!")
 
         if description["step_params"].get("restol", -1.0) >= 0:
             return (
