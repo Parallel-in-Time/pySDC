@@ -13,14 +13,20 @@ RA_TO_RES = {
 }
 
 
-def plot_binding():
+def get_path(path):
+    from pathlib import Path
+
+    return f'{Path(__file__).parent.parent}/{path}'
+
+
+def plot_binding():  # pragma: no cover
     fig, axs = plt.subplots(1, 2, figsize=figsize(scale=1, ratio=0.4))
     all_data = [
-        pd.read_csv(f'benchmarks/results/{machine}_RBC3DG4R4SDC44Ra{Ra}.txt')
-        for machine, Ra in zip(['JUSUF', 'JUPITER'], ['1e5', '1e7'])
+        pd.read_csv(get_path(f'benchmarks/results/{machine}_RBC3DG4R4SDC44Ra{Ra}.txt'))
+        for machine, Ra in zip(['JUSUF', 'JUPITER'], ['1e5', '1e7'], strict=True)
     ]
 
-    for ax, data in zip(axs.flatten(), all_data):
+    for ax, data in zip(axs.flatten(), all_data, strict=True):
         binds = ['block:cyclic:cyclic', 'cyclic:cyclic:cyclic']
         dists = ['space_first', 'time_first']
         for dist in dists:
@@ -50,7 +56,9 @@ def plot_binding():
     savefig(fig, 'pySDC_binding')
 
 
-def compare_methods_single_config(ax, machine, Ra='1e5', normalize=False, scale_by_stability_limit=False):
+def compare_methods_single_config(
+    ax, machine, Ra='1e5', normalize=False, scale_by_stability_limit=False
+):  # pragma: no cover
     methods = ['SDC44', 'SDC23', 'RK', 'Euler']
 
     assert not (normalize and scale_by_stability_limit)
@@ -61,7 +69,7 @@ def compare_methods_single_config(ax, machine, Ra='1e5', normalize=False, scale_
     stable_step_sizes['1e7'] = {'SDC44': 0.005, 'SDC23': 0.005, 'RK': 0.004, 'Euler': 0.001}
 
     if normalize:
-        norm_data = pd.read_csv(f'benchmarks/results/{machine}_RBC3DG4R4EulerRa{Ra}.txt')
+        norm_data = pd.read_csv(get_path(f'benchmarks/results/{machine}_RBC3DG4R4EulerRa{Ra}.txt'))
         for cost in [3, 4, 5, 13]:
             ax.axhline(cost, ls=':', color='black')
     else:
@@ -69,7 +77,7 @@ def compare_methods_single_config(ax, machine, Ra='1e5', normalize=False, scale_
 
     for method in methods:
         config = f"RBC3DG4R4{method}Ra{Ra}"
-        data = pd.read_csv(f'benchmarks/results/{machine}_{config}.txt')
+        data = pd.read_csv(get_path(f'benchmarks/results/{machine}_{config}.txt'))
         bind_mask = data.distribution == 'block:cyclic:cyclic'
         dist_mask = data.binding == 'time_first'
         base_mask = np.logical_and(bind_mask, dist_mask)
@@ -108,7 +116,7 @@ def compare_methods_single_config(ax, machine, Ra='1e5', normalize=False, scale_
     # ax.legend(frameon=False)
 
 
-def compare_methods(machine, normalize=False, scale_by_stability_limit=False):
+def compare_methods(machine, normalize=False, scale_by_stability_limit=False):  # pragma: no cover
     fig, axs = plt.subplots(1, 2, figsize=figsize(scale=1, ratio=0.4))
 
     Ras = {'JUSUF': ['1e5', '1e6'], 'BOOSTER': ['1e6', '1e7'], 'JUPITER': ['1e6', '1e7']}
@@ -118,7 +126,7 @@ def compare_methods(machine, normalize=False, scale_by_stability_limit=False):
         )
 
     handles, labels = axs[0].get_legend_handles_labels()
-    by_label = dict(zip(labels, handles))  # removes duplicates
+    by_label = dict(zip(labels, handles, strict=True))  # removes duplicates
 
     fig.legend(
         by_label.values(),
@@ -137,14 +145,14 @@ def compare_methods(machine, normalize=False, scale_by_stability_limit=False):
         savefig(fig, f"compare_methods_{machine}")
 
 
-def plot_space_scaling(method='Euler'):
+def plot_space_scaling(method='Euler'):  # pragma: no cover
     fig, axs = plt.subplots(1, 3, figsize=figsize(scale=1, ratio=0.4), sharex=True, sharey=True)
 
     for machine in ['JUSUF', 'BOOSTER', 'JUPITER']:
-        for Ra, ax in zip(['1e5', '1e6', '1e7'], axs.flatten()):
+        for Ra, ax in zip(['1e5', '1e6', '1e7'], axs.flatten(), strict=True):
             if machine == 'JUPITER' and Ra == '1e5':
                 continue
-            data = pd.read_csv(f'benchmarks/results/{machine}_RBC3DG4R4{method}Ra{Ra}.txt')
+            data = pd.read_csv(get_path(f'benchmarks/results/{machine}_RBC3DG4R4{method}Ra{Ra}.txt'))
 
             mask = np.isfinite(data.time)
             time = np.array(data.time[mask])
@@ -165,7 +173,7 @@ def plot_space_scaling(method='Euler'):
     axs[0].set_ylabel(r'time / s')
 
     handles, labels = axs[1].get_legend_handles_labels()
-    by_label = dict(zip(labels, handles))  # removes duplicates
+    by_label = dict(zip(labels, handles, strict=True))  # removes duplicates
 
     fig.legend(
         by_label.values(),
@@ -179,13 +187,13 @@ def plot_space_scaling(method='Euler'):
     savefig(fig, f'space_scaling_{method}')
 
 
-def plot_space_time_scaling(method='SDC44'):
+def plot_space_time_scaling(method='SDC44'):  # pragma: no cover
     fig, axs = plt.subplots(1, 3, figsize=figsize(scale=1, ratio=0.4), sharex=True, sharey=True)
     PinT_efficiency_fig, PinT_efficiency_ax = plt.subplots(figsize=figsize(scale=1, ratio=0.4))
 
     for machine in ['JUSUF', 'BOOSTER', 'JUPITER']:
-        for Ra, ax in zip(['1e5', '1e6', '1e7'], axs.flatten()):
-            data = pd.read_csv(f'benchmarks/results/{machine}_RBC3DG4R4{method}Ra{Ra}.txt')
+        for Ra, ax in zip(['1e5', '1e6', '1e7'], axs.flatten(), strict=True):
+            data = pd.read_csv(get_path(f'benchmarks/results/{machine}_RBC3DG4R4{method}Ra{Ra}.txt'))
 
             base_mask = np.logical_and(data.distribution == 'block:cyclic:cyclic', data.binding == 'time_first')
             base_mask = np.logical_and(base_mask, np.isfinite(data.time))
@@ -235,7 +243,7 @@ def plot_space_time_scaling(method='SDC44'):
     axs[0].set_ylabel(r'time / s')
 
     handles, labels = axs[1].get_legend_handles_labels()
-    by_label = dict(zip(labels, handles))  # removes duplicates
+    by_label = dict(zip(labels, handles, strict=True))  # removes duplicates
 
     fig.legend(
         by_label.values(),
@@ -249,7 +257,7 @@ def plot_space_time_scaling(method='SDC44'):
     savefig(fig, f'space_time_scaling_{method}')
 
     handles, labels = PinT_efficiency_ax.get_legend_handles_labels()
-    by_label = dict(zip(labels, handles))  # removes duplicates
+    by_label = dict(zip(labels, handles, strict=True))  # removes duplicates
 
     PinT_efficiency_ax.set_ylabel('PinT Efficiency')
     PinT_efficiency_ax.set_xlabel(r'$N_\mathrm{tasks,\ space}$')
@@ -269,8 +277,8 @@ def make_plots_for_SIAMPP26():  # pragma: no cover
     fig, axs = plt.subplots(1, 2, figsize=figsize(scale=0.9, ratio=0.4), sharex=True, sharey=True)
 
     for machine in ['JUSUF', 'JUPITER']:
-        for Ra, ax in zip(['1e6', '1e7'], axs.flatten()):
-            data = pd.read_csv(f'benchmarks/results/{machine}_RBC3DG4R4SDC44Ra{Ra}.txt')
+        for Ra, ax in zip(['1e6', '1e7'], axs.flatten(), strict=True):
+            data = pd.read_csv(get_path(f'benchmarks/results/{machine}_RBC3DG4R4SDC44Ra{Ra}.txt'))
 
             base_mask = np.logical_and(data.distribution == 'block:cyclic:cyclic', data.binding == 'time_first')
             base_mask = np.logical_and(base_mask, np.isfinite(data.time))
@@ -299,7 +307,7 @@ def make_plots_for_SIAMPP26():  # pragma: no cover
     axs[0].set_ylabel(r'time / s')
 
     handles, labels = axs[1].get_legend_handles_labels()
-    by_label = dict(zip(labels, handles))  # removes duplicates
+    by_label = dict(zip(labels, handles, strict=True))  # removes duplicates
 
     fig.legend(
         by_label.values(),
@@ -322,7 +330,7 @@ def make_plots_for_SIAMPP26():  # pragma: no cover
         ax.set_title(f'Ra={Ra}\n{RA_TO_RES[Ra]}')
 
     handles, labels = axs[0].get_legend_handles_labels()
-    by_label = dict(zip(labels, handles))  # removes duplicates
+    by_label = dict(zip(labels, handles, strict=True))  # removes duplicates
 
     fig.legend(
         by_label.values(),
