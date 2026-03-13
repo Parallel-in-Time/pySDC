@@ -348,6 +348,7 @@ def make_plots_for_paper():  # pragma: no cover
     plot_space_scaling()
     plot_binding()
     plot_space_time_scaling('SDC44')
+    compare_methods('JUSUF', scale_by_stability_limit=False)
     compare_methods('JUPITER', scale_by_stability_limit=False)
     compare_methods('JUPITER', scale_by_stability_limit=True)
 
