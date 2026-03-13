@@ -16,7 +16,7 @@ def parse_args():
         type=str,
         help='Mode for this script',
         default=None,
-        choices=['run', 'plot'],
+        choices=['run', 'plot', 'benchmark'],
     )
     parser.add_argument('--config', type=str, help='Configuration to load', default=None)
     parser.add_argument('--restart_idx', type=int, help='Restart from file by index', default=0)
@@ -27,6 +27,13 @@ def parse_args():
         '--logger_level', type=int, help='Logger level on the first rank in space and in the sweeper', default=15
     )
     parser.add_argument('-o', type=str, help='output path', default='./')
+    parser.add_argument(
+        '--distribution',
+        type=str,
+        help='distribute tasks',
+        default='space_first',
+        choices=['space_first', 'time_first'],
+    )
 
     return vars(parser.parse_args())
 
@@ -41,10 +48,16 @@ def run_experiment(args, config, **kwargs):
     type(config).base_path = args['o']
     os.makedirs(f'{args["o"]}/data', exist_ok=True)
 
+    if args['mode'] == 'benchmark':
+        config.prepare_for_benchmark()
+
     description = config.get_description(
         useGPU=args['useGPU'], MPIsweeper=args['procs'][1] > 1, res=args['res'], dt=args['dt'], **kwargs
     )
     controller_params = config.get_controller_params(logger_level=args['logger_level'])
+
+    if args['mode'] == 'benchmark':
+        config.prepare_description_for_benchmark(description, controller_params)
 
     if args['useGPU']:
         from pySDC.implementations.hooks.log_timings import GPUTimings
@@ -58,6 +71,9 @@ def run_experiment(args, config, **kwargs):
     prob = controller.MS[0].levels[0].prob
 
     u0, t0 = config.get_initial_condition(prob, restart_idx=args['restart_idx'])
+
+    if args['mode'] == 'benchmark':
+        config.prepare_caches_for_benchmark(prob, controller)
 
     config.prepare_caches(prob)
 
@@ -81,7 +97,7 @@ if __name__ == '__main__':
 
     config = get_config(args)
 
-    if args['mode'] == 'run':
+    if args['mode'] in ['run', 'benchmark']:
         run_experiment(args, config)
     else:
         raise NotImplementedError

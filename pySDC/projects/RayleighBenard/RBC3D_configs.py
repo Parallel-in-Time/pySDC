@@ -125,6 +125,61 @@ class RayleighBenard3DRegular(Config):
         """
         prob.eval_f(prob.u_init)
 
+    def prepare_for_benchmark(self):
+        def _pass(*args, **kwargs):
+            pass
+
+        self.get_LogToFile = _pass
+
+    def prepare_caches_for_benchmark(self, prob, controller):
+        _rhs = prob.u_init
+        sweeper = controller.MS[0].levels[0].sweep
+        _dt = sweeper.level.dt
+
+        hooks = controller.hooks
+
+        # mute controller
+        type(controller).hooks = []
+        controller.run(_rhs, 0, _dt)
+
+        # unmute controller
+        controller.hooks = hooks
+
+        try:
+            import cuda as cp
+
+            cp.cuda.get_current_stream().synchronize()
+        except ModuleNotFoundError:
+            pass
+        from mpi4py import MPI
+
+        MPI.COMM_WORLD.Barrier()
+        controller.logger.critical('Set up caches for benchmarking')
+
+    def prepare_description_for_benchmark(self, description, controller_params):
+        from pySDC.projects.RayleighBenard.benchmarks.print_timings_hook import PrintCPUTimings, PrintGPUTimings
+        from mpi4py import MPI
+
+        self.Tend = 5 * description['level_params']['dt']
+
+        controller_params['logger_level'] = 40
+        controller_params['hook_class'] += [PrintCPUTimings]
+        if description['problem_params']['useGPU']:
+            controller_params['hook_class'] += [PrintGPUTimings]
+
+        description['problem_params']['max_cached_factorizations'] = 99
+
+        time_rank = 0
+        if 'comm' in description['sweeper_params'].keys():
+            time_rank = description['sweeper_params']['comm'].rank
+        for i in range(MPI.COMM_WORLD.size):
+            if MPI.COMM_WORLD.rank == i:
+                print(
+                    f'Global rank {MPI.COMM_WORLD.rank} is {time_rank} in time and {description["problem_params"]["comm"].rank} in space',
+                    flush=True,
+                )
+            MPI.COMM_WORLD.barrier()
+
 
 class RBC3Dverification(RayleighBenard3DRegular):
     converged = 0

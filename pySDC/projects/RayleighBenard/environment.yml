@@ -12,6 +12,7 @@ dependencies:
   - mpi4py-fft>=2.0.2
   - mpi4py>=3.0.0
   - tqdm
+  - pandas
   - pip
   - pip:
     - qmat>=0.1.8
