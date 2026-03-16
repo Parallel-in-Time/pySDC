@@ -75,7 +75,7 @@ def test_eval_f():
     # Apply mass matrix to obtain M * (nu * Delta u)
     Mlap_u = prob.apply_mass_matrix(prob.dtype_u(df.interpolate(lap_u, prob.V)))
 
-    # bouandary condition
+    # boundary condition
     bc = df.DirichletBC(prob.V, lap_u, 'on_boundary')
     bc.apply(f.impl.values.vector())
     bc.apply(Mlap_u.values.vector())
