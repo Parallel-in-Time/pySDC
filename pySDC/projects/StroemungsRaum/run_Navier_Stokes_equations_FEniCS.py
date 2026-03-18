@@ -2,8 +2,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_FEniCS import fenics_NSE_2D_mass
 from pySDC.projects.StroemungsRaum.sweepers.imex_1st_order_mass_NSE import imex_1st_order_mass_NSE
 
-
-def setup(t0=None):
+def setup(t0=0):
     """
     Helper routine to set up parameters
 
@@ -22,7 +21,7 @@ def setup(t0=None):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1e-9
+    level_params['e_tol'] = 1e-9
     level_params['dt'] = dt
 
     # initialize step parameters
@@ -76,8 +75,8 @@ def run_simulation(description, controller_params, Tend):
            Problem instance containing the final solution and other problem-related information.
         stats: dict,
            collected runtime statistics,
-        rel_err: float,
-           relative final-time error.
+        uend: FEniCS function,
+           Final solution at time Tend.
     """
     # get initial time from description
     t0 = description['problem_params']['t0']
@@ -103,5 +102,5 @@ if __name__ == "__main__":
     # run the setup to get description and controller parameters
     description, controller_params = setup(t0=t0)
 
-    # run the simulation and get the problem, stats and relative error
+    # run the simulation and get the problem, stats and final solution
     problem, stats, uend = run_simulation(description, controller_params, Tend)

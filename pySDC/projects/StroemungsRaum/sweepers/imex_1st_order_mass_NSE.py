@@ -1,11 +1,10 @@
 from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
 
-
 class imex_1st_order_mass_NSE(imex_1st_order_mass):
     """
-    Custom sweeper class, implements Sweeper.py
-
-    First-order IMEX sweeper using implicit/explicit Euler as base integrator, with mass or weighting matrix
+    Custom sweeper class implementing IMEX SDC for solving the incompressible Navier–Stokes equations
+    using a projection method.
+    
     """
 
     def update_nodes(self):
@@ -18,10 +17,7 @@ class imex_1st_order_mass_NSE(imex_1st_order_mass):
         # get current level and problem description
         L = self.level
         P = L.prob
-
-        #  store old value for residual computation
-        L.uold = L.u.copy()
-
+        
         # only if the level has been touched before
         assert L.status.unlocked
 
@@ -72,48 +68,4 @@ class imex_1st_order_mass_NSE(imex_1st_order_mass):
         L.status.updated = True
         return None
 
-    def compute_residual(self, stage=None):
-        """
-        Computation of the residual using the collocation matrix Q
-
-        Args:
-            stage (str): The current stage of the step the level belongs to
-        """
-
-        # get current level and problem description
-        L = self.level
-
-        # Check if we want to skip the residual computation to gain performance
-        # Keep in mind that skipping any residual computation is likely to give incorrect outputs of the residual!
-        if stage in self.params.skip_residual_computation:
-            L.status.residual = 0.0 if L.status.residual is None else L.status.residual
-            return None
-
-        # compute the residual for each node
-        # build QF(u)
-        res_norm = []
-        res = [0] * (self.coll.num_nodes + 1)
-        for m in range(self.coll.num_nodes):
-
-            # compute the residual at node m, using the incremental criterion
-            if L.uold[m + 1] is not None:
-                res[m] = L.u[m + 1] - L.uold[m + 1]
-            else:
-                res[m] = L.u[m + 1]
-
-            # Due to different boundary conditions we might have to fix the residual
-            if L.prob.fix_bc_for_residual:
-                L.prob.fix_residual(res[m])
-            # use abs function from data type here
-            res_norm.append(abs(res[m]))
-
-        # find maximal residual over the nodes
-        L.status.residual = max(res_norm)
-
-        if L.time == 3.1250000000e-04 and L.status.residual == 0.0:
-            L.status.residual = 1.0
-
-        # indicate that the residual has seen the new values
-        L.status.updated = False
-
-        return None
+    

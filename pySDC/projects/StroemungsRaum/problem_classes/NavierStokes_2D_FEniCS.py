@@ -6,11 +6,10 @@ import os
 from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_fenics_mesh
 
-
 class fenics_NSE_2D_mass(Problem):
     r"""
     Example implementing a forced two-dimensional incompressible Navier–Stokes problem for the DFG
-    benchmark flow around cyilder using FEniCS (dolfin).
+    benchmark flow around cylinder using FEniCS (dolfin).
 
     The unknowns are the velocity field :math:`\mathbf{u}(x,y,t)` and the pressure field
     :math:`p(x,y,t)` on a 2D domain :math:`\Omega` (here loaded from ``cylinder.xml``).
@@ -175,13 +174,14 @@ class fenics_NSE_2D_mass(Problem):
         rhs : dtype_f
             Right-hand side for the nonlinear system.
         factor : float
-            Abbrev. for the node-to-node stepsize (or any other factor required).
+           Factor for the linear system.
         u0 : dtype_u
             Initial guess for the iterative solver (not used here so far).
         t : float
             Current time.
         dtau : float
-            Node-to-node stepsize
+              Local time increment between consecutive collocation nodes in the SDC sweep,
+              used in the pressure correction step.
 
         Returns
         -------
