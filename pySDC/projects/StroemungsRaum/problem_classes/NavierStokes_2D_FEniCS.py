@@ -6,6 +6,7 @@ import os
 from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_fenics_mesh
 
+
 class fenics_NSE_2D_mass(Problem):
     r"""
     Example implementing a forced two-dimensional incompressible Navier–Stokes problem for the DFG

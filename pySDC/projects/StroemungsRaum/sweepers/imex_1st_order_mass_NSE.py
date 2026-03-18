@@ -1,10 +1,11 @@
 from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
 
+
 class imex_1st_order_mass_NSE(imex_1st_order_mass):
     """
     Custom sweeper class implementing IMEX SDC for solving the incompressible Navier–Stokes equations
     using a projection method.
-    
+
     """
 
     def update_nodes(self):
@@ -17,7 +18,7 @@ class imex_1st_order_mass_NSE(imex_1st_order_mass):
         # get current level and problem description
         L = self.level
         P = L.prob
-        
+
         # only if the level has been touched before
         assert L.status.unlocked
 
@@ -67,5 +68,3 @@ class imex_1st_order_mass_NSE(imex_1st_order_mass):
         # indicate presence of new values at this level
         L.status.updated = True
         return None
-
-    
