@@ -257,8 +257,8 @@ class RBCProblem2D():
         p = cls(**pParams)
 
         dt = baseDt/p.resFactor
-        nSteps = round(float(tEnd-tBeg)/dt, ndigits=3)
-        if float(tEnd-tBeg) != round(nSteps*dt, ndigits=3):
+        nSteps = round(float(tEnd-tBeg)/dt, ndigits=6)
+        if float(tEnd-tBeg) != round(nSteps*dt, ndigits=6):
             raise ValueError(f"{tEnd=} is not divisible by timestep {dt=} ({nSteps=})")
         nSteps = int(nSteps)
         p.infos.update(tEnd=tEnd, dt=dt, nSteps=nSteps)
