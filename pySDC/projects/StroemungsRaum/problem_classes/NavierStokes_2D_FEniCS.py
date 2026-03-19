@@ -181,8 +181,7 @@ class fenics_NSE_2D_mass(Problem):
         t : float
             Current time.
         dtau : float
-              Local time increment between consecutive collocation nodes in the SDC sweep,
-              used in the pressure correction step.
+              Zero-to-node step size in the SDC sweep, used in the pressure correction step.
 
         Returns
         -------
