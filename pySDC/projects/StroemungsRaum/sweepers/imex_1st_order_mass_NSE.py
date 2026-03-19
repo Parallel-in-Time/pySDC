@@ -3,8 +3,8 @@ from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_o
 
 class imex_1st_order_mass_NSE(imex_1st_order_mass):
     """
-    This sweeper extends imex_1st_order_mass for a projection-based discretization of the incompressible 
-    Navier–Stokes equations. This requires passing the zero-to-node step size at each collocation 
+    This sweeper extends imex_1st_order_mass for a projection-based discretization of the incompressible
+    Navier–Stokes equations. This requires passing the zero-to-node step size at each collocation
     node and handling the update of the velocity and the pressure within `solve_system`
 
     """
