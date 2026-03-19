@@ -257,8 +257,8 @@ class RBCProblem2D():
         p = cls(**pParams)
 
         dt = baseDt/p.resFactor
-        nSteps = round(float(tEnd-tBeg)/dt, ndigits=6)
-        if float(tEnd-tBeg) != round(nSteps*dt, ndigits=6):
+        nSteps = round(float(tEnd-tBeg)/dt, ndigits=3)
+        if float(tEnd-tBeg) != round(nSteps*dt, ndigits=3):
             raise ValueError(f"{tEnd=} is not divisible by timestep {dt=} ({nSteps=})")
         nSteps = int(nSteps)
         p.infos.update(tEnd=tEnd, dt=dt, nSteps=nSteps)
@@ -305,8 +305,8 @@ class RBCProblem2D():
         # Fields IO
         if dtWrite:
             cls.log(" -- setting up fields output ...")
-            iterWrite = dtWrite/dt
-            if int(iterWrite) != round(iterWrite, ndigits=3):
+            iterWrite = round(float(dtWrite/dt), ndigits=3)
+            if float(dtWrite) != round(iterWrite*dt, ndigits=3):
                 raise ValueError(f"{dtWrite=} is not divisible by {dt=} ({iterWrite=})")
             iterWrite = int(iterWrite)
             snapshots = solver.evaluator.add_file_handler(
