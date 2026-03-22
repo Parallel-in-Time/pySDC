@@ -5,7 +5,7 @@ time-dependent Dirichlet boundary conditions, using FEM (FEniCS).
 This module reproduces the results from the order-reduction document referenced in
 the pySDC issue: *SDC with time-dependent boundary conditions*.
 
-Two test cases are compared:
+Three test cases are compared:
 
 - **Sine solution** (``fenics_heat_mass``):
   :math:`u(x,t) = \\sin(\\pi x)\\cos(t) + c` with homogeneous Dirichlet BCs.
@@ -23,6 +23,13 @@ Two test cases are compared:
   solution, resulting in an effective convergence order lower than the theoretical
   SDC order.
 
+- **Cosine solution with boundary lifting** (``fenics_heat_mass_timebc_lift``):
+  Uses the same cosine solution but decomposes :math:`u = v + E` where
+  :math:`E(x,t) = (1-2x)\\cos(t) + c` is a linear lift satisfying the
+  time-dependent BCs. The transformed variable :math:`v = u - E` satisfies
+  homogeneous Dirichlet BCs, and SDC is applied to :math:`v` with a corrected
+  forcing term. This approach **restores full order** of convergence.
+
 Usage
 -----
 Run directly::
@@ -38,6 +45,7 @@ from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced 
     fenics_heat_mass_timebc,
 )
 from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
+from pySDC.playgrounds.FEniCS.order_reduction.problem_classes import fenics_heat_mass_timebc_lift
 
 
 def build_description(problem_class, num_nodes, dt, t0=0.0, c_nvars=64, nu=0.1, c=0.0):
@@ -47,7 +55,8 @@ def build_description(problem_class, num_nodes, dt, t0=0.0, c_nvars=64, nu=0.1, 
     Parameters
     ----------
     problem_class : type
-        Either ``fenics_heat_mass`` or ``fenics_heat_mass_timebc``.
+        Either ``fenics_heat_mass``, ``fenics_heat_mass_timebc``, or
+        ``fenics_heat_mass_timebc_lift``.
     num_nodes : int
         Number of SDC collocation nodes (RADAU-RIGHT).
     dt : float
@@ -179,6 +188,7 @@ def main():
     for problem_class, label in [
         (fenics_heat_mass, "Sine  (homogeneous BCs, no order reduction)"),
         (fenics_heat_mass_timebc, "Cosine (time-dependent BCs, order reduction)"),
+        (fenics_heat_mass_timebc_lift, "Cosine + lifting (boundary lifting, full order restored)"),
     ]:
         errors, order = compute_order(problem_class, dts, num_nodes=num_nodes, Tend=Tend)
         print(f"\n{label}")

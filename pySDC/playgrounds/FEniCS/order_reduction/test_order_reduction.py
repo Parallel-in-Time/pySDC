@@ -2,7 +2,7 @@
 Tests verifying the SDC order-reduction behaviour with time-dependent Dirichlet
 boundary conditions, using the FEniCS-based 1D heat equation problem classes.
 
-Two scenarios are tested:
+Three scenarios are tested:
 
 1. **Sine solution** (``fenics_heat_mass``, homogeneous BCs):
    SDC achieves the expected collocation order (≈ 2M − 1 for RADAU-RIGHT with M nodes).
@@ -11,6 +11,12 @@ Two scenarios are tested:
    The standard FEniCS BC imposition via ``bc.apply(b.values.vector())`` in
    ``solve_system`` causes order reduction — the observed convergence order is
    lower than the theoretical SDC order.
+
+3. **Cosine solution with boundary lifting** (``fenics_heat_mass_timebc_lift``):
+   The boundary lifting approach decomposes ``u = v + E``, where ``E`` is a
+   linear lift satisfying the time-dependent BCs. The transformed variable ``v``
+   satisfies homogeneous BCs, and SDC applied to ``v`` **restores the full
+   convergence order**.
 
 All tests are marked ``@pytest.mark.fenics`` because they require the FEniCS/dolfin
 library.
@@ -79,3 +85,47 @@ def test_cosine_has_lower_order_than_sine():
     _, order_cosine = compute_order(fenics_heat_mass_timebc, _DTS, num_nodes=num_nodes, Tend=_TEND, c_nvars=_C_NVARS)
 
     assert order_sine > order_cosine + 1.0, f"Sine order ({order_sine:.2f}) should be > cosine timebc order ({order_cosine:.2f}) + 1.0"
+
+
+@pytest.mark.fenics
+@pytest.mark.parametrize("num_nodes", [2, 3])
+def test_lifting_restores_full_order(num_nodes):
+    """
+    Cosine solution with boundary lifting must recover the full SDC order.
+
+    The boundary lifting approach (``fenics_heat_mass_timebc_lift``) transforms
+    the problem so that the solver sees homogeneous BCs. This eliminates the
+    source of order reduction and the observed convergence order must be at
+    least 2M − 2.
+    """
+    from pySDC.playgrounds.FEniCS.order_reduction.run_convergence import compute_order
+    from pySDC.playgrounds.FEniCS.order_reduction.problem_classes import fenics_heat_mass_timebc_lift
+
+    errors, order = compute_order(fenics_heat_mass_timebc_lift, _DTS, num_nodes=num_nodes, Tend=_TEND, c_nvars=_C_NVARS)
+
+    expected = 2 * num_nodes - 1
+    assert order >= expected - 1.0, (
+        f"Lifting case (M={num_nodes}): expected order >= {expected - 1.0:.1f} (full order restored), got {order:.2f}"
+    )
+
+
+@pytest.mark.fenics
+def test_lifting_has_higher_order_than_timebc():
+    """
+    The boundary lifting case must converge faster than the plain time-dependent BC case.
+
+    This verifies that the lifting correction actually fixes the order reduction.
+    """
+    from pySDC.playgrounds.FEniCS.order_reduction.run_convergence import compute_order
+    from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import fenics_heat_mass_timebc
+    from pySDC.playgrounds.FEniCS.order_reduction.problem_classes import fenics_heat_mass_timebc_lift
+
+    num_nodes = 3
+    _, order_timebc = compute_order(fenics_heat_mass_timebc, _DTS, num_nodes=num_nodes, Tend=_TEND, c_nvars=_C_NVARS)
+    _, order_lift = compute_order(
+        fenics_heat_mass_timebc_lift, _DTS, num_nodes=num_nodes, Tend=_TEND, c_nvars=_C_NVARS
+    )
+
+    assert order_lift > order_timebc + 1.0, (
+        f"Lifting order ({order_lift:.2f}) should be > timebc order ({order_timebc:.2f}) + 1.0"
+    )
