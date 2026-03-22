@@ -177,7 +177,9 @@ def compute_order(problem_class, dts, **kwargs):
 def main():
     """Run the convergence study and print results."""
     num_nodes = 3
-    dts = [0.2 / 2**k for k in range(4)]
+    # Use dt values in the large-dt asymptotic regime so temporal errors
+    # dominate over the FEM spatial discretization error for all three cases.
+    dts = [0.5 / 2**k for k in range(3)]
     Tend = 1.0
 
     print("=" * 70)
