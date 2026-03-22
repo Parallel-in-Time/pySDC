@@ -34,15 +34,13 @@ def test_sine_no_order_reduction(num_nodes):
     For RADAU-RIGHT collocation with M nodes and a fully converged SDC iteration,
     the expected order is 2M − 1. The measured order must be at least 2M − 2.
     """
-    from pySDC.projects.order_reduction.run_convergence import compute_order
+    from pySDC.playgrounds.FEniCS.order_reduction.run_convergence import compute_order
     from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import fenics_heat_mass
 
     errors, order = compute_order(fenics_heat_mass, _DTS, num_nodes=num_nodes, Tend=_TEND, c_nvars=_C_NVARS)
 
     expected = 2 * num_nodes - 1
-    assert order >= expected - 1.0, (
-        f"Sine case (M={num_nodes}): expected order ≥ {expected - 1.0:.1f}, got {order:.2f}"
-    )
+    assert order >= expected - 1.0, f"Sine case (M={num_nodes}): expected order >= {expected - 1.0:.1f}, got {order:.2f}"
 
 
 @pytest.mark.fenics
@@ -54,16 +52,14 @@ def test_cosine_order_reduction():
     strictly less than the theoretical SDC order (2M − 1) due to the naive
     time-dependent BC imposition that causes order reduction.
     """
-    from pySDC.projects.order_reduction.run_convergence import compute_order
+    from pySDC.playgrounds.FEniCS.order_reduction.run_convergence import compute_order
     from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import fenics_heat_mass_timebc
 
     num_nodes = 3
     errors, order = compute_order(fenics_heat_mass_timebc, _DTS, num_nodes=num_nodes, Tend=_TEND, c_nvars=_C_NVARS)
 
     theoretical_order = 2 * num_nodes - 1  # = 5 for M=3
-    assert order < theoretical_order - 1.0, (
-        f"Cosine timebc case: expected order < {theoretical_order - 1.0:.1f} (order reduction), got {order:.2f}"
-    )
+    assert order < theoretical_order - 1.0, f"Cosine timebc case: expected order < {theoretical_order - 1.0:.1f} (order reduction), got {order:.2f}"
 
 
 @pytest.mark.fenics
@@ -72,7 +68,7 @@ def test_cosine_has_lower_order_than_sine():
     The cosine solution (time-dependent BCs) must converge slower than the
     sine solution (homogeneous BCs) — i.e., order reduction is present.
     """
-    from pySDC.projects.order_reduction.run_convergence import compute_order
+    from pySDC.playgrounds.FEniCS.order_reduction.run_convergence import compute_order
     from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import (
         fenics_heat_mass,
         fenics_heat_mass_timebc,
@@ -82,6 +78,4 @@ def test_cosine_has_lower_order_than_sine():
     _, order_sine = compute_order(fenics_heat_mass, _DTS, num_nodes=num_nodes, Tend=_TEND, c_nvars=_C_NVARS)
     _, order_cosine = compute_order(fenics_heat_mass_timebc, _DTS, num_nodes=num_nodes, Tend=_TEND, c_nvars=_C_NVARS)
 
-    assert order_sine > order_cosine + 1.0, (
-        f"Sine order ({order_sine:.2f}) should be > cosine timebc order ({order_cosine:.2f}) + 1.0"
-    )
+    assert order_sine > order_cosine + 1.0, f"Sine order ({order_sine:.2f}) should be > cosine timebc order ({order_cosine:.2f}) + 1.0"
