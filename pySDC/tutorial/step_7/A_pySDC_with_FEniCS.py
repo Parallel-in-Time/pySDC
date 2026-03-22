@@ -8,7 +8,6 @@ from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced 
     fenics_heat_mass,
     fenics_heat,
     fenics_heat_mass_timebc,
-    fenics_heat_mass_timebc_lift,
 )
 from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass, imex_1st_order
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
@@ -108,11 +107,6 @@ def run_variants(variant=None, ml=None, num_procs=None):
         description['level_params']['restol'] *= 20
         description['problem_class'] = fenics_heat_mass_timebc
         description['sweeper_class'] = imex_1st_order_mass
-    elif variant == 'mass_timebc_lift':
-        # Boundary lifting restores full order: tolerance can be tightened like the full-order variants
-        description['level_params']['restol'] /= 500
-        description['problem_class'] = fenics_heat_mass_timebc_lift
-        description['sweeper_class'] = imex_1st_order_mass
     else:
         raise NotImplementedError('Variant %s is not implemented' % variant)
 
@@ -161,7 +155,7 @@ def run_variants(variant=None, ml=None, num_procs=None):
 
     if num_procs == 1:
         assert np.mean(niters) <= 6.0, 'Mean number of iterations is too high, got %s' % np.mean(niters)
-        if variant == 'mass' or variant == 'mass_inv' or variant == 'mass_timebc_lift':
+        if variant == 'mass' or variant == 'mass_inv':
             assert err <= 1.15e-08, 'Error is too high, got %s' % err
         else:
             assert err <= 3.25e-07, 'Error is too high, got %s' % err
@@ -178,7 +172,6 @@ def main():
     run_variants(variant='mass_inv', ml=False, num_procs=1)
     run_variants(variant='mass', ml=False, num_procs=1)
     run_variants(variant='mass_timebc', ml=False, num_procs=1)
-    run_variants(variant='mass_timebc_lift', ml=False, num_procs=1)
     run_variants(variant='mass_inv', ml=True, num_procs=1)
     run_variants(variant='mass', ml=True, num_procs=1)
     run_variants(variant='mass_timebc', ml=True, num_procs=1)
