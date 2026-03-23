@@ -67,9 +67,10 @@ class fenics_allencahn_imex_timebc(Problem):
 
     * Implicit part: :math:`f_{\mathrm{impl}} = K u`
       (assembled stiffness matrix applied to :math:`u`).
-    * Explicit part: :math:`f_{\mathrm{expl}} = M N(u)`
-      (mass-matrix-weighted nodal evaluation of the nonlinear reaction
-      :math:`N(u) = -\frac{2}{\varepsilon^2} u(1-u)(1-2u) - 6 d_w u(1-u)`).
+    * Explicit part: :math:`f_{\mathrm{expl}} = M(-N(u))`
+      where :math:`N(u) = \frac{2}{\varepsilon^2} u(1-u)(1-2u) + 6 d_w u(1-u)`
+      is the positive reaction function, so that the PDE reads
+      :math:`u_t = u_{xx} - N(u)`.
 
     Parameters
     ----------
@@ -218,9 +219,9 @@ class fenics_allencahn_imex_timebc(Problem):
         Evaluate both parts of the right-hand side.
 
         * ``f.impl = K u`` — stiffness matrix applied to :math:`u`.
-        * ``f.expl = M N(u)`` — mass-matrix-weighted nodal evaluation of the
-          nonlinear reaction
-          :math:`N(u) = -\tfrac{2}{\varepsilon^2}u(1-u)(1-2u) - 6d_w u(1-u)`.
+        * ``f.expl = M(-N(u))`` — mass-matrix-weighted negated reaction, where
+          :math:`N(u) = \tfrac{2}{\varepsilon^2}u(1-u)(1-2u) + 6d_w u(1-u)`
+          so that the Allen-Cahn PDE reads :math:`u_t = u_{xx} - N(u)`.
 
         Parameters
         ----------
@@ -236,13 +237,14 @@ class fenics_allencahn_imex_timebc(Problem):
         # Implicit part: stiffness applied to u
         self.K.mult(u.values.vector(), f.impl.values.vector())
 
-        # Explicit part: nonlinear reaction N(u), mass-weighted
+        # Explicit part: -N(u), mass-weighted
+        # N(u) = (2/eps^2)*u*(1-u)*(1-2u) + 6*dw*u*(1-u)  [positive reaction]
         u_vec = u.values.vector()[:]
         eps2 = self.eps**2
-        N_nodal = -(2.0 / eps2) * u_vec * (1.0 - u_vec) * (1.0 - 2.0 * u_vec) - 6.0 * self.dw * u_vec * (1.0 - u_vec)
-        N_fn = self.dtype_u(self.V)
-        N_fn.values.vector()[:] = N_nodal
-        f.expl = self.apply_mass_matrix(N_fn)
+        pos_N = (2.0 / eps2) * u_vec * (1.0 - u_vec) * (1.0 - 2.0 * u_vec) + 6.0 * self.dw * u_vec * (1.0 - u_vec)
+        expl_fn = self.dtype_u(self.V)
+        expl_fn.values.vector()[:] = -pos_N
+        f.expl = self.apply_mass_matrix(expl_fn)
 
         return f
 
@@ -411,9 +413,9 @@ class fenics_allencahn_imex_timebc_lift(fenics_allencahn_imex_timebc):
         Evaluate both parts of the right-hand side for the lifted variable.
 
         * ``f.impl = K v`` — stiffness applied to :math:`v`.
-        * ``f.expl = M(-N(v + E) - E_t)`` — mass-weighted sum of the
-          nonlinear reaction evaluated at :math:`u = v + E` and the
-          negated lift time-derivative :math:`E_t`.
+        * ``f.expl = M(-N(v + E) - E_t)`` — mass-weighted negated reaction
+          :math:`N(v+E)` plus negated lift derivative :math:`E_t`, where
+          :math:`N(u) = \tfrac{2}{\varepsilon^2}u(1-u)(1-2u) + 6d_w u(1-u)`.
 
         Parameters
         ----------
@@ -436,14 +438,14 @@ class fenics_allencahn_imex_timebc_lift(fenics_allencahn_imex_timebc):
         # u = v + E at DOF locations
         u_vals = v.values.vector()[:] + E_vals
 
-        # Nonlinear reaction evaluated at u = v + E: N(u) = -(2/eps^2)*u*(1-u)*(1-2u) - 6*dw*u*(1-u)
+        # N(v+E) = (2/eps^2)*u*(1-u)*(1-2u) + 6*dw*u*(1-u)  [positive reaction]
         eps2 = self.eps**2
-        N_nodal = -(2.0 / eps2) * u_vals * (1.0 - u_vals) * (1.0 - 2.0 * u_vals) - 6.0 * self.dw * u_vals * (
+        pos_N = (2.0 / eps2) * u_vals * (1.0 - u_vals) * (1.0 - 2.0 * u_vals) + 6.0 * self.dw * u_vals * (
             1.0 - u_vals
         )
 
-        # Explicit forcing for v: -N(v+E) - E_t
-        expl_nodal = N_nodal - Et_vals
+        # Explicit forcing for v: -N(v+E) - E_t  (matches lifted equation v_t = v_xx - N(v+E) - E_t)
+        expl_nodal = -pos_N - Et_vals
 
         expl_fn = self.dtype_u(self.V)
         expl_fn.values.vector()[:] = expl_nodal
