@@ -22,22 +22,8 @@ class GenericSpectralLinearTimeDepBCs(GenericSpectralLinear):
 
         if self.spectral_space:
             rhs_hat = rhs.copy()
-            if u0 is not None:
-                u0_hat = u0.copy().flatten()
-            else:
-                u0_hat = None
         else:
             rhs_hat = self.spectral.transform(rhs)
-            if u0 is not None:
-                u0_hat = self.spectral.transform(u0).flatten()
-            else:
-                u0_hat = None
-
-        # apply inverse right preconditioner to initial guess
-        if u0_hat is not None and 'direct' not in self.solver_type:
-            if not hasattr(self, '_Pr_inv'):
-                self._PR_inv = self.linalg.splu(self.Pr.astype(complex)).solve
-            u0_hat[...] = self._PR_inv(u0_hat)
 
         rhs_hat = (self.M @ rhs_hat.flatten()).reshape(rhs_hat.shape)
         rhs_hat = self.spectral.put_BCs_in_rhs_hat(rhs_hat)
@@ -47,19 +33,8 @@ class GenericSpectralLinearTimeDepBCs(GenericSpectralLinear):
         rhs_hat = self.Pl @ rhs_hat.flatten()
 
         if dt not in self.cached_factorizations.keys():
-            if self.heterogeneous:
-                M = self.M_CPU
-                L = self.L_CPU
-                Pl = self.Pl_CPU
-                Pr = self.Pr_CPU
-            else:
-                M = self.M
-                L = self.L
-                Pl = self.Pl
-                Pr = self.Pr
-
-            A = M + dt * L
-            A = Pl @ self.spectral.put_BCs_in_matrix(A) @ Pr
+            A = self.M + dt * self.L
+            A = self.Pl @ self.spectral.put_BCs_in_matrix(A) @ self.Pr
 
         if dt not in self.cached_factorizations.keys():
             if len(self.cached_factorizations) >= self.max_cached_factorizations:
@@ -84,10 +59,6 @@ class GenericSpectralLinearTimeDepBCs(GenericSpectralLinear):
         else:
             sol = self.spectral.u_init
             sol[:] = self.spectral.itransform(sol_hat).real
-
-            if self.spectral.debug:
-                self.spectral.check_BCs(sol)
-
             return sol
 
 
