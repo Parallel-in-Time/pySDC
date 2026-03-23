@@ -8,7 +8,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.implementations.hooks.plotting import PlotPostStep
 
 
-def run_heat(dt=1e-1, Tend=4):
+def run_heat(dt=1e-1, Tend=4, plotting=False):
     level_params = {}
     level_params['dt'] = dt
 
@@ -24,7 +24,8 @@ def run_heat(dt=1e-1, Tend=4):
 
     controller_params = {}
     controller_params['logger_level'] = 15
-    controller_params['hook_class'] = PlotPostStep
+    if plotting:
+        controller_params['hook_class'] = PlotPostStep
 
     description = {}
     description['problem_class'] = Heat1DTimeDependentBCs
@@ -47,5 +48,5 @@ def run_heat(dt=1e-1, Tend=4):
 
 
 if __name__ == '__main__':
-    run_heat()
+    run_heat(plotting=True)
     plt.show()

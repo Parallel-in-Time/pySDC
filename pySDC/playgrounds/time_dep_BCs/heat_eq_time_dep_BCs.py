@@ -195,6 +195,8 @@ class Heat1DTimeDependentBCs(GenericSpectralLinearTimeDepBCs):
         """
         Put the time dependent BCs in the right hand side.
 
+        See Section 2.5.10 in https://doi.org/10.15480/882.16360 for details on the implementation of the boundary conditions.
+
         In this simple 1D case the BCs are simply in the last two lines of the problem, so we can put there whatever we want.
         Note that in 2D you essentially do the same, but you need to unflatten the RHS, put the BCs in the last lines, and then reflatten.
         """
