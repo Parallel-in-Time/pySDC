@@ -19,7 +19,7 @@ def test_time_dep_heat_eq(a, b, t):
     expect_boundary = np.empty((2, 2))
     expect_boundary = problem.put_time_dep_BCs_in_rhs(expect_boundary, t)
 
-    # we use T_n(1) = 1 and T_n(-1) = (1)^n, to compute the values at the boundaries from the spectral representation
+    # we use T_n(1) = 1 and T_n(-1) = (-1)^n, to compute the values at the boundaries from the spectral representation
     # see Wikipedia for more details: https://en.wikipedia.org/wiki/Chebyshev_polynomials#Roots_and_extrema
     right_boundary = u.sum()
     expect_right_boundary = expect_boundary[0, -2]
