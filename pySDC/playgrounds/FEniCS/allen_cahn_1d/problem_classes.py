@@ -55,13 +55,13 @@ class fenics_allencahn_imex_timebc(Problem):
 
     .. code-block:: python
 
-        self.bc.apply(T, b.values.vector())   # modifies system matrix
-        self.bc.apply(b.values.vector())      # overwrites boundary DOFs
+        self.bc.apply(T, b.values.vector())
 
-    The second line *overwrites* boundary entries of the accumulated SDC
-    right-hand side with the exact boundary value at the new time.  This
-    disrupts the implicit sweeper's fixed-point equation and leads to
-    **SDC order reduction**.
+    Dolfin's ``apply(A, b)`` call modifies the system matrix *and* overwrites
+    the boundary DOFs of ``b`` with the Dirichlet value :math:`u_D(t)`.  This
+    replaces whatever the SDC iteration had accumulated at the boundary nodes
+    with the exact data at the *new* time, disrupting the implicit sweeper's
+    fixed-point equation and leading to **SDC order reduction**.
 
     **IMEX split**
 
@@ -179,16 +179,17 @@ class fenics_allencahn_imex_timebc(Problem):
         r"""
         Solve the linear system :math:`(M - \text{factor}\,K)\,u = \text{rhs}`.
 
-        The time-dependent BC is applied via two ``bc.apply`` calls:
+        The time-dependent BC is imposed via
 
-        * ``bc.apply(T, b.values.vector())`` — modifies the system matrix;
-        * ``bc.apply(b.values.vector())`` — **overwrites** boundary DOFs of
-          the right-hand side with :math:`u_D(t)`.
+        .. code-block:: python
 
-        The second call is the source of **SDC order reduction**: it replaces
-        whatever value the SDC iteration accumulated at the boundary with the
-        exact Dirichlet data at the *new* time, breaking the fixed-point
-        property of the sweep.
+            self.bc.apply(T, b.values.vector())
+
+        Dolfin's ``apply(A, b)`` call simultaneously modifies the system matrix
+        *and* **overwrites** the boundary DOFs of ``b`` with the Dirichlet value
+        :math:`u_D(t)`.  This overwrites whatever values the SDC iteration had
+        accumulated at the boundary nodes, breaking the fixed-point property of
+        the implicit sweep and causing **SDC order reduction**.
 
         Parameters
         ----------
@@ -205,10 +206,11 @@ class fenics_allencahn_imex_timebc(Problem):
         T = self.M - factor * self.K
         b = self.dtype_u(rhs)
 
-        # Update expression time and impose time-dependent BC (causes order reduction)
+        # Update expression time.
+        # bc.apply(T, b) modifies the system matrix AND overwrites boundary DOFs
+        # of b with u_D(t) — this is the source of SDC order reduction.
         self.u_D.t = t
         self.bc.apply(T, b.values.vector())
-        self.bc.apply(b.values.vector())
 
         df.solve(T, u.values.vector(), b.values.vector())
 
