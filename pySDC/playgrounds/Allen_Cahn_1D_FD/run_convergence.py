@@ -13,8 +13,28 @@ Allen-Cahn equation with a travelling-wave solution in two ways:
 **Part 2 – Temporal convergence (fixed sweep count)**
     Fix the spatial grid and perform a fixed number of SDC sweeps *K* per
     time step (instead of iterating to tolerance).  Refining :math:`\\Delta t`
-    shows that more sweeps yield higher-order accuracy, illustrating the
-    key SDC benefit.
+    shows that more sweeps yield higher-order accuracy.
+
+    **Expected orders.**  With Gauss-Radau-Right quadrature (:math:`M` nodes)
+    and a constant initial guess (``initial_guess = 'spread'``, which spreads
+    :math:`u_0` to all collocation nodes and evaluates :math:`f(u_0)` there,
+    giving a first-order-accurate predictor), each IMEX-SDC sweep raises the
+    order of accuracy by one.  After :math:`K` sweeps the expected order is
+    therefore
+
+    .. math::
+
+        p(K) = \\min(K,\\; 2M-1),
+
+    where :math:`2M-1` is the classical collocation order (the fixed-point
+    of the SDC iteration).  For :math:`M = 3` (used here) the maximum is
+    :math:`2 \\times 3 - 1 = 5`.  Since we test :math:`K \\in \\{1,2,3,4\\}`,
+    the expected orders are simply :math:`1, 2, 3, 4`.
+
+    The results below confirm this: the computed order approaches the
+    expected value :math:`K` as :math:`\\Delta t \\to 0`.  The convergence
+    is pre-asymptotic for larger time steps because the nonlinear reaction
+    term delays the onset of the asymptotic regime.
 
 Usage::
 
@@ -35,7 +55,6 @@ Parameters used
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.playgrounds.Allen_Cahn_1D_FD.AllenCahn_1D_FD_IMEX import allencahn_1d_imex
@@ -136,8 +155,11 @@ def temporal_convergence(nvars=127, Tend=0.5, num_nodes=3):
     fixed number of SDC sweeps *K* per step.  The error is measured against
     a fine-:math:`\Delta t` reference solution on the same grid.
 
-    SDC theory predicts that *K* sweeps (with an order-1 predictor) yield
-    approximately order *K* + 1 in practice.
+    With a first-order initial guess (``'spread'``), each IMEX-SDC sweep
+    increases the order of the time-stepping error by one.  After :math:`K`
+    sweeps the expected convergence order is :math:`\min(K,\,2M-1)`, where
+    :math:`2M-1` is the maximum collocation order.  For :math:`M = 3` and
+    :math:`K \le 4` this is simply :math:`K`.
 
     Parameters
     ----------
@@ -146,7 +168,7 @@ def temporal_convergence(nvars=127, Tend=0.5, num_nodes=3):
     Tend : float
         Final time.
     num_nodes : int
-        Number of SDC collocation nodes.
+        Number of SDC collocation nodes (:math:`M`).
 
     Returns
     -------
@@ -159,16 +181,19 @@ def temporal_convergence(nvars=127, Tend=0.5, num_nodes=3):
 
     dts = [Tend / (2**k) for k in range(1, 7)]
     sweep_counts = [1, 2, 3, 4]
+    max_order = 2 * num_nodes - 1  # collocation order = 2M-1
 
-    print('\n' + '=' * 60)
+    print('\n' + '=' * 70)
     print('Part 2: Temporal convergence  (nvars = {}, M = {})'.format(nvars, num_nodes))
     print('        error vs. fine-dt reference  (dt_ref = {:.2e})'.format(dt_ref))
-    print('=' * 60)
+    print('        collocation order (max achievable) = 2M-1 = {}'.format(max_order))
+    print('=' * 70)
 
     results = {}
     for K in sweep_counts:
-        print(f'\n  K = {K} SDC sweep(s) per step:')
-        print(f'  {"dt":>10}  {"error (inf)":>14}  {"order":>8}')
+        expected = min(K, max_order)
+        print(f'\n  K = {K} SDC sweep(s) per step  (expected order {expected}):')
+        print(f'  {"dt":>10}  {"error (inf)":>14}  {"order":>8}  {"expected":>10}')
         errs = []
         for dt in dts:
             uend, _, _ = _run(nvars, dt, num_nodes=num_nodes, max_iter=K, restol=1e-20, Tend=Tend)
@@ -176,9 +201,9 @@ def temporal_convergence(nvars=127, Tend=0.5, num_nodes=3):
             errs.append(err)
             if len(errs) > 1 and errs[-2] > 0.0:
                 order = np.log(errs[-2] / err) / np.log(dts[len(errs) - 2] / dt)
-                print(f'  {dt:>10.5f}  {err:>14.4e}  {order:>8.2f}')
+                print(f'  {dt:>10.5f}  {err:>14.4e}  {order:>8.2f}  {expected:>10d}')
             else:
-                print(f'  {dt:>10.5f}  {err:>14.4e}  {"---":>8}')
+                print(f'  {dt:>10.5f}  {err:>14.4e}  {"---":>8}  {expected:>10d}')
         results[K] = (dts, errs)
 
     return results
@@ -188,7 +213,7 @@ def temporal_convergence(nvars=127, Tend=0.5, num_nodes=3):
 # Plotting
 # ---------------------------------------------------------------------------
 
-def make_plot(dxs, sp_errors, temp_results):
+def make_plot(dxs, sp_errors, temp_results, num_nodes=3):
     """Save a two-panel convergence figure."""
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4))
 
@@ -203,14 +228,20 @@ def make_plot(dxs, sp_errors, temp_results):
     ax1.grid(True, which='both', linestyle=':')
 
     # --- Temporal convergence ---
+    max_order = 2 * num_nodes - 1
     markers = ['o', 's', '^', 'D']
     colors = ['C0', 'C1', 'C2', 'C3']
     for (K, (dts, errs)), marker, color in zip(temp_results.items(), markers, colors):
+        expected = min(K, max_order)
         ax2.loglog(dts, errs, marker=marker, color=color, label=f'K={K}')
+        # Reference slope for expected order K
+        ref = errs[-1] * (np.array(dts) / dts[-1]) ** expected
+        ax2.loglog(dts, ref, linestyle='--', color=color, alpha=0.5,
+                   label=f'order {expected} (theory)')
     ax2.set_xlabel(r'$\Delta t$', fontsize=12)
     ax2.set_ylabel(r'error vs. reference', fontsize=12)
-    ax2.set_title('Temporal convergence\n(fixed sweep count K)')
-    ax2.legend(fontsize=9)
+    ax2.set_title(f'Temporal convergence\n(fixed sweep count K, M={num_nodes})')
+    ax2.legend(fontsize=8, ncol=2)
     ax2.grid(True, which='both', linestyle=':')
 
     plt.tight_layout()
