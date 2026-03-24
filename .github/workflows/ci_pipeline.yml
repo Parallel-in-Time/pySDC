@@ -99,6 +99,7 @@ jobs:
           - Second_orderSDC
           - soft_failure
           - TOMS
+          - StroemungsRaum
     defaults:
       run:
         shell: bash -l {0}
