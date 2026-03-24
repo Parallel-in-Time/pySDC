@@ -3,14 +3,14 @@ Convergence study – 1D Allen-Cahn IMEX-SDC
 ===========================================
 
 Demonstrates the finite-difference / IMEX-SDC implementation of the 1D
-Allen-Cahn equation with a travelling-wave solution in two ways:
+Allen-Cahn equation with a travelling-wave solution in three parts:
 
 **Part 1 – Spatial convergence**
     Fix a small time step (SDC converged) and refine the spatial grid.
     The centred-difference Laplacian should give second-order convergence
     in the grid spacing :math:`\\Delta x`.
 
-**Part 2 – Temporal convergence (fixed sweep count)**
+**Part 2 – Temporal convergence: standard formulation**
     Fix the spatial grid and perform a fixed number of SDC sweeps *K* per
     time step (instead of iterating to tolerance).  Refining :math:`\\Delta t`
     shows that more sweeps yield higher-order accuracy.
@@ -31,10 +31,34 @@ Allen-Cahn equation with a travelling-wave solution in two ways:
     :math:`2 \\times 3 - 1 = 5`.  Since we test :math:`K \\in \\{1,2,3,4\\}`,
     the expected orders are simply :math:`1, 2, 3, 4`.
 
-    The results below confirm this: the computed order approaches the
-    expected value :math:`K` as :math:`\\Delta t \\to 0`.  The convergence
-    is pre-asymptotic for larger time steps because the nonlinear reaction
-    term delays the onset of the asymptotic regime.
+    In practice the order stalls below the expected value for :math:`K \\ge 3`:
+    order :math:`\\approx 2.6` for :math:`K = 3` and :math:`\\approx 2.8–3.1`
+    for :math:`K = 4`.  This is *pre-asymptotic* behaviour caused by the
+    nonlinear explicit reaction term; the observed orders do increase with
+    :math:`K` but have not yet reached the asymptotic regime in the
+    :math:`\\Delta t` range tested.
+
+**Part 3 – Temporal convergence: boundary-lifting formulation**
+    The same study repeated with the boundary-lifted formulation
+    (:class:`~AllenCahn_1D_FD_IMEX_Lift.allencahn_1d_imex_lift`).
+
+    **Background.**  In the FEniCS-based problem studied in PR #632, applying
+    time-dependent Dirichlet BCs directly inside ``solve_system`` (by
+    *overwriting* the solution at boundary DOFs) capped the effective order at
+    :math:`\\approx 2` regardless of :math:`K`.  Boundary lifting – reformulating
+    the equation for :math:`v = u - E(t)` where :math:`E` is a linear lift
+    satisfying the BCs – restored the full collocation order there.
+
+    In the *finite-difference* setting used here, the BCs are handled via a
+    boundary-correction vector :math:`b_\\text{bc}(t)` added to
+    :math:`f_\\text{impl}`, which is a proper correction consistent with the
+    SDC collocation framework (no overwriting occurs).  Consequently, the
+    orders for the standard FD formulation are already correct in the
+    asymptotic sense.  As the comparison shows, boundary lifting does **not**
+    meaningfully improve the orders for this problem: both formulations exhibit
+    the same pre-asymptotic stalling for :math:`K \\ge 3`, confirming that
+    the stalling originates in the nonlinear explicit reaction term rather than
+    the BC treatment.
 
 Usage::
 
@@ -58,22 +82,25 @@ import matplotlib.pyplot as plt
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.playgrounds.Allen_Cahn_1D_FD.AllenCahn_1D_FD_IMEX import allencahn_1d_imex
+from pySDC.playgrounds.Allen_Cahn_1D_FD.AllenCahn_1D_FD_IMEX_Lift import allencahn_1d_imex_lift
 
 
 # ---------------------------------------------------------------------------
-# Shared helper
+# Shared helpers
 # ---------------------------------------------------------------------------
 
-def _build_description(nvars, dt, num_nodes, max_iter, restol=1e-12):
-    """Return a pySDC description dict."""
+_PROBLEM_PARAMS = {
+    'eps': 0.3,
+    'dw': -0.04,
+    'interval': (-0.5, 0.5),
+}
+
+
+def _build_description(problem_class, nvars, dt, num_nodes, max_iter, restol=1e-12):
+    """Return a pySDC description dict for *problem_class*."""
     return {
-        'problem_class': allencahn_1d_imex,
-        'problem_params': {
-            'nvars': nvars,
-            'eps': 0.3,
-            'dw': -0.04,
-            'interval': (-0.5, 0.5),
-        },
+        'problem_class': problem_class,
+        'problem_params': {'nvars': nvars, **_PROBLEM_PARAMS},
         'sweeper_class': imex_1st_order,
         'sweeper_params': {
             'quad_type': 'RADAU-RIGHT',
@@ -87,13 +114,22 @@ def _build_description(nvars, dt, num_nodes, max_iter, restol=1e-12):
     }
 
 
-def _run(nvars, dt, num_nodes=3, max_iter=50, restol=1e-12, t0=0.0, Tend=0.5):
-    """Run a single IMEX-SDC simulation and return (solution array, problem, stats)."""
-    desc = _build_description(nvars, dt, num_nodes, max_iter, restol)
+def _run(problem_class, nvars, dt, num_nodes=3, max_iter=50, restol=1e-12, t0=0.0, Tend=0.5):
+    """
+    Run a single IMEX-SDC simulation and return (physical_u_array, problem, stats).
+
+    For the lifted variant the returned array is :math:`v + E(T)`, i.e. the
+    physical solution *u* (not the lifted variable *v*).
+    """
+    desc = _build_description(problem_class, nvars, dt, num_nodes, max_iter, restol)
     ctrl = controller_nonMPI(num_procs=1, controller_params={'logger_level': 40}, description=desc)
     P = ctrl.MS[0].levels[0].prob
-    uend, stats = ctrl.run(u0=P.u_exact(t0), t0=t0, Tend=Tend)
-    return np.asarray(uend).copy(), P, stats
+    state_end, stats = ctrl.run(u0=P.u_exact(t0), t0=t0, Tend=Tend)
+    state_arr = np.asarray(state_end).copy()
+    # For the lifted formulation, add back the lift to get physical u.
+    if isinstance(P, allencahn_1d_imex_lift):
+        state_arr = state_arr + P.lift(Tend)
+    return state_arr, P, stats
 
 
 # ---------------------------------------------------------------------------
@@ -132,7 +168,7 @@ def spatial_convergence(Tend=0.5, dt=0.005, num_nodes=3):
     dxs, errors = [], []
     for nvars in nvars_list:
         dx = 1.0 / (nvars + 1)
-        uend, P, _ = _run(nvars, dt, num_nodes=num_nodes, Tend=Tend)
+        uend, P, _ = _run(allencahn_1d_imex, nvars, dt, num_nodes=num_nodes, Tend=Tend)
         err = float(np.linalg.norm(P.u_exact(Tend) - uend, np.inf))
         dxs.append(dx)
         errors.append(err)
@@ -146,23 +182,22 @@ def spatial_convergence(Tend=0.5, dt=0.005, num_nodes=3):
 
 
 # ---------------------------------------------------------------------------
-# Part 2: Temporal convergence (fixed sweep count)
+# Parts 2 & 3: Temporal convergence – standard vs. boundary-lifted
 # ---------------------------------------------------------------------------
 
-def temporal_convergence(nvars=127, Tend=0.5, num_nodes=3):
+def temporal_convergence(problem_class, label, nvars=127, Tend=0.5, num_nodes=3):
     r"""
     Fix the spatial grid and run with a range of time-step sizes *and* a
     fixed number of SDC sweeps *K* per step.  The error is measured against
-    a fine-:math:`\Delta t` reference solution on the same grid.
-
-    With a first-order initial guess (``'spread'``), each IMEX-SDC sweep
-    increases the order of the time-stepping error by one.  After :math:`K`
-    sweeps the expected convergence order is :math:`\min(K,\,2M-1)`, where
-    :math:`2M-1` is the maximum collocation order.  For :math:`M = 3` and
-    :math:`K \le 4` this is simply :math:`K`.
+    a fine-:math:`\Delta t` reference (non-lifted, fully converged) on the
+    same grid.
 
     Parameters
     ----------
+    problem_class : type
+        Either :class:`allencahn_1d_imex` or :class:`allencahn_1d_imex_lift`.
+    label : str
+        Short label printed in the header (e.g. ``'standard'`` or ``'lifted'``).
     nvars : int
         Number of interior spatial grid points.
     Tend : float
@@ -175,18 +210,21 @@ def temporal_convergence(nvars=127, Tend=0.5, num_nodes=3):
     results : dict
         ``{K: (dts, errors)}`` for each sweep count *K* tried.
     """
-    # Reference solution: very fine dt, fully converged SDC
+    # Common fine-dt reference: always use the non-lifted formulation so that
+    # both comparisons are measured against the same reference u.
     dt_ref = Tend / 1024
-    uref, _, _ = _run(nvars, dt_ref, num_nodes=num_nodes, max_iter=50, restol=1e-13, Tend=Tend)
+    uref, _, _ = _run(allencahn_1d_imex, nvars, dt_ref, num_nodes=num_nodes,
+                      max_iter=50, restol=1e-13, Tend=Tend)
 
     dts = [Tend / (2**k) for k in range(1, 7)]
     sweep_counts = [1, 2, 3, 4]
     max_order = 2 * num_nodes - 1  # collocation order = 2M-1
 
     print('\n' + '=' * 70)
-    print('Part 2: Temporal convergence  (nvars = {}, M = {})'.format(nvars, num_nodes))
-    print('        error vs. fine-dt reference  (dt_ref = {:.2e})'.format(dt_ref))
-    print('        collocation order (max achievable) = 2M-1 = {}'.format(max_order))
+    print(f'Temporal convergence  [{label}]  (nvars = {nvars}, M = {num_nodes})')
+    print(f'  error measured in physical u against non-lifted reference'
+          f'  (dt_ref = {dt_ref:.2e})')
+    print(f'  collocation order (max achievable) = 2M-1 = {max_order}')
     print('=' * 70)
 
     results = {}
@@ -196,7 +234,8 @@ def temporal_convergence(nvars=127, Tend=0.5, num_nodes=3):
         print(f'  {"dt":>10}  {"error (inf)":>14}  {"order":>8}  {"expected":>10}')
         errs = []
         for dt in dts:
-            uend, _, _ = _run(nvars, dt, num_nodes=num_nodes, max_iter=K, restol=1e-20, Tend=Tend)
+            uend, _, _ = _run(problem_class, nvars, dt, num_nodes=num_nodes,
+                              max_iter=K, restol=1e-20, Tend=Tend)
             err = float(np.linalg.norm(uend - uref, np.inf))
             errs.append(err)
             if len(errs) > 1 and errs[-2] > 0.0:
@@ -213,9 +252,10 @@ def temporal_convergence(nvars=127, Tend=0.5, num_nodes=3):
 # Plotting
 # ---------------------------------------------------------------------------
 
-def make_plot(dxs, sp_errors, temp_results, num_nodes=3):
-    """Save a two-panel convergence figure."""
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4))
+def make_plot(dxs, sp_errors, temp_std, temp_lift, num_nodes=3):
+    """Save a three-panel convergence figure."""
+    fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+    ax1, ax2, ax3 = axes
 
     # --- Spatial convergence ---
     ax1.loglog(dxs, sp_errors, 'o-', color='C0', label='FD error')
@@ -227,22 +267,28 @@ def make_plot(dxs, sp_errors, temp_results, num_nodes=3):
     ax1.legend(fontsize=9)
     ax1.grid(True, which='both', linestyle=':')
 
-    # --- Temporal convergence ---
+    # --- Temporal convergence helper ---
     max_order = 2 * num_nodes - 1
     markers = ['o', 's', '^', 'D']
     colors = ['C0', 'C1', 'C2', 'C3']
-    for (K, (dts, errs)), marker, color in zip(temp_results.items(), markers, colors):
-        expected = min(K, max_order)
-        ax2.loglog(dts, errs, marker=marker, color=color, label=f'K={K}')
-        # Reference slope for expected order K
-        ref = errs[-1] * (np.array(dts) / dts[-1]) ** expected
-        ax2.loglog(dts, ref, linestyle='--', color=color, alpha=0.5,
-                   label=f'order {expected} (theory)')
-    ax2.set_xlabel(r'$\Delta t$', fontsize=12)
-    ax2.set_ylabel(r'error vs. reference', fontsize=12)
-    ax2.set_title(f'Temporal convergence\n(fixed sweep count K, M={num_nodes})')
-    ax2.legend(fontsize=8, ncol=2)
-    ax2.grid(True, which='both', linestyle=':')
+
+    def _plot_temporal(ax, results, title):
+        for (K, (dts, errs)), marker, color in zip(results.items(), markers, colors):
+            expected = min(K, max_order)
+            ax.loglog(dts, errs, marker=marker, color=color, label=f'K={K}')
+            ref = errs[-1] * (np.array(dts) / dts[-1]) ** expected
+            ax.loglog(dts, ref, linestyle='--', color=color, alpha=0.5,
+                      label=f'order {expected} (theory)')
+        ax.set_xlabel(r'$\Delta t$', fontsize=12)
+        ax.set_ylabel(r'error vs. reference', fontsize=12)
+        ax.set_title(title)
+        ax.legend(fontsize=8, ncol=2)
+        ax.grid(True, which='both', linestyle=':')
+
+    _plot_temporal(ax2, temp_std,
+                   f'Temporal – standard\n(fixed K, M={num_nodes})')
+    _plot_temporal(ax3, temp_lift,
+                   f'Temporal – boundary lifting\n(fixed K, M={num_nodes})')
 
     plt.tight_layout()
     fname = 'allen_cahn_1d_convergence.png'
@@ -256,9 +302,17 @@ def make_plot(dxs, sp_errors, temp_results, num_nodes=3):
 
 def main():
     dxs, sp_errors = spatial_convergence()
-    temp_results = temporal_convergence()
-    make_plot(dxs, sp_errors, temp_results)
+    print('\n' + '#' * 70)
+    print('# Part 2: Standard formulation (b_bc correction in solve_system) #')
+    print('#' * 70)
+    temp_std = temporal_convergence(allencahn_1d_imex, 'standard')
+    print('\n' + '#' * 70)
+    print('# Part 3: Boundary-lifting formulation (homogeneous BCs for v)   #')
+    print('#' * 70)
+    temp_lift = temporal_convergence(allencahn_1d_imex_lift, 'lifted')
+    make_plot(dxs, sp_errors, temp_std, temp_lift)
 
 
 if __name__ == '__main__':
     main()
+
