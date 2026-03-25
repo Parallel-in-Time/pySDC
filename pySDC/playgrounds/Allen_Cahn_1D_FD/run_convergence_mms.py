@@ -32,12 +32,12 @@ Each class adds a manufactured forcing term so the prescribed solution is
 exact.  Errors are measured against the **analytical MMS solution** at
 :math:`T_\text{end}`.
 
-**Spatial resolution**: ``nvars = 255`` interior points with a
+**Spatial resolution**: ``nvars = 1023`` interior points with a
 **fourth-order FD Laplacian**
-(:math:`\Delta x = 1/256`, spatial error floor
-:math:`O(\Delta x^4) \approx 2 \times 10^{-10}`).  Temporal errors
-dominate for :math:`\Delta t \ge 0.0625`; convergence stalls at the
-spatial floor only at the finest :math:`\Delta t` values.
+(:math:`\Delta x = 1/1024`, spatial error floor
+:math:`O(\Delta x^4) \approx 1 \times 10^{-12}`).  Temporal errors
+dominate for all three formulations across the dt range tested; convergence
+stalls at the spatial floor only at the finest dt values.
 
 Usage::
 
@@ -59,10 +59,10 @@ from pySDC.playgrounds.Allen_Cahn_1D_FD.AllenCahn_1D_FD_MMS import (
 # ---------------------------------------------------------------------------
 
 # 4th-order FD Laplacian: spatial error ~ pi^6/90 * dx^4 * Tend.
-# With nvars=255 (dx=1/256), the spatial floor is O(dx^4) ~ 2e-10,
-# well below temporal errors for dt >= 0.0625 and clearly visible
-# only at the finest dt values.
-_NVARS = 255
+# With nvars=1023 (dx=1/1024), the spatial floor is O(dx^4) ~ 1e-12,
+# well below the temporal error for all dt values tested.  This allows
+# 4-5 clean decades of temporal convergence before the floor is reached.
+_NVARS = 1023
 _TEND = 0.5
 _EPS = 1.0
 _DW = 0.0
@@ -142,7 +142,7 @@ def main():
     Parameters (fixed):
 
     * ``restol = 1e-13``, :math:`\varepsilon = 1.0`, :math:`M = 3`
-    * ``nvars = 255`` (4th-order FD, spatial floor :math:`\approx 2 \times 10^{-10}`)
+    * ``nvars = 1023`` (4th-order FD, spatial floor :math:`\approx 1 \times 10^{-12}`)
     * :math:`T_\text{end} = 0.5`
     * Error measured vs.\ analytical MMS solution.
 
@@ -153,8 +153,8 @@ def main():
     # Inhom std has b_bc in f.impl which reduces collocation order to 2M-2=4.
     inhom_std_order = max_order - 1
 
-    # dt range: start wide enough that temporal error >> spatial floor (~2e-10),
-    # stop before the floor dominates entirely.
+    # dt range: temporal error >> spatial floor (~1e-12) for the coarser dt
+    # values, and clean convergence orders are visible for 4-5 halvings.
     dts = [_TEND / (2**k) for k in range(1, 7)]  # 0.25 … 0.0078
 
     cases = [
@@ -165,7 +165,7 @@ def main():
 
     print(f'\nFully-converged IMEX-SDC  (restol={_RESTOL:.0e}, ε={_EPS}, M={_NUM_NODES})')
     print(f'Expected collocation order = {max_order}  (= 2M − 1)')
-    print(f'nvars = {_NVARS}, 4th-order FD  (spatial error floor ~ O(dx⁴) ≈ 2e-10)')
+    print(f'nvars = {_NVARS}, 4th-order FD  (spatial error floor ~ O(dx⁴) ≈ 1e-12)')
     print(f'Error vs. analytical MMS solution at T={_TEND}\n')
 
     for cls, label, exp_order in cases:
@@ -190,7 +190,7 @@ def main():
     print(f'    → b_bc(t) in f.impl reduces the collocation order by 1.')
     print(f'  Inhomogeneous (lift):   converging to collocation order {max_order}')
     print(f'    → removing b_bc from f.impl restores the full collocation order.')
-    print(f'  (Convergence plateaus at the 4th-order spatial error ~2e-10')
+    print(f'  (Convergence plateaus at the 4th-order spatial error ~1e-12')
     print(f'   once the temporal error falls below the O(dx⁴) floor.)')
 
 
