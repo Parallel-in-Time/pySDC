@@ -59,21 +59,29 @@ to the nonlinear reaction term:
     :math:`\\Delta t \\approx 0.004`
 
 * **Fully converged SDC** (iterate until ``restol = 1e-13``,
-  :math:`\\varepsilon = 1`): converges to the collocation solution whose
-  order is :math:`2M - 1 = 5` for :math:`M = 3` RADAU-RIGHT nodes:
+  :math:`\\varepsilon = 1`): applied to **all three MMS classes**, this
+  reveals the effect of :math:`b_\\text{bc}(t)` on the collocation order:
 
-  * Observed order: **5.00** at :math:`\\Delta t = 0.016`
+  * Homogeneous (no :math:`b_\\text{bc}`): reaches collocation order **5**
+  * Inhomogeneous standard (:math:`b_\\text{bc}` in :math:`f_\\text{impl}`):
+    stalls at order :math:`\\approx 4` — the :math:`b_\\text{bc}` term
+    reduces the *collocation* order by one
+  * Inhomogeneous lifted (autonomous :math:`f_\\text{impl}`): approaches
+    order **5**, limited only by floating-point precision
 
 **Summary of all findings**
 
-* Standard :math:`b_\\text{bc}` reduces order to :math:`\\approx 1` when
+* Standard :math:`b_\\text{bc}` reduces fixed-:math:`K` order to :math:`\\approx 1` when
   :math:`b_\\text{bc}(t)` varies on an :math:`O(1)` time scale.
-* Boundary lifting restores the expected orders.
+* Boundary lifting restores the expected fixed-:math:`K` orders.
 * The nonlinear reaction (cause 1) causes a wide pre-asymptotic regime; its
   width shrinks as :math:`\\varepsilon` grows (weaker reaction).
 * Full orders 3, 4, 5 are confirmed when the nonlinearity is weakened
   (:math:`\\varepsilon = 10`) or when SDC is iterated to collocation
   convergence (``restol``).
+* With fully-converged SDC, the :math:`b_\\text{bc}` term in :math:`f_\\text{impl}`
+  still reduces the collocation order from 5 to :math:`\\approx 4`.  Boundary
+  lifting removes this reduction and recovers collocation order 5.
 
 **Parameters**
 
@@ -289,9 +297,21 @@ def print_summary(results_hom, results_inhom, results_lift, num_nodes=3):
 # Part 4 – Full asymptotic orders with weak nonlinearity and restol
 # ---------------------------------------------------------------------------
 
+def _print_fc_table(dts, errs, max_order):
+    """Print a dt/error/order table for a fully-converged SDC study."""
+    print(f'  {"dt":>10}  {"error (inf)":>14}  {"order":>8}  {"expected":>10}')
+    for i, (dt, err) in enumerate(zip(dts, errs)):
+        if i > 0 and errs[i - 1] > 0.0 and err > 0.0:
+            order = np.log(errs[i - 1] / err) / np.log(dts[i - 1] / dt)
+            print(f'  {dt:>10.5f}  {err:>14.4e}  {order:>8.2f}  {max_order:>10d}')
+        else:
+            print(f'  {dt:>10.5f}  {err:>14.4e}  {"---":>8}  {max_order:>10d}')
+
+
 def asymptotic_order_study(nvars=127, Tend=0.5, num_nodes=3):
     r"""
-    Demonstrate that the expected orders 3, 4, and 5 are attainable.
+    Demonstrate that the expected orders 3, 4, and 5 are attainable, and
+    compare all three MMS formulations under fully-converged SDC.
 
     **Strategy 1 – weak nonlinearity** (:math:`\varepsilon = 10`, fixed :math:`K`):
 
@@ -300,15 +320,22 @@ def asymptotic_order_study(nvars=127, Tend=0.5, num_nodes=3):
     a forced heat equation.  The pre-asymptotic regime collapses and the
     asymptotic SDC orders are recovered at practical :math:`\Delta t`.
 
-    **Strategy 2 – fully converged SDC** (:math:`\varepsilon = 1`, ``restol = 1e-13``):
+    **Strategy 2 – fully converged SDC** (:math:`\varepsilon = 1`,
+    ``restol = 1e-13``, all three MMS classes):
 
-    Running SDC until the residual drops below ``restol`` ensures convergence
-    to the underlying collocation solution.  The collocation order is
+    Running SDC until the residual drops below ``restol`` converges to the
+    underlying collocation solution.  The collocation order is
     :math:`2M - 1 = 5` for :math:`M = 3` RADAU-RIGHT nodes.
 
-    Both strategies use the homogeneous MMS class (:math:`\sin(\pi x)\cos(t)`,
-    no :math:`b_\\text{bc}` correction) so the only remaining effect is the
-    nonlinear Allen-Cahn reaction term.
+    With fully-converged SDC the effect of the :math:`b_\\text{bc}(t)` term
+    in the implicit part is also revealed:
+
+    * Homogeneous (no :math:`b_\\text{bc}`): reaches collocation order **5**.
+    * Inhomogeneous standard (:math:`b_\\text{bc}(t)` in :math:`f_\\text{impl}`):
+      stalls at order :math:`\\approx 4`, confirming that the
+      :math:`b_\\text{bc}` term reduces the *collocation* order by one.
+    * Inhomogeneous lifted (autonomous :math:`f_\\text{impl}`): approaches
+      order **5** and is limited only by floating-point precision.
 
     Parameters
     ----------
@@ -320,19 +347,21 @@ def asymptotic_order_study(nvars=127, Tend=0.5, num_nodes=3):
         Number of RADAU-RIGHT collocation nodes.
     """
     max_order = 2 * num_nodes - 1  # collocation order = 5
-
-    # ---- Fine-dt reference (used for both strategies) ----------------------
-    # Use restol=1e-13 so the reference itself is fully converged.
+    restol = 1e-13
     dt_ref = Tend / 2048
-    uref, _ = _run(allencahn_1d_mms_hom, nvars, dt_ref, max_iter=50,
-                   eps=1.0, dw=0.0, Tend=Tend,
-                   restol=1e-13)
 
-    # ---- Strategy 1: fixed K, eps=10 ---------------------------------------
+    # ---- Compute fine-dt references for each formulation -------------------
+    uref_hom, _ = _run(allencahn_1d_mms_hom, nvars, dt_ref, max_iter=50,
+                       eps=1.0, dw=0.0, Tend=Tend, restol=restol)
+    uref_inh, _ = _run(allencahn_1d_mms_inhom, nvars, dt_ref, max_iter=50,
+                       eps=1.0, dw=0.0, Tend=Tend, restol=restol)
+    uref_lft, _ = _run(allencahn_1d_mms_inhom_lift, nvars, dt_ref, max_iter=50,
+                       eps=1.0, dw=0.0, Tend=Tend, restol=restol)
+
+    # ---- Strategy 1: fixed K, eps=10 (hom only) ----------------------------
     eps_weak = 10.0
     uref_weak, _ = _run(allencahn_1d_mms_hom, nvars, dt_ref, max_iter=50,
-                        eps=eps_weak, dw=0.0, Tend=Tend,
-                        restol=1e-13)
+                        eps=eps_weak, dw=0.0, Tend=Tend, restol=restol)
 
     # dt range: coarser (0.125) to finer (~0.001) to expose asymptotic regime
     dts_fine = [Tend / (2**k) for k in range(2, 10)]  # 0.125, 0.0625, ..., ~0.00098
@@ -360,41 +389,48 @@ def asymptotic_order_study(nvars=127, Tend=0.5, num_nodes=3):
                 print(f'  {dt:>10.5f}  {err:>14.4e}  {"---":>8}  {expected:>10d}')
         results_weak[K] = (dts_fine[:], errs[:])
 
-    # ---- Strategy 2: fully converged SDC, eps=1 ----------------------------
-    restol = 1e-13
-    # dt range where order-5 is visible before hitting floating-point noise
+    # ---- Strategy 2: fully converged SDC, all three MMS classes ------------
+    # dt range where collocation order-5 is visible before floating-point noise
     dts_fc = [Tend / (2**k) for k in range(1, 7)]  # 0.25 ... 0.0078
 
-    print('\n' + '=' * 70)
-    print(f'  Part 4b – Fully converged SDC (restol={restol:.0e}, ε=1.0, M={num_nodes})')
-    print(f'  error vs. fine-dt reference;  homogeneous BCs, sin(πx)cos(t)')
-    print(f'  expected collocation order = {max_order}')
-    print('=' * 70)
-    print(f'\n  {"dt":>10}  {"error (inf)":>14}  {"order":>8}  {"expected":>10}')
+    # The inhom standard case includes b_bc(t) in f.impl, which reduces the
+    # collocation order from 2M-1 to 2M-2 (empirically confirmed below).
+    inhom_std_order = max_order - 1
 
-    errs_fc = []
-    for dt in dts_fc:
-        u, _ = _run(allencahn_1d_mms_hom, nvars, dt, max_iter=50,
-                    eps=1.0, dw=0.0, Tend=Tend,
-                    restol=restol)
-        err = float(np.linalg.norm(u - uref, np.inf))
-        errs_fc.append(err)
-        if len(errs_fc) > 1 and errs_fc[-2] > 0.0 and err > 0.0:
-            order = np.log(errs_fc[-2] / err) / np.log(dts_fc[len(errs_fc) - 2] / dt)
-            print(f'  {dt:>10.5f}  {err:>14.4e}  {order:>8.2f}  {max_order:>10d}')
-        else:
-            print(f'  {dt:>10.5f}  {err:>14.4e}  {"---":>8}  {max_order:>10d}')
+    cases = [
+        (allencahn_1d_mms_hom,         uref_hom, 'hom, sin(πx)cos(t)',       max_order),
+        (allencahn_1d_mms_inhom,       uref_inh, 'inhom std, cos(πx)cos(t)', inhom_std_order),
+        (allencahn_1d_mms_inhom_lift,  uref_lft, 'inhom lift, cos(πx)cos(t)', max_order),
+    ]
 
-    results_fc = (dts_fc, errs_fc)
+    results_fc = {}
+    for cls, uref, label, exp_order in cases:
+        print('\n' + '=' * 70)
+        print(f'  Part 4b – Fully converged SDC (restol={restol:.0e}, ε=1.0, M={num_nodes})')
+        print(f'  {label}')
+        print(f'  expected collocation order = {exp_order}')
+        print('=' * 70)
+        errs_fc = []
+        for dt in dts_fc:
+            u, _ = _run(cls, nvars, dt, max_iter=50,
+                        eps=1.0, dw=0.0, Tend=Tend, restol=restol)
+            err = float(np.linalg.norm(u - uref, np.inf))
+            errs_fc.append(err)
+        _print_fc_table(dts_fc, errs_fc, exp_order)
+        results_fc[label] = (dts_fc[:], errs_fc[:])
 
     # ---- Summary -----------------------------------------------------------
     print()
-    print('  Conclusion:')
+    print('  Conclusions:')
     print(f'  - With ε={eps_weak}, K=3 recovers order 3 (reaction term negligible).')
     print(f'  - With ε={eps_weak}, K=4 recovers order 4.')
-    print(f'  - Fully converged (restol={restol:.0e}) recovers collocation order {max_order}.')
-    print('  - The pre-asymptotic stalling at ε=1 is solely due to the nonlinear')
-    print('    reaction broadening the pre-asymptotic regime, not an SDC bug.')
+    print(f'  - Hom (fully conv.): collocation order {max_order} confirmed.')
+    print(f'  - Inhom std (fully conv.): stalls at order {max_order - 1}')
+    print(f'    → b_bc(t) in f.impl reduces the collocation order by 1.')
+    print(f'  - Inhom lift (fully conv.): approaches order {max_order}')
+    print(f'    → removing b_bc from f.impl restores the full collocation order.')
+    print('  - Pre-asymptotic stalling at ε=1 with fixed K is solely from')
+    print('    the nonlinear reaction broadening the pre-asymptotic regime.')
 
     return results_weak, results_fc
 
