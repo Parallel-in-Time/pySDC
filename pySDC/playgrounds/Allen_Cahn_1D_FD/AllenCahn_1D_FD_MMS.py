@@ -3,8 +3,8 @@ Manufactured-solution (MMS) problem classes for the 1D Allen-Cahn playground
 ==============================================================================
 
 Three self-contained problem classes on the domain :math:`[0, 1]`, each
-implementing the modified Allen-Cahn equation with a source term that
-enforces a known smooth exact solution:
+implementing the Allen-Cahn equation with a source term that enforces a
+prescribed smooth exact solution:
 
 .. math::
 
@@ -16,32 +16,22 @@ where
 
     R(u) = -\frac{2}{\varepsilon^2}\,u(1-u)(1-2u) - 6\,d_w\,u(1-u)
 
-is the Allen-Cahn reaction term and :math:`g(x,t)` is a forcing term chosen
-so that the prescribed :math:`u_\text{mms}` is the exact solution.
+and :math:`g(x,t)` is chosen so that :math:`u_\text{mms}` is the exact
+solution.  The three classes differ only in their boundary treatment:
 
-**Why manufactured solutions?**
+* :class:`allencahn_1d_mms_hom` – homogeneous Dirichlet BCs; no
+  boundary-correction vector :math:`b_\text{bc}` required.
+  The implicit operator :math:`f_\text{impl} = A u` is autonomous.
+* :class:`allencahn_1d_mms_inhom` – time-dependent Dirichlet BCs handled
+  via the standard :math:`b_\text{bc}(t)` correction in
+  :math:`f_\text{impl}`.
+* :class:`allencahn_1d_mms_inhom_lift` – same time-dependent BCs treated
+  by boundary lifting (:math:`v = u - E`); the implicit operator
+  :math:`f_\text{impl} = A v` is again autonomous.
 
-The travelling-wave study showed order stalling at :math:`K \approx 3`.  Two
-explanations are possible:
-
-1. The **nonlinear explicit reaction term** broadens the pre-asymptotic
-   region for all IMEX-SDC formulations.
-2. The **time-dependent boundary-correction vector** :math:`b_\text{bc}(t)`
-   in :math:`f_\text{impl}` breaks the autonomous-operator assumption
-   underlying the SDC convergence proof.
-
-By using manufactured solutions we can isolate these effects:
-
-* :class:`allencahn_1d_mms_hom` – homogeneous Dirichlet BCs (no
-  :math:`b_\text{bc}` needed).  Tests effect (1) only.
-* :class:`allencahn_1d_mms_inhom` – time-dependent BCs, standard
-  :math:`b_\text{bc}` correction.  Tests effects (1) + (2).
-* :class:`allencahn_1d_mms_inhom_lift` – same time-dependent BCs, but
-  treated via boundary lifting (:math:`v = u - E`).  Tests effect (1) only
-  with autonomous implicit operator.
-
-Comparing the three cases reveals whether the stalling is due to the
-nonlinear reaction (ubiquitous) or to the BC treatment (removable).
+Comparing the three cases under fully-converged IMEX-SDC shows that
+including a time-dependent :math:`b_\text{bc}(t)` in :math:`f_\text{impl}`
+reduces the collocation order, while boundary lifting restores it.
 
 Classes
 -------
