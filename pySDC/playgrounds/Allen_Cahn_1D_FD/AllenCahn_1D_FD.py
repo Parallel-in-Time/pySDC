@@ -1,5 +1,5 @@
 r"""
-Manufactured-solution (MMS) problem classes for the 1D Allen-Cahn playground
+Manufactured-solution problem classes for the 1D Allen-Cahn playground
 ==============================================================================
 
 Three self-contained problem classes on the domain :math:`[0, 1]`, each
@@ -16,16 +16,16 @@ where
 
     R(u) = -\frac{2}{\varepsilon^2}\,u(1-u)(1-2u) - 6\,d_w\,u(1-u)
 
-and :math:`g(x,t)` is chosen so that :math:`u_\text{mms}` is the exact
+and :math:`g(x,t)` is chosen so that :math:`u_\text{ex}` is the exact
 solution.  The three classes differ only in their boundary treatment:
 
-* :class:`allencahn_1d_mms_hom` – homogeneous Dirichlet BCs; no
+* :class:`allencahn_1d_hom` – homogeneous Dirichlet BCs; no
   boundary-correction vector :math:`b_\text{bc}` required.
   The implicit operator :math:`f_\text{impl} = A u` is autonomous.
-* :class:`allencahn_1d_mms_inhom` – time-dependent Dirichlet BCs handled
+* :class:`allencahn_1d_inhom` – time-dependent Dirichlet BCs handled
   via the standard :math:`b_\text{bc}(t)` correction in
   :math:`f_\text{impl}`.
-* :class:`allencahn_1d_mms_inhom_lift` – same time-dependent BCs treated
+* :class:`allencahn_1d_inhom_lift` – same time-dependent BCs treated
   by boundary lifting (:math:`v = u - E`); the implicit operator
   :math:`f_\text{impl} = A v` is again autonomous.
 
@@ -35,17 +35,17 @@ reduces the collocation order, while boundary lifting restores it.
 
 Classes
 -------
-allencahn_1d_mms_hom
-    :math:`u_\text{mms}(x,t) = \sin(\pi x)\cos(t)`,
+allencahn_1d_hom
+    :math:`u_\text{ex}(x,t) = \sin(\pi x)\cos(t)`,
     homogeneous BCs :math:`u|_\partial = 0`.
 
-allencahn_1d_mms_inhom
-    :math:`u_\text{mms}(x,t) = \cos(\pi x)\cos(t)`,
+allencahn_1d_inhom
+    :math:`u_\text{ex}(x,t) = \cos(\pi x)\cos(t)`,
     time-dependent BCs :math:`u(0,t)=\cos(t)`,
     :math:`u(1,t)=-\cos(t)`.  Standard :math:`b_\text{bc}(t)` correction.
 
-allencahn_1d_mms_inhom_lift
-    Same exact solution as :class:`allencahn_1d_mms_inhom` but reformulated
+allencahn_1d_inhom_lift
+    Same exact solution as :class:`allencahn_1d_inhom` but reformulated
     with boundary lifting.  Lift :math:`E(x,t) = (1-2x)\cos(t)`, state
     variable :math:`v = u - E` satisfies homogeneous BCs.
 """
@@ -86,9 +86,9 @@ def _reaction(u, eps, dw):
 # Shared base class
 # ---------------------------------------------------------------------------
 
-class _AllenCahn1D_MMS_Base(Problem):
+class _AllenCahn1D_Base(Problem):
     r"""
-    Shared setup for all MMS problem classes.
+    Shared setup for all problem classes.
 
     Builds a fourth-order FD Laplacian on :math:`[0,1]` with *zero* Dirichlet
     BCs (the boundary correction, if any, is handled by the subclass).
@@ -219,15 +219,15 @@ class _AllenCahn1D_MMS_Base(Problem):
 # Case 1: Homogeneous BCs
 # ---------------------------------------------------------------------------
 
-class allencahn_1d_mms_hom(_AllenCahn1D_MMS_Base):
+class allencahn_1d_hom(_AllenCahn1D_Base):
     r"""
-    Allen-Cahn MMS problem with **homogeneous** Dirichlet BCs.
+    Allen-Cahn problem with **homogeneous** Dirichlet BCs.
 
     **Exact solution**
 
     .. math::
 
-        u_\text{mms}(x, t) = \sin(\pi x)\,\cos(t), \quad x \in [0, 1].
+        u_\text{ex}(x, t) = \sin(\pi x)\,\cos(t), \quad x \in [0, 1].
 
     **Boundary conditions**
 
@@ -238,8 +238,8 @@ class allencahn_1d_mms_hom(_AllenCahn1D_MMS_Base):
     .. math::
 
         g(x, t)
-        = \partial_t u_\text{mms} - \partial_{xx} u_\text{mms} - R(u_\text{mms})
-        = -\sin(\pi x)\sin(t) + \pi^2 \sin(\pi x)\cos(t) - R(u_\text{mms}),
+        = \partial_t u_\text{ex} - \partial_{xx} u_\text{ex} - R(u_\text{ex})
+        = -\sin(\pi x)\sin(t) + \pi^2 \sin(\pi x)\cos(t) - R(u_\text{ex}),
 
     so that the modified Allen-Cahn PDE is satisfied exactly.
 
@@ -260,13 +260,13 @@ class allencahn_1d_mms_hom(_AllenCahn1D_MMS_Base):
 
         .. math::
 
-            g = -\sin(\pi x)\sin(t) + \pi^2\sin(\pi x)\cos(t) - R(u_\text{mms}).
+            g = -\sin(\pi x)\sin(t) + \pi^2\sin(\pi x)\cos(t) - R(u_\text{ex}).
         """
         x = self.xvalues
-        u_mms = np.sin(np.pi * x) * np.cos(t)
+        u_ex = np.sin(np.pi * x) * np.cos(t)
         u_t = -np.sin(np.pi * x) * np.sin(t)
         u_xx = -np.pi**2 * np.sin(np.pi * x) * np.cos(t)
-        return u_t - u_xx - _reaction(u_mms, self.eps, self.dw)
+        return u_t - u_xx - _reaction(u_ex, self.eps, self.dw)
 
     def eval_f(self, u, t):
         r"""
@@ -336,16 +336,16 @@ class allencahn_1d_mms_hom(_AllenCahn1D_MMS_Base):
 # Case 2: Inhomogeneous BCs, standard b_bc correction
 # ---------------------------------------------------------------------------
 
-class allencahn_1d_mms_inhom(_AllenCahn1D_MMS_Base):
+class allencahn_1d_inhom(_AllenCahn1D_Base):
     r"""
-    Allen-Cahn MMS problem with **time-dependent** Dirichlet BCs,
+    Allen-Cahn problem with **time-dependent** Dirichlet BCs,
     handled by the standard boundary-correction vector :math:`b_\text{bc}(t)`.
 
     **Exact solution**
 
     .. math::
 
-        u_\text{mms}(x, t) = \cos(\pi x)\,\cos(t), \quad x \in [0, 1].
+        u_\text{ex}(x, t) = \cos(\pi x)\,\cos(t), \quad x \in [0, 1].
 
     **Boundary conditions**
 
@@ -356,7 +356,7 @@ class allencahn_1d_mms_inhom(_AllenCahn1D_MMS_Base):
     .. math::
 
         g(x, t)
-        = -\cos(\pi x)\sin(t) + \pi^2\cos(\pi x)\cos(t) - R(u_\text{mms}).
+        = -\cos(\pi x)\sin(t) + \pi^2\cos(\pi x)\cos(t) - R(u_\text{ex}).
 
     **IMEX split**
 
@@ -407,7 +407,7 @@ class allencahn_1d_mms_inhom(_AllenCahn1D_MMS_Base):
 
     def _forcing(self, t):
         r"""
-        Forcing :math:`g = -\cos(\pi x)\sin(t) + \pi^2\cos(\pi x)\cos(t) - R(u_\text{mms})`.
+        Forcing :math:`g = -\cos(\pi x)\sin(t) + \pi^2\cos(\pi x)\cos(t) - R(u_\text{ex})`.
 
         Parameters
         ----------
@@ -418,10 +418,10 @@ class allencahn_1d_mms_inhom(_AllenCahn1D_MMS_Base):
         numpy.ndarray
         """
         x = self.xvalues
-        u_mms = np.cos(np.pi * x) * np.cos(t)
+        u_ex = np.cos(np.pi * x) * np.cos(t)
         u_t = -np.cos(np.pi * x) * np.sin(t)
         u_xx = -np.pi**2 * np.cos(np.pi * x) * np.cos(t)
-        return u_t - u_xx - _reaction(u_mms, self.eps, self.dw)
+        return u_t - u_xx - _reaction(u_ex, self.eps, self.dw)
 
     def eval_f(self, u, t):
         r"""
@@ -484,14 +484,14 @@ class allencahn_1d_mms_inhom(_AllenCahn1D_MMS_Base):
 # Case 3: Inhomogeneous BCs, boundary lifting
 # ---------------------------------------------------------------------------
 
-class allencahn_1d_mms_inhom_lift(_AllenCahn1D_MMS_Base):
+class allencahn_1d_inhom_lift(_AllenCahn1D_Base):
     r"""
-    Allen-Cahn MMS problem with **time-dependent** Dirichlet BCs treated
+    Allen-Cahn problem with **time-dependent** Dirichlet BCs treated
     by **boundary lifting**.
 
     **Background**
 
-    The same exact solution as :class:`allencahn_1d_mms_inhom` is used, but
+    The same exact solution as :class:`allencahn_1d_inhom` is used, but
     reformulated in terms of a lifted variable :math:`v = u - E(t)` where
 
     .. math::
@@ -516,12 +516,12 @@ class allencahn_1d_mms_inhom_lift(_AllenCahn1D_MMS_Base):
 
     .. math::
 
-        v_\text{mms}(x, t) = u_\text{mms}(x,t) - E(x,t)
+        v_\text{ex}(x, t) = u_\text{ex}(x,t) - E(x,t)
         = \cos(t)\bigl(\cos(\pi x) - 1 + 2x\bigr).
 
     Parameters
     ----------
-    nvars, eps, dw : see :class:`_AllenCahn1D_MMS_Base`.
+    nvars, eps, dw : see :class:`_AllenCahn1D_Base`.
     """
 
     def lift(self, t):
@@ -554,7 +554,7 @@ class allencahn_1d_mms_inhom_lift(_AllenCahn1D_MMS_Base):
 
     def _forcing(self, t):
         r"""
-        Physical forcing :math:`g(x,t) = u_t - u_{xx} - R(u_\text{mms})`.
+        Physical forcing :math:`g(x,t) = u_t - u_{xx} - R(u_\text{ex})`.
 
         Parameters
         ----------
@@ -565,10 +565,10 @@ class allencahn_1d_mms_inhom_lift(_AllenCahn1D_MMS_Base):
         numpy.ndarray
         """
         x = self.xvalues
-        u_mms = np.cos(np.pi * x) * np.cos(t)
+        u_ex = np.cos(np.pi * x) * np.cos(t)
         u_t = -np.cos(np.pi * x) * np.sin(t)
         u_xx = -np.pi**2 * np.cos(np.pi * x) * np.cos(t)
-        return u_t - u_xx - _reaction(u_mms, self.eps, self.dw)
+        return u_t - u_xx - _reaction(u_ex, self.eps, self.dw)
 
     def eval_f(self, v, t):
         r"""
@@ -619,7 +619,7 @@ class allencahn_1d_mms_inhom_lift(_AllenCahn1D_MMS_Base):
 
     def u_exact(self, t):
         r"""
-        Exact lifted solution :math:`v_\text{mms} = u_\text{mms} - E(t)`.
+        Exact lifted solution :math:`v_\text{ex} = u_\text{ex} - E(t)`.
 
         To recover the physical solution, call :meth:`lift` and add.
 

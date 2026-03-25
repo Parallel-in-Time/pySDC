@@ -20,16 +20,16 @@ nodes), that:
   :math:`f_\text{impl} = A v`) **restores the full collocation order 5**
   by removing the time-dependent :math:`b_\text{bc}` from the implicit part.
 
-Three MMS problem classes are compared on :math:`[0, 1]`:
+Three problem classes are compared on :math:`[0, 1]`:
 
-* ``allencahn_1d_mms_hom`` — :math:`u_\text{mms} = \sin(\pi x)\cos(t)`,
+* ``allencahn_1d_hom`` — :math:`u_\text{ex} = \sin(\pi x)\cos(t)`,
   homogeneous BCs.
-* ``allencahn_1d_mms_inhom`` — :math:`u_\text{mms} = \cos(\pi x)\cos(t)`,
+* ``allencahn_1d_inhom`` — :math:`u_\text{ex} = \cos(\pi x)\cos(t)`,
   time-dependent BCs via :math:`b_\text{bc}(t)` in :math:`f_\text{impl}`.
-* ``allencahn_1d_mms_inhom_lift`` — same exact solution, boundary lifting.
+* ``allencahn_1d_inhom_lift`` — same exact solution, boundary lifting.
 
 Each class adds a manufactured forcing term so the prescribed solution is
-exact.  Errors are measured against the **analytical MMS solution** at
+exact.  Errors are measured against the **exact analytical solution** at
 :math:`T_\text{end}`.
 
 **Spatial resolution**: ``nvars = 1023`` interior points with a
@@ -41,17 +41,17 @@ stalls at the spatial floor only at the finest dt values.
 
 Usage::
 
-    python run_convergence_mms.py
+    python run_convergence.py
 """
 
 import numpy as np
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.playgrounds.Allen_Cahn_1D_FD.AllenCahn_1D_FD_MMS import (
-    allencahn_1d_mms_hom,
-    allencahn_1d_mms_inhom,
-    allencahn_1d_mms_inhom_lift,
+from pySDC.playgrounds.Allen_Cahn_1D_FD.AllenCahn_1D_FD import (
+    allencahn_1d_hom,
+    allencahn_1d_inhom,
+    allencahn_1d_inhom_lift,
 )
 
 # ---------------------------------------------------------------------------
@@ -101,21 +101,21 @@ def _run(problem_class, dt, restol=_RESTOL, max_iter=50):
     P = ctrl.MS[0].levels[0].prob
     uend, _ = ctrl.run(u0=P.u_exact(0.0), t0=0.0, Tend=_TEND)
     u = np.asarray(uend).copy()
-    if isinstance(P, allencahn_1d_mms_inhom_lift):
+    if isinstance(P, allencahn_1d_inhom_lift):
         u = u + P.lift(_TEND)
     return u, P
 
 
 def _exact(P):
     """
-    Return the analytical MMS solution (physical variable) at ``Tend``.
+    Return the exact analytical solution (physical variable) at ``Tend``.
 
     For the lifted formulation, ``u_exact`` stores the lifted variable
     :math:`v = u - E`; this function adds the lift back to return the
     physical solution :math:`u`.
     """
     uex = np.asarray(P.u_exact(_TEND)).copy()
-    if isinstance(P, allencahn_1d_mms_inhom_lift):
+    if isinstance(P, allencahn_1d_inhom_lift):
         uex = uex + P.lift(_TEND)
     return uex
 
@@ -137,14 +137,14 @@ def _print_table(dts, errs, expected_order):
 
 def main():
     r"""
-    Compare three MMS formulations under fully-converged SDC.
+    Compare three formulations under fully-converged SDC.
 
     Parameters (fixed):
 
     * ``restol = 1e-13``, :math:`\varepsilon = 1.0`, :math:`M = 3`
     * ``nvars = 1023`` (4th-order FD, spatial floor :math:`\approx 1 \times 10^{-12}`)
     * :math:`T_\text{end} = 0.5`
-    * Error measured vs.\ analytical MMS solution.
+    * Error measured vs.\ exact analytical solution.
 
     Expected collocation order :math:`2M - 1 = 5`.
     """
@@ -158,15 +158,15 @@ def main():
     dts = [_TEND / (2**k) for k in range(1, 7)]  # 0.25 … 0.0078
 
     cases = [
-        (allencahn_1d_mms_hom,        'Homogeneous BCs      (sin solution)',  max_order),
-        (allencahn_1d_mms_inhom,      'Inhomogeneous, std   (cos + b_bc)',    inhom_std_order),
-        (allencahn_1d_mms_inhom_lift, 'Inhomogeneous, lift  (cos + lifting)', max_order),
+        (allencahn_1d_hom,        'Homogeneous BCs      (sin solution)',  max_order),
+        (allencahn_1d_inhom,      'Inhomogeneous, std   (cos + b_bc)',    inhom_std_order),
+        (allencahn_1d_inhom_lift, 'Inhomogeneous, lift  (cos + lifting)', max_order),
     ]
 
     print(f'\nFully-converged IMEX-SDC  (restol={_RESTOL:.0e}, ε={_EPS}, M={_NUM_NODES})')
     print(f'Expected collocation order = {max_order}  (= 2M − 1)')
     print(f'nvars = {_NVARS}, 4th-order FD  (spatial error floor ~ O(dx⁴) ≈ 1e-12)')
-    print(f'Error vs. analytical MMS solution at T={_TEND}\n')
+    print(f'Error vs. exact analytical solution at T={_TEND}\n')
 
     for cls, label, exp_order in cases:
         print('=' * 70)
