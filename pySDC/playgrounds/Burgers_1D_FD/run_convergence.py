@@ -15,7 +15,11 @@ that:
   the collocation order** — the time-dependent source term in the implicit
   operator degrades the quadrature accuracy of the collocation method.
 
-Two problem classes are compared on :math:`[0, 1]`:
+* **Boundary lifting** (:math:`v = u - E(t)`, autonomous implicit operator
+  :math:`f_\text{impl} = \nu A\,v`) **restores the full collocation order 5**
+  by removing the time-dependent :math:`b_\text{bc}` from the implicit part.
+
+Three problem classes are compared on :math:`[0, 1]`:
 
 * ``burgers_1d_hom`` — :math:`u_\text{ex} = 0.1\sin(\pi x)\cos(t)`,
   homogeneous BCs.
@@ -23,6 +27,8 @@ Two problem classes are compared on :math:`[0, 1]`:
   +0.1\,x\sin(t)`, time-dependent right BC
   :math:`u(1,t)=0.5+0.1\sin(t)` via :math:`b_\text{bc}(t)` in
   :math:`f_\text{impl}`.
+* ``burgers_1d_inhom_lift`` — same exact solution, boundary lifting
+  :math:`E(x,t)=0.5+0.1\,x\sin(t)`.
 
 Each class adds a manufactured forcing term so the prescribed solution is
 exact.  Errors are measured against the **exact analytical solution** at
@@ -46,6 +52,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.playgrounds.Burgers_1D_FD.Burgers_1D_FD import (
     burgers_1d_hom,
     burgers_1d_inhom,
+    burgers_1d_inhom_lift,
 )
 
 # ---------------------------------------------------------------------------
@@ -75,7 +82,12 @@ _SWEEPER_PARAMS = {
 # ---------------------------------------------------------------------------
 
 def _run(problem_class, dt, restol=_RESTOL, max_iter=50):
-    """Run one simulation and return (u_array, problem_instance)."""
+    """
+    Run one simulation and return (physical_u_array, problem_instance).
+
+    For the lifted variant the returned array is ``v + E(Tend)``,
+    i.e. the *physical* solution *u* (not the lifted variable *v*).
+    """
     desc = {
         'problem_class': problem_class,
         'problem_params': {'nvars': _NVARS, 'nu': _NU},
@@ -87,7 +99,24 @@ def _run(problem_class, dt, restol=_RESTOL, max_iter=50):
     ctrl = controller_nonMPI(num_procs=1, controller_params={'logger_level': 40}, description=desc)
     P = ctrl.MS[0].levels[0].prob
     uend, _ = ctrl.run(u0=P.u_exact(0.0), t0=0.0, Tend=_TEND)
-    return np.asarray(uend).copy(), P
+    u = np.asarray(uend).copy()
+    if isinstance(P, burgers_1d_inhom_lift):
+        u = u + P.lift(_TEND)
+    return u, P
+
+
+def _exact(P):
+    """
+    Return the exact analytical solution (physical variable) at ``Tend``.
+
+    For the lifted formulation, ``u_exact`` stores the lifted variable
+    :math:`v = u - E`; this function adds the lift back to return the
+    physical solution :math:`u`.
+    """
+    uex = np.asarray(P.u_exact(_TEND)).copy()
+    if isinstance(P, burgers_1d_inhom_lift):
+        uex = uex + P.lift(_TEND)
+    return uex
 
 
 def _print_table(dts, errs, expected_order):
@@ -107,7 +136,7 @@ def _print_table(dts, errs, expected_order):
 
 def main():
     r"""
-    Compare two formulations under fully-converged IMEX-SDC.
+    Compare three formulations under fully-converged IMEX-SDC.
 
     Parameters (fixed):
 
@@ -121,16 +150,17 @@ def main():
     """
     max_order = 2 * _NUM_NODES - 1  # = 5
 
-    # Inhom case has time-dependent b_bc in f_impl → order reduction (2M-2=4).
-    inhom_order = max_order - 1
+    # Inhom std has time-dependent b_bc in f_impl → order reduction (2M-2=4).
+    inhom_std_order = max_order - 1
 
     # dt range: temporal error dominates for coarser dt, clean convergence
     # orders visible for 4-5 halvings before reaching the spatial floor.
     dts = [_TEND / (2**k) for k in range(1, 7)]  # 0.25 … 0.0078
 
     cases = [
-        (burgers_1d_hom,   'Homogeneous BCs      (sin solution)', max_order),
-        (burgers_1d_inhom, 'Inhomogeneous, std   (b_bc in f_impl)', inhom_order),
+        (burgers_1d_hom,        'Homogeneous BCs      (sin solution)',   max_order),
+        (burgers_1d_inhom,      'Inhomogeneous, std   (b_bc in f_impl)', inhom_std_order),
+        (burgers_1d_inhom_lift, 'Inhomogeneous, lift  (E = 0.5+0.1x*sin(t))', max_order),
     ]
 
     print(f'\nFully-converged IMEX-SDC  (restol={_RESTOL:.0e}, ν={_NU}, M={_NUM_NODES})')
@@ -147,7 +177,7 @@ def main():
         errs = []
         for dt in dts:
             u, P = _run(cls, dt)
-            uex = np.asarray(P.u_exact(_TEND)).copy()
+            uex = _exact(P)
             errs.append(float(np.linalg.norm(u - uex, np.inf)))
         _print_table(dts, errs, exp_order)
         print()
@@ -155,9 +185,11 @@ def main():
     print('=' * 70)
     print('  Summary')
     print('=' * 70)
-    print(f'  Homogeneous BCs:      converging to full collocation order {max_order}')
-    print(f'  Inhomogeneous (b_bc): order reduction — expected ≈ {inhom_order}')
-    print(f'    → time-dependent b_bc(t) in f_impl reduces collocation order by 1.')
+    print(f'  Homogeneous BCs:        converging to collocation order {max_order}')
+    print(f'  Inhomogeneous (b_bc):   stalls at order {inhom_std_order}')
+    print(f'    → b_bc(t) in f_impl reduces the collocation order by 1.')
+    print(f'  Inhomogeneous (lift):   converging to collocation order {max_order}')
+    print(f'    → removing b_bc from f_impl restores the full collocation order.')
     print(f'  (Convergence plateaus at the 4th-order spatial error ~1e-12')
     print(f'   once the temporal error falls below the O(dx⁴) floor.)')
 

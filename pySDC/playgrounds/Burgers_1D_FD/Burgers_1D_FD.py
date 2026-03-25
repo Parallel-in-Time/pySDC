@@ -2,7 +2,7 @@ r"""
 Manufactured-solution problem classes for the 1D viscous Burgers playground
 ============================================================================
 
-Two self-contained problem classes on the domain :math:`[0, 1]`, each
+Three self-contained problem classes on the domain :math:`[0, 1]`, each
 implementing the viscous Burgers equation with a source term that enforces a
 prescribed smooth exact solution:
 
@@ -11,7 +11,7 @@ prescribed smooth exact solution:
     u_t = \nu\,u_{xx} - u\,u_x + g(x, t),
 
 where :math:`g(x,t)` is chosen so that :math:`u_\text{ex}` is the exact
-solution.  The two classes differ only in their boundary treatment:
+solution.  The three classes differ only in their boundary treatment:
 
 * :class:`burgers_1d_hom` – homogeneous Dirichlet BCs; no
   boundary-correction vector :math:`b_\text{bc}` required.
@@ -19,15 +19,19 @@ solution.  The two classes differ only in their boundary treatment:
 * :class:`burgers_1d_inhom` – time-dependent Dirichlet BCs handled
   via the standard :math:`b_\text{bc}(t)` correction in
   :math:`f_\text{impl}`.
+* :class:`burgers_1d_inhom_lift` – same time-dependent BCs treated
+  by boundary lifting (:math:`v = u - E`); the implicit operator
+  :math:`f_\text{impl} = \nu A\,v` is again autonomous.
 
-Comparing the two cases under fully-converged IMEX-SDC shows that
-the homogeneous case achieves the full collocation order :math:`2M-1`, while
+Comparing the three cases under fully-converged IMEX-SDC shows that
+the homogeneous case achieves the full collocation order :math:`2M-1`,
 including a time-dependent :math:`b_\text{bc}(t)` in :math:`f_\text{impl}`
-reduces the collocation order (order reduction).
+reduces the collocation order (order reduction), and boundary lifting
+restores the full collocation order.
 
 **Spatial discretisation**
 
-Both classes use a **fourth-order finite-difference** Laplacian and a
+All classes use a **fourth-order finite-difference** Laplacian and a
 **fourth-order finite-difference** first-derivative operator on :math:`[0,1]`,
 so that spatial errors are :math:`O(\Delta x^4)` and do not dominate the
 temporal error for the grid resolutions used.
@@ -42,6 +46,11 @@ burgers_1d_inhom
     :math:`u_\text{ex}(x,t) = 0.5 + 0.1\sin(\pi x)\cos(t) + 0.1\,x\sin(t)`,
     time-dependent BCs :math:`u(0,t)=0.5`,
     :math:`u(1,t)=0.5+0.1\sin(t)`.  Standard :math:`b_\text{bc}(t)` correction.
+
+burgers_1d_inhom_lift
+    Same exact solution as :class:`burgers_1d_inhom` but reformulated
+    with boundary lifting.  Lift :math:`E(x,t) = 0.5 + 0.1\,x\sin(t)`, state
+    variable :math:`v = u - E` satisfies homogeneous BCs.
 """
 
 import numpy as np
@@ -539,4 +548,187 @@ class burgers_1d_inhom(_Burgers1D_Base):
         me = self.dtype_u(self.init, val=0.0)
         x = self.xvalues
         me[:] = 0.5 + 0.1 * np.sin(np.pi * x) * np.cos(t) + 0.1 * x * np.sin(t)
+        return me
+
+
+# ---------------------------------------------------------------------------
+# Case 3: Inhomogeneous BCs, boundary lifting
+# ---------------------------------------------------------------------------
+
+class burgers_1d_inhom_lift(_Burgers1D_Base):
+    r"""
+    Viscous Burgers problem with **time-dependent** Dirichlet BCs treated
+    by **boundary lifting**.
+
+    **Background**
+
+    The same exact solution as :class:`burgers_1d_inhom` is used, but
+    reformulated in terms of a lifted variable :math:`v = u - E(t)` where
+
+    .. math::
+
+        E(x, t) = 0.5 + 0.1\,x\cdot\sin(t)
+
+    is a linear interpolant satisfying the BCs:
+    :math:`E(0,t) = 0.5` and :math:`E(1,t) = 0.5 + 0.1\sin(t)`.
+
+    The lifted variable satisfies *homogeneous* BCs and evolves according to
+
+    .. math::
+
+        v_t = \nu\,A\,v - (v+E)\,(v_x + \dot{E}_x) + g(x,t) - \dot{E}(x,t),
+
+    where :math:`\dot{E}(x,t) = 0.1\,x\cos(t)` and
+    :math:`\dot{E}_x(t) = 0.1\cos(t)`.  The implicit operator
+    :math:`\nu\,A` is now **purely autonomous** (no :math:`b_\text{bc}(t)`
+    correction), which should restore the full SDC convergence order.
+
+    **Exact lifted solution**
+
+    Since :math:`E(x,t) = 0.5 + 0.1\,x\sin(t)`:
+
+    .. math::
+
+        v_\text{ex}(x, t) = u_\text{ex}(x,t) - E(x,t)
+        = 0.1\,\sin(\pi x)\cos(t).
+
+    The lifted variable happens to coincide with :math:`u_\text{ex}` of
+    the homogeneous case, so it satisfies homogeneous BCs.
+
+    Parameters
+    ----------
+    nvars, nu : see :class:`_Burgers1D_Base`.
+    """
+
+    def lift(self, t):
+        r"""
+        Lift :math:`E(x_i, t) = 0.5 + 0.1\,x_i\sin(t)`.
+
+        Parameters
+        ----------
+        t : float
+
+        Returns
+        -------
+        numpy.ndarray
+        """
+        return 0.5 + 0.1 * self.xvalues * np.sin(t)
+
+    def _dlift_dt(self, t):
+        r"""
+        :math:`\dot{E}(x_i, t) = 0.1\,x_i\cos(t)`.
+
+        Parameters
+        ----------
+        t : float
+
+        Returns
+        -------
+        numpy.ndarray
+        """
+        return 0.1 * self.xvalues * np.cos(t)
+
+    def _dlift_dx(self, t):
+        r"""
+        :math:`\partial_x E(t) = 0.1\sin(t)` (uniform over all interior points).
+
+        Parameters
+        ----------
+        t : float
+
+        Returns
+        -------
+        float
+        """
+        return 0.1 * np.sin(t)
+
+    def _forcing(self, t):
+        r"""
+        Physical forcing :math:`g = u_t - \nu u_{xx} + u_\text{ex}\,u_x^\text{ex}`.
+
+        Parameters
+        ----------
+        t : float
+
+        Returns
+        -------
+        numpy.ndarray
+        """
+        x = self.xvalues
+        u_ex = 0.5 + 0.1 * np.sin(np.pi * x) * np.cos(t) + 0.1 * x * np.sin(t)
+        u_t = -0.1 * np.sin(np.pi * x) * np.sin(t) + 0.1 * x * np.cos(t)
+        u_xx = -0.1 * np.pi**2 * np.sin(np.pi * x) * np.cos(t)
+        u_x = 0.1 * np.pi * np.cos(np.pi * x) * np.cos(t) + 0.1 * np.sin(t)
+        return u_t - self.nu * u_xx + u_ex * u_x
+
+    def eval_f(self, v, t):
+        r"""
+        Evaluate the RHS for the lifted variable :math:`v`.
+
+        Parameters
+        ----------
+        v : dtype_u
+            Current lifted solution (homogeneous BCs).
+        t : float
+
+        Returns
+        -------
+        f : imex_mesh
+            ``f.impl = nu * A * v`` (no BC correction),
+            ``f.expl = -(v+E)*(v_x+E_x) + g(t) - dE/dt``.
+        """
+        E = self.lift(t)
+        E_x = self._dlift_dx(t)
+        v_arr = np.asarray(v)
+        u = v_arr + E  # recover physical variable
+
+        f = self.dtype_f(self.init)
+        f.impl[:] = self.nu * self.A.dot(v_arr)
+        # v has homogeneous BCs → v_L=v_R=0 for the FD stencil on v
+        v_x = self._compute_ux(v_arr, 0.0, 0.0, self.dx)
+        f.expl[:] = -u * (v_x + E_x) + self._forcing(t) - self._dlift_dt(t)
+        self.work_counters['rhs']()
+        return f
+
+    def solve_system(self, rhs, factor, u0, t):
+        r"""
+        Solve :math:`(I - \text{factor}\cdot\nu A)\,v = \text{rhs}`.
+
+        No boundary-correction term needed since :math:`v` satisfies
+        homogeneous BCs.
+
+        Parameters
+        ----------
+        rhs : dtype_u
+        factor : float
+        u0 : dtype_u
+        t : float
+
+        Returns
+        -------
+        me : dtype_u
+        """
+        me = self.dtype_u(self.init)
+        me[:] = spsolve(
+            sp.eye(self.nvars, format='csc') - factor * self.nu * self.A,
+            np.asarray(rhs),
+        )
+        return me
+
+    def u_exact(self, t):
+        r"""
+        Exact lifted solution :math:`v_\text{ex} = u_\text{ex} - E(t) = 0.1\sin(\pi x)\cos(t)`.
+
+        To recover the physical solution, call :meth:`lift` and add.
+
+        Parameters
+        ----------
+        t : float
+
+        Returns
+        -------
+        me : dtype_u
+        """
+        me = self.dtype_u(self.init, val=0.0)
+        me[:] = 0.1 * np.sin(np.pi * self.xvalues) * np.cos(t)
         return me
