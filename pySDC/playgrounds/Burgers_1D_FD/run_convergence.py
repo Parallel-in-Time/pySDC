@@ -115,13 +115,13 @@ def main():
     * ``nvars = 1023`` (4th-order FD, spatial floor
       :math:`\approx 1 \times 10^{-12}`)
     * :math:`T_\text{end} = 0.5`
-    * Error measured vs.\ exact analytical solution.
+    * Error measured vs. exact analytical solution.
 
     Expected collocation order :math:`2M - 1 = 5`.
     """
     max_order = 2 * _NUM_NODES - 1  # = 5
 
-    # Inhom case has time-dependent b_bc in f.impl → order reduction (2M-2=4).
+    # Inhom case has time-dependent b_bc in f_impl → order reduction (2M-2=4).
     inhom_order = max_order - 1
 
     # dt range: temporal error dominates for coarser dt, clean convergence
@@ -157,7 +157,7 @@ def main():
     print('=' * 70)
     print(f'  Homogeneous BCs:      converging to full collocation order {max_order}')
     print(f'  Inhomogeneous (b_bc): order reduction — expected ≈ {inhom_order}')
-    print(f'    → time-dependent b_bc(t) in f.impl reduces collocation order by 1.')
+    print(f'    → time-dependent b_bc(t) in f_impl reduces collocation order by 1.')
     print(f'  (Convergence plateaus at the 4th-order spatial error ~1e-12')
     print(f'   once the temporal error falls below the O(dx⁴) floor.)')
 
