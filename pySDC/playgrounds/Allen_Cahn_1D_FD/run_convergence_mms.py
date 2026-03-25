@@ -29,9 +29,15 @@ Three MMS problem classes are compared on :math:`[0, 1]`:
 * ``allencahn_1d_mms_inhom_lift`` — same exact solution, boundary lifting.
 
 Each class adds a manufactured forcing term so the prescribed solution is
-exact.  Errors are measured against a fine-:math:`\Delta t` reference
-(:math:`\Delta t_\text{ref} = T_\text{end}/2048`, same class, same
-``restol``) to isolate temporal errors.
+exact.  Errors are measured against the **analytical MMS solution** at
+:math:`T_\text{end}`.
+
+**Spatial resolution**: ``nvars = 32767`` interior points
+(:math:`\Delta x \approx 3 \times 10^{-5}`) so that the second-order
+spatial discretisation error
+(:math:`O(\Delta x^2) \approx 4 \times 10^{-9}`) lies well below the
+temporal error for all :math:`\Delta t` in the study.  Convergence stalls
+at this spatial floor once the temporal error falls below it.
 
 Usage::
 
@@ -52,7 +58,9 @@ from pySDC.playgrounds.Allen_Cahn_1D_FD.AllenCahn_1D_FD_MMS import (
 # Fixed parameters
 # ---------------------------------------------------------------------------
 
-_NVARS = 127
+# Use a fine spatial grid so that the O(dx^2) spatial error (~4e-9)
+# is below the temporal error range of interest.
+_NVARS = 32767
 _TEND = 0.5
 _EPS = 1.0
 _DW = 0.0
@@ -73,7 +81,12 @@ _SWEEPER_PARAMS = {
 # ---------------------------------------------------------------------------
 
 def _run(problem_class, dt, restol=_RESTOL, max_iter=50):
-    """Run one simulation and return the physical solution array at Tend."""
+    """
+    Run one simulation and return (physical_u_array, problem_instance).
+
+    For the lifted variant the returned array is ``v + E(Tend)``,
+    i.e. the *physical* solution *u* (not the lifted variable *v*).
+    """
     desc = {
         'problem_class': problem_class,
         'problem_params': {'nvars': _NVARS, 'eps': _EPS, 'dw': _DW},
@@ -88,7 +101,21 @@ def _run(problem_class, dt, restol=_RESTOL, max_iter=50):
     u = np.asarray(uend).copy()
     if isinstance(P, allencahn_1d_mms_inhom_lift):
         u = u + P.lift(_TEND)
-    return u
+    return u, P
+
+
+def _exact(P):
+    """
+    Return the analytical MMS solution (physical variable) at ``Tend``.
+
+    For the lifted formulation, ``u_exact`` stores the lifted variable
+    :math:`v = u - E`; this function adds the lift back to return the
+    physical solution :math:`u`.
+    """
+    uex = np.asarray(P.u_exact(_TEND)).copy()
+    if isinstance(P, allencahn_1d_mms_inhom_lift):
+        uex = uex + P.lift(_TEND)
+    return uex
 
 
 def _print_table(dts, errs, expected_order):
@@ -113,18 +140,19 @@ def main():
     Parameters (fixed):
 
     * ``restol = 1e-13``, :math:`\varepsilon = 1.0`, :math:`M = 3`
-    * ``nvars = 127``, :math:`T_\text{end} = 0.5`
-    * Error measured vs.\ fine-:math:`\Delta t` reference
-      (:math:`\Delta t_\text{ref} = T_\text{end}/2048`).
+    * ``nvars = 32767``, :math:`T_\text{end} = 0.5`
+    * Error measured vs.\ analytical MMS solution.
 
     Expected collocation order :math:`2M - 1 = 5`.
     """
     max_order = 2 * _NUM_NODES - 1  # = 5
-    dt_ref = _TEND / 2048
-    dts = [_TEND / (2**k) for k in range(1, 7)]  # 0.25 … 0.0078
 
     # Inhom std has b_bc in f.impl which reduces collocation order to 2M-2=4.
     inhom_std_order = max_order - 1
+
+    # Use a dt range wide enough to see several decades of convergence before
+    # the O(dx^2) ~ 4e-9 spatial floor is reached.
+    dts = [_TEND / (2**k) for k in range(1, 7)]  # 0.25 … 0.0078
 
     cases = [
         (allencahn_1d_mms_hom,        'Homogeneous BCs      (sin solution)',  max_order),
@@ -134,12 +162,10 @@ def main():
 
     print(f'\nFully-converged IMEX-SDC  (restol={_RESTOL:.0e}, ε={_EPS}, M={_NUM_NODES})')
     print(f'Expected collocation order = {max_order}  (= 2M − 1)')
-    print(f'Error vs. fine-Δt reference  (dt_ref = {dt_ref:.2e})\n')
+    print(f'nvars = {_NVARS}  (spatial error floor ~ O(dx²) ≈ 4e-9)')
+    print(f'Error vs. analytical MMS solution at T={_TEND}\n')
 
     for cls, label, exp_order in cases:
-        # Fine-dt reference for this formulation.
-        uref = _run(cls, dt_ref)
-
         print('=' * 70)
         print(f'  {label}')
         print(f'  expected collocation order = {exp_order}')
@@ -147,19 +173,22 @@ def main():
 
         errs = []
         for dt in dts:
-            u = _run(cls, dt)
-            errs.append(float(np.linalg.norm(u - uref, np.inf)))
+            u, P = _run(cls, dt)
+            uex = _exact(P)
+            errs.append(float(np.linalg.norm(u - uex, np.inf)))
         _print_table(dts, errs, exp_order)
         print()
 
     print('=' * 70)
     print('  Summary')
     print('=' * 70)
-    print(f'  Homogeneous BCs:        collocation order {max_order} ✓')
+    print(f'  Homogeneous BCs:        converging to collocation order {max_order}')
     print(f'  Inhomogeneous (b_bc):   stalls at order {inhom_std_order}')
     print(f'    → b_bc(t) in f.impl reduces the collocation order by 1.')
-    print(f'  Inhomogeneous (lift):   approaches order {max_order}')
+    print(f'  Inhomogeneous (lift):   converging to collocation order {max_order}')
     print(f'    → removing b_bc from f.impl restores the full collocation order.')
+    print(f'  (Convergence plateaus at the spatial discretisation error ~4e-9')
+    print(f'   once the temporal error falls below the O(dx²) floor.)')
 
 
 if __name__ == '__main__':
