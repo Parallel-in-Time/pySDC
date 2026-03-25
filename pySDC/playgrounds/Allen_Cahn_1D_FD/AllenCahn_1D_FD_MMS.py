@@ -90,13 +90,41 @@ class _AllenCahn1D_MMS_Base(Problem):
     r"""
     Shared setup for all MMS problem classes.
 
-    Builds a uniform FD Laplacian on :math:`[0,1]` with *zero* Dirichlet
+    Builds a fourth-order FD Laplacian on :math:`[0,1]` with *zero* Dirichlet
     BCs (the boundary correction, if any, is handled by the subclass).
+
+    **Spatial discretisation**
+
+    Interior rows :math:`k = 2, \ldots, n-3` use the standard centred
+    fourth-order stencil
+
+    .. math::
+
+        u_{xx}(x_k) \approx
+        \frac{-u_{k-2} + 16u_{k-1} - 30u_k + 16u_{k+1} - u_{k+2}}{12\,\Delta x^2}.
+
+    The two innermost rows (:math:`k = 1` and :math:`k = n-2`) use the same
+    centred stencil with the known Dirichlet boundary value substituted for
+    the out-of-domain point, which contributes to the :math:`b_\text{bc}`
+    correction in the inhomogeneous subclass.
+
+    The two outermost rows (:math:`k = 0` and :math:`k = n-1`) use a
+    6-point one-sided stencil derived to maintain fourth-order accuracy
+    without requiring a ghost point outside the domain:
+
+    .. math::
+
+        u_{xx}(x_0) \approx
+        \frac{10u_L - 15u_0 - 4u_1 + 14u_2 - 6u_3 + u_4}{12\,\Delta x^2},
+
+    and symmetrically at :math:`k = n-1`.  The :math:`u_L` and :math:`u_R`
+    terms contribute to :math:`b_\text{bc}` in the inhomogeneous subclass;
+    for the homogeneous and lifted cases they vanish.
 
     Parameters
     ----------
     nvars : int
-        Number of interior grid points (default 127).
+        Number of interior grid points (default 127; must be ≥ 5).
     eps : float
         Interface-width parameter :math:`\varepsilon` (default 1.0).
     dw : float
@@ -109,27 +137,82 @@ class _AllenCahn1D_MMS_Base(Problem):
     xvalues : numpy.ndarray
         Interior grid point coordinates.
     A : scipy.sparse.csc_matrix
-        Tridiagonal FD Laplacian (with *zero* boundary rows, not the BC
-        correction).
+        Fourth-order FD Laplacian (zero Dirichlet BCs, autonomous part only).
     """
 
     dtype_u = mesh
     dtype_f = imex_mesh
 
     def __init__(self, nvars=127, eps=1.0, dw=0.0):
+        if nvars < 5:
+            raise ValueError(f"nvars must be >= 5 for the 4th-order FD Laplacian; got {nvars}")
         super().__init__((nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister('nvars', 'eps', 'dw', localVars=locals(), readOnly=True)
 
         self.dx = 1.0 / (nvars + 1)
         self.xvalues = np.linspace(self.dx, 1.0 - self.dx, nvars)
-
-        diag_main = np.full(nvars, -2.0)
-        diag_off = np.ones(nvars - 1)
-        self.A = (
-            sp.diags([diag_off, diag_main, diag_off], offsets=[-1, 0, 1],
-                     shape=(nvars, nvars), format='csc') / self.dx**2
-        )
+        self.A = self._build_laplacian(nvars, self.dx)
         self.work_counters['rhs'] = WorkCounter()
+
+    @staticmethod
+    def _build_laplacian(n, dx):
+        r"""
+        Assemble the fourth-order FD Laplacian matrix (n × n, zero Dirichlet BCs).
+
+        Parameters
+        ----------
+        n : int
+            Number of interior grid points (>= 5).
+        dx : float
+            Grid spacing.
+
+        Returns
+        -------
+        scipy.sparse.csc_matrix
+        """
+        inv12dx2 = 1.0 / (12.0 * dx**2)
+        A = sp.lil_matrix((n, n))
+
+        # Row 0: 6-point one-sided stencil (4th-order, no ghost point needed).
+        # u_xx(x_0) ~ (10*u_L - 15*u[0] - 4*u[1] + 14*u[2] - 6*u[3] + u[4]) / (12*dx^2)
+        # Matrix part (u_L = 0 for zero-BC; non-zero contribution goes to b_bc):
+        A[0, 0] = -15
+        A[0, 1] = -4
+        A[0, 2] = 14
+        A[0, 3] = -6
+        A[0, 4] = 1
+
+        # Row 1: standard 4th-order centred, uses u[-1] = u_L (boundary) as b_bc correction.
+        # u_xx(x_1) ~ (-u_L + 16*u[0] - 30*u[1] + 16*u[2] - u[3]) / (12*dx^2)
+        A[1, 0] = 16
+        A[1, 1] = -30
+        A[1, 2] = 16
+        A[1, 3] = -1
+
+        # Rows 2,...,n-3: standard centred 4th-order stencil.
+        for k in range(2, n - 2):
+            A[k, k - 2] = -1
+            A[k, k - 1] = 16
+            A[k, k] = -30
+            A[k, k + 1] = 16
+            A[k, k + 2] = -1
+
+        # Row n-2: standard 4th-order centred, uses u[n] = u_R (boundary) as b_bc correction.
+        # u_xx(x_{n-2}) ~ (-u[n-4] + 16*u[n-3] - 30*u[n-2] + 16*u[n-1] - u_R) / (12*dx^2)
+        A[n - 2, n - 4] = -1
+        A[n - 2, n - 3] = 16
+        A[n - 2, n - 2] = -30
+        A[n - 2, n - 1] = 16
+
+        # Row n-1: mirror of row 0 (6-point one-sided stencil).
+        # u_xx(x_{n-1}) ~ (u[n-5]-6*u[n-4]+14*u[n-3]-4*u[n-2]-15*u[n-1]+10*u_R)/(12*dx^2)
+        A[n - 1, n - 5] = 1
+        A[n - 1, n - 4] = -6
+        A[n - 1, n - 3] = 14
+        A[n - 1, n - 2] = -4
+        A[n - 1, n - 1] = -15
+
+        return (A * inv12dx2).tocsc()
 
 
 # ---------------------------------------------------------------------------
@@ -288,13 +371,20 @@ class allencahn_1d_mms_inhom(_AllenCahn1D_MMS_Base):
 
     def _bc_vector(self, t):
         r"""
-        Boundary-correction vector :math:`b_\text{bc}(t)`.
+        Boundary-correction vector :math:`b_\text{bc}(t)` for the 4th-order
+        FD Laplacian.
 
-        .. math::
+        The non-zero entries come from substituting the Dirichlet boundary
+        values into the FD stencil rows that touch the domain boundary:
 
-            b_0 = \cos(t)/\Delta x^2, \quad
-            b_{n-1} = -\cos(t)/\Delta x^2, \quad
-            b_i = 0 \text{ otherwise}.
+        * Row 0 (6-point one-sided stencil):
+          :math:`b_0 = 10\cos(t) / (12\,\Delta x^2)`.
+        * Row 1 (standard centred stencil, needs :math:`u_L`):
+          :math:`b_1 = -\cos(t) / (12\,\Delta x^2)`.
+        * Row :math:`n-2` (standard centred, needs :math:`u_R`):
+          :math:`b_{n-2} = \cos(t) / (12\,\Delta x^2)`.
+        * Row :math:`n-1` (6-point one-sided):
+          :math:`b_{n-1} = -10\cos(t) / (12\,\Delta x^2)`.
 
         Parameters
         ----------
@@ -304,9 +394,15 @@ class allencahn_1d_mms_inhom(_AllenCahn1D_MMS_Base):
         -------
         numpy.ndarray
         """
-        bc = np.zeros(self.nvars)
-        bc[0] = np.cos(t) / self.dx**2
-        bc[-1] = -np.cos(t) / self.dx**2
+        n = self.nvars
+        inv12dx2 = 1.0 / (12.0 * self.dx**2)
+        u_L = np.cos(t)
+        u_R = -np.cos(t)
+        bc = np.zeros(n)
+        bc[0] = 10 * u_L * inv12dx2
+        bc[1] = -u_L * inv12dx2
+        bc[n - 2] = -u_R * inv12dx2
+        bc[n - 1] = 10 * u_R * inv12dx2
         return bc
 
     def _forcing(self, t):
