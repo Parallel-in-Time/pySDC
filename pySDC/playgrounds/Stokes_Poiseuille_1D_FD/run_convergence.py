@@ -26,9 +26,14 @@ Three constraint treatments are compared
    increases toward :math:`M+1`.
 
 3. **Differentiated constraint** :math:`B\mathbf{u}' = q'(t)`: replaces the
-   algebraic constraint with its time derivative.  Converts the DAE to an
-   equivalent index-0 ODE system, allowing RADAU to achieve the full
-   collocation order :math:`2M-1` for **both** velocity and pressure.
+   algebraic constraint with its time derivative, raising the stage pressure
+   accuracy by one order from :math:`\mathcal{O}(\Delta t^M)` to
+   :math:`\mathcal{O}(\Delta t^{M+1})`.  The endpoint error in the
+   **U-formulation** then becomes
+   :math:`\Delta t\,\sum_j Q_{Mj}\,\mathcal{O}(\Delta t^{M+1}) =
+   \mathcal{O}(\Delta t^{M+2})`.  For :math:`M = 3` this gives
+   :math:`M+2 = 5 = 2M-1` (coincidence!).  For :math:`M \geq 4` the order
+   is :math:`M+2`, **not** :math:`2M-1`.
 
 Key findings (:math:`\nu = 0.1`, ``nvars = 1023``, ``restol = 1e-13``,
 :math:`M = 3`)
@@ -36,23 +41,20 @@ Key findings (:math:`\nu = 0.1`, ``nvars = 1023``, ``restol = 1e-13``,
 
 * **Standard (algebraic)**: velocity :math:`\to M+1 = 4`, pressure
   :math:`\to M = 3`.  The :math:`\mathcal{O}(\Delta t^M)` stage pressure
-  errors feed back into the velocity derivatives and break the :math:`2M-1`
-  superconvergence.
+  errors feed back into the velocity derivatives and break superconvergence.
 
 * **Lifted (homogeneous)**: velocity :math:`\to M+1 = 4` (unchanged);
   pressure order increases monotonically toward :math:`M+1 = 4`.
 
-* **Differentiated constraint**: velocity :math:`\to 2M-1 = 5` ✓,
-  pressure :math:`\to 2M-1 = 5` ✓.  By enforcing :math:`B\mathbf{U}_m =
-  q'(\tau_m)` at each stage instead of :math:`B\mathbf{u}_m = q(\tau_m)`,
-  the stage pressure errors are reduced to
-  :math:`e_{G_m} = -BAe_{\mathbf{u}_m}/s = \mathcal{O}(\Delta t^{M+1})`,
-  eliminating the feedback that breaks superconvergence.  The index-reduced
-  system is essentially an ODE and RADAU achieves its full order :math:`2M-1`.
+* **Differentiated constraint**: velocity :math:`\to M+2 = 5`,
+  pressure :math:`\to M+2 = 5`.  For :math:`M = 3`, :math:`M+2 = 5 = 2M-1`
+  coincidentally equals the full RADAU collocation order.  For :math:`M = 4`,
+  the observed order is :math:`M+2 = 6 \neq 2M-1 = 7`, confirming that the
+  improvement is one order (+1) above the standard, not a jump to :math:`2M-1`.
 
-Why the differentiated constraint works
-----------------------------------------
-For the original algebraic constraint at each node:
+Why the differentiated constraint improves order by +1
+-------------------------------------------------------
+For the original algebraic constraint at each SDC node:
 
 .. math::
 
@@ -74,7 +76,12 @@ For the differentiated constraint:
 
 since the stage velocity error :math:`e_{\mathbf{u}_m} = \mathcal{O}(\Delta
 t^{M+1})` at collocation nodes.  With :math:`G_m` at order :math:`M+1`, the
-velocity endpoint recovers the full RADAU superconvergence :math:`2M-1`.
+stage velocity derivative errors :math:`e_{\mathbf{U}_m} = \mathcal{O}(\Delta
+t^{M+1})`, and the U-formulation quadrature gives endpoint order
+:math:`\Delta t \cdot \mathcal{O}(\Delta t^{M+1}) = \mathcal{O}(\Delta
+t^{M+2})`.  Achieving the full collocation order :math:`2M-1 \geq M+2` for
+:math:`M \geq 4` would require the **y-formulation** (standard RADAU-IIA), not
+the U-formulation.
 
 Usage::
 
@@ -212,18 +219,21 @@ def main():
       :math:`M = 3`.
     * **Lifted (homogeneous)**: velocity :math:`M+1 = 4`, pressure
       approaches :math:`M+1 = 4`.
-    * **Differentiated constraint**: both velocity and pressure
-      approach full collocation order :math:`2M-1 = 5`.
+    * **Differentiated constraint**: both velocity and pressure at
+      order :math:`M+2 = 5`.  For :math:`M = 3`, :math:`M+2 = 5 = 2M-1`
+      coincidentally equals the full RADAU collocation order; the improvement
+      is one order (+1) above the standard, not a jump to :math:`2M-1`.
     * **Lifted + differentiated**: same as lifted (the differentiated
       homogeneous constraint is equivalent to the original).
     """
-    colloc_order = 2 * _NUM_NODES - 1  # 2M-1 = 5
+    mplus2 = _NUM_NODES + 2   # M+2 = 5 for M=3 (coincides with 2M-1=5)
 
     # 7 halvings from T_end/2 to T_end/128  →  0.5, 0.25, …, 0.0078125
     dts = [_TEND / (2**k) for k in range(1, 8)]
 
     print(f'\nFully-converged SDC  (restol={_RESTOL:.0e}, ν={_NU}, M={_NUM_NODES})')
-    print(f'Full RADAU collocation order: 2M-1 = {colloc_order}')
+    print(f'Standard vel order: M+1={_NUM_NODES+1}; diffconstr vel order: M+2={mplus2}')
+    print(f'  (For M=3: M+2=5=2M-1=5 — coincidence; for M=4: M+2=6≠2M-1=7)')
     print(f'nvars = {_NVARS}, 4th-order FD  (spatial floor ~ O(dx^4) ≈ 1e-12)')
     print(f'ν = {_NU}:  slow-mode |λΔt| ≤ {_NU * np.pi**2 * dts[0]:.2f} at Δt = {dts[0]:.4f}'
           f'  → asymptotic regime accessible')
@@ -235,7 +245,7 @@ def main():
         (stokes_poiseuille_1d_fd_lift,
          'Lifted    (B·ṽ = 0,   homogeneous constraint)'),
         (stokes_poiseuille_1d_fd_diffconstr,
-         'Diff.constr. (B·U = q\'(t), differentiated)  ← remedy'),
+         f'Diff.constr. (B·U = q\'(t))  order M+2={mplus2}  ← remedy'),
         (stokes_poiseuille_1d_fd_lift_diffconstr,
          'Lifted+diff. (B·Ũ = 0,  equiv. to lifted)'),
     ]
@@ -254,7 +264,7 @@ def main():
             vel_errs.append(ve)
             pres_errs.append(pe)
 
-        _print_table(dts, vel_errs, pres_errs, colloc_order)
+        _print_table(dts, vel_errs, pres_errs, mplus2)
         results[label] = (vel_errs, pres_errs)
 
     # ---- Summary ----
@@ -279,15 +289,15 @@ def main():
         f'  • Lifted (B·ṽ=0): vel→M+1, pres increasing toward M+1 (pre-asymptotic).'
     )
     print(
-        f'  • Differentiated constraint (B·U=q\'): vel→2M-1={colloc_order}, '
-        f'pres→2M-1={colloc_order}.'
+        f'  • Differentiated constraint (B·U=q\'): vel→M+2={mplus2}, '
+        f'pres→M+2={mplus2}.'
     )
     print(
         '    Enforcing B·U_m = q\'(τ_m) at each stage reduces the stage pressure\n'
-        '    error from O(dt^M) to O(dt^(M+1)), restoring the full RADAU\n'
-        '    superconvergence order 2M-1 for both velocity and pressure.\n'
-        '    The differentiated constraint converts the semi-explicit index-1\n'
-        '    DAE to an equivalent index-0 ODE system at each stage.'
+        '    error from O(dt^M) to O(dt^{M+1}), giving endpoint order O(dt^{M+2})\n'
+        '    in the U-formulation.  For M=3: M+2=5=2M-1 (coincidence!).  For M=4:\n'
+        '    M+2=6, which is observed, confirming the improvement is +1 order\n'
+        '    over the standard, not a jump to the full collocation order 2M-1.'
     )
     print(
         f'  • Lifted+differentiated: same as lifted (the differentiated\n'

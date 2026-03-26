@@ -56,8 +56,9 @@ Two sweepers are supported:
 
 * :class:`~pySDC.projects.DAE.sweepers.semiImplicitDAE.SemiImplicitDAE`
   (U-formulation): velocity order :math:`M+1`, pressure order :math:`M`
-  (standard), approaching :math:`M+1` (lifted), or full :math:`2M-1`
-  (differentiated constraint).
+  (standard), approaching :math:`M+1` (lifted), or order :math:`M+2`
+  (differentiated constraint — coincides with :math:`2M-1` only for
+  :math:`M = 3`).
 
 Three constraint treatments are provided — see Classes section below.
 
@@ -108,8 +109,13 @@ derivative :math:`B\mathbf{U}_m = q'(\tau_m)`.  The Schur formula becomes
     G_m = \frac{q'(\tau_m) - B\mathbf{w}}{B\mathbf{v}_0},
 
 and the stage pressure error reduces from :math:`\mathcal{O}(\Delta t^M)`
-to :math:`\mathcal{O}(\Delta t^{M+1})`, restoring the full RADAU
-collocation order :math:`2M-1` for **both** velocity and pressure.
+to :math:`\mathcal{O}(\Delta t^{M+1})`.  The U-formulation quadrature then
+gives endpoint error :math:`\Delta t \cdot \mathcal{O}(\Delta t^{M+1}) =
+\mathcal{O}(\Delta t^{M+2})`.  **For :math:`M = 3`, :math:`M+2 = 5 = 2M-1`
+coincidentally equals the full RADAU collocation order.**  For :math:`M = 4`,
+the order is :math:`M+2 = 6 \neq 2M-1 = 7`, as confirmed numerically.
+Achieving :math:`2M-1` for :math:`M \geq 4` requires the y-formulation
+(standard RADAU-IIA), not the U-formulation used here.
 
 Classes
 -------
@@ -123,7 +129,8 @@ stokes_poiseuille_1d_fd_lift
 
 stokes_poiseuille_1d_fd_diffconstr
     Differentiated constraint :math:`B\mathbf{U}_m = q'(\tau_m)`.
-    SemiImplicitDAE: **vel and pres both at** :math:`2M-1`.
+    SemiImplicitDAE: vel and pres both at :math:`M+2` (= :math:`2M-1`
+    only for :math:`M = 3`).
 
 stokes_poiseuille_1d_fd_lift_diffconstr
     Lifting + differentiated :math:`B\tilde{\mathbf{U}} = 0`.
