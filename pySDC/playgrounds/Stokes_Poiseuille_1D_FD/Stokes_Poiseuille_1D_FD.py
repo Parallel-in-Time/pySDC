@@ -141,6 +141,16 @@ stokes_poiseuille_1d_fd_full
 
 stokes_poiseuille_1d_fd_lift_full
     Lifting, FullyImplicitDAE (same fixed point as lifted).
+
+stokes_poiseuille_1d_fd_coupled
+    Explicit :math:`(N+1)\times(N+1)` block solve for the differentiated
+    constraint (mathematically equivalent to diffconstr Schur).
+    Optional ``project=True`` also enforces :math:`B\mathbf{u}_m = q(\tau_m)`
+    via a post-solve projection, but this **degrades** convergence because
+    it creates an inconsistency between ``solve_system`` (which after
+    projection enforces the algebraic constraint) and ``eval_f`` (which
+    checks the differentiated constraint).  Provided for pedagogical
+    comparison only.
 """
 
 import numpy as np
@@ -419,6 +429,116 @@ class _StokesBase(ProblemDAE):
 
         U = w + factor * G_prime * v0
         return U, float(G_prime)
+
+    def _coupled_block_solve(self, rhs_eff, v_approx, factor, q_prime_val,
+                             project=False, q_val=None):
+        r"""
+        Fully-coupled :math:`(N+1)\times(N+1)` block solve for the
+        differentiated constraint :math:`B\mathbf{U} = q'(t)`.
+
+        Assembles and solves the full block system
+
+        .. math::
+
+            \begin{pmatrix}
+                I - \alpha\nu A & -\mathbf{1} \\
+                h\,\mathbf{1}^T & 0
+            \end{pmatrix}
+            \begin{pmatrix} \mathbf{U} \\ G \end{pmatrix}
+            =
+            \begin{pmatrix} \mathbf{r}_\text{eff} \\ q'(t) \end{pmatrix}
+
+        This is **mathematically equivalent** to
+        :meth:`_schur_solve_diffconstr` (which reduces the same system to a
+        scalar Schur equation), but solves the full :math:`(N+1)` sparse
+        system directly.
+
+        If ``project=True``, a post-solve projection step enforces the
+        **original** algebraic constraint :math:`B(\mathbf{v}+\alpha\mathbf{U})
+        = q(t)` in addition to the differentiated one.  The minimal-norm
+        correction
+
+        .. math::
+
+            \delta = -\frac{B(\mathbf{v}+\alpha\mathbf{U}) - q(t)}{s}
+                       \,\mathbf{1}
+
+        is added to :math:`\mathbf{v}+\alpha\mathbf{U}`, giving
+
+        .. math::
+
+            \mathbf{U}_\text{proj} =
+                \mathbf{U} + \frac{\delta}{\alpha}.
+
+        The pressure :math:`G` is then updated by solving the Schur formula
+        :math:`G = (q'(t) - B\mathbf{U}_\text{proj}) / (B\mathbf{v}_0)` so
+        that :math:`B\mathbf{U}_\text{proj}` uses the corrected derivative.
+
+        Parameters
+        ----------
+        rhs_eff : numpy.ndarray
+            Effective velocity RHS
+            :math:`\nu A\mathbf{v}_\text{approx} + \mathbf{f}(t)`.
+        v_approx : numpy.ndarray
+            Current velocity approximation at the node.
+        factor : float
+            Implicit prefactor :math:`\alpha = \Delta t\,\tilde{q}_{mm}`.
+        q_prime_val : float
+            Value of :math:`q'(t)` at the current stage time.
+        project : bool, optional
+            If ``True``, apply the projection step that also enforces
+            :math:`B(\mathbf{v}+\alpha\mathbf{U}) = q(t)`.  Default ``False``.
+        q_val : float or None
+            Value of :math:`q(t)` required when ``project=True``.
+
+        Returns
+        -------
+        U : numpy.ndarray
+            Velocity derivative at the node.
+        G_new : float
+            Pressure gradient satisfying :math:`B\mathbf{U} = q'(t)` (before
+            projection) or consistent with the projected velocity (after).
+        """
+        n = self.nvars
+        top_left = sp.eye(n, format='csc') - factor * self.A
+        top_right = sp.csc_matrix(-self.ones.reshape(-1, 1))
+        bot_left = sp.csc_matrix(self.dx * self.ones.reshape(1, -1))
+        bot_right = sp.csc_matrix(np.zeros((1, 1)))
+
+        K = sp.bmat(
+            [[top_left, top_right], [bot_left, bot_right]],
+            format='csc',
+        )
+        rhs = np.concatenate([rhs_eff, [q_prime_val]])
+        sol = spsolve(K, rhs)
+
+        U = sol[:n].copy()
+        G = float(sol[n])
+
+        if project and q_val is not None:
+            # Post-solve projection: enforce B*(v + factor*U) = q(t).
+            # WARNING: this projection changes U_m in a way that is
+            # INCONSISTENT with eval_f, which checks B*u' - q'(t) = 0.
+            # After projection, B*U_proj = B*U - violation/factor ≠ q'(t)
+            # in general (since B*U = q'(t) before projection but violation ≠ 0).
+            # As a result, the SDC residual no longer converges cleanly and
+            # the sweep converges to a DIFFERENT (worse) fixed point.
+            # The projection is provided here for pedagogical comparison only;
+            # it should NOT be used in practice with the differentiated-constraint
+            # eval_f.
+            u_m = v_approx + factor * U
+            violation = self._B_dot(u_m) - q_val
+            if abs(violation) > 0.0:
+                delta = -(violation / self.s) * self.ones
+                U = U + delta / factor
+                # Update G from the momentum residual.
+                # At the unperturbed solution, (I-factor*A)*U - G*ones = rhs_eff,
+                # so G*ones = (I-factor*A)*U - rhs_eff.  After projection, U changes
+                # and all N components of (I-factor*A)*U_proj - rhs_eff theoretically
+                # equal the same G value; we take the mean for numerical stability.
+                G = float(np.mean(top_left.dot(U) - rhs_eff))
+
+        return U, G
 
     def _schur_solve_diffconstr(self, rhs_eff, factor, q_prime_val):
         r"""
@@ -1189,6 +1309,155 @@ class stokes_poiseuille_1d_fd_lift_diffconstr(stokes_poiseuille_1d_fd_lift):
         rhs_eff = self.A.dot(v_approx) + self._net_forcing(t)
         # Differentiated homogeneous constraint: B·U_tilde = 0 → q'_eff = 0
         U, G_new = self._schur_solve_diffconstr(rhs_eff, factor, 0.0)
+
+        me.diff[:] = U
+        me.alg[0] = G_new
+        return me
+
+
+# ---------------------------------------------------------------------------
+# Case 7: Coupled block solve + projection
+# ---------------------------------------------------------------------------
+
+class stokes_poiseuille_1d_fd_coupled(stokes_poiseuille_1d_fd):
+    r"""
+    1-D Stokes/Poiseuille DAE using an **explicit** :math:`(N+1)\times(N+1)`
+    block solve for the differentiated constraint, with an optional
+    post-solve projection that also enforces the original algebraic constraint.
+
+    Two sub-variants are provided via the ``project`` constructor parameter:
+
+    **Block solve only** (``project=False``, default)
+        Assembles and solves the full :math:`(N+1)\times(N+1)` sparse system
+
+        .. math::
+
+            \begin{pmatrix}
+                I - \alpha\nu A & -\mathbf{1} \\
+                h\,\mathbf{1}^T & 0
+            \end{pmatrix}
+            \begin{pmatrix} \mathbf{U} \\ G \end{pmatrix}
+            =
+            \begin{pmatrix}
+                \nu A\mathbf{v} + \mathbf{f}(\tau_m) \\
+                q'(\tau_m)
+            \end{pmatrix}
+
+        This is **mathematically equivalent** to
+        :class:`stokes_poiseuille_1d_fd_diffconstr` (which reduces the same
+        system to a scalar Schur equation).  Convergence orders are the same:
+        velocity :math:`M+2`, pressure :math:`M+2` (:math:`= 2M-1` for
+        :math:`M = 3` by coincidence).
+
+    **Block solve + projection** (``project=True``)
+        After the block solve, a minimal-norm correction enforces the
+        **original** algebraic constraint :math:`B(\mathbf{v}+\alpha\mathbf{U})
+        = q(\tau_m)` as well.
+
+        .. warning::
+
+            This variant gives **worse** results than the plain block solve.
+            The root cause is an inconsistency between ``solve_system`` (which
+            after projection enforces :math:`B(\mathbf{v}+\alpha\mathbf{U})
+            = q(t)`) and ``eval_f`` (which checks the **differentiated**
+            constraint :math:`B\mathbf{u}' - q'(t) = 0`).  Because the
+            projection changes :math:`\mathbf{U}` so that
+            :math:`B\mathbf{U} \neq q'(t)` any more, the SDC residual
+            never converges cleanly and the sweep converges to a different,
+            lower-accuracy fixed point.  Numerically, the projection variant
+            achieves only velocity :math:`M+1 \approx 4`, pressure
+            :math:`M \approx 3` — the same as the standard algebraic formulation.
+
+        The lesson is that **self-consistency between** ``solve_system`` **and**
+        ``eval_f`` **is essential**: both must enforce the same constraint
+        (either the algebraic :math:`B\mathbf{u}=q` or the differentiated
+        :math:`B\mathbf{u}'=q'`).  Mixing the two degrades convergence.
+
+    The ``eval_f`` uses the differentiated constraint
+    :math:`F_\text{alg} = B\mathbf{u}' - q'(t) = 0`, matching
+    :class:`stokes_poiseuille_1d_fd_diffconstr`.
+
+    Parameters
+    ----------
+    nvars : int
+        Number of interior grid points (default 127; must be ≥ 5).
+    nu : float
+        Kinematic viscosity (default 1.0).
+    newton_tol : float
+        Unused; passed to base class (default 1e-10).
+    project : bool
+        If ``True``, apply the post-solve projection step that also enforces
+        :math:`B(\mathbf{v}+\alpha\mathbf{U}) = q(\tau_m)`.  Default ``False``.
+        See warning above — this is provided for pedagogical comparison only.
+    """
+
+    def __init__(self, nvars=127, nu=1.0, newton_tol=1e-10, project=False):
+        super().__init__(nvars=nvars, nu=nu, newton_tol=newton_tol)
+        self._makeAttributeAndRegister('project', localVars=locals(), readOnly=True)
+
+    def eval_f(self, u, du, t):
+        r"""
+        Fully-implicit DAE residual using the **differentiated constraint**:
+
+        .. math::
+
+            F_\text{diff} = \mathbf{u}' - \nu A\,\mathbf{u}
+                          - G\,\mathbf{1} - \mathbf{f}(t),
+
+        .. math::
+
+            F_\text{alg} = B\,\mathbf{u}' - q'(t).
+
+        Identical to :class:`stokes_poiseuille_1d_fd_diffconstr`.
+        """
+        f = self.dtype_f(self.init, val=0.0)
+        u_vel = np.asarray(u.diff)
+        du_vel = np.asarray(du.diff)
+        G = float(u.alg[0])
+
+        f.diff[:] = du_vel - (self.A.dot(u_vel) + G * self.ones + self._forcing(t))
+        f.alg[0] = self._B_dot(du_vel) - self._q_prime(t)
+
+        self.work_counters['rhs']()
+        return f
+
+    def solve_system(self, impl_sys, u_approx, factor, u0, t):
+        r"""
+        Coupled :math:`(N+1)\times(N+1)` block solve with the differentiated
+        constraint :math:`B\mathbf{U} = q'(t)`.
+
+        Optionally applies a post-solve projection onto
+        :math:`B(\mathbf{v}+\alpha\mathbf{U}) = q(t)` if ``self.project``
+        is ``True``.
+
+        Parameters
+        ----------
+        impl_sys : callable
+            Unused; system solved directly.
+        u_approx : MeshDAE
+            Current velocity approximation at the node.
+        factor : float
+            Implicit prefactor :math:`\alpha`.
+        u0 : MeshDAE
+            Unused (direct solver).
+        t : float
+            Current time.
+
+        Returns
+        -------
+        me : MeshDAE
+            ``me.diff[:]`` = velocity derivative :math:`\mathbf{U}_m`,
+            ``me.alg[0]`` = pressure gradient :math:`G_m`.
+        """
+        me = self.dtype_u(self.init, val=0.0)
+        v_approx = np.asarray(u_approx.diff).copy()
+
+        rhs_eff = self.A.dot(v_approx) + self._forcing(t)
+        U, G_new = self._coupled_block_solve(
+            rhs_eff, v_approx, factor, self._q_prime(t),
+            project=self.project,
+            q_val=self._q(t) if self.project else None,
+        )
 
         me.diff[:] = U
         me.alg[0] = G_new

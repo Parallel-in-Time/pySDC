@@ -97,6 +97,7 @@ from pySDC.playgrounds.Stokes_Poiseuille_1D_FD.Stokes_Poiseuille_1D_FD import (
     stokes_poiseuille_1d_fd_lift,
     stokes_poiseuille_1d_fd_diffconstr,
     stokes_poiseuille_1d_fd_lift_diffconstr,
+    stokes_poiseuille_1d_fd_coupled,
 )
 
 # ---------------------------------------------------------------------------
@@ -126,10 +127,14 @@ _SWEEPER_PARAMS = {
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _run(problem_class, sweeper_class, dt, restol=_RESTOL, max_iter=50, nvars=_NVARS):
+def _run(problem_class, sweeper_class, dt, restol=_RESTOL, max_iter=50, nvars=_NVARS,
+         extra_problem_params=None):
+    prob_params = {'nvars': nvars, 'nu': _NU}
+    if extra_problem_params:
+        prob_params.update(extra_problem_params)
     desc = {
         'problem_class': problem_class,
-        'problem_params': {'nvars': nvars, 'nu': _NU},
+        'problem_params': prob_params,
         'sweeper_class': sweeper_class,
         'sweeper_params': _SWEEPER_PARAMS,
         'level_params': {'restol': restol, 'dt': dt},
@@ -241,17 +246,27 @@ def main():
 
     cases = [
         (stokes_poiseuille_1d_fd,
-         'Standard  (B·u = q(t), algebraic constraint)'),
+         'Standard  (B·u = q(t), algebraic constraint)',
+         {}),
         (stokes_poiseuille_1d_fd_lift,
-         'Lifted    (B·ṽ = 0,   homogeneous constraint)'),
+         'Lifted    (B·ṽ = 0,   homogeneous constraint)',
+         {}),
         (stokes_poiseuille_1d_fd_diffconstr,
-         f'Diff.constr. (B·U = q\'(t))  order M+2={mplus2}  ← remedy'),
+         f'Diff.constr. (B·U = q\'(t))  order M+2={mplus2}  ← remedy',
+         {}),
         (stokes_poiseuille_1d_fd_lift_diffconstr,
-         'Lifted+diff. (B·Ũ = 0,  equiv. to lifted)'),
+         'Lifted+diff. (B·Ũ = 0,  equiv. to lifted)',
+         {}),
+        (stokes_poiseuille_1d_fd_coupled,
+         f'Coupled block (N+1)×(N+1) solve, no projection  [≡ diffconstr]',
+         {'project': False}),
+        (stokes_poiseuille_1d_fd_coupled,
+         f'Coupled block + projection B·u_m=q(τ_m)         [degrades!]',
+         {'project': True}),
     ]
 
     results = {}
-    for cls, label in cases:
+    for cls, label, extra_params in cases:
         print()
         print('=' * 72)
         print(f'  {label}')
@@ -259,7 +274,7 @@ def main():
 
         vel_errs, pres_errs = [], []
         for dt in dts:
-            uend, P = _run(cls, SemiImplicitDAE, dt)
+            uend, P = _run(cls, SemiImplicitDAE, dt, extra_problem_params=extra_params)
             ve, pe = _errors(uend, P)
             vel_errs.append(ve)
             pres_errs.append(pe)
@@ -272,7 +287,7 @@ def main():
     print('=' * 72)
     print('  Summary')
     print('=' * 72)
-    for cls, label in cases:
+    for cls, label, extra_params in cases:
         vel_errs, pres_errs = results[label]
         vel_ord = _asymptotic_order(dts, vel_errs)
         pres_ord = _asymptotic_order(dts, pres_errs)
@@ -303,6 +318,14 @@ def main():
         f'  • Lifted+differentiated: same as lifted (the differentiated\n'
         f'    homogeneous constraint B·Ũ=0 is equivalent to the original B·ṽ=0\n'
         f'    at the SDC fixed point; no additional improvement).'
+    )
+    print(
+        f'  • Coupled block (N+1)×(N+1) solve (no proj): mathematically equivalent\n'
+        f'    to diffconstr (same Schur system, different implementation). Same orders.\n'
+        f'  • Coupled + projection B·u_m=q(τ_m): DEGRADES convergence! The projection\n'
+        f'    changes U so that B·U ≠ q\'(t) any more, creating an inconsistency with\n'
+        f'    eval_f (which checks B·u\'-q\'=0). Lesson: solve_system and eval_f must\n'
+        f'    enforce the SAME constraint — mixing algebraic and differentiated degrades.'
     )
     print(
         f'  • Spatial floor ~1e-12 (nvars={_NVARS}) limits the finest accessible Δt.'
