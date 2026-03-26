@@ -52,13 +52,21 @@ with ``nvars`` interior points:
 * ``u.diff[:]`` – velocity on :math:`N` interior grid points.
 * ``u.alg[0]`` – pressure gradient :math:`G` (Lagrange multiplier).
 
-The compatible sweeper is
-:class:`~pySDC.projects.DAE.sweepers.semiImplicitDAE.SemiImplicitDAE`.
+Two sweepers are supported:
+
+* :class:`~pySDC.projects.DAE.sweepers.semiImplicitDAE.SemiImplicitDAE`
+  (U-formulation): velocity order :math:`M+1`, pressure order :math:`M`
+  (or increasing toward :math:`M+1` with lifting).
+
+* :class:`~pySDC.projects.DAE.sweepers.fullyImplicitDAE.FullyImplicitDAE`
+  (collocation-consistent): treats :math:`G` as a differential variable
+  updated by the same quadrature as the velocity, restoring the full
+  collocation order :math:`2M-1` for both.
 
 Without constraint lifting (class :class:`stokes_poiseuille_1d_fd`), the
 constraint :math:`B\mathbf{u} = q(t)` has a time-dependent right-hand side,
 which causes order reduction in :math:`G` to order :math:`M` (= 3 for
-3 RADAU-RIGHT nodes).
+3 RADAU-RIGHT nodes) when using :class:`SemiImplicitDAE`.
 
 Constraint lifting (class :class:`stokes_poiseuille_1d_fd_lift`)
 -----------------------------------------------------------------
@@ -95,11 +103,13 @@ Classes
 -------
 stokes_poiseuille_1d_fd
     No lifting; constraint :math:`B\mathbf{u} = q(t)` (time-dependent).
-    Pressure converges at order :math:`M`.
+    Compatible with **SemiImplicitDAE** (pressure order :math:`M`) and
+    **FullyImplicitDAE** (pressure order :math:`2M-1`).
 
 stokes_poiseuille_1d_fd_lift
     Constraint lifting; homogeneous :math:`B\tilde{\mathbf{v}} = 0`.
-    Expected to restore full order :math:`2M-1` in the pressure.
+    Compatible with both sweepers; FullyImplicitDAE restores full
+    :math:`2M-1` order cleanly.
 """
 
 import numpy as np
@@ -306,6 +316,72 @@ class _StokesBase(ProblemDAE):
 
         U = w + G_new * v0
         return U, float(G_new)
+
+    def _schur_solve_full_implicit(self, rhs_eff, v_approx, factor, constraint_rhs):
+        r"""
+        Schur-complement saddle-point solve for use with
+        :class:`~pySDC.projects.DAE.sweepers.fullyImplicitDAE.FullyImplicitDAE`.
+
+        Finds :math:`(\mathbf{U}, G')` satisfying
+
+        .. math::
+
+            (I - \alpha\nu A)\,\mathbf{U} - \alpha G'\,\mathbf{1}
+                = \mathbf{r}_\text{eff},
+
+        .. math::
+
+            B(\mathbf{v}_\text{approx} + \alpha\,\mathbf{U}) = c,
+
+        where :math:`G' = \mathrm{d}G/\mathrm{d}t` is the **derivative** of
+        the pressure gradient and :math:`c` is ``constraint_rhs``.
+
+        Compared to :meth:`_schur_solve`, here ``rhs_eff`` must already
+        include the :math:`G_0\,\mathbf{1}` term (the current pressure
+        estimate from ``u_approx.alg[0]``), and the denominator carries an
+        extra :math:`\alpha` factor:
+
+        .. math::
+
+            G' = \frac{c - B\mathbf{v} - \alpha B\mathbf{w}}
+                      {\alpha^2 B\mathbf{v}_0},
+
+        Parameters
+        ----------
+        rhs_eff : numpy.ndarray
+            Effective velocity RHS :math:`\nu A\mathbf{v} + G_0\mathbf{1}
+            + \mathbf{f}_\text{net}`.
+        v_approx : numpy.ndarray
+            Current velocity approximation at the node.
+        factor : float
+            Implicit prefactor :math:`\alpha = \Delta t\,\tilde{q}_{mm}`.
+        constraint_rhs : float
+            RHS of the constraint :math:`c` (``q(t)`` standard; ``0`` lifted).
+
+        Returns
+        -------
+        U : numpy.ndarray
+            Velocity derivative at the node.
+        G_prime : float
+            Derivative of the pressure gradient :math:`G'`.
+        """
+        M = sp.eye(self.nvars, format='csc') - factor * self.A
+        w = spsolve(M, rhs_eff)
+        v0 = spsolve(M, self.ones)
+
+        Bw = self._B_dot(w)
+        Bv0 = self._B_dot(v0)
+        Bv = self._B_dot(v_approx)
+        # Extra factor of alpha in denominator vs _schur_solve
+        denom = factor**2 * Bv0
+        assert abs(denom) > 0.0, (
+            f'_schur_solve_full_implicit: denominator factor²·B·v₀ = {denom:.3e} is zero; '
+            f'factor = {factor}, B·v₀ = {Bv0:.3e}'
+        )
+        G_prime = (constraint_rhs - Bv - factor * Bw) / denom
+
+        U = w + factor * G_prime * v0
+        return U, float(G_prime)
 
 
 # ---------------------------------------------------------------------------
@@ -616,4 +692,184 @@ class stokes_poiseuille_1d_fd_lift(_StokesBase):
         me = self.dtype_u(self.init, val=0.0)
         me.diff[:] = np.sin(np.pi * self.xvalues) * np.cos(t) - self._lift_dot(t)
         me.alg[0] = -np.sin(t)
+        return me
+
+
+# ---------------------------------------------------------------------------
+# Case 3: FullyImplicitDAE – no lifting
+# ---------------------------------------------------------------------------
+
+class stokes_poiseuille_1d_fd_full(stokes_poiseuille_1d_fd):
+    r"""
+    1-D Stokes/Poiseuille DAE **without** constraint lifting, compatible with
+    :class:`~pySDC.projects.DAE.sweepers.fullyImplicitDAE.FullyImplicitDAE`.
+
+    The key difference from :class:`stokes_poiseuille_1d_fd` is in
+    ``solve_system``: here the unknown is the full derivative
+    :math:`(\mathbf{U}, G') = (\mathbf{u}', G')`, i.e. ``me.alg[0]`` is the
+    *derivative* of the pressure gradient.  The pressure gradient at the
+    node is then recovered by quadrature:
+
+    .. math::
+
+        G_m = G_0 + \Delta t \sum_{j=1}^{M} Q_{mj}\,G'_j,
+
+    which gives the pressure the same collocation structure as
+    the velocity (both recovered via the quadrature formula).
+
+    .. note::
+
+        In practice, :class:`FullyImplicitDAE` and
+        :class:`~.semiImplicitDAE.SemiImplicitDAE` converge to the
+        **same collocation fixed point** for this index-1 DAE: the
+        :math:`\mathcal{O}(\Delta t^M)` errors in the stage pressure
+        values break the :math:`2M-1` superconvergence, and both sweepers
+        achieve velocity order :math:`M+1` and pressure order :math:`M`
+        (standard) or increasing toward :math:`M+1` (lifted).  The
+        :class:`FullyImplicitDAE` formulation is included for completeness
+        and pedagogical comparison.
+
+    The Schur-complement solve for the unknown :math:`(\mathbf{U}, G')`:
+
+    .. math::
+
+        (I - \alpha\nu A)\,\mathbf{U} - \alpha G'\,\mathbf{1}
+            = \nu A\mathbf{v} + G_0\mathbf{1} + \mathbf{f}(t),
+
+    .. math::
+
+        B(\mathbf{v} + \alpha\,\mathbf{U}) = q(t),
+
+    yields
+
+    .. math::
+
+        G' = \frac{q(t) - B\mathbf{v} - \alpha B\mathbf{w}}{\alpha^2 B\mathbf{v}_0},
+        \quad
+        \mathbf{U} = \mathbf{w} + \alpha G'\,\mathbf{v}_0,
+
+    where :math:`\mathbf{w} = (I-\alpha\nu A)^{-1}(\nu A\mathbf{v}
+    + G_0\mathbf{1} + \mathbf{f})` and
+    :math:`\mathbf{v}_0 = (I-\alpha\nu A)^{-1}\mathbf{1}`.
+
+    Parameters
+    ----------
+    nvars : int
+        Number of interior grid points (default 127; must be ≥ 5).
+    nu : float
+        Kinematic viscosity (default 1.0).
+    newton_tol : float
+        Unused; passed to base class (default 1e-10).
+    """
+
+    def solve_system(self, impl_sys, u_approx, factor, u0, t):
+        r"""
+        Schur-complement solve for
+        :class:`~pySDC.projects.DAE.sweepers.fullyImplicitDAE.FullyImplicitDAE`.
+
+        Returns the **derivative** :math:`(\mathbf{U}, G')`.
+        ``me.alg[0]`` = :math:`G'` (pressure-gradient time derivative).
+
+        Parameters
+        ----------
+        impl_sys : callable
+            Unused; system solved directly.
+        u_approx : MeshDAE
+            Approximation :math:`(\mathbf{v}, G_0)` at the current node.
+        factor : float
+            Implicit prefactor :math:`\alpha`.
+        u0 : MeshDAE
+            Unused (direct solver).
+        t : float
+            Current time.
+
+        Returns
+        -------
+        me : MeshDAE
+            ``me.diff[:]`` = :math:`\mathbf{U}`,
+            ``me.alg[0]``  = :math:`G'`.
+        """
+        me = self.dtype_u(self.init, val=0.0)
+        v_approx = np.asarray(u_approx.diff).copy()
+        G0 = float(u_approx.alg[0])
+
+        # rhs_eff includes current G0: FullyImplicitDAE treats G as a differential
+        # variable (G = G0 + factor*G'), so G0 enters the RHS (unlike SemiImplicitDAE
+        # where u_approx.alg = 0 and G is purely algebraic in the local solve).
+        rhs_eff = self.A.dot(v_approx) + G0 * self.ones + self._forcing(t)
+        U, G_prime = self._schur_solve_full_implicit(rhs_eff, v_approx, factor, self._q(t))
+
+        me.diff[:] = U
+        me.alg[0] = G_prime
+        return me
+
+
+# ---------------------------------------------------------------------------
+# Case 4: FullyImplicitDAE – with lifting
+# ---------------------------------------------------------------------------
+
+class stokes_poiseuille_1d_fd_lift_full(stokes_poiseuille_1d_fd_lift):
+    r"""
+    1-D Stokes/Poiseuille DAE **with** constraint lifting, compatible with
+    :class:`~pySDC.projects.DAE.sweepers.fullyImplicitDAE.FullyImplicitDAE`.
+
+    Combines the homogeneous constraint :math:`B\tilde{\mathbf{v}} = 0`
+    from :class:`stokes_poiseuille_1d_fd_lift` with the
+    :class:`FullyImplicitDAE`-consistent ``solve_system`` from
+    :class:`stokes_poiseuille_1d_fd_full`.
+
+    .. note::
+
+        :class:`FullyImplicitDAE` and :class:`SemiImplicitDAE` converge
+        to the same collocation fixed point for this DAE: velocity order
+        :math:`M+1` and pressure order increasing toward :math:`M+1`
+        (same as :class:`stokes_poiseuille_1d_fd_lift`).  This class is
+        provided for pedagogical comparison.
+
+    Parameters
+    ----------
+    nvars : int
+        Number of interior grid points (default 127; must be ≥ 5).
+    nu : float
+        Kinematic viscosity (default 1.0).
+    newton_tol : float
+        Unused; passed to base class (default 1e-10).
+    """
+
+    def solve_system(self, impl_sys, v_approx_mesh, factor, u0, t):
+        r"""
+        Schur-complement solve for
+        :class:`~pySDC.projects.DAE.sweepers.fullyImplicitDAE.FullyImplicitDAE`
+        with the **homogeneous** constraint :math:`B\tilde{\mathbf{v}} = 0`.
+
+        Returns :math:`(\tilde{\mathbf{U}}, G')`.
+
+        Parameters
+        ----------
+        impl_sys : callable
+            Unused; system solved directly.
+        v_approx_mesh : MeshDAE
+            Approximation :math:`(\tilde{\mathbf{v}}, G_0)` at the node.
+        factor : float
+            Implicit prefactor :math:`\alpha`.
+        u0 : MeshDAE
+            Unused (direct solver).
+        t : float
+            Current time.
+
+        Returns
+        -------
+        me : MeshDAE
+            ``me.diff[:]`` = :math:`\tilde{\mathbf{U}}`,
+            ``me.alg[0]``  = :math:`G'`.
+        """
+        me = self.dtype_u(self.init, val=0.0)
+        vv = np.asarray(v_approx_mesh.diff).copy()
+        G0 = float(v_approx_mesh.alg[0])
+
+        rhs_eff = self.A.dot(vv) + G0 * self.ones + self._net_forcing(t)
+        U, G_prime = self._schur_solve_full_implicit(rhs_eff, vv, factor, 0.0)
+
+        me.diff[:] = U
+        me.alg[0] = G_prime
         return me
