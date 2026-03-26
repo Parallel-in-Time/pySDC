@@ -56,17 +56,15 @@ Two sweepers are supported:
 
 * :class:`~pySDC.projects.DAE.sweepers.semiImplicitDAE.SemiImplicitDAE`
   (U-formulation): velocity order :math:`M+1`, pressure order :math:`M`
-  (or increasing toward :math:`M+1` with lifting).
+  (standard), approaching :math:`M+1` (lifted), or full :math:`2M-1`
+  (differentiated constraint).
 
-* :class:`~pySDC.projects.DAE.sweepers.fullyImplicitDAE.FullyImplicitDAE`
-  (collocation-consistent): treats :math:`G` as a differential variable
-  updated by the same quadrature as the velocity, restoring the full
-  collocation order :math:`2M-1` for both.
+Three constraint treatments are provided — see Classes section below.
 
 Without constraint lifting (class :class:`stokes_poiseuille_1d_fd`), the
 constraint :math:`B\mathbf{u} = q(t)` has a time-dependent right-hand side,
 which causes order reduction in :math:`G` to order :math:`M` (= 3 for
-3 RADAU-RIGHT nodes) when using :class:`SemiImplicitDAE`.
+3 RADAU-RIGHT nodes).
 
 Constraint lifting (class :class:`stokes_poiseuille_1d_fd_lift`)
 -----------------------------------------------------------------
@@ -95,21 +93,47 @@ and evolves according to
                                - \dot{\mathbf{u}}_\ell(t)\bigr]
                         + G\,\mathbf{1}.
 
-Because the constraint :math:`B\tilde{\mathbf{v}} = 0` no longer contains a
-time-dependent right-hand side, the Lagrange multiplier :math:`G` is expected
-to converge at the full collocation order :math:`2M-1`, matching the velocity.
+Because the constraint :math:`B\tilde{\mathbf{v}} = 0` is autonomous, the
+order reduction in :math:`G` is reduced (pressure approaches :math:`M+1`)
+but not fully eliminated in the SDC context.
+
+Differentiated constraint (class :class:`stokes_poiseuille_1d_fd_diffconstr`)
+------------------------------------------------------------------------------
+Instead of enforcing the algebraic constraint
+:math:`B\mathbf{u}_m = q(\tau_m)` at each SDC stage, enforce its time
+derivative :math:`B\mathbf{U}_m = q'(\tau_m)`.  The Schur formula becomes
+
+.. math::
+
+    G_m = \frac{q'(\tau_m) - B\mathbf{w}}{B\mathbf{v}_0},
+
+and the stage pressure error reduces from :math:`\mathcal{O}(\Delta t^M)`
+to :math:`\mathcal{O}(\Delta t^{M+1})`, restoring the full RADAU
+collocation order :math:`2M-1` for **both** velocity and pressure.
 
 Classes
 -------
 stokes_poiseuille_1d_fd
-    No lifting; constraint :math:`B\mathbf{u} = q(t)` (time-dependent).
-    Compatible with **SemiImplicitDAE** (pressure order :math:`M`) and
-    **FullyImplicitDAE** (pressure order :math:`2M-1`).
+    No lifting; algebraic constraint :math:`B\mathbf{u} = q(t)`.
+    SemiImplicitDAE: vel :math:`M+1`, pres :math:`M`.
 
 stokes_poiseuille_1d_fd_lift
     Constraint lifting; homogeneous :math:`B\tilde{\mathbf{v}} = 0`.
-    Compatible with both sweepers; FullyImplicitDAE restores full
-    :math:`2M-1` order cleanly.
+    SemiImplicitDAE: vel :math:`M+1`, pres approaching :math:`M+1`.
+
+stokes_poiseuille_1d_fd_diffconstr
+    Differentiated constraint :math:`B\mathbf{U}_m = q'(\tau_m)`.
+    SemiImplicitDAE: **vel and pres both at** :math:`2M-1`.
+
+stokes_poiseuille_1d_fd_lift_diffconstr
+    Lifting + differentiated :math:`B\tilde{\mathbf{U}} = 0`.
+    Equivalent to :class:`stokes_poiseuille_1d_fd_lift` at the fixed point.
+
+stokes_poiseuille_1d_fd_full
+    No lifting, FullyImplicitDAE (same fixed point as standard).
+
+stokes_poiseuille_1d_fd_lift_full
+    Lifting, FullyImplicitDAE (same fixed point as lifted).
 """
 
 import numpy as np
@@ -247,6 +271,12 @@ class _StokesBase(ProblemDAE):
         """
         return self.C_B * np.sin(t)
 
+    def _q_prime(self, t):
+        r"""
+        Time derivative of the flow-rate RHS: :math:`q'(t) = C_B\,\cos(t)`.
+        """
+        return self.C_B * np.cos(t)
+
     def _forcing(self, t):
         r"""
         Manufactured forcing consistent with :math:`u_\text{ex}` and
@@ -382,6 +412,68 @@ class _StokesBase(ProblemDAE):
 
         U = w + factor * G_prime * v0
         return U, float(G_prime)
+
+    def _schur_solve_diffconstr(self, rhs_eff, factor, q_prime_val):
+        r"""
+        Schur-complement solve using the **differentiated constraint**
+        :math:`B\mathbf{U} = q'(t)`.
+
+        Instead of enforcing the original algebraic constraint
+        :math:`B(\mathbf{v} + \alpha\mathbf{U}) = q(t)`, this method uses
+        the differentiated form :math:`B\mathbf{U} = q'(t)`.  The key
+        formula is
+
+        .. math::
+
+            G = \frac{q'(t) - B\mathbf{w}}{B\mathbf{v}_0},
+
+        where
+        :math:`\mathbf{w} = (I - \alpha\nu A)^{-1}\mathbf{r}_\text{eff}` and
+        :math:`\mathbf{v}_0 = (I - \alpha\nu A)^{-1}\mathbf{1}`.
+
+        **Why this gives higher-order pressure**: At the SDC fixed point the
+        stage velocities satisfy :math:`\mathbf{u}_m - \mathbf{u}(\tau_m) =
+        \mathcal{O}(\Delta t^{M+1})` (collocation accuracy).  The
+        differentiated-constraint error propagates as
+
+        .. math::
+
+            e_{G_m} = G_m - G(\tau_m) = -\frac{B A\,e_{\mathbf{u}_m}}{s}
+                    = \mathcal{O}(\Delta t^{M+1}),
+
+        whereas the original algebraic constraint gives only
+        :math:`\mathcal{O}(\Delta t^M)`.
+
+        Parameters
+        ----------
+        rhs_eff : numpy.ndarray
+            Effective velocity RHS
+            :math:`\nu A\mathbf{v}_\text{approx} + \mathbf{f}_\text{net}(t)`.
+        factor : float
+            Implicit prefactor :math:`\alpha = \Delta t\,\tilde{q}_{mm}`.
+        q_prime_val : float
+            Value of :math:`q'(t)` at the current stage time.
+
+        Returns
+        -------
+        U : numpy.ndarray
+            Velocity derivative at the node.
+        G_new : float
+            Pressure gradient satisfying :math:`B\mathbf{U} = q'(t)`.
+        """
+        M_mat = sp.eye(self.nvars, format='csc') - factor * self.A
+        w = spsolve(M_mat, rhs_eff)
+        v0 = spsolve(M_mat, self.ones)
+
+        Bw = self._B_dot(w)
+        Bv0 = self._B_dot(v0)
+        assert abs(Bv0) > 0.0, (
+            f'_schur_solve_diffconstr: B·v₀ = {Bv0:.3e} is zero; factor = {factor}'
+        )
+        G_new = (q_prime_val - Bw) / Bv0
+
+        U = w + G_new * v0
+        return U, float(G_new)
 
 
 # ---------------------------------------------------------------------------
@@ -872,4 +964,225 @@ class stokes_poiseuille_1d_fd_lift_full(stokes_poiseuille_1d_fd_lift):
 
         me.diff[:] = U
         me.alg[0] = G_prime
+        return me
+
+
+# ---------------------------------------------------------------------------
+# Case 5: No lifting – differentiated constraint B·U = q'(t)
+# ---------------------------------------------------------------------------
+
+class stokes_poiseuille_1d_fd_diffconstr(stokes_poiseuille_1d_fd):
+    r"""
+    1-D Stokes/Poiseuille DAE using the **differentiated constraint**
+    :math:`B\mathbf{u}' = q'(t)` at every SDC stage.
+
+    This is a remedy for the order reduction in the pressure gradient.
+    Rather than enforcing the original algebraic constraint
+    :math:`B\mathbf{u}_m = q(\tau_m)` (which limits :math:`G` to order
+    :math:`M`), each stage solve uses
+
+    .. math::
+
+        B\,\mathbf{U}_m = q'(\tau_m),
+
+    where :math:`\mathbf{U}_m = \mathbf{u}'(\tau_m)` is the velocity
+    derivative.  The corresponding Schur-complement formula is
+
+    .. math::
+
+        G_m = \frac{q'(\tau_m) - B\mathbf{w}}{B\mathbf{v}_0},
+
+    giving pressure error
+    :math:`e_{G_m} = -BA\,e_{\mathbf{u}_m}/s = \mathcal{O}(\Delta t^{M+1})`
+    (one order higher than the algebraic constraint).
+
+    ``eval_f`` is also modified to check :math:`B\mathbf{u}' - q'(t) = 0`
+    (so that the SDC residual converges to machine precision at the fixed
+    point of the differentiated-constraint iteration).
+
+    .. note::
+
+        The original constraint :math:`B\mathbf{u} = q(t)` is satisfied
+        approximately: since :math:`B\mathbf{u}(t_n) = q(t_n)` (consistent
+        IC) and :math:`B\mathbf{U}_m = q'(\tau_m)` at every stage,
+        the quadrature formula gives
+        :math:`B\mathbf{u}_{n+1} - q(t_{n+1}) = \mathcal{O}(\Delta t^{2M})`
+        at the endpoint (Gauss quadrature error) and
+        :math:`\mathcal{O}(\Delta t^{M+1})` at interior nodes.
+
+    Parameters
+    ----------
+    nvars : int
+        Number of interior grid points (default 127; must be ≥ 5).
+    nu : float
+        Kinematic viscosity (default 1.0).
+    newton_tol : float
+        Unused; passed to base class (default 1e-10).
+    """
+
+    def eval_f(self, u, du, t):
+        r"""
+        Fully-implicit DAE residual using the **differentiated constraint**:
+
+        .. math::
+
+            F_\text{diff} = \mathbf{u}' - \nu A\,\mathbf{u}
+                          - G\,\mathbf{1} - \mathbf{f}(t),
+
+        .. math::
+
+            F_\text{alg} = B\,\mathbf{u}' - q'(t).
+
+        The second equation uses the velocity **derivative** ``du.diff``
+        instead of the velocity state ``u.diff``, making the SDC residual
+        exactly zero (machine precision) when :meth:`solve_system` has
+        enforced :math:`B\mathbf{U}_m = q'(\tau_m)`.
+        """
+        f = self.dtype_f(self.init, val=0.0)
+        u_vel = np.asarray(u.diff)
+        du_vel = np.asarray(du.diff)
+        G = float(u.alg[0])
+
+        f.diff[:] = du_vel - (self.A.dot(u_vel) + G * self.ones + self._forcing(t))
+        f.alg[0] = self._B_dot(du_vel) - self._q_prime(t)
+
+        self.work_counters['rhs']()
+        return f
+
+    def solve_system(self, impl_sys, u_approx, factor, u0, t):
+        r"""
+        Schur-complement solve using the differentiated constraint
+        :math:`B\mathbf{U} = q'(t)`.
+
+        Parameters
+        ----------
+        impl_sys : callable
+            Unused; system solved directly.
+        u_approx : MeshDAE
+            Current velocity approximation at the node.
+        factor : float
+            Implicit prefactor :math:`\alpha`.
+        u0 : MeshDAE
+            Unused (direct solver).
+        t : float
+            Current time.
+
+        Returns
+        -------
+        me : MeshDAE
+            ``me.diff[:]`` = velocity derivative :math:`\mathbf{U}_m`
+            satisfying :math:`B\mathbf{U}_m = q'(t)`,
+            ``me.alg[0]`` = pressure gradient :math:`G_m`.
+        """
+        me = self.dtype_u(self.init, val=0.0)
+        v_approx = np.asarray(u_approx.diff).copy()
+
+        rhs_eff = self.A.dot(v_approx) + self._forcing(t)
+        U, G_new = self._schur_solve_diffconstr(rhs_eff, factor, self._q_prime(t))
+
+        me.diff[:] = U
+        me.alg[0] = G_new
+        return me
+
+
+# ---------------------------------------------------------------------------
+# Case 6: Lifting + differentiated constraint B·Ũ = 0
+# ---------------------------------------------------------------------------
+
+class stokes_poiseuille_1d_fd_lift_diffconstr(stokes_poiseuille_1d_fd_lift):
+    r"""
+    1-D Stokes/Poiseuille DAE with **constraint lifting** and the
+    **differentiated constraint** :math:`B\tilde{\mathbf{u}}' = 0`.
+
+    Combines:
+
+    * The homogeneous constraint :math:`B\tilde{\mathbf{v}} = 0` from
+      :class:`stokes_poiseuille_1d_fd_lift` (reduces order reduction).
+    * The differentiated constraint :math:`B\tilde{\mathbf{U}} = 0` in
+      the stage solve, analogous to :class:`stokes_poiseuille_1d_fd_diffconstr`.
+
+    .. note::
+
+        For the lifted problem the original constraint is
+        :math:`B\tilde{\mathbf{v}} = 0` (homogeneous, constant in time).
+        Its time derivative is :math:`B\tilde{\mathbf{v}}' = 0`, which is
+        the same condition.  The differentiated-constraint Schur solve
+        therefore reduces to
+        :math:`G = -B\mathbf{w}_\text{net} / (B\mathbf{v}_0)`,
+        which is **equivalent to the original lifted Schur solve at the fixed
+        point** (when :math:`B\tilde{\mathbf{v}} \approx 0`).  Both this class
+        and :class:`stokes_poiseuille_1d_fd_lift` therefore converge to the
+        same fixed point and give identical convergence orders.  This class is
+        included for completeness and to confirm the equivalence.
+
+    Parameters
+    ----------
+    nvars : int
+        Number of interior grid points (default 127; must be ≥ 5).
+    nu : float
+        Kinematic viscosity (default 1.0).
+    newton_tol : float
+        Unused; passed to base class (default 1e-10).
+    """
+
+    def eval_f(self, u, du, t):
+        r"""
+        Fully-implicit DAE residual using the differentiated homogeneous
+        constraint :math:`B\tilde{\mathbf{u}}' = 0`:
+
+        .. math::
+
+            F_\text{diff} = \tilde{\mathbf{u}}' - \nu A\,\tilde{\mathbf{v}}
+                          - G\,\mathbf{1} - \mathbf{f}_\text{net}(t),
+
+        .. math::
+
+            F_\text{alg} = B\,\tilde{\mathbf{u}}' - 0.
+        """
+        f = self.dtype_f(self.init, val=0.0)
+        v_tilde = np.asarray(u.diff)
+        dv_tilde = np.asarray(du.diff)
+        G = float(u.alg[0])
+
+        f.diff[:] = dv_tilde - (self.A.dot(v_tilde) + G * self.ones + self._net_forcing(t))
+        f.alg[0] = self._B_dot(dv_tilde)   # B·ũ' = 0
+
+        self.work_counters['rhs']()
+        return f
+
+    def solve_system(self, impl_sys, u_approx, factor, u0, t):
+        r"""
+        Schur-complement solve using the differentiated homogeneous
+        constraint :math:`B\tilde{\mathbf{U}} = 0`.
+
+        Parameters
+        ----------
+        impl_sys : callable
+            Unused; system solved directly.
+        u_approx : MeshDAE
+            Current velocity approximation :math:`(\tilde{\mathbf{v}}, G)`.
+        factor : float
+            Implicit prefactor :math:`\alpha`.
+        u0 : MeshDAE
+            Unused (direct solver).
+        t : float
+            Current time.
+
+        Returns
+        -------
+        me : MeshDAE
+            ``me.diff[:]`` = lifted velocity derivative
+            :math:`\tilde{\mathbf{U}}_m` (satisfies
+            :math:`B\tilde{\mathbf{U}}_m = 0`),
+            ``me.alg[0]`` = pressure gradient :math:`G_m`.
+        """
+        me = self.dtype_u(self.init, val=0.0)
+        v_approx = np.asarray(u_approx.diff).copy()
+
+        rhs_eff = self.A.dot(v_approx) + self._net_forcing(t)
+        # Differentiated homogeneous constraint: B·U_tilde = 0 → q'_eff = 0
+        U, G_new = self._schur_solve_diffconstr(rhs_eff, factor, 0.0)
+
+        me.diff[:] = U
+        me.alg[0] = G_new
         return me

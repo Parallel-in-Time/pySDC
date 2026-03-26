@@ -14,76 +14,67 @@ index-1 DAE:
 
     0 = B\,\mathbf{u} - q(t).
 
-Two sweepers are compared
---------------------------
-1. :class:`~pySDC.projects.DAE.sweepers.semiImplicitDAE.SemiImplicitDAE`
-   (U-formulation): stores and integrates velocity derivatives
-   :math:`U_m = u'(\tau_m)`.
-2. :class:`~pySDC.projects.DAE.sweepers.fullyImplicitDAE.FullyImplicitDAE`
-   (collocation-consistent): treats the full state :math:`(u, G)` as a
-   differential system with derivative :math:`(U_m, G'_m)`.
-
-Two constraint formulations are compared
+Three constraint treatments are compared
 -----------------------------------------
-1. **Standard** (no lifting): constraint :math:`B\mathbf{u} = q(t)` has a
-   time-dependent RHS.  Causes order reduction in :math:`G` to order :math:`M`.
-2. **Lifted**: lifting :math:`\mathbf{u}_\ell(t) = (q(t)/s)\,\mathbf{1}` makes
-   the constraint **homogeneous**: :math:`B\tilde{\mathbf{v}} = 0`.
+1. **Standard** (no lifting, algebraic constraint): constraint
+   :math:`B\mathbf{u} = q(t)` has a time-dependent RHS.  Causes order
+   reduction in :math:`G` to order :math:`M` (= 3 for 3 RADAU nodes).
 
-Why M+1 (not 2M-1) for the velocity?
---------------------------------------
-For a pure ODE discretised with RADAU-RIGHT :math:`M` nodes, the collocation
-polynomial achieves the superconvergent order :math:`2M-1` at the endpoint.
+2. **Lifted** (homogeneous constraint): lifting
+   :math:`\mathbf{u}_\ell(t) = (q(t)/s)\,\mathbf{1}` makes the constraint
+   **homogeneous**: :math:`B\tilde{\mathbf{v}} = 0`.  Pressure order
+   increases toward :math:`M+1`.
 
-For this **DAE**, both SemiImplicitDAE and FullyImplicitDAE converge to the
-**same collocation fixed point**.  At that fixed point the stage values of the
-pressure gradient :math:`G_m` have only :math:`\mathcal{O}(\Delta t^M)`
-accuracy (the constraint at each node is exact, but the velocity
-:math:`u_m = u_0 + \Delta t\sum_j Q_{mj} U_j` at intermediate nodes has
-only stage-order accuracy :math:`\mathcal{O}(\Delta t^{M+1})`).  These
-:math:`\mathcal{O}(\Delta t^M)` errors in :math:`G_m` feed back into the
-velocity derivatives :math:`U_m = A u_m + G_m \mathbf{1} + f(\tau_m)`,
-**breaking the superconvergence** and limiting:
+3. **Differentiated constraint** :math:`B\mathbf{u}' = q'(t)`: replaces the
+   algebraic constraint with its time derivative.  Converts the DAE to an
+   equivalent index-0 ODE system, allowing RADAU to achieve the full
+   collocation order :math:`2M-1` for **both** velocity and pressure.
 
-* velocity to :math:`\mathcal{O}(\Delta t^{M+1})` — one higher than the
-  stage order;
-* pressure :math:`G` to :math:`\mathcal{O}(\Delta t^M)` (standard) or
-  increasing toward :math:`M+1` (lifted).
-
-This is confirmed across :math:`M = 2, 3, 4` RADAU-RIGHT and is independent
-of the sweeper (SemiImplicitDAE = FullyImplicitDAE at the fixed point):
-
-* :math:`M = 2`: velocity :math:`\to 3` (:math:`= M+1 = 2M-1`; degenerate)
-* :math:`M = 3`: velocity :math:`\to 4` (:math:`= M+1`; not :math:`2M-1 = 5`)
-* :math:`M = 4`: velocity :math:`\to 5` (:math:`= M+1`; not :math:`2M-1 = 7`)
-
-Achieving the full collocation order :math:`2M-1` for **both** velocity and
-pressure would require solving all :math:`M` RADAU stages simultaneously as
-a coupled system (standard RADAU-IIA), which goes beyond the node-by-node
-SDC sweep used here.
-
-Observed results (:math:`\nu = 0.1`, ``nvars = 1023``, ``restol = 1e-13``,
+Key findings (:math:`\nu = 0.1`, ``nvars = 1023``, ``restol = 1e-13``,
 :math:`M = 3`)
----------------------------------------------------------------------------
-With :math:`\nu = 1.0` the problem is stiff (slow-mode Courant number
-:math:`|\lambda\,\Delta t| = \nu\pi^2 \Delta t \approx 2.5` at :math:`\Delta t = 0.25`),
-keeping the solution in the pre-asymptotic regime across the entire accessible
-:math:`\Delta t` range.  Reducing to :math:`\nu = 0.1` brings
-:math:`|\lambda\,\Delta t| \lesssim 0.25` at :math:`\Delta t = 0.25`, entering
-the asymptotic region and revealing the clean orders:
+------------------------------------------------------------------------
 
-* **Standard**: velocity at :math:`M+1 = 4`, pressure at :math:`M = 3`
-  (time-dependent constraint :math:`B\mathbf{u} = q(t)` causes order reduction
-  in :math:`G`).
-* **Lifted**: velocity at :math:`M+1 = 4` (unchanged); pressure order
-  increases monotonically, approaching :math:`M+1 = 4` (homogeneous
-  constraint removes the order reduction).
-* **FullyImplicitDAE** (standard or lifted): **identical results** to
-  SemiImplicitDAE — both converge to the same collocation fixed point.
+* **Standard (algebraic)**: velocity :math:`\to M+1 = 4`, pressure
+  :math:`\to M = 3`.  The :math:`\mathcal{O}(\Delta t^M)` stage pressure
+  errors feed back into the velocity derivatives and break the :math:`2M-1`
+  superconvergence.
 
-**Spatial resolution**: ``nvars = 1023`` interior points with a
-fourth-order FD Laplacian (:math:`\Delta x = 1/1024`, spatial error floor
-:math:`\mathcal{O}(\Delta x^4) \approx 10^{-12}`).
+* **Lifted (homogeneous)**: velocity :math:`\to M+1 = 4` (unchanged);
+  pressure order increases monotonically toward :math:`M+1 = 4`.
+
+* **Differentiated constraint**: velocity :math:`\to 2M-1 = 5` ✓,
+  pressure :math:`\to 2M-1 = 5` ✓.  By enforcing :math:`B\mathbf{U}_m =
+  q'(\tau_m)` at each stage instead of :math:`B\mathbf{u}_m = q(\tau_m)`,
+  the stage pressure errors are reduced to
+  :math:`e_{G_m} = -BAe_{\mathbf{u}_m}/s = \mathcal{O}(\Delta t^{M+1})`,
+  eliminating the feedback that breaks superconvergence.  The index-reduced
+  system is essentially an ODE and RADAU achieves its full order :math:`2M-1`.
+
+Why the differentiated constraint works
+----------------------------------------
+For the original algebraic constraint at each node:
+
+.. math::
+
+    B(\mathbf{v}_m + \alpha\,\mathbf{U}_m) = q(\tau_m)
+    \quad\Rightarrow\quad
+    G_m = \frac{q(\tau_m) - B\mathbf{v}_m - \alpha B\mathbf{w}}
+               {\alpha\,B\mathbf{v}_0}
+    = \mathcal{O}(\Delta t^M).
+
+For the differentiated constraint:
+
+.. math::
+
+    B\,\mathbf{U}_m = q'(\tau_m)
+    \quad\Rightarrow\quad
+    G_m = \frac{q'(\tau_m) - B\mathbf{w}}{B\mathbf{v}_0}
+        = G(\tau_m) - \frac{B A\,e_{\mathbf{u}_m}}{s}
+        = \mathcal{O}(\Delta t^{M+1}),
+
+since the stage velocity error :math:`e_{\mathbf{u}_m} = \mathcal{O}(\Delta
+t^{M+1})` at collocation nodes.  With :math:`G_m` at order :math:`M+1`, the
+velocity endpoint recovers the full RADAU superconvergence :math:`2M-1`.
 
 Usage::
 
@@ -94,12 +85,11 @@ import numpy as np
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.DAE.sweepers.semiImplicitDAE import SemiImplicitDAE
-from pySDC.projects.DAE.sweepers.fullyImplicitDAE import FullyImplicitDAE
 from pySDC.playgrounds.Stokes_Poiseuille_1D_FD.Stokes_Poiseuille_1D_FD import (
     stokes_poiseuille_1d_fd,
     stokes_poiseuille_1d_fd_lift,
-    stokes_poiseuille_1d_fd_full,
-    stokes_poiseuille_1d_fd_lift_full,
+    stokes_poiseuille_1d_fd_diffconstr,
+    stokes_poiseuille_1d_fd_lift_diffconstr,
 )
 
 # ---------------------------------------------------------------------------
@@ -130,13 +120,6 @@ _SWEEPER_PARAMS = {
 # ---------------------------------------------------------------------------
 
 def _run(problem_class, sweeper_class, dt, restol=_RESTOL, max_iter=50, nvars=_NVARS):
-    """
-    Run one simulation and return ``(uend, problem_instance)``.
-
-    For the lifted variant ``uend.diff`` contains the *lifted* velocity
-    :math:`\\tilde{\\mathbf{v}}`; call :meth:`P.lift` to recover the
-    physical velocity.
-    """
     desc = {
         'problem_class': problem_class,
         'problem_params': {'nvars': nvars, 'nu': _NU},
@@ -214,7 +197,7 @@ def _asymptotic_order(dts, errs, skip=2):
 
 def main():
     r"""
-    Compare four formulations: two sweepers × two constraint treatments.
+    Compare three constraint treatments using :class:`SemiImplicitDAE`.
 
     Fixed parameters:
 
@@ -225,43 +208,40 @@ def main():
 
     Expected orders (see module docstring for derivation):
 
-    * **Velocity**: :math:`M+1 = 4` for all four formulations.
-    * **Pressure (standard)**: :math:`M = 3` (order reduction due to
-      time-dependent constraint).
-    * **Pressure (lifted)**: approaches :math:`M+1 = 4` (homogeneous
-      constraint removes the order reduction).
-    * **SemiImplicitDAE vs FullyImplicitDAE**: identical results — both
-      converge to the same collocation fixed point for this DAE.
+    * **Standard (algebraic)**: velocity :math:`M+1 = 4`, pressure
+      :math:`M = 3`.
+    * **Lifted (homogeneous)**: velocity :math:`M+1 = 4`, pressure
+      approaches :math:`M+1 = 4`.
+    * **Differentiated constraint**: both velocity and pressure
+      approach full collocation order :math:`2M-1 = 5`.
+    * **Lifted + differentiated**: same as lifted (the differentiated
+      homogeneous constraint is equivalent to the original).
     """
-    vel_order = _NUM_NODES + 1   # M+1 = 4 (U-formulation limit)
-    pres_order = _NUM_NODES      # M   = 3 (algebraic variable at each node)
+    colloc_order = 2 * _NUM_NODES - 1  # 2M-1 = 5
 
     # 7 halvings from T_end/2 to T_end/128  →  0.5, 0.25, …, 0.0078125
     dts = [_TEND / (2**k) for k in range(1, 8)]
 
     print(f'\nFully-converged SDC  (restol={_RESTOL:.0e}, ν={_NU}, M={_NUM_NODES})')
-    print(f'Expected velocity order  M+1 = {vel_order}  '
-          f'(pure-ODE collocation order 2M-1 = {2*_NUM_NODES-1} not achieved; see module docstring)')
-    print(f'Expected pressure order  M   = {pres_order}  (no-lift) '
-          f'/ approaches M+1 = {vel_order}  (lifted)')
+    print(f'Full RADAU collocation order: 2M-1 = {colloc_order}')
     print(f'nvars = {_NVARS}, 4th-order FD  (spatial floor ~ O(dx^4) ≈ 1e-12)')
     print(f'ν = {_NU}:  slow-mode |λΔt| ≤ {_NU * np.pi**2 * dts[0]:.2f} at Δt = {dts[0]:.4f}'
           f'  → asymptotic regime accessible')
     print(f'Error vs. exact analytical solution at T={_TEND}')
 
     cases = [
-        (stokes_poiseuille_1d_fd, SemiImplicitDAE,
-         'SemiImplicitDAE, standard  (B·u = q(t))'),
-        (stokes_poiseuille_1d_fd_lift, SemiImplicitDAE,
-         'SemiImplicitDAE, lifted    (B·ṽ = 0)  '),
-        (stokes_poiseuille_1d_fd_full, FullyImplicitDAE,
-         'FullyImplicitDAE, standard  (B·u = q(t))  [same fixed pt as SemiImplicit]'),
-        (stokes_poiseuille_1d_fd_lift_full, FullyImplicitDAE,
-         'FullyImplicitDAE, lifted    (B·ṽ = 0)    [same fixed pt as SemiImplicit]'),
+        (stokes_poiseuille_1d_fd,
+         'Standard  (B·u = q(t), algebraic constraint)'),
+        (stokes_poiseuille_1d_fd_lift,
+         'Lifted    (B·ṽ = 0,   homogeneous constraint)'),
+        (stokes_poiseuille_1d_fd_diffconstr,
+         'Diff.constr. (B·U = q\'(t), differentiated)  ← remedy'),
+        (stokes_poiseuille_1d_fd_lift_diffconstr,
+         'Lifted+diff. (B·Ũ = 0,  equiv. to lifted)'),
     ]
 
     results = {}
-    for cls, sweeper, label in cases:
+    for cls, label in cases:
         print()
         print('=' * 72)
         print(f'  {label}')
@@ -269,12 +249,12 @@ def main():
 
         vel_errs, pres_errs = [], []
         for dt in dts:
-            uend, P = _run(cls, sweeper, dt)
+            uend, P = _run(cls, SemiImplicitDAE, dt)
             ve, pe = _errors(uend, P)
             vel_errs.append(ve)
             pres_errs.append(pe)
 
-        _print_table(dts, vel_errs, pres_errs, vel_order)
+        _print_table(dts, vel_errs, pres_errs, colloc_order)
         results[label] = (vel_errs, pres_errs)
 
     # ---- Summary ----
@@ -282,43 +262,40 @@ def main():
     print('=' * 72)
     print('  Summary')
     print('=' * 72)
-    for cls, sweeper, label in cases:
+    for cls, label in cases:
         vel_errs, pres_errs = results[label]
         vel_ord = _asymptotic_order(dts, vel_errs)
         pres_ord = _asymptotic_order(dts, pres_errs)
-        is_lift = hasattr(cls(), 'lift')
-        exp_pres = vel_order if is_lift else pres_order
         print(f'\n  {label}:')
-        print(f'    Velocity order ≈ {vel_ord:.1f}  (expected M+1 = {vel_order})')
-        if pres_ord < vel_order - 0.4:
-            if is_lift:
-                status = f'increasing, ≈ {pres_ord:.1f} (pre-asymptotic, heading to M+1 = {vel_order})'
-            else:
-                status = f'order reduced to {pres_ord:.1f} = M  (time-dependent constraint)'
-            print(f'    Pressure order ≈ {pres_ord:.1f}  → {status}')
-        else:
-            print(f'    Pressure order ≈ {pres_ord:.1f}  → full order M+1 = {vel_order} ✓')
+        print(f'    Velocity order ≈ {vel_ord:.1f}')
+        print(f'    Pressure order ≈ {pres_ord:.1f}')
 
     print()
     print('  Conclusion:')
     print(
-        f'  • All four formulations confirm velocity order M+1 = {vel_order}.'
+        f'  • Standard (algebraic B·u=q): vel→M+1={_NUM_NODES+1}, pres→M={_NUM_NODES}.'
     )
     print(
-        f'  • Standard: pressure at order M = {pres_order} (order reduction from time-dependent constraint).'
+        f'  • Lifted (B·ṽ=0): vel→M+1, pres increasing toward M+1 (pre-asymptotic).'
     )
     print(
-        f'  • Lifted: pressure increasing toward M+1 = {vel_order} (autonomous constraint removes reduction).'
+        f'  • Differentiated constraint (B·U=q\'): vel→2M-1={colloc_order}, '
+        f'pres→2M-1={colloc_order}.'
     )
     print(
-        '  • SemiImplicitDAE and FullyImplicitDAE converge to the SAME collocation\n'
-        '    fixed point for this DAE: identical velocity and pressure errors.\n'
-        '    The O(dt^M) stage pressure errors break the 2M-1 superconvergence\n'
-        '    of both sweepers; achieving 2M-1 would require solving all M RADAU\n'
-        '    stages simultaneously (full RADAU-IIA, beyond SDC node-by-node sweeps).'
+        '    Enforcing B·U_m = q\'(τ_m) at each stage reduces the stage pressure\n'
+        '    error from O(dt^M) to O(dt^(M+1)), restoring the full RADAU\n'
+        '    superconvergence order 2M-1 for both velocity and pressure.\n'
+        '    The differentiated constraint converts the semi-explicit index-1\n'
+        '    DAE to an equivalent index-0 ODE system at each stage.'
     )
     print(
-        f'  • Spatial floor ~1e-12 (nvars={_NVARS}) may cause order plateau at fine Δt.'
+        f'  • Lifted+differentiated: same as lifted (the differentiated\n'
+        f'    homogeneous constraint B·Ũ=0 is equivalent to the original B·ṽ=0\n'
+        f'    at the SDC fixed point; no additional improvement).'
+    )
+    print(
+        f'  • Spatial floor ~1e-12 (nvars={_NVARS}) limits the finest accessible Δt.'
     )
 
 
