@@ -1,6 +1,11 @@
+from pathlib import Path
+import json
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_FEniCS import fenics_NSE_2D_mass
 from pySDC.projects.StroemungsRaum.sweepers.imex_1st_order_mass_NSE import imex_1st_order_mass_NSE
+from pySDC.projects.StroemungsRaum.hooks.hooks_NSE_IMEX_FEniCS import LogLiftDrag
+from pySDC.helpers.stats_helper import get_sorted
 
 
 def setup(t0=0):
@@ -46,6 +51,7 @@ def setup(t0=0):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 20
+    controller_params['hook_class'] = [LogLiftDrag]
 
     # Fill description dictionary
     description = dict()
@@ -95,6 +101,51 @@ def run_simulation(description, controller_params, Tend):
     return P, stats, uend
 
 
+def run_postprocessing(description, stats):
+    """
+    Postprocess and store simulation results for visualization and analysis.
+
+    Args:
+        description: dict,
+            pySDC description containing problem parameters.
+        problem: Problem instance,
+            Problem instance containing the final solution and other problem-related information.
+        stats: dict,
+            collected runtime statistics,
+
+    Returns: None
+    """
+    # get the data directory
+    import os
+
+    # create directory for storing results
+    path = f"{os.path.dirname(__file__)}/data/navier_stokes/"
+    Path(path).mkdir(parents=True, exist_ok=True)
+
+    # extract lift and drag coefficients from the collected statistics
+    lift = get_sorted(stats, type='lift_post_step', sortby='time')
+    drag = get_sorted(stats, type='drag_post_step', sortby='time')
+
+    # extract timing information
+    timing = get_sorted(stats, type='timing_run', sortby='time')
+
+    # save parameters
+    parameters = description['problem_params']
+    parameters.update(description['level_params'])
+    parameters['Tend'] = lift[-1][0]
+    parameters['timing'] = timing[0][1]
+    with open(path + "Navier_Stokes_FEniCS_parameters.json", 'w') as f:
+        json.dump(parameters, f)
+
+    # save lift and drag coefficients
+    with open(path + "Lift_Drag_Coefficients.txt", 'w') as f:
+        for i in range(len(lift)):
+            out = '%1.16f  %1.16f  %1.16f' % (lift[i][0], drag[i][1], lift[i][1])
+            f.write(out + '\n')
+
+    return None
+
+
 if __name__ == "__main__":
 
     t0 = 3.125e-04
@@ -105,3 +156,6 @@ if __name__ == "__main__":
 
     # run the simulation and get the problem, stats and final solution
     problem, stats, uend = run_simulation(description, controller_params, Tend)
+
+    # run postprocessing to save parameters and solutions for visualization
+    run_postprocessing(description, stats)
