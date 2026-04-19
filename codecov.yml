@@ -1,0 +1,36 @@
+codecov:
+  require_ci_to_pass: yes
+  notify:
+    wait_for_ci: yes
+
+coverage:
+  precision: 2
+  round: down
+  range: "70...100"
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+        base: auto
+    patch:
+      default:
+        target: auto
+        threshold: 1%
+        base: auto
+
+comment:
+  layout: "reach,diff,flags,tree,reach"
+  behavior: default
+  require_changes: false
+  require_base: false
+  require_head: true
+
+ignore:
+  - "pySDC/tests/**"
+  - "pySDC/playgrounds/**"
+  - "pySDC/projects/deprecated/**"
+  - "data/**"
+  - "docs/**"
+  - "etc/**"
+  - "setup.py"

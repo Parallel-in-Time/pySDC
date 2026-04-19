@@ -1250,7 +1250,7 @@ def get_configs(mode, problem):
 
         i = 0
         for interpolate_between_restarts, handle, ls in zip(
-            [True, False], ['Interpolation between restarts', 'regular'], ['--', '-']
+            [True, False], ['Interpolation between restarts', 'regular'], ['--', '-'], strict=True
         ):
             configurations[i] = {
                 'strategies': [
@@ -1275,7 +1275,7 @@ def get_configs(mode, problem):
 
         for parallel in [False, True]:
             desc = {'sweeper_class': parallel_sweeper} if parallel else {}
-            for num_nodes, ls in zip([3, 4, 2], ['-', '--', ':', '-.']):
+            for num_nodes, ls in zip([3, 4, 2], ['-', '--', ':', '-.'], strict=True):
                 configurations[num_nodes + (99 if parallel else 0)] = {
                     'custom_description': {**desc, 'sweeper_params': {'num_nodes': num_nodes}},
                     'strategies': [
@@ -1362,7 +1362,11 @@ def get_configs(mode, problem):
                 'MIN-SR-S',
                 # 'MIN-SR-FLEX',
             ],
-            [9991, 12123127391, 1231723109247102731092],
+            [
+                9991,
+                # 12123127391, 1231723109247102731092
+            ],
+            strict=True,
         ):
             configurations[i] = {
                 'custom_description': {
@@ -1762,7 +1766,7 @@ def all_problems(
             _ncols = ncols.get(mode, None)
 
         if shared_params['work_key'] == 'param':
-            for ax, prob in zip(fig.get_axes(), problems):
+            for ax, prob in zip(fig.get_axes(), problems, strict=True):
                 add_param_order_lines(ax, prob)
         save_fig(
             fig=fig,
@@ -1961,7 +1965,7 @@ def aggregate_parallel_efficiency_plot():  # pragma: no cover
 
     num_procs_sweeper_list = [2, 3, 4]
 
-    for problem, ax in zip([run_vdp, run_Lorenz, run_quench], axs.flatten()):
+    for problem, ax in zip([run_vdp, run_Lorenz, run_quench], axs.flatten(), strict=True):
         speedup = []
         for num_procs_sweeper in num_procs_sweeper_list:
             s, e = plot_parallel_efficiency_diagonalSDC(

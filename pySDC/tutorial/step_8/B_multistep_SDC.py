@@ -136,7 +136,7 @@ def main():
 
     # compute and print statistics
     for item_pfasst, item_mssdc_jac, item_mssdc_gs in zip(
-        iter_counts_pfasst, iter_counts_mssdc_jac, iter_counts_mssdc_gs
+        iter_counts_pfasst, iter_counts_mssdc_jac, iter_counts_mssdc_gs, strict=True
     ):
         out = 'Number of iterations for time %4.2f (PFASST/parMSSDC/serMSSDC): %2i / %2i / %2i' % (
             item_pfasst[0],

@@ -181,6 +181,10 @@ class RungeKutta(Sweeper):
             f"There is not an update order for RK scheme \"{cls.__name__}\" implemented. Maybe it is not an embedded scheme?"
         )
 
+    @classmethod
+    def is_embedded(cls):
+        return cls.ButcherTableauClass == ButcherTableauEmbedded
+
     def get_full_f(self, f):
         """
         Get the full right hand side as a `mesh` from the right hand side
@@ -258,7 +262,10 @@ class RungeKutta(Sweeper):
                 lvl.u[m + 1] = rhs
 
             # update function values (we don't usually need to evaluate the RHS at the solution of the step)
-            lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m + 1])
+            if m < M - 1 or not self.coll.globally_stiffly_accurate or self.is_embedded():
+                lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m + 1])
+            else:
+                lvl.f[m + 1] = prob.f_init
 
         # indicate presence of new values at this level
         lvl.status.updated = True
@@ -273,22 +280,22 @@ class RungeKutta(Sweeper):
 
         if lvl.f[1] is None:
             lvl.uend = lvl.prob.dtype_u(lvl.u[0])
-            if type(self.coll) == ButcherTableauEmbedded:
+            if self.is_embedded():
                 self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
         elif self.coll.globally_stiffly_accurate:
             lvl.uend = lvl.prob.dtype_u(lvl.u[-1])
-            if type(self.coll) == ButcherTableauEmbedded:
+            if self.is_embedded():
                 self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
-                for w2, k in zip(self.coll.weights[1], lvl.f[1:]):
+                for w2, k in zip(self.coll.weights[1], lvl.f[1:], strict=True):
                     self.u_secondary += lvl.dt * w2 * k
         else:
             lvl.uend = lvl.prob.dtype_u(lvl.u[0])
             if type(self.coll) == ButcherTableau:
-                for w, k in zip(self.coll.weights, lvl.f[1:]):
+                for w, k in zip(self.coll.weights, lvl.f[1:], strict=True):
                     lvl.uend += lvl.dt * w * k
-            elif type(self.coll) == ButcherTableauEmbedded:
+            elif self.is_embedded():
                 self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
-                for w1, w2, k in zip(self.coll.weights[0], self.coll.weights[1], lvl.f[1:]):
+                for w1, w2, k in zip(self.coll.weights[0], self.coll.weights[1], lvl.f[1:], strict=True):
                     lvl.uend += lvl.dt * w1 * k
                     self.u_secondary += lvl.dt * w2 * k
 
@@ -438,7 +445,14 @@ class RungeKuttaIMEX(RungeKutta):
                 lvl.u[m + 1] = rhs[:]
 
             # update function values
-            lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m + 1])
+            if (
+                m < M - 1
+                or not (self.coll.globally_stiffly_accurate and self.coll_explicit.globally_stiffly_accurate)
+                or self.is_embedded()
+            ):
+                lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m + 1])
+            else:
+                lvl.f[m + 1] = prob.f_init
 
         # indicate presence of new values at this level
         lvl.status.updated = True
@@ -453,20 +467,20 @@ class RungeKuttaIMEX(RungeKutta):
 
         if lvl.f[1] is None:
             lvl.uend = lvl.prob.dtype_u(lvl.u[0])
-            if type(self.coll) == ButcherTableauEmbedded:
+            if self.is_embedded():
                 self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
         elif self.coll.globally_stiffly_accurate and self.coll_explicit.globally_stiffly_accurate:
             lvl.uend = lvl.u[-1]
-            if type(self.coll) == ButcherTableauEmbedded:
+            if self.is_embedded():
                 self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
-                for w2, w2E, k in zip(self.coll.weights[1], self.coll_explicit.weights[1], lvl.f[1:]):
+                for w2, w2E, k in zip(self.coll.weights[1], self.coll_explicit.weights[1], lvl.f[1:], strict=True):
                     self.u_secondary += lvl.dt * (w2 * k.impl + w2E * k.expl)
         else:
             lvl.uend = lvl.prob.dtype_u(lvl.u[0])
             if type(self.coll) == ButcherTableau:
-                for w, wE, k in zip(self.coll.weights, self.coll_explicit.weights, lvl.f[1:]):
+                for w, wE, k in zip(self.coll.weights, self.coll_explicit.weights, lvl.f[1:], strict=True):
                     lvl.uend += lvl.dt * (w * k.impl + wE * k.expl)
-            elif type(self.coll) == ButcherTableauEmbedded:
+            elif self.is_embedded():
                 self.u_secondary = lvl.u[0].copy()
                 for w1, w2, w1E, w2E, k in zip(
                     self.coll.weights[0],
@@ -474,6 +488,7 @@ class RungeKuttaIMEX(RungeKutta):
                     self.coll_explicit.weights[0],
                     self.coll_explicit.weights[1],
                     lvl.f[1:],
+                    strict=True,
                 ):
                     lvl.uend += lvl.dt * (w1 * k.impl + w1E * k.expl)
                     self.u_secondary += lvl.dt * (w2 * k.impl + w2E * k.expl)
@@ -507,6 +522,21 @@ class IMEXEuler(RungeKuttaIMEX):
 
     matrix = BackwardEuler.matrix
     matrix_explicit = ForwardEuler.matrix
+
+
+class IMEXEulerStifflyAccurate(RungeKuttaIMEX):
+    """
+    This implements u = fI^-1(u0 + fE(u0)) rather than u = fI^-1(u0) + fE(u0) + u0.
+    This implementation is slightly inefficient with two stages, but the last stage is the solution, making it stiffly
+    accurate and suitable for some DAEs.
+    """
+
+    nodes = np.array([0, 1])
+    weights = np.array([0, 1])
+    weights_explicit = np.array([1, 0])
+
+    matrix = np.array([[0, 0], [0, 1]])
+    matrix_explicit = np.array([[0, 0], [1, 0]])
 
 
 class CrankNicolson(RungeKutta):

@@ -178,7 +178,7 @@ class Brusselator(IMEX_Laplacian_MPIFFT):
 
         vmin = u.min()
         vmax = u.max()
-        for i, label in zip([self.iU, self.iV], [r'$u$', r'$v$']):
+        for i, label in zip([self.iU, self.iV], [r'$u$', r'$v$'], strict=True):
             im = axs[i].pcolormesh(self.X[0], self.X[1], u[i], vmin=vmin, vmax=vmax)
             axs[i].set_aspect(1)
             axs[i].set_title(label)

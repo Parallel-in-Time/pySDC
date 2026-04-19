@@ -4,7 +4,6 @@ from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedE
 from pySDC.implementations.hooks.log_extrapolated_error_estimate import LogExtrapolationErrorEstimate
 from pySDC.implementations.hooks.log_step_size import LogStepSize
 
-
 hook_collection = [LogSolution, LogEmbeddedErrorEstimate, LogExtrapolationErrorEstimate, LogStepSize]
 
 

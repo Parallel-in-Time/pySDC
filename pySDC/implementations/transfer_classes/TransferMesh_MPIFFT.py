@@ -29,7 +29,7 @@ class fft_to_fft(SpaceTransfer):
 
         Nf = list(self.fine_prob.fft.global_shape())
         Nc = list(self.coarse_prob.fft.global_shape())
-        self.ratio = [int(nf / nc) for nf, nc in zip(Nf, Nc)]
+        self.ratio = [int(nf / nc) for nf, nc in zip(Nf, Nc, strict=True)]
         axes = tuple(range(len(Nf)))
 
         fft_args = {}

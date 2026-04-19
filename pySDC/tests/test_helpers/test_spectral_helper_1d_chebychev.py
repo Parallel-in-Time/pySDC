@@ -140,6 +140,35 @@ def test_integration_matrix(N):
 
 
 @pytest.mark.base
+@pytest.mark.parametrize('x0', [-1, 0])
+@pytest.mark.parametrize('x1', [0.789, 1])
+@pytest.mark.parametrize('N', [4, 7])
+def test_integral_whole_interval(x0, x1, N):
+    import numpy as np
+    from pySDC.helpers.spectral_helper import ChebychevHelper
+    from qmat.lagrange import LagrangeApproximation
+
+    cheby = ChebychevHelper(N, x0=x0, x1=x1)
+    x = cheby.get_1dgrid()
+
+    coeffs = np.random.random(N)
+    coeffs[-1] = 0
+
+    u_hat = coeffs
+    u = cheby.itransform(u_hat)
+
+    weights = cheby.get_integration_weights()
+    integral = weights @ u_hat
+
+    # generate a reference solution with qmat
+    lag = LagrangeApproximation(points=x)
+    Q = lag.getIntegrationMatrix(intervals=[(x0, x1)])
+    integral_ref = (Q @ u)[0]
+
+    assert np.isclose(integral, integral_ref)
+
+
+@pytest.mark.base
 @pytest.mark.parametrize('N', [4])
 @pytest.mark.parametrize('d', [1, 2, 3])
 def test_transform(N, d):
@@ -164,12 +193,16 @@ def test_transform(N, d):
 
 
 @pytest.mark.cupy
-def test_transform_cupy(N=8):
+@pytest.mark.parametrize('is_complex', [True, False])
+@pytest.mark.parametrize('N', [8, 12])
+def test_transform_cupy(N, is_complex):
     import numpy as np
     import cupy as cp
     from pySDC.helpers.spectral_helper import ChebychevHelper
 
     u = cp.random.random(N).astype('D')
+    if is_complex:
+        u += 1j * cp.random.random(N).astype('D')
 
     helper_CPU = ChebychevHelper(N=N, useGPU=False)
     u_hat_CPU = helper_CPU.transform(u.get())

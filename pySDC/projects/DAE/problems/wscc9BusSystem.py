@@ -866,7 +866,7 @@ class WSCC9BusSystem(ProblemDAE):
         self.IC6 = [row[3] for row in self.bus]  # Column 4 in MATLAB is indexed as 3 in Python
         self.IC6 = [val / self.baseMVA for val in self.IC6]
 
-        self.IC = list(zip(self.IC1, self.IC2, self.IC3, self.IC4, self.IC5, self.IC6))
+        self.IC = list(zip(self.IC1, self.IC2, self.IC3, self.IC4, self.IC5, self.IC6, strict=True))
 
         self.PL = [row[4] for row in self.IC]  # Column 5 in MATLAB is indexed as 4 in Python
         self.QL = [row[5] for row in self.IC]  # Column 6 in MATLAB is indexed as 5 in Python

@@ -124,7 +124,7 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
         # print and store radii and error over time
         err_test = 0.0
         results = dict()
-        for cr, er, cv, ev in zip(computed_radii, exact_radii, computed_vol, exact_vol):
+        for cr, er, cv, ev in zip(computed_radii, exact_radii, computed_vol, exact_vol, strict=True):
             if name == 'AC-test-noforce':
                 exrad = er[1]
                 exvol = ev[1]

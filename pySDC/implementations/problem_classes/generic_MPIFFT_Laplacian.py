@@ -120,7 +120,7 @@ class IMEX_Laplacian_MPIFFT(Problem):
         s = self.fft.local_slice()
         N = self.fft.global_shape()
         k = [self.xp.fft.fftfreq(n, 1.0 / n).astype(int) for n in N]
-        K = [ki[si] for ki, si in zip(k, s)]
+        K = [ki[si] for ki, si in zip(k, s, strict=True)]
         Ks = list(self.xp.meshgrid(*K, indexing='ij', sparse=True))
         Lp = 2 * np.pi / self.L
         for i in range(self.ndim):

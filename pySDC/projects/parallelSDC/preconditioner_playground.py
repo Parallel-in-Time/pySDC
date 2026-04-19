@@ -188,7 +188,7 @@ def plot_iterations():
     for setup in setup_list:
         plt_helper.newfig(textwidth=238.96, scale=0.89)
 
-        for qd_type, marker, color in zip(qd_type_list, marker_list, color_list):
+        for qd_type, marker, color in zip(qd_type_list, marker_list, color_list, strict=True):
             niter = np.zeros(len(results[setup][1]))
             for key in results.keys():
                 if isinstance(key, ID):

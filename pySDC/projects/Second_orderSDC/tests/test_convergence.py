@@ -1,6 +1,5 @@
 import pytest
 
-
 METHODS = ['RKN', 'Velocity_Verlet']
 
 

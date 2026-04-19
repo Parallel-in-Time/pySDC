@@ -363,7 +363,7 @@ class RayleighBenard(GenericSpectralLinear):
 
         imT = axs[0].pcolormesh(self.X, self.Z, u[self.index(quantity)].real)
 
-        for i, label in zip([0, 1], [rf'${quantity}$', 'vorticity']):
+        for i, label in zip([0, 1], [rf'${quantity}$', 'vorticity'], strict=True):
             axs[i].set_aspect(1)
             axs[i].set_title(label)
 
@@ -630,6 +630,7 @@ class LogAnalysisVariables(Hooks):
         for key, value in zip(
             ['Nusselt', 'buoyancy_production', 'viscous_dissipation'],
             [Nusselt, buoyancy_production, viscous_dissipation],
+            strict=True,
         ):
             self.add_to_stats(
                 process=step.status.slot,

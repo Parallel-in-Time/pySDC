@@ -53,6 +53,131 @@ def cache(func):
     return wrapper
 
 
+class vkFFT(object):
+    """
+    pyVkFFT FFT backend.
+    The special feature of vkFFT is fast DCT on GPU with cached plans.
+    """
+
+    cached_plans = {}
+
+    @staticmethod
+    def is_complex(x):
+        return 'complex' in str(x.dtype)
+
+    @staticmethod
+    def get_plan(transform_type, shape, dtype, axes, norm):
+        from pyvkfft.cuda import VkFFTApp
+
+        assert norm == 'backward'
+
+        key = f'{transform_type=}, {shape=}, {dtype=}, {axes=}, {norm=}'
+
+        if key not in vkFFT.cached_plans.keys():
+
+            kwargs = {}
+
+            if transform_type == 'dct':
+                kwargs['dct'] = 2
+
+            vkFFT.cached_plans[key] = VkFFTApp(shape, dtype, len(axes), axes=axes, norm=norm, **kwargs)
+
+            logger = logging.getLogger(name='VkFFT')
+            logger.debug(f'Cached plan for VkFFT: {key}')
+        return vkFFT.cached_plans[key]
+
+    @staticmethod
+    def fftn(x, s=None, axes=None, norm='backward', overwrite_x=False):
+        assert not overwrite_x  # for consistent interface with scipy
+        assert norm == 'backward'  # for consistent interface with scipy
+        plan = vkFFT.get_plan(
+            transform_type='fft',
+            shape=x.shape,
+            dtype=x.dtype,
+            axes=axes,
+            norm=norm,
+        )
+        _x = x.copy() + 0j  # cast to complex
+        plan.fft(_x)
+        return _x
+
+    @staticmethod
+    def ifftn(x, s=None, axes=None, norm='forward', overwrite_x=False):
+        assert norm == 'forward'
+        assert not overwrite_x  # for consistent interface with scipy
+
+        norm = 'backward'
+        plan = vkFFT.get_plan(
+            transform_type='fft',
+            shape=x.shape,
+            dtype=x.dtype,
+            axes=axes,
+            norm=norm,
+        )
+        _x = x.copy() + 0j  # promote to complex
+        plan.ifft(_x)
+        return _x * sum(x.shape[i] for i in axes)
+
+    @staticmethod
+    def dctn(x, type=2, s=None, axes=None, norm=None, overwrite_x=False):
+        assert type == 2  # for consistent interface with scipy
+        assert not overwrite_x  # for consistent interface with scipy
+
+        is_complex = vkFFT.is_complex(x)
+
+        dtype = x.dtype if not is_complex else x.real.dtype
+
+        plan = vkFFT.get_plan(
+            transform_type='dct',
+            shape=x.shape,
+            dtype=dtype,
+            axes=axes,
+            norm=norm,
+        )
+
+        if is_complex:
+            x_real = x.real.copy()
+            x_imag = x.imag.copy()
+
+            plan.fft(x_real)
+            plan.fft(x_imag)
+
+            return x_real + 1j * x_imag
+        else:
+            _x = x.copy()
+            plan.fft(x)
+            return x
+
+    @staticmethod
+    def idctn(x, type=2, s=None, axes=None, norm=None, overwrite_x=False):
+        assert type == 2  # for consistent interface with scipy
+        assert not overwrite_x  # for consistent interface with scipy
+
+        is_complex = vkFFT.is_complex(x)
+        dtype = x.dtype if not is_complex else x.real.dtype
+
+        plan = vkFFT.get_plan(
+            transform_type='dct',
+            shape=x.shape,
+            dtype=dtype,
+            axes=axes,
+            norm=norm,
+        )
+
+        if is_complex:
+            x_real = x.real.copy()
+            x_imag = x.imag.copy()
+
+            plan.ifft(x_real)
+            plan.ifft(x_imag)
+
+            return x_real + 1j * x_imag
+        else:
+            _x = x.copy()
+            plan.ifft(x)
+            return x
+
+
 class SpectralHelper1D:
     """
     Abstract base class for 1D spectral discretizations. Defines a common interface with parameters and functions that
@@ -97,6 +222,7 @@ class SpectralHelper1D:
 
         if useGPU:
             self.setup_GPU()
+            self.logger.debug('Set up for GPU')
         else:
             self.setup_CPU(useFFTW=useFFTW)
 
@@ -109,13 +235,12 @@ class SpectralHelper1D:
         import cupy as cp
         import cupyx.scipy.sparse as sparse_lib
         import cupyx.scipy.sparse.linalg as linalg
-        import cupyx.scipy.fft as fft_lib
         from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
 
         cls.xp = cp
         cls.sparse_lib = sparse_lib
         cls.linalg = linalg
-        cls.fft_lib = fft_lib
+        cls.fft_lib = vkFFT
 
     @classmethod
     def setup_CPU(cls, useFFTW=False):
@@ -159,6 +284,10 @@ class SpectralHelper1D:
         raise NotImplementedError()
 
     def get_integration_matrix(self):
+        raise NotImplementedError()
+
+    def get_integration_weights(self):
+        """Weights for integration across entire domain"""
         raise NotImplementedError()
 
     def get_wavenumbers(self):
@@ -378,6 +507,16 @@ class ChebychevHelper(SpectralHelper1D):
         else:
             raise NotImplementedError(f'This function allows to integrate only from x=0, you attempted from x={lbnd}.')
         return S
+
+    def get_integration_weights(self):
+        """Weights for integration across entire domain"""
+        n = self.xp.arange(self.N, dtype=float)
+
+        weights = (-1) ** n + 1
+        weights[2:] /= 1 - (n**2)[2:]
+
+        weights /= 2 / self.L
+        return weights
 
     def get_differentiation_matrix(self, p=1):
         '''
@@ -808,6 +947,12 @@ class FFTHelper(SpectralHelper1D):
         k[0] = 1j * self.L
         return self.linalg.matrix_power(self.sparse_lib.diags(1 / (1j * k)), p)
 
+    def get_integration_weights(self):
+        """Weights for integration across entire domain"""
+        weights = self.xp.zeros(self.N)
+        weights[0] = self.L / self.N
+        return weights
+
     def get_plan(self, u, forward, *args, **kwargs):
         if self.fft_lib.__name__ == 'mpi4py_fft.fftw':
             if 'axes' in kwargs.keys():
@@ -1006,7 +1151,6 @@ class SpectralHelper:
         self.BCs = None
 
         self.fft_cache = {}
-        self.fft_dealias_shape_cache = {}
 
         self.logger = logging.getLogger(name='Spectral Discretization')
         if debug:
@@ -1293,11 +1437,12 @@ class SpectralHelper:
 
         diags = self.xp.ones(self.BCs.shape[0])
         diags[self.BC_zero_index] = 0
-        self.BC_line_zero_matrix = sp.diags(diags)
+        self.BC_line_zero_matrix = sp.diags(diags).tocsc()
 
         # prepare BCs in spectral space to easily add to the RHS
         rhs_BCs = self.put_BCs_in_rhs(self.u_init)
-        self.rhs_BCs_hat = self.transform(rhs_BCs)
+        self.rhs_BCs_hat = self.transform(rhs_BCs).view(self.xp.ndarray)
+        del self.BC_rhs_mask
 
     def check_BCs(self, u):
         """
@@ -1350,7 +1495,7 @@ class SpectralHelper:
             Generate a mask where we need to set values in the rhs in spectral space to zero, such that can replace them
             by the boundary conditions. The mask is then cached.
             """
-            self._rhs_hat_zero_mask = self.newDistArray().astype(bool)
+            self._rhs_hat_zero_mask = self.newDistArray(forward_output=True).astype(bool).view(self.xp.ndarray)
 
             for axis in range(self.ndim):
                 for bc in self.full_BCs:
@@ -1498,7 +1643,7 @@ class SpectralHelper:
     def get_pfft(self, axes=None, padding=None, grid=None):
         if self.ndim == 1 or self.comm is None:
             return None
-        from mpi4py_fft import PFFT
+        from mpi4py_fft import PFFT, newDistArray
 
         axes = tuple(i for i in range(self.ndim)) if axes is None else axes
         padding = list(padding if padding else [1.0 for _ in range(self.ndim)])
@@ -1530,6 +1675,10 @@ class SpectralHelper:
             transforms=transforms,
             grid=grid,
         )
+
+        # do a transform to do the planning
+        _u = newDistArray(pfft, forward_output=False)
+        pfft.backward(pfft.forward(_u))
         return pfft
 
     def get_fft(self, axes=None, direction='object', padding=None, shape=None):
@@ -1885,6 +2034,7 @@ class SpectralHelper:
             _D = self.axes[axis].get_differentiation_matrix(**kwargs)
             D = D @ self.expand_matrix_ND(_D, axis)
 
+        self.logger.debug(f'Set up differentiation matrix along axes {axes} with kwargs {kwargs}')
         return D
 
     def get_integration_matrix(self, axes):
@@ -1948,4 +2098,5 @@ class SpectralHelper:
             _C = self.axes[axis].get_basis_change_matrix(**kwargs)
             C = C @ self.expand_matrix_ND(_C, axis)
 
+        self.logger.debug(f'Set up basis change matrix along axes {axes} with kwargs {kwargs}')
         return C

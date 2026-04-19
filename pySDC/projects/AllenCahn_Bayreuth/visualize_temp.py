@@ -27,7 +27,7 @@ def plot_data(path='./data', name='', output='.'):
     json_files = sorted(glob.glob(f'{path}/{name}_*.json'))
     data_files = sorted(glob.glob(f'{path}/{name}_*.dat'))
 
-    for json_file, data_file in zip(json_files, data_files):
+    for json_file, data_file in zip(json_files, data_files, strict=True):
         with open(json_file, 'r') as fp:
             obj = json.load(fp)
 
@@ -74,7 +74,7 @@ def make_movie(path='./data', name='', output='.'):
     data_files = sorted(glob.glob(f'{path}/{name}_*.dat'))
 
     img_list = []
-    for json_file, data_file in zip(json_files, data_files):
+    for json_file, data_file in zip(json_files, data_files, strict=True):
         with open(json_file, 'r') as fp:
             obj = json.load(fp)
 

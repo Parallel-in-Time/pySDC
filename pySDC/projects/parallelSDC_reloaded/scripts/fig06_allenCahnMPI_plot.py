@@ -5,6 +5,7 @@ Created on Thu Jan 11 11:14:01 2024
 
 Figures with experiments on the Allen-Cahn problem (MPI runs)
 """
+
 import os
 import json
 import numpy as np
@@ -36,7 +37,7 @@ for qDeltaList in config:
     figNameConv = f"{SCRIPT}_conv_1"
     figNameCost = f"{SCRIPT}_cost_1"
 
-    for qDelta, sym in zip(qDeltaList, symList):
+    for qDelta, sym in zip(qDeltaList, symList, strict=False):
         if qDelta == "MIN-SR-NS":
             res = timings["MIN-SR-S_MPI"].copy()
             res["errors"] = [np.nan for _ in res["errors"]]
@@ -83,7 +84,10 @@ for qDelta in ["MIN-SR-S", "MIN-SR-FLEX", "VDHS"]:
     ), f"parallel and sequential errors are not close for {qDelta}"
     tComp = seq["costs"]
     tCompMPI = par["costs"]
-    meanEff += np.mean([tS / tP for tP, tS in zip(tCompMPI, tComp)])
-    print(f"{qDelta:12} |" + '|'.join(f" {tS/tP:1.1f} ({tS/tP/4*100:1.0f}%) " for tP, tS in zip(tCompMPI, tComp)))
+    meanEff += np.mean([tS / tP for tP, tS in zip(tCompMPI, tComp, strict=True)])
+    print(
+        f"{qDelta:12} |"
+        + '|'.join(f" {tS/tP:1.1f} ({tS/tP/4*100:1.0f}%) " for tP, tS in zip(tCompMPI, tComp, strict=True))
+    )
 meanEff /= 3
 print("Mean parallel efficiency :", meanEff / 4)

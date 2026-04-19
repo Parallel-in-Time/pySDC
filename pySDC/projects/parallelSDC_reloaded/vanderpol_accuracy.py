@@ -11,6 +11,7 @@ in particular with graphs such as :
 
 Note : implementation in progress ...
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -57,7 +58,7 @@ nSweepList = [4]
 
 fig, axs = plt.subplots(2, len(muVals))
 
-for j, (mu, tEnd) in enumerate(zip(muVals, tEndVals)):
+for j, (mu, tEnd) in enumerate(zip(muVals, tEndVals, strict=True)):
     print("-" * 80)
     print(f"mu={mu}")
     print("-" * 80)

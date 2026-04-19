@@ -5,6 +5,7 @@ Created on Tue Jan  9 16:00:41 2024
 
 Convergence plots (on Dahlquist) for the article
 """
+
 import os
 import numpy as np
 
@@ -66,7 +67,7 @@ for nNodes, quadType, sweepType in config:
     # Figure generation
     figName = f"{sweepType}_{quadType}"
     plt.figure(f"{sweepType}_{quadType}")
-    for (qDelta, nSweeps), style in zip(schemes, styles):
+    for (qDelta, nSweeps), style in zip(schemes, styles, strict=False):
         params = getParamsSDC(quadType, nNodes, qDelta, nSweeps, nodeType)
         label = f"$K={nSweeps}$"
         errors = []

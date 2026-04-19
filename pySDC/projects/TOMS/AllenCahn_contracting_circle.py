@@ -20,7 +20,6 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
 from pySDC.projects.TOMS.AllenCahn_monitor import monitor
 
-
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
 
 
@@ -247,7 +246,7 @@ def show_results(fname, cwd=''):
 
         exact_radii = get_sorted(item, type='exact_radius', sortby='time')
 
-        diff = np.array([abs(item0[1] - item1[1]) for item0, item1 in zip(exact_radii, computed_radii)])
+        diff = np.array([abs(item0[1] - item1[1]) for item0, item1 in zip(exact_radii, computed_radii, strict=True)])
         max_pos = int(np.argmax(diff))
         assert max(diff) < 0.07, 'ERROR: computed radius is too far away from exact radius, got %s' % max(diff)
         assert 0.028 < computed_radii[max_pos][0] < 0.03, (

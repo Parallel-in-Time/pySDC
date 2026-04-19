@@ -1,0 +1,18 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+# This pre-commit configuration matches the CI pipeline linting checks exactly.
+# The CI runs: black pySDC --check --diff --color and ruff check pySDC
+# Therefore, we only check files in the pySDC directory here.
+repos:
+  - repo: https://github.com/psf/black
+    rev: 24.10.0
+    hooks:
+      - id: black
+        args: [--check, --diff, --color]
+        language_version: python3
+        files: ^pySDC/
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      - id: ruff
+        files: ^pySDC/

@@ -324,7 +324,7 @@ class Burgers2D(GenericSpectralLinear):
         imV = axs[1].pcolormesh(self.X, self.Z, u[iv].real, vmin=vmin, vmax=vmax)
         imVort = axs[2].pcolormesh(self.X, self.Z, self.compute_vorticity(u).real)
 
-        for i, label in zip([0, 1, 2], [r'$u$', '$v$', 'vorticity']):
+        for i, label in zip([0, 1, 2], [r'$u$', '$v$', 'vorticity'], strict=True):
             axs[i].set_aspect(1)
             axs[i].set_title(label)
 

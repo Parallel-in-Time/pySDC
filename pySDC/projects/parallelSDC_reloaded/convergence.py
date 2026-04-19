@@ -5,6 +5,7 @@ Created on Tue Jan  9 14:44:41 2024
 
 Generate convergence plots on Dahlquist for SDC with given parameters
 """
+
 import numpy as np
 from pySDC.projects.parallelSDC_reloaded.utils import getParamsRK, getParamsSDC, solutionSDC, plt
 
@@ -46,7 +47,7 @@ styles = [
 # Script execution
 # -----------------------------------------------------------------------------
 plt.figure()
-for (qDelta, nSweeps), style in zip(schemes, styles):
+for (qDelta, nSweeps), style in zip(schemes, styles, strict=False):
     if nSweeps is None:
         params = getParamsRK(qDelta)
         label = None

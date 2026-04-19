@@ -5,6 +5,7 @@ Created on Wed Jan 10 15:34:24 2024
 
 Figures with experiment on the Lorenz problem
 """
+
 import os
 import numpy as np
 import scipy as sp
@@ -69,7 +70,7 @@ def getError(uNum, uRef):
 
 
 config = ["PIC", "MIN-SR-NS"]
-for qDelta, sym in zip(config, symList):
+for qDelta, sym in zip(config, symList, strict=False):
     figName = f"{SCRIPT}_conv_{qDelta}"
     plt.figure(figName)
 
@@ -132,7 +133,7 @@ for qDeltaList, nSweeps in config:
     i += 1
     plt.figure(figName)
 
-    for qDelta, sym in zip(qDeltaList, symList):
+    for qDelta, sym in zip(qDeltaList, symList, strict=False):
         try:
             params = getParamsRK(qDelta)
         except KeyError:

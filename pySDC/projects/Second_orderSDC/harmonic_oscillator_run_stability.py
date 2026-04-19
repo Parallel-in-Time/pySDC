@@ -1,7 +1,6 @@
 from pySDC.projects.Second_orderSDC.harmonic_oscillator_params import get_default_harmonic_oscillator_description
 from pySDC.projects.Second_orderSDC.stability_simulation import StabilityImplementation
 
-
 if __name__ == '__main__':
     """
     To implement Stability region for the Harmonic Oscillator problem

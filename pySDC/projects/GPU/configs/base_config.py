@@ -7,6 +7,8 @@ def get_config(args):
     name = args['config']
     if name[:2] == 'GS':
         from pySDC.projects.GPU.configs.GS_configs import get_config as _get_config
+    elif name[:5] == 'RBC3D':
+        from pySDC.projects.RayleighBenard.RBC3D_configs import get_config as _get_config
     elif name[:3] == 'RBC':
         from pySDC.projects.GPU.configs.RBC_configs import get_config as _get_config
     else:
@@ -67,8 +69,18 @@ class Config(object):
         self.args = args
         self.comm_world = MPI.COMM_WORLD if comm_world is None else comm_world
         self.n_procs_list = args["procs"]
-        if args['mode'] == 'run':
-            self.comms = get_comms(n_procs_list=self.n_procs_list, useGPU=args['useGPU'], comm_world=self.comm_world)
+        if args['mode'] in ['run', 'benchmark']:
+            distribution = args.get('distribution', 'time_first')
+            if distribution in ['space_first', 'space_major']:
+                self.comms = get_comms(
+                    n_procs_list=self.n_procs_list[::-1], useGPU=args['useGPU'], comm_world=self.comm_world
+                )[::-1]
+            elif distribution in ['time_first', 'time_major']:
+                self.comms = get_comms(
+                    n_procs_list=self.n_procs_list, useGPU=args['useGPU'], comm_world=self.comm_world
+                )
+            else:
+                raise NotImplementedError
         else:
             self.comms = [MPI.COMM_SELF, MPI.COMM_SELF, MPI.COMM_SELF]
         self.ranks = [me.rank for me in self.comms]
@@ -199,9 +211,12 @@ class LogStats(ConvergenceController):
 
         stats = {}
         for i in range(hook.counter - 1):
-            with open(self.get_stats_path(index=i), 'rb') as file:
-                _stats = pickle.load(file)
-                stats = {**stats, **_stats}
+            try:
+                with open(self.get_stats_path(index=i), 'rb') as file:
+                    _stats = pickle.load(file)
+                    stats = {**stats, **_stats}
+            except (FileNotFoundError, EOFError):
+                print(f'Warning: No stats found at path {self.get_stats_path(index=i)}')
 
         stats = {**stats, **controller.return_stats()}
         return stats

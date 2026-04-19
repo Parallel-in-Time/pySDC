@@ -1,16 +1,21 @@
 import logging
+from typing import Any, Dict, Optional, TYPE_CHECKING
 
 import scipy.sparse as sp
+import numpy as np
 
 from pySDC.core.errors import UnlockError
 from pySDC.helpers.pysdc_helper import FrozenClass
 from qmat.lagrange import LagrangeApproximation
 
+if TYPE_CHECKING:
+    from pySDC.core.level import Level
+
 
 # short helper class to add params as attributes
 class _Pars(FrozenClass):
-    def __init__(self, pars):
-        self.finter = False
+    def __init__(self, pars: Dict[str, Any]) -> None:
+        self.finter: bool = False
         for k, v in pars.items():
             setattr(self, k, v)
 
@@ -28,7 +33,14 @@ class BaseTransfer(object):
         coarse (pySDC.Level.level): reference to the coarse level
     """
 
-    def __init__(self, fine_level, coarse_level, base_transfer_params, space_transfer_class, space_transfer_params):
+    def __init__(
+        self,
+        fine_level: 'Level',
+        coarse_level: 'Level',
+        base_transfer_params: Dict[str, Any],
+        space_transfer_class: Any,
+        space_transfer_params: Dict[str, Any],
+    ) -> None:
         """
         Initialization routine
 
@@ -40,31 +52,31 @@ class BaseTransfer(object):
             space_transfer_params (dict): parameters for the space_transfer operations
         """
 
-        self.params = _Pars(base_transfer_params)
+        self.params: _Pars = _Pars(base_transfer_params)
 
         # set up logger
-        self.logger = logging.getLogger('transfer')
+        self.logger: logging.Logger = logging.getLogger('transfer')
 
-        self.fine = fine_level
-        self.coarse = coarse_level
+        self.fine: 'Level' = fine_level
+        self.coarse: 'Level' = coarse_level
 
         fine_grid = self.fine.sweep.coll.nodes
         coarse_grid = self.coarse.sweep.coll.nodes
 
         if len(fine_grid) == len(coarse_grid):
-            self.Pcoll = sp.eye(len(fine_grid)).toarray()
-            self.Rcoll = sp.eye(len(fine_grid)).toarray()
+            self.Pcoll: np.ndarray = sp.eye(len(fine_grid)).toarray()
+            self.Rcoll: np.ndarray = sp.eye(len(fine_grid)).toarray()
         else:
             self.Pcoll = self.get_transfer_matrix_Q(fine_grid, coarse_grid)
             self.Rcoll = self.get_transfer_matrix_Q(coarse_grid, fine_grid)
 
         # set up spatial transfer
-        self.space_transfer = space_transfer_class(
+        self.space_transfer: Any = space_transfer_class(
             fine_prob=self.fine.prob, coarse_prob=self.coarse.prob, params=space_transfer_params
         )
 
     @staticmethod
-    def get_transfer_matrix_Q(f_nodes, c_nodes):
+    def get_transfer_matrix_Q(f_nodes: np.ndarray, c_nodes: np.ndarray) -> np.ndarray:
         """
         Helper routine to quickly define transfer matrices from a coarse set
         to a fine set of nodes (fully Lagrangian)
@@ -78,7 +90,7 @@ class BaseTransfer(object):
         approx = LagrangeApproximation(c_nodes)
         return approx.getInterpolationMatrix(f_nodes)
 
-    def restrict(self):
+    def restrict(self) -> None:
         """
         Space-time restriction routine
 
@@ -163,7 +175,7 @@ class BaseTransfer(object):
 
         return None
 
-    def prolong(self):
+    def prolong(self) -> None:
         """
         Space-time prolongation routine
 
@@ -202,7 +214,7 @@ class BaseTransfer(object):
 
         return None
 
-    def prolong_f(self):
+    def prolong_f(self) -> None:
         """
         Space-time prolongation routine w.r.t. the rhs f
 

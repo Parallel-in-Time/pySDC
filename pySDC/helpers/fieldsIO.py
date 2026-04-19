@@ -47,6 +47,7 @@ Warning
 To use MPI collective writing, you need to call first the class methods :class:`Rectilinear.setupMPI` (cf their docstring).
 Also, `Rectilinear.setHeader` **must be given the global grids coordinates**, whether the code is run in parallel or not.
 """
+
 import os
 import numpy as np
 from typing import Type, TypeVar
@@ -154,7 +155,8 @@ class FieldsIO:
         fieldsIO : :class:`FieldsIO`
             The specialized `FieldsIO` adapted to the file.
         """
-        assert os.path.isfile(fileName), f"not a file ({fileName})"
+        if not os.path.isfile(fileName):
+            raise FileNotFoundError(f"not a file ({fileName})")
         with open(fileName, "rb") as f:
             STRUCT, DTYPE = np.fromfile(f, dtype=H_DTYPE, count=2)
             fieldsIO: FieldsIO = cls.STRUCTS[STRUCT](DTYPES[DTYPE], fileName)
@@ -714,7 +716,7 @@ def writeFields_MPI(fileName, dtypeIdx, algo, nSteps, nVar, gridSizes):
 
     iLoc, nLoc = blocks.localBounds
     Rectilinear.setupMPI(comm, iLoc, nLoc)
-    s = [slice(i, i + n) for i, n in zip(iLoc, nLoc)]
+    s = [slice(i, i + n) for i, n in zip(iLoc, nLoc, strict=True)]
     u0 = u0[(slice(None), *s)]
 
     f1 = Rectilinear(DTYPES[dtypeIdx], fileName)

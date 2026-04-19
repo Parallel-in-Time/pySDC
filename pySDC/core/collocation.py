@@ -1,4 +1,5 @@
 import logging
+from typing import Optional, Any
 import numpy as np
 from qmat import Q_GENERATORS
 
@@ -44,7 +45,15 @@ class CollBase(object):
         left_is_node (bool): flag to indicate whether left point is collocation node
     """
 
-    def __init__(self, num_nodes=None, tleft=0, tright=1, node_type='LEGENDRE', quad_type=None, **kwargs):
+    def __init__(
+        self,
+        num_nodes: Optional[int] = None,
+        tleft: float = 0,
+        tright: float = 1,
+        node_type: str = 'LEGENDRE',
+        quad_type: Optional[str] = None,
+        **kwargs: Any,
+    ) -> None:
         """
         Initialization routine for a collocation object
 
@@ -59,7 +68,7 @@ class CollBase(object):
         if not tleft < tright:
             raise CollocationError('interval boundaries are corrupt, got %s and %s' % (tleft, tright))
 
-        self.logger = logging.getLogger('collocation')
+        self.logger: logging.Logger = logging.getLogger('collocation')
         try:
             self.generator = Q_GENERATORS["Collocation"](
                 nNodes=num_nodes, nodeType=node_type, quadType=quad_type, tLeft=tleft, tRight=tright
@@ -99,7 +108,7 @@ class CollBase(object):
         self.delta_m = self._gen_deltas
 
     @staticmethod
-    def evaluate(weights, data):
+    def evaluate(weights: np.ndarray, data: np.ndarray) -> np.ndarray:
         """
         Evaluates the quadrature over the full interval
 
@@ -116,7 +125,7 @@ class CollBase(object):
         return np.dot(weights, data)
 
     @property
-    def _gen_deltas(self):
+    def _gen_deltas(self) -> np.ndarray:
         """
         Compute distances between the nodes
 

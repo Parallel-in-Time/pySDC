@@ -123,7 +123,7 @@ def plot_graphs(cwd=''):
         elif sweeper == 'linearized_implicit_fixed_parallel_prec':
             label_list.append('Inexact Newton')
 
-    setups = zip(sweeper_list, color_list, marker_list, label_list)
+    setups = zip(sweeper_list, color_list, marker_list, label_list, strict=True)
 
     plt_helper.setup_mpl()
 

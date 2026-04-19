@@ -7,13 +7,15 @@ Description
 Module containing utility classe(s) from which inherit some of the pySDC base
 classes.
 """
+
+from typing import Any, Optional, Set, Dict
 from pySDC.core.errors import ReadOnlyError
 
 
 class _MetaRegisterParams(type):
     """Metaclass for RegisterParams base class"""
 
-    def __new__(cls, name, bases, dct):
+    def __new__(cls, name: str, bases: tuple, dct: dict) -> type:
         obj = super().__new__(cls, name, bases, dct)
         obj._parNamesReadOnly = set()
         obj._parNames = set()
@@ -34,7 +36,9 @@ class RegisterParams(metaclass=_MetaRegisterParams):
         Names of all the parameters registered as read-only.
     """
 
-    def _makeAttributeAndRegister(self, *names, localVars=None, readOnly=False):
+    def _makeAttributeAndRegister(
+        self, *names: str, localVars: Optional[Dict[str, Any]] = None, readOnly: bool = False
+    ) -> None:
         """
         Register a list of attribute name as parameters of the class.
 
@@ -65,11 +69,11 @@ class RegisterParams(metaclass=_MetaRegisterParams):
             self._parNames = self._parNames.union(names)
 
     @property
-    def params(self):
+    def params(self) -> Dict[str, Any]:
         """Dictionary containing names and values of registered parameters"""
         return {name: getattr(self, name) for name in self._parNamesReadOnly.union(self._parNames)}
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         if name in self._parNamesReadOnly:
             raise ReadOnlyError(name)
         super().__setattr__(name, value)

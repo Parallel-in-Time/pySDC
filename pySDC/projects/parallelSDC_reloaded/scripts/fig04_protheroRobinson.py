@@ -5,6 +5,7 @@ Created on Thu Jan 11 10:21:47 2024
 
 Figures with experiment on the Prothero-Robinson problem
 """
+
 import os
 import numpy as np
 
@@ -60,7 +61,7 @@ for qDeltaList, nSweeps in config:
     figNameCost = f"{SCRIPT}_cost_{i}"
     i += 1
 
-    for qDelta, sym in zip(qDeltaList, symList):
+    for qDelta, sym in zip(qDeltaList, symList, strict=False):
         try:
             params = getParamsRK(qDelta)
         except KeyError:
