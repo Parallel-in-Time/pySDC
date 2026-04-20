@@ -58,16 +58,38 @@ class generic_implicit_mass(generic_implicit):
                 rhs += L.dt * self.QI[m + 1, j] * L.f[j]
 
             # implicit solve with prefactor stemming from the diagonal of Qd
-            alpha = L.dt * self.QI[m + 1, m + 1]
-            if alpha == 0:
-                L.u[m + 1] = rhs
-            else:
-                L.u[m + 1] = P.solve_system(rhs, alpha, L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
+            L.u[m + 1] = P.solve_system(
+                rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m]
+            )
+
             # update function values
             L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
         # indicate presence of new values at this level
         L.status.updated = True
+
+        return None
+
+    def compute_end_point(self):
+        """
+        Compute u at the right point of the interval
+
+        The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False
+
+        Returns:
+            None
+        """
+
+        # get current level and problem description
+        L = self.level
+        P = L.prob
+
+        # check if Mth node is equal to right point and do_coll_update is false, perform a simple copy
+        if self.coll.right_is_node and not self.params.do_coll_update:
+            # a copy is sufficient
+            L.uend = P.dtype_u(L.u[-1])
+        else:
+            raise NotImplementedError('Mass matrix sweeper expect u_M = u_end')
 
         return None
 

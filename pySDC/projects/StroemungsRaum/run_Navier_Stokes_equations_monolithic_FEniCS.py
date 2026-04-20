@@ -1,6 +1,3 @@
-from pathlib import Path
-import json
-
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_monolithic_FEniCS import fenics_NSE_2D_Monolithic
 from pySDC.projects.StroemungsRaum.sweepers.generic_implicit_mass import generic_implicit_mass
@@ -36,13 +33,14 @@ def setup(t0=0):
     sweeper_params = dict()
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 2
-    sweeper_params['QI'] = ['LU']
+    sweeper_params['QI'] = 'LU'
 
     # initialize problem parameters
     problem_params = dict()
     problem_params['nu'] = 0.001
     problem_params['t0'] = t0
     problem_params['order'] = 2
+    problem_params['Sol_tol'] = 1e-10
 
     # initialize controller parameters
     controller_params = dict()

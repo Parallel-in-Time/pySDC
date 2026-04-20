@@ -14,7 +14,7 @@ class fenics_NSE_2D_Monolithic(Problem):
     time-dependent Dirichlet boundary conditions
 
     .. math::
-        \frac{\partial u}{\partial t} = - u \cdot \nabla u  + \nu \nabla u - \nabla p + f
+        \frac{\partial u}{\partial t} = - u \cdot \nabla u  + \nu \Delta u - \nabla p + f
                       0 = \nabla \cdot u
 
     for :math:`x \in \Omega`, where the forcing term :math:`f` is defined by
@@ -33,7 +33,7 @@ class fenics_NSE_2D_Monolithic(Problem):
     In this class the problem is implemented in the way that the spatial part is solved using ``FEniCS`` [1]_. Hence, the problem
     is reformulated to the *weak formulation*
 
-    .. math:
+    .. math::
         \int_\Omega u_t v\,dx = - \int_\Omega u \cdot \nabla u v\,dx -  \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega p \nabla \cdot v\,dx + \int_\Omega f v\,dx
         \int_\Omega \nabla \cdot u q\,dx = 0
 
@@ -45,6 +45,8 @@ class fenics_NSE_2D_Monolithic(Problem):
         Defines the order of the elements in the function space.
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
+    Sol_tol : float, optional
+        Tolerance for the nonlinear solver.
 
     Attributes
     ----------
@@ -59,7 +61,7 @@ class fenics_NSE_2D_Monolithic(Problem):
     Mf : scalar, vector, matrix or higher rank tensor
         Denotes the expression :math:`\int_\Omega u v\,dx + \int_\Omega p q\,dx`.
     g : Expression
-        The forcing term :math:`f` in the heat equation.
+        The forcing term :math:`f` in the Navier-Stokes momentum equation.
     bc : DirichletBC
         Denotes the time-dependent Dirichlet boundary conditions.
     bc_hom : DirichletBC
@@ -80,7 +82,7 @@ class fenics_NSE_2D_Monolithic(Problem):
 
     df.set_log_active(False)
 
-    def __init__(self, t0=0.0, order=2, nu=0.001):
+    def __init__(self, t0=0.0, order=2, nu=0.001, Sol_tol=1e-10):
 
         # set logger level for FFC and dolfin
         logging.getLogger('FFC').setLevel(logging.WARNING)
@@ -105,10 +107,10 @@ class fenics_NSE_2D_Monolithic(Problem):
 
         # print the number of DoFs for debugging purposes
         tmp = df.Function(self.W)
-        self.logger.debug('DoFs on this level:', len(tmp.vector()[:]))
+        self.logger.debug('DoFs on this level: %d', len(tmp.vector()[:]))
 
         super().__init__(self.W)
-        self._makeAttributeAndRegister('t0', 'order', 'nu', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister('t0', 'order', 'nu', 'Sol_tol', localVars=locals(), readOnly=True)
 
         # Trial and test function for the Mixed FE space
         self.u, self.p = df.TrialFunctions(self.W)
@@ -120,7 +122,7 @@ class fenics_NSE_2D_Monolithic(Problem):
 
         # full mass matrix
         a_Mf = df.inner(self.u, self.v) * df.dx + df.inner(self.p, self.q) * df.dx
-        self.Mf = df.assemble(a_Mf)
+        Mf = df.assemble(a_Mf)
 
         # define the time-dependent inflow profile as an Expression
         Uin = '4.0*1.5*sin(pi*t/8)*x[1]*(0.41 - x[1]) / pow(0.41, 2)'
@@ -158,11 +160,15 @@ class fenics_NSE_2D_Monolithic(Problem):
         self.xdmffile_p = None
         self.xdmffile_u = None
 
+        # set up linear solver for the inversion of the mass matrix
+        self.solver = df.LUSolver(Mf)
+        # self.solver.parameters['reuse_factorization'] = True
+
     def solve_system(self, rhs, factor, u0, t):
         r"""
         Dolfin's nonlinear solver for :
-
-        (u,v) + factor * (u \cdot \nabla u, v) + factor * \nu (\nabla u, \nabla v) - factor * (p, \nabla \cdot v) - factor * (g, v) - factor * (div(u), q) = (rhs_u, v) + (rhs_p, q)
+        .. math::
+           (u,v) + factor * (u \cdot \nabla u, v) + factor * \nu (\nabla u, \nabla v) - factor * (p, \nabla \cdot v) - factor * (g, v) - factor * (div(u), q) = (rhs_u, v) + (rhs_p, q)
 
         Parameters
         ----------
@@ -188,7 +194,7 @@ class fenics_NSE_2D_Monolithic(Problem):
         rhs = self.__invert_mass_matrix(rhs)
         rhs_u, rhs_p = df.split(rhs.values)
 
-        # update time in Boundary conditions
+        # update time in boundary conditions
         self.u_in.t = t
 
         # get the forcing term
@@ -206,7 +212,7 @@ class fenics_NSE_2D_Monolithic(Problem):
         F -= df.dot(rhs_p, self.q) * df.dx
 
         # solve the nonlinear system using Newton's method
-        df.solve(F == 0, w.values, self.bc, solver_parameters={"newton_solver": {"absolute_tolerance": 1e-15}})
+        df.solve(F == 0, w.values, self.bc, solver_parameters={"newton_solver": {"absolute_tolerance": self.Sol_tol}})
 
         return w
 
@@ -233,7 +239,7 @@ class fenics_NSE_2D_Monolithic(Problem):
 
         # get the forcing term
         self.g.t = t
-        g = self.dtype_f(df.interpolate(self.g, self.V), val=self.V)
+        g = self.dtype_f(df.interpolate(self.g, self.V))
 
         F = -1.0 * df.dot(df.dot(u, df.nabla_grad(u)), self.v) * df.dx
         F -= self.nu * df.inner(df.nabla_grad(u), df.nabla_grad(self.v)) * df.dx
@@ -241,7 +247,7 @@ class fenics_NSE_2D_Monolithic(Problem):
         F += df.dot(g.values, self.v) * df.dx
         F += df.dot(df.div(u), self.q) * df.dx
 
-        f.values.vector()[:] = df.assemble(F)
+        df.assemble(F, tensor=f.values.vector())
 
         return f
 
@@ -281,7 +287,7 @@ class fenics_NSE_2D_Monolithic(Problem):
         """
 
         me = self.dtype_u(self.W)
-        df.solve(self.Mf, me.values.vector(), w.values.vector())
+        self.solver.solve(me.values.vector(), w.values.vector())
         return me
 
     def u_exact(self, t):
