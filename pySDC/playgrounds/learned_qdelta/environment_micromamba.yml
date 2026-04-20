@@ -1,0 +1,13 @@
+name: pysdc-learned-qdelta
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy
+  - scipy
+  - pytorch
+  - pip
+  - pip:
+      - qmat
+
