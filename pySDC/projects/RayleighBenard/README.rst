@@ -75,3 +75,16 @@ The, just run
     python analysis_scripts/RBC3D_spectrum.py
 
 to make the plot.
+
+
+Plotting macroscopic verification
+---------------------------------
+Macroscopic verification is done via comparison with data from https://doi.org/10.5281/zenodo.14205874.
+You need to download this reference dataset and copy it to `pySDC/projects/RayleighBenard/data/Nek5000`.
+Apart from that you need the pySDC simulation data prepared in the microscopic verification step.
+Then you simply run
+
+.. code-block:: bash
+    python analysis_scripts/compare_Nek5000.py
+
+to make the plot.
