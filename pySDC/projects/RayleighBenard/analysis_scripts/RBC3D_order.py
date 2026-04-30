@@ -102,7 +102,7 @@ def compare_order(Ra, ax=None):  # pragma: no cover
 
     ax.legend(frameon=False)
     ax.set_xlabel(r'$\Delta t$')
-    ax.set_ylabel(r'$e$')
+    ax.set_ylabel(r'$\frac{\|T-T_\mathrm{ref}\|_\infty}{\|T_\mathrm{ref}\|_\infty}$')
     if fig is not None:
         savefig(fig, 'RBC3D_order_Ra1e5')
 
