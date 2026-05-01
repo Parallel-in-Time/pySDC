@@ -59,3 +59,32 @@ for all the configurations to generate the data and then run
     python analysis_scripts/RBC3D_order.py
 
 to make the plot.
+
+
+Plotting microscopic verification
+---------------------------------
+After you have plotted the order of accuracy, you can make a plot for microscopic verification, which includes the order of accuracy plot and adds a plot for the spectrum.
+You need to run and analyse simulations with:
+ - ``--res=32 --dt=0.06 --config=RBC3DG4R4SDC23Ra1e5``
+ - ``--res=64 --dt=0.01 --config=RBC3DG4R4SDC23Ra1e6``
+ - ``--res=128 --dt=0.005 --config=RBC3DG4R4SDC23Ra1e7``
+
+Then, just run
+
+.. code-block:: bash
+    python analysis_scripts/RBC3D_spectrum.py
+
+to make the plot.
+
+
+Plotting macroscopic verification
+---------------------------------
+Macroscopic verification is done via comparison with data from https://doi.org/10.5281/zenodo.14205874.
+You need to download this reference dataset and copy it to ``pySDC/projects/RayleighBenard/data/Nek5000``.
+Apart from that you need the pySDC simulation data prepared in the microscopic verification step.
+Then you simply run
+
+.. code-block:: bash
+    python analysis_scripts/compare_Nek5000.py
+
+to make the plot.

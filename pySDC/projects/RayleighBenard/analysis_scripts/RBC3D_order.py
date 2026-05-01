@@ -71,10 +71,14 @@ def plot_error_all_components(args):  # pragma: no cover
     ax.set_ylabel(r'$e$')
 
 
-def compare_order(Ra):  # pragma: no cover
-    fig, ax = plt.subplots(figsize=figsize_by_journal('Nature_CS', 1, 0.6))
+def compare_order(Ra, ax=None):  # pragma: no cover
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize_by_journal('Nature_CS', 1, 0.6))
+    else:
+        fig = None
+
     if Ra == 1e5:
-        names = ['RK', 'Euler', 'SDC22', 'SDC23', 'SDC34', 'SDC44'][::-1]
+        names = ['RK', 'Euler', 'SDC23', 'SDC44'][::-1]
         configs = [f'RBC3DG4R4{me}Ra1e5' for me in names]
         paths = [f'./data/RBC3DG4R4{me}Ra1e5-res-1-order.pickle' for me in names]
 
@@ -98,8 +102,9 @@ def compare_order(Ra):  # pragma: no cover
 
     ax.legend(frameon=False)
     ax.set_xlabel(r'$\Delta t$')
-    ax.set_ylabel(r'$e$')
-    savefig(fig, 'RBC3D_order_Ra1e5')
+    ax.set_ylabel(r'$\frac{\|T-T_\mathrm{ref}\|_\infty}{\|T_\mathrm{ref}\|_\infty}$')
+    if fig is not None:
+        savefig(fig, 'RBC3D_order_Ra1e5')
 
 
 def run(args, dt, Tend):
