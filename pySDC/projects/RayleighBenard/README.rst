@@ -69,7 +69,7 @@ You need to run and analyse simulations with:
  - ``--res=64 --dt=0.01 --config=RBC3DG4R4SDC23Ra1e6``
  - ``--res=128 --dt=0.005 --config=RBC3DG4R4SDC23Ra1e7``
 
-The, just run
+Then, just run
 
 .. code-block:: bash
     python analysis_scripts/RBC3D_spectrum.py
