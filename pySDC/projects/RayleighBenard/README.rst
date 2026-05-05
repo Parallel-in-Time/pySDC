@@ -69,7 +69,7 @@ You need to run and analyse simulations with:
  - ``--res=64 --dt=0.01 --config=RBC3DG4R4SDC23Ra1e6``
  - ``--res=128 --dt=0.005 --config=RBC3DG4R4SDC23Ra1e7``
 
-The, just run
+Then, just run
 
 .. code-block:: bash
     python analysis_scripts/RBC3D_spectrum.py
@@ -80,7 +80,7 @@ to make the plot.
 Plotting macroscopic verification
 ---------------------------------
 Macroscopic verification is done via comparison with data from https://doi.org/10.5281/zenodo.14205874.
-You need to download this reference dataset and copy it to `pySDC/projects/RayleighBenard/data/Nek5000`.
+You need to download this reference dataset and copy it to ``pySDC/projects/RayleighBenard/data/Nek5000``.
 Apart from that you need the pySDC simulation data prepared in the microscopic verification step.
 Then you simply run
 
