@@ -193,6 +193,7 @@ jobs:
         with:
           repository: firedrakeproject/gusto
           path: ./gusto_repo
+          # Last known passing Gusto commit in CI run 24328039993 / job 71027429748
           ref: f11fba9ee858aa84281baf41baa09704431ac0ff
       - name: Create virtual environment
         # pass '--system-site-packages' so Firedrake can be found
