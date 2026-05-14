@@ -171,7 +171,7 @@ jobs:
   user_firedrake_tests:
     runs-on: ubuntu-latest
     container:
-      image: firedrakeproject/firedrake-vanilla-default:2025.10.4
+      image: firedrakeproject/firedrake-vanilla-default:2025.10.3
       options: --user root
       volumes:
         - ${{ github.workspace }}:/repositories
