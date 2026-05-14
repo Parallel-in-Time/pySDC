@@ -171,7 +171,7 @@ jobs:
   user_firedrake_tests:
     runs-on: ubuntu-latest
     container:
-      image: firedrakeproject/firedrake-vanilla-default:latest
+      image: firedrakeproject/firedrake-vanilla-default@sha256:455fabbe164276329a4cc91af54a05f56bf383dd3164195d0fa1182e981f6839
       options: --user root
       volumes:
         - ${{ github.workspace }}:/repositories
@@ -193,6 +193,8 @@ jobs:
         with:
           repository: firedrakeproject/gusto
           path: ./gusto_repo
+          # Last known passing Gusto commit in CI run 24328039993 / job 71027429748
+          ref: f11fba9ee858aa84281baf41baa09704431ac0ff
       - name: Create virtual environment
         # pass '--system-site-packages' so Firedrake can be found
         run: python3 -m venv --system-site-packages venv-pySDC
