@@ -46,7 +46,12 @@ For more details, see the [automated failure handling documentation](../../.gith
 
 ## Code linting
 
-Code style linting is performed using [black](https://black.readthedocs.io/en/stable/) and [ruff](https://docs.astral.sh/ruff/) for code syntax checking. In particular, `black` is used to check compliance with (most of) [PEP-8 guidelines](https://peps.python.org/pep-0008/).
+Code quality checks are performed in the lint stage of the CI pipeline:
+
+- **Code Formatting**: [black](https://black.readthedocs.io/en/stable/) ensures compliance with (most of) [PEP-8 guidelines](https://peps.python.org/pep-0008/)
+- **Code Linting**: [ruff](https://docs.astral.sh/ruff/) checks for code syntax issues, potential bugs, and style violations
+
+Both tools run on Python 3.13 and check the `pySDC` package.
 
 Those tests are conducted for each commit (even for forks), but you can also run it locally in the root folder of `pySDC` before pushing any commit :
 
