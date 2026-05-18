@@ -12,7 +12,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 class fenicsx_NSE_mass(Problem):
-    r""" 
+    r"""
     Monolithic incompressible Navier–Stokes problem in 2D using FEniCSx.
 
     This class implements a finite element discretization of the incompressible
@@ -41,10 +41,10 @@ class fenicsx_NSE_mass(Problem):
             u(x,y,t) = 1 - e^{-8\pi^{2}\nu t}\sin(2\pi(x-t))\sin(\pi y)\cos(\pi y)
             v(x,y,t) =   - e^{-8\pi^{2}\nu t} \cos\(2\pi(x-t)) \cos^{2}(\pi y)
             p(x,y,t) = 1 + \frac{4}{17} e^{-16\pi^{2}\nu t} \cos\(4\pi(x-t)) \cos(\pi y)
-        
-        The solution is specifically constructed to investigate the impact of boundary 
-        conditions on numerical accuracy. The source term g =(g_1, g_2) is derived from 
-        the exact solution to ensure that it satisfies the Navier–Stokes equations. 
+
+        The solution is specifically constructed to investigate the impact of boundary
+        conditions on numerical accuracy. The source term g =(g_1, g_2) is derived from
+        the exact solution to ensure that it satisfies the Navier–Stokes equations.
 
     Boundary conditions:
         - Time-dependent Dirichlet conditions on the left and right boundaries
@@ -95,18 +95,20 @@ class fenicsx_NSE_mass(Problem):
         Mass matrix for the monolithic system (velocity and pressure).
 
     """
+
     dtype_u = mesh
     dtype_f = mesh
-    
+
     def __init__(self, nelems=128, t0=0.0, family='CG', order=4, nu=0.1, comm=MPI.COMM_WORLD):
-       
-        # Create mesh 
-        domain = dfx.mesh.create_rectangle(comm,
-                                            [np.array([-0.5, -0.5]), np.array([0.5, 0.5])],
-                                            [nelems, nelems],
-                                            cell_type=dfx.mesh.CellType.triangle,
-                                          )  
-        
+
+        # Create mesh
+        domain = dfx.mesh.create_rectangle(
+            comm,
+            [np.array([-0.5, -0.5]), np.array([0.5, 0.5])],
+            [nelems, nelems],
+            cell_type=dfx.mesh.CellType.triangle,
+        )
+
         # Define mixed function space for velocity and pressure
         Ve = basix.ufl.element(family, domain.topology.cell_name(), order, shape=(domain.geometry.dim,))
         Pe = basix.ufl.element(family, domain.topology.cell_name(), order - 1, shape=())
@@ -122,7 +124,9 @@ class fenicsx_NSE_mass(Problem):
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nx, comm, np.dtype('float64')))
-        self._makeAttributeAndRegister('nelems', 't0', 'family', 'order', 'nu', 'comm', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister(
+            'nelems', 't0', 'family', 'order', 'nu', 'comm', localVars=locals(), readOnly=True
+        )
 
         # initialize functions for the solution, source term, and right-hand side
         w_zero = dfx.fem.Function(self.W)
@@ -130,22 +134,34 @@ class fenicsx_NSE_mass(Problem):
         self.rhs = dfx.fem.Function(self.W)
         self.tmp_f = dfx.fem.Function(self.W)
         self.u_bndry = dfx.fem.Function(self.W)
-        
+
         # interpolate initial and boundary conditions
         self.convert_to_fenicsx_vector(input=self.u_exact(t0), output=self.u_bndry)
 
-        w_zero.sub(0).interpolate(lambda x: np.vstack(( np.full(x.shape[1], 0.0, dtype=np.float64),np.full(x.shape[1], 0.0, dtype=np.float64))))
+        w_zero.sub(0).interpolate(
+            lambda x: np.vstack(
+                (np.full(x.shape[1], 0.0, dtype=np.float64), np.full(x.shape[1], 0.0, dtype=np.float64))
+            )
+        )
         w_zero.sub(1).interpolate(lambda x: np.full(x.shape[1], 0.0, dtype=np.float64))
-        
+
         # locate boundary facets
-        fdim = domain.topology.dim - 1 
-        
+        fdim = domain.topology.dim - 1
+
         w_dbc = dfx.fem.Function(self.W)
-        w_dbc.sub(0).interpolate(lambda x: np.vstack((np.full(x.shape[1], 1.0, dtype=np.float64),np.full(x.shape[1], 0.0, dtype=np.float64))))
+        w_dbc.sub(0).interpolate(
+            lambda x: np.vstack(
+                (np.full(x.shape[1], 1.0, dtype=np.float64), np.full(x.shape[1], 0.0, dtype=np.float64))
+            )
+        )
         w_dbc.sub(1).interpolate(lambda x: np.full(x.shape[1], 1.0, dtype=np.float64))
         #
-        TopBottom = dfx.mesh.locate_entities_boundary(domain, fdim, lambda x: np.logical_or(np.isclose(x[1], -0.5) , np.isclose(x[1], 0.5)))
-        LeftRight = dfx.mesh.locate_entities_boundary(domain, fdim, lambda x: np.logical_or(np.isclose(x[0], -0.5) , np.isclose(x[0], 0.5)))
+        TopBottom = dfx.mesh.locate_entities_boundary(
+            domain, fdim, lambda x: np.logical_or(np.isclose(x[1], -0.5), np.isclose(x[1], 0.5))
+        )
+        LeftRight = dfx.mesh.locate_entities_boundary(
+            domain, fdim, lambda x: np.logical_or(np.isclose(x[0], -0.5), np.isclose(x[0], 0.5))
+        )
 
         dofs_TopBottom_u = dfx.fem.locate_dofs_topological((self.W.sub(0), self.V), fdim, TopBottom)
         dofs_TopBottom_p = dfx.fem.locate_dofs_topological((self.W.sub(1), self.Q), fdim, TopBottom)
@@ -164,7 +180,7 @@ class fenicsx_NSE_mass(Problem):
         bcp_hom = dfx.fem.dirichletbc(w_zero.sub(1).collapse(), dofs_bndry_p, self.W.sub(1))
         self.bc_hom = [bcu_hom, bcp_hom]
         self.fix_bc_for_residual = True
-        
+
         # Define trial and test functions
         self.u, self.p = ufl.TrialFunctions(self.W)
         self.v, self.q = ufl.TestFunctions(self.W)
@@ -184,7 +200,7 @@ class fenicsx_NSE_mass(Problem):
         a_Mf = ufl.dot(self.u, self.v) * ufl.dx + ufl.dot(self.p, self.q) * ufl.dx
         self.Mf = dolfinx.fem.petsc.assemble_matrix(dfx.fem.form(a_Mf), bcs=[])
         self.Mf.assemble()
-        
+
         self.Lin_solver = PETSc.KSP().create(domain.comm)
         self.Lin_solver.setType(PETSc.KSP.Type.BCGS)
         self.Lin_solver.setOperators(self.Mf)
@@ -192,24 +208,23 @@ class fenicsx_NSE_mass(Problem):
         pc = self.Lin_solver.getPC()
         pc.setType(PETSc.PC.Type.JACOBI)
 
-     
         # Initialize the nonlinear form for the Navier–Stokes equations
         self.factor = dfx.fem.Constant(domain, PETSc.ScalarType(0.0))
 
         self.w = dfx.fem.Function(self.W)
-        
+
         u, p = ufl.split(self.w)
         rhs_u, rhs_p = ufl.split(self.rhs)
-     
+
         # define the nonlinear form to be compatible with the multi-point constraints
-        F = (1/self.factor) * ufl.dot(u, self.v) * ufl.dx
+        F = (1 / self.factor) * ufl.dot(u, self.v) * ufl.dx
         F += ufl.dot(ufl.dot(u, ufl.nabla_grad(u)), self.v) * ufl.dx
         F += ufl.inner(self.nu * ufl.nabla_grad(u), ufl.nabla_grad(self.v)) * ufl.dx
         F -= ufl.dot(p, ufl.div(self.v)) * ufl.dx
         F -= ufl.dot(self.g, self.v) * ufl.dx
         F -= ufl.dot(ufl.div(u), self.q) * ufl.dx
-        F -= (1/self.factor) * ufl.dot(rhs_u, self.v) * ufl.dx
-        F -= (1/self.factor) * ufl.dot(rhs_p, self.q) * ufl.dx
+        F -= (1 / self.factor) * ufl.dot(rhs_u, self.v) * ufl.dx
+        F -= (1 / self.factor) * ufl.dot(rhs_p, self.q) * ufl.dx
         self.F = F
 
         # Assemble the nonlinear problem and configure the Newton solver
@@ -224,7 +239,7 @@ class fenicsx_NSE_mass(Problem):
             "ksp_error_if_not_converged": True,
             "snes_error_if_not_converged": True,
         }
-        
+
         # plotter for solution visualization
         self.plotter = None
 
@@ -235,7 +250,7 @@ class fenicsx_NSE_mass(Problem):
     @staticmethod
     def convert_from_fenicsx_vector(input, output):
         output[:] = input.x.array[:]
-        
+
     def solve_system(self, rhs, factor, u0, t):
         r"""
         Dolfin's nonlinear solver for :
@@ -276,18 +291,18 @@ class fenicsx_NSE_mass(Problem):
         self.tmp_f = self.__invert_mass_matrix(self.tmp_f)
 
         self.rhs.x.array[:] = self.tmp_f.x.array[:]
-       
-        problem = dolfinx.fem.petsc.NonlinearProblem(self.F, self.w, bcs=bcup,
-                     petsc_options=self.petsc_options, petsc_options_prefix="nonlinearsolver")
-    
+
+        problem = dolfinx.fem.petsc.NonlinearProblem(
+            self.F, self.w, bcs=bcup, petsc_options=self.petsc_options, petsc_options_prefix="nonlinearsolver"
+        )
+
         # solve the nonlinear system using Dolfinx's nonlinear solver
         problem.solve()
-     
+
         self.w.x.scatter_forward()
 
         #
         self.convert_from_fenicsx_vector(input=self.w, output=w)
-        
 
         return w
 
@@ -326,7 +341,7 @@ class fenicsx_NSE_mass(Problem):
         b = dolfinx.fem.petsc.assemble_vector(dfx.fem.form(F))
         b.assemble()
         b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
-        
+
         #
         with b.localForm() as loc_b, self.tmp_f.x.petsc_vec.localForm() as loc_f:
             loc_b.copy(loc_f)
@@ -334,7 +349,7 @@ class fenicsx_NSE_mass(Problem):
         self.convert_from_fenicsx_vector(input=self.tmp_f, output=f)
 
         return f
-    
+
     def apply_mass_matrix(self, u):
         r"""
         Routine to apply mass matrix.
@@ -355,7 +370,7 @@ class fenicsx_NSE_mass(Problem):
         me = self.dtype_u(self.init)
         self.convert_from_fenicsx_vector(input=self.tmp_f, output=me)
         return me
-    
+
     def __invert_mass_matrix(self, u):
         r"""
         Helper routine to invert mass matrix.
@@ -374,8 +389,7 @@ class fenicsx_NSE_mass(Problem):
         self.tmp_f.x.scatter_forward()
 
         return self.tmp_f
-    
-    
+
     def source_term(self, t):
         r"""
         Routine to compute the source term at time :math:`t`.
@@ -392,18 +406,25 @@ class fenicsx_NSE_mass(Problem):
         """
 
         self.g.interpolate(
-            lambda x: np.vstack((
-                    np.pi / 34 * np.exp(-16 * np.pi**2 * self.nu * t) * np.sin(4 * np.pi * (t - x[0])) * \
-                    np.cos(np.pi * x[1]) * (32 - 17*np.cos(np.pi*x[1])),
+            lambda x: np.vstack(
+                (
+                    np.pi
+                    / 34
+                    * np.exp(-16 * np.pi**2 * self.nu * t)
+                    * np.sin(4 * np.pi * (t - x[0]))
+                    * np.cos(np.pi * x[1])
+                    * (32 - 17 * np.cos(np.pi * x[1])),
                     #
-                    2 * np.pi**2 * self.nu * np.exp(-8 * np.pi**2 * self.nu * t) * np.cos(2 * np.pi * (t - x[0])) \
-                    - np.pi * np.exp(-16 * np.pi**2 * self.nu * t) * np.sin(np.pi * x[1]) * (2 * np.cos(np.pi \
-                    * x[1])**3 + 4/17 * np.cos(4 * np.pi * (t - x[0])))
-                ))
+                    2 * np.pi**2 * self.nu * np.exp(-8 * np.pi**2 * self.nu * t) * np.cos(2 * np.pi * (t - x[0]))
+                    - np.pi
+                    * np.exp(-16 * np.pi**2 * self.nu * t)
+                    * np.sin(np.pi * x[1])
+                    * (2 * np.cos(np.pi * x[1]) ** 3 + 4 / 17 * np.cos(4 * np.pi * (t - x[0]))),
+                )
+            )
         )
         return self.g
 
-    
     def u_exact(self, t):
         r"""
         Routine to compute the exact solution at time :math:`t`.
@@ -418,24 +439,32 @@ class fenicsx_NSE_mass(Problem):
         me : dtype_u
             Exact solution.
         """
-        
-        
+
         w = dfx.fem.Function(self.W)
 
-        w.sub(0).interpolate(lambda x: np.vstack((
-                       1.0 - np.exp(-8 * np.pi**2 * self.nu * t) * np.sin(2.0 * np.pi * (x[0] - t)) \
-                       * np.sin(np.pi * x[1]) * np.cos(np.pi * x[1]),
-                       #
-                       - np.exp(-8 * np.pi**2 * self.nu * t) * np.cos(2.0 * np.pi * (x[0] - t)) \
-                       * (np.cos(np.pi * x[1]))**2  
-                                                 ))
-                             )
-                        
-        w.sub(1).interpolate( lambda x: (4/17) * np.exp(-16 * np.pi**2 * self.nu * t) * \
-                                       np.cos(4 * np.pi * (x[0]-t)) * np.cos(np.pi * x[1]) + 1
-                             )
-        
-        
+        w.sub(0).interpolate(
+            lambda x: np.vstack(
+                (
+                    1.0
+                    - np.exp(-8 * np.pi**2 * self.nu * t)
+                    * np.sin(2.0 * np.pi * (x[0] - t))
+                    * np.sin(np.pi * x[1])
+                    * np.cos(np.pi * x[1]),
+                    #
+                    -np.exp(-8 * np.pi**2 * self.nu * t)
+                    * np.cos(2.0 * np.pi * (x[0] - t))
+                    * (np.cos(np.pi * x[1])) ** 2,
+                )
+            )
+        )
+
+        w.sub(1).interpolate(
+            lambda x: (4 / 17)
+            * np.exp(-16 * np.pi**2 * self.nu * t)
+            * np.cos(4 * np.pi * (x[0] - t))
+            * np.cos(np.pi * x[1])
+            + 1
+        )
 
         me = self.dtype_u(self.init)
         self.convert_from_fenicsx_vector(input=w, output=me)
@@ -459,7 +488,7 @@ class fenicsx_NSE_mass(Problem):
 
 
 class fenicsx_NSE_periodic_mass(fenicsx_NSE_mass):
-    r""" 
+    r"""
     Monolithic incompressible Navier–Stokes problem in 2D using FEniCSx.
 
     This class implements a finite element discretization of the incompressible
@@ -475,7 +504,7 @@ class fenicsx_NSE_periodic_mass(fenicsx_NSE_mass):
         \quad \nabla \cdot \mathbf{u} = 0
 
     Domain:
-        A square domain :math:`\Omega = [-0.5, 0.5]^2` discretized with triangular 
+        A square domain :math:`\Omega = [-0.5, 0.5]^2` discretized with triangular
         elements.
 
     Spatial discretization:
@@ -489,10 +518,10 @@ class fenicsx_NSE_periodic_mass(fenicsx_NSE_mass):
             u(x,y,t) = 1 - e^{-8\pi^{2}\nu t}\sin(2\pi(x-t))\sin(\pi y)\cos(\pi y)
             v(x,y,t) =   - e^{-8\pi^{2}\nu t} \cos\(2\pi(x-t)) \cos^{2}(\pi y)
             p(x,y,t) = 1 + \frac{4}{17} e^{-16\pi^{2}\nu t} \cos\(4\pi(x-t)) \cos(\pi y)
-        
-        The solution is specifically constructed to investigate the impact of boundary 
-        conditions on numerical accuracy. The source term g =(g_1, g_2) is derived from 
-        the exact solution to ensure that it satisfies the Navier–Stokes equations. 
+
+        The solution is specifically constructed to investigate the impact of boundary
+        conditions on numerical accuracy. The source term g =(g_1, g_2) is derived from
+        the exact solution to ensure that it satisfies the Navier–Stokes equations.
 
     Boundary conditions:
         - periodic boundary conditions on the left and right boundaries
@@ -501,7 +530,7 @@ class fenicsx_NSE_periodic_mass(fenicsx_NSE_mass):
         In this class, the same problem as "fenicsx_NSE_mass" is formulated with periodic
         boundary conditions on the left and right boundaries, while retaining the time-
         independent Dirichlet conditions on the top and bottom boundaries, in order to
-        isolate and compare the effects of time-dependent boundary data on the numerical 
+        isolate and compare the effects of time-dependent boundary data on the numerical
         accuracy.
 
 
@@ -550,49 +579,55 @@ class fenicsx_NSE_periodic_mass(fenicsx_NSE_mass):
         self.xmin = domain.geometry.x[:, 0].min()
         self.xmax = domain.geometry.x[:, 0].max()
         self.ymin = domain.geometry.x[:, 1].min()
-        self.ymax = domain.geometry.x[:, 1].max()  
-        self.Lx = float(self.xmax - self.xmin)   
-        self.Ly = float(self.ymax - self.ymin)  
+        self.ymax = domain.geometry.x[:, 1].max()
+        self.Lx = float(self.xmax - self.xmin)
+        self.Ly = float(self.ymax - self.ymin)
 
         fdim = domain.topology.dim - 1
 
         # locate facets on the right boundary for periodicity and create meshtags for them
-        facets_x = dfx.mesh.locate_entities_boundary(domain, fdim, self.periodic_boundary_x)       
+        facets_x = dfx.mesh.locate_entities_boundary(domain, fdim, self.periodic_boundary_x)
         arg_sort_x = np.argsort(facets_x)
         mt_x = dfx.mesh.meshtags(domain, fdim, facets_x[arg_sort_x], np.full(len(facets_x), 2, dtype=np.int32))
-        
+
         # create multi-point constraints for periodicity and add the periodic constraints to tthe boundary conditions
         self.mpc = dolfinx_mpc.MultiPointConstraint(self.W)
-        self.mpc.create_periodic_constraint_topological(self.W.sub(0).sub(0), mt_x, 2, self.periodic_relation_x, self.bcs)
-        self.mpc.create_periodic_constraint_topological(self.W.sub(0).sub(1), mt_x, 2, self.periodic_relation_x, self.bcs)
+        self.mpc.create_periodic_constraint_topological(
+            self.W.sub(0).sub(0), mt_x, 2, self.periodic_relation_x, self.bcs
+        )
+        self.mpc.create_periodic_constraint_topological(
+            self.W.sub(0).sub(1), mt_x, 2, self.periodic_relation_x, self.bcs
+        )
         self.mpc.create_periodic_constraint_topological(self.W.sub(1), mt_x, 2, self.periodic_relation_x, self.bcs)
         self.mpc.finalize()
 
-        # reassemble the nonlinear problem 
+        # reassemble the nonlinear problem
         self.factor = dfx.fem.Constant(domain, PETSc.ScalarType(0.0))
-        
+
         # redefine the solution function to be compatible with the multi-point constraints
         W_mpc = self.mpc.function_space
         self.w = dfx.fem.Function(W_mpc)
         u, p = ufl.split(self.w)
         rhs_u, rhs_p = ufl.split(self.rhs)
-      
+
         # redefine the nonlinear form to be compatible with the multi-point constraints
-        F = (1/self.factor) * ufl.dot(u, self.v) * ufl.dx
+        F = (1 / self.factor) * ufl.dot(u, self.v) * ufl.dx
         F += ufl.dot(ufl.dot(u, ufl.nabla_grad(u)), self.v) * ufl.dx
         F += ufl.inner(self.nu * ufl.nabla_grad(u), ufl.nabla_grad(self.v)) * ufl.dx
         F -= ufl.dot(p, ufl.div(self.v)) * ufl.dx
         F -= ufl.dot(self.g, self.v) * ufl.dx
         F -= ufl.dot(ufl.div(u), self.q) * ufl.dx
-        F -= (1/self.factor) * ufl.dot(rhs_u, self.v) * ufl.dx
-        F -= (1/self.factor) * ufl.dot(rhs_p, self.q) * ufl.dx
-        
+        F -= (1 / self.factor) * ufl.dot(rhs_u, self.v) * ufl.dx
+        F -= (1 / self.factor) * ufl.dot(rhs_p, self.q) * ufl.dx
+
         # compute the Jacobian of the nonlinear form for use in the Newton solver
         Jac = ufl.derivative(F, self.w, ufl.TrialFunction(self.W))
-        
+
         # assemble the nonlinear problem with the multi-point constraints and configure the Newton solver
-        self.problem = dolfinx_mpc.NonlinearProblem(F, self.w, mpc=self.mpc, bcs=self.bcs, J=Jac, petsc_options=self.petsc_options)
-    
+        self.problem = dolfinx_mpc.NonlinearProblem(
+            F, self.w, mpc=self.mpc, bcs=self.bcs, J=Jac, petsc_options=self.petsc_options
+        )
+
     def solve_system(self, rhs, factor, u0, t):
         r"""
         Dolfin's nonlinear solver for :
@@ -629,7 +664,7 @@ class fenicsx_NSE_periodic_mass(fenicsx_NSE_mass):
         self.w.x.scatter_forward()
         #
         self.convert_from_fenicsx_vector(input=self.w, output=u)
-        
+
         return u
 
     def periodic_boundary_x(self, x):
@@ -638,15 +673,15 @@ class fenicsx_NSE_periodic_mass(fenicsx_NSE_mass):
         Parameters
         ----------
         x : array_like
-            Coordinates of the points to check for periodicity. 
+            Coordinates of the points to check for periodicity.
         Returns
         -------
         boolTrue if the point is on the right boundary (x = xmax), False otherwise.
 
         """
         eps = 10 * np.finfo(x.dtype).resolution
-        return np.isclose(x[0], self.xmax, atol=eps) 
-    
+        return np.isclose(x[0], self.xmax, atol=eps)
+
     def periodic_relation_x(self, x):
         r"""
         Maps points from the right boundary to the left boundary for periodicity.
@@ -664,5 +699,3 @@ class fenicsx_NSE_periodic_mass(fenicsx_NSE_mass):
         out_x[1] = x[1]
         out_x[2] = x[2]
         return out_x
-     
- 

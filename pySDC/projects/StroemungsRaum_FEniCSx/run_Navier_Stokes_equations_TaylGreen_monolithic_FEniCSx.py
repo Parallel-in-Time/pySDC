@@ -5,9 +5,10 @@ import ufl
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.StroemungsRaum.sweepers.generic_implicit_mass import generic_implicit_mass
 from pySDC.projects.StroemungsRaum_FEniCSx.problem_classes.NavierStokes_2D_TaylGreen_monolithic_FEniCSx import (
-    fenicsx_NSE_mass, 
-    fenicsx_NSE_periodic_mass
-    )
+    fenicsx_NSE_mass,
+    fenicsx_NSE_periodic_mass,
+)
+
 
 def setup(t0=0, periodic=False):
     """
@@ -45,27 +46,27 @@ def setup(t0=0, periodic=False):
 
     problem_params = dict()
     problem_params['nu'] = 0.2
-    problem_params['t0'] = t0  
+    problem_params['t0'] = t0
     problem_params['nelems'] = [64]
     problem_params['family'] = 'CG'
     problem_params['order'] = [2]
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 20 
+    controller_params['logger_level'] = 20
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
     if periodic:
-        description['problem_class'] = fenicsx_NSE_periodic_mass 
+        description['problem_class'] = fenicsx_NSE_periodic_mass
     else:
-        description['problem_class'] = fenicsx_NSE_mass 
+        description['problem_class'] = fenicsx_NSE_mass
     description['sweeper_class'] = generic_implicit_mass
     description['problem_params'] = problem_params
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
-    
+
     return description, controller_params
 
 
@@ -101,12 +102,13 @@ def run_simulation(description, controller_params, Tend):
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    
+
     return P, stats, uend
+
 
 def run_postprocessing(P, uend, Tend):
     """
-    Postprocess and store simulation results for visualization and analysis.
+    Compute L2 and relative L2 errors between numerical and exact solutions at final time.
 
     Args:
         P: Problem instance,
@@ -116,7 +118,7 @@ def run_postprocessing(P, uend, Tend):
         Tend: float,
             Final simulation time.
 
-    Returns: 
+    Returns:
         rel_error_u: float,
             Relative L2 error in velocity compared to the exact solution.
         rel_error_p: float,
@@ -135,29 +137,29 @@ def run_postprocessing(P, uend, Tend):
     ue, pe = wx.split()
     ue_ = ue.collapse()
     pe_ = pe.collapse()
-    # 
+    #
     error_u = np.sqrt(dfx.fem.assemble_scalar(dfx.fem.form(ufl.dot(un_ - ue_, un_ - ue_) * ufl.dx)))
     error_p = np.sqrt(dfx.fem.assemble_scalar(dfx.fem.form((pn_ - pe_) * (pn_ - pe_) * ufl.dx)))
-    
-    # 
+
+    #
     norm_u = np.sqrt(dfx.fem.assemble_scalar(dfx.fem.form(ufl.dot(ue_, ue_) * ufl.dx)))
     norm_p = np.sqrt(dfx.fem.assemble_scalar(dfx.fem.form(pe_ * pe_ * ufl.dx)))
 
     #
     rel_error_u = error_u / norm_u
-    rel_error_p = error_p / norm_p 
-    
+    rel_error_p = error_p / norm_p
+
     #
     print(f"L2 error in velocity : {error_u:.3e} (relative: {rel_error_u:.3e})")
     print(f"L2 error in pressure : {error_p:.3e} (relative: {rel_error_p:.3e})")
 
     return rel_error_u, rel_error_p
-  
+
 
 if __name__ == "__main__":
 
     t0 = 0.0
-    Tend =0.1
+    Tend = 0.1
 
     # run the setup to get description and controller parameters
     description, controller_params = setup(t0=t0, periodic=True)
@@ -165,5 +167,5 @@ if __name__ == "__main__":
     # run the simulation and get the problem, stats and final solution
     problem, stats, uend = run_simulation(description, controller_params, Tend)
 
-    # run postprocessing to save parameters and solutions for visualization
+    # run postprocessing to evaluate L2 errors
     rel_error_u, rel_error_p = run_postprocessing(problem, uend, Tend)
