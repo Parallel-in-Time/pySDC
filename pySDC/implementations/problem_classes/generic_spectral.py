@@ -237,9 +237,9 @@ class GenericSpectralLinear(Problem):
             rows = self.xp.arange(N * nc)
             cols = (rows % nc) * N + rows // nc
 
-            R = self.spectral.sparse_lib.csr_matrix((self.xp.ones(N * nc), (rows, cols)), shape=(N * nc, N * nc))
-
-            self.Pl = self.spectral.sparse_lib.csc_matrix(R, dtype=complex)
+            self.Pl = self.spectral.sparse_lib.csc_matrix(
+                (self.xp.ones(N * nc, dtype=complex), (rows, cols)), shape=(N * nc, N * nc)
+            )
 
             self.logger.debug('Finished setup of left preconditioner')
         else:
