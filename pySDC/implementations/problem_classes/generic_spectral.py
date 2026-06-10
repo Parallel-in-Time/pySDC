@@ -448,7 +448,7 @@ class GenericSpectralLinear(Problem):
         if self.spectral.useGPU:
             u = u.get()
 
-        return np.array(u)
+        return u.view(np.ndarray)
 
 
 def compute_residual_DAE(self, stage=''):
