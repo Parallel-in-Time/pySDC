@@ -240,7 +240,15 @@ class RBC3Dverification(RayleighBenard3DRegular):
         ic_ny = desc['problem_params']['ny']
         ic_nz = desc['problem_params']['nz']
 
-        _P = type(P)(nx=ic_nx, ny=ic_ny, nz=ic_nz, comm=P.comm, useGPU=P.useGPU)
+        _P = type(P)(
+            nx=ic_nx,
+            ny=ic_ny,
+            nz=ic_nz,
+            comm=P.comm,
+            useGPU=P.useGPU,
+            Dirichlet_recombination=False,
+            left_preconditioner=False,
+        )
         _P.setUpFieldsIO()
         filename = ic_config.get_file_name()
         ic_file = FieldsIO.fromFile(filename)
