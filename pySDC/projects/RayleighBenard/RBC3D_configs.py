@@ -110,6 +110,9 @@ class RayleighBenard3DRegular(Config):
             t0, solution = outfile.readField(restart_idx)
             solution = solution[: P.spectral.ncomponents, ...]
 
+            if P.useGPU:
+                solution = P.xp.array(solution)
+
             u0 = P.u_init
 
             if P.spectral_space:
@@ -235,6 +238,7 @@ class RBC3Dverification(RayleighBenard3DRegular):
         ic_config = self.ic_config['config'](
             args={**self.args, 'res': self.ic_config['res'], 'dt': self.ic_config['dt']}
         )
+        ic_config.base_path = self.base_path
         desc = ic_config.get_description(res=self.ic_config['res'], dt=self.ic_config['dt'])
         ic_nx = desc['problem_params']['nx']
         ic_ny = desc['problem_params']['ny']
