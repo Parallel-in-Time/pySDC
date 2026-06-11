@@ -489,6 +489,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">setUpFieldsIO</span><span class="p">()</span>
 
         <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span><span class="o">.</span><span class="n">get_1dgrid</span><span class="p">()</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">axes</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">useGPU</span><span class="p">:</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">coords</span><span class="p">]</span>
+
         <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">me</span><span class="p">)</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">coords</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">global_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
 
         <span class="n">fOut</span> <span class="o">=</span> <span class="n">Rectilinear</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">fileName</span><span class="o">=</span><span class="n">fileName</span><span class="p">)</span>
@@ -501,9 +504,14 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.processSolutionForOutput">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">processSolutionForOutput</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">real</span><span class="p">)</span></div>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">real</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">useGPU</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span></div>
 </div>
 
 
