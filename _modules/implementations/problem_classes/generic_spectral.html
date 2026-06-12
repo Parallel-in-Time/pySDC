@@ -511,7 +511,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">useGPU</span><span class="p">:</span>
             <span class="n">u</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 
-        <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span></div>
 </div>
 
 
