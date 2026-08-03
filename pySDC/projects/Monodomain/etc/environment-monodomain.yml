@@ -15,7 +15,7 @@ dependencies:
   - pytest-benchmark
   - pytest-timeout
   - pytest-order
-  - coverage=7.15.0
+  - coverage=7.15.1
   - sphinx
   - numdifftools>=0.9.41
   - pybind11
