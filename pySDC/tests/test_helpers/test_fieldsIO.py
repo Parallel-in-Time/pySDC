@@ -163,8 +163,6 @@ def testRectilinear(tmpdir, dim, nVar, nSteps, dtypeIdx):
 @pytest.mark.parametrize("nX", [1, 5, 16])
 @pytest.mark.parametrize("nVar", [1, 2, 3])
 def testToVTR(tmpdir, nVar, nX, nY, nZ, nSteps):
-    pytest.importorskip("vtk")
-
     from pySDC.helpers.fieldsIO import Rectilinear
     from pySDC.helpers.vtkIO import readFromVTR
 
