@@ -1,6 +1,7 @@
 import pytest
 import numpy as np
 
+pytestmark = pytest.mark.vtk
 pytest.importorskip("vtk")
 
 

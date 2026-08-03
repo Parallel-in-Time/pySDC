@@ -156,6 +156,7 @@ def testRectilinear(tmpdir, dim, nVar, nSteps, dtypeIdx):
 
 
 @pytest.mark.base
+@pytest.mark.vtk
 @pytest.mark.parametrize("nSteps", [1, 10])
 @pytest.mark.parametrize("nZ", [1, 5, 16])
 @pytest.mark.parametrize("nY", [1, 5, 16])

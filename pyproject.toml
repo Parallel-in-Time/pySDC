@@ -70,6 +70,7 @@ markers = [
     'monodomain: tests the monodomain project, which requires previous compilation of c++ code',
     'pytorch: tests for PyTorch related things in pySDC',
     'firedrake: tests for firedrake',
+    'vtk: tests requiring the VTK Python bindings',
     ]
 timeout = 300
 
