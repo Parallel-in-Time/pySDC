@@ -8,4 +8,4 @@ dependencies:
   - pytest-benchmark
   - pytest-timeout
   - pytest-order
-  - coverage=7.15.0
+  - coverage

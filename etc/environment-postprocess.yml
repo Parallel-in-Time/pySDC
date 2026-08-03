@@ -4,7 +4,7 @@ name: pySDC
 channels:
   - conda-forge
 dependencies:
-  - coverage=7.15.0
+  - coverage
   - sphinx
   - numpy
   - scipy

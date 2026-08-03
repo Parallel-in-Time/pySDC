@@ -64,9 +64,14 @@ jobs:
           pip install --no-deps -e .
       - name: Run pytest for CPU stuff
         run: |
-          echo "print('Loading sitecustomize.py...')
-          import coverage
-          coverage.process_startup() " > sitecustomize.py
+          cat > sitecustomize.py << 'EOF'
+          print('Loading sitecustomize.py...')
+          import os
+          _mpi_vars = ('OMPI_COMM_WORLD_RANK', 'PMI_RANK', 'PMIX_RANK', 'MPI_LOCALRANKID')
+          if not any(k in os.environ for k in _mpi_vars):
+              import coverage
+              coverage.process_startup()
+          EOF
           coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
       - name: Make coverage report
         run: |
@@ -119,9 +124,14 @@ jobs:
           micromamba install -y --file etc/environment-tests.yml --freeze-installed
       - name: Run pytest for CPU stuff
         run: |
-          echo "print('Loading sitecustomize.py...')
-          import coverage
-          coverage.process_startup() " > sitecustomize.py
+          cat > sitecustomize.py << 'EOF'
+          print('Loading sitecustomize.py...')
+          import os
+          _mpi_vars = ('OMPI_COMM_WORLD_RANK', 'PMI_RANK', 'PMIX_RANK', 'MPI_LOCALRANKID')
+          if not any(k in os.environ for k in _mpi_vars):
+              import coverage
+              coverage.process_startup()
+          EOF
           coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/${{ matrix.env }}/tests
       - name: Make coverage report
         run: |
@@ -261,9 +271,14 @@ jobs:
           -o ${IONIC_MODELS_PATH}/ionicmodels$(python3-config --extension-suffix)
       - name: Run pytest for CPU stuff
         run: |
-          echo "print('Loading sitecustomize.py...')
-          import coverage
-          coverage.process_startup() " > sitecustomize.py
+          cat > sitecustomize.py << 'EOF'
+          print('Loading sitecustomize.py...')
+          import os
+          _mpi_vars = ('OMPI_COMM_WORLD_RANK', 'PMI_RANK', 'PMIX_RANK', 'MPI_LOCALRANKID')
+          if not any(k in os.environ for k in _mpi_vars):
+              import coverage
+              coverage.process_startup()
+          EOF
           coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/Monodomain/tests -m monodomain
       - name: Make coverage report
         run: |
