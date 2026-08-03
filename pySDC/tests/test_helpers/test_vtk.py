@@ -1,6 +1,8 @@
 import pytest
 import numpy as np
 
+pytest.importorskip("vtk")
+
 
 @pytest.mark.parametrize("nZ", [1, 5, 16])
 @pytest.mark.parametrize("nY", [1, 5, 16])
