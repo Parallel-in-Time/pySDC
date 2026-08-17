@@ -8,4 +8,9 @@ dependencies:
   - pytest-benchmark
   - pytest-timeout
   - pytest-order
-  - coverage[toml]
+  # Pinned: coverage>=7.15.1 intermittently SIGTERMs subprocess-spawning test
+  # jobs (mpi4py/petsc/pytorch/project tests) during collection on CI, even in
+  # the latest release (7.15.4 as of writing). 7.15.0 is the last version
+  # confirmed stable across pySDC's CI history. Bump only after verifying a
+  # newer release on a branch first.
+  - coverage[toml]=7.15.0

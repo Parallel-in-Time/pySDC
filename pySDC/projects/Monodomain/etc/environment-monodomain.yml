@@ -4,7 +4,7 @@ name: pySDC_monodomain
 channels:
   - conda-forge
 dependencies:
-  - python
+  - python>=3.10,<3.14
   - numpy
   - scipy>=0.17.1
   - matplotlib>=3.0
@@ -15,7 +15,9 @@ dependencies:
   - pytest-benchmark
   - pytest-timeout
   - pytest-order
-  - coverage[toml]
+  # Pinned: see etc/environment-tests.yml for rationale (coverage>=7.15.1
+  # intermittently SIGTERMs subprocess-spawning test jobs on CI).
+  - coverage[toml]=7.15.0
   - sphinx
   - numdifftools>=0.9.41
   - pybind11
