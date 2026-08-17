@@ -45,13 +45,7 @@ jobs:
           ruff check pySDC
 
   user_cpu_tests_linux:
-    # EXPERIMENT (see PR #659): testing whether the exit-143 SIGTERM crashes
-    # in MPI-using jobs are caused by a kernel regression shipped in GitHub's
-    # ubuntu-latest (24.04) runner image around 2026-07-14
-    # (6.17.0-1018-azure -> 6.17.0-1020-azure), by using the separately
-    # versioned ubuntu-22.04 image instead. Revert to ubuntu-latest if this
-    # doesn't measurably reduce the failure rate.
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       max-parallel: 8
@@ -109,8 +103,7 @@ jobs:
             coverage_${{ matrix.env }}.dat
 
   project_cpu_tests_linux:
-    # EXPERIMENT (see PR #659): see user_cpu_tests_linux above.
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       max-parallel: 8
@@ -279,8 +272,7 @@ jobs:
             coverage_firedrake.dat
          
   user_monodomain_tests_linux:
-    # EXPERIMENT (see PR #659): see user_cpu_tests_linux above.
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash -l {0}
@@ -331,6 +323,31 @@ jobs:
           path: |
             data_monodomain
             coverage_monodomain.dat
+
+  rerun-failed-jobs:
+    runs-on: ubuntu-latest
+    needs: [lint, user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_monodomain_tests_linux]
+    # See PR #659: the exit-143 SIGTERM crashes in MPI-using jobs correlate
+    # with specific Azure regions (centralus/northcentralus/westcentralus/
+    # westus3), not with any package version or OS image, and persist for
+    # the life of a runner - so retrying the command in-place (see the
+    # per-step retry loops above) can't help when the problem is the runner
+    # itself. A fresh job attempt gets assigned a new runner and a new shot
+    # at a healthy region. Capped at 3 total attempts (this job only fires
+    # on attempts 1 and 2) so it can't loop forever; a genuinely failing
+    # test still ends up red after that, just slower. Note this is coarser
+    # than the per-step retry: it reruns whatever job failed for any
+    # reason, not just the exit 143/15 signature, since the rerun API
+    # doesn't expose that distinction.
+    if: failure() && fromJSON(github.run_attempt) < 3
+    permissions:
+      actions: write
+    steps:
+      - name: Rerun failed jobs in a new attempt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run rerun ${{ github.run_id }} --repo ${{ github.repository }} --failed
 
   coverage_comment_on_pr:
     runs-on: ubuntu-latest
