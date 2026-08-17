@@ -45,7 +45,13 @@ jobs:
           ruff check pySDC
 
   user_cpu_tests_linux:
-    runs-on: ubuntu-latest
+    # EXPERIMENT (see PR #659): testing whether the exit-143 SIGTERM crashes
+    # in MPI-using jobs are caused by a kernel regression shipped in GitHub's
+    # ubuntu-latest (24.04) runner image around 2026-07-14
+    # (6.17.0-1018-azure -> 6.17.0-1020-azure), by using the separately
+    # versioned ubuntu-22.04 image instead. Revert to ubuntu-latest if this
+    # doesn't measurably reduce the failure rate.
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       max-parallel: 8
@@ -103,7 +109,8 @@ jobs:
             coverage_${{ matrix.env }}.dat
 
   project_cpu_tests_linux:
-    runs-on: ubuntu-latest
+    # EXPERIMENT (see PR #659): see user_cpu_tests_linux above.
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       max-parallel: 8
@@ -272,7 +279,8 @@ jobs:
             coverage_firedrake.dat
          
   user_monodomain_tests_linux:
-    runs-on: ubuntu-latest
+    # EXPERIMENT (see PR #659): see user_cpu_tests_linux above.
+    runs-on: ubuntu-22.04
     defaults:
       run:
         shell: bash -l {0}
