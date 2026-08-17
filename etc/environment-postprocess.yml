@@ -4,9 +4,7 @@ name: pySDC
 channels:
   - conda-forge
 dependencies:
-  # Pinned: see etc/environment-tests.yml for rationale (coverage>=7.15.1
-  # intermittently SIGTERMs subprocess-spawning test jobs on CI).
-  - coverage[toml]=7.15.0
+  - coverage[toml]
   - sphinx
   - numpy
   - scipy

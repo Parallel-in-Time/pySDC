@@ -110,7 +110,13 @@ exclude = '''playgrounds/'''
 [tool.coverage.run]
 omit = ['*/pySDC/tests/*', '*/data/*', '*/pySDC/playgrounds/*', '*/pySDC/projects/deprecated/*', '*/pySDC/projects/*/tests/*']
 relative_files = true
-concurrency = ['multiprocessing']
+# Deliberately not tracking subprocess/multiprocessing coverage here (no
+# `concurrency = ['multiprocessing']`): coverage's subprocess-tracking hook
+# (installed via sitecustomize.py + coverage.process_startup() in CI)
+# intermittently SIGTERMs subprocess-spawning test jobs (mpi4py/petsc/pytorch,
+# and MPI-heavy project tests) during collection, reproduced across coverage
+# 7.15.0-7.15.4. Coverage inside MPI-rank/multiprocessing subprocesses is not
+# measured as a result.
 source = ['pySDC']
 
 [tool.coverage.report]
