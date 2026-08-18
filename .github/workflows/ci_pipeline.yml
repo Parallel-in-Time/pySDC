@@ -30,9 +30,9 @@ jobs:
         shell: bash -l {0}
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v7
       - name: Install Conda environment with Micromamba
-        uses: mamba-org/setup-micromamba@v1
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: ${{ env.YML }}
           create-args: >-
@@ -57,9 +57,9 @@ jobs:
         shell: bash -l {0}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install Conda environment with Micromamba
-        uses: mamba-org/setup-micromamba@v1
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: "etc/environment-${{ matrix.env }}.yml"
           create-args: >-
@@ -81,7 +81,7 @@ jobs:
           coverage combine
           mv .coverage coverage_${{ matrix.env }}.dat
       - name: Uploading artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: matrix.python == '3.13'
         with:
           name: test-artifacts-cpu-${{ matrix.env }}
@@ -118,9 +118,9 @@ jobs:
         shell: bash -l {0}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install Conda environment with Micromamba
-        uses: mamba-org/setup-micromamba@v1
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: "pySDC/projects/${{ matrix.env }}/environment.yml"
       - name: Install additional packages as needed
@@ -137,7 +137,7 @@ jobs:
           coverage combine
           mv .coverage coverage_${{ matrix.env }}.dat
       - name: Uploading artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-artifacts-project-${{ matrix.env }}
           path: |
@@ -155,7 +155,7 @@ jobs:
         shell: bash -l {0}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install pySDC and pytest
         run: |
           source /pySDC/pySDC/projects/compression/Docker/install_pySDC.sh
@@ -174,7 +174,7 @@ jobs:
           coverage combine
           mv .coverage coverage_libpressio.dat
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-artifacts-libpressio
           path: |
@@ -198,11 +198,11 @@ jobs:
         # (https://github.com/actions/runner/issues/863)
         run: echo "HOME=/home/firedrake" >> "$GITHUB_ENV"
       - name: Checkout pySDC
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with: 
           path: ./pySDC
       - name: Checkout gusto
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: firedrakeproject/gusto
           path: ./gusto_repo
@@ -239,7 +239,7 @@ jobs:
           coverage combine
           mv .coverage ../coverage_firedrake.dat
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-artifacts-firedrake
           path: |
@@ -253,9 +253,9 @@ jobs:
         shell: bash -l {0}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install Conda environment with Micromamba
-        uses: mamba-org/setup-micromamba@v1
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: "pySDC/projects/Monodomain/etc/environment-monodomain.yml"
           create-args: >-
@@ -280,7 +280,7 @@ jobs:
           coverage combine
           mv .coverage coverage_monodomain.dat
       - name: Uploading artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-artifacts-monodomain
           path: |
@@ -299,13 +299,13 @@ jobs:
         shell: bash -l {0}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install Conda environment with Micromamba
-        uses: mamba-org/setup-micromamba@v1
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: "etc/environment-postprocess.yml"
       - name: Download all coverage artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: .
           pattern: test-artifacts-*
