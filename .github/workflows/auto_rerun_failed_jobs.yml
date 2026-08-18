@@ -5,10 +5,10 @@ name: Auto-rerun failed CI jobs
 # See PR #659: exit-143 SIGTERM crashes in MPI-using jobs correlate with
 # specific Azure regions (centralus/northcentralus/westcentralus/westus3),
 # not with any package version or OS image, and persist for the life of a
-# runner - so retrying a command in-place (see the per-step retry loops in
-# ci_pipeline.yml) can't help when the problem is the runner itself. A
-# fresh job attempt gets assigned a new runner and a new shot at a healthy
-# region.
+# runner - retrying a command in-place doesn't help when the problem is
+# the runner itself (confirmed: two in-place retry attempts in the same
+# job both failed identically). A fresh job attempt gets assigned a new
+# runner and a new shot at a healthy region.
 #
 # This has to be a separate workflow_run-triggered workflow rather than a
 # job inside ci_pipeline.yml: GitHub refuses `gh run rerun` while the
