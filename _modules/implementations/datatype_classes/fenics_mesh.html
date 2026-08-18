@@ -45,15 +45,15 @@
 <div class="viewcode-block" id="fenics_mesh">
 <a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.fenics_mesh.html#implementations.datatype_classes.fenics_mesh.fenics_mesh">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">fenics_mesh</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    FEniCS Function data type with arbitrary dimensions</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        values (np.ndarray): contains the ndarray of the values</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -61,7 +61,7 @@
 <span class="sd">            val: initial value (default: 0.0)</span>
 <span class="sd">        Raises:</span>
 <span class="sd">            DataError: if init is none of the types above</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># if init is another fenic_mesh, do a deepcopy (init by copy)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">init</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deepcopy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -72,10 +72,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span> <span class="o">=</span> <span class="n">val</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s1">&#39;something went wrong during </span><span class="si">%s</span><span class="s1"> initialization&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">init</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s1">'something went wrong during </span><span class="si">%s</span><span class="s1"> initialization'</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">init</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Overloading the addition operator for mesh types</span>
 
 <span class="sd">        Args:</span>
@@ -84,7 +84,7 @@
 <span class="sd">            DataError: if other is not a mesh object</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            fenics_mesh: sum of caller and other values (self+other)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="c1"># always create new mesh, since otherwise c = a + b changes a as well!</span>
@@ -92,10 +92,10 @@
             <span class="n">me</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span>
             <span class="k">return</span> <span class="n">me</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">&quot;Type error: cannot add </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">"Type error: cannot add </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Overloading the subtraction operator for mesh types</span>
 
 <span class="sd">        Args:</span>
@@ -104,7 +104,7 @@
 <span class="sd">            DataError: if other is not a mesh object</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            fenics_mesh: differences between caller and other values (self-other)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="c1"># always create new mesh, since otherwise c = a - b changes a as well!</span>
@@ -112,10 +112,10 @@
             <span class="n">me</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span>
             <span class="k">return</span> <span class="n">me</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">&quot;Type error: cannot subtract </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">"Type error: cannot subtract </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Overloading the right multiply by factor operator for mesh types</span>
 
 <span class="sd">        Args:</span>
@@ -124,7 +124,7 @@
 <span class="sd">            DataError: if other is not a float</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            fenics_mesh: copy of original values scaled by factor</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
             <span class="c1"># always create new mesh, since otherwise c = f*a changes a as well!</span>
@@ -132,19 +132,19 @@
             <span class="n">me</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span> <span class="o">=</span> <span class="n">other</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span>
             <span class="k">return</span> <span class="n">me</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">&quot;Type error: cannot multiply </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">"Type error: cannot multiply </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Overloading the abs operator for mesh types</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: absolute maximum of all mesh values</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># take absolute values of the mesh values</span>
 
-        <span class="n">absval</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="s1">&#39;L2&#39;</span><span class="p">)</span>
+        <span class="n">absval</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="s1">'L2'</span><span class="p">)</span>
 
         <span class="c1"># return maximum</span>
         <span class="k">return</span> <span class="n">absval</span></div>
@@ -154,7 +154,7 @@
 <div class="viewcode-block" id="rhs_fenics_mesh">
 <a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.fenics_mesh.html#implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">rhs_fenics_mesh</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    RHS data type for fenics_meshes with implicit and explicit components</span>
 
 <span class="sd">    This data type can be used to have RHS with 2 components (here implicit and explicit)</span>
@@ -162,10 +162,10 @@
 <span class="sd">    Attributes:</span>
 <span class="sd">        impl (fenics_mesh): implicit part</span>
 <span class="sd">        expl (fenics_mesh): explicit part</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -174,7 +174,7 @@
 <span class="sd">            val (float): an initial number (default: 0.0)</span>
 <span class="sd">        Raises:</span>
 <span class="sd">            DataError: if init is none of the types above</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># if init is another rhs_imex_mesh, do a deepcopy (init by copy)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">impl</span> <span class="o">=</span> <span class="n">fenics_mesh</span><span class="p">(</span><span class="n">init</span><span class="o">.</span><span class="n">impl</span><span class="p">)</span>
@@ -185,10 +185,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="n">fenics_mesh</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
         <span class="c1"># something is wrong, if none of the ones above hit</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s1">&#39;something went wrong during </span><span class="si">%s</span><span class="s1"> initialization&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s1">'something went wrong during </span><span class="si">%s</span><span class="s1"> initialization'</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Overloading the subtraction operator for rhs types</span>
 
 <span class="sd">        Args:</span>
@@ -197,7 +197,7 @@
 <span class="sd">            DataError: if other is not a rhs object</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            rhs_fenics_mesh: differences between caller and other values (self-other)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">rhs_fenics_mesh</span><span class="p">):</span>
             <span class="c1"># always create new rhs_imex_mesh, since otherwise c = a - b changes a as well!</span>
@@ -206,10 +206,10 @@
             <span class="n">me</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expl</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">expl</span>
             <span class="k">return</span> <span class="n">me</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">&quot;Type error: cannot subtract </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">"Type error: cannot subtract </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">         Overloading the addition operator for rhs types</span>
 
 <span class="sd">        Args:</span>
@@ -218,7 +218,7 @@
 <span class="sd">            DataError: if other is not a rhs object</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            rhs_fenics_mesh: sum of caller and other values (self-other)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">rhs_fenics_mesh</span><span class="p">):</span>
             <span class="c1"># always create new rhs_imex_mesh, since otherwise c = a + b changes a as well!</span>
@@ -227,10 +227,10 @@
             <span class="n">me</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expl</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">expl</span>
             <span class="k">return</span> <span class="n">me</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">&quot;Type error: cannot add </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">"Type error: cannot add </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Overloading the right multiply by factor operator for mesh types</span>
 
 <span class="sd">        Args:</span>
@@ -239,7 +239,7 @@
 <span class="sd">            DataError: is other is not a float</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            rhs_fenics_mesh: copy of original values scaled by factor</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
             <span class="c1"># always create new mesh, since otherwise c = f*a changes a as well!</span>
@@ -248,7 +248,7 @@
             <span class="n">me</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="n">other</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">expl</span>
             <span class="k">return</span> <span class="n">me</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">&quot;Type error: cannot multiply </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span></div>
+            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">"Type error: cannot multiply </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span></div>
 
 </pre></div>
 

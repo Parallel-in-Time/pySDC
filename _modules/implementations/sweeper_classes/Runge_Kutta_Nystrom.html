@@ -49,36 +49,36 @@
 <div class="viewcode-block" id="ButcherTableauNoCollUpdate">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.ButcherTableauNoCollUpdate">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ButcherTableauNoCollUpdate</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Version of Butcher Tableau that does not need a collocation update because the weights are put in the last line of Q&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Version of Butcher Tableau that does not need a collocation update because the weights are put in the last line of Q"""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialization routine to get a quadrature matrix out of a Butcher tableau</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            weights (numpy.ndarray): Butcher tableau weights</span>
 <span class="sd">            nodes (numpy.ndarray): Butcher tableau nodes</span>
 <span class="sd">            matrix (numpy.ndarray): Butcher tableau entries</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># check if the arguments have the correct form</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Runge-Kutta matrix needs to be supplied as  a numpy array!&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">'Runge-Kutta matrix needs to be supplied as  a numpy array!'</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Runge-Kutta matrix needs to be a square 2D numpy array!&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">'Runge-Kutta matrix needs to be a square 2D numpy array!'</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Weights need to be supplied as a numpy array!&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">'Weights need to be supplied as a numpy array!'</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Incompatible dimension of weights! Need 1, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Incompatible dimension of weights! Need 1, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">!=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Incompatible number of weights! Need </span><span class="si">{</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Incompatible number of weights! Need </span><span class="si">{</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Nodes need to be supplied as a numpy array!&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">'Nodes need to be supplied as a numpy array!'</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Incompatible dimension of nodes! Need 1, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Incompatible dimension of nodes! Need 1, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span> <span class="o">!=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Incompatible number of nodes! Need </span><span class="si">{</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Incompatible number of nodes! Need </span><span class="si">{</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">globally_stiffly_accurate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">weights</span><span class="p">)</span>
 
@@ -117,7 +117,7 @@
 <div class="viewcode-block" id="RungeKuttaNystrom">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RungeKuttaNystrom</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Runge-Kutta scheme that fits the interface of a sweeper.</span>
 <span class="sd">    Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions</span>
 <span class="sd">    at the nodes are successively computed from earlier nodes. However, we only perform a single iteration of this.</span>
@@ -127,7 +127,7 @@
 <span class="sd">    subtracting the two. For that reason, we built this new sweeper, which does not have a preconditioner.</span>
 
 <span class="sd">    This class only supports lower triangular Butcher tableaux such that the system can be solved with forward</span>
-<span class="sd">    substitution. In this way, we don&#39;t get the maximum order that we could for the number of stages, but computing the</span>
+<span class="sd">    substitution. In this way, we don't get the maximum order that we could for the number of stages, but computing the</span>
 <span class="sd">    stages is much cheaper. In particular, if the Butcher tableaux is strictly lower triangular, we get an explicit</span>
 <span class="sd">    method, which does not require us to solve a system of equations to compute the stages.</span>
 
@@ -142,20 +142,20 @@
 
 <span class="sd">    Attribues:</span>
 <span class="sd">        butcher_tableau (ButcherTableauNoCollUpdate): Butcher tableau for the Runge-Kutta scheme that you want</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauNoCollUpdate</span>
     <span class="n">weights_bar</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">matrix_bar</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialization routine for the custom sweeper</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            params: parameters for the sweeper</span>
 <span class="sd">            level (pySDC.Level.level): the level that uses this sweeper</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coll_bar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Butcher_tableau_bar</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Qx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll_bar</span><span class="o">.</span><span class="n">Qmat</span>
@@ -170,7 +170,7 @@
 <div class="viewcode-block" id="RungeKuttaNystrom.get_full_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.get_full_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_full_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Test the right hand side function is the correct type</span>
 
 <span class="sd">        Args:</span>
@@ -178,23 +178,23 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            mesh: Full right hand side as a mesh</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="n">particles</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">f</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Type </span><span class="se">\&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="si">}</span><span class="se">\&quot;</span><span class="s1"> not implemented&#39;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Type </span><span class="se">\"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="si">}</span><span class="se">\"</span><span class="s1"> not implemented'</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="RungeKuttaNystrom.update_nodes">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.update_nodes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Update the u- and f-values at the collocation nodes</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># get current level and problem description</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
@@ -202,7 +202,7 @@
 
         <span class="c1"># only if the level has been touched before</span>
         <span class="k">assert</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">unlocked</span>
-        <span class="k">assert</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;RK schemes are direct solvers. Please perform only 1 iteration!&quot;</span>
+        <span class="k">assert</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"RK schemes are direct solvers. Please perform only 1 iteration!"</span>
 
         <span class="c1"># get number of collocation nodes for easier access</span>
         <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
@@ -217,12 +217,12 @@
 
                 <span class="n">f</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">build_f</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">L</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
                 <span class="n">rhs</span><span class="o">.</span><span class="n">pos</span> <span class="o">+=</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Qx</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_full_f</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-<span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">                </span><span class="sd">"""</span>
 
 <span class="sd">                Implicit part only works for Velocity-Verlet scheme</span>
 <span class="sd">                Boris solver for the implicit part</span>
 
-<span class="sd">                &quot;&quot;&quot;</span>
+<span class="sd">                """</span>
 
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">implicit</span><span class="p">:</span>
                     <span class="n">ck</span> <span class="o">=</span> <span class="n">rhs</span><span class="o">.</span><span class="n">vel</span> <span class="o">*</span> <span class="mf">0.0</span>
@@ -253,9 +253,9 @@
 <div class="viewcode-block" id="RungeKuttaNystrom.compute_end_point">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.compute_end_point">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        In this Runge-Kutta implementation, the solution to the step is always stored in the last node</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 </div>
 
@@ -264,12 +264,12 @@
 <div class="viewcode-block" id="RKN">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RKN</span><span class="p">(</span><span class="n">RungeKuttaNystrom</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Runge-Kutta-Nystrom method</span>
 <span class="sd">    https://link.springer.com/book/10.1007/978-3-540-78862-1</span>
 <span class="sd">    page: 284</span>
 <span class="sd">    Chapter: II.14 Numerical methods for Second order differential equations</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
     <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">6.0</span>
@@ -289,10 +289,10 @@
 <div class="viewcode-block" id="Velocity_Verlet">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Velocity_Verlet</span><span class="p">(</span><span class="n">RungeKuttaNystrom</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Velocity-Verlet scheme</span>
 <span class="sd">    https://de.wikipedia.org/wiki/Verlet-Algorithmus</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
     <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>

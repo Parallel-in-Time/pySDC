@@ -47,7 +47,7 @@
 <div class="viewcode-block" id="battery_n_capacitors">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">battery_n_capacitors</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Example implementing the battery drain model with :math:`N` capacitors, where :math:`N` is an arbitrary integer greater than zero.</span>
 <span class="sd">    First, the capacitor :math:`C` serves as a battery and provides energy. When the voltage of the capacitor :math:`v_{C_n}` for</span>
 <span class="sd">    :math:`n=1,..,N` drops below their reference value :math:`V_{ref,n-1}`, the circuit switches to the next capacitor. If all capacitors</span>
@@ -96,13 +96,13 @@
 <span class="sd">    ----</span>
 <span class="sd">    The array containing the capacitances :math:`C_n` and the array containing the reference values :math:`V_{ref, n-1}`</span>
 <span class="sd">    for each capacitor must be equal to the number of capacitors :math:`n_{capacitors}`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncapacitors</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">Vs</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">Rs</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">C</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">V_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Initialization routine"""</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">ncapacitors</span>
         <span class="n">nvars</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span>
 
@@ -112,9 +112,9 @@
             <span class="k">elif</span> <span class="n">ncapacitors</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No default value for C is set up for ncapacitors=</span><span class="si">{</span><span class="n">ncapacitors</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No default value for C is set up for ncapacitors=</span><span class="si">{</span><span class="n">ncapacitors</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">msgC</span> <span class="o">=</span> <span class="s2">&quot;ERROR for capacitance C: C has to be an np.ndarray and/or length of array needs to be equal to number of capacitances&quot;</span>
+            <span class="n">msgC</span> <span class="o">=</span> <span class="s2">"ERROR for capacitance C: C has to be an np.ndarray and/or length of array needs to be equal to number of capacitances"</span>
             <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="nb">type</span><span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">C</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">n</span><span class="p">]),</span> <span class="n">msgC</span>
 
         <span class="k">if</span> <span class="n">V_ref</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -123,26 +123,26 @@
             <span class="k">elif</span> <span class="n">ncapacitors</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="n">V_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No default value for V_ref is set up for ncapacitors=</span><span class="si">{</span><span class="n">ncapacitors</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No default value for V_ref is set up for ncapacitors=</span><span class="si">{</span><span class="n">ncapacitors</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">assertions_V_ref_1</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="nb">type</span><span class="p">(</span><span class="n">V_ref</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">V_ref</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">n</span><span class="p">,</span>
             <span class="p">]</span>
-            <span class="n">msg1</span> <span class="o">=</span> <span class="s2">&quot;ERROR for reference value V_ref: V_ref has to be an np.ndarray and/or length of array needs to be equal to number of capacitances&quot;</span>
+            <span class="n">msg1</span> <span class="o">=</span> <span class="s2">"ERROR for reference value V_ref: V_ref has to be an np.ndarray and/or length of array needs to be equal to number of capacitances"</span>
             <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">assertions_V_ref_1</span><span class="p">),</span> <span class="n">msg1</span>
 
             <span class="n">assertions_V_ref_2</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="p">(</span><span class="n">alpha</span> <span class="o">&gt;</span> <span class="n">V_ref</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)),</span>
                 <span class="p">(</span><span class="n">V_ref</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)),</span>
             <span class="p">]</span>
-            <span class="n">msg2</span> <span class="o">=</span> <span class="s2">&quot;ERROR for V_ref: At least one of V_ref is less than zero and/or alpha!&quot;</span>
+            <span class="n">msg2</span> <span class="o">=</span> <span class="s2">"ERROR for V_ref: At least one of V_ref is less than zero and/or alpha!"</span>
             <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">assertions_V_ref_2</span><span class="p">),</span> <span class="n">msg2</span>
 
         <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
-            <span class="s1">&#39;nvars&#39;</span><span class="p">,</span> <span class="s1">&#39;ncapacitors&#39;</span><span class="p">,</span> <span class="s1">&#39;Vs&#39;</span><span class="p">,</span> <span class="s1">&#39;Rs&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">,</span> <span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="s1">&#39;V_ref&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
+            <span class="s1">'nvars'</span><span class="p">,</span> <span class="s1">'ncapacitors'</span><span class="p">,</span> <span class="s1">'Vs'</span><span class="p">,</span> <span class="s1">'Rs'</span><span class="p">,</span> <span class="s1">'C'</span><span class="p">,</span> <span class="s1">'R'</span><span class="p">,</span> <span class="s1">'L'</span><span class="p">,</span> <span class="s1">'alpha'</span><span class="p">,</span> <span class="s1">'V_ref'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">switch_A</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">switch_f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_problem_dict</span><span class="p">()</span>
@@ -154,7 +154,7 @@
 <div class="viewcode-block" id="battery_n_capacitors.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.eval_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem. Let :math:`v_k:=v_{C_k}` be the voltage of capacitor :math:`C_k` for :math:`k=1,..,N`</span>
 <span class="sd">        with reference value :math:`V_{ref, k-1}`. No switch estimator is used: For :math:`N = 3` there are :math:`N + 1 = 4` different states of the battery:</span>
 
@@ -178,7 +178,7 @@
 <span class="sd">        .. math::</span>
 <span class="sd">            v_1 \leq V_{ref,0}, v_2 \leq V_{ref,1}, v_3 \leq V_{ref,2}.</span>
 
-<span class="sd">        :math:`max_{index}` is initialized to :math:`-1`. List &quot;switch&quot; contains a True if :math:`v_k \leq V_{ref,k-1}` is satisfied.</span>
+<span class="sd">        :math:`max_{index}` is initialized to :math:`-1`. List "switch" contains a True if :math:`v_k \leq V_{ref,k-1}` is satisfied.</span>
 <span class="sd">            - Is no True there (i.e., :math:`max_{index}=-1`), we are in the first case.</span>
 <span class="sd">            - :math:`max_{index}=k\geq 0` means we are in the :math:`(k+1)`-th case.</span>
 <span class="sd">              So, the actual RHS has key :math:`max_{index}`-1 in the dictionary self.switch_f.</span>
@@ -195,7 +195,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        f : dtype_f</span>
 <span class="sd">            The right-hand side of the problem.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
@@ -220,7 +220,7 @@
 <div class="viewcode-block" id="battery_n_capacitors.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.solve_system">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
 
 <span class="sd">        Parameters</span>
@@ -238,7 +238,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        me : dtype_u</span>
 <span class="sd">            The solution as mesh.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">switch_A</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">nswitches</span><span class="p">]</span>
@@ -261,7 +261,7 @@
 <div class="viewcode-block" id="battery_n_capacitors.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.u_exact">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
@@ -273,20 +273,20 @@
 <span class="sd">        -------</span>
 <span class="sd">        me : dtype_u</span>
 <span class="sd">            The exact solution.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ERROR: u_exact only valid for t=0&#39;</span>
+<span class="sd">        """</span>
+        <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'ERROR: u_exact only valid for t=0'</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 
         <span class="n">me</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># cL</span>
-        <span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_ref</span>  <span class="c1"># vC&#39;s</span>
+        <span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_ref</span>  <span class="c1"># vC's</span>
         <span class="k">return</span> <span class="n">me</span></div>
 
 
 <div class="viewcode-block" id="battery_n_capacitors.get_switching_info">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.get_switching_info">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_switching_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Provides information about a discrete event for one subinterval.</span>
 
 <span class="sd">        Parameters</span>
@@ -304,7 +304,7 @@
 <span class="sd">            Index of collocation node inside one subinterval of where the discrete event was found.</span>
 <span class="sd">        state_function : list</span>
 <span class="sd">            Contains values of the state function (for interpolation).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">switch_detected</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">m_guess</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span>
@@ -332,10 +332,10 @@
 <div class="viewcode-block" id="battery_n_capacitors.count_switches">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.count_switches">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">count_switches</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Counts the number of switches. This function is called when a switch is found inside the range of tolerance</span>
 <span class="sd">        (in pySDC/projects/PinTSimE/switch_estimator.py)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">nswitches</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
@@ -343,9 +343,9 @@
 <div class="viewcode-block" id="battery_n_capacitors.get_problem_dict">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.get_problem_dict">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_problem_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Helper to create dictionaries for both the coefficent matrix of the ODE system and the nonhomogeneous part.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncapacitors</span>
         <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
@@ -363,7 +363,7 @@
 <div class="viewcode-block" id="battery">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">battery</span><span class="p">(</span><span class="n">battery_n_capacitors</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Example implementing the battery drain model with :math:`N=1` capacitor, inherits from ``battery_n_capacitors``. This model is an example</span>
 <span class="sd">    of a discontinuous problem. The state function :math:`decides` which differential equation is solved. When the state function has</span>
 <span class="sd">    a sign change the dynamics of the solution changes by changing the differential equation. The ODE system of this model is given by</span>
@@ -390,18 +390,18 @@
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
 <span class="sd">    This class has the same attributes as the class it inherits from.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncapacitors</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">Vs</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">Rs</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">C</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">V_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Initialization routine"""</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">ncapacitors</span><span class="p">,</span> <span class="n">Vs</span><span class="p">,</span> <span class="n">Rs</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">V_ref</span><span class="p">)</span>
 
 <div class="viewcode-block" id="battery.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery.eval_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
 <span class="sd">        Parameters</span>
@@ -415,7 +415,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        f : dtype_f</span>
 <span class="sd">            The right-hand side of the problem.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
@@ -434,7 +434,7 @@
 <div class="viewcode-block" id="battery.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery.solve_system">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
 
 <span class="sd">        Parameters</span>
@@ -452,7 +452,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        me : dtype_u</span>
 <span class="sd">            The solution as mesh.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
         <span class="n">t_switch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span>
@@ -471,7 +471,7 @@
 <div class="viewcode-block" id="battery.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery.u_exact">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
@@ -483,8 +483,8 @@
 <span class="sd">        -------</span>
 <span class="sd">        me : dtype_u</span>
 <span class="sd">            The exact solution.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ERROR: u_exact only valid for t=0&#39;</span>
+<span class="sd">        """</span>
+        <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'ERROR: u_exact only valid for t=0'</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 
@@ -499,7 +499,7 @@
 <div class="viewcode-block" id="battery_implicit">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_implicit">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">battery_implicit</span><span class="p">(</span><span class="n">battery</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Example implementing the battery drain model as above. The method solve_system uses a fully-implicit computation.</span>
 
 <span class="sd">    Parameters</span>
@@ -529,7 +529,7 @@
 <span class="sd">    ----------</span>
 <span class="sd">    work_counters : WorkCounter</span>
 <span class="sd">        Counts different things, here: Number of Newton iterations is counted.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
 
@@ -547,14 +547,14 @@
         <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-11</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">ncapacitors</span><span class="p">,</span> <span class="n">Vs</span><span class="p">,</span> <span class="n">Rs</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">V_ref</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">,</span> <span class="s1">&#39;newton_tol&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">'newton_maxiter'</span><span class="p">,</span> <span class="s1">'newton_tol'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'newton'</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
 
 <div class="viewcode-block" id="battery_implicit.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_implicit.eval_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
 <span class="sd">        Parameters</span>
@@ -568,7 +568,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        f : dtype_f</span>
 <span class="sd">            The right-hand side of the problem.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
         <span class="n">non_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
@@ -590,7 +590,7 @@
 <div class="viewcode-block" id="battery_implicit.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_implicit.solve_system">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Simple Newton solver.</span>
 
 <span class="sd">        Parameters</span>
@@ -608,7 +608,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        me : dtype_u</span>
 <span class="sd">            The solution as mesh.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
         <span class="n">non_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
@@ -645,15 +645,15 @@
 
             <span class="c1"># increase iteration count</span>
             <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'newton'</span><span class="p">]()</span>
 
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_at_nan</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations, aborting...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">'Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations, aborting...'</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">'Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations...'</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Newton did not converge after </span><span class="si">%i</span><span class="s1"> iterations, error is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">res</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">'Newton did not converge after </span><span class="si">%i</span><span class="s1"> iterations, error is </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">res</span><span class="p">))</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
         <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:]</span>

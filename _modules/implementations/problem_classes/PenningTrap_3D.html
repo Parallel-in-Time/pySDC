@@ -49,7 +49,7 @@
 <div class="viewcode-block" id="penningtrap">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">penningtrap</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    This class implements a standard Penning trap problem on the time interval :math:`[0, t_{end}]`</span>
 <span class="sd">    fully investigated in [1]_. The equations are given by the following equation of motion</span>
 
@@ -61,7 +61,7 @@
 
 <span class="sd">    with the particles :math:`x, v\in \mathbb{R}^{3}`. For the penning trap problem, the other parameters are given by</span>
 <span class="sd">    the constant magnetic field :math:`B=\frac{\omega_{B}}{\alpha}\cdot \hat{e_{z}}\in \mathbb{R}^{3}`</span>
-<span class="sd">    along the :math:`z`-axis with the particle&#39;s charge-to-mass ratio :math:`\alpha=\frac{q}{m}` so that</span>
+<span class="sd">    along the :math:`z`-axis with the particle's charge-to-mass ratio :math:`\alpha=\frac{q}{m}` so that</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        v\times B=\frac{\omega_{B}}{\alpha}\left(</span>
@@ -101,7 +101,7 @@
 <span class="sd">    u0 : np.1darray</span>
 <span class="sd">        Initial condition for position, and for velocity.</span>
 <span class="sd">    q : np.1darray</span>
-<span class="sd">        Particle&#39;s charge.</span>
+<span class="sd">        Particle's charge.</span>
 <span class="sd">    m : np.1darray</span>
 <span class="sd">        Mass.</span>
 <span class="sd">    nparts : int</span>
@@ -120,25 +120,25 @@
 <span class="sd">        Physica. Vol. 3 (1936).</span>
 <span class="sd">    .. [2] Mathias Winkel, Robert Speck and Daniel Ruprecht. A high-order Boris integrator.</span>
 <span class="sd">        Journal of Computational Physics (2015).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">particles</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">fields</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">omega_B</span><span class="p">,</span> <span class="n">omega_E</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">nparts</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
         <span class="c1"># invoke super init, passing nparts, dtype_u and dtype_f</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(((</span><span class="mi">3</span><span class="p">,</span> <span class="n">nparts</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;nparts&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;omega_B&#39;</span><span class="p">,</span> <span class="s1">&#39;omega_E&#39;</span><span class="p">,</span> <span class="s1">&#39;u0&#39;</span><span class="p">,</span> <span class="s1">&#39;sig&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;Boris_solver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(((</span><span class="mi">3</span><span class="p">,</span> <span class="n">nparts</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">'nparts'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">'omega_B'</span><span class="p">,</span> <span class="s1">'omega_E'</span><span class="p">,</span> <span class="s1">'u0'</span><span class="p">,</span> <span class="s1">'sig'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'Boris_solver'</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'rhs'</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
 
 <div class="viewcode-block" id="penningtrap.fast_interactions">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.fast_interactions">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nogil</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">fast_interactions</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Computes the fast interactions.</span>
 
 <span class="sd">        Parameters</span>
@@ -150,13 +150,13 @@
 <span class="sd">        sig : float</span>
 <span class="sd">            The smoothing parameter :math:`\lambda &gt; 0`.</span>
 <span class="sd">        q : np.1darray</span>
-<span class="sd">            Particle&#39;s charge.</span>
+<span class="sd">            Particle's charge.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Efield : np.2darray</span>
 <span class="sd">            The internal E field for each particle.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">Efield</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
         <span class="n">contrib</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 
@@ -177,7 +177,7 @@
 <div class="viewcode-block" id="penningtrap.get_interactions">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.get_interactions">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_interactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">part</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Routine to compute the particle-particle interaction, assuming :math:`q = 1` for all particles.</span>
 
 <span class="sd">        Parameters</span>
@@ -189,7 +189,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        Efield : np.ndarray</span>
 <span class="sd">            The internal E field for each particle.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nparts</span>
 
@@ -201,7 +201,7 @@
 <div class="viewcode-block" id="penningtrap.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.eval_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">part</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Routine to compute the E and B fields (named f for consistency with the original PEPC version).</span>
 
 <span class="sd">        Parameters</span>
@@ -215,11 +215,11 @@
 <span class="sd">        -------</span>
 <span class="sd">        f : dtype_f</span>
 <span class="sd">            Fields for the particles (internal and external), i.e., the right-hand side of the problem.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nparts</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'rhs'</span><span class="p">]()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">_unused</span> <span class="o">=</span> <span class="n">penningtrap</span><span class="o">.</span><span class="n">Harmonic_oscillator</span>
             <span class="n">Emat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
@@ -241,14 +241,14 @@
 <div class="viewcode-block" id="penningtrap.u_init">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.u_init">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">u_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Routine to compute the starting values for the particles.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        u : dtype_u</span>
 <span class="sd">            Particle set filled with initial data.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">u0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u0</span>
         <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nparts</span>
@@ -256,7 +256,7 @@
         <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">u0</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">u0</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;so far only q = m = 1 is implemented&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">'so far only q = m = 1 is implemented'</span><span class="p">)</span>
 
         <span class="c1"># set first particle to u0</span>
         <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -297,7 +297,7 @@
             <span class="n">comy</span> <span class="o">+=</span> <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span>
             <span class="n">comz</span> <span class="o">+=</span> <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span>
 
-        <span class="c1"># print(&#39;Center of positions:&#39;,comx/N,comy/N,comz/N)</span>
+        <span class="c1"># print('Center of positions:',comx/N,comy/N,comz/N)</span>
 
         <span class="k">return</span> <span class="n">u</span></div>
 
@@ -305,7 +305,7 @@
 <div class="viewcode-block" id="penningtrap.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.u_exact">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Routine to compute the exact trajectory at time :math:`t` (only for single-particle setup).</span>
 
 <span class="sd">        Parameters</span>
@@ -317,7 +317,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        u : dtype_u</span>
 <span class="sd">            Particle type containing the exact position and velocity.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># some abbreviations</span>
         <span class="n">wE</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">omega_E</span>
@@ -326,7 +326,7 @@
         <span class="n">u0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u0</span>
 
         <span class="k">if</span> <span class="n">N</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;u_exact is only valid for a single particle&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">'u_exact is only valid for a single particle'</span><span class="p">)</span>
 
         <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
 
@@ -361,7 +361,7 @@
 <div class="viewcode-block" id="penningtrap.build_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.build_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">build_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">part</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Helper function to assemble the correct right-hand side out of B and E field.</span>
 
 <span class="sd">        Parameters</span>
@@ -377,10 +377,10 @@
 <span class="sd">        -------</span>
 <span class="sd">        rhs : acceleration</span>
 <span class="sd">            Correct right-hand side of type acceleration.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">part</span><span class="p">,</span> <span class="n">particles</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;something is wrong during build_f, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">part</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">'something is wrong during build_f, got </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">part</span><span class="p">))</span>
 
         <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nparts</span>
 
@@ -395,7 +395,7 @@
 <div class="viewcode-block" id="penningtrap.boris_solver">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.boris_solver">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">boris_solver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">old_fields</span><span class="p">,</span> <span class="n">new_fields</span><span class="p">,</span> <span class="n">old_parts</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        The actual Boris solver for static (!) B fields, extended by the c-term.</span>
 
 <span class="sd">        Parameters</span>
@@ -415,11 +415,11 @@
 <span class="sd">        -------</span>
 <span class="sd">        vel : particles</span>
 <span class="sd">            The velocities at the :math:`(m+1)`-th node.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nparts</span>
         <span class="n">vel</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">velocity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;Boris_solver&#39;</span><span class="p">]()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'Boris_solver'</span><span class="p">]()</span>
         <span class="n">Emean</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">old_fields</span><span class="o">.</span><span class="n">elec</span> <span class="o">+</span> <span class="n">new_fields</span><span class="o">.</span><span class="n">elec</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
             <span class="n">a</span> <span class="o">=</span> <span class="n">old_parts</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">/</span> <span class="n">old_parts</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>

@@ -48,7 +48,7 @@
 <div class="viewcode-block" id="harmonic_oscillator">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HarmonicOscillator.html#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">harmonic_oscillator</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Example implementing the harmonic oscillator with mass :math:`1`</span>
 
 <span class="sd">    .. math::</span>
@@ -70,22 +70,22 @@
 <span class="sd">    amp : float, optional</span>
 <span class="sd">        Amplitude of the oscillation.</span>
 <span class="sd">    Source: https://beltoforion.de/en/harmonic_oscillator/</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">particles</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">acceleration</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">u0</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">phase</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">amp</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Initialization routine"""</span>
         <span class="c1"># invoke super init, passing nparts, dtype_u and dtype_f</span>
         <span class="n">u0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;float64&quot;</span><span class="p">)))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="s1">&#39;mu&#39;</span><span class="p">,</span> <span class="s1">&#39;u0&#39;</span><span class="p">,</span> <span class="s1">&#39;phase&#39;</span><span class="p">,</span> <span class="s1">&#39;amp&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">"float64"</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">'k'</span><span class="p">,</span> <span class="s1">'mu'</span><span class="p">,</span> <span class="s1">'u0'</span><span class="p">,</span> <span class="s1">'phase'</span><span class="p">,</span> <span class="s1">'amp'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <div class="viewcode-block" id="harmonic_oscillator.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HarmonicOscillator.html#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.eval_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Routine to compute the right-hand side of the problem.</span>
 
 <span class="sd">        Parameters</span>
@@ -99,7 +99,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        me : dtype_f</span>
 <span class="sd">            The right-hand side of the problem.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
         <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">pos</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">vel</span>
         <span class="k">return</span> <span class="n">me</span></div>
@@ -108,9 +108,9 @@
 <div class="viewcode-block" id="harmonic_oscillator.u_init">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HarmonicOscillator.html#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.u_init">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">u_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Helper function to compute the initial condition for u.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">u0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u0</span>
 
         <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
@@ -124,7 +124,7 @@
 <div class="viewcode-block" id="harmonic_oscillator.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HarmonicOscillator.html#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.u_exact">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Routine to compute the exact trajectory at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
@@ -136,7 +136,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        me : dtype_u</span>
 <span class="sd">            Exact position and velocity.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
         <span class="n">delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span>
         <span class="n">omega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
@@ -145,9 +145,9 @@
         <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">delta</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">omega</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
         <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="n">omega</span><span class="p">:</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">"""</span>
 <span class="sd">            Overdamped case</span>
-<span class="sd">            &quot;&quot;&quot;</span>
+<span class="sd">            """</span>
 
             <span class="n">lam_1</span> <span class="o">=</span> <span class="o">-</span><span class="n">delta</span> <span class="o">+</span> <span class="n">alpha</span>
             <span class="n">lam_2</span> <span class="o">=</span> <span class="o">-</span><span class="n">delta</span> <span class="o">-</span> <span class="n">alpha</span>
@@ -157,9 +157,9 @@
             <span class="n">me</span><span class="o">.</span><span class="n">vel</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">A</span> <span class="o">*</span> <span class="n">lam_1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">lam_1</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="n">B</span> <span class="o">*</span> <span class="n">lam_2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">lam_2</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="n">delta</span> <span class="o">==</span> <span class="n">omega</span><span class="p">:</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">"""</span>
 <span class="sd">            Critically damped case</span>
-<span class="sd">            &quot;&quot;&quot;</span>
+<span class="sd">            """</span>
 
             <span class="n">A</span> <span class="o">=</span> <span class="n">U_0</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">B</span> <span class="o">=</span> <span class="n">U_0</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">delta</span> <span class="o">*</span> <span class="n">A</span>
@@ -167,9 +167,9 @@
             <span class="n">me</span><span class="o">.</span><span class="n">vel</span><span class="p">[:]</span> <span class="o">=</span> <span class="o">-</span><span class="n">delta</span> <span class="o">*</span> <span class="n">me</span><span class="o">.</span><span class="n">pos</span><span class="p">[:]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">delta</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">B</span>
 
         <span class="k">elif</span> <span class="n">delta</span> <span class="o">&lt;</span> <span class="n">omega</span><span class="p">:</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">"""</span>
 <span class="sd">            Underdamped case</span>
-<span class="sd">            &quot;&quot;&quot;</span>
+<span class="sd">            """</span>
 
             <span class="n">lam_1</span> <span class="o">=</span> <span class="o">-</span><span class="n">delta</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span>
             <span class="n">lam_2</span> <span class="o">=</span> <span class="o">-</span><span class="n">delta</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span>
@@ -182,14 +182,14 @@
 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">pass</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s2">&quot;Exact solution is not working&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s2">"Exact solution is not working"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">me</span></div>
 
 
 <div class="viewcode-block" id="harmonic_oscillator.eval_hamiltonian">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HarmonicOscillator.html#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.eval_hamiltonian">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Routine to compute the Hamiltonian.</span>
 
 <span class="sd">        Parameters</span>
@@ -201,7 +201,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        ham : float</span>
 <span class="sd">            The Hamiltonian.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">ham</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">vel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
         <span class="k">return</span> <span class="n">ham</span></div>

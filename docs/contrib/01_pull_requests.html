@@ -62,7 +62,7 @@
 <p>Those changes should be compatible with the existing API (<em>i.e</em> not break it), and <strong>avoid any change</strong> in the current user interface. In particular, it should not modify default values for parameters or remove attributes of existing classes. But new attributes or parameters can be added with pre-set default values, and new classes can be added in the <code class="docutils literal notranslate"><span class="pre">pySDC.implementations</span></code> module.</p>
 <blockquote>
 <div><p>🔔 During the revision of your pull request, it can happen that additional changes are done to the <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code> branch (in parallel-in-time/pySDC repo). In that case, don’t hesitate to regularly merge them into your local branch to solve eventual conflicts, for instance :</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># On your local repo, with the &quot;my_feature&quot; branch</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># On your local repo, with the "my_feature" branch</span>
 $<span class="w"> </span>git<span class="w"> </span>fetch<span class="w"> </span>upstream<span class="w">  </span><span class="c1"># synchronize with parallel-in-time/pySDC</span>
 $<span class="w"> </span>git<span class="w"> </span>merge<span class="w"> </span>upstream/master<span class="w">  </span><span class="c1"># merge into my_feature</span>
 $<span class="w"> </span>git<span class="w"> </span>push<span class="w">  </span><span class="c1"># push local merges to your repository</span>

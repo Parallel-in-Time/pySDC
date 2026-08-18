@@ -82,32 +82,32 @@ instantiate things within subroutines</p></li>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A simple test program to set up a spatial problem and play with it</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># instantiate problem</span>
     <span class="n">prob</span> <span class="o">=</span> <span class="n">heatNd_unforced</span><span class="p">(</span>
         <span class="n">nvars</span><span class="o">=</span><span class="mi">1023</span><span class="p">,</span>  <span class="c1"># number of degrees of freedom</span>
         <span class="n">nu</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>  <span class="c1"># diffusion coefficient</span>
         <span class="n">freq</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>  <span class="c1"># frequency for the test value</span>
-        <span class="n">bc</span><span class="o">=</span><span class="s1">&#39;dirichlet-zero&#39;</span><span class="p">,</span>  <span class="c1"># boundary conditions</span>
+        <span class="n">bc</span><span class="o">=</span><span class="s1">'dirichlet-zero'</span><span class="p">,</span>  <span class="c1"># boundary conditions</span>
     <span class="p">)</span>
 
     <span class="c1"># run accuracy test, get error back</span>
     <span class="n">err</span> <span class="o">=</span> <span class="n">run_accuracy_check</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
 
-    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/step_1_A_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Error of the spatial accuracy test: </span><span class="si">%8.6e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/step_1_A_out.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'Error of the spatial accuracy test: </span><span class="si">%8.6e</span><span class="s1">'</span> <span class="o">%</span> <span class="n">err</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="mf">2e-04</span><span class="p">,</span> <span class="s2">&quot;ERROR: the spatial accuracy is higher than expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span>
+    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="mf">2e-04</span><span class="p">,</span> <span class="s2">"ERROR: the spatial accuracy is higher than expected, got </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">err</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">run_accuracy_check</span><span class="p">(</span><span class="n">prob</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Routine to check the error of the Laplacian vs. its FD discretization</span>
 
 <span class="sd">    Args:</span>
@@ -115,7 +115,7 @@ instantiate things within subroutines</p></li>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        the error between the analytic Laplacian and the computed one of a given function</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># create x values, use only inner points</span>
     <span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
@@ -134,7 +134,7 @@ instantiate things within subroutines</p></li>
     <span class="k">return</span> <span class="n">err</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -160,7 +160,7 @@ the data! Also, use headers to store meta-information.</p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span>
 
-<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Agg&#39;</span><span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">'Agg'</span><span class="p">)</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pylab</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
@@ -171,19 +171,19 @@ the data! Also, use headers to store meta-information.</p></li>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">heatNd_unforced</span>
 
 <span class="c1"># setup id for gathering the results (will sort by nvars)</span>
-<span class="n">ID</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;nvars&#39;</span><span class="p">)</span>
+<span class="n">ID</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">'ID'</span><span class="p">,</span> <span class="s1">'nvars'</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A simple test program to check order of accuracy in space for a simple test problem</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># initialize problem parameters</span>
     <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'nu'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'freq'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'bc'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'dirichlet-zero'</span>  <span class="c1"># boundary conditions</span>
 
     <span class="c1"># create list of nvars to do the accuracy test with</span>
     <span class="n">nvars_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">15</span><span class="p">)]</span>
@@ -194,24 +194,24 @@ the data! Also, use headers to store meta-information.</p></li>
     <span class="c1"># compute order of accuracy</span>
     <span class="n">order</span> <span class="o">=</span> <span class="n">get_accuracy_order</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 
-    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/step_1_B_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/step_1_B_out.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">order</span><span class="p">)):</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Expected order: </span><span class="si">%2i</span><span class="s1"> -- Computed order </span><span class="si">%4.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">order</span><span class="p">[</span><span class="n">l</span><span class="p">])</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">'Expected order: </span><span class="si">%2i</span><span class="s1"> -- Computed order </span><span class="si">%4.3f</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">order</span><span class="p">[</span><span class="n">l</span><span class="p">])</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="c1"># visualize results</span>
     <span class="n">plot_accuracy</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 
-    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;data/step_1_accuracy_test_space.png&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create file&#39;</span>
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">'data/step_1_accuracy_test_space.png'</span><span class="p">),</span> <span class="s1">'ERROR: plotting did not create file'</span>
 
-    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">0.06</span><span class="p">)),</span> <span class="s2">&quot;ERROR: spatial order of accuracy is not as expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">order</span>
+    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">0.06</span><span class="p">)),</span> <span class="s2">"ERROR: spatial order of accuracy is not as expected, got </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">order</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">run_accuracy_check</span><span class="p">(</span><span class="n">nvars_list</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Routine to check the error of the Laplacian vs. its FD discretization</span>
 
 <span class="sd">    Args:</span>
@@ -220,13 +220,13 @@ the data! Also, use headers to store meta-information.</p></li>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        a dictionary containing the errors and a header (with nvars_list)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="c1"># loop over all nvars</span>
     <span class="k">for</span> <span class="n">nvars</span> <span class="ow">in</span> <span class="n">nvars_list</span><span class="p">:</span>
         <span class="c1"># setup problem</span>
-        <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvars</span>
+        <span class="n">problem_params</span><span class="p">[</span><span class="s1">'nvars'</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvars</span>
         <span class="n">prob</span> <span class="o">=</span> <span class="n">heatNd_unforced</span><span class="p">(</span><span class="o">**</span><span class="n">problem_params</span><span class="p">)</span>
 
         <span class="c1"># create x values, use only inner points</span>
@@ -247,13 +247,13 @@ the data! Also, use headers to store meta-information.</p></li>
         <span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">err</span>
 
     <span class="c1"># add nvars_list to dictionary for easier access later on</span>
-    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;nvars_list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvars_list</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">'nvars_list'</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvars_list</span>
 
     <span class="k">return</span> <span class="n">results</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">get_accuracy_order</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Routine to compute the order of accuracy in space</span>
 
 <span class="sd">    Args:</span>
@@ -261,11 +261,11 @@ the data! Also, use headers to store meta-information.</p></li>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        the list of orders</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># retrieve the list of nvars from results</span>
-    <span class="k">assert</span> <span class="s1">&#39;nvars_list&#39;</span> <span class="ow">in</span> <span class="n">results</span><span class="p">,</span> <span class="s1">&#39;ERROR: expecting the list of nvars in the results dictionary&#39;</span>
-    <span class="n">nvars_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;nvars_list&#39;</span><span class="p">])</span>
+    <span class="k">assert</span> <span class="s1">'nvars_list'</span> <span class="ow">in</span> <span class="n">results</span><span class="p">,</span> <span class="s1">'ERROR: expecting the list of nvars in the results dictionary'</span>
+    <span class="n">nvars_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">'nvars_list'</span><span class="p">])</span>
 
     <span class="n">order</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="c1"># loop over two consecutive errors/nvars pairs</span>
@@ -282,26 +282,26 @@ the data! Also, use headers to store meta-information.</p></li>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_accuracy</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Routine to visualize the errors as well as the expected errors</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        results: the dictionary containing the errors</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># retrieve the list of nvars from results</span>
-    <span class="k">assert</span> <span class="s1">&#39;nvars_list&#39;</span> <span class="ow">in</span> <span class="n">results</span><span class="p">,</span> <span class="s1">&#39;ERROR: expecting the list of nvars in the results dictionary&#39;</span>
-    <span class="n">nvars_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;nvars_list&#39;</span><span class="p">])</span>
+    <span class="k">assert</span> <span class="s1">'nvars_list'</span> <span class="ow">in</span> <span class="n">results</span><span class="p">,</span> <span class="s1">'ERROR: expecting the list of nvars in the results dictionary'</span>
+    <span class="n">nvars_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">'nvars_list'</span><span class="p">])</span>
 
     <span class="c1"># Set up plotting parameters</span>
     <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;legend.fontsize&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
-        <span class="s1">&#39;figure.figsize&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
-        <span class="s1">&#39;axes.labelsize&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
-        <span class="s1">&#39;axes.titlesize&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
-        <span class="s1">&#39;xtick.labelsize&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
-        <span class="s1">&#39;ytick.labelsize&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
-        <span class="s1">&#39;lines.linewidth&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s1">'legend.fontsize'</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="s1">'figure.figsize'</span><span class="p">:</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+        <span class="s1">'axes.labelsize'</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="s1">'axes.titlesize'</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="s1">'xtick.labelsize'</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="s1">'ytick.labelsize'</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="s1">'lines.linewidth'</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
@@ -309,8 +309,8 @@ the data! Also, use headers to store meta-information.</p></li>
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
     <span class="c1"># take x-axis limits from nvars_list + some spacing left and right</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="n">nvars_list</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">nvars_list</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">])</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;nvars&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;abs. error&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'nvars'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'abs. error'</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
 
     <span class="c1"># get guide for the order of accuracy, i.e. the errors to expect</span>
@@ -319,7 +319,7 @@ the data! Also, use headers to store meta-information.</p></li>
     <span class="n">base_error</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
     <span class="c1"># assemble optimal errors for 2nd order method and plot</span>
     <span class="n">order_guide_space</span> <span class="o">=</span> <span class="p">[</span><span class="n">base_error</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">nvars_list</span><span class="p">))]</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">nvars_list</span><span class="p">,</span> <span class="n">order_guide_space</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;2nd order&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">nvars_list</span><span class="p">,</span> <span class="n">order_guide_space</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'k'</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'2nd order'</span><span class="p">)</span>
 
     <span class="n">min_err</span> <span class="o">=</span> <span class="mf">1e99</span>
     <span class="n">max_err</span> <span class="o">=</span> <span class="mf">0e00</span>
@@ -331,20 +331,20 @@ the data! Also, use headers to store meta-information.</p></li>
         <span class="n">min_err</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">min_err</span><span class="p">)</span>
         <span class="n">max_err</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">max_err</span><span class="p">)</span>
         <span class="n">err_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">nvars_list</span><span class="p">,</span> <span class="n">err_list</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;experiment&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">nvars_list</span><span class="p">,</span> <span class="n">err_list</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">' '</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'o'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'experiment'</span><span class="p">)</span>
 
     <span class="c1"># adjust y-axis limits, add legend</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="n">min_err</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span> <span class="n">max_err</span> <span class="o">*</span> <span class="mi">10</span><span class="p">])</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">numpoints</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># save plot as PDF, beautify</span>
-    <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;data/step_1_accuracy_test_space.png&#39;</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="s1">'data/step_1_accuracy_test_space.png'</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="kc">None</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -397,20 +397,20 @@ space is fine? …</p></li>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A simple test program to create and solve a collocation problem directly</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># instantiate problem</span>
     <span class="n">prob</span> <span class="o">=</span> <span class="n">heatNd_unforced</span><span class="p">(</span>
         <span class="n">nvars</span><span class="o">=</span><span class="mi">1023</span><span class="p">,</span>  <span class="c1"># number of degrees of freedom</span>
         <span class="n">nu</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>  <span class="c1"># diffusion coefficient</span>
         <span class="n">freq</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>  <span class="c1"># frequency for the test value</span>
-        <span class="n">bc</span><span class="o">=</span><span class="s1">&#39;dirichlet-zero&#39;</span><span class="p">,</span>  <span class="c1"># boundary conditions</span>
+        <span class="n">bc</span><span class="o">=</span><span class="s1">'dirichlet-zero'</span><span class="p">,</span>  <span class="c1"># boundary conditions</span>
     <span class="p">)</span>
 
     <span class="c1"># instantiate collocation class, relative to the time interval [0,1]</span>
-    <span class="n">coll</span> <span class="o">=</span> <span class="n">CollBase</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tleft</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tright</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_type</span><span class="o">=</span><span class="s1">&#39;LEGENDRE&#39;</span><span class="p">,</span> <span class="n">quad_type</span><span class="o">=</span><span class="s1">&#39;RADAU-RIGHT&#39;</span><span class="p">)</span>
+    <span class="n">coll</span> <span class="o">=</span> <span class="n">CollBase</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tleft</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tright</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_type</span><span class="o">=</span><span class="s1">'LEGENDRE'</span><span class="p">,</span> <span class="n">quad_type</span><span class="o">=</span><span class="s1">'RADAU-RIGHT'</span><span class="p">)</span>
 
     <span class="c1"># set time-step size (warning: the collocation matrices are relative to [0,1], see above)</span>
     <span class="n">dt</span> <span class="o">=</span> <span class="mf">0.1</span>
@@ -418,18 +418,18 @@ space is fine? …</p></li>
     <span class="c1"># solve collocation problem</span>
     <span class="n">err</span> <span class="o">=</span> <span class="n">solve_collocation_problem</span><span class="p">(</span><span class="n">prob</span><span class="o">=</span><span class="n">prob</span><span class="p">,</span> <span class="n">coll</span><span class="o">=</span><span class="n">coll</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
 
-    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/step_1_C_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Error of the collocation problem: </span><span class="si">%8.6e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/step_1_C_out.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'Error of the collocation problem: </span><span class="si">%8.6e</span><span class="s1">'</span> <span class="o">%</span> <span class="n">err</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="mf">4e-04</span><span class="p">,</span> <span class="s2">&quot;ERROR: did not get collocation error as expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span>
+    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="mf">4e-04</span><span class="p">,</span> <span class="s2">"ERROR: did not get collocation error as expected, got </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">err</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">solve_collocation_problem</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">coll</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Routine to build and solve the linear collocation problem</span>
 
 <span class="sd">    Args:</span>
@@ -439,7 +439,7 @@ space is fine? …</p></li>
 
 <span class="sd">    Return:</span>
 <span class="sd">        the analytic error of the solved collocation problem</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># shrink collocation matrix: first line and column deals with initial value, not needed here</span>
     <span class="n">Q</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>
@@ -463,7 +463,7 @@ space is fine? …</p></li>
     <span class="k">return</span> <span class="n">err</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -489,7 +489,7 @@ compute 0 very, very thoroughly…</p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span>
 
-<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Agg&#39;</span><span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">'Agg'</span><span class="p">)</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pylab</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
@@ -501,26 +501,26 @@ compute 0 very, very thoroughly…</p></li>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">heatNd_unforced</span>
 
 <span class="c1"># setup id for gathering the results (will sort by dt)</span>
-<span class="n">ID</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
+<span class="n">ID</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">'ID'</span><span class="p">,</span> <span class="s1">'dt'</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A simple test program to compute the order of accuracy in time</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># initialize problem parameters</span>
     <span class="n">problem_params</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">16383</span>  <span class="c1"># number of DOFs in space</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'nu'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'freq'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'nvars'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">16383</span>  <span class="c1"># number of DOFs in space</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'bc'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'dirichlet-zero'</span>  <span class="c1"># boundary conditions</span>
 
     <span class="c1"># instantiate problem</span>
     <span class="n">prob</span> <span class="o">=</span> <span class="n">heatNd_unforced</span><span class="p">(</span><span class="o">**</span><span class="n">problem_params</span><span class="p">)</span>
 
     <span class="c1"># instantiate collocation class, relative to the time interval [0,1]</span>
-    <span class="n">coll</span> <span class="o">=</span> <span class="n">CollBase</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tleft</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tright</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_type</span><span class="o">=</span><span class="s1">&#39;LEGENDRE&#39;</span><span class="p">,</span> <span class="n">quad_type</span><span class="o">=</span><span class="s1">&#39;RADAU-RIGHT&#39;</span><span class="p">)</span>
+    <span class="n">coll</span> <span class="o">=</span> <span class="n">CollBase</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tleft</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tright</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_type</span><span class="o">=</span><span class="s1">'LEGENDRE'</span><span class="p">,</span> <span class="n">quad_type</span><span class="o">=</span><span class="s1">'RADAU-RIGHT'</span><span class="p">)</span>
 
     <span class="c1"># assemble list of dt</span>
     <span class="n">dt_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span> <span class="o">/</span> <span class="mi">2</span><span class="o">**</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)]</span>
@@ -531,26 +531,26 @@ compute 0 very, very thoroughly…</p></li>
     <span class="c1"># get order of accuracy</span>
     <span class="n">order</span> <span class="o">=</span> <span class="n">get_accuracy_order</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 
-    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/step_1_D_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/step_1_D_out.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">order</span><span class="p">)):</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Expected order: </span><span class="si">%2i</span><span class="s1"> -- Computed order </span><span class="si">%4.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">order</span><span class="p">[</span><span class="n">l</span><span class="p">])</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">'Expected order: </span><span class="si">%2i</span><span class="s1"> -- Computed order </span><span class="si">%4.3f</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">order</span><span class="p">[</span><span class="n">l</span><span class="p">])</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="c1"># visualize results</span>
     <span class="n">plot_accuracy</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 
-    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;data/step_1_accuracy_test_coll.png&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">'data/step_1_accuracy_test_coll.png'</span><span class="p">)</span>
 
     <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)),</span> <span class="p">(</span>
-        <span class="s2">&quot;ERROR: did not get order of accuracy as expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">order</span>
+        <span class="s2">"ERROR: did not get order of accuracy as expected, got </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">order</span>
     <span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">run_accuracy_check</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">coll</span><span class="p">,</span> <span class="n">dt_list</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Routine to build and solve the linear collocation problem</span>
 
 <span class="sd">    Args:</span>
@@ -560,7 +560,7 @@ compute 0 very, very thoroughly…</p></li>
 
 <span class="sd">    Return:</span>
 <span class="sd">        the analytic error of the solved collocation problem</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="c1"># loop over all nvars</span>
@@ -588,12 +588,12 @@ compute 0 very, very thoroughly…</p></li>
         <span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">err</span>
 
     <span class="c1"># add list of dt to results for easier access</span>
-    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;dt_list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt_list</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">'dt_list'</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt_list</span>
     <span class="k">return</span> <span class="n">results</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">get_accuracy_order</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Routine to compute the order of accuracy in time</span>
 
 <span class="sd">    Args:</span>
@@ -601,11 +601,11 @@ compute 0 very, very thoroughly…</p></li>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        the list of orders</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># retrieve the list of dt from results</span>
-    <span class="k">assert</span> <span class="s1">&#39;dt_list&#39;</span> <span class="ow">in</span> <span class="n">results</span><span class="p">,</span> <span class="s1">&#39;ERROR: expecting the list of dt in the results dictionary&#39;</span>
-    <span class="n">dt_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;dt_list&#39;</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="s1">'dt_list'</span> <span class="ow">in</span> <span class="n">results</span><span class="p">,</span> <span class="s1">'ERROR: expecting the list of dt in the results dictionary'</span>
+    <span class="n">dt_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">'dt_list'</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="n">order</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="c1"># loop over two consecutive errors/dt pairs</span>
@@ -622,26 +622,26 @@ compute 0 very, very thoroughly…</p></li>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_accuracy</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Routine to visualize the errors as well as the expected errors</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        results: the dictionary containing the errors</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># retrieve the list of nvars from results</span>
-    <span class="k">assert</span> <span class="s1">&#39;dt_list&#39;</span> <span class="ow">in</span> <span class="n">results</span><span class="p">,</span> <span class="s1">&#39;ERROR: expecting the list of dts in the results dictionary&#39;</span>
-    <span class="n">dt_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;dt_list&#39;</span><span class="p">])</span>
+    <span class="k">assert</span> <span class="s1">'dt_list'</span> <span class="ow">in</span> <span class="n">results</span><span class="p">,</span> <span class="s1">'ERROR: expecting the list of dts in the results dictionary'</span>
+    <span class="n">dt_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">'dt_list'</span><span class="p">])</span>
 
     <span class="c1"># Set up plotting parameters</span>
     <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;legend.fontsize&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
-        <span class="s1">&#39;figure.figsize&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
-        <span class="s1">&#39;axes.labelsize&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
-        <span class="s1">&#39;axes.titlesize&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
-        <span class="s1">&#39;xtick.labelsize&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
-        <span class="s1">&#39;ytick.labelsize&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
-        <span class="s1">&#39;lines.linewidth&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s1">'legend.fontsize'</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="s1">'figure.figsize'</span><span class="p">:</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+        <span class="s1">'axes.labelsize'</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="s1">'axes.titlesize'</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="s1">'xtick.labelsize'</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="s1">'ytick.labelsize'</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="s1">'lines.linewidth'</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
@@ -649,8 +649,8 @@ compute 0 very, very thoroughly…</p></li>
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
     <span class="c1"># take x-axis limits from nvars_list + some spacning left and right</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="n">dt_list</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">dt_list</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">])</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;dt&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;abs. error&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'dt'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'abs. error'</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
 
     <span class="c1"># get guide for the order of accuracy, i.e. the errors to expect</span>
@@ -659,7 +659,7 @@ compute 0 very, very thoroughly…</p></li>
     <span class="n">base_error</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
     <span class="c1"># assemble optimal errors for 5th order method and plot</span>
     <span class="n">order_guide_space</span> <span class="o">=</span> <span class="p">[</span><span class="n">base_error</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dt_list</span><span class="p">))]</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">dt_list</span><span class="p">,</span> <span class="n">order_guide_space</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;5th order&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">dt_list</span><span class="p">,</span> <span class="n">order_guide_space</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'k'</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'5th order'</span><span class="p">)</span>
 
     <span class="n">min_err</span> <span class="o">=</span> <span class="mf">1e99</span>
     <span class="n">max_err</span> <span class="o">=</span> <span class="mf">0e00</span>
@@ -671,20 +671,20 @@ compute 0 very, very thoroughly…</p></li>
         <span class="n">min_err</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">min_err</span><span class="p">)</span>
         <span class="n">max_err</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">max_err</span><span class="p">)</span>
         <span class="n">err_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">dt_list</span><span class="p">,</span> <span class="n">err_list</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;experiment&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">dt_list</span><span class="p">,</span> <span class="n">err_list</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">' '</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'o'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'experiment'</span><span class="p">)</span>
 
     <span class="c1"># adjust y-axis limits, add legend</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="n">min_err</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span> <span class="n">max_err</span> <span class="o">*</span> <span class="mi">10</span><span class="p">])</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">numpoints</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># save plot as PDF, beautify</span>
-    <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;data/step_1_accuracy_test_coll.png&#39;</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="s1">'data/step_1_accuracy_test_coll.png'</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="kc">None</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>

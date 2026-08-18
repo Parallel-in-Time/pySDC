@@ -48,7 +48,7 @@
 <div class="viewcode-block" id="piline">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Piline.html#implementations.problem_classes.Piline.piline">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">piline</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Example implementing the model of the piline. It serves as a transmission line in an energy grid. The problem of simulating the</span>
 <span class="sd">    piline consists of three ordinary differential equations (ODEs) with nonhomogeneous part:</span>
 
@@ -88,19 +88,19 @@
 <span class="sd">    Attributes:</span>
 <span class="sd">    A : np.2darray</span>
 <span class="sd">        Coefficient matrix of the linear ODE system.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Vs</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">Rs</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">C1</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Rpi</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">Lpi</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">C2</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Rl</span><span class="o">=</span><span class="mf">5.0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Initialization routine"""</span>
 
         <span class="n">nvars</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="c1"># invoke super init, passing number of dofs</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
-            <span class="s1">&#39;nvars&#39;</span><span class="p">,</span> <span class="s1">&#39;Vs&#39;</span><span class="p">,</span> <span class="s1">&#39;Rs&#39;</span><span class="p">,</span> <span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="s1">&#39;Rpi&#39;</span><span class="p">,</span> <span class="s1">&#39;Lpi&#39;</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">,</span> <span class="s1">&#39;Rl&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
+            <span class="s1">'nvars'</span><span class="p">,</span> <span class="s1">'Vs'</span><span class="p">,</span> <span class="s1">'Rs'</span><span class="p">,</span> <span class="s1">'C1'</span><span class="p">,</span> <span class="s1">'Rpi'</span><span class="p">,</span> <span class="s1">'Lpi'</span><span class="p">,</span> <span class="s1">'C2'</span><span class="p">,</span> <span class="s1">'Rl'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
 
         <span class="c1"># compute dx and get discretization matrix A</span>
@@ -116,7 +116,7 @@
 <div class="viewcode-block" id="piline.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Piline.html#implementations.problem_classes.Piline.piline.eval_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
 <span class="sd">        Parameters</span>
@@ -130,7 +130,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        f : dtype_f</span>
 <span class="sd">            The right-hand side of the problem.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
@@ -141,7 +141,7 @@
 <div class="viewcode-block" id="piline.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Piline.html#implementations.problem_classes.Piline.piline.solve_system">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
 
 <span class="sd">        Parameters</span>
@@ -159,7 +159,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        me : dtype_u</span>
 <span class="sd">            The solution as mesh.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
         <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>
@@ -169,7 +169,7 @@
 <div class="viewcode-block" id="piline.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Piline.html#implementations.problem_classes.Piline.piline.u_exact">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Routine to approximate the exact solution at time :math:`t` by ``SciPy`` as a reference.</span>
 
 <span class="sd">        Parameters</span>
@@ -185,7 +185,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        me : dtype_u</span>
 <span class="sd">            The reference solution.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 
@@ -197,8 +197,8 @@
         <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">u_init</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">t_init</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Please supply `t_init` when you want to get the exact solution from a point that </span><span class="se">\</span>
-<span class="s1">is not 0!&#39;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Please supply `t_init` when you want to get the exact solution from a point that </span><span class="se">\</span>
+<span class="s1">is not 0!'</span><span class="p">)</span>
                 <span class="n">me</span> <span class="o">=</span> <span class="n">u_init</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">t_init</span> <span class="o">=</span> <span class="mf">0.0</span>

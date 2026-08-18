@@ -46,9 +46,9 @@
 <div class="viewcode-block" id="CrashBase">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.CrashBase">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CrashBase</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Crash the code across all ranks</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -59,14 +59,14 @@
 
 <div class="viewcode-block" id="CrashBase.communicate_crash">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.CrashBase.communicate_crash">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">communicate_crash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crash</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">communicate_crash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crash</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">''</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Communicate a crash across all ranks and raise an error if so.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            crash (bool): If this rank wants to crash</span>
 <span class="sd">            comm (mpi4py.MPI.Intracomm or None): Communicator of the controller, if applicable:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># communicate across the sweeper</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">:</span>
@@ -85,15 +85,15 @@
 <div class="viewcode-block" id="StopAtNan">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.StopAtNan">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">StopAtNan</span><span class="p">(</span><span class="n">CrashBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Crash the code when the norm of the solution exceeds some limit or contains nan.</span>
 <span class="sd">    This class is useful when running with MPI in the sweeper or controller.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="StopAtNan.setup">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.StopAtNan.setup">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Define parameters here.</span>
 
 <span class="sd">        Default parameters are:</span>
@@ -106,11 +106,11 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            (dict): The updated params dictionary</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'comm'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="mi">94</span><span class="p">,</span>
-            <span class="s2">&quot;thresh&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+            <span class="s2">"control_order"</span><span class="p">:</span> <span class="mi">94</span><span class="p">,</span>
+            <span class="s2">"thresh"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
@@ -119,7 +119,7 @@
 <div class="viewcode-block" id="StopAtNan.prepare_next_block">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.StopAtNan.prepare_next_block">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">prepare_next_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Check if we need to crash the code.</span>
 
 <span class="sd">        Args:</span>
@@ -129,7 +129,7 @@
 
 <span class="sd">        Raises:</span>
 <span class="sd">            ConvergenceError: If the solution does not fall within the allowed space</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">isfinite</span><span class="p">,</span> <span class="n">below_limit</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span>
         <span class="n">crash</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -148,7 +148,7 @@
             <span class="k">if</span> <span class="n">crash</span><span class="p">:</span>
                 <span class="k">break</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">communicate_crash</span><span class="p">(</span><span class="n">crash</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Solution exceeds bounds! Crashing code at </span><span class="si">{</span><span class="n">S</span><span class="o">.</span><span class="n">time</span><span class="si">}</span><span class="s1">!&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">communicate_crash</span><span class="p">(</span><span class="n">crash</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Solution exceeds bounds! Crashing code at </span><span class="si">{</span><span class="n">S</span><span class="o">.</span><span class="n">time</span><span class="si">}</span><span class="s1">!'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 </div>
 
 
@@ -156,14 +156,14 @@
 <div class="viewcode-block" id="StopAtMaxRuntime">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.StopAtMaxRuntime">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">StopAtMaxRuntime</span><span class="p">(</span><span class="n">CrashBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Abort the code when the problem has exceeded a maximum runtime.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="StopAtMaxRuntime.setup">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.StopAtMaxRuntime.setup">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Define parameters here.</span>
 
 <span class="sd">        Default parameters are:</span>
@@ -176,11 +176,11 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            (dict): The updated params dictionary</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'comm'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="mi">94</span><span class="p">,</span>
-            <span class="s2">&quot;max_runtime&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+            <span class="s2">"control_order"</span><span class="p">:</span> <span class="mi">94</span><span class="p">,</span>
+            <span class="s2">"max_runtime"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
 
@@ -190,7 +190,7 @@
 <div class="viewcode-block" id="StopAtMaxRuntime.prepare_next_block">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.StopAtMaxRuntime.prepare_next_block">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">prepare_next_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Check if we need to crash the code.</span>
 
 <span class="sd">        Args:</span>
@@ -200,10 +200,10 @@
 
 <span class="sd">        Raises:</span>
 <span class="sd">            ConvergenceError: If the solution does not fall within the allowed space</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">communicate_crash</span><span class="p">(</span>
             <span class="n">crash</span><span class="o">=</span><span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t0</span> <span class="o">-</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">())</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">max_runtime</span><span class="p">,</span>
-            <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Exceeding max. runtime of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">max_runtime</span><span class="si">}</span><span class="s1">s! Crashing code at </span><span class="si">{</span><span class="n">S</span><span class="o">.</span><span class="n">time</span><span class="si">}</span><span class="s1">!&#39;</span><span class="p">,</span>
+            <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Exceeding max. runtime of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">max_runtime</span><span class="si">}</span><span class="s1">s! Crashing code at </span><span class="si">{</span><span class="n">S</span><span class="o">.</span><span class="n">time</span><span class="si">}</span><span class="s1">!'</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span></div>
 </div>

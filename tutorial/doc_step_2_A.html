@@ -47,40 +47,40 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A simple test program to setup a full step instance</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'restol'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'dt'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LU&#39;</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'quad_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'RADAU-RIGHT'</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'num_nodes'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'QI'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'LU'</span>
 
     <span class="c1"># initialize problem parameters</span>
     <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1023</span>  <span class="c1"># number of degrees of freedom</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'nu'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'freq'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'nvars'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1023</span>  <span class="c1"># number of degrees of freedom</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'bc'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'dirichlet-zero'</span>  <span class="c1"># boundary conditions</span>
 
     <span class="c1"># initialize step parameters</span>
     <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">'maxiter'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'level_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'step_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
 
     <span class="c1"># now the description contains more or less everything we need to create a step</span>
     <span class="n">S</span> <span class="o">=</span> <span class="n">Step</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
@@ -94,17 +94,17 @@
     <span class="c1"># now we can do e.g. what we did before with the problem</span>
     <span class="n">err</span> <span class="o">=</span> <span class="n">run_accuracy_check</span><span class="p">(</span><span class="n">P</span><span class="p">)</span>
 
-    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/step_2_A_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Error of the spatial accuracy test: </span><span class="si">%8.6e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/step_2_A_out.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'Error of the spatial accuracy test: </span><span class="si">%8.6e</span><span class="s1">'</span> <span class="o">%</span> <span class="n">err</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="mf">2e-04</span><span class="p">,</span> <span class="s2">&quot;ERROR: the spatial accuracy is higher than expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span>
+    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="mf">2e-04</span><span class="p">,</span> <span class="s2">"ERROR: the spatial accuracy is higher than expected, got </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">err</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>

@@ -47,9 +47,9 @@
 <div class="viewcode-block" id="full_solar_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.FullSolarSystem.html#implementations.problem_classes.FullSolarSystem.full_solar_system">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">full_solar_system</span><span class="p">(</span><span class="n">outer_solar_system</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    The :math:`N`-body problem describes the mutual influence of the motion of :math:`N` bodies. Formulation of the problem is</span>
-<span class="sd">    based on Newton&#39;s second law. Therefore, the :math:`N`-body problem is formulated as</span>
+<span class="sd">    based on Newton's second law. Therefore, the :math:`N`-body problem is formulated as</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        m_i \frac{d^2 {\bf r}_i}{d t^2} = \sum_{j=1, i\neq j}^N G \frac{m_i m_j}{|{\bf r}_i - {\bf r}_j|^3}({\bf r}_i - {\bf r}_j),</span>
@@ -60,7 +60,7 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        m_i \frac{d^2 {\bf r}_i}{d t^2} = G \frac{m_1}{|{\bf r}_i - {\bf r}_1|^3}({\bf r}_i - {\bf r}_1).</span>
 
-<span class="sd">    This class implements the full solar system containing all planets including Earth&#39;s moon, i.e., :math:`N=10`. Initial conditions</span>
+<span class="sd">    This class implements the full solar system containing all planets including Earth's moon, i.e., :math:`N=10`. Initial conditions</span>
 <span class="sd">    are taken from [1]_, and masses relative to the sun taken from [2]_.</span>
 
 <span class="sd">    Parameters</span>
@@ -77,21 +77,21 @@
 <span class="sd">    ----------</span>
 <span class="sd">    .. [1] https://www.aanda.org/articles/aa/full/2002/08/aa1405/aa1405.right.html</span>
 <span class="sd">    .. [2] https://en.wikipedia.org/wiki/Planetary_mass#Values_from_the_DE405_ephemeris</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">particles</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">acceleration</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sun_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Initialization routine"""</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sun_only</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">))</span>
 
 <div class="viewcode-block" id="full_solar_system.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.FullSolarSystem.html#implementations.problem_classes.FullSolarSystem.full_solar_system.u_exact">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Routine to compute the exact/initial trajectory at time :math:`t`. Values here are taken from [1]_, [2]_.</span>
 
 <span class="sd">        Parameters</span>
@@ -103,8 +103,8 @@
 <span class="sd">        -------</span>
 <span class="sd">        me : dtype_u</span>
 <span class="sd">            Exact/initial position and velocity.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;error, u_exact only works for the initial time t0=0&#39;</span>
+<span class="sd">        """</span>
+        <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">'error, u_exact only works for the initial time t0=0'</span>
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 
         <span class="n">me</span><span class="o">.</span><span class="n">pos</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>

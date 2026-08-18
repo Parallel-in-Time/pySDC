@@ -45,26 +45,26 @@
 <div class="viewcode-block" id="InterpolateBetweenRestarts">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">InterpolateBetweenRestarts</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Interpolate the solution and right hand side to the new set of collocation nodes after a restart.</span>
 <span class="sd">    The idea is that when you adjust the step size between restarts, you already know what the new quadrature method</span>
 <span class="sd">    is going to be and possibly interpolating the current iterate to these results in a better initial guess than</span>
 <span class="sd">    spreading the initial conditions or whatever you usually like to do.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="InterpolateBetweenRestarts.setup">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.setup">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Store the initial guess used in the sweeper when no restart has happened</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller.controller): The controller</span>
 <span class="sd">            params (dict): Parameters for the convergence controller</span>
 <span class="sd">            description (dict): The description object used to instantiate the controller</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;control_order&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+            <span class="s1">'control_order'</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
 
@@ -72,13 +72,13 @@
 <div class="viewcode-block" id="InterpolateBetweenRestarts.setup_status_variables">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.setup_status_variables">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Add variables to the sweeper containing the interpolated solution and right hand side.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller.controller): The controller</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">([</span><span class="s1">&#39;u_inter&#39;</span><span class="p">,</span> <span class="s1">&#39;f_inter&#39;</span><span class="p">,</span> <span class="s1">&#39;perform_interpolation&#39;</span><span class="p">,</span> <span class="s1">&#39;skip_interpolation&#39;</span><span class="p">])</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">([</span><span class="s1">'u_inter'</span><span class="p">,</span> <span class="s1">'f_inter'</span><span class="p">,</span> <span class="s1">'perform_interpolation'</span><span class="p">,</span> <span class="s1">'skip_interpolation'</span><span class="p">])</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">u_inter</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">f_inter</span> <span class="o">=</span> <span class="p">[]</span>
@@ -89,13 +89,13 @@
 <div class="viewcode-block" id="InterpolateBetweenRestarts.post_spread_processing">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.post_spread_processing">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">post_spread_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Spread the interpolated values to the collocation nodes. This overrides whatever the sweeper uses for prediction.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller.controller): The controller</span>
 <span class="sd">            step (pySDC.Step.step): The current step</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">perform_interpolation</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">skip_interpolation</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">)):</span>
                 <span class="n">level</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -118,7 +118,7 @@
 <div class="viewcode-block" id="InterpolateBetweenRestarts.post_iteration_processing">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.post_iteration_processing">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Interpolate the solution and right hand sides and store them in the sweeper, where they will be distributed</span>
 <span class="sd">        accordingly in the prediction step.</span>
 
@@ -126,12 +126,12 @@
 <span class="sd">        iterating as soon as we have decided to restart. If we let the step continue to iterate, this is not the most</span>
 <span class="sd">        efficient implementation and you may choose to write a different convergence controller.</span>
 
-<span class="sd">        The interpolation is based on Thibaut&#39;s magic.</span>
+<span class="sd">        The interpolation is based on Thibaut's magic.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
 <span class="sd">            step (pySDC.Step.step): The current step</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span>
             <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="n">level</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span>
@@ -152,7 +152,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">perform_interpolation</span> <span class="o">=</span> <span class="kc">True</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;Interpolating before restart from dt=</span><span class="si">{</span><span class="n">level</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1"> to dt=</span><span class="si">{</span><span class="n">level</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">step</span>
+                    <span class="sa">f</span><span class="s1">'Interpolating before restart from dt=</span><span class="si">{</span><span class="n">level</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1"> to dt=</span><span class="si">{</span><span class="n">level</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="n">step</span>
                 <span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>

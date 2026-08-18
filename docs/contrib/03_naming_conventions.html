@@ -86,7 +86,7 @@ Python packages should also have short, all-lowercase names, although the use of
 <span id="docs-contrib-03-naming-conventions-function-and-variables-names"></span><h2>Function and variables names<a class="headerlink" href="#function-and-variables-names" title="Link to this heading">¶</a></h2>
 <p>Function (or method) and variable names should use camelCase formatting, and same goes for function arguments. For instance :</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tLeft</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">quadType</span> <span class="o">=</span> <span class="s1">&#39;LEGENDRE&#39;</span>
+<span class="n">quadType</span> <span class="o">=</span> <span class="s1">'LEGENDRE'</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">computeFejerRule</span><span class="p">(</span><span class="n">nNodes</span><span class="p">):</span>
     <span class="c1"># ...</span>
@@ -107,9 +107,9 @@ Python packages should also have short, all-lowercase names, although the use of
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initSweep</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">initSweep</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_initSweep_</span><span class="si">{</span><span class="n">initSweep</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initSweep</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'_initSweep_</span><span class="si">{</span><span class="n">initSweep</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;initSweep=</span><span class="si">{</span><span class="n">initSweep</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'initSweep=</span><span class="si">{</span><span class="n">initSweep</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_initSweep_COPY</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
@@ -130,12 +130,12 @@ Python packages should also have short, all-lowercase names, although the use of
         <span class="bp">self</span><span class="o">.</span><span class="n">param</span> <span class="o">=</span> <span class="n">param</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_think</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'...'</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">act</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">param</span> <span class="o">==</span> <span class="s1">&#39;doubt&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">param</span> <span class="o">==</span> <span class="s1">'doubt'</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_think</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;*?%&amp;$?*§&quot;$*$*§#{*&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'*?%&amp;$?*§"$*$*§#{*'</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>📜 In general, variable name starting with double underscore <code class="docutils literal notranslate"><span class="pre">__</span></code> are usually left for Python built-in names, <em>e.g</em> <code class="docutils literal notranslate"><span class="pre">__dict__</span></code>, <code class="docutils literal notranslate"><span class="pre">__init__</span></code>, …</p>
@@ -143,8 +143,8 @@ Python packages should also have short, all-lowercase names, although the use of
 <section id="constants">
 <span id="docs-contrib-03-naming-conventions-constants"></span><h2>Constants<a class="headerlink" href="#constants" title="Link to this heading">¶</a></h2>
 <p>Constants are usually defined on a module level and written in all-uppercase with underscores (all-uppercase with minus are not allowed by Python syntax). Examples :</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">NODE_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;EQUID&#39;</span><span class="p">,</span> <span class="s1">&#39;LEGENDRE&#39;</span><span class="p">,</span> <span class="s1">&#39;CHEBY-1&#39;</span><span class="p">,</span> <span class="s1">&#39;CHEBY-2&#39;</span><span class="p">,</span> <span class="s1">&#39;CHEBY-3&#39;</span><span class="p">,</span> <span class="s1">&#39;CHEBY-4&#39;</span><span class="p">]</span>
-<span class="n">QUAD_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GAUSS&#39;</span><span class="p">,</span> <span class="s1">&#39;RADAU-LEFT&#39;</span><span class="p">,</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span><span class="p">,</span> <span class="s1">&#39;LOBATTO&#39;</span><span class="p">]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">NODE_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'EQUID'</span><span class="p">,</span> <span class="s1">'LEGENDRE'</span><span class="p">,</span> <span class="s1">'CHEBY-1'</span><span class="p">,</span> <span class="s1">'CHEBY-2'</span><span class="p">,</span> <span class="s1">'CHEBY-3'</span><span class="p">,</span> <span class="s1">'CHEBY-4'</span><span class="p">]</span>
+<span class="n">QUAD_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'GAUSS'</span><span class="p">,</span> <span class="s1">'RADAU-LEFT'</span><span class="p">,</span> <span class="s1">'RADAU-RIGHT'</span><span class="p">,</span> <span class="s1">'LOBATTO'</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>For <em>constant string values</em>, however, favor the use of all uppercase with minus, <em>e.g</em> <code class="docutils literal notranslate"><span class="pre">RADAU-RIGHT</span></code>, <code class="docutils literal notranslate"><span class="pre">LEGENDRE-NUMPY</span></code> to distinguish those from constants names.</p>
@@ -153,9 +153,9 @@ Python packages should also have short, all-lowercase names, although the use of
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initSweep</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">initSweep</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_initSweep_</span><span class="si">{</span><span class="n">initSweep</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="s1">&#39;_&#39;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initSweep</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'_initSweep_</span><span class="si">{</span><span class="n">initSweep</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'-'</span><span class="p">,</span><span class="s1">'_'</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;initSweep=</span><span class="si">{</span><span class="n">initSweep</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'initSweep=</span><span class="si">{</span><span class="n">initSweep</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_initSweep_COPY_PASTE</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>

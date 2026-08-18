@@ -46,7 +46,7 @@
 <div class="viewcode-block" id="buck_converter">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.BuckConverter.html#implementations.problem_classes.BuckConverter.buck_converter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">buck_converter</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Example implementing the model of a buck converter, which is also called a step-down converter. The converter has two different</span>
 <span class="sd">    states and each of this state can be expressed as a nonhomogeneous linear system of ordinary differential equations (ODEs)</span>
 
@@ -116,19 +116,19 @@
 <span class="sd">    .. [1] J. Sun. Pulse-Width Modulation. 25-61. Springer, (2012).</span>
 <span class="sd">    .. [2] J. Gyselinck, C. Martis, R. V. Sabariego. Using dedicated time-domain basis functions for the simulation of</span>
 <span class="sd">        pulse-width-modulation controlled devices - application to the steady-state regime of a buck converter. Electromotion (2013).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duty</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">fsw</span><span class="o">=</span><span class="mf">1e3</span><span class="p">,</span> <span class="n">Vs</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">Rs</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">C1</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">Rp</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">L1</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">C2</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">Rl</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Initialization routine"""</span>
 
         <span class="c1"># invoke super init, passing number of dofs</span>
         <span class="n">nvars</span> <span class="o">=</span> <span class="mi">3</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
-            <span class="s1">&#39;nvars&#39;</span><span class="p">,</span> <span class="s1">&#39;duty&#39;</span><span class="p">,</span> <span class="s1">&#39;fsw&#39;</span><span class="p">,</span> <span class="s1">&#39;Vs&#39;</span><span class="p">,</span> <span class="s1">&#39;Rs&#39;</span><span class="p">,</span> <span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="s1">&#39;Rp&#39;</span><span class="p">,</span> <span class="s1">&#39;L1&#39;</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">,</span> <span class="s1">&#39;Rl&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
+            <span class="s1">'nvars'</span><span class="p">,</span> <span class="s1">'duty'</span><span class="p">,</span> <span class="s1">'fsw'</span><span class="p">,</span> <span class="s1">'Vs'</span><span class="p">,</span> <span class="s1">'Rs'</span><span class="p">,</span> <span class="s1">'C1'</span><span class="p">,</span> <span class="s1">'Rp'</span><span class="p">,</span> <span class="s1">'L1'</span><span class="p">,</span> <span class="s1">'C2'</span><span class="p">,</span> <span class="s1">'Rl'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nvars</span><span class="p">,</span> <span class="n">nvars</span><span class="p">))</span>
@@ -136,7 +136,7 @@
 <div class="viewcode-block" id="buck_converter.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.BuckConverter.html#implementations.problem_classes.BuckConverter.buck_converter.eval_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
 <span class="sd">        Parameters</span>
@@ -150,7 +150,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        f : dtype_f</span>
 <span class="sd">            The right-hand side of the problem.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">Tsw</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsw</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
@@ -170,7 +170,7 @@
 <div class="viewcode-block" id="buck_converter.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.BuckConverter.html#implementations.problem_classes.BuckConverter.buck_converter.solve_system">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
 
 <span class="sd">        Parameters</span>
@@ -188,7 +188,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        me : dtype_u</span>
 <span class="sd">            The solution as mesh.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">Tsw</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsw</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 
@@ -220,7 +220,7 @@
 <div class="viewcode-block" id="buck_converter.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.BuckConverter.html#implementations.problem_classes.BuckConverter.buck_converter.u_exact">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
@@ -232,8 +232,8 @@
 <span class="sd">        -------</span>
 <span class="sd">        me : dtype_u</span>
 <span class="sd">            The exact solution.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ERROR: u_exact only valid for t=0&#39;</span>
+<span class="sd">        """</span>
+        <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'ERROR: u_exact only valid for t=0'</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 

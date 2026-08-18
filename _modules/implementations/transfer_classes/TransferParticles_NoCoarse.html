@@ -45,22 +45,22 @@
 <div class="viewcode-block" id="particles_to_particles">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferParticles_NoCoarse.html#implementations.transfer_classes.TransferParticles_NoCoarse.particles_to_particles">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">particles_to_particles</span><span class="p">(</span><span class="n">SpaceTransfer</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Custom transfer class, implements SpaceTransfer.py</span>
 
 <span class="sd">    This implementation is just a dummy for particles with no direct functionality, i.e. the number of particles is not</span>
 <span class="sd">    reduced on the coarse problem</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="particles_to_particles.restrict">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferParticles_NoCoarse.html#implementations.transfer_classes.TransferParticles_NoCoarse.particles_to_particles.restrict">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Dummy restriction routine</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            F: the fine level data</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">particles</span><span class="p">):</span>
             <span class="n">G</span> <span class="o">=</span> <span class="n">particles</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
@@ -69,19 +69,19 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">):</span>
             <span class="n">G</span> <span class="o">=</span> <span class="n">acceleration</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s2">&quot;Unknown type of fine data, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s2">"Unknown type of fine data, got </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">G</span></div>
 
 
 <div class="viewcode-block" id="particles_to_particles.prolong">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferParticles_NoCoarse.html#implementations.transfer_classes.TransferParticles_NoCoarse.particles_to_particles.prolong">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">G</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Dummy prolongation routine</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            G: the coarse level data</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">particles</span><span class="p">):</span>
             <span class="n">F</span> <span class="o">=</span> <span class="n">particles</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
@@ -90,7 +90,7 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">acceleration</span><span class="p">):</span>
             <span class="n">F</span> <span class="o">=</span> <span class="n">acceleration</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s2">&quot;Unknown type of coarse data, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s2">"Unknown type of coarse data, got </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">F</span></div>
 </div>
 

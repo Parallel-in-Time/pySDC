@@ -43,7 +43,7 @@
 <div class="viewcode-block" id="multi_implicit">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.multi_implicit.html#implementations.sweeper_classes.multi_implicit.multi_implicit">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">multi_implicit</span><span class="p">(</span><span class="n">Sweeper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Custom sweeper class, implements Sweeper.py</span>
 
 <span class="sd">    First-order multi-implicit sweeper for two components</span>
@@ -51,24 +51,24 @@
 <span class="sd">    Attributes:</span>
 <span class="sd">        Q1: implicit integration matrix for the first component</span>
 <span class="sd">        Q2: implicit integration matrix for the second component</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialization routine for the custom sweeper</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            params: parameters for the sweeper</span>
 <span class="sd">            level (pySDC.Level.level): the level that uses this sweeper</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># Default choice: implicit Euler</span>
-        <span class="k">if</span> <span class="s1">&#39;Q1&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-            <span class="n">params</span><span class="p">[</span><span class="s1">&#39;Q1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;IE&#39;</span>
-        <span class="k">if</span> <span class="s1">&#39;Q2&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-            <span class="n">params</span><span class="p">[</span><span class="s1">&#39;Q2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;IE&#39;</span>
+        <span class="k">if</span> <span class="s1">'Q1'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s1">'Q1'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'IE'</span>
+        <span class="k">if</span> <span class="s1">'Q2'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s1">'Q2'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'IE'</span>
 
-        <span class="c1"># call parent&#39;s initialization routine</span>
+        <span class="c1"># call parent's initialization routine</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">multi_implicit</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span>
 
         <span class="c1"># Integration matrices</span>
@@ -78,12 +78,12 @@
 <div class="viewcode-block" id="multi_implicit.integrate">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.multi_implicit.html#implementations.sweeper_classes.multi_implicit.multi_implicit.integrate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Integrates the right-hand side (two components)</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            list of dtype_u: containing the integral as values</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># get current level and problem description</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
@@ -104,12 +104,12 @@
 <div class="viewcode-block" id="multi_implicit.update_nodes">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.multi_implicit.html#implementations.sweeper_classes.multi_implicit.multi_implicit.update_nodes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># get current level and problem description</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
@@ -178,14 +178,14 @@
 <div class="viewcode-block" id="multi_implicit.compute_end_point">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.multi_implicit.html#implementations.sweeper_classes.multi_implicit.multi_implicit.compute_end_point">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Compute u at the right point of the interval</span>
 
 <span class="sd">        The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># get current level and problem description</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>

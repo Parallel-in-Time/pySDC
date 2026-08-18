@@ -48,13 +48,13 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">assert</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QE</span> <span class="o">==</span> <span class="s1">&#39;PIC&#39;</span>
-        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Only Picard is implemented for explicit preconditioner so far in </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">! You chose </span><span class="se">\&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QE</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QE</span> <span class="o">==</span> <span class="s1">'PIC'</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">"Only Picard is implemented for explicit preconditioner so far in </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">! You chose </span><span class="se">\"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QE</span><span class="si">}</span><span class="se">\"</span><span class="s2">"</span>
 
 <div class="viewcode-block" id="imex_1st_order_MPI.integrate">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order_MPI.html#implementations.sweeper_classes.imex_1st_order_MPI.imex_1st_order_MPI.integrate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">last_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Integrates the right-hand side (here impl + expl)</span>
 
 <span class="sd">        Args:</span>
@@ -62,7 +62,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            list of dtype_u: containing the integral as values</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
         <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>
@@ -83,12 +83,12 @@
 <div class="viewcode-block" id="imex_1st_order_MPI.update_nodes">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order_MPI.html#implementations.sweeper_classes.imex_1st_order_MPI.imex_1st_order_MPI.update_nodes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
         <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>
@@ -132,12 +132,12 @@
 <div class="viewcode-block" id="imex_1st_order_MPI.compute_end_point">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order_MPI.html#implementations.sweeper_classes.imex_1st_order_MPI.imex_1st_order_MPI.compute_end_point">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Compute u at the right point of the interval</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
         <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>

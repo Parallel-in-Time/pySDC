@@ -45,7 +45,7 @@
 <div class="viewcode-block" id="verlet">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.verlet.html#implementations.sweeper_classes.verlet.verlet">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">verlet</span><span class="p">(</span><span class="n">Sweeper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Custom sweeper class, implements Sweeper.py</span>
 
 <span class="sd">    Second-order sweeper using velocity-Verlet as base integrator</span>
@@ -55,21 +55,21 @@
 <span class="sd">        QT: 0-to-node trapezoidal matrix</span>
 <span class="sd">        Qx: 0-to-node Euler half-step for position update</span>
 <span class="sd">        qQ: update rule for final value (if needed)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialization routine for the custom sweeper</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            params: parameters for the sweeper</span>
 <span class="sd">            level (pySDC.Level.level): the level that uses this sweeper</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
-        <span class="k">if</span> <span class="s1">&#39;QI&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-            <span class="n">params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;IE&#39;</span>
-        <span class="k">if</span> <span class="s1">&#39;QE&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-            <span class="n">params</span><span class="p">[</span><span class="s1">&#39;QE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;EE&#39;</span>
+        <span class="k">if</span> <span class="s1">'QI'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s1">'QI'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'IE'</span>
+        <span class="k">if</span> <span class="s1">'QE'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s1">'QE'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'EE'</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">verlet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span>
 
@@ -79,7 +79,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">qQ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:])</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__get_Qd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get integration matrices for 2nd-order SDC</span>
 
 <span class="sd">        Returns:</span>
@@ -87,7 +87,7 @@
 <span class="sd">            SQ: node-to-node collocation matrix (second order)</span>
 <span class="sd">            ST: node-to-node trapezoidal matrix</span>
 <span class="sd">            Sx: node-to-node Euler half-step for position update</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># set implicit and explicit Euler matrices</span>
         <span class="n">QI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Qdelta_implicit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QI</span><span class="p">)</span>
@@ -104,7 +104,7 @@
 
         <span class="c1"># if we have Gauss-Lobatto nodes, we can do a magic trick from the Book</span>
         <span class="c1"># this takes Gauss-Lobatto IIIB and create IIIA out of this</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">node_type</span> <span class="o">==</span> <span class="s1">&#39;LEGENDRE&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">quad_type</span> <span class="o">==</span> <span class="s1">&#39;LOBATTO&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">node_type</span> <span class="o">==</span> <span class="s1">'LEGENDRE'</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">quad_type</span> <span class="o">==</span> <span class="s1">'LOBATTO'</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">):</span>
                     <span class="n">QQ</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span>
@@ -121,12 +121,12 @@
 <div class="viewcode-block" id="verlet.update_nodes">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.verlet.html#implementations.sweeper_classes.verlet.verlet.update_nodes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># get current level and problem description</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
@@ -195,12 +195,12 @@
 <div class="viewcode-block" id="verlet.integrate">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.verlet.html#implementations.sweeper_classes.verlet.verlet.integrate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Integrates the right-hand side</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            list of dtype_u: containing the integral as values</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># get current level and problem description</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
@@ -224,14 +224,14 @@
 <div class="viewcode-block" id="verlet.compute_end_point">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.verlet.html#implementations.sweeper_classes.verlet.verlet.compute_end_point">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Compute u at the right point of the interval</span>
 
 <span class="sd">        The value uend computed here is a full evaluation of the Picard formulation (always!)</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># get current level and problem description</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>

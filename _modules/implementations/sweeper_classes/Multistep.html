@@ -44,22 +44,22 @@
 <div class="viewcode-block" id="Cache">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.Cache">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Cache</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Class for managing solutions and right hand side evaluations of previous steps for the MultiStep &quot;sweeper&quot;.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Class for managing solutions and right hand side evaluations of previous steps for the MultiStep "sweeper".</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        - u (list): Contains solution from previous steps</span>
 <span class="sd">        - f (list): Contains right hand side evaluations from previous steps</span>
 <span class="sd">        - t (list): Contains time of previous steps</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialization routing</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            num_steps (int): Number of entries for the cache</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_steps</span> <span class="o">=</span> <span class="n">num_steps</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_steps</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_steps</span>
@@ -68,14 +68,14 @@
 <div class="viewcode-block" id="Cache.update">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.Cache.update">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Add a new value to the cache and remove the oldest one.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            t (float): Time of new step</span>
 <span class="sd">            u (dtype_u): Solution of new step</span>
 <span class="sd">            f (dtype_f): Right hand side evaluation at new step</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
@@ -86,12 +86,12 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Print the contents of the cache for debugging purposes.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">string</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="sd">        """</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="s1">''</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_steps</span><span class="p">):</span>
-            <span class="n">string</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">string</span><span class="si">}</span><span class="s1"> t=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">: u=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">, f=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">string</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">string</span><span class="si">}</span><span class="s1"> t=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">: u=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">, f=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span>
 
         <span class="k">return</span> <span class="n">string</span></div>
 
@@ -104,7 +104,7 @@
     <span class="n">beta</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialization routine for the base sweeper.</span>
 
 <span class="sd">        Multistep methods work by constructing Euleresque steps with the right hand side composed of a weighted sum of solutions and right hand side evaluations at previous steps.</span>
@@ -120,22 +120,22 @@
 <span class="sd">        Args:</span>
 <span class="sd">            params (dict): parameter object</span>
 <span class="sd">            level (pySDC.Level.level): the level that uses this sweeper</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.collocation</span><span class="w"> </span><span class="kn">import</span> <span class="n">CollBase</span>
 
         <span class="c1"># set up logger</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;sweeper&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">'sweeper'</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">_Pars</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
         <span class="c1"># check if some parameters are set which only apply to actual sweepers</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;initial_guess&#39;</span><span class="p">,</span> <span class="s1">&#39;collocation_class&#39;</span><span class="p">,</span> <span class="s1">&#39;num_nodes&#39;</span><span class="p">,</span> <span class="s1">&#39;quad_type&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'initial_guess'</span><span class="p">,</span> <span class="s1">'collocation_class'</span><span class="p">,</span> <span class="s1">'num_nodes'</span><span class="p">,</span> <span class="s1">'quad_type'</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">&quot; will be ignored by multistep sweeper&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">'"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">" will be ignored by multistep sweeper'</span><span class="p">)</span>
 
         <span class="c1"># we need a dummy collocation object to instantiate the levels.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coll</span> <span class="o">=</span> <span class="n">CollBase</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">quad_type</span><span class="o">=</span><span class="s1">&#39;RADAU-RIGHT&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coll</span> <span class="o">=</span> <span class="n">CollBase</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">quad_type</span><span class="o">=</span><span class="s1">'RADAU-RIGHT'</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__level</span> <span class="o">=</span> <span class="n">level</span>
 
@@ -147,35 +147,35 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">level</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns the current level</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            pySDC.Level.level: Current level</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__level</span>
 
     <span class="nd">@level</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lvl</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Sets a reference to the current level (done in the initialization of the level)</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            lvl (pySDC.Level.level): Current level</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lvl</span><span class="p">,</span> <span class="n">Level</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;You tried to set the sweeper&#39;s level with an instance of </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">lvl</span><span class="p">)</span><span class="si">}</span><span class="s2">!&quot;</span>
+<span class="sd">        """</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lvl</span><span class="p">,</span> <span class="n">Level</span><span class="p">),</span> <span class="sa">f</span><span class="s2">"You tried to set the sweeper's level with an instance of </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">lvl</span><span class="p">)</span><span class="si">}</span><span class="s2">!"</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__level</span> <span class="o">=</span> <span class="n">lvl</span>
 
 <div class="viewcode-block" id="MultiStep.predict">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.MultiStep.predict">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Add the initial conditions to the cache if needed.</span>
 
 <span class="sd">        Default prediction for the sweepers, only copies the values to all collocation nodes</span>
 <span class="sd">        and evaluates the RHS of the ODE there</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
 
         <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">me</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">t</span><span class="p">):</span>
@@ -190,12 +190,12 @@
 <div class="viewcode-block" id="MultiStep.compute_residual">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.MultiStep.compute_residual">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Do nothing.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            stage (str): The current stage of the step the level belongs to</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
         <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">False</span>
@@ -206,18 +206,18 @@
 <div class="viewcode-block" id="MultiStep.compute_end_point">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.MultiStep.compute_end_point">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        The solution is stored in the single node that we have.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="MultiStep.update_nodes">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.MultiStep.update_nodes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Compute the solution to the current step. If the cache is not filled, we compute a provisional solution with a different method.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
         <span class="n">prob</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span>
@@ -236,7 +236,7 @@
                 <span class="n">rhs</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="n">rhs</span> <span class="o">+=</span> <span class="n">dts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
-            <span class="c1"># compute the solution to the current step &quot;implicit Euler style&quot;</span>
+            <span class="c1"># compute the solution to the current step "implicit Euler style"</span>
             <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">time</span><span class="p">)</span>
 
         <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">time</span><span class="p">)</span>
@@ -246,12 +246,12 @@
 <div class="viewcode-block" id="MultiStep.generate_starting_values">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.MultiStep.generate_starting_values">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">generate_starting_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Compute solutions to the steps when not enough previous values are available for the multistep method.</span>
 <span class="sd">        The initial conditions are added in `predict` since this is not bespoke behaviour to any method.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-            <span class="s2">&quot;No implementation for generating solutions when not enough previous values are available!&quot;</span>
+            <span class="s2">"No implementation for generating solutions when not enough previous values are available!"</span>
         <span class="p">)</span></div>
 </div>
 
@@ -260,9 +260,9 @@
 <div class="viewcode-block" id="AdamsBashforthExplicit1Step">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.AdamsBashforthExplicit1Step">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AdamsBashforthExplicit1Step</span><span class="p">(</span><span class="n">MultiStep</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    This is just forward Euler.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">alpha</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">]</span>
     <span class="n">beta</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span></div>
@@ -272,9 +272,9 @@
 <div class="viewcode-block" id="BackwardEuler">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.BackwardEuler">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BackwardEuler</span><span class="p">(</span><span class="n">MultiStep</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Almost as old, impressive and beloved as Koelner Dom.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">alpha</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">]</span>
     <span class="n">beta</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span></div>
@@ -284,9 +284,9 @@
 <div class="viewcode-block" id="AdamsMoultonImplicit1Step">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit1Step">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AdamsMoultonImplicit1Step</span><span class="p">(</span><span class="n">MultiStep</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Trapezoidal method dressed up as a multistep method.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">alpha</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">]</span>
     <span class="n">beta</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span></div>
@@ -296,9 +296,9 @@
 <div class="viewcode-block" id="AdamsMoultonImplicit2Step">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AdamsMoultonImplicit2Step</span><span class="p">(</span><span class="n">MultiStep</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Third order implicit scheme</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">alpha</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]</span>
     <span class="n">beta</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">12.0</span><span class="p">,</span> <span class="mf">8.0</span> <span class="o">/</span> <span class="mf">12.0</span><span class="p">,</span> <span class="mf">5.0</span> <span class="o">/</span> <span class="mf">12.0</span><span class="p">]</span>
@@ -306,9 +306,9 @@
 <div class="viewcode-block" id="AdamsMoultonImplicit2Step.generate_starting_values">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step.generate_starting_values">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">generate_starting_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Generate starting value by trapezoidal rule.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
         <span class="n">prob</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span>
         <span class="n">time</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span>

@@ -46,7 +46,7 @@
 <div class="viewcode-block" id="next_neighbors_periodic">
 <a class="viewcode-back" href="../../pySDC/helpers.transfer_helper.html#helpers.transfer_helper.next_neighbors_periodic">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">next_neighbors_periodic</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">ps</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Function to find the next neighbors for a periodic setup</span>
 
 <span class="sd">    This function gives for a value p the k points next to it which are found in</span>
@@ -59,7 +59,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        list: the k next neighbors</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">p_bar</span> <span class="o">=</span> <span class="n">p</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.0</span>
     <span class="n">ps</span> <span class="o">=</span> <span class="n">ps</span> <span class="o">-</span> <span class="n">ps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">distance_to_p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
@@ -80,7 +80,7 @@
 <div class="viewcode-block" id="next_neighbors">
 <a class="viewcode-back" href="../../pySDC/helpers.transfer_helper.html#helpers.transfer_helper.next_neighbors">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">next_neighbors</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">ps</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Function to find the next neighbors for a non-periodic setup</span>
 
 <span class="sd">    This function gives for a value p the k points next to it which are found in</span>
@@ -93,7 +93,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        list: the k next neighbors</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">distance_to_p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">ps</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span>
     <span class="c1"># zip it</span>
     <span class="n">value_index</span> <span class="o">=</span> <span class="p">[]</span>
@@ -109,7 +109,7 @@
 <div class="viewcode-block" id="continue_periodic_array">
 <a class="viewcode-back" href="../../pySDC/helpers.transfer_helper.html#helpers.transfer_helper.continue_periodic_array">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">continue_periodic_array</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">nn</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Function to append an array for nn neighbors for periodicity</span>
 
 <span class="sd">    Args:</span>
@@ -118,7 +118,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        np.ndarray: the continued array</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">nn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">nn</span><span class="p">)</span>
     <span class="n">d_nn</span> <span class="o">=</span> <span class="n">nn</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">nn</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -139,7 +139,7 @@
 <div class="viewcode-block" id="restriction_matrix_1d">
 <a class="viewcode-back" href="../../pySDC/helpers.transfer_helper.html#helpers.transfer_helper.restriction_matrix_1d">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">restriction_matrix_1d</span><span class="p">(</span><span class="n">fine_grid</span><span class="p">,</span> <span class="n">coarse_grid</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">periodic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Function to contruct the restriction matrix in 1d using barycentric interpolation</span>
 
 <span class="sd">    Args:</span>
@@ -151,7 +151,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">         sprs.csc_matrix: restriction matrix</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">n_g</span> <span class="o">=</span> <span class="n">coarse_grid</span><span class="o">.</span><span class="n">size</span>
 
@@ -166,7 +166,7 @@
             <span class="n">bary_pol</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
                 <span class="n">bary_pol</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">BarycentricInterpolator</span><span class="p">(</span><span class="n">cont_arr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">circulating_one</span><span class="p">,</span> <span class="n">l</span><span class="p">)))</span>
-            <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">'ignore'</span><span class="p">):</span>
                 <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">nn</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">bary_pol</span><span class="p">)))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">coarse_grid</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">pad</span><span class="p">))</span>
@@ -178,7 +178,7 @@
             <span class="n">bary_pol</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
                 <span class="n">bary_pol</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">BarycentricInterpolator</span><span class="p">(</span><span class="n">padded_f_grid</span><span class="p">[</span><span class="n">nn</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">circulating_one</span><span class="p">,</span> <span class="n">l</span><span class="p">)))</span>
-            <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">'ignore'</span><span class="p">):</span>
                 <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">nn</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">bary_pol</span><span class="p">)))</span>
         <span class="k">if</span> <span class="n">pad</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">M</span> <span class="o">=</span> <span class="n">M</span><span class="p">[:,</span> <span class="n">pad</span><span class="p">:</span><span class="o">-</span><span class="n">pad</span><span class="p">]</span>
@@ -190,7 +190,7 @@
 <div class="viewcode-block" id="interpolation_matrix_1d">
 <a class="viewcode-back" href="../../pySDC/helpers.transfer_helper.html#helpers.transfer_helper.interpolation_matrix_1d">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">interpolation_matrix_1d</span><span class="p">(</span><span class="n">fine_grid</span><span class="p">,</span> <span class="n">coarse_grid</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">periodic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">equidist_nested</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Function to construct the restriction matrix in 1d using barycentric interpolation</span>
 
 <span class="sd">    Args:</span>
@@ -203,7 +203,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">         sprs.csc_matrix: interpolation matrix</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">n_f</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">size</span>
 
@@ -238,7 +238,7 @@
                     <span class="n">bary_pol</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
                         <span class="n">bary_pol</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">BarycentricInterpolator</span><span class="p">(</span><span class="n">cont_arr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">circulating_one</span><span class="p">,</span> <span class="n">l</span><span class="p">)))</span>
-                    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
+                    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">'ignore'</span><span class="p">):</span>
                         <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">nn</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">bary_pol</span><span class="p">)))</span>
 
         <span class="k">else</span><span class="p">:</span>
@@ -253,7 +253,7 @@
                 <span class="n">bary_pol</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
                     <span class="n">bary_pol</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">BarycentricInterpolator</span><span class="p">(</span><span class="n">cont_arr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">circulating_one</span><span class="p">,</span> <span class="n">l</span><span class="p">)))</span>
-                <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
+                <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">'ignore'</span><span class="p">):</span>
                     <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">nn</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">bary_pol</span><span class="p">)))</span>
 
     <span class="k">else</span><span class="p">:</span>
@@ -280,7 +280,7 @@
                     <span class="n">bary_pol</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
                         <span class="n">bary_pol</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">BarycentricInterpolator</span><span class="p">(</span><span class="n">padded_c_grid</span><span class="p">[</span><span class="n">nn</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">circulating_one</span><span class="p">,</span> <span class="n">l</span><span class="p">)))</span>
-                    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
+                    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">'ignore'</span><span class="p">):</span>
                         <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">nn</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">bary_pol</span><span class="p">)))</span>
 
         <span class="k">else</span><span class="p">:</span>
@@ -291,7 +291,7 @@
                 <span class="n">bary_pol</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
                     <span class="n">bary_pol</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">BarycentricInterpolator</span><span class="p">(</span><span class="n">padded_c_grid</span><span class="p">[</span><span class="n">nn</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">circulating_one</span><span class="p">,</span> <span class="n">l</span><span class="p">)))</span>
-                <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
+                <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">'ignore'</span><span class="p">):</span>
                     <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">nn</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">bary_pol</span><span class="p">)))</span>
 
         <span class="k">if</span> <span class="n">pad</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -303,8 +303,8 @@
 
 <div class="viewcode-block" id="border_padding">
 <a class="viewcode-back" href="../../pySDC/helpers.transfer_helper.html#helpers.transfer_helper.border_padding">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">border_padding</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">pad_type</span><span class="o">=</span><span class="s1">&#39;mirror&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">border_padding</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">pad_type</span><span class="o">=</span><span class="s1">'mirror'</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Function to pad/embed an array at the boundaries</span>
 
 <span class="sd">    Args:</span>
@@ -316,11 +316,11 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        np.npdarray: the padded array</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">assert</span> <span class="n">l</span> <span class="o">&lt;</span> <span class="n">grid</span><span class="o">.</span><span class="n">size</span> <span class="ow">and</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="n">grid</span><span class="o">.</span><span class="n">size</span>
     <span class="n">padded_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="n">l</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">pad_type</span> <span class="o">==</span> <span class="s1">&#39;mirror&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">pad_type</span> <span class="o">==</span> <span class="s1">'mirror'</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
             <span class="n">padded_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">grid</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="n">i</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>

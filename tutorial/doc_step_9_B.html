@@ -37,10 +37,10 @@
           <div class="body" role="main">
             
   <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_9/B_paradiag_for_nonlinear_problems.py">pySDC/tutorial/step_9/B_paradiag_for_nonlinear_problems.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">"""</span>
 <span class="sd">This script introduces ParaDiag for nonlinear problems with the van der Pol oscillator as an example.</span>
 
-<span class="sd">ParaDiag works by diagonalizing the &quot;top layer&quot; of Kronecker products that make up the circularized composite</span>
+<span class="sd">ParaDiag works by diagonalizing the "top layer" of Kronecker products that make up the circularized composite</span>
 <span class="sd">collocation problem.</span>
 <span class="sd">However, in nonlinear problems, the problem cannot be written as a matrix and therefore we cannot write the composite</span>
 <span class="sd">collocation problem as a matrix.</span>
@@ -61,7 +61,7 @@
 <span class="sd">    - (5) Weighted iFFT in time</span>
 <span class="sd">    - (6) Increment solution</span>
 <span class="sd">As IMEX ParaDiag is a trivial extension of ParaDiag for linear problems, we focus on the second approach here.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
@@ -71,7 +71,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.Van_der_Pol_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">vanderpol</span>
 
 <span class="c1"># setup output</span>
-<span class="n">out_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/step_9_B_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+<span class="n">out_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/step_9_B_out.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">my_print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -91,26 +91,26 @@
 <span class="n">N</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="c1"># make problem work on complex data</span>
-<span class="n">prob</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="o">*</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">[:</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;complex128&#39;</span><span class="p">)])</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="o">*</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">[:</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'complex128'</span><span class="p">)])</span>
 
 <span class="c1"># setup global solution array</span>
 <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
 
 <span class="c1"># setup collocation problem</span>
-<span class="n">sweep</span> <span class="o">=</span> <span class="n">sweeper_class</span><span class="p">({</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">:</span> <span class="n">M</span><span class="p">,</span> <span class="s1">&#39;quad_type&#39;</span><span class="p">:</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span><span class="p">},</span> <span class="kc">None</span><span class="p">)</span>
+<span class="n">sweep</span> <span class="o">=</span> <span class="n">sweeper_class</span><span class="p">({</span><span class="s1">'num_nodes'</span><span class="p">:</span> <span class="n">M</span><span class="p">,</span> <span class="s1">'quad_type'</span><span class="p">:</span> <span class="s1">'RADAU-RIGHT'</span><span class="p">},</span> <span class="kc">None</span><span class="p">)</span>
 
 <span class="c1"># initial conditions</span>
 <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="n">my_print</span><span class="p">(</span>
-    <span class="sa">f</span><span class="s1">&#39;Running ParaDiag test script for van der Pol with mu=</span><span class="si">{</span><span class="n">prob</span><span class="o">.</span><span class="n">mu</span><span class="si">}</span><span class="s1"> and </span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s1"> time steps and </span><span class="si">{</span><span class="n">M</span><span class="si">}</span><span class="s1"> collocation nodes.&#39;</span>
+    <span class="sa">f</span><span class="s1">'Running ParaDiag test script for van der Pol with mu=</span><span class="si">{</span><span class="n">prob</span><span class="o">.</span><span class="n">mu</span><span class="si">}</span><span class="s1"> and </span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s1"> time steps and </span><span class="si">{</span><span class="n">M</span><span class="si">}</span><span class="s1"> collocation nodes.'</span>
 <span class="p">)</span>
 
 
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 <span class="sd">Setup matrices that make up the composite collocation problem. We do not set up the full composite collocation problem</span>
 <span class="sd">here, however. See https://arxiv.org/abs/2103.12571 for the meaning of the matrices.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 <span class="n">I_M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
 
 <span class="n">H_M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">tolil</span><span class="p">()</span> <span class="o">*</span> <span class="mi">0</span>
@@ -128,7 +128,7 @@
 <span class="n">E_alpha</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">alpha</span>
 
 <span class="n">gamma</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="o">/</span> <span class="n">L</span><span class="p">)</span>
-<span class="n">D_alpha_diag_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">E_alpha</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">norm</span><span class="o">=</span><span class="s1">&#39;backward&#39;</span><span class="p">)</span>
+<span class="n">D_alpha_diag_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">E_alpha</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">norm</span><span class="o">=</span><span class="s1">'backward'</span><span class="p">)</span>
 
 <span class="n">J</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
 <span class="n">J_inv</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">gamma</span><span class="p">)</span>
@@ -151,14 +151,14 @@
     <span class="n">S</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_S</span><span class="p">)</span>
     <span class="n">S_inv</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_S_inv</span><span class="p">)</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 <span class="sd">Setup functions for computing matrix-vector productions on the steps and for computing the residual of the composite</span>
 <span class="sd">collocation problem</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">mat_vec</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">vec</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Matrix vector product</span>
 
 <span class="sd">    Args:</span>
@@ -167,7 +167,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        np.ndarray: mat @ vec</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
@@ -176,7 +176,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">residual</span><span class="p">(</span><span class="n">_u</span><span class="p">,</span> <span class="n">u0</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the residual of the composite collocation problem</span>
 
 <span class="sd">    Args:</span>
@@ -185,7 +185,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        np.ndarray: LMN size array with the residual</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">_u</span> <span class="o">*</span> <span class="mi">0</span><span class="n">j</span>
     <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
         <span class="c1"># build step local residual</span>
@@ -220,7 +220,7 @@
     <span class="c1"># weighted FFT in time</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">mat_vec</span><span class="p">(</span><span class="n">J_inv</span><span class="o">.</span><span class="n">toarray</span><span class="p">(),</span> <span class="n">res</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="c1"># perform local solves of &quot;collocation problems&quot; on the steps in parallel</span>
+    <span class="c1"># perform local solves of "collocation problems" on the steps in parallel</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
 
@@ -237,8 +237,8 @@
 
     <span class="n">res</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">sol_paradiag</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
     <span class="n">niter</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="k">assert</span> <span class="n">niter</span> <span class="o">&lt;</span> <span class="mi">99</span><span class="p">,</span> <span class="s1">&#39;ParaDiag did not converge for nonlinear problem!&#39;</span>
-<span class="n">my_print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Needed </span><span class="si">{</span><span class="n">niter</span><span class="si">}</span><span class="s1"> ParaDiag iterations, stopped at residual </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">res</span><span class="p">))</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">niter</span> <span class="o">&lt;</span> <span class="mi">99</span><span class="p">,</span> <span class="s1">'ParaDiag did not converge for nonlinear problem!'</span>
+<span class="n">my_print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Needed </span><span class="si">{</span><span class="n">niter</span><span class="si">}</span><span class="s1"> ParaDiag iterations, stopped at residual </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">res</span><span class="p">))</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Results:</p>

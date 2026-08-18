@@ -40,7 +40,7 @@
 <div class="viewcode-block" id="generate_description">
 <a class="viewcode-back" href="../../pySDC/helpers.setup_helper.html#helpers.setup_helper.generate_description">[docs]</a>
 <span></span><span class="k">def</span><span class="w"> </span><span class="nf">generate_description</span><span class="p">(</span><span class="n">problem_class</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Generate a description object that you can use to run pySDC based on a problem class and various input.</span>
 <span class="sd">    This function does not set any additional defaults, but distributes the values to where they belong.</span>
 
@@ -49,41 +49,41 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: A description object for running pySDC</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.level</span><span class="w"> </span><span class="kn">import</span> <span class="n">_Pars</span> <span class="k">as</span> <span class="n">level_params</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.step</span><span class="w"> </span><span class="kn">import</span> <span class="n">_Pars</span> <span class="k">as</span> <span class="n">step_params</span>
 
     <span class="n">description</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;level_params&#39;</span><span class="p">:</span> <span class="p">{},</span>
-        <span class="s1">&#39;problem_params&#39;</span><span class="p">:</span> <span class="p">{},</span>
-        <span class="s1">&#39;sweeper_params&#39;</span><span class="p">:</span> <span class="p">{},</span>
-        <span class="s1">&#39;problem_class&#39;</span><span class="p">:</span> <span class="n">problem_class</span><span class="p">,</span>
-        <span class="s1">&#39;step_params&#39;</span><span class="p">:</span> <span class="p">{},</span>
-        <span class="s1">&#39;sweeper_class&#39;</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">,</span> <span class="n">problem_class</span><span class="o">.</span><span class="n">get_default_sweeper_class</span><span class="p">()),</span>
-        <span class="s1">&#39;convergence_controllers&#39;</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="s1">'level_params'</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="s1">'problem_params'</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="s1">'sweeper_params'</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="s1">'problem_class'</span><span class="p">:</span> <span class="n">problem_class</span><span class="p">,</span>
+        <span class="s1">'step_params'</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="s1">'sweeper_class'</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'sweeper_class'</span><span class="p">,</span> <span class="n">problem_class</span><span class="o">.</span><span class="n">get_default_sweeper_class</span><span class="p">()),</span>
+        <span class="s1">'convergence_controllers'</span><span class="p">:</span> <span class="p">{},</span>
     <span class="p">}</span>
 
     <span class="n">problem_keys</span> <span class="o">=</span> <span class="n">problem_class</span><span class="o">.</span><span class="fm">__init__</span><span class="o">.</span><span class="vm">__code__</span><span class="o">.</span><span class="n">co_varnames</span>
     <span class="n">level_keys</span> <span class="o">=</span> <span class="n">level_params</span><span class="p">({})</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-    <span class="n">sweeper_keys</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">](</span>
-        <span class="p">{</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;quad_type&#39;</span><span class="p">:</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span><span class="p">},</span> <span class="kc">None</span>
+    <span class="n">sweeper_keys</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_class'</span><span class="p">](</span>
+        <span class="p">{</span><span class="s1">'num_nodes'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'quad_type'</span><span class="p">:</span> <span class="s1">'RADAU-RIGHT'</span><span class="p">},</span> <span class="kc">None</span>
     <span class="p">)</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
     <span class="n">step_keys</span> <span class="o">=</span> <span class="n">step_params</span><span class="p">({})</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 
     <span class="c1"># TODO: add convergence controllers</span>
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">problem_keys</span><span class="p">:</span>
-            <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="n">description</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
         <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">level_keys</span><span class="p">:</span>
-            <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="n">description</span><span class="p">[</span><span class="s1">'level_params'</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
         <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sweeper_keys</span><span class="p">:</span>
-            <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
         <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">step_keys</span><span class="p">:</span>
-            <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;sweeper_class&#39;</span><span class="p">:</span>
+            <span class="n">description</span><span class="p">[</span><span class="s1">'step_params'</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">'sweeper_class'</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Don</span><span class="se">\&#39;</span><span class="s1">t know what parameter </span><span class="se">\&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="se">\&quot;</span><span class="s1"> is for!&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Don</span><span class="se">\'</span><span class="s1">t know what parameter </span><span class="se">\"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="se">\"</span><span class="s1"> is for!'</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">description</span></div>
 

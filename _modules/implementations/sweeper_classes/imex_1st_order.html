@@ -45,7 +45,7 @@
 <div class="viewcode-block" id="imex_1st_order">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">imex_1st_order</span><span class="p">(</span><span class="n">Sweeper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Custom sweeper class, implements Sweeper.py</span>
 
 <span class="sd">    First-order IMEX sweeper using implicit/explicit Euler as base integrator</span>
@@ -53,21 +53,21 @@
 <span class="sd">    Attributes:</span>
 <span class="sd">        QI: implicit Euler integration matrix</span>
 <span class="sd">        QE: explicit Euler integration matrix</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialization routine for the custom sweeper</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            params: parameters for the sweeper</span>
 <span class="sd">            level (pySDC.Level.level): the level that uses this sweeper</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
-        <span class="k">if</span> <span class="s1">&#39;QI&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-            <span class="n">params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;IE&#39;</span>
-        <span class="k">if</span> <span class="s1">&#39;QE&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-            <span class="n">params</span><span class="p">[</span><span class="s1">&#39;QE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;EE&#39;</span>
+        <span class="k">if</span> <span class="s1">'QI'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s1">'QI'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'IE'</span>
+        <span class="k">if</span> <span class="s1">'QE'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s1">'QE'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'EE'</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span>
 
@@ -78,12 +78,12 @@
 <div class="viewcode-block" id="imex_1st_order.integrate">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order.integrate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Integrates the right-hand side (here impl + expl)</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            list of dtype_u: containing the integral as values</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
         <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>
@@ -101,12 +101,12 @@
 <div class="viewcode-block" id="imex_1st_order.update_nodes">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order.update_nodes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># get current level and problem description</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
@@ -157,14 +157,14 @@
 <div class="viewcode-block" id="imex_1st_order.compute_end_point">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order.compute_end_point">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Compute u at the right point of the interval</span>
 
 <span class="sd">        The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># get current level and problem description</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
@@ -189,12 +189,12 @@
 <div class="viewcode-block" id="imex_1st_order.get_sweeper_mats">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_sweeper_mats">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_sweeper_mats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns the three matrices Q, QI, QE which define the sweeper.</span>
 
 <span class="sd">        The first row and column, corresponding to the left starting value, are removed to correspond to the notation</span>
 <span class="sd">        introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave slow-wave splitting, 2016</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">QE</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">QE</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>
         <span class="n">QI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>
         <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>
@@ -204,19 +204,19 @@
 <div class="viewcode-block" id="imex_1st_order.get_scalar_problems_sweeper_mats">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_scalar_problems_sweeper_mats">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_scalar_problems_sweeper_mats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        This function returns the corresponding matrices of an IMEX-SDC sweep in matrix formulation.</span>
 
 <span class="sd">        See Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave slow-wave splitting, 2016 for the derivation.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            lambdas (numpy.ndarray): the first entry in lambdas is lambda_fast, the second is lambda_slow.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">QE</span><span class="p">,</span> <span class="n">QI</span><span class="p">,</span> <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sweeper_mats</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">lambdas</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">pass</span>
             <span class="c1"># should use lambdas from attached problem and make sure it is a scalar IMEX</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;At the moment, the values for lambda have to be provided&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"At the moment, the values for lambda have to be provided"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">lambda_fast</span> <span class="o">=</span> <span class="n">lambdas</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">lambda_slow</span> <span class="o">=</span> <span class="n">lambdas</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -230,13 +230,13 @@
 <div class="viewcode-block" id="imex_1st_order.get_scalar_problems_manysweep_mat">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_scalar_problems_manysweep_mat">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_scalar_problems_manysweep_mat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nsweeps</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        For a scalar problem, K sweeps of IMEX-SDC can be written in matrix form.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            nsweeps (int): number of sweeps</span>
 <span class="sd">            lambdas (numpy.ndarray): the first entry in lambdas is lambda_fast, the second is lambda_slow.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">LHS</span><span class="p">,</span> <span class="n">RHS</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_scalar_problems_sweeper_mats</span><span class="p">(</span><span class="n">lambdas</span><span class="o">=</span><span class="n">lambdas</span><span class="p">)</span>
         <span class="n">Pinv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">LHS</span><span class="p">)</span>
         <span class="n">Mat_sweep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_power</span><span class="p">(</span><span class="n">Pinv</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">RHS</span><span class="p">),</span> <span class="n">nsweeps</span><span class="p">)</span>

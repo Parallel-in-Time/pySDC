@@ -46,20 +46,20 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A simple test program to create and solve a collocation problem directly</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># instantiate problem</span>
     <span class="n">prob</span> <span class="o">=</span> <span class="n">heatNd_unforced</span><span class="p">(</span>
         <span class="n">nvars</span><span class="o">=</span><span class="mi">1023</span><span class="p">,</span>  <span class="c1"># number of degrees of freedom</span>
         <span class="n">nu</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>  <span class="c1"># diffusion coefficient</span>
         <span class="n">freq</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>  <span class="c1"># frequency for the test value</span>
-        <span class="n">bc</span><span class="o">=</span><span class="s1">&#39;dirichlet-zero&#39;</span><span class="p">,</span>  <span class="c1"># boundary conditions</span>
+        <span class="n">bc</span><span class="o">=</span><span class="s1">'dirichlet-zero'</span><span class="p">,</span>  <span class="c1"># boundary conditions</span>
     <span class="p">)</span>
 
     <span class="c1"># instantiate collocation class, relative to the time interval [0,1]</span>
-    <span class="n">coll</span> <span class="o">=</span> <span class="n">CollBase</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tleft</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tright</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_type</span><span class="o">=</span><span class="s1">&#39;LEGENDRE&#39;</span><span class="p">,</span> <span class="n">quad_type</span><span class="o">=</span><span class="s1">&#39;RADAU-RIGHT&#39;</span><span class="p">)</span>
+    <span class="n">coll</span> <span class="o">=</span> <span class="n">CollBase</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tleft</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tright</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_type</span><span class="o">=</span><span class="s1">'LEGENDRE'</span><span class="p">,</span> <span class="n">quad_type</span><span class="o">=</span><span class="s1">'RADAU-RIGHT'</span><span class="p">)</span>
 
     <span class="c1"># set time-step size (warning: the collocation matrices are relative to [0,1], see above)</span>
     <span class="n">dt</span> <span class="o">=</span> <span class="mf">0.1</span>
@@ -67,18 +67,18 @@
     <span class="c1"># solve collocation problem</span>
     <span class="n">err</span> <span class="o">=</span> <span class="n">solve_collocation_problem</span><span class="p">(</span><span class="n">prob</span><span class="o">=</span><span class="n">prob</span><span class="p">,</span> <span class="n">coll</span><span class="o">=</span><span class="n">coll</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
 
-    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/step_1_C_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Error of the collocation problem: </span><span class="si">%8.6e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/step_1_C_out.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'Error of the collocation problem: </span><span class="si">%8.6e</span><span class="s1">'</span> <span class="o">%</span> <span class="n">err</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="mf">4e-04</span><span class="p">,</span> <span class="s2">&quot;ERROR: did not get collocation error as expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span>
+    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="mf">4e-04</span><span class="p">,</span> <span class="s2">"ERROR: did not get collocation error as expected, got </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">err</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">solve_collocation_problem</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">coll</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Routine to build and solve the linear collocation problem</span>
 
 <span class="sd">    Args:</span>
@@ -88,7 +88,7 @@
 
 <span class="sd">    Return:</span>
 <span class="sd">        the analytic error of the solved collocation problem</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># shrink collocation matrix: first line and column deals with initial value, not needed here</span>
     <span class="n">Q</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>
@@ -112,7 +112,7 @@
     <span class="k">return</span> <span class="n">err</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>

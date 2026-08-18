@@ -46,7 +46,7 @@
 <div class="viewcode-block" id="base_transfer_MPI">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.BaseTransferMPI.html#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">base_transfer_MPI</span><span class="p">(</span><span class="n">BaseTransfer</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Standard base_transfer class</span>
 
 <span class="sd">    Attributes:</span>
@@ -54,7 +54,7 @@
 <span class="sd">        params(__Pars): parameter object containing the custom parameters passed by the user</span>
 <span class="sd">        fine (pySDC.Level.level): reference to the fine level</span>
 <span class="sd">        coarse (pySDC.Level.level): reference to the coarse level</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -66,20 +66,20 @@
             <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_coarse</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
         <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> only works when each rank administers one collocation node so far!&#39;</span>
+                <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> only works when each rank administers one collocation node so far!'</span>
             <span class="p">)</span>
 
 <div class="viewcode-block" id="base_transfer_MPI.restrict">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.BaseTransferMPI.html#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.restrict">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Space-time restriction routine</span>
 
 <span class="sd">        The routine applies the spatial restriction operator to the fine values on the fine nodes, then reevaluates f</span>
 <span class="sd">        on the coarse level. This is used for the first part of the FAS correction tau via integration. The second part</span>
 <span class="sd">        is the integral over the fine values, restricted to the coarse level. Finally, possible tau corrections on the</span>
 <span class="sd">        fine level are restricted as well.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">F</span><span class="p">,</span> <span class="n">G</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse</span>
         <span class="n">CF</span><span class="p">,</span> <span class="n">CG</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_fine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_coarse</span>
@@ -88,7 +88,7 @@
 
         <span class="c1"># only if the level is unlocked at least by prediction</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">F</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">unlocked</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">UnlockError</span><span class="p">(</span><span class="s1">&#39;fine level is still locked, cannot use data from there&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">UnlockError</span><span class="p">(</span><span class="s1">'fine level is still locked, cannot use data from there'</span><span class="p">)</span>
 
         <span class="c1"># restrict fine values in space</span>
         <span class="n">tmp_u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">space_transfer</span><span class="o">.</span><span class="n">restrict</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">CF</span><span class="o">.</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
@@ -148,12 +148,12 @@
 <div class="viewcode-block" id="base_transfer_MPI.prolong">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.BaseTransferMPI.html#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.prolong">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Space-time prolongation routine</span>
 
 <span class="sd">        This routine applies the spatial prolongation routine to the difference between the computed and the restricted</span>
 <span class="sd">        values on the coarse level and then adds this difference to the fine values as coarse correction.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># get data for easier access</span>
         <span class="n">F</span><span class="p">,</span> <span class="n">G</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse</span>
@@ -163,7 +163,7 @@
 
         <span class="c1"># only of the level is unlocked at least by prediction or restriction</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">G</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">unlocked</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">UnlockError</span><span class="p">(</span><span class="s1">&#39;coarse level is still locked, cannot use data from there&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">UnlockError</span><span class="p">(</span><span class="s1">'coarse level is still locked, cannot use data from there'</span><span class="p">)</span>
 
         <span class="c1"># build coarse correction</span>
 
@@ -187,12 +187,12 @@
 <div class="viewcode-block" id="base_transfer_MPI.prolong_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.BaseTransferMPI.html#implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.prolong_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">prolong_f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Space-time prolongation routine w.r.t. the rhs f</span>
 
 <span class="sd">        This routine applies the spatial prolongation routine to the difference between the computed and the restricted</span>
 <span class="sd">        values on the coarse level and then adds this difference to the fine values as coarse correction.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># get data for easier access</span>
         <span class="n">F</span><span class="p">,</span> <span class="n">G</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse</span>
@@ -201,7 +201,7 @@
 
         <span class="c1"># only of the level is unlocked at least by prediction or restriction</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">G</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">unlocked</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">UnlockError</span><span class="p">(</span><span class="s1">&#39;coarse level is still locked, cannot use data from there&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">UnlockError</span><span class="p">(</span><span class="s1">'coarse level is still locked, cannot use data from there'</span><span class="p">)</span>
 
         <span class="c1"># build coarse correction</span>
 

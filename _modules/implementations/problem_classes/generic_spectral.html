@@ -47,7 +47,7 @@
 <div class="viewcode-block" id="GenericSpectralLinear">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GenericSpectralLinear</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Generic class to solve problems of the form M u_t + L u = y, with mass matrix M, linear operator L and some right</span>
 <span class="sd">    hand side y using spectral methods.</span>
 <span class="sd">    L may contain algebraic conditions, as long as (M + dt L) is invertible.</span>
@@ -68,12 +68,12 @@
 <span class="sd">        diff_mask (list): Mask for separating differential and algebraic terms</span>
 <span class="sd">        Pl (sparse matrix): Left preconditioner</span>
 <span class="sd">        Pr (sparse matrix): Right preconditioner</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="GenericSpectralLinear.setup_GPU">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_GPU">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;switch to GPU modules&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""switch to GPU modules"""</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">cupy_mesh</span><span class="p">,</span> <span class="n">imex_cupy_mesh</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
@@ -91,7 +91,7 @@
             <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.NCCL_communicator</span><span class="w"> </span><span class="kn">import</span> <span class="n">NCCLComm</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">,</span> <span class="n">NCCLComm</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">NCCLComm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">)</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">'comm'</span><span class="p">]</span> <span class="o">=</span> <span class="n">NCCLComm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -101,7 +101,7 @@
         <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">Dirichlet_recombination</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">left_preconditioner</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">solver_type</span><span class="o">=</span><span class="s1">&#39;cached_direct&#39;</span><span class="p">,</span>
+        <span class="n">solver_type</span><span class="o">=</span><span class="s1">'cached_direct'</span><span class="p">,</span>
         <span class="n">solver_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">preconditioner_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">useGPU</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -111,7 +111,7 @@
         <span class="n">heterogeneous</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Base class for problems discretized with spectral methods.</span>
 
 <span class="sd">        Args:</span>
@@ -128,26 +128,26 @@
 <span class="sd">            real_spectral_coefficients (bool): If yes, allow only real values in spectral space, otherwise, allow complex.</span>
 <span class="sd">            heterogeneous (bool): If yes, perform memory intensive sparse matrix operations on CPU</span>
 <span class="sd">            debug (bool): Make additional tests at extra computational cost</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">solver_args</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">solver_args</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">solver_args</span>
 
         <span class="n">preconditioner_args</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">preconditioner_args</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">preconditioner_args</span>
-        <span class="n">preconditioner_args</span><span class="p">[</span><span class="s1">&#39;drop_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">preconditioner_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;drop_tol&#39;</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">)</span>
-        <span class="n">preconditioner_args</span><span class="p">[</span><span class="s1">&#39;fill_factor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">preconditioner_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fill_factor&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">preconditioner_args</span><span class="p">[</span><span class="s1">'drop_tol'</span><span class="p">]</span> <span class="o">=</span> <span class="n">preconditioner_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'drop_tol'</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">)</span>
+        <span class="n">preconditioner_args</span><span class="p">[</span><span class="s1">'fill_factor'</span><span class="p">]</span> <span class="o">=</span> <span class="n">preconditioner_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'fill_factor'</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
-            <span class="s1">&#39;max_cached_factorizations&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;useGPU&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;solver_type&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;solver_args&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;preconditioner_args&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;left_preconditioner&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;Dirichlet_recombination&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;comm&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;spectral_space&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;real_spectral_coefficients&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;heterogeneous&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;debug&#39;</span><span class="p">,</span>
+            <span class="s1">'max_cached_factorizations'</span><span class="p">,</span>
+            <span class="s1">'useGPU'</span><span class="p">,</span>
+            <span class="s1">'solver_type'</span><span class="p">,</span>
+            <span class="s1">'solver_args'</span><span class="p">,</span>
+            <span class="s1">'preconditioner_args'</span><span class="p">,</span>
+            <span class="s1">'left_preconditioner'</span><span class="p">,</span>
+            <span class="s1">'Dirichlet_recombination'</span><span class="p">,</span>
+            <span class="s1">'comm'</span><span class="p">,</span>
+            <span class="s1">'spectral_space'</span><span class="p">,</span>
+            <span class="s1">'real_spectral_coefficients'</span><span class="p">,</span>
+            <span class="s1">'heterogeneous'</span><span class="p">,</span>
+            <span class="s1">'debug'</span><span class="p">,</span>
             <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span> <span class="o">=</span> <span class="n">SpectralHelper</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">,</span> <span class="n">useGPU</span><span class="o">=</span><span class="n">useGPU</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
@@ -155,8 +155,8 @@
         <span class="k">if</span> <span class="n">useGPU</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">setup_GPU</span><span class="p">()</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">if</span> <span class="s1">&#39;rtol&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_args</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">solver_args</span><span class="p">[</span><span class="s1">&#39;tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;rtol&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s1">'rtol'</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_args</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">solver_args</span><span class="p">[</span><span class="s1">'tol'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">'rtol'</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="n">bases</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">add_axis</span><span class="p">(</span><span class="o">**</span><span class="n">base</span><span class="p">)</span>
@@ -167,7 +167,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">init_forward</span> <span class="k">if</span> <span class="n">spectral_space</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="n">solver_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;factorizations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'factorizations'</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">setup_preconditioner</span><span class="p">(</span><span class="n">Dirichlet_recombination</span><span class="p">,</span> <span class="n">left_preconditioner</span><span class="p">)</span>
 
@@ -176,36 +176,36 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">heterogeneous</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__heterogeneous_setup</span> <span class="o">=</span> <span class="kc">False</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Finished GenericSpectralLinear __init__&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">'Finished GenericSpectralLinear __init__'</span><span class="p">)</span>
 
 <div class="viewcode-block" id="GenericSpectralLinear.heterogeneous_setup">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.heterogeneous_setup">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">heterogeneous_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">heterogeneous</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__heterogeneous_setup</span><span class="p">:</span>
 
-            <span class="n">CPU_only</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;BC_line_zero_matrix&#39;</span><span class="p">,</span> <span class="s1">&#39;BCs&#39;</span><span class="p">]</span>
-            <span class="n">both</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Pl&#39;</span><span class="p">,</span> <span class="s1">&#39;Pr&#39;</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">,</span> <span class="s1">&#39;M&#39;</span><span class="p">]</span>
+            <span class="n">CPU_only</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'BC_line_zero_matrix'</span><span class="p">,</span> <span class="s1">'BCs'</span><span class="p">]</span>
+            <span class="n">both</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Pl'</span><span class="p">,</span> <span class="s1">'Pr'</span><span class="p">,</span> <span class="s1">'L'</span><span class="p">,</span> <span class="s1">'M'</span><span class="p">]</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Starting heterogeneous setup. Moving </span><span class="si">{</span><span class="n">CPU_only</span><span class="si">}</span><span class="s1"> and copying </span><span class="si">{</span><span class="n">both</span><span class="si">}</span><span class="s1"> to CPU&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Starting heterogeneous setup. Moving </span><span class="si">{</span><span class="n">CPU_only</span><span class="si">}</span><span class="s1"> and copying </span><span class="si">{</span><span class="n">both</span><span class="si">}</span><span class="s1"> to CPU'</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">useGPU</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">CPU_only</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Moving </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1"> to CPU&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Moving </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1"> to CPU'</span><span class="p">)</span>
                     <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
 
                 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">both</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Copying </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1"> to CPU&#39;</span><span class="p">)</span>
-                    <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">_CPU&#39;</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Copying </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1"> to CPU'</span><span class="p">)</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">_CPU'</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">both</span><span class="p">:</span>
-                    <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">_CPU&#39;</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">_CPU'</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Done with heterogeneous setup&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">'Done with heterogeneous setup'</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__heterogeneous_setup</span> <span class="o">=</span> <span class="kc">True</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Pass requests on to the helper if they are not directly attributes of this class for convenience.</span>
 
 <span class="sd">        Args:</span>
@@ -213,11 +213,11 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            request</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_setup_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LHS</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Setup a sparse linear operator by adding relationships. See documentation for ``GenericSpectralLinear.setup_L`` to learn more.</span>
 
 <span class="sd">        Args:</span>
@@ -225,7 +225,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            sparse linear operator</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">operator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">get_empty_operator_matrix</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">line</span><span class="p">,</span> <span class="n">equation</span> <span class="ow">in</span> <span class="n">LHS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">add_equation_lhs</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">equation</span><span class="p">)</span>
@@ -234,7 +234,7 @@
 <div class="viewcode-block" id="GenericSpectralLinear.setup_L">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_L">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">setup_L</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LHS</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Setup the left hand side of the linear operator L and store it in ``self.L``.</span>
 
 <span class="sd">        The argument is meant to be a dictionary with the line you want to write the equation in as the key and the relationship between components as another dictionary. For instance, you can add an algebraic condition capturing a first derivative relationship between u and ux as follows:</span>
@@ -242,7 +242,7 @@
 <span class="sd">        ```</span>
 <span class="sd">        Dx = self.get_differentiation_matrix(axes=(0,))</span>
 <span class="sd">        I = self.get_Id()</span>
-<span class="sd">        LHS = {&#39;ux&#39;: {&#39;u&#39;: Dx, &#39;ux&#39;: -I}}</span>
+<span class="sd">        LHS = {'ux': {'u': Dx, 'ux': -I}}</span>
 <span class="sd">        self.setup_L(LHS)</span>
 <span class="sd">        ```</span>
 
@@ -250,33 +250,33 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            LHS (dict): Dictionary containing the equations.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_operator</span><span class="p">(</span><span class="n">LHS</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Set up L matrix&#39;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">'Set up L matrix'</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="GenericSpectralLinear.setup_M">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_M">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">setup_M</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LHS</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''</span>
 <span class="sd">        Setup mass matrix, see documentation of ``GenericSpectralLinear.setup_L``.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="n">diff_index</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">LHS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">diff_mask</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span> <span class="ow">in</span> <span class="n">diff_index</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_operator</span><span class="p">(</span><span class="n">LHS</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Set up M matrix&#39;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">'Set up M matrix'</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="GenericSpectralLinear.setup_preconditioner">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_preconditioner">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">setup_preconditioner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Dirichlet_recombination</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">left_preconditioner</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get left and right preconditioners.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            Dirichlet_recombination (bool): Basis conversion for right preconditioner. Useful for Chebychev and Ultraspherical methods. 10/10 would recommend.</span>
 <span class="sd">            left_preconditioner (bool): If True, it will interleave the variables and reverse the Kronecker product</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">N</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:])</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">useGPU</span><span class="p">:</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">cupy_backends.cuda.libs.cusparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">CuSparseError</span> <span class="k">as</span> <span class="n">MemError</span>
@@ -284,7 +284,7 @@
             <span class="n">MemError</span> <span class="o">=</span> <span class="ne">MemoryError</span>
 
         <span class="k">if</span> <span class="n">left_preconditioner</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Setting up left preconditioner with </span><span class="si">{</span><span class="n">N</span><span class="si">}</span><span class="s1"> local degrees of freedom&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Setting up left preconditioner with </span><span class="si">{</span><span class="n">N</span><span class="si">}</span><span class="s1"> local degrees of freedom'</span><span class="p">)</span>
 
             <span class="c1"># reverse Kronecker product</span>
             <span class="n">nc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncomponents</span>
@@ -296,14 +296,14 @@
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">nc</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">),</span> <span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">)),</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">nc</span><span class="p">,</span> <span class="n">N</span> <span class="o">*</span> <span class="n">nc</span><span class="p">)</span>
             <span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Finished setup of left preconditioner&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">'Finished setup of left preconditioner'</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">Id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
             <span class="n">Pl_lhs</span> <span class="o">=</span> <span class="p">{</span><span class="n">comp</span><span class="p">:</span> <span class="p">{</span><span class="n">comp</span><span class="p">:</span> <span class="n">Id</span><span class="p">}</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">}</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Pl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_operator</span><span class="p">(</span><span class="n">Pl_lhs</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">Dirichlet_recombination</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ChebychevHelper&#39;</span><span class="p">,</span> <span class="s1">&#39;UltrasphericalHelper&#39;</span><span class="p">]:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Using Dirichlet recombination as right preconditioner&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">Dirichlet_recombination</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'ChebychevHelper'</span><span class="p">,</span> <span class="s1">'UltrasphericalHelper'</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">'Using Dirichlet recombination as right preconditioner'</span><span class="p">)</span>
             <span class="n">_Pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">get_Dirichlet_recombination_matrix</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">_Pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
@@ -314,14 +314,14 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Pr</span> <span class="o">=</span> <span class="n">operator</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pl</span><span class="o">.</span><span class="n">T</span>
         <span class="k">except</span> <span class="n">MemError</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Setting up right preconditioner on CPU due to memory error&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">'Setting up right preconditioner on CPU due to memory error'</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">sparse_lib</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pl</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">get</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="GenericSpectralLinear.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.solve_system">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">skip_itransform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Do an implicit Euler step to solve M u_t + Lu = rhs, with M the mass matrix and L the linear operator as setup by</span>
 <span class="sd">        ``GenericSpectralLinear.setup_L`` and ``GenericSpectralLinear.setup_M``.</span>
 
@@ -330,7 +330,7 @@
 
 <span class="sd">        Note that by putting M rhs on the right hand side, this function can only solve algebraic conditions equal to</span>
 <span class="sd">        zero. If you want something else, it should be easy to overload this function.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">sparse_lib</span>
 
@@ -350,8 +350,8 @@
                 <span class="n">u0_hat</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># apply inverse right preconditioner to initial guess</span>
-        <span class="k">if</span> <span class="n">u0_hat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;direct&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_Pr_inv&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">u0_hat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">'direct'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'_Pr_inv'</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_PR_inv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">splu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Pr</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">complex</span><span class="p">))</span><span class="o">.</span><span class="n">solve</span>
             <span class="n">u0_hat</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PR_inv</span><span class="p">(</span><span class="n">u0_hat</span><span class="p">)</span>
 
@@ -359,7 +359,7 @@
         <span class="n">rhs_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">put_BCs_in_rhs_hat</span><span class="p">(</span><span class="n">rhs_hat</span><span class="p">)</span>
         <span class="n">rhs_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pl</span> <span class="o">@</span> <span class="n">rhs_hat</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">dt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_factorizations</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;cached_direct&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_factorizations</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'cached_direct'</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">heterogeneous</span><span class="p">:</span>
                 <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">M_CPU</span>
                 <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">L_CPU</span>
@@ -382,28 +382,28 @@
             <span class="c1">#     im = plt.spy(M)</span>
             <span class="c1">#     plt.show()</span>
 
-        <span class="k">if</span> <span class="s1">&#39;ilu&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s1">'ilu'</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">dt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_factorizations</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cached_factorizations</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_cached_factorizations</span><span class="p">:</span>
                     <span class="n">to_evict</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cached_factorizations</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">cached_factorizations</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">to_evict</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Evicted matrix factorization for </span><span class="si">{</span><span class="n">to_evict</span><span class="si">=:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1"> from cache&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Evicted matrix factorization for </span><span class="si">{</span><span class="n">to_evict</span><span class="si">=:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1"> from cache'</span><span class="p">)</span>
                 <span class="n">iLU</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spilu</span><span class="p">(</span>
-                    <span class="n">A</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">preconditioner_args</span><span class="p">,</span> <span class="s1">&#39;drop_tol&#39;</span><span class="p">:</span> <span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">preconditioner_args</span><span class="p">[</span><span class="s1">&#39;drop_tol&#39;</span><span class="p">]}</span>
+                    <span class="n">A</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">preconditioner_args</span><span class="p">,</span> <span class="s1">'drop_tol'</span><span class="p">:</span> <span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">preconditioner_args</span><span class="p">[</span><span class="s1">'drop_tol'</span><span class="p">]}</span>
                 <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cached_factorizations</span><span class="p">[</span><span class="n">dt</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinearOperator</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">iLU</span><span class="o">.</span><span class="n">solve</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cached incomplete LU factorization for </span><span class="si">{</span><span class="n">dt</span><span class="si">=:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;factorizations&#39;</span><span class="p">]()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Cached incomplete LU factorization for </span><span class="si">{</span><span class="n">dt</span><span class="si">=:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'factorizations'</span><span class="p">]()</span>
             <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_factorizations</span><span class="p">[</span><span class="n">dt</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">M</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">info</span> <span class="o">=</span> <span class="mi">0</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;cached_direct&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'cached_direct'</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">dt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_factorizations</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cached_factorizations</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_cached_factorizations</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">cached_factorizations</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cached_factorizations</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Evicted matrix factorization for </span><span class="si">{</span><span class="n">dt</span><span class="si">=:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1"> from cache&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Evicted matrix factorization for </span><span class="si">{</span><span class="n">dt</span><span class="si">=:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1"> from cache'</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">heterogeneous</span><span class="p">:</span>
                     <span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
@@ -420,30 +420,30 @@
                     <span class="n">solver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">factorized</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">cached_factorizations</span><span class="p">[</span><span class="n">dt</span><span class="p">]</span> <span class="o">=</span> <span class="n">solver</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cached matrix factorization for </span><span class="si">{</span><span class="n">dt</span><span class="si">=:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;factorizations&#39;</span><span class="p">]()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Cached matrix factorization for </span><span class="si">{</span><span class="n">dt</span><span class="si">=:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'factorizations'</span><span class="p">]()</span>
 
             <span class="n">_sol_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_factorizations</span><span class="p">[</span><span class="n">dt</span><span class="p">](</span><span class="n">rhs_hat</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="p">]()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Used cached matrix factorization for </span><span class="si">{</span><span class="n">dt</span><span class="si">=:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Used cached matrix factorization for </span><span class="si">{</span><span class="n">dt</span><span class="si">=:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;direct&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'direct'</span><span class="p">:</span>
             <span class="n">_sol_hat</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">rhs_hat</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="s1">&#39;gmres&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+        <span class="k">elif</span> <span class="s1">'gmres'</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
             <span class="n">_sol_hat</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">gmres</span><span class="p">(</span>
                 <span class="n">A</span><span class="p">,</span>
                 <span class="n">rhs_hat</span><span class="p">,</span>
                 <span class="n">x0</span><span class="o">=</span><span class="n">u0_hat</span><span class="p">,</span>
                 <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_args</span><span class="p">,</span>
                 <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="p">],</span>
-                <span class="n">callback_type</span><span class="o">=</span><span class="s1">&#39;pr_norm&#39;</span><span class="p">,</span>
+                <span class="n">callback_type</span><span class="o">=</span><span class="s1">'pr_norm'</span><span class="p">,</span>
                 <span class="n">M</span><span class="o">=</span><span class="n">M</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;cg&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'cg'</span><span class="p">:</span>
             <span class="n">_sol_hat</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cg</span><span class="p">(</span>
                 <span class="n">A</span><span class="p">,</span> <span class="n">rhs_hat</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">u0_hat</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_args</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="p">]</span>
             <span class="p">)</span>
-        <span class="k">elif</span> <span class="s1">&#39;bicgstab&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+        <span class="k">elif</span> <span class="s1">'bicgstab'</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
             <span class="n">_sol_hat</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">bicgstab</span><span class="p">(</span>
                 <span class="n">A</span><span class="p">,</span>
                 <span class="n">rhs_hat</span><span class="p">,</span>
@@ -453,10 +453,10 @@
                 <span class="n">M</span><span class="o">=</span><span class="n">M</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Solver </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="si">=}</span><span class="s1"> not implemented in </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">!&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Solver </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="si">=}</span><span class="s1"> not implemented in </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">!'</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">info</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="si">}</span><span class="s1"> not converged! </span><span class="si">{</span><span class="n">info</span><span class="si">=}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="si">}</span><span class="s1"> not converged! </span><span class="si">{</span><span class="n">info</span><span class="si">=}</span><span class="s1">'</span><span class="p">)</span>
 
         <span class="n">sol_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">u_init_forward</span>
         <span class="n">sol_hat</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Pr</span> <span class="o">@</span> <span class="n">_sol_hat</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">sol_hat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -518,13 +518,13 @@
 
 <div class="viewcode-block" id="compute_residual_DAE">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.compute_residual_DAE">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">compute_residual_DAE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_residual_DAE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s1">''</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Computation of the residual that does not add u_0 - u_m in algebraic equations.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        stage (str): The current stage of the step the level belongs to</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># get current level and problem description</span>
     <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
@@ -553,18 +553,18 @@
         <span class="n">res_norm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="n">m</span><span class="p">]))</span>
 
     <span class="c1"># find maximal residual over the nodes</span>
-    <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">&#39;full_abs&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">'full_abs'</span><span class="p">:</span>
         <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">res_norm</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">&#39;last_abs&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">'last_abs'</span><span class="p">:</span>
         <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="n">res_norm</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="k">elif</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">&#39;full_rel&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">'full_rel'</span><span class="p">:</span>
         <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">res_norm</span><span class="p">)</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="k">elif</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">&#39;last_rel&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">'last_rel'</span><span class="p">:</span>
         <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="n">res_norm</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;residual_type = </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span><span class="si">}</span><span class="s1"> not implemented, choose &#39;</span>
-            <span class="sa">f</span><span class="s1">&#39;full_abs, last_abs, full_rel or last_rel instead&#39;</span>
+            <span class="sa">f</span><span class="s1">'residual_type = </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span><span class="si">}</span><span class="s1"> not implemented, choose '</span>
+            <span class="sa">f</span><span class="s1">'full_abs, last_abs, full_rel or last_rel instead'</span>
         <span class="p">)</span>
 
     <span class="c1"># indicate that the residual has seen the new values</span>
@@ -577,12 +577,12 @@
 <div class="viewcode-block" id="compute_residual_DAE_MPI">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.compute_residual_DAE_MPI">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_residual_DAE_MPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Computation of the residual using the collocation matrix Q</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        stage (str): The current stage of the step the level belongs to</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
 
     <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
@@ -596,7 +596,7 @@
     <span class="c1"># compute the residual for each node</span>
 
     <span class="c1"># build QF(u)</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span><span class="n">last_only</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;last&#39;</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span><span class="n">last_only</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'last'</span><span class="p">)</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">diff_mask</span>
     <span class="n">res</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">mask</span><span class="p">]</span> <span class="o">-</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="n">mask</span><span class="p">]</span>
     <span class="c1"># add tau if associated</span>
@@ -606,16 +606,16 @@
     <span class="n">res_norm</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 
     <span class="c1"># find maximal residual over the nodes</span>
-    <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">&#39;full_abs&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">'full_abs'</span><span class="p">:</span>
         <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">res_norm</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">MAX</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">&#39;last_abs&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">'last_abs'</span><span class="p">:</span>
         <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">res_norm</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">&#39;full_rel&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">'full_rel'</span><span class="p">:</span>
         <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">res_norm</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">MAX</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">&#39;last_rel&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">'last_rel'</span><span class="p">:</span>
         <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">res_norm</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;residual type </span><span class="se">\&quot;</span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span><span class="si">}</span><span class="se">\&quot;</span><span class="s1"> not implemented!&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'residual type </span><span class="se">\"</span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span><span class="si">}</span><span class="se">\"</span><span class="s1"> not implemented!'</span><span class="p">)</span>
 
     <span class="c1"># indicate that the residual has seen the new values</span>
     <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">False</span>
@@ -627,7 +627,7 @@
 <div class="viewcode-block" id="get_extrapolated_error_DAE">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.get_extrapolated_error_DAE">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_extrapolated_error_DAE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the</span>
 <span class="sd">    solution obtained by the time marching scheme. This function can be used in `EstimateExtrapolationError`.</span>
 
@@ -636,7 +636,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        None</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">u_ex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extrapolated_solution</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
     <span class="n">diff_mask</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">diff_mask</span>
     <span class="k">if</span> <span class="n">u_ex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

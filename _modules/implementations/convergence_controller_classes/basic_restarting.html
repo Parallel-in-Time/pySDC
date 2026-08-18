@@ -48,19 +48,19 @@
 <div class="viewcode-block" id="BasicRestarting">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BasicRestarting</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Class with some utilities for restarting. The specific functions are:</span>
 <span class="sd">     - Telling each step after one that requested a restart to get restarted as well</span>
 <span class="sd">     - Allowing each step to be restarted a limited number of times in a row before just moving on anyways</span>
 
 <span class="sd">    Default control order is 95.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="BasicRestarting.get_implementation">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.get_implementation">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_implementation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">useMPI</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Retrieve the implementation for a specific flavor of this class.</span>
 
 <span class="sd">        Args:</span>
@@ -68,7 +68,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            cls: The child class that implements the desired flavor</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">useMPI</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">BasicRestartingMPI</span>
         <span class="k">else</span><span class="p">:</span>
@@ -76,21 +76,21 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
 <span class="sd">            params (dict): Parameters for the convergence controller</span>
 <span class="sd">            description (dict): The description object used to instantiate the controller</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span> <span class="o">=</span> <span class="n">Pars</span><span class="p">({</span><span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;max_restart_reached&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span> <span class="o">=</span> <span class="n">Pars</span><span class="p">({</span><span class="s2">"restart"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"max_restart_reached"</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
 
 <div class="viewcode-block" id="BasicRestarting.setup">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.setup">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Define parameters here.</span>
 
 <span class="sd">        Default parameters are:</span>
@@ -107,13 +107,13 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            (dict): The updated params dictionary</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="mi">95</span><span class="p">,</span>
-            <span class="s2">&quot;max_restarts&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-            <span class="s2">&quot;crash_after_max_restarts&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-            <span class="s2">&quot;restart_from_first_step&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="s2">&quot;step_size_spreader&quot;</span><span class="p">:</span> <span class="n">SpreadStepSizesBlockwise</span><span class="o">.</span><span class="n">get_implementation</span><span class="p">(</span><span class="n">useMPI</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;useMPI&#39;</span><span class="p">]),</span>
+            <span class="s2">"control_order"</span><span class="p">:</span> <span class="mi">95</span><span class="p">,</span>
+            <span class="s2">"max_restarts"</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="s2">"crash_after_max_restarts"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">"restart_from_first_step"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"step_size_spreader"</span><span class="p">:</span> <span class="n">SpreadStepSizesBlockwise</span><span class="o">.</span><span class="n">get_implementation</span><span class="p">(</span><span class="n">useMPI</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s1">'useMPI'</span><span class="p">]),</span>
         <span class="p">}</span>
 
         <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.hooks.log_restarts</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogRestarts</span>
@@ -126,34 +126,34 @@
 <div class="viewcode-block" id="BasicRestarting.setup_status_variables">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.setup_status_variables">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Add status variables for whether to restart now and how many times the step has been restarted in a row to the</span>
 <span class="sd">        Steps</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_status_variable_to_step</span><span class="p">(</span><span class="s1">&#39;restart&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_status_variable_to_step</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_status_variable_to_step</span><span class="p">(</span><span class="s1">'restart'</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_status_variable_to_step</span><span class="p">(</span><span class="s1">'restarts_in_a_row'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BasicRestarting.reset_status_variables">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.reset_status_variables">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reset_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Add status variables for whether to restart now and how many times the step has been restarted in a row to the</span>
 <span class="sd">        Steps</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_step_status_variable</span><span class="p">(</span><span class="s1">&#39;restart&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_step_status_variable</span><span class="p">(</span><span class="s1">'restart'</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BasicRestarting.dependencies">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.dependencies">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Load a convergence controller that spreads the step sizes between steps.</span>
 
 <span class="sd">        Args:</span>
@@ -162,9 +162,9 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">spread_step_sizes_params</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;spread_from_first_restarted&#39;</span><span class="p">:</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restart_from_first_step</span><span class="p">,</span>
+            <span class="s1">'spread_from_first_restarted'</span><span class="p">:</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restart_from_first_step</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">step_size_spreader</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">spread_step_sizes_params</span>
@@ -175,7 +175,7 @@
 <div class="viewcode-block" id="BasicRestarting.determine_restart">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.determine_restart">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Restart all steps after the first one which wants to be restarted as well, but also check if we lost patience</span>
 <span class="sd">        with the restarts and want to move on anyways.</span>
 
@@ -185,8 +185,8 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Please implement a function to determine if we need a restart here!&quot;</span><span class="p">)</span></div>
+<span class="sd">        """</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Please implement a function to determine if we need a restart here!"</span><span class="p">)</span></div>
 </div>
 
 
@@ -194,14 +194,14 @@
 <div class="viewcode-block" id="BasicRestartingNonMPI">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BasicRestartingNonMPI</span><span class="p">(</span><span class="n">BasicRestarting</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Non-MPI specific version of basic restarting</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="BasicRestartingNonMPI.reset_buffers_nonMPI">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI.reset_buffers_nonMPI">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reset_buffers_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Reset all variables with are used to simulate communication here</span>
 
 <span class="sd">        Args:</span>
@@ -209,7 +209,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">max_restart_reached</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -219,7 +219,7 @@
 <div class="viewcode-block" id="BasicRestartingNonMPI.determine_restart">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI.determine_restart">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">MS</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Restart all steps after the first one which wants to be restarted as well, but also check if we lost patience</span>
 <span class="sd">        with the restarts and want to move on anyways.</span>
 
@@ -230,17 +230,17 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># check if we performed too many restarts</span>
         <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">max_restart_reached</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restarts_in_a_row</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">max_restarts</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">max_restart_reached</span> <span class="ow">and</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">crash_after_max_restarts</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">ConvergenceError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Restarted </span><span class="si">{</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restarts_in_a_row</span><span class="si">}</span><span class="s2"> time(s) already, surrendering now.&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">ConvergenceError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Restarted </span><span class="si">{</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restarts_in_a_row</span><span class="si">}</span><span class="s2"> time(s) already, surrendering now."</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Step(s) restarted </span><span class="si">{</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restarts_in_a_row</span><span class="si">}</span><span class="s2"> time(s) already, maximum reached, moving </span><span class="se">\</span>
-<span class="s2">on...&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">"Step(s) restarted </span><span class="si">{</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restarts_in_a_row</span><span class="si">}</span><span class="s2"> time(s) already, maximum reached, moving </span><span class="se">\</span>
+<span class="s2">on..."</span><span class="p">,</span>
                     <span class="n">S</span><span class="p">,</span>
                 <span class="p">)</span>
 
@@ -257,7 +257,7 @@
 <div class="viewcode-block" id="BasicRestartingNonMPI.prepare_next_block">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI.prepare_next_block">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">prepare_next_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="n">MS</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Update restarts in a row for all steps.</span>
 
 <span class="sd">        Args:</span>
@@ -270,7 +270,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">S</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MS</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
@@ -290,30 +290,30 @@
 <div class="viewcode-block" id="BasicRestartingMPI">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BasicRestartingMPI</span><span class="p">(</span><span class="n">BasicRestarting</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    MPI specific version of basic restarting</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialization routine. Adds a buffer.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
 <span class="sd">            params (dict): Parameters for the convergence controller</span>
 <span class="sd">            description (dict): The description object used to instantiate the controller</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">OR</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">LOR</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span> <span class="o">=</span> <span class="n">Pars</span><span class="p">({</span><span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;max_restart_reached&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;restart_earlier&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span> <span class="o">=</span> <span class="n">Pars</span><span class="p">({</span><span class="s2">"restart"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"max_restart_reached"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">'restart_earlier'</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
 
 <div class="viewcode-block" id="BasicRestartingMPI.determine_restart">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI.determine_restart">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Restart all steps after the first one which wants to be restarted as well, but also check if we lost patience</span>
 <span class="sd">        with the restarts and want to move on anyways.</span>
 
@@ -324,7 +324,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">crash_now</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
@@ -336,8 +336,8 @@
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">crash_after_max_restarts</span><span class="p">:</span>
                     <span class="n">crash_now</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Step(s) restarted </span><span class="si">{</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restarts_in_a_row</span><span class="si">}</span><span class="s2"> time(s) already, maximum reached, moving </span><span class="se">\</span>
-<span class="s2">on...&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">"Step(s) restarted </span><span class="si">{</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restarts_in_a_row</span><span class="si">}</span><span class="s2"> time(s) already, maximum reached, moving </span><span class="se">\</span>
+<span class="s2">on..."</span><span class="p">,</span>
                     <span class="n">S</span><span class="p">,</span>
                 <span class="p">)</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">prev_done</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restart_from_first_step</span><span class="p">:</span>
@@ -364,7 +364,7 @@
             <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">OR</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">max_restart_reached</span>
 
         <span class="k">if</span> <span class="n">crash_now</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ConvergenceError</span><span class="p">(</span><span class="s2">&quot;Surrendering because of too many restarts...&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ConvergenceError</span><span class="p">(</span><span class="s2">"Surrendering because of too many restarts..."</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
@@ -372,7 +372,7 @@
 <div class="viewcode-block" id="BasicRestartingMPI.prepare_next_block">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI.prepare_next_block">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">prepare_next_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Update restarts in a row for all steps.</span>
 
 <span class="sd">        Args:</span>
@@ -385,11 +385,11 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">restart_from</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">comm</span><span class="o">.</span><span class="n">allgather</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="k">else</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">time_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
 
-        <span class="c1"># send &quot;backward&quot; the number of restarts in a row</span>
+        <span class="c1"># send "backward" the number of restarts in a row</span>
         <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">&gt;=</span> <span class="n">restart_from</span><span class="p">:</span>
             <span class="n">buff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
             <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restarts_in_a_row</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>

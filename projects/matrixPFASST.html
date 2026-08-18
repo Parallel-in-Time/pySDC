@@ -74,145 +74,145 @@ against the standard PFASST implementation.</p>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">diffusion_setup</span><span class="p">(</span><span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Setup routine for advection test</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        par (float): parameter for controlling stiffness</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.25</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;nsweeps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'restol'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'dt'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.25</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'nsweeps'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LU&#39;</span>  <span class="c1"># For the IMEX sweeper, the LU-trick can be activated for the implicit part</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;initial_guess&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;spread&#39;</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'quad_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'RADAU-RIGHT'</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'num_nodes'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'QI'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'LU'</span>  <span class="c1"># For the IMEX sweeper, the LU-trick can be activated for the implicit part</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'initial_guess'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'spread'</span>
 
     <span class="c1"># initialize problem parameters</span>
     <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span>  <span class="c1"># diffusion coefficient</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">127</span><span class="p">,</span> <span class="mi">63</span><span class="p">]</span>  <span class="c1"># number of degrees of freedom for each level</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'nu'</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'freq'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'nvars'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">127</span><span class="p">,</span> <span class="mi">63</span><span class="p">]</span>  <span class="c1"># number of degrees of freedom for each level</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'bc'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'dirichlet-zero'</span>  <span class="c1"># boundary conditions</span>
 
     <span class="c1"># initialize step parameters</span>
     <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">'maxiter'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
 
     <span class="c1"># initialize space transfer parameters</span>
     <span class="n">space_transfer_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;rorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">'rorder'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">'iorder'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
 
     <span class="c1"># initialize controller parameters</span>
     <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;all_to_done&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'logger_level'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'all_to_done'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>  <span class="c1"># pass problem class</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>  <span class="c1"># pass problem parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>  <span class="c1"># pass sweeper</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>  <span class="c1"># pass spatial transfer class</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>  <span class="c1"># pass paramters for spatial transfer</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>  <span class="c1"># pass problem class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>  <span class="c1"># pass problem parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>  <span class="c1"># pass sweeper</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'level_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'step_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'space_transfer_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>  <span class="c1"># pass spatial transfer class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'space_transfer_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>  <span class="c1"># pass paramters for spatial transfer</span>
 
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">advection_setup</span><span class="p">(</span><span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Setup routine for advection test</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        par (float): parameter for controlling stiffness</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.25</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;nsweeps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'restol'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'dt'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.25</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'nsweeps'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LU&#39;</span><span class="p">]</span>  <span class="c1"># For the IMEX sweeper, the LU-trick can be activated for the implicit part</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;initial_guess&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;spread&#39;</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'quad_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'RADAU-RIGHT'</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'num_nodes'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'QI'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'LU'</span><span class="p">]</span>  <span class="c1"># For the IMEX sweeper, the LU-trick can be activated for the implicit part</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'initial_guess'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'spread'</span>
 
     <span class="c1"># initialize problem parameters</span>
     <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">]</span>  <span class="c1"># number of degrees of freedom for each level</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;stencil_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;center&#39;</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;periodic&#39;</span>  <span class="c1"># boundary conditions</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'c'</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'freq'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'nvars'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">]</span>  <span class="c1"># number of degrees of freedom for each level</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'order'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'stencil_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'center'</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'bc'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'periodic'</span>  <span class="c1"># boundary conditions</span>
 
     <span class="c1"># initialize step parameters</span>
     <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">'maxiter'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
 
     <span class="c1"># initialize space transfer parameters</span>
     <span class="n">space_transfer_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;rorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">'rorder'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">'iorder'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">'periodic'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="c1"># initialize controller parameters</span>
     <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;all_to_done&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'logger_level'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'all_to_done'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">advectionNd</span>  <span class="c1"># pass problem class</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>  <span class="c1"># pass sweeper (see part B)</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>  <span class="c1"># pass spatial transfer class</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>  <span class="c1"># pass paramters for spatial transfer</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">advectionNd</span>  <span class="c1"># pass problem class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>  <span class="c1"># pass sweeper (see part B)</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'level_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'step_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'space_transfer_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>  <span class="c1"># pass spatial transfer class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'space_transfer_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>  <span class="c1"># pass paramters for spatial transfer</span>
 
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">testequation_setup</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Setup routine for the test equation</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        par (float): parameter for controlling stiffness</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.25</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;nsweeps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'restol'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'dt'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.25</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'nsweeps'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LU&#39;</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;initial_guess&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;spread&#39;</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'quad_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'RADAU-RIGHT'</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'num_nodes'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'QI'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'LU'</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'initial_guess'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'spread'</span>
 
     <span class="c1"># initialize problem parameters</span>
     <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;u0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># initial value (for all instances)</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'u0'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># initial value (for all instances)</span>
     <span class="c1"># use single values like this...</span>
-    <span class="c1"># problem_params[&#39;lambdas&#39;] = [[-1.0]]</span>
+    <span class="c1"># problem_params['lambdas'] = [[-1.0]]</span>
     <span class="c1"># .. or a list of values like this ...</span>
-    <span class="c1"># problem_params[&#39;lambdas&#39;] = [[-1.0, -2.0, 1j, -1j]]</span>
+    <span class="c1"># problem_params['lambdas'] = [[-1.0, -2.0, 1j, -1j]]</span>
     <span class="c1"># .. or a whole block of values like this</span>
     <span class="n">ilim_left</span> <span class="o">=</span> <span class="o">-</span><span class="mi">11</span>
     <span class="n">ilim_right</span> <span class="o">=</span> <span class="mi">0</span>
@@ -224,58 +224,58 @@ against the standard PFASST implementation.</p>
     <span class="k">for</span> <span class="n">rl</span> <span class="ow">in</span> <span class="n">rlam</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">il</span> <span class="ow">in</span> <span class="n">ilam</span><span class="p">:</span>
             <span class="n">lambdas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rl</span> <span class="o">+</span> <span class="n">il</span><span class="p">)</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lambdas&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">lambdas</span><span class="p">]</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'lambdas'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">lambdas</span><span class="p">]</span>
     <span class="c1"># note: PFASST will do all of those at once, but without interaction (realized via diagonal matrix).</span>
     <span class="c1"># The propagation matrix will be diagonal too, corresponding to the respective lambda value.</span>
 
     <span class="c1"># initialize step parameters</span>
     <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">'maxiter'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
 
     <span class="c1"># initialize controller parameters</span>
     <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;all_to_done&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'logger_level'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'all_to_done'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">testequation0d</span>  <span class="c1"># pass problem class</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>  <span class="c1"># pass problem parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>  <span class="c1"># pass sweeper</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh_nocoarse</span>  <span class="c1"># pass spatial transfer class</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c1"># pass paramters for spatial transfer</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">testequation0d</span>  <span class="c1"># pass problem class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>  <span class="c1"># pass problem parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>  <span class="c1"># pass sweeper</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'level_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'step_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'space_transfer_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh_nocoarse</span>  <span class="c1"># pass spatial transfer class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'space_transfer_params'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c1"># pass paramters for spatial transfer</span>
 
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">compare_controllers</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A simple test program to compare PFASST runs with matrix-based and matrix-free controllers</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        type (str): setup type</span>
 <span class="sd">        par (float) parameter for controlling stiffness</span>
 <span class="sd">        f: file handler</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># set time parameters</span>
     <span class="n">t0</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">Tend</span> <span class="o">=</span> <span class="mf">1.0</span>
 
-    <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;diffusion&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">'diffusion'</span><span class="p">:</span>
         <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span> <span class="o">=</span> <span class="n">diffusion_setup</span><span class="p">(</span><span class="n">par</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;advection&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">'advection'</span><span class="p">:</span>
         <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span> <span class="o">=</span> <span class="n">advection_setup</span><span class="p">(</span><span class="n">par</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;testequation&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">'testequation'</span><span class="p">:</span>
         <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span> <span class="o">=</span> <span class="n">testequation_setup</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No valis setup type provided, aborting..&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'No valis setup type provided, aborting..'</span><span class="p">)</span>
 
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Working with </span><span class="si">%s</span><span class="s1"> setup and parameter </span><span class="si">%3.1e</span><span class="s1">..&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">par</span><span class="p">)</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">Working with </span><span class="si">%s</span><span class="s1"> setup and parameter </span><span class="si">%3.1e</span><span class="s1">..'</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">par</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="c1"># instantiate controller</span>
@@ -297,44 +297,44 @@ against the standard PFASST implementation.</p>
     <span class="n">err_mat</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uend_mat</span> <span class="o">-</span> <span class="n">uex</span><span class="p">)</span>
     <span class="n">err_nomat</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uend_nomat</span> <span class="o">-</span> <span class="n">uex</span><span class="p">)</span>
 
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;  Error (mat/nomat) vs. exact solution: </span><span class="si">%6.4e</span><span class="s1"> -- </span><span class="si">%6.4e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">err_mat</span><span class="p">,</span> <span class="n">err_nomat</span><span class="p">)</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'  Error (mat/nomat) vs. exact solution: </span><span class="si">%6.4e</span><span class="s1"> -- </span><span class="si">%6.4e</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">err_mat</span><span class="p">,</span> <span class="n">err_nomat</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;  Difference between both results: </span><span class="si">%6.4e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">diff</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'  Difference between both results: </span><span class="si">%6.4e</span><span class="s1">'</span> <span class="o">%</span> <span class="n">diff</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
-    <span class="k">assert</span> <span class="n">diff</span> <span class="o">&lt;</span> <span class="mf">2.3e-15</span><span class="p">,</span> <span class="s1">&#39;ERROR: difference between matrix-based and matrix-free result is too large, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">diff</span>
+    <span class="k">assert</span> <span class="n">diff</span> <span class="o">&lt;</span> <span class="mf">2.3e-15</span><span class="p">,</span> <span class="s1">'ERROR: difference between matrix-based and matrix-free result is too large, got </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="n">diff</span>
 
     <span class="c1"># get and convert statistics to list of iterations count, sorted by process</span>
-    <span class="n">iter_counts_mat</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_mat</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
-    <span class="n">iter_counts_nomat</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_nomat</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">iter_counts_mat</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_mat</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'niter'</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">'time'</span><span class="p">)</span>
+    <span class="n">iter_counts_nomat</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_nomat</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'niter'</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">'time'</span><span class="p">)</span>
 
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;  Iteration counts for matrix-based version: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">iter_counts_mat</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'  Iteration counts for matrix-based version: </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="n">iter_counts_mat</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;  Iteration counts for matrix-free version: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">iter_counts_nomat</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'  Iteration counts for matrix-free version: </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="n">iter_counts_nomat</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="k">assert</span> <span class="p">(</span>
         <span class="n">iter_counts_nomat</span> <span class="o">==</span> <span class="n">iter_counts_mat</span>
-    <span class="p">),</span> <span class="s1">&#39;ERROR: number of iterations differ between matrix-based and matrix-free controller&#39;</span>
+    <span class="p">),</span> <span class="s1">'ERROR: number of iterations differ between matrix-based and matrix-free controller'</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">par_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1e-02</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1e02</span><span class="p">]</span>
 
-    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/comparison_matrix_vs_nomat_detail.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/comparison_matrix_vs_nomat_detail.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">par</span> <span class="ow">in</span> <span class="n">par_list</span><span class="p">:</span>
-        <span class="n">compare_controllers</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;diffusion&#39;</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="n">par</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-        <span class="n">compare_controllers</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;advection&#39;</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="n">par</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-    <span class="n">compare_controllers</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;testequation&#39;</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">compare_controllers</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">'diffusion'</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="n">par</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">compare_controllers</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">'advection'</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="n">par</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">compare_controllers</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">'testequation'</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -405,143 +405,143 @@ over all steps, iterations and sweeps. This matrix can be used to analyze PFASST
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">diffusion_setup</span><span class="p">(</span><span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Setup routine for advection test</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        par (float): parameter for controlling stiffness</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.25</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;nsweeps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'restol'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'dt'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.25</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'nsweeps'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LU&#39;</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;initial_guess&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;spread&#39;</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'quad_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'RADAU-RIGHT'</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'num_nodes'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'QI'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'LU'</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'initial_guess'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'spread'</span>
 
     <span class="c1"># initialize problem parameters</span>
     <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span>  <span class="c1"># diffusion coefficient</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">127</span><span class="p">]</span>  <span class="c1"># number of degrees of freedom for each level</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'nu'</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'freq'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'nvars'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">127</span><span class="p">]</span>  <span class="c1"># number of degrees of freedom for each level</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'bc'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'dirichlet-zero'</span>  <span class="c1"># boundary conditions</span>
 
     <span class="c1"># initialize step parameters</span>
     <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">'maxiter'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
 
     <span class="c1"># initialize space transfer parameters</span>
     <span class="n">space_transfer_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;rorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">'rorder'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">'iorder'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
 
     <span class="c1"># initialize controller parameters</span>
     <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'logger_level'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>  <span class="c1"># pass problem class</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>  <span class="c1"># pass problem parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>  <span class="c1"># pass sweeper</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>  <span class="c1"># pass spatial transfer class</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>  <span class="c1"># pass paramters for spatial transfer</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>  <span class="c1"># pass problem class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>  <span class="c1"># pass problem parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>  <span class="c1"># pass sweeper</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'level_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'step_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'space_transfer_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>  <span class="c1"># pass spatial transfer class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'space_transfer_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>  <span class="c1"># pass paramters for spatial transfer</span>
 
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">advection_setup</span><span class="p">(</span><span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Setup routine for advection test</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        par (float): parameter for controlling stiffness</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.25</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;nsweeps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'restol'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'dt'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.25</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'nsweeps'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LU&#39;</span><span class="p">]</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;initial_guess&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;spread&#39;</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'quad_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'RADAU-RIGHT'</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'num_nodes'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'QI'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'LU'</span><span class="p">]</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'initial_guess'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'spread'</span>
 
     <span class="c1"># initialize problem parameters</span>
     <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">]</span>  <span class="c1"># number of degrees of freedom for each level</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;stencil_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;center&#39;</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;periodic&#39;</span>  <span class="c1"># boundary conditions</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'c'</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'freq'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'nvars'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">]</span>  <span class="c1"># number of degrees of freedom for each level</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'order'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'stencil_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'center'</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'bc'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'periodic'</span>  <span class="c1"># boundary conditions</span>
 
     <span class="c1"># initialize step parameters</span>
     <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">'maxiter'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
 
     <span class="c1"># initialize space transfer parameters</span>
     <span class="n">space_transfer_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;rorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">'rorder'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">'iorder'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">'periodic'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="c1"># initialize controller parameters</span>
     <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'logger_level'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">advectionNd</span>  <span class="c1"># pass problem class</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>  <span class="c1"># pass sweeper (see part B)</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>  <span class="c1"># pass spatial transfer class</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>  <span class="c1"># pass paramters for spatial transfer</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">advectionNd</span>  <span class="c1"># pass problem class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>  <span class="c1"># pass sweeper (see part B)</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'level_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'step_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'space_transfer_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>  <span class="c1"># pass spatial transfer class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'space_transfer_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>  <span class="c1"># pass paramters for spatial transfer</span>
 
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">scalar_equation_setup</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Setup routine for the test equation</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        par (float): parameter for controlling stiffness</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.25</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;nsweeps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'restol'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'dt'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.25</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'nsweeps'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LU&#39;</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;initial_guess&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;spread&#39;</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'quad_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'RADAU-RIGHT'</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'num_nodes'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'QI'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'LU'</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'initial_guess'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'spread'</span>
 
     <span class="c1"># initialize problem parameters</span>
     <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;u0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># initial value (for all instances)</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'u0'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># initial value (for all instances)</span>
     <span class="c1"># use single values like this...</span>
-    <span class="c1"># problem_params[&#39;lambdas&#39;] = [[-1.0]]</span>
+    <span class="c1"># problem_params['lambdas'] = [[-1.0]]</span>
     <span class="c1"># .. or a list of values like this ...</span>
-    <span class="c1"># problem_params[&#39;lambdas&#39;] = [[-1.0, -2.0, 1j, -1j]]</span>
+    <span class="c1"># problem_params['lambdas'] = [[-1.0, -2.0, 1j, -1j]]</span>
     <span class="c1"># .. or a whole block of values like this</span>
     <span class="n">ilim_left</span> <span class="o">=</span> <span class="o">-</span><span class="mi">11</span>
     <span class="n">ilim_right</span> <span class="o">=</span> <span class="mi">0</span>
@@ -553,57 +553,57 @@ over all steps, iterations and sweeps. This matrix can be used to analyze PFASST
     <span class="k">for</span> <span class="n">rl</span> <span class="ow">in</span> <span class="n">rlam</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">il</span> <span class="ow">in</span> <span class="n">ilam</span><span class="p">:</span>
             <span class="n">lambdas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rl</span> <span class="o">+</span> <span class="n">il</span><span class="p">)</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lambdas&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">lambdas</span><span class="p">]</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'lambdas'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">lambdas</span><span class="p">]</span>
     <span class="c1"># note: PFASST will do all of those at once, but without interaction (realized via diagonal matrix).</span>
     <span class="c1"># The propagation matrix will be diagonal too, corresponding to the respective lambda value.</span>
 
     <span class="c1"># initialize step parameters</span>
     <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">'maxiter'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
 
     <span class="c1"># initialize controller parameters</span>
     <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'logger_level'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">testequation0d</span>  <span class="c1"># pass problem class</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>  <span class="c1"># pass problem parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>  <span class="c1"># pass sweeper</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh_nocoarse</span>  <span class="c1"># pass spatial transfer class</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c1"># pass paramters for spatial transfer</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">testequation0d</span>  <span class="c1"># pass problem class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>  <span class="c1"># pass problem parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>  <span class="c1"># pass sweeper</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'level_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'step_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'space_transfer_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh_nocoarse</span>  <span class="c1"># pass spatial transfer class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'space_transfer_params'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c1"># pass paramters for spatial transfer</span>
 
     <span class="k">return</span> <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">compare_controllers</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A simple test program to compare PFASST runs with matrix-based and matrix-free controllers</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        type (str): setup type</span>
 <span class="sd">        par (float): parameter for controlling stiffness</span>
 <span class="sd">        f: file handler</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># set time parameters</span>
     <span class="n">t0</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">Tend</span> <span class="o">=</span> <span class="mf">1.0</span>
 
-    <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;diffusion&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">'diffusion'</span><span class="p">:</span>
         <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span> <span class="o">=</span> <span class="n">diffusion_setup</span><span class="p">(</span><span class="n">par</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;advection&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">'advection'</span><span class="p">:</span>
         <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span> <span class="o">=</span> <span class="n">advection_setup</span><span class="p">(</span><span class="n">par</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;testequation&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">'testequation'</span><span class="p">:</span>
         <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span> <span class="o">=</span> <span class="n">scalar_equation_setup</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No valis setup type provided, aborting..&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'No valis setup type provided, aborting..'</span><span class="p">)</span>
 
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Working with </span><span class="si">%s</span><span class="s1"> setup and parameter </span><span class="si">%3.1e</span><span class="s1">..&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">par</span><span class="p">)</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">Working with </span><span class="si">%s</span><span class="s1"> setup and parameter </span><span class="si">%3.1e</span><span class="s1">..'</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">par</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="c1"># instantiate controller</span>
@@ -617,15 +617,15 @@ over all steps, iterations and sweeps. This matrix can be used to analyze PFASST
     <span class="n">uend_mat</span><span class="p">,</span> <span class="n">stats_mat</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
 
     <span class="c1"># filter statistics by type (number of iterations)</span>
-    <span class="n">iter_counts_mat</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_mat</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">iter_counts_mat</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_mat</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'niter'</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">'time'</span><span class="p">)</span>
 
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;  Iteration counts for matrix-based version: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">iter_counts_mat</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'  Iteration counts for matrix-based version: </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="n">iter_counts_mat</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="c1"># filter only iteration counts and check for equality</span>
     <span class="n">niters</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts_mat</span><span class="p">]</span>
-    <span class="k">assert</span> <span class="n">niters</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">niters</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">niters</span><span class="p">),</span> <span class="s1">&#39;ERROR: not all time-steps have the same number of iterations&#39;</span>
+    <span class="k">assert</span> <span class="n">niters</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">niters</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">niters</span><span class="p">),</span> <span class="s1">'ERROR: not all time-steps have the same number of iterations'</span>
     <span class="n">niter</span> <span class="o">=</span> <span class="n">niters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="c1"># build propagation matrix using the prescribed number of iterations (or any other, if needed)</span>
@@ -633,32 +633,32 @@ over all steps, iterations and sweeps. This matrix can be used to analyze PFASST
 
     <span class="n">err_prop_ex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">uinit</span><span class="p">)</span> <span class="o">-</span> <span class="n">uex</span><span class="p">)</span>
     <span class="n">err_mat_ex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">uend_mat</span> <span class="o">-</span> <span class="n">uex</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;  Error (mat/prop) vs. exact solution: </span><span class="si">%6.4e</span><span class="s1"> -- </span><span class="si">%6.4e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">err_mat_ex</span><span class="p">,</span> <span class="n">err_prop_ex</span><span class="p">)</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'  Error (mat/prop) vs. exact solution: </span><span class="si">%6.4e</span><span class="s1"> -- </span><span class="si">%6.4e</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">err_mat_ex</span><span class="p">,</span> <span class="n">err_prop_ex</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">err_mat_prop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">uinit</span><span class="p">)</span> <span class="o">-</span> <span class="n">uend_mat</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;  Difference between matrix-PFASST and propagator: </span><span class="si">%6.4e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err_mat_prop</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'  Difference between matrix-PFASST and propagator: </span><span class="si">%6.4e</span><span class="s1">'</span> <span class="o">%</span> <span class="n">err_mat_prop</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="k">assert</span> <span class="n">err_mat_prop</span> <span class="o">&lt;</span> <span class="mf">2.0e-14</span><span class="p">,</span> <span class="p">(</span>
-        <span class="s1">&#39;ERROR: difference between matrix-based and propagator result is too large, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err_mat_prop</span>
+        <span class="s1">'ERROR: difference between matrix-based and propagator result is too large, got </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="n">err_mat_prop</span>
     <span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">par_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1e-02</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1e02</span><span class="p">]</span>
 
-    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/comparison_matrix_vs_propagator_detail.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/comparison_matrix_vs_propagator_detail.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">par</span> <span class="ow">in</span> <span class="n">par_list</span><span class="p">:</span>
-        <span class="n">compare_controllers</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;diffusion&#39;</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="n">par</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-        <span class="n">compare_controllers</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;advection&#39;</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="n">par</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-    <span class="n">compare_controllers</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;testequation&#39;</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">compare_controllers</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">'diffusion'</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="n">par</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">compare_controllers</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">'advection'</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="n">par</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">compare_controllers</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">'testequation'</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>

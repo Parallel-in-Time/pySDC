@@ -45,7 +45,7 @@
 <div class="viewcode-block" id="boris_2nd_order">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">boris_2nd_order</span><span class="p">(</span><span class="n">Sweeper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Custom sweeper class, implements Sweeper.py</span>
 
 <span class="sd">    Second-order sweeper using velocity-Verlet with Boris scheme as base integrator</span>
@@ -55,21 +55,21 @@
 <span class="sd">        SQ: node-to-node collocation matrix (second order)</span>
 <span class="sd">        ST: node-to-node trapezoidal matrix</span>
 <span class="sd">        Sx: node-to-node Euler half-step for position update</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialization routine for the custom sweeper</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            params: parameters for the sweeper</span>
 <span class="sd">            level (pySDC.Level.level): the level that uses this sweeper</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
-        <span class="k">if</span> <span class="s2">&quot;QI&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;QI&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;IE&quot;</span>
-        <span class="k">if</span> <span class="s2">&quot;QE&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;QE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;EE&quot;</span>
+        <span class="k">if</span> <span class="s2">"QI"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">"QI"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"IE"</span>
+        <span class="k">if</span> <span class="s2">"QE"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">"QE"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"EE"</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">boris_2nd_order</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span>
 
@@ -89,7 +89,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">qQ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:])</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__get_Qd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get integration matrices for 2nd-order SDC</span>
 
 <span class="sd">        Returns:</span>
@@ -97,7 +97,7 @@
 <span class="sd">            SQ: node-to-node collocation matrix (second order)</span>
 <span class="sd">            ST: node-to-node trapezoidal matrix</span>
 <span class="sd">            Sx: node-to-node Euler half-step for position update</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># set implicit and explicit Euler matrices (default, but can be changed)</span>
         <span class="n">QI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Qdelta_implicit</span><span class="p">(</span><span class="n">qd_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QI</span><span class="p">)</span>
@@ -132,12 +132,12 @@
 <div class="viewcode-block" id="boris_2nd_order.update_nodes">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.update_nodes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># get current level and problem description</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
@@ -200,12 +200,12 @@
 <div class="viewcode-block" id="boris_2nd_order.integrate">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.integrate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Integrates the right-hand side</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            list of dtype_u: containing the integral as values</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># get current level and problem description</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
@@ -229,14 +229,14 @@
 <div class="viewcode-block" id="boris_2nd_order.compute_end_point">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.compute_end_point">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Compute u at the right point of the interval</span>
 
 <span class="sd">        The value uend computed here is a full evaluation of the Picard formulation (always!)</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># get current level and problem description</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
@@ -258,9 +258,9 @@
 <div class="viewcode-block" id="boris_2nd_order.get_sweeper_mats">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_sweeper_mats">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_sweeper_mats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns the matrices Q, QQ, Qx, QT which define the sweeper.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>
         <span class="n">QQ</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">QQ</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>
@@ -273,19 +273,19 @@
 <div class="viewcode-block" id="boris_2nd_order.get_scalar_problems_sweeper_mats">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_sweeper_mats">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_scalar_problems_sweeper_mats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        This function returns the corresponding matrices of an SDC sweep matrix formulation</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            lambdas (numpy.narray): the first entry in lambdas is k-spring constant and the second is mu friction.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">Q</span><span class="p">,</span> <span class="n">QQ</span><span class="p">,</span> <span class="n">Qx</span><span class="p">,</span> <span class="n">QT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sweeper_mats</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">lambdas</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">pass</span>
             <span class="c1"># should use lambdas from attached problem and make sure it is scalar SDC</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;At the moment, the values for the lambda have to be provided&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"At the moment, the values for the lambda have to be provided"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">k</span> <span class="o">=</span> <span class="n">lambdas</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">mu</span> <span class="o">=</span> <span class="n">lambdas</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -321,13 +321,13 @@
 <div class="viewcode-block" id="boris_2nd_order.get_scalar_problems_manysweep_mats">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_manysweep_mats">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_scalar_problems_manysweep_mats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nsweeps</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        For a scalar problem, K sweeps of SDC can be written in matrix form.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            nsweeps (int): number of sweeps</span>
 <span class="sd">            lambdas (numpy.ndarray): the first entry in lambdas is k-spring constant and the second is mu friction.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">nnodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
 
         <span class="n">C_coll</span><span class="p">,</span> <span class="n">Q_coll</span><span class="p">,</span> <span class="n">Q_vv</span><span class="p">,</span> <span class="n">M_vv</span><span class="p">,</span> <span class="n">F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_scalar_problems_sweeper_mats</span><span class="p">(</span><span class="n">lambdas</span><span class="o">=</span><span class="n">lambdas</span><span class="p">)</span>
@@ -350,13 +350,13 @@
 <div class="viewcode-block" id="boris_2nd_order.get_scalar_problems_picardsweep_mats">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_picardsweep_mats">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_scalar_problems_picardsweep_mats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nsweeps</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        For a scalar problem, K sweeps of SDC can be written in matrix form.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            nsweeps (int): number of sweeps</span>
 <span class="sd">            lambdas (numpy.ndarray): the first entry in lambdas is k-spring constant and the second is mu friction.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">nnodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
 
         <span class="n">C_coll</span><span class="p">,</span> <span class="n">Q_coll</span><span class="p">,</span> <span class="n">Q_vv</span><span class="p">,</span> <span class="n">M_vv</span><span class="p">,</span> <span class="n">F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_scalar_problems_sweeper_mats</span><span class="p">(</span><span class="n">lambdas</span><span class="o">=</span><span class="n">lambdas</span><span class="p">)</span>

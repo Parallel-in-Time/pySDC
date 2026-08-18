@@ -46,7 +46,7 @@
 <div class="viewcode-block" id="advectionNd">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AdvectionEquation_ND_FD.html#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">advectionNd</span><span class="p">(</span><span class="n">GenericNDimFinDiff</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Example implementing the unforced ND advection equation with periodic</span>
 <span class="sd">    or Dirichlet boundary conditions in :math:`[0,1]^N`</span>
 
@@ -81,7 +81,7 @@
 <span class="sd">    solver_type : str, optional</span>
 <span class="sd">        Solve the linear system directly or using GMRES or CG</span>
 <span class="sd">    bc : str, optional</span>
-<span class="sd">        Boundary conditions, either ``&#39;periodic&#39;`` or ``&#39;dirichlet&#39;``.</span>
+<span class="sd">        Boundary conditions, either ``'periodic'`` or ``'dirichlet'``.</span>
 <span class="sd">    sigma : float, optional</span>
 <span class="sd">        If ``freq=-1`` and ``ndim=1``, uses a Gaussian initial solution of the form</span>
 
@@ -104,32 +104,32 @@
 <span class="sd">    ----</span>
 <span class="sd">    Args can be set as values or as tuples, which will increase the dimension.</span>
 <span class="sd">    Do, however, take care that all spatial parameters have the same dimension.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">nvars</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
         <span class="n">c</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
         <span class="n">freq</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="n">stencil_type</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+        <span class="n">stencil_type</span><span class="o">=</span><span class="s1">'center'</span><span class="p">,</span>
         <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="n">lintol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
         <span class="n">liniter</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
-        <span class="n">solver_type</span><span class="o">=</span><span class="s1">&#39;direct&#39;</span><span class="p">,</span>
-        <span class="n">bc</span><span class="o">=</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span>
+        <span class="n">solver_type</span><span class="o">=</span><span class="s1">'direct'</span><span class="p">,</span>
+        <span class="n">bc</span><span class="o">=</span><span class="s1">'periodic'</span><span class="p">,</span>
         <span class="n">sigma</span><span class="o">=</span><span class="mf">6e-2</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="o">-</span><span class="n">c</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">stencil_type</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">lintol</span><span class="p">,</span> <span class="n">liniter</span><span class="p">,</span> <span class="n">solver_type</span><span class="p">,</span> <span class="n">bc</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">solver_type</span> <span class="o">==</span> <span class="s1">&#39;CG&#39;</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;CG is not usually used for advection equation&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;sigma&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">solver_type</span> <span class="o">==</span> <span class="s1">'CG'</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">'CG is not usually used for advection equation'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">'c'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">'sigma'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span>
 
 <div class="viewcode-block" id="advectionNd.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AdvectionEquation_ND_FD.html#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.u_exact">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
@@ -137,16 +137,16 @@
 <span class="sd">        t : float</span>
 <span class="sd">            Time of the exact solution.</span>
 <span class="sd">        **kwargs : dict</span>
-<span class="sd">            Additional arguments (that won&#39;t be used).</span>
+<span class="sd">            Additional arguments (that won't be used).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        sol : dtype_u</span>
 <span class="sd">            The exact solution.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s1">&#39;u_init&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">or</span> <span class="s1">&#39;t_init&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="s1">'u_init'</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">or</span> <span class="s1">'t_init'</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> uses an analytic exact solution from t=0. If you try to compute the local error, you will get the global error instead!&#39;</span>
+                <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> uses an analytic exact solution from t=0. If you try to compute the local error, you will get the global error instead!'</span>
             <span class="p">)</span>
 
         <span class="c1"># Initialize pointers and variables</span>

@@ -45,19 +45,19 @@
 <div class="viewcode-block" id="mesh_to_mesh_petsc_dmda">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferPETScDMDA.html#implementations.transfer_classes.TransferPETScDMDA.mesh_to_mesh_petsc_dmda">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">mesh_to_mesh_petsc_dmda</span><span class="p">(</span><span class="n">SpaceTransfer</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    This implementation can restrict and prolong between PETSc DMDA grids</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fine_prob</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fine_prob: fine problem</span>
 <span class="sd">            coarse_prob: coarse problem</span>
 <span class="sd">            params: parameters for the transfer operators</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># invoke super initialization</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">mesh_to_mesh_petsc_dmda</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">fine_prob</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
@@ -72,12 +72,12 @@
 <div class="viewcode-block" id="mesh_to_mesh_petsc_dmda.restrict">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferPETScDMDA.html#implementations.transfer_classes.TransferPETScDMDA.mesh_to_mesh_petsc_dmda.restrict">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Restriction implementation</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            F: the fine level data</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">petsc_vec</span><span class="p">):</span>
             <span class="n">u_coarse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">inject</span><span class="o">.</span><span class="n">mult</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">u_coarse</span><span class="p">)</span>
@@ -90,7 +90,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">inject</span><span class="o">.</span><span class="n">mult</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">comp1</span><span class="p">,</span> <span class="n">u_coarse</span><span class="o">.</span><span class="n">comp1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">inject</span><span class="o">.</span><span class="n">mult</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">comp2</span><span class="p">,</span> <span class="n">u_coarse</span><span class="o">.</span><span class="n">comp2</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">&#39;Unknown type of fine data, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">'Unknown type of fine data, got </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">u_coarse</span></div>
 
@@ -98,12 +98,12 @@
 <div class="viewcode-block" id="mesh_to_mesh_petsc_dmda.prolong">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferPETScDMDA.html#implementations.transfer_classes.TransferPETScDMDA.mesh_to_mesh_petsc_dmda.prolong">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">G</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Prolongation implementation</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            G: the coarse level data</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">petsc_vec</span><span class="p">):</span>
             <span class="n">u_fine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">interp</span><span class="o">.</span><span class="n">mult</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">u_fine</span><span class="p">)</span>
@@ -116,7 +116,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">interp</span><span class="o">.</span><span class="n">mult</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">comp1</span><span class="p">,</span> <span class="n">u_fine</span><span class="o">.</span><span class="n">comp1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">interp</span><span class="o">.</span><span class="n">mult</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">comp2</span><span class="p">,</span> <span class="n">u_fine</span><span class="o">.</span><span class="n">comp2</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">&#39;Unknown type of coarse data, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">'Unknown type of coarse data, got </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">u_fine</span></div>
 </div>

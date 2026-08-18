@@ -51,63 +51,63 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A simple test program to do compare PFASST with multi-step SDC</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5e-10</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.125</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'restol'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5e-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'dt'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.125</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LU&#39;</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'quad_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'RADAU-RIGHT'</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'num_nodes'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'QI'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'LU'</span>
 
     <span class="c1"># initialize problem parameters</span>
     <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># frequency for the test value</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'nu'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'freq'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'bc'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'dirichlet-zero'</span>  <span class="c1"># boundary conditions</span>
 
     <span class="c1"># initialize step parameters</span>
     <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">'maxiter'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
 
     <span class="c1"># initialize space transfer parameters</span>
     <span class="n">space_transfer_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;rorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">'rorder'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">'iorder'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">6</span>
 
     <span class="c1"># initialize controller parameters</span>
     <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">40</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'logger_level'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">40</span>
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'level_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'step_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'space_transfer_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'space_transfer_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>
 
     <span class="c1"># set up parameters for PFASST run</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">63</span><span class="p">,</span> <span class="mi">31</span><span class="p">]</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'nvars'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">63</span><span class="p">,</span> <span class="mi">31</span><span class="p">]</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">description_pfasst</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="c1"># set up parameters for MSSDC run</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">63</span><span class="p">]</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'nvars'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">63</span><span class="p">]</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">description_mssdc</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;mssdc_jac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'mssdc_jac'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">controller_params_jac</span> <span class="o">=</span> <span class="n">controller_params</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;mssdc_jac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'mssdc_jac'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">controller_params_gs</span> <span class="o">=</span> <span class="n">controller_params</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="c1"># set time parameters</span>
@@ -146,66 +146,66 @@
     <span class="n">diff_gs</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uend_mssdc_gs</span> <span class="o">-</span> <span class="n">uend_pfasst</span><span class="p">)</span>
     <span class="n">diff_jac_gs</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uend_mssdc_gs</span> <span class="o">-</span> <span class="n">uend_mssdc_jac</span><span class="p">)</span>
 
-    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/step_8_B_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/step_8_B_out.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
 
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Error PFASST: </span><span class="si">%12.8e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err_pfasst</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'Error PFASST: </span><span class="si">%12.8e</span><span class="s1">'</span> <span class="o">%</span> <span class="n">err_pfasst</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Error parallel MSSDC: </span><span class="si">%12.8e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err_mssdc_jac</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'Error parallel MSSDC: </span><span class="si">%12.8e</span><span class="s1">'</span> <span class="o">%</span> <span class="n">err_mssdc_jac</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Error serial MSSDC: </span><span class="si">%12.8e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err_mssdc_gs</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'Error serial MSSDC: </span><span class="si">%12.8e</span><span class="s1">'</span> <span class="o">%</span> <span class="n">err_mssdc_gs</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Diff PFASST vs. parallel MSSDC: </span><span class="si">%12.8e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">diff_jac</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'Diff PFASST vs. parallel MSSDC: </span><span class="si">%12.8e</span><span class="s1">'</span> <span class="o">%</span> <span class="n">diff_jac</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Diff PFASST vs. serial MSSDC: </span><span class="si">%12.8e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">diff_gs</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'Diff PFASST vs. serial MSSDC: </span><span class="si">%12.8e</span><span class="s1">'</span> <span class="o">%</span> <span class="n">diff_gs</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Diff parallel vs. serial MSSDC: </span><span class="si">%12.8e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">diff_jac_gs</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'Diff parallel vs. serial MSSDC: </span><span class="si">%12.8e</span><span class="s1">'</span> <span class="o">%</span> <span class="n">diff_jac_gs</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="c1"># convert filtered statistics to list of iterations count, sorted by process</span>
-    <span class="n">iter_counts_pfasst</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_pfasst</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
-    <span class="n">iter_counts_mssdc_jac</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_mssdc_jac</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
-    <span class="n">iter_counts_mssdc_gs</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_mssdc_gs</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">iter_counts_pfasst</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_pfasst</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'niter'</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">'time'</span><span class="p">)</span>
+    <span class="n">iter_counts_mssdc_jac</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_mssdc_jac</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'niter'</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">'time'</span><span class="p">)</span>
+    <span class="n">iter_counts_mssdc_gs</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_mssdc_gs</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'niter'</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">'time'</span><span class="p">)</span>
 
     <span class="c1"># compute and print statistics</span>
     <span class="k">for</span> <span class="n">item_pfasst</span><span class="p">,</span> <span class="n">item_mssdc_jac</span><span class="p">,</span> <span class="n">item_mssdc_gs</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
         <span class="n">iter_counts_pfasst</span><span class="p">,</span> <span class="n">iter_counts_mssdc_jac</span><span class="p">,</span> <span class="n">iter_counts_mssdc_gs</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Number of iterations for time </span><span class="si">%4.2f</span><span class="s1"> (PFASST/parMSSDC/serMSSDC): </span><span class="si">%2i</span><span class="s1"> / </span><span class="si">%2i</span><span class="s1"> / </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">'Number of iterations for time </span><span class="si">%4.2f</span><span class="s1"> (PFASST/parMSSDC/serMSSDC): </span><span class="si">%2i</span><span class="s1"> / </span><span class="si">%2i</span><span class="s1"> / </span><span class="si">%2i</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span>
             <span class="n">item_pfasst</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
             <span class="n">item_pfasst</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
             <span class="n">item_mssdc_jac</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
             <span class="n">item_mssdc_gs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
         <span class="p">)</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="c1"># call helper routine to produce residual plot</span>
-    <span class="n">show_residual_across_simulation</span><span class="p">(</span><span class="n">stats_mssdc_jac</span><span class="p">,</span> <span class="s1">&#39;data/step_8_residuals_mssdc_jac.png&#39;</span><span class="p">)</span>
-    <span class="n">show_residual_across_simulation</span><span class="p">(</span><span class="n">stats_mssdc_gs</span><span class="p">,</span> <span class="s1">&#39;data/step_8_residuals_mssdc_gs.png&#39;</span><span class="p">)</span>
+    <span class="n">show_residual_across_simulation</span><span class="p">(</span><span class="n">stats_mssdc_jac</span><span class="p">,</span> <span class="s1">'data/step_8_residuals_mssdc_jac.png'</span><span class="p">)</span>
+    <span class="n">show_residual_across_simulation</span><span class="p">(</span><span class="n">stats_mssdc_gs</span><span class="p">,</span> <span class="s1">'data/step_8_residuals_mssdc_gs.png'</span><span class="p">)</span>
 
-    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;data/step_8_residuals_mssdc_jac.png&#39;</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;data/step_8_residuals_mssdc_gs.png&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">'data/step_8_residuals_mssdc_jac.png'</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">'data/step_8_residuals_mssdc_gs.png'</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">diff_jac</span> <span class="o">&lt;</span> <span class="mf">3.1e-10</span><span class="p">,</span> <span class="p">(</span>
-        <span class="s2">&quot;ERROR: difference between PFASST and parallel MSSDC controller is too large, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">diff_jac</span>
+        <span class="s2">"ERROR: difference between PFASST and parallel MSSDC controller is too large, got </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">diff_jac</span>
     <span class="p">)</span>
     <span class="k">assert</span> <span class="n">diff_gs</span> <span class="o">&lt;</span> <span class="mf">3.1e-10</span><span class="p">,</span> <span class="p">(</span>
-        <span class="s2">&quot;ERROR: difference between PFASST and serial MSSDC controller is too large, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">diff_gs</span>
+        <span class="s2">"ERROR: difference between PFASST and serial MSSDC controller is too large, got </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">diff_gs</span>
     <span class="p">)</span>
     <span class="k">assert</span> <span class="n">diff_jac_gs</span> <span class="o">&lt;</span> <span class="mf">3.1e-10</span><span class="p">,</span> <span class="p">(</span>
-        <span class="s2">&quot;ERROR: difference between parallel and serial MSSDC controller is too large, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">diff_jac_gs</span>
+        <span class="s2">"ERROR: difference between parallel and serial MSSDC controller is too large, got </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">diff_jac_gs</span>
     <span class="p">)</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -213,9 +213,9 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Error</span> <span class="n">PFASST</span><span class="p">:</span> <span class="mf">2.87344391e-07</span>
 <span class="n">Error</span> <span class="n">parallel</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">2.87650037e-07</span>
 <span class="n">Error</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">2.87540078e-07</span>
-<span class="n">Diff</span> <span class="n">PFASST</span> <span class="n">vs</span><span class="o">.</span> <span class="n">parallel</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">3.05646470e-10</span>
-<span class="n">Diff</span> <span class="n">PFASST</span> <span class="n">vs</span><span class="o">.</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">1.95687262e-10</span>
-<span class="n">Diff</span> <span class="n">parallel</span> <span class="n">vs</span><span class="o">.</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">1.09959215e-10</span>
+<span class="n">Diff</span> <span class="n">PFASST</span> <span class="n">vs</span><span class="o">.</span> <span class="n">parallel</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">3.05646456e-10</span>
+<span class="n">Diff</span> <span class="n">PFASST</span> <span class="n">vs</span><span class="o">.</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">1.95687268e-10</span>
+<span class="n">Diff</span> <span class="n">parallel</span> <span class="n">vs</span><span class="o">.</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">1.09959188e-10</span>
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span> <span class="p">(</span><span class="n">PFASST</span><span class="o">/</span><span class="n">parMSSDC</span><span class="o">/</span><span class="n">serMSSDC</span><span class="p">):</span>  <span class="mi">5</span> <span class="o">/</span>  <span class="mi">8</span> <span class="o">/</span>  <span class="mi">8</span>
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.12</span> <span class="p">(</span><span class="n">PFASST</span><span class="o">/</span><span class="n">parMSSDC</span><span class="o">/</span><span class="n">serMSSDC</span><span class="p">):</span>  <span class="mi">5</span> <span class="o">/</span> <span class="mi">10</span> <span class="o">/</span>  <span class="mi">9</span>
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span> <span class="p">(</span><span class="n">PFASST</span><span class="o">/</span><span class="n">parMSSDC</span><span class="o">/</span><span class="n">serMSSDC</span><span class="p">):</span>  <span class="mi">6</span> <span class="o">/</span> <span class="mi">11</span> <span class="o">/</span>  <span class="mi">9</span>

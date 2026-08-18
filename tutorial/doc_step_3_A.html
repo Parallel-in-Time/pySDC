@@ -47,80 +47,80 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A simple test program to describe how to get statistics of a run</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># run simulation</span>
     <span class="n">stats</span> <span class="o">=</span> <span class="n">run_simulation</span><span class="p">()</span>
 
-    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/step_3_A_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;List of registered statistic types: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">get_list_of_types</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/step_3_A_out.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">'List of registered statistic types: </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="n">get_list_of_types</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="c1"># filter statistics by first time interval and type (residual)</span>
-    <span class="n">residuals</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;residual_post_iteration&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)</span>
+    <span class="n">residuals</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'residual_post_iteration'</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">'iter'</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">residuals</span><span class="p">:</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Residual in iteration </span><span class="si">%2i</span><span class="s1">: </span><span class="si">%8.4e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">item</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">'Residual in iteration </span><span class="si">%2i</span><span class="s1">: </span><span class="si">%8.4e</span><span class="s1">'</span> <span class="o">%</span> <span class="n">item</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="c1"># get and convert filtered statistics to list of iterations count, sorted by time</span>
     <span class="c1"># the get_sorted function is just a shortcut for sort_stats(filter_stats()) with all the same arguments</span>
-    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'niter'</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">'time'</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts</span><span class="p">:</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Number of iterations at time </span><span class="si">%4.2f</span><span class="s1">: </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">item</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">'Number of iterations at time </span><span class="si">%4.2f</span><span class="s1">: </span><span class="si">%2i</span><span class="s1">'</span> <span class="o">%</span> <span class="n">item</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">12</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts</span><span class="p">),</span> <span class="p">(</span>
-        <span class="s1">&#39;ERROR: number of iterations are not as expected, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">iter_counts</span>
+        <span class="s1">'ERROR: number of iterations are not as expected, got </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="n">iter_counts</span>
     <span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">run_simulation</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A simple test program to run IMEX SDC for a single time step</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'restol'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'dt'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'quad_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'RADAU-RIGHT'</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'num_nodes'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
 
     <span class="c1"># initialize problem parameters</span>
     <span class="n">problem_params</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1023</span>  <span class="c1"># number of degrees of freedom</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'nu'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'freq'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'nvars'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1023</span>  <span class="c1"># number of degrees of freedom</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">'bc'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'dirichlet-zero'</span>  <span class="c1"># boundary conditions</span>
 
     <span class="c1"># initialize step parameters</span>
     <span class="n">step_params</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">'maxiter'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
 
     <span class="c1"># initialize controller parameters (&lt;-- this is new!)</span>
     <span class="n">controller_params</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>  <span class="c1"># reduce verbosity of each run</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'logger_level'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>  <span class="c1"># reduce verbosity of each run</span>
 
     <span class="c1"># Fill description dictionary for easy hierarchy creation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_forced</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imex_1st_order</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_forced</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">imex_1st_order</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'level_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'step_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
 
     <span class="c1"># instantiate the controller (no controller parameters used here)</span>
     <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
@@ -139,12 +139,12 @@
     <span class="k">return</span> <span class="n">stats</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">List</span> <span class="n">of</span> <span class="n">registered</span> <span class="n">statistic</span> <span class="n">types</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;residual_post_sweep&#39;</span><span class="p">,</span> <span class="s1">&#39;residual_post_iteration&#39;</span><span class="p">,</span> <span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="s1">&#39;residual_post_step&#39;</span><span class="p">,</span> <span class="s1">&#39;_recomputed&#39;</span><span class="p">,</span> <span class="s1">&#39;timing_setup&#39;</span><span class="p">,</span> <span class="s1">&#39;timing_comm&#39;</span><span class="p">,</span> <span class="s1">&#39;timing_sweep&#39;</span><span class="p">,</span> <span class="s1">&#39;timing_iteration&#39;</span><span class="p">,</span> <span class="s1">&#39;timing_step&#39;</span><span class="p">,</span> <span class="s1">&#39;timing_run&#39;</span><span class="p">,</span> <span class="s1">&#39;restart&#39;</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">List</span> <span class="n">of</span> <span class="n">registered</span> <span class="n">statistic</span> <span class="n">types</span><span class="p">:</span> <span class="p">[</span><span class="s1">'residual_post_sweep'</span><span class="p">,</span> <span class="s1">'residual_post_iteration'</span><span class="p">,</span> <span class="s1">'niter'</span><span class="p">,</span> <span class="s1">'residual_post_step'</span><span class="p">,</span> <span class="s1">'_recomputed'</span><span class="p">,</span> <span class="s1">'timing_setup'</span><span class="p">,</span> <span class="s1">'timing_comm'</span><span class="p">,</span> <span class="s1">'timing_sweep'</span><span class="p">,</span> <span class="s1">'timing_iteration'</span><span class="p">,</span> <span class="s1">'timing_step'</span><span class="p">,</span> <span class="s1">'timing_run'</span><span class="p">,</span> <span class="s1">'restart'</span><span class="p">]</span>
 <span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">1</span><span class="p">:</span> <span class="mf">4.1119e-03</span>
 <span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">2</span><span class="p">:</span> <span class="mf">6.6844e-04</span>
 <span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">3</span><span class="p">:</span> <span class="mf">8.8038e-05</span>
@@ -153,10 +153,10 @@
 <span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">6</span><span class="p">:</span> <span class="mf">6.3645e-07</span>
 <span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">7</span><span class="p">:</span> <span class="mf">1.6895e-07</span>
 <span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">8</span><span class="p">:</span> <span class="mf">3.5259e-08</span>
-<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">9</span><span class="p">:</span> <span class="mf">6.0728e-09</span>
-<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span> <span class="mi">10</span><span class="p">:</span> <span class="mf">8.2909e-10</span>
-<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span> <span class="mi">11</span><span class="p">:</span> <span class="mf">1.1874e-10</span>
-<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span> <span class="mi">12</span><span class="p">:</span> <span class="mf">1.4173e-11</span>
+<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">9</span><span class="p">:</span> <span class="mf">6.0722e-09</span>
+<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span> <span class="mi">10</span><span class="p">:</span> <span class="mf">8.2716e-10</span>
+<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span> <span class="mi">11</span><span class="p">:</span> <span class="mf">1.1914e-10</span>
+<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span> <span class="mi">12</span><span class="p">:</span> <span class="mf">1.4455e-11</span>
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.10</span><span class="p">:</span> <span class="mi">12</span>
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.20</span><span class="p">:</span> <span class="mi">12</span>
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.30</span><span class="p">:</span> <span class="mi">12</span>

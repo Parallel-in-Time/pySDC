@@ -45,7 +45,7 @@
 <div class="viewcode-block" id="HotRod">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HotRod</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Class that incorporates the Hot Rod detector [1] for soft faults. Based on comparing two estimates of the local</span>
 <span class="sd">    error.</span>
 
@@ -54,12 +54,12 @@
 <span class="sd">    See for the reference:</span>
 <span class="sd">    [1]: Lightweight and Accurate Silent Data Corruption Detection in Ordinary Differential Equation Solvers,</span>
 <span class="sd">    Guhur et al. 2016, Springer. DOI: https://doi.org/10.1007/978-3-319-43659-3_47</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="HotRod.setup">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod.setup">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Setup default values for crucial parameters.</span>
 
 <span class="sd">        Args:</span>
@@ -69,11 +69,11 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: The updated params</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">default_params</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;HotRod_tol&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
-            <span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">40</span><span class="p">,</span>
-            <span class="s2">&quot;no_storage&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"HotRod_tol"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+            <span class="s2">"control_order"</span><span class="p">:</span> <span class="o">-</span><span class="mi">40</span><span class="p">,</span>
+            <span class="s2">"no_storage"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">default_params</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
 
@@ -81,7 +81,7 @@
 <div class="viewcode-block" id="HotRod.dependencies">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod.dependencies">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Load the dependencies of Hot Rod, which are the two error estimators</span>
 
 <span class="sd">        Args:</span>
@@ -90,11 +90,11 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.convergence_controller_classes.estimate_embedded_error</span><span class="w"> </span><span class="kn">import</span> <span class="n">EstimateEmbeddedError</span>
 
         <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
-            <span class="n">EstimateEmbeddedError</span><span class="o">.</span><span class="n">get_implementation</span><span class="p">(</span><span class="n">flavor</span><span class="o">=</span><span class="s1">&#39;linearized&#39;</span><span class="p">,</span> <span class="n">useMPI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">useMPI</span><span class="p">),</span>
+            <span class="n">EstimateEmbeddedError</span><span class="o">.</span><span class="n">get_implementation</span><span class="p">(</span><span class="n">flavor</span><span class="o">=</span><span class="s1">'linearized'</span><span class="p">,</span> <span class="n">useMPI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">useMPI</span><span class="p">),</span>
             <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">useMPI</span><span class="p">:</span>
@@ -104,21 +104,21 @@
             <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.convergence_controller_classes.basic_restarting</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasicRestartingNonMPI</span>
 
             <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
-                <span class="n">EstimateExtrapolationErrorNonMPI</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;no_storage&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">no_storage</span><span class="p">}</span>
+                <span class="n">EstimateExtrapolationErrorNonMPI</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">'no_storage'</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">no_storage</span><span class="p">}</span>
             <span class="p">)</span>
             <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
                 <span class="n">BasicRestartingNonMPI</span><span class="p">,</span>
                 <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
-                <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;restart_from_first_step&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+                <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">'restart_from_first_step'</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Don&#39;t know how to estimate extrapolated error with MPI&quot;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Don't know how to estimate extrapolated error with MPI"</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="HotRod.check_parameters">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod.check_parameters">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.</span>
 
 <span class="sd">        Args:</span>
@@ -129,31 +129,31 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: Whether the parameters are compatible</span>
 <span class="sd">            str: Error message</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">HotRod_tol</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">:</span>
-            <span class="n">controller</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Hot Rod needs a detection threshold, which is now set to infinity, such that a </span><span class="se">\</span>
-<span class="s2">restart is never triggered!&quot;</span><span class="p">)</span>
+            <span class="n">controller</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Hot Rod needs a detection threshold, which is now set to infinity, such that a </span><span class="se">\</span>
+<span class="s2">restart is never triggered!"</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">description</span><span class="p">[</span><span class="s2">&quot;step_params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;restol&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">description</span><span class="p">[</span><span class="s2">"step_params"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"restol"</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span>
                 <span class="kc">False</span><span class="p">,</span>
-                <span class="s2">&quot;Hot Rod needs constant order in time and hence restol in the step parameters has to be </span><span class="se">\</span>
-<span class="s2">smaller than 0!&quot;</span><span class="p">,</span>
+                <span class="s2">"Hot Rod needs constant order in time and hence restol in the step parameters has to be </span><span class="se">\</span>
+<span class="s2">smaller than 0!"</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">controller</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">mssdc_jac</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span>
                 <span class="kc">False</span><span class="p">,</span>
-                <span class="s2">&quot;Hot Rod needs the same order on all steps, please activate Gauss-Seidel multistep mode!&quot;</span><span class="p">,</span>
+                <span class="s2">"Hot Rod needs the same order on all steps, please activate Gauss-Seidel multistep mode!"</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;&quot;</span></div>
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">""</span></div>
 
 
 <div class="viewcode-block" id="HotRod.determine_restart">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod.determine_restart">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">MS</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Check if the difference between the error estimates exceeds the allowed tolerance</span>
 
 <span class="sd">        Args:</span>
@@ -163,7 +163,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># we determine whether to restart only on the last sweep</span>
         <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&lt;</span> <span class="n">S</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
@@ -177,12 +177,12 @@
                 <span class="k">if</span> <span class="n">diff</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">HotRod_tol</span><span class="p">:</span>
                     <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Triggering restart: e_em=</span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">, e_ex=</span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_extrapolation_estimate</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> -&gt; delta=</span><span class="si">{</span><span class="n">diff</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">, tol=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">HotRod_tol</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">"Triggering restart: e_em=</span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">, e_ex=</span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_extrapolation_estimate</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> -&gt; delta=</span><span class="si">{</span><span class="n">diff</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">, tol=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">HotRod_tol</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
                         <span class="n">S</span><span class="p">,</span>
                     <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Not triggering restart: e_em=</span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">, e_ex=</span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_extrapolation_estimate</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> -&gt; delta=</span><span class="si">{</span><span class="n">diff</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">, tol=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">HotRod_tol</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">"Not triggering restart: e_em=</span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">, e_ex=</span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_extrapolation_estimate</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> -&gt; delta=</span><span class="si">{</span><span class="n">diff</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">, tol=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">HotRod_tol</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
                         <span class="n">S</span><span class="p">,</span>
                     <span class="p">)</span>
 
@@ -192,7 +192,7 @@
 <div class="viewcode-block" id="HotRod.post_iteration_processing">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod.post_iteration_processing">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Throw away the final sweep to match the error estimates.</span>
 
 <span class="sd">        Args:</span>
@@ -201,7 +201,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">==</span> <span class="n">S</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>
                 <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">uold</span><span class="p">[:]</span>

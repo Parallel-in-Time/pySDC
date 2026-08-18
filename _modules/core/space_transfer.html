@@ -59,7 +59,7 @@
 <div class="viewcode-block" id="SpaceTransfer">
 <a class="viewcode-back" href="../../pySDC/core.space_transfer.html#core.space_transfer.SpaceTransfer">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SpaceTransfer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Abstract SpaceTransfer class</span>
 
 <span class="sd">    Attributes:</span>
@@ -67,22 +67,22 @@
 <span class="sd">        logger: custom logger for transfer-related logging</span>
 <span class="sd">        fine_prob (pySDC.Problem.ptype): reference to the fine problem</span>
 <span class="sd">        coarse_prob (pySDC.Problem.ptype): reference to the coarse problem</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fine_prob</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fine_prob (pySDC.Problem.ptype): reference to the fine problem</span>
 <span class="sd">            coarse_prob (pySDC.Problem.ptype): reference to the coarse problem</span>
 <span class="sd">            params (dict): user-defined parameters</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span> <span class="n">_Pars</span> <span class="o">=</span> <span class="n">_Pars</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
         <span class="c1"># set up logger</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;space-transfer&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">'space-transfer'</span><span class="p">)</span>
 
         <span class="c1"># just copy by object</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">fine_prob</span>
@@ -91,25 +91,25 @@
 <div class="viewcode-block" id="SpaceTransfer.restrict">
 <a class="viewcode-back" href="../../pySDC/core.space_transfer.html#core.space_transfer.SpaceTransfer.restrict">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Abstract interface for restriction in space</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            F: the fine level data (easier to access than via the fine attribute)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;ERROR: space_transfer has to implement restrict(self, F)&#39;</span><span class="p">)</span></div>
+<span class="sd">        """</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'ERROR: space_transfer has to implement restrict(self, F)'</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SpaceTransfer.prolong">
 <a class="viewcode-back" href="../../pySDC/core.space_transfer.html#core.space_transfer.SpaceTransfer.prolong">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">G</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Abstract interface for prolongation in space</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            G: the coarse level data (easier to access than via the coarse attribute)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;ERROR: space_transfer has to implement prolong(self, G)&#39;</span><span class="p">)</span></div>
+<span class="sd">        """</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'ERROR: space_transfer has to implement prolong(self, G)'</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

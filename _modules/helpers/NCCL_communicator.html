@@ -46,29 +46,29 @@
 <div class="viewcode-block" id="NCCLComm">
 <a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">NCCLComm</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Wraps an MPI communicator and performs some calls to NCCL functions instead.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Args:</span>
 <span class="sd">            comm (mpi4py.Intracomm): MPI communicator</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">commMPI</span> <span class="o">=</span> <span class="n">comm</span>
 
         <span class="n">uid</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">nccl</span><span class="o">.</span><span class="n">get_unique_id</span><span class="p">(),</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">commNCCL</span> <span class="o">=</span> <span class="n">nccl</span><span class="o">.</span><span class="n">NcclCommunicator</span><span class="p">(</span><span class="n">comm</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">uid</span><span class="p">,</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Pass calls that are not explicitly overridden by NCCL functionality on to the MPI communicator.</span>
 <span class="sd">        When performing any operations that depend on data, we have to synchronize host and device beforehand.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            Name (str): Name of the requested attribute</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="s1">&#39;rank&#39;</span><span class="p">,</span> <span class="s1">&#39;Get_rank&#39;</span><span class="p">,</span> <span class="s1">&#39;Get_size&#39;</span><span class="p">,</span> <span class="s1">&#39;Split&#39;</span><span class="p">,</span> <span class="s1">&#39;Create_cart&#39;</span><span class="p">,</span> <span class="s1">&#39;Is_inter&#39;</span><span class="p">,</span> <span class="s1">&#39;Get_topology&#39;</span><span class="p">]:</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'size'</span><span class="p">,</span> <span class="s1">'rank'</span><span class="p">,</span> <span class="s1">'Get_rank'</span><span class="p">,</span> <span class="s1">'Get_size'</span><span class="p">,</span> <span class="s1">'Split'</span><span class="p">,</span> <span class="s1">'Create_cart'</span><span class="p">,</span> <span class="s1">'Is_inter'</span><span class="p">,</span> <span class="s1">'Get_topology'</span><span class="p">]:</span>
             <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_current_stream</span><span class="p">()</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">commMPI</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
@@ -77,29 +77,29 @@
 <a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.get_dtype">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_dtype</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        As NCCL doesn&#39;t support complex numbers, we have to act as if we&#39;re sending two real numbers if using complex.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        As NCCL doesn't support complex numbers, we have to act as if we're sending two real numbers if using complex.</span>
+<span class="sd">        """</span>
         <span class="n">dtype</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span>
-        <span class="k">if</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;complex64&#39;</span><span class="p">)]:</span>
+        <span class="k">if</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'float32'</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'complex64'</span><span class="p">)]:</span>
             <span class="k">return</span> <span class="n">nccl</span><span class="o">.</span><span class="n">NCCL_FLOAT32</span>
-        <span class="k">elif</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;complex128&#39;</span><span class="p">)]:</span>
+        <span class="k">elif</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'complex128'</span><span class="p">)]:</span>
             <span class="k">return</span> <span class="n">nccl</span><span class="o">.</span><span class="n">NCCL_FLOAT64</span>
-        <span class="k">elif</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;int32&#39;</span><span class="p">)]:</span>
+        <span class="k">elif</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'int32'</span><span class="p">)]:</span>
             <span class="k">return</span> <span class="n">nccl</span><span class="o">.</span><span class="n">NCCL_INT32</span>
-        <span class="k">elif</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)]:</span>
+        <span class="k">elif</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'int64'</span><span class="p">)]:</span>
             <span class="k">return</span> <span class="n">nccl</span><span class="o">.</span><span class="n">NCCL_INT64</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Don</span><span class="se">\&#39;</span><span class="s1">t know what NCCL dtype to use to send data of dtype </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s1">!&#39;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Don</span><span class="se">\'</span><span class="s1">t know what NCCL dtype to use to send data of dtype </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s1">!'</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="NCCLComm.get_count">
 <a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.get_count">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_count</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        As NCCL doesn&#39;t support complex numbers, we have to act as if we&#39;re sending two real numbers if using complex.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        As NCCL doesn't support complex numbers, we have to act as if we're sending two real numbers if using complex.</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">cp</span><span class="o">.</span><span class="n">iscomplexobj</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">size</span> <span class="o">*</span> <span class="mi">2</span>
         <span class="k">else</span><span class="p">:</span>
@@ -118,15 +118,15 @@
         <span class="k">elif</span> <span class="n">MPI_op</span> <span class="o">==</span> <span class="n">MPI</span><span class="o">.</span><span class="n">MIN</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">nccl</span><span class="o">.</span><span class="n">NCCL_MIN</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Don</span><span class="se">\&#39;</span><span class="s1">t know what NCCL operation to use to replace this MPI operation!&#39;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'Don</span><span class="se">\'</span><span class="s1">t know what NCCL operation to use to replace this MPI operation!'</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="NCCLComm.reduce">
 <a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.reduce">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sendobj</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="n">sync</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendobj</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendobj</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;ptr&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendobj</span><span class="p">,</span> <span class="s1">'data'</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendobj</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">'ptr'</span><span class="p">):</span>
                 <span class="n">sync</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">sync</span><span class="p">:</span>
             <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">Device</span><span class="p">()</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
@@ -138,8 +138,8 @@
 <a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.allreduce">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">allreduce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sendobj</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span><span class="p">):</span>
         <span class="n">sync</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendobj</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendobj</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;ptr&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendobj</span><span class="p">,</span> <span class="s1">'data'</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendobj</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">'ptr'</span><span class="p">):</span>
                 <span class="n">sync</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">sync</span><span class="p">:</span>
             <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">Device</span><span class="p">()</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
@@ -150,7 +150,7 @@
 <div class="viewcode-block" id="NCCLComm.Reduce">
 <a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.Reduce">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">Reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sendbuf</span><span class="p">,</span> <span class="n">recvbuf</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendbuf</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;ptr&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendbuf</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">'ptr'</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">commMPI</span><span class="o">.</span><span class="n">Reduce</span><span class="p">(</span><span class="n">sendbuf</span><span class="o">=</span><span class="n">sendbuf</span><span class="p">,</span> <span class="n">recvbuf</span><span class="o">=</span><span class="n">recvbuf</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">op</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">)</span>
 
         <span class="n">dtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dtype</span><span class="p">(</span><span class="n">sendbuf</span><span class="p">)</span>
@@ -173,7 +173,7 @@
 <div class="viewcode-block" id="NCCLComm.Allreduce">
 <a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.Allreduce">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">Allreduce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sendbuf</span><span class="p">,</span> <span class="n">recvbuf</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendbuf</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;ptr&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendbuf</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">'ptr'</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">commMPI</span><span class="o">.</span><span class="n">Allreduce</span><span class="p">(</span><span class="n">sendbuf</span><span class="o">=</span><span class="n">sendbuf</span><span class="p">,</span> <span class="n">recvbuf</span><span class="o">=</span><span class="n">recvbuf</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">op</span><span class="p">)</span>
 
         <span class="n">dtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dtype</span><span class="p">(</span><span class="n">sendbuf</span><span class="p">)</span>
@@ -189,7 +189,7 @@
 <div class="viewcode-block" id="NCCLComm.Bcast">
 <a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.Bcast">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">Bcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">buf</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;ptr&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">buf</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">'ptr'</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">commMPI</span><span class="o">.</span><span class="n">Bcast</span><span class="p">(</span><span class="n">buf</span><span class="o">=</span><span class="n">buf</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">)</span>
 
         <span class="n">dtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dtype</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>

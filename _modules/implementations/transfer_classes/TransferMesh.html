@@ -48,7 +48,7 @@
 <div class="viewcode-block" id="mesh_to_mesh">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferMesh.html#implementations.transfer_classes.TransferMesh.mesh_to_mesh">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">mesh_to_mesh</span><span class="p">(</span><span class="n">SpaceTransfer</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Custom base_transfer class, implements Transfer.py</span>
 
 <span class="sd">    This implementation can restrict and prolong between nd meshes with dirichlet-0 or periodic boundaries</span>
@@ -57,37 +57,37 @@
 <span class="sd">    Attributes:</span>
 <span class="sd">        Rspace: spatial restriction matrix, dim. Nf x Nc</span>
 <span class="sd">        Pspace: spatial prolongation matrix, dim. Nc x Nf</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fine_prob</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fine_prob: fine problem</span>
 <span class="sd">            coarse_prob: coarse problem</span>
 <span class="sd">            params: parameters for the transfer operators</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># invoke super initialization</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">fine_prob</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">rorder</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">&#39;Need even order for restriction&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">'Need even order for restriction'</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">iorder</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">&#39;Need even order for interpolation&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">'Need even order for interpolation'</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">tuple</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">tuple</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">&#39;nvars parameter of coarse problem needs to be a tuple&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">'nvars parameter of coarse problem needs to be a tuple'</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">&#39;nvars parameter of fine and coarse level needs to have the same length&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">'nvars parameter of fine and coarse level needs to have the same length'</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">int</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">&#39;nvars parameter of coarse problem needs to be an int&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">'nvars parameter of coarse problem needs to be an int'</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s2">&quot;unknow type of nvars for transfer, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s2">"unknow type of nvars for transfer, got </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
 
         <span class="c1"># we have a 1d problem</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
@@ -181,24 +181,24 @@
             <span class="c1"># kronecker 1-d operators for n-d</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Pspace</span> <span class="o">=</span> <span class="n">Pspace</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">Pspace</span><span class="p">)):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">Pspace</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Pspace</span><span class="p">,</span> <span class="n">Pspace</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Pspace</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Pspace</span><span class="p">,</span> <span class="n">Pspace</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">'csc'</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">Rspace</span> <span class="o">=</span> <span class="n">Rspace</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">Rspace</span><span class="p">)):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">Rspace</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rspace</span><span class="p">,</span> <span class="n">Rspace</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Rspace</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rspace</span><span class="p">,</span> <span class="n">Rspace</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">'csc'</span><span class="p">)</span>
 
 <div class="viewcode-block" id="mesh_to_mesh.restrict">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferMesh.html#implementations.transfer_classes.TransferMesh.mesh_to_mesh.restrict">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Restriction implementation</span>
 <span class="sd">        Args:</span>
 <span class="sd">            F: the fine level data (easier to access than via the fine attribute)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">G</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_restrict</span><span class="p">(</span><span class="n">fine</span><span class="p">,</span> <span class="n">coarse</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="p">,</span> <span class="s1">&#39;ncomp&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="p">,</span> <span class="s1">'ncomp'</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">ncomp</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">fine</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">ncomp</span><span class="p">:</span>
                         <span class="n">tmpF</span> <span class="o">=</span> <span class="n">fine</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
@@ -209,34 +209,34 @@
                         <span class="n">tmpG</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rspace</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">tmpF</span><span class="p">)</span>
                         <span class="n">coarse</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmpG</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">&#39;Don</span><span class="se">\&#39;</span><span class="s1">t know how to restrict for this problem with multiple components&#39;</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">'Don</span><span class="se">\'</span><span class="s1">t know how to restrict for this problem with multiple components'</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">tmpF</span> <span class="o">=</span> <span class="n">fine</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
                 <span class="n">tmpG</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rspace</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">tmpF</span><span class="p">)</span>
                 <span class="n">coarse</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">tmpG</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">),</span> <span class="s1">&#39;components&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">),</span> <span class="s1">'components'</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">F</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
                 <span class="n">_restrict</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">comp</span><span class="p">),</span> <span class="n">G</span><span class="o">.</span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">comp</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;mesh&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'mesh'</span><span class="p">:</span>
             <span class="n">_restrict</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">G</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">&#39;Wrong data type for restriction, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">'Wrong data type for restriction, got </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">G</span></div>
 
 
 <div class="viewcode-block" id="mesh_to_mesh.prolong">
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferMesh.html#implementations.transfer_classes.TransferMesh.mesh_to_mesh.prolong">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">G</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Prolongation implementation</span>
 <span class="sd">        Args:</span>
 <span class="sd">            G: the coarse level data (easier to access than via the coarse attribute)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">F</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_prolong</span><span class="p">(</span><span class="n">coarse</span><span class="p">,</span> <span class="n">fine</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="p">,</span> <span class="s1">&#39;ncomp&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="p">,</span> <span class="s1">'ncomp'</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">ncomp</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">coarse</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">ncomp</span><span class="p">:</span>
                         <span class="n">tmpG</span> <span class="o">=</span> <span class="n">coarse</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
@@ -247,20 +247,20 @@
                         <span class="n">tmpF</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pspace</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">tmpG</span><span class="p">)</span>
                         <span class="n">fine</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmpF</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">&#39;Don</span><span class="se">\&#39;</span><span class="s1">t know how to prolong for this problem with multiple components&#39;</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">'Don</span><span class="se">\'</span><span class="s1">t know how to prolong for this problem with multiple components'</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">tmpG</span> <span class="o">=</span> <span class="n">coarse</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
                 <span class="n">tmpF</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pspace</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">tmpG</span><span class="p">)</span>
                 <span class="n">fine</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">tmpF</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">fine</span>
 
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">),</span> <span class="s1">&#39;components&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">),</span> <span class="s1">'components'</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
                 <span class="n">_prolong</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">comp</span><span class="p">),</span> <span class="n">F</span><span class="o">.</span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">comp</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;mesh&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'mesh'</span><span class="p">:</span>
             <span class="n">F</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">_prolong</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">F</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">&#39;Wrong data type for prolongation, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">'Wrong data type for prolongation, got </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">F</span></div>
 </div>
 
