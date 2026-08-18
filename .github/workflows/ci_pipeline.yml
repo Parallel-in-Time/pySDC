@@ -8,6 +8,17 @@ on:
   schedule:
     - cron: '1 5 * * 1'
 
+# Pushing to a branch with an open PR fires both `push` and `pull_request`
+# for the same commit, doubling the ~80-job matrix. Cancel the older,
+# now-stale run instead of letting both run to completion. `head_ref` is
+# only set on pull_request events (the PR's source branch); `ref_name` is
+# the plain branch name on push events (unlike `ref`, which carries a
+# `refs/heads/` prefix that would never match `head_ref`) - so both events
+# for the same branch land in the same group.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
 
   lint:
@@ -37,6 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      max-parallel: 8
       matrix:
         env: ['base', 'fenics', 'mpi4py', 'petsc', 'pytorch']
         python: ['3.10', '3.11', '3.12', '3.13']
@@ -81,8 +93,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      max-parallel: 8
       matrix:
-        env: 
+        env:
           - AllenCahn_Bayreuth
           - AsympConv
           - DAE
@@ -305,6 +318,11 @@ jobs:
           python -m coverage report
       - name: Post coverage comment on PR
         uses: py-cov-action/python-coverage-comment-action@v3
+        # Non-blocking: this only posts an informational PR comment, not a
+        # correctness signal, and has been observed to fail on a transient
+        # GitHub API 504 unrelated to this workflow (see PR #659). Don't
+        # fail the whole PR's CI status over a comment.
+        continue-on-error: true
         with:
           GITHUB_TOKEN: ${{ github.token }}
           MINIMUM_GREEN: 70
