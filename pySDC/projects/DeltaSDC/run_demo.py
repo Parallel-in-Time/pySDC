@@ -77,7 +77,9 @@ def main():
         'eps': 0.04,
         'newton_maxiter': 100,
         'newton_tol': 1e-12,
-        'lin_tol': 1e-8,
+        # lin_tol is relative, so it can be very loose for free: at 1e-2 the accuracy is
+        # unchanged and the linear work halves. newton_tol is absolute and must stay tight.
+        'lin_tol': 1e-2,
         'lin_maxiter': 500,
         'radius': 0.25,
     }
