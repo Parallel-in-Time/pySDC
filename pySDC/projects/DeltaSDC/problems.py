@@ -30,47 +30,51 @@ import scipy.sparse as sp
 from scipy.sparse.linalg import cg
 
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit
-from pySDC.projects.DeltaSDC.precision import PrecisionAwareTolerances
+from pySDC.projects.DeltaSDC.precision import clamp_tolerance, tol_floor, working_dtype
 
 
-class allencahn_delta(PrecisionAwareTolerances, allencahn_fullyimplicit):
+class allencahn_delta(allencahn_fullyimplicit):
     r"""
-    Fully implicit Allen-Cahn with a node-local correction solve.
+        Fully implicit Allen-Cahn with a node-local correction solve.
 
-    The right-hand side is :math:`f(u) = Au + \varepsilon^{-2} u (1 - u^\nu)`, so for :math:`\nu=2`
+        The right-hand side is :math:`f(u) = Au + \varepsilon^{-2} u (1 - u^\nu)`, so for :math:`\nu=2`
 
-    .. math::
-        f(w+\delta) - f(w) = A\delta
-            + \varepsilon^{-2}\left[\delta - \left(3w^2\delta + 3w\delta^2 + \delta^3\right)\right],
+        .. math::
+            f(w+\delta) - f(w) = A\delta
+                + \varepsilon^{-2}\left[\delta - \left(3w^2\delta + 3w\delta^2 + \delta^3\right)\right],
 
-    in which every term carries a factor :math:`\delta`.
+        in which every term carries a factor :math:`\delta`.
 
-    Parameters
-    ----------
-    solve_precision : dtype-like or None, optional
-        Working precision of the node-local solve. ``None`` keeps backend precision.
-    krylov_tol : float, optional
-        Requested relative tolerance of the linear solver, clamped to the precision floor.
-    newton_rtol : float, optional
-        Requested relative tolerance of the nonlinear solver, clamped to the precision floor.
-    **kwargs
-        Forwarded to :class:`allencahn_fullyimplicit`.
+    Tolerances are the inherited ones and are set in the frontend as usual: ``lin_tol`` is the
+        relative Krylov tolerance and ``newton_tol`` the absolute bar on the correction residual. Both
+        keep exactly the meaning they have in :class:`allencahn_fullyimplicit`, because the correction
+        residual :math:`\delta - \alpha[f(w+\delta) - f(w)] - r` is the same quantity as the parent's
+        :math:`u - \alpha f(u) - rhs` under :math:`u = w + \delta`. The only addition is that both are
+        raised to what ``solve_precision`` can actually deliver, which can only be decided inside the
+        solve because it depends on :math:`\alpha`.
 
-    Raises
-    ------
-    NotImplementedError
-        If ``nu`` is not 2, for which the analytic increment below is derived.
+        Parameters
+        ----------
+        solve_precision : dtype-like or None, optional
+            Working precision of the node-local solve. ``None`` keeps backend precision.
+        **kwargs
+            Forwarded to :class:`allencahn_fullyimplicit`, including ``lin_tol``, ``newton_tol``,
+            ``lin_maxiter`` and ``newton_maxiter``.
+
+        Raises
+        ------
+        NotImplementedError
+            If ``nu`` is not 2, for which the analytic increment below is derived.
     """
 
-    def __init__(self, solve_precision=None, krylov_tol=1e-8, newton_rtol=1e-8, **kwargs):
+    def __init__(self, solve_precision=None, **kwargs):
         """Initialization routine"""
         super().__init__(**kwargs)
         if self.nu != 2:
             raise NotImplementedError('allencahn_delta derives its analytic increment for nu=2 only!')
 
-        self.setup_precision_tolerances(solve_precision, krylov_tol, newton_rtol)
-
-        dtype = np.dtype('float64') if self.solve_precision is None else self.solve_precision
+        self.solve_precision = None if solve_precision is None else np.dtype(solve_precision)
+        dtype = working_dtype(self.solve_precision)
         size = self.nvars[0] * self.nvars[1]
         self._work_dtype = dtype
         self._A_work = self.A.astype(dtype).tocsr()
@@ -154,9 +158,13 @@ class allencahn_delta(PrecisionAwareTolerances, allencahn_fullyimplicit):
         rhs_work = np.asarray(r, dtype=dtype).reshape(-1)
         delta = np.zeros_like(rhs_work)
 
-        # The reachable tolerance scales with alpha * ||J||, so it is derived per solve.
-        krylov_tol, newton_rtol = self.effective_tolerances(1.0 + float(factor) * self._operator_norm)
-        bar = newton_rtol * max(float(np.linalg.norm(rhs_work, np.inf)), 1e-300)
+        # The reachable tolerance scales with alpha * ||J||, which is only known here, so the
+        # inherited tolerances are raised to the working-precision floor per solve.
+        conditioning = 1.0 + float(factor) * self._operator_norm
+        krylov_tol, _ = clamp_tolerance(self.lin_tol, self.solve_precision, conditioning=conditioning)
+        scale = max(float(np.linalg.norm(rhs_work, np.inf)), 1e-300)
+        floor = tol_floor(self.solve_precision, conditioning=conditioning)
+        bar = max(float(self.newton_tol), floor * scale)
 
         converged = False
         for _ in range(self.newton_maxiter):
@@ -178,12 +186,12 @@ class allencahn_delta(PrecisionAwareTolerances, allencahn_fullyimplicit):
 
         if not converged:
             self.logger.warning(
-                'Correction solve hit newton_maxiter=%d at %s without reaching rtol=%.2e. The '
-                'tolerance is probably below what this working precision can deliver; raise '
-                'newton_rtol or the safety factor.',
+                'Correction solve hit newton_maxiter=%d at %s without reaching a residual of %.2e. '
+                'The tolerance is probably below what this working precision can deliver; raise '
+                'newton_tol.',
                 self.newton_maxiter,
-                self.tolerance_report['working_precision'],
-                newton_rtol,
+                working_dtype(self.solve_precision),
+                bar,
             )
 
         me = self.dtype_u(self.init)

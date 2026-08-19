@@ -14,7 +14,6 @@ from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.projects.DeltaSDC.precision import tol_floor
 from pySDC.projects.DeltaSDC.problems import allencahn_delta
 from pySDC.projects.DeltaSDC.sweepers import delta_implicit
 
@@ -78,18 +77,16 @@ def main():
         'eps': 0.04,
         'newton_maxiter': 100,
         'newton_tol': 1e-12,
-        'lin_tol': 1e-12,
+        'lin_tol': 1e-8,
         'lin_maxiter': 500,
         'radius': 0.25,
     }
-    tol = tol_floor(np.float32)
-
     reference = run(allencahn_fullyimplicit, base_params, generic_implicit, SWEEPER_PARAMS)
 
     results = {'generic_implicit (fp64)': reference}
     for label, precision in [('delta-form (fp64)', None), ('delta-form (fp32 solve)', np.float32)]:
-        params = dict(base_params)
-        params.update({'solve_precision': precision, 'krylov_tol': tol, 'newton_rtol': tol})
+        # only the working precision is new; lin_tol / newton_tol are the usual pySDC knobs
+        params = dict(base_params, solve_precision=precision)
         results[label] = run(allencahn_delta, params, delta_implicit, SWEEPER_PARAMS)
 
     print(f"{'configuration':>26} | {'sweeps':>7} {'CG':>7} | {'diff to generic_implicit':>25}")

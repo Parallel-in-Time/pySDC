@@ -231,7 +231,7 @@ def test_solve_system_delta_path_is_preferred():
     allencahn_delta.solve_system_delta = counting
     try:
         u_std, _, _ = run(allencahn_fullyimplicit, AC_PARAMS, generic_implicit, sweeper_params(), 4e-4, 2, 8)
-        params = dict(AC_PARAMS, krylov_tol=1e-12, newton_rtol=1e-12)
+        params = dict(AC_PARAMS, lin_tol=1e-12, newton_tol=1e-12)
         u_delta, _, _ = run(allencahn_delta, params, delta_implicit, sweeper_params(), 4e-4, 2, 8)
     finally:
         allencahn_delta.solve_system_delta = original

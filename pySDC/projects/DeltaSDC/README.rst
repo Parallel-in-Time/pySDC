@@ -97,16 +97,21 @@ runs to ``maxiter`` against an impossible bar, turning reduced precision into a 
 pessimisation. ``precision.py`` derives the floor from the working precision, clamps requested
 tolerances to it, and records the clamping in ``tolerance_report`` so it is never silent.
 
-The floor is **conditioning-aware**::
+Tolerances themselves stay ordinary problem parameters, set in the frontend exactly as elsewhere
+in pySDC: ``lin_tol`` is the relative Krylov tolerance and ``newton_tol`` the absolute bar on the
+correction residual, both keeping the meaning they have in the parent problem class. The only
+thing this module adds is the **floor** below which a requested tolerance is unreachable, which is
+**conditioning-aware**::
 
     tol_floor(dtype, conditioning) = eps(dtype) * max(safety, conditioning_safety * conditioning)
 
 Forming the correction residual involves :math:`\alpha J \delta`, so its rounding error is of order
 :math:`\varepsilon\,\alpha\|J\|\,|\delta|`: the smallest reachable relative tolerance scales with
 :math:`\alpha\|J\|`, which grows with the step size and the spatial resolution. A fixed multiple of
-``eps`` is too tight for stiff or well-resolved problems. A problem class that knows
-:math:`\alpha\|J\|` should call ``effective_tolerances(1 + alpha * norm)`` per solve, as
-``allencahn_delta`` does; ``safety`` remains an unconditional minimum for callers that do not.
+``eps`` is too tight for stiff or well-resolved problems. This cannot live in the frontend:
+:math:`\alpha = \Delta t Q^\Delta_{mm}` is only known inside the node-local solve and differs per
+node and per level, so ``allencahn_delta`` raises the inherited tolerances to the floor per solve.
+``safety`` is an unconditional minimum for callers that do not know :math:`\alpha\|J\|`.
 
 A correction solve that exits on ``newton_maxiter`` rather than on its tolerance logs a warning,
 since that is the signature of a tolerance the working precision cannot deliver.

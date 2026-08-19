@@ -46,31 +46,6 @@ def test_clamp_tolerance():
 
 
 @pytest.mark.base
-def test_precision_aware_mixin_reports():
-    import numpy as np
-    from pySDC.projects.DeltaSDC.precision import PrecisionAwareTolerances, tol_floor
-
-    class Dummy(PrecisionAwareTolerances):
-        pass
-
-    obj = Dummy()
-    report = obj.setup_precision_tolerances(np.float32, 1e-12, 1e-12)
-
-    assert obj.krylov_tol == pytest.approx(tol_floor(np.float32))
-    assert obj.newton_rtol == pytest.approx(tol_floor(np.float32))
-    assert report['krylov_clamped'] is True
-    assert report['newton_clamped'] is True
-    assert report['working_precision'] == 'float32'
-    assert 'clamped' in obj.describe_tolerances()
-
-    obj64 = Dummy()
-    obj64.setup_precision_tolerances(None, 1e-8, 1e-8)
-    assert obj64.krylov_tol == pytest.approx(1e-8)
-    assert obj64.solve_precision is None
-    assert 'clamped' not in obj64.describe_tolerances()
-
-
-@pytest.mark.base
 def test_tol_floor_is_conditioning_aware():
     """The floor must grow with alpha*||J||, which is what a fixed multiple of eps misses."""
     import numpy as np
@@ -106,21 +81,10 @@ def test_clamp_tolerance_uses_conditioning():
 
 
 @pytest.mark.base
-def test_effective_tolerances_reclamps_for_conditioning():
-    """The mixin must re-derive the tolerances once the conditioning is known."""
+def test_clamp_none_selects_the_floor():
+    """Passing no tolerance falls back to the floor for that precision and conditioning."""
     import numpy as np
-    from pySDC.projects.DeltaSDC.precision import PrecisionAwareTolerances, tol_floor
+    from pySDC.projects.DeltaSDC.precision import clamp_tolerance, tol_floor
 
-    class Dummy(PrecisionAwareTolerances):
-        pass
-
-    obj = Dummy()
-    obj.setup_precision_tolerances(np.float32, 1e-4, 1e-4)
-
-    mild_krylov, mild_newton = obj.effective_tolerances(1.0)
-    assert mild_krylov == pytest.approx(1e-4) and mild_newton == pytest.approx(1e-4)
-
-    stiff_krylov, stiff_newton = obj.effective_tolerances(1000.0)
-    expected = tol_floor(np.float32, conditioning=1000.0)
-    assert stiff_krylov == pytest.approx(expected) and stiff_newton == pytest.approx(expected)
-    assert stiff_krylov > mild_krylov
+    value, clamped = clamp_tolerance(None, np.float32, conditioning=500.0)
+    assert value == pytest.approx(tol_floor(np.float32, conditioning=500.0)) and clamped is False
