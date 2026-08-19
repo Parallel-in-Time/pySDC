@@ -215,3 +215,46 @@ def test_warns_when_the_correction_solve_hits_maxiter(caplog):
         prob.solve_system_delta(rhs, 1e-4, base, prob.eval_f(base, 0.0), 0.0)
 
     assert any('newton_maxiter' in record.message for record in caplog.records)
+
+
+@pytest.mark.base
+def test_relative_and_absolute_inner_tolerances_behave_differently():
+    """A loose relative Krylov tolerance is free; a loose absolute Newton bar caps the accuracy."""
+    import numpy as np
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.projects.DeltaSDC.problems import allencahn_delta
+    from pySDC.projects.DeltaSDC.sweepers import delta_implicit
+
+    sweeper_params = {
+        'quad_type': 'RADAU-RIGHT',
+        'node_type': 'LEGENDRE',
+        'num_nodes': 3,
+        'QI': 'LU',
+        'initial_guess': 'spread',
+    }
+
+    def solve(lin_tol, newton_tol):
+        params = dict(AC_PARAMS, nvars=(32, 32), lin_maxiter=500, lin_tol=lin_tol, newton_tol=newton_tol)
+        description = {
+            'problem_class': allencahn_delta,
+            'problem_params': params,
+            'sweeper_class': delta_implicit,
+            'sweeper_params': sweeper_params,
+            'level_params': {'restol': 1e-9, 'dt': 4e-3},
+            'step_params': {'maxiter': 40},
+        }
+        controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 40}, description=description)
+        prob = controller.MS[0].levels[0].prob
+        uend, _ = controller.run(u0=prob.u_exact(0.0), t0=0.0, Tend=8e-3)
+        return uend, prob.work_counters['linear'].niter
+
+    tight, tight_cg = solve(1e-12, 1e-30)
+    loose_relative, loose_cg = solve(1e-1, 1e-30)
+    loose_absolute, _ = solve(1e-12, 1e-5)
+
+    # a one-digit linear solve costs less and changes nothing
+    assert abs(loose_relative - tight) < 1e-10, 'a loose relative tolerance must not change the answer'
+    assert loose_cg < tight_cg, 'a loose relative tolerance must save inner work'
+
+    # a loose absolute bar caps the achievable accuracy
+    assert abs(loose_absolute - tight) > 1e-7, 'a loose absolute newton_tol must cap the accuracy'

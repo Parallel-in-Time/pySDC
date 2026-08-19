@@ -116,6 +116,30 @@ node and per level, so ``allencahn_delta`` raises the inherited tolerances to th
 A correction solve that exits on ``newton_maxiter`` rather than on its tolerance logs a warning,
 since that is the signature of a tolerance the working precision cannot deliver.
 
+Inexactness
+-----------
+
+The node-local solve is a preconditioner for the SDC iteration, not part of its fixed point, so it
+need not be solved to full accuracy. The two knobs behave very differently, and the difference
+matters:
+
+* ``lin_tol`` is **relative**, and loosening it is close to free. Solving the linear system to a
+  single digit still converges in the same number of sweeps to the same error, and costs about a
+  third less inner work than solving it tightly. This is genuine inexact SDC — loosen it
+  aggressively.
+* ``newton_tol`` is **absolute**, and it caps the accuracy of the whole SDC iteration: the
+  attainable error tracks it directly, so the residual can never fall much below it however many
+  sweeps are run. Keep it well below the target accuracy.
+
+The same distinction explains why reduced precision does not cap accuracy while an absolute
+tolerance does. The precision floor is *relative* (``floor * |r|``), so it shrinks with the
+correction; a fixed ``newton_tol`` does not.
+
+A consequence worth knowing: while ``newton_tol`` sits above the precision floor, the effective bar
+is ``newton_tol`` for every precision, so reduced- and full-precision runs do *identical* work and
+return the same answer. Reduced precision only starts to differ once the requested tolerance drops
+below what it can deliver.
+
 Reduced-precision storage
 -------------------------
 
