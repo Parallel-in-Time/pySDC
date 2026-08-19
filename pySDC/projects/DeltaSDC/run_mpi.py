@@ -1,9 +1,14 @@
 """
-Driver run under ``mpirun`` to compare the node-parallel delta sweeper against the serial one.
+Node-parallel delta-form sweeper, run under ``mpirun`` with one rank per collocation node.
 
-Each rank owns one collocation node. Rank 0 compares the result against a serial reference computed
-in the same process and exits non-zero on mismatch, so the spawning test only has to check the
-return code.
+Runnable entry point in the style of ``pySDC/tutorial/step_7/C_pySDC_with_PETSc.py``: the
+mpi4py-marked test spawns this with ``mpirun -np 3`` and only checks the return code.
+
+Rank 0 compares against a serial reference computed in the same process and aborts on mismatch.
+
+Usage::
+
+    mpirun -np 3 python pySDC/projects/DeltaSDC/run_mpi.py [--fp32]
 """
 
 import sys

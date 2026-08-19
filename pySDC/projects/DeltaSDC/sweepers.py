@@ -66,15 +66,38 @@ class DeltaFormMixin:
         return (prob.init[0], prob.init[1], self._work_dtype)
 
     def _to_work(self, prob, value):
-        """Store a small correction quantity in a reduced-precision datatype."""
+        """
+        Store a small correction quantity in a reduced-precision datatype.
+
+        Returns the value unchanged when no reduced precision was requested, so the default path
+        makes no assumption about the datatype and works with any pySDC backend.
+
+        Raises
+        ------
+        NotImplementedError
+            If ``correction_precision`` was requested but the datatype cannot be built at another
+            precision, as is the case for datatypes not backed by a numpy array.
+        """
         if self._work_dtype is None:
             return value
-        me = prob.dtype_u(self._work_init(prob))
-        me[:] = value
+        try:
+            me = prob.dtype_u(self._work_init(prob))
+            me[:] = value
+        except (TypeError, NotImplementedError) as error:
+            raise NotImplementedError(
+                f'correction_precision is not supported for {prob.dtype_u.__name__}: it cannot be '
+                f'built at a different precision from the problem init tuple ({error})'
+            ) from error
         return me
 
     def _to_backend(self, prob, value):
-        """Lift a possibly reduced-precision quantity back to backend precision."""
+        """
+        Lift a possibly reduced-precision quantity back to backend precision.
+
+        A no-op when no reduced precision is in play, which keeps the default path datatype-agnostic.
+        """
+        if self._work_dtype is None:
+            return value
         me = prob.dtype_u(prob.init)
         me[:] = value
         return me
@@ -201,8 +224,7 @@ class delta_implicit(DeltaFormMixin, generic_implicit):
             lvl.u[m + 1] = u_old + self._to_backend(prob, self._to_work(prob, delta))
             lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], t_node)
 
-            increment = prob.dtype_u(prob.init)
-            increment[:] = lvl.f[m + 1]
+            increment = prob.dtype_u(lvl.f[m + 1])
             increment -= f_old
             df[m + 1] = self._to_work(prob, increment)
 
@@ -258,13 +280,11 @@ class delta_imex_1st_order(DeltaFormMixin, imex_1st_order):
             lvl.u[m + 1] = u_old + self._to_backend(prob, self._to_work(prob, delta))
             lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], t_node)
 
-            impl = prob.dtype_u(prob.init)
-            impl[:] = lvl.f[m + 1].impl
+            impl = prob.dtype_u(lvl.f[m + 1].impl)
             impl -= f_old.impl
             df_impl[m + 1] = self._to_work(prob, impl)
 
-            expl = prob.dtype_u(prob.init)
-            expl[:] = lvl.f[m + 1].expl
+            expl = prob.dtype_u(lvl.f[m + 1].expl)
             expl -= f_old.expl
             df_expl[m + 1] = self._to_work(prob, expl)
 
