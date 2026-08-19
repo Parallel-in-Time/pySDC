@@ -94,10 +94,22 @@ Tolerances
 
 Asking a reduced-precision solver for a tolerance it cannot reach does not fail loudly — the solver
 runs to ``maxiter`` against an impossible bar, turning reduced precision into a large
-pessimisation. ``precision.py`` derives the floor from the working precision
-(``tol_floor(dtype) = 100 * eps(dtype)``), clamps requested tolerances to it, and records the
-clamping in ``tolerance_report`` so it is never silent. Any problem class implementing
-``solve_system_delta`` should use it, as ``allencahn_delta`` does.
+pessimisation. ``precision.py`` derives the floor from the working precision, clamps requested
+tolerances to it, and records the clamping in ``tolerance_report`` so it is never silent.
+
+The floor is **conditioning-aware**::
+
+    tol_floor(dtype, conditioning) = eps(dtype) * max(safety, conditioning_safety * conditioning)
+
+Forming the correction residual involves :math:`\alpha J \delta`, so its rounding error is of order
+:math:`\varepsilon\,\alpha\|J\|\,|\delta|`: the smallest reachable relative tolerance scales with
+:math:`\alpha\|J\|`, which grows with the step size and the spatial resolution. A fixed multiple of
+``eps`` is too tight for stiff or well-resolved problems. A problem class that knows
+:math:`\alpha\|J\|` should call ``effective_tolerances(1 + alpha * norm)`` per solve, as
+``allencahn_delta`` does; ``safety`` remains an unconditional minimum for callers that do not.
+
+A correction solve that exits on ``newton_maxiter`` rather than on its tolerance logs a warning,
+since that is the signature of a tolerance the working precision cannot deliver.
 
 Reduced-precision storage
 -------------------------

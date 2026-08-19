@@ -77,6 +77,10 @@ class allencahn_delta(PrecisionAwareTolerances, allencahn_fullyimplicit):
         self._Id_work = sp.eye(size, dtype=dtype, format='csr')
         self._inv_eps2 = dtype.type(1.0 / self.eps**2)
 
+        # Bound on ||J||_inf, used to make the tolerance floor conditioning-aware. The reaction
+        # term contributes |1 - (nu+1) u^nu| <= nu for u in [-1, 1].
+        self._operator_norm = float(abs(self.A).sum(axis=1).max()) + self.nu / self.eps**2
+
     def _increment(self, base, delta):
         r"""
         Evaluate :math:`f(w+\delta) - f(w)` without cancellation.
@@ -149,23 +153,38 @@ class allencahn_delta(PrecisionAwareTolerances, allencahn_fullyimplicit):
         base_work = np.asarray(base, dtype=dtype).reshape(-1)
         rhs_work = np.asarray(r, dtype=dtype).reshape(-1)
         delta = np.zeros_like(rhs_work)
-        bar = self.newton_rtol * max(float(np.linalg.norm(rhs_work, np.inf)), 1e-300)
 
+        # The reachable tolerance scales with alpha * ||J||, so it is derived per solve.
+        krylov_tol, newton_rtol = self.effective_tolerances(1.0 + float(factor) * self._operator_norm)
+        bar = newton_rtol * max(float(np.linalg.norm(rhs_work, np.inf)), 1e-300)
+
+        converged = False
         for _ in range(self.newton_maxiter):
             residual = delta - alpha * self._increment(base_work, delta) - rhs_work
             if float(np.linalg.norm(residual, np.inf)) < bar:
+                converged = True
                 break
             step = cg(
                 self._jacobian(base_work + delta, alpha),
                 residual,
                 x0=np.zeros_like(residual),
-                rtol=self.krylov_tol,
+                rtol=krylov_tol,
                 maxiter=self.lin_maxiter,
                 atol=0,
                 callback=self.work_counters['linear'],
             )[0]
             delta = delta - step.astype(dtype)
             self.work_counters['newton']()
+
+        if not converged:
+            self.logger.warning(
+                'Correction solve hit newton_maxiter=%d at %s without reaching rtol=%.2e. The '
+                'tolerance is probably below what this working precision can deliver; raise '
+                'newton_rtol or the safety factor.',
+                self.newton_maxiter,
+                self.tolerance_report['working_precision'],
+                newton_rtol,
+            )
 
         me = self.dtype_u(self.init)
         me[:] = delta.reshape(self.nvars)

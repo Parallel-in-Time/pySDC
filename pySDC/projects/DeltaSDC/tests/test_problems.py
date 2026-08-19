@@ -131,3 +131,80 @@ def test_demo_runs():
     for label, result in results.items():
         assert abs(result['uend'] - reference) < 1e-10, f'{label} deviates'
         assert result['niter'] == results['delta-form (fp64)']['niter']
+
+
+@pytest.mark.base
+def test_operator_norm_tracks_resolution_and_epsilon():
+    """The conditioning estimate must grow with the resolution and with 1/eps^2."""
+    from pySDC.projects.DeltaSDC.problems import allencahn_delta
+
+    coarse = allencahn_delta(**dict(AC_PARAMS, nvars=(32, 32)))
+    fine = allencahn_delta(**dict(AC_PARAMS, nvars=(64, 64)))
+    sharp = allencahn_delta(**dict(AC_PARAMS, nvars=(32, 32), eps=0.02))
+
+    assert fine._operator_norm > coarse._operator_norm
+    assert sharp._operator_norm > coarse._operator_norm
+    assert coarse._operator_norm > 0.0
+
+
+@pytest.mark.base
+def test_stiff_configuration_does_not_stall_in_reduced_precision():
+    """Regression: a fixed eps-multiple floor made this configuration run to maxiter in fp32."""
+    import numpy as np
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.projects.DeltaSDC.precision import tol_floor
+    from pySDC.projects.DeltaSDC.problems import allencahn_delta
+    from pySDC.projects.DeltaSDC.sweepers import delta_implicit
+
+    sweeper_params = {
+        'quad_type': 'RADAU-RIGHT',
+        'node_type': 'LEGENDRE',
+        'num_nodes': 3,
+        'QI': 'LU',
+        'initial_guess': 'spread',
+    }
+    counts = {}
+    for precision in [None, np.float32]:
+        params = dict(
+            AC_PARAMS,
+            nvars=(64, 64),
+            lin_maxiter=500,
+            solve_precision=precision,
+            krylov_tol=tol_floor(np.float32),
+            newton_rtol=tol_floor(np.float32),
+        )
+        description = {
+            'problem_class': allencahn_delta,
+            'problem_params': params,
+            'sweeper_class': delta_implicit,
+            'sweeper_params': sweeper_params,
+            'level_params': {'restol': 1e-9, 'dt': 4e-3},
+            'step_params': {'maxiter': 30},
+        }
+        controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description)
+        prob = controller.MS[0].levels[0].prob
+        controller.run(u0=prob.u_exact(0.0), t0=0.0, Tend=8e-3)
+        counts[precision] = prob.work_counters['newton'].niter
+
+    assert counts[np.float32] == counts[None], (
+        f'reduced precision needed {counts[np.float32]} Newton iterations against '
+        f'{counts[None]} at full precision, i.e. it stalled'
+    )
+
+
+@pytest.mark.base
+def test_warns_when_the_correction_solve_hits_maxiter(caplog):
+    """Exiting on maxiter rather than on the tolerance must be reported, not silent."""
+    import logging
+    import numpy as np
+    from pySDC.projects.DeltaSDC.problems import allencahn_delta
+
+    prob = allencahn_delta(**dict(AC_PARAMS, newton_maxiter=1, krylov_tol=1e-10, newton_rtol=1e-14))
+    base = prob.u_exact(0.0)
+    rhs = prob.dtype_u(prob.init)
+    rhs[:] = 1e-2 * np.sin(np.arange(prob.nvars[0] * prob.nvars[1]) * 0.01).reshape(prob.nvars)
+
+    with caplog.at_level(logging.WARNING, logger='problem'):
+        prob.solve_system_delta(rhs, 1e-4, base, prob.eval_f(base, 0.0), 0.0)
+
+    assert any('newton_maxiter' in record.message for record in caplog.records)

@@ -9,23 +9,37 @@ pessimisation instead of a saving.
 This module derives the tolerance floor from the working precision instead of inheriting a
 precision-agnostic constant::
 
-    tol_floor(dtype) = safety * eps(dtype)
+    tol_floor(dtype, conditioning) = eps(dtype) * max(safety, conditioning_safety * conditioning)
 
-with ``safety`` standing in for the condition number. Requested tolerances tighter than the floor
-are clamped, and the clamping is recorded so it is never silent.
+The floor has to account for the *conditioning* of the node-local system, not only for the machine
+epsilon. Forming the correction residual :math:`g = \delta - \alpha[f(w+\delta) - f(w)] - r`
+involves the term :math:`\alpha J \delta`, so its rounding error is of order
+:math:`\varepsilon\,\alpha\|J\|\,|\delta|` while the bar is :math:`rtol\,|r|`. Since
+:math:`|\delta| \sim |r|`, the smallest reachable relative tolerance scales with
+:math:`\alpha\|J\|`, which grows with the step size and with the spatial resolution. A fixed
+multiple of ``eps`` is therefore too tight for stiff or well-resolved problems, and the solver
+silently runs to ``maxiter`` instead of converging.
 
-============  ===========  ===========
-dtype         eps          floor (x100)
-============  ===========  ===========
-``float64``   2.22e-16     2.22e-14
-``float32``   1.19e-07     1.19e-05
-``float16``   9.77e-04     9.77e-02
-============  ===========  ===========
+Callers that know :math:`\alpha\|J\|` should pass ``conditioning=1 + alpha * norm``; ``safety``
+remains an unconditional minimum for callers that do not. Requested tolerances tighter than the
+floor are clamped, and the clamping is recorded so it is never silent.
+
+==========  =========  ==================  ==================
+dtype       eps        floor (cond. 1)     floor (cond. 200)
+==========  =========  ==================  ==================
+``float64``  2.22e-16   2.22e-14            1.78e-13
+``float32``  1.19e-07   1.19e-05            9.54e-05
+``float16``  9.77e-04   9.77e-02            7.81e-01
+==========  =========  ==================  ==================
 """
 
 import numpy as np
 
 DEFAULT_SAFETY = 100.0
+"""Unconditional minimum multiple of ``eps``, used when the conditioning is unknown."""
+
+DEFAULT_CONDITIONING_SAFETY = 4.0
+"""Multiplier applied to a supplied conditioning estimate."""
 
 
 def working_dtype(solve_precision):
@@ -62,8 +76,10 @@ def working_eps(solve_precision):
     return float(np.finfo(working_dtype(solve_precision)).eps)
 
 
-def tol_floor(solve_precision, safety=DEFAULT_SAFETY):
-    """
+def tol_floor(
+    solve_precision, safety=DEFAULT_SAFETY, conditioning=1.0, conditioning_safety=DEFAULT_CONDITIONING_SAFETY
+):
+    r"""
     Smallest relative tolerance worth requesting at this working precision.
 
     Parameters
@@ -71,18 +87,22 @@ def tol_floor(solve_precision, safety=DEFAULT_SAFETY):
     solve_precision : dtype-like or None
         Requested working precision.
     safety : float, optional
-        Multiple of the machine epsilon used as the floor.
+        Unconditional minimum multiple of the machine epsilon.
+    conditioning : float, optional
+        Estimate of :math:`1 + \alpha\|J\|` for the node-local system. Leave at 1 if unknown.
+    conditioning_safety : float, optional
+        Multiplier applied to ``conditioning``.
 
     Returns
     -------
     float
         The tolerance floor.
     """
-    return safety * working_eps(solve_precision)
+    return working_eps(solve_precision) * max(safety, conditioning_safety * float(conditioning))
 
 
-def clamp_tolerance(requested, solve_precision, safety=DEFAULT_SAFETY):
-    """
+def clamp_tolerance(requested, solve_precision, safety=DEFAULT_SAFETY, conditioning=1.0):
+    r"""
     Clamp a requested relative tolerance to the working-precision floor.
 
     Parameters
@@ -92,14 +112,16 @@ def clamp_tolerance(requested, solve_precision, safety=DEFAULT_SAFETY):
     solve_precision : dtype-like or None
         Requested working precision.
     safety : float, optional
-        Multiple of the machine epsilon used as the floor.
+        Unconditional minimum multiple of the machine epsilon.
+    conditioning : float, optional
+        Estimate of :math:`1 + \alpha\|J\|` for the node-local system.
 
     Returns
     -------
     tuple of (float, bool)
         The effective tolerance and whether it was clamped.
     """
-    floor = tol_floor(solve_precision, safety)
+    floor = tol_floor(solve_precision, safety, conditioning)
     if requested is None:
         return floor, False
     return (floor, True) if float(requested) < floor else (float(requested), False)
@@ -154,6 +176,33 @@ class PrecisionAwareTolerances:
             'newton_clamped': newton_clamped,
         }
         return self.tolerance_report
+
+    def effective_tolerances(self, conditioning=1.0):
+        r"""
+        Re-clamp the requested tolerances for a known conditioning.
+
+        The floor set in :meth:`setup_precision_tolerances` assumes nothing about the node-local
+        system. Callers that know :math:`\alpha\|J\|` should use this instead, because the
+        reachable relative tolerance scales with it.
+
+        Parameters
+        ----------
+        conditioning : float, optional
+            Estimate of :math:`1 + \alpha\|J\|` for the node-local system.
+
+        Returns
+        -------
+        tuple of (float, float)
+            Effective Krylov and Newton tolerances.
+        """
+        report = self.tolerance_report
+        krylov, _ = clamp_tolerance(
+            report['krylov_requested'], self.solve_precision, self.tolerance_safety, conditioning
+        )
+        newton, _ = clamp_tolerance(
+            report['newton_requested'], self.solve_precision, self.tolerance_safety, conditioning
+        )
+        return krylov, newton
 
     def describe_tolerances(self):
         """
