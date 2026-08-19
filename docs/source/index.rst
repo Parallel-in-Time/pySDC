@@ -55,6 +55,7 @@ Projects
    projects/second_order.rst
    projects/monodomain.rst
    projects/GPU.rst
+   projects/DeltaSDC.rst
 
 
 API documentation
