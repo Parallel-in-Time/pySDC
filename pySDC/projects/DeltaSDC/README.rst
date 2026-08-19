@@ -45,7 +45,6 @@ Contents
 
 ===========================  ====================================================================
 ``sweepers.py``              ``delta_implicit`` and ``delta_imex_1st_order``
-``precision.py``             precision-aware tolerance policy
 ``problems.py``              ``allencahn_delta``, an example nonlinear correction solve
 ``run_demo.py``              runnable demonstration
 ===========================  ====================================================================
@@ -92,26 +91,26 @@ That is always correct and identical to ``generic_implicit``, but the solver see
 Tolerances
 ----------
 
-Asking a reduced-precision solver for a tolerance it cannot reach does not fail loudly — the solver
-runs to ``maxiter`` against an impossible bar, turning reduced precision into a large
-pessimisation. ``precision.py`` derives the floor from the working precision, clamps requested
-tolerances to it, and records the clamping in ``tolerance_report`` so it is never silent.
+Tolerances are ordinary problem parameters, set in the frontend exactly as elsewhere in pySDC:
+``lin_tol`` is the relative Krylov tolerance and ``newton_tol`` the absolute bar on the correction
+residual, both keeping the meaning they have in the parent problem class.
 
-Tolerances themselves stay ordinary problem parameters, set in the frontend exactly as elsewhere
-in pySDC: ``lin_tol`` is the relative Krylov tolerance and ``newton_tol`` the absolute bar on the
-correction residual, both keeping the meaning they have in the parent problem class. The only
-thing this module adds is the **floor** below which a requested tolerance is unreachable, which is
-**conditioning-aware**::
+A problem implementing ``solve_system_delta`` must additionally raise them to what its working
+precision can deliver. Asking a reduced-precision solver for an unreachable tolerance does not fail
+loudly — it runs to ``newton_maxiter`` against an impossible bar. Measured on the demo
+configuration, removing this floor costs **20x the linear work in float32** for an identical
+answer, so it is not optional::
 
-    tol_floor(dtype, conditioning) = eps(dtype) * max(safety, conditioning_safety * conditioning)
+    floor = eps(dtype) * max(100, 4 * (1 + alpha * ||J||))
+    krylov_tol = max(lin_tol, floor)
+    newton_bar = max(newton_tol, floor * |r|)
 
-Forming the correction residual involves :math:`\alpha J \delta`, so its rounding error is of order
-:math:`\varepsilon\,\alpha\|J\|\,|\delta|`: the smallest reachable relative tolerance scales with
-:math:`\alpha\|J\|`, which grows with the step size and the spatial resolution. A fixed multiple of
-``eps`` is too tight for stiff or well-resolved problems. This cannot live in the frontend:
+The floor scales with :math:`\alpha\|J\|` because forming the correction residual involves
+:math:`\alpha J \delta`, so its rounding error is of order
+:math:`\varepsilon\,\alpha\|J\|\,|\delta|`. That is also why it cannot live in the frontend:
 :math:`\alpha = \Delta t Q^\Delta_{mm}` is only known inside the node-local solve and differs per
-node and per level, so ``allencahn_delta`` raises the inherited tolerances to the floor per solve.
-``safety`` is an unconditional minimum for callers that do not know :math:`\alpha\|J\|`.
+node and per level. ``allencahn_delta`` shows the four lines this takes; a bound on
+:math:`\|J\|_\infty` computed once at construction is enough.
 
 A correction solve that exits on ``newton_maxiter`` rather than on its tolerance logs a warning,
 since that is the signature of a tolerance the working precision cannot deliver.

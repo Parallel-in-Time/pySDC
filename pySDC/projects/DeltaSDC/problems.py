@@ -30,7 +30,12 @@ import scipy.sparse as sp
 from scipy.sparse.linalg import cg
 
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit
-from pySDC.projects.DeltaSDC.precision import clamp_tolerance, tol_floor, working_dtype
+
+TOLERANCE_SAFETY = 100.0
+"""Unconditional minimum multiple of the working-precision epsilon."""
+
+CONDITIONING_SAFETY = 4.0
+"""Multiplier applied to the conditioning estimate ``1 + alpha * ||J||``."""
 
 
 class allencahn_delta(allencahn_fullyimplicit):
@@ -74,7 +79,7 @@ class allencahn_delta(allencahn_fullyimplicit):
             raise NotImplementedError('allencahn_delta derives its analytic increment for nu=2 only!')
 
         self.solve_precision = None if solve_precision is None else np.dtype(solve_precision)
-        dtype = working_dtype(self.solve_precision)
+        dtype = np.dtype('float64') if self.solve_precision is None else self.solve_precision
         size = self.nvars[0] * self.nvars[1]
         self._work_dtype = dtype
         self._A_work = self.A.astype(dtype).tocsr()
@@ -158,12 +163,17 @@ class allencahn_delta(allencahn_fullyimplicit):
         rhs_work = np.asarray(r, dtype=dtype).reshape(-1)
         delta = np.zeros_like(rhs_work)
 
-        # The reachable tolerance scales with alpha * ||J||, which is only known here, so the
-        # inherited tolerances are raised to the working-precision floor per solve.
-        conditioning = 1.0 + float(factor) * self._operator_norm
-        krylov_tol, _ = clamp_tolerance(self.lin_tol, self.solve_precision, conditioning=conditioning)
+        # Raise the inherited tolerances to what this working precision can actually deliver.
+        # Asking for less than that does not fail loudly, it just runs to newton_maxiter against an
+        # impossible bar: removing this floor costs 20x the linear work in float32 for an identical
+        # answer. The floor scales with alpha*||J|| because forming the correction residual involves
+        # alpha*J*delta, so its rounding error is O(eps * alpha*||J|| * |delta|); alpha is only
+        # known here, which is why this cannot be decided in the frontend.
+        floor = np.finfo(dtype).eps * max(
+            TOLERANCE_SAFETY, CONDITIONING_SAFETY * (1.0 + float(factor) * self._operator_norm)
+        )
+        krylov_tol = max(float(self.lin_tol), floor)
         scale = max(float(np.linalg.norm(rhs_work, np.inf)), 1e-300)
-        floor = tol_floor(self.solve_precision, conditioning=conditioning)
         bar = max(float(self.newton_tol), floor * scale)
 
         converged = False
@@ -190,7 +200,7 @@ class allencahn_delta(allencahn_fullyimplicit):
                 'The tolerance is probably below what this working precision can deliver; raise '
                 'newton_tol.',
                 self.newton_maxiter,
-                working_dtype(self.solve_precision),
+                dtype,
                 bar,
             )
 

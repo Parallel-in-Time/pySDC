@@ -62,10 +62,10 @@ def test_jacobian_is_assembled_at_working_precision():
 def test_solve_system_delta_solves_the_correction_equation(precision):
     """The returned correction must satisfy d - alpha [f(w+d) - f(w)] = r."""
     import numpy as np
-    from pySDC.projects.DeltaSDC.precision import tol_floor
     from pySDC.projects.DeltaSDC.problems import allencahn_delta
 
-    tol = tol_floor(precision)
+    # loose enough for float32 to reach; the solve raises it to its own floor if it is not
+    tol = 1e-5
     prob = allencahn_delta(solve_precision=precision, **dict(AC_PARAMS, lin_tol=tol, newton_tol=1e-14))
 
     base = prob.u_exact(0.0)
@@ -88,10 +88,9 @@ def test_solve_system_delta_solves_the_correction_equation(precision):
 def test_reduced_precision_solve_matches_full_precision():
     """The correction solve at float32 must agree with the float64 one to fp32 relative accuracy."""
     import numpy as np
-    from pySDC.projects.DeltaSDC.precision import tol_floor
     from pySDC.projects.DeltaSDC.problems import allencahn_delta
 
-    tol = tol_floor(np.float32)
+    tol = 1e-5
     results = {}
     for precision in [None, np.float32]:
         prob = allencahn_delta(solve_precision=precision, **dict(AC_PARAMS, lin_tol=tol, newton_tol=1e-14))
@@ -152,7 +151,6 @@ def test_stiff_configuration_does_not_stall_in_reduced_precision():
     """Regression: a fixed eps-multiple floor made this configuration run to maxiter in fp32."""
     import numpy as np
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.projects.DeltaSDC.precision import tol_floor
     from pySDC.projects.DeltaSDC.problems import allencahn_delta
     from pySDC.projects.DeltaSDC.sweepers import delta_implicit
 
@@ -170,7 +168,7 @@ def test_stiff_configuration_does_not_stall_in_reduced_precision():
             nvars=(64, 64),
             lin_maxiter=500,
             solve_precision=precision,
-            lin_tol=tol_floor(np.float32),
+            lin_tol=1e-5,
             newton_tol=1e-30,
         )
         description = {
