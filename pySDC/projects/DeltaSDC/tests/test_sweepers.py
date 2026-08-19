@@ -251,3 +251,57 @@ def test_nonlinear_fallback_without_correction_solve():
     u_std, _, _ = run(args[0], args[1], generic_implicit, sweeper_params(), *args[2:])
     u_delta, _, _ = run(args[0], args[1], delta_implicit, sweeper_params(), *args[2:])
     assert abs(u_std - u_delta) < 1e-11
+
+
+def _multilevel_run(sweeper_class, sweeper_params_, nvars, num_procs, maxiter=6, restol=-1):
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
+    from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
+
+    description = {
+        'problem_class': heatNd_unforced,
+        'problem_params': dict(HEAT_PARAMS, nvars=nvars),
+        'sweeper_class': sweeper_class,
+        'sweeper_params': sweeper_params_,
+        'level_params': {'restol': restol, 'dt': 1e-2},
+        'step_params': {'maxiter': maxiter},
+        'space_transfer_class': mesh_to_mesh,
+        'space_transfer_params': {'iorder': 2, 'rorder': 2},
+    }
+    controller = controller_nonMPI(num_procs=num_procs, controller_params={'logger_level': 30}, description=description)
+    prob = controller.MS[0].levels[0].prob
+    uend, _ = controller.run(u0=prob.u_exact(0.0), t0=0.0, Tend=4e-2)
+    return uend
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('nvars', [[63, 31], [63, 31, 15]])
+def test_mlsdc_multiple_levels(nvars):
+    """MLSDC with two and three levels, i.e. recursive coarsening."""
+    from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+    from pySDC.projects.DeltaSDC.sweepers import delta_implicit
+
+    u_std = _multilevel_run(generic_implicit, sweeper_params(), nvars, num_procs=1)
+    u_delta = _multilevel_run(delta_implicit, sweeper_params(), nvars, num_procs=1)
+    assert abs(u_std - u_delta) < 1e-12, f'{len(nvars)}-level MLSDC deviates'
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('num_procs', [2, 4])
+def test_pfasst(num_procs):
+    """PFASST: multiple levels AND multiple steps in a block, which MLSDC alone does not cover."""
+    import numpy as np
+    from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+    from pySDC.projects.DeltaSDC.sweepers import delta_implicit
+
+    u_std = _multilevel_run(generic_implicit, sweeper_params(), [63, 31], num_procs=num_procs)
+    u_delta = _multilevel_run(delta_implicit, sweeper_params(), [63, 31], num_procs=num_procs)
+    assert abs(u_std - u_delta) < 1e-12, f'PFASST on {num_procs} steps deviates'
+
+    reduced = _multilevel_run(
+        delta_implicit,
+        sweeper_params(correction_precision=np.dtype('float32')),
+        [63, 31],
+        num_procs=num_procs,
+    )
+    assert abs(u_std - reduced) < 1e-9, 'PFASST with reduced-precision corrections deviates'

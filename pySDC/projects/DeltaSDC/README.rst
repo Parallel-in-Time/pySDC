@@ -45,9 +45,41 @@ Contents
 
 ===========================  ====================================================================
 ``sweepers.py``              ``delta_implicit`` and ``delta_imex_1st_order``
+``sweepers_MPI.py``          ``delta_implicit_MPI``, one collocation node per rank
 ``problems.py``              ``allencahn_delta``, an example nonlinear correction solve
+``problems_petsc.py``        ``petsc_fisher_delta`` (reduced precision emulated)
+``problems_fenics.py``       ``fenics_grayscott_delta`` (reduced precision emulated)
 ``run_demo.py``              runnable demonstration
 ===========================  ====================================================================
+
+The optional-backend modules are imported separately so ``sweepers`` and ``problems`` stay usable
+without ``mpi4py``, ``petsc4py`` or ``dolfin``.
+
+Coverage
+--------
+
+===========================  ====================================================================
+SDC, MLSDC (2 and 3 levels)  covered
+PFASST (multi-level, multi-step)  covered
+MSSDC (single level, multi-step)  covered
+Node-parallel sweeper        covered, spawns ``mpirun`` with one rank per node
+IMEX                         covered
+PETSc                        covered, reduced precision **emulated**
+FEniCS                       written but **never executed** — see the note below
+===========================  ====================================================================
+
+PETSc and DOLFIN fix their scalar type at build time, so genuine single precision needs a
+``--with-precision=single`` build. Both backends therefore *emulate* it: values are rounded through
+the requested precision while the arithmetic stays at the backend type. That caps the information
+but is optimistic about iteration counts and attainable accuracy, and results obtained this way
+should be labelled as emulated.
+
+``problems_fenics.py`` and its tests have **never been executed**. The DOLFIN available while they
+were written is incompatible with pySDC's own ``GrayScott_1D_FEniCS_implicit`` (it no longer
+exposes ``dolfin.WARNING``), so not even the stock problem can be constructed there. The module is
+verified by inspection of the weak forms only; treat it as unvalidated until the ``fenics``-marked
+tests have passed in a working environment. The tests skip themselves unless the stock Gray-Scott
+problem can actually be built, so they never fail for environmental reasons.
 
 Usage
 -----
