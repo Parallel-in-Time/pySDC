@@ -76,6 +76,13 @@ class fenics_grayscott_delta(fenics_grayscott):
 
     def __init__(self, solve_precision=None, **kwargs):
         """Initialization routine"""
+        # Dolfin's Newton stops on |r_k| < newton_tol OR |r_k|/|r_0| < newton_rtol, and here the
+        # unknown is the correction, started from zero -- so r_0 *is* the correction right-hand
+        # side, which shrinks as the SDC iteration converges. The relative bar is therefore already
+        # an adaptive one, tightening by itself sweep after sweep, and the only thing that can spoil
+        # it is a fixed absolute bar firing first. So the absolute bar is off by default here, unlike
+        # in the parent, whose unknown is the full state and whose r_0 does not shrink.
+        kwargs.setdefault('newton_tol', 1e-30)
         super().__init__(**kwargs)
         self.solve_precision = None if solve_precision is None else np.dtype(solve_precision)
 

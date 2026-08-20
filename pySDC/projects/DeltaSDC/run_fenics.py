@@ -108,9 +108,10 @@ GRAYSCOTT_PARAMS = {
     'Dv': 0.01,
     'A': 0.09,
     'B': 0.086,
-    # The node-local Newton has to be tighter than the SDC residual tolerance, or it -- and not the
-    # SDC iteration -- sets the accuracy floor, and every sweep runs against a bar it cannot clear.
-    # Gray-Scott's defaults (1e-9 / 1e-8) are looser than the restol used here.
+    # Needed by the *stock* path in this comparison, whose unknown is the full state: its Newton
+    # starts from a residual of order |u|, so a relative bar is a fixed absolute one and cannot
+    # follow the SDC iteration down. The delta path needs neither -- its unknown is a correction, so
+    # its relative bar tightens by itself -- but it is harmless to pass them to both.
     'newton_tol': 1e-13,
     'newton_rtol': 1e-13,
 }
