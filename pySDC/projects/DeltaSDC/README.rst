@@ -48,6 +48,7 @@ Contents
 ``sweepers_MPI.py``          ``delta_implicit_MPI``, one collocation node per rank
 ``problems.py``              ``allencahn_delta``, an example nonlinear correction solve
 ``problems_petsc.py``        ``petsc_fisher_delta`` (reduced precision emulated)
+``problems_fenics.py``       ``fenics_grayscott_delta`` (reduced precision emulated)
 ``run_demo.py``              runnable demonstration
 ``run_petsc.py``             PETSc entry point, called by the ``petsc``-marked test
 ``run_fenics.py``            FEniCS entry point, called by the ``fenics``-marked test
@@ -67,7 +68,7 @@ MSSDC (single level, multi-step)  covered
 Node-parallel sweeper        covered, spawns ``mpirun`` with one rank per node
 IMEX                         covered
 PETSc                        covered, reduced precision **emulated**
-FEniCS                       covered, on ``fenics_heat`` via the IMEX delta form
+FEniCS                       covered, linear via ``fenics_heat``, nonlinear via Gray-Scott
 ===========================  ====================================================================
 
 PETSc and DOLFIN fix their scalar type at build time, so genuine single precision needs a
