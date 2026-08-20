@@ -150,9 +150,9 @@ class fenics_grayscott_delta(fenics_grayscott):
         problem = df.NonlinearVariationalProblem(residual, self.delta, [], jacobian)
         solver = df.NonlinearVariationalSolver(problem)
         prm = solver.parameters['newton_solver']
-        prm['absolute_tolerance'] = 1e-09
-        prm['relative_tolerance'] = 1e-08
-        prm['maximum_iterations'] = 100
+        prm['absolute_tolerance'] = self.newton_tol
+        prm['relative_tolerance'] = self.newton_rtol
+        prm['maximum_iterations'] = self.newton_maxiter
         prm['relaxation_parameter'] = 1.0
         solver.solve()
 

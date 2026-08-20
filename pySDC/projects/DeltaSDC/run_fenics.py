@@ -108,6 +108,11 @@ GRAYSCOTT_PARAMS = {
     'Dv': 0.01,
     'A': 0.09,
     'B': 0.086,
+    # The node-local Newton has to be tighter than the SDC residual tolerance, or it -- and not the
+    # SDC iteration -- sets the accuracy floor, and every sweep runs against a bar it cannot clear.
+    # Gray-Scott's defaults (1e-9 / 1e-8) are looser than the restol used here.
+    'newton_tol': 1e-13,
+    'newton_rtol': 1e-13,
 }
 
 
@@ -176,11 +181,12 @@ def check_nonlinear():
         fenics_grayscott_delta, dict(GRAYSCOTT_PARAMS, solve_precision=np.float32), delta_implicit
     )
 
-    # Gray-Scott's own Newton runs to absolute_tolerance 1e-9, which sets the agreement level here
+    # With the node-local Newton tightened past the SDC residual tolerance, the agreement level is set
+    # by the SDC iteration rather than by the node-local solve, so it can be asserted much harder.
     for label in ['delta', 'delta_fp32']:
         deviation = abs(results[label] - results['stock'])
-        print(f'{label:>22} vs stock: {deviation:.3e} (tol 1e-08)')
-        assert deviation < 1e-8, f'{label} deviates from the stock path by {deviation:.3e}'
+        print(f'{label:>22} vs stock: {deviation:.3e} (tol 1e-10)')
+        assert deviation < 1e-10, f'{label} deviates from the stock path by {deviation:.3e}'
 
     return results
 
