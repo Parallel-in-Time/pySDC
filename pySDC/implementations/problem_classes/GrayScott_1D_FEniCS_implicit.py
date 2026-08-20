@@ -101,7 +101,7 @@ class fenics_grayscott(Problem):
             return on_boundary
 
         # set logger level for FFC and dolfin
-        df.set_log_level(df.WARNING)
+        df.set_log_level(df.LogLevel.WARNING)
         logging.getLogger('FFC').setLevel(logging.WARNING)
 
         # set solver and form parameters
@@ -113,12 +113,15 @@ class fenics_grayscott(Problem):
         for _ in range(refinements):
             mesh = df.refine(mesh)
 
-        # define function space for future reference
-        V = df.FunctionSpace(mesh, family, order)
-        self.V = V * V
+        # define mixed function space for future reference. `V * V` was removed in DOLFIN 2019.1,
+        # so the mixed space is built from a MixedElement instead.
+        element = df.FiniteElement(family, mesh.ufl_cell(), order)
+        self.V = df.FunctionSpace(mesh, df.MixedElement([element, element]))
 
-        # invoke super init, passing number of dofs
-        super(fenics_grayscott).__init__(V)
+        # invoke super init, passing number of dofs. Note this used to be
+        # `super(fenics_grayscott).__init__(V)`, which builds an unbound super object and therefore
+        # never ran Problem.__init__ at all.
+        super(fenics_grayscott, self).__init__(self.V)
         self._makeAttributeAndRegister(
             'c_nvars', 't0', 'family', 'order', 'refinements', 'Du', 'Dv', 'A', 'B', localVars=locals(), readOnly=True
         )
@@ -263,11 +266,12 @@ class fenics_grayscott(Problem):
             Exact solution (only at :math:`t_0 = 0.0`).
         """
 
-        class InitialConditions(df.Expression):
-            def __init__(self):
-                # fixme: why do we need this?
+        # subclassing df.Expression was removed in DOLFIN 2018.1; UserExpression is the
+        # replacement and requires the base initialiser to run.
+        class InitialConditions(df.UserExpression):
+            def __init__(self, **kwargs):
                 random.seed(2)
-                pass
+                super().__init__(**kwargs)
 
             def eval(self, values, x):
                 values[0] = 1 - 0.5 * np.power(np.sin(np.pi * x[0] / 100), 100)
@@ -278,7 +282,7 @@ class fenics_grayscott(Problem):
 
         assert t == 0, 'ERROR: u_exact only valid for t=0'
 
-        uinit = InitialConditions()
+        uinit = InitialConditions(degree=self.order)
 
         me = self.dtype_u(self.V)
         me.values = df.interpolate(uinit, self.V)
