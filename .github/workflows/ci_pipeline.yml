@@ -113,6 +113,7 @@ jobs:
           - soft_failure
           - TOMS
           - StroemungsRaum
+          - FEniCS_MLSDC
     defaults:
       run:
         shell: bash -l {0}
