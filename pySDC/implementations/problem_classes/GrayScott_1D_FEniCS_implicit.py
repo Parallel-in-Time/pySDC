@@ -4,7 +4,6 @@ import random
 import dolfin as df
 import numpy as np
 
-from pySDC.core.errors import ParameterError
 from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh
 
@@ -57,6 +56,14 @@ class fenics_grayscott(Problem):
         Feed rate for :math:`v`.
     B : float, optional
         Overall decay rate for :math:`u`.
+    newton_tol : float, optional
+        Absolute tolerance of the node-local Newton solve. It has to be tighter than the SDC residual
+        tolerance, otherwise the node-local solve, not the SDC iteration, sets the accuracy floor.
+    newton_rtol : float, optional
+        Relative tolerance of the node-local Newton solve. Dolfin stops on whichever bar is met first,
+        so this one has to be lowered alongside ``newton_tol`` to actually tighten the solve.
+    newton_maxiter : int, optional
+        Maximum number of node-local Newton iterations.
 
     Attributes
     ----------
@@ -90,18 +97,32 @@ class fenics_grayscott(Problem):
     dtype_u = fenics_mesh
     dtype_f = fenics_mesh
 
-    def __init__(self, c_nvars=256, t0=0.0, family='CG', order=4, refinements=None, Du=1.0, Dv=0.01, A=0.09, B=0.086):
+    def __init__(
+        self,
+        c_nvars=256,
+        t0=0.0,
+        family='CG',
+        order=4,
+        refinements=None,
+        Du=1.0,
+        Dv=0.01,
+        A=0.09,
+        B=0.086,
+        newton_tol=1e-9,
+        newton_rtol=1e-8,
+        newton_maxiter=100,
+    ):
         """Initialization routine"""
 
         if refinements is None:
-            refinements = [1, 0]
-
-        # define the Dirichlet boundary
-        def Boundary(x, on_boundary):
-            return on_boundary
+            refinements = 0
 
         # set logger level for FFC and dolfin
-        df.set_log_level(df.WARNING)
+        warning_level = getattr(df, 'WARNING', None)
+        if warning_level is None and hasattr(df, 'LogLevel'):
+            warning_level = df.LogLevel.WARNING
+        if warning_level is not None:
+            df.set_log_level(warning_level)
         logging.getLogger('FFC').setLevel(logging.WARNING)
 
         # set solver and form parameters
@@ -110,18 +131,23 @@ class fenics_grayscott(Problem):
 
         # set mesh and refinement (for multilevel)
         mesh = df.IntervalMesh(c_nvars, 0, 100)
-        for _ in range(refinements):
+        num_refinements = refinements if isinstance(refinements, int) else sum(refinements)
+        for _ in range(num_refinements):
             mesh = df.refine(mesh)
 
         # define function space for future reference
-        V = df.FunctionSpace(mesh, family, order)
-        self.V = V * V
+        element = df.FiniteElement(family, mesh.ufl_cell(), order)
+        self.V = df.FunctionSpace(mesh, df.MixedElement([element, element]))
 
         # invoke super init, passing number of dofs
-        super(fenics_grayscott).__init__(V)
+        super().__init__(self.V)
         self._makeAttributeAndRegister(
             'c_nvars', 't0', 'family', 'order', 'refinements', 'Du', 'Dv', 'A', 'B', localVars=locals(), readOnly=True
         )
+        self._makeAttributeAndRegister(
+            'newton_tol', 'newton_rtol', 'newton_maxiter', localVars=locals(), readOnly=False
+        )
+
         # rhs in weak form
         self.w = df.Function(self.V)
         q1, q2 = df.TestFunctions(self.V)
@@ -211,9 +237,9 @@ class fenics_grayscott(Problem):
         solver = df.NonlinearVariationalSolver(problem)
 
         prm = solver.parameters
-        prm['newton_solver']['absolute_tolerance'] = 1e-09
-        prm['newton_solver']['relative_tolerance'] = 1e-08
-        prm['newton_solver']['maximum_iterations'] = 100
+        prm['newton_solver']['absolute_tolerance'] = self.newton_tol
+        prm['newton_solver']['relative_tolerance'] = self.newton_rtol
+        prm['newton_solver']['maximum_iterations'] = self.newton_maxiter
         prm['newton_solver']['relaxation_parameter'] = 1.0
 
         solver.solve()
@@ -263,11 +289,11 @@ class fenics_grayscott(Problem):
             Exact solution (only at :math:`t_0 = 0.0`).
         """
 
-        class InitialConditions(df.Expression):
-            def __init__(self):
+        class InitialConditions(df.UserExpression):
+            def __init__(self, **kwargs):
+                super().__init__(**kwargs)
                 # fixme: why do we need this?
                 random.seed(2)
-                pass
 
             def eval(self, values, x):
                 values[0] = 1 - 0.5 * np.power(np.sin(np.pi * x[0] / 100), 100)
@@ -278,9 +304,10 @@ class fenics_grayscott(Problem):
 
         assert t == 0, 'ERROR: u_exact only valid for t=0'
 
-        uinit = InitialConditions()
+        uinit = InitialConditions(degree=max(1, self.order))
 
         me = self.dtype_u(self.V)
         me.values = df.interpolate(uinit, self.V)
 
         return me
+
