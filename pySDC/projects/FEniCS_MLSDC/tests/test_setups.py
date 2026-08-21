@@ -58,8 +58,20 @@ def test_bad_input_raises(kwargs, match):
 
 
 @pytest.mark.fenics
-def test_unknown_example_tolerance_raises():
-    from pySDC.projects.FEniCS_MLSDC.setups import get_tolerance
+def test_pfasst_procs_lookup():
+    from pySDC.projects.FEniCS_MLSDC.setups import get_pfasst_procs
+
+    for example in EXAMPLES:
+        procs = get_pfasst_procs(example)
+        assert procs[0] == 1 and all(b > a for a, b in zip(procs, procs[1:]))
+    # the vortex returns a wrong answer beyond 4 parallel steps, so it must not advertise more
+    assert max(get_pfasst_procs('vortex')) == 4
+
+
+@pytest.mark.fenics
+@pytest.mark.parametrize('lookup', ['get_tolerance', 'get_pfasst_procs'])
+def test_unknown_example_lookup_raises(lookup):
+    import pySDC.projects.FEniCS_MLSDC.setups as setups
 
     with pytest.raises(ValueError, match='unknown example'):
-        get_tolerance('nope')
+        getattr(setups, lookup)('nope')

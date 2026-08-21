@@ -55,27 +55,24 @@ def test_vortex_is_correct_but_not_cheaper():
         )
 
 
-#: The vortex is absent on purpose: under PFASST every step builds its own problem instance, and FFC
-#: then miscompiles the projection in its explicit right-hand side, emitting a duplicate 'J_c1'
-#: declaration. That is invalid C++ on any compiler, so it is an upstream FEniCS limitation rather
-#: than something this project can configure around. SDC and MLSDC on the vortex are unaffected.
-PFASST_EXAMPLES = ('heat', 'grayscott')
-
-
 @pytest.mark.fenics
-@pytest.mark.parametrize('example', PFASST_EXAMPLES)
+@pytest.mark.parametrize('example', EXAMPLES)
 def test_pfasst_iterations_stay_bounded(example):
-    """PFASST iteration counts must not blow up with the number of parallel steps."""
-    from pySDC.projects.FEniCS_MLSDC.run_examples import check_pfasst
-    from pySDC.projects.FEniCS_MLSDC.setups import get_tolerance
+    """PFASST must converge and agree with serial over the step counts each example supports.
 
-    procs = (1, 2, 4)
+    The bound is loose on purpose: heat and Gray-Scott grow by 1.3-1.7x out to 8 steps, the vortex by
+    2.4x out to 4, which is why get_pfasst_procs stops there for it.
+    """
+    from pySDC.projects.FEniCS_MLSDC.run_examples import check_pfasst
+    from pySDC.projects.FEniCS_MLSDC.setups import get_pfasst_procs, get_tolerance
+
+    procs = tuple(p for p in get_pfasst_procs(example) if p <= 4)
     results = check_pfasst(example, procs=procs, out=lambda *a: None, **SHORT)
-    serial = results[1]
+    serial = results[procs[0]]
 
     for p in procs:
         res = results[p]
-        assert res['niter'] <= 2.5 * serial['niter'], (
+        assert res['niter'] <= 3.0 * serial['niter'], (
             f'{example}: PFASST on {p} steps needed {res["niter"]} iterations against '
             f'{serial["niter"]} in serial'
         )

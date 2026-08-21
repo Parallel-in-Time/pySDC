@@ -16,7 +16,7 @@ import numpy as np
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.FEniCS_MLSDC.setups import EXAMPLES, get_description
+from pySDC.projects.FEniCS_MLSDC.setups import EXAMPLES, get_description, get_pfasst_procs
 
 
 def run(example, nlevels=1, num_procs=1, **kwargs):
@@ -64,8 +64,9 @@ def compare_mlsdc(example, out=print, **kwargs):
     return results
 
 
-def check_pfasst(example, nlevels=2, procs=(1, 2, 4, 8), out=print, **kwargs):
+def check_pfasst(example, nlevels=2, procs=None, out=print, **kwargs):
     """PFASST over a growing number of parallel steps. Returns the results keyed by num_procs."""
+    procs = get_pfasst_procs(example) if procs is None else procs
     results = {p: run(example, nlevels=nlevels, num_procs=p, **kwargs) for p in procs}
     ref = results[procs[0]]
 

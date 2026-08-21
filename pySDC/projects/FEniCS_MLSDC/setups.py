@@ -27,7 +27,7 @@ _SETUPS = {
         'problem_class': fenics_heat_mass,
         'sweeper_class': imex_1st_order_mass,
         'problem_params': {'nu': 0.1, 't0': 0.0, 'c_nvars': [128], 'family': 'CG', 'order': [4], 'c': 1.0},
-        'sweeper_params': {'quad_type': 'RADAU-RIGHT'},
+        'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'QI': 'LU'},
         'refinements': [2, 1, 0],
         'dt': 0.2,
         'nsteps': 8,
@@ -35,6 +35,7 @@ _SETUPS = {
         'maxiter': 20,
         'num_nodes': 3,
         'utol': 1e-8,
+        'pfasst_procs': (1, 2, 4, 8),
     },
     'grayscott': {
         'problem_class': fenics_grayscott_mass,
@@ -54,6 +55,7 @@ _SETUPS = {
         'maxiter': 30,
         'num_nodes': 3,
         'utol': 1e-6,
+        'pfasst_procs': (1, 2, 4, 8),
     },
     # The vortex is the correctness example, not a savings example: MLSDC converges to the same
     # answer here but the coarse level does not pay for itself. Measured insensitive to the layer
@@ -70,7 +72,7 @@ _SETUPS = {
             'family': 'CG',
             'order': [2],
         },
-        'sweeper_params': {'quad_type': 'RADAU-RIGHT'},
+        'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'QI': 'LU'},
         'refinements': [2, 1, 0],
         'dt': 0.001,
         'nsteps': 8,
@@ -78,6 +80,8 @@ _SETUPS = {
         'maxiter': 30,
         'num_nodes': 3,
         'utol': 1e-6,
+        # only reliable to 4 steps: at 8 it reports convergence but returns an O(1) wrong answer
+        'pfasst_procs': (1, 2, 4),
     },
 }
 
@@ -87,6 +91,13 @@ def get_tolerance(example):
     if example not in _SETUPS:
         raise ValueError(f'unknown example {example!r}, expected one of {EXAMPLES}')
     return _SETUPS[example]['utol']
+
+
+def get_pfasst_procs(example):
+    """Process counts PFASST is known to be reliable for on this example."""
+    if example not in _SETUPS:
+        raise ValueError(f'unknown example {example!r}, expected one of {EXAMPLES}')
+    return _SETUPS[example]['pfasst_procs']
 
 
 def get_description(example, nlevels=1, dt=None, restol=None, maxiter=None, nsteps=None):

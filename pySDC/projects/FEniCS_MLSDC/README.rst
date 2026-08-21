@@ -72,38 +72,35 @@ What it demonstrates
 =============  ==========  ==========  ==========
 example        SDC         MLSDC (2)   MLSDC (3)
 =============  ==========  ==========  ==========
-``heat``       5.88        3.00        2.00
-speed-up       1.00x       1.31x       **1.68x**
+``heat``       5.75        3.00        2.00
+speed-up       1.00x       1.28x       **1.64x**
 ``grayscott``  6.50        3.62        3.12
 speed-up       1.00x       1.20x       1.19x
-``vortex``     6.75        6.75        6.75
-speed-up       1.00x       0.80x       0.76x
+``vortex``     5.75        6.12        6.12
+speed-up       1.00x       0.75x       0.72x
 =============  ==========  ==========  ==========
 
 A third level pays on the linear problem, is neutral on Gray-Scott, and **the vortex shows no gain at
-all**. That is reported rather than tuned away: it is insensitive to the preconditioner (``LU`` gives
-0.83x) and to the width of the shear layer (``delta`` 0.05, 0.15 and 0.3 give identical counts), so
-the coarse level simply has nothing to contribute for this problem at this size. The vortex is here as
-the *correctness* example -- a 2D nonlinear IMEX problem where the mass route gives the same answer
-under SDC, MLSDC and PFASST -- not as a savings example. Expect less from a multilevel hierarchy the
-more nonlinear the problem is.
+all** -- it needs slightly *more* iterations with a coarse level than without. That is reported rather
+than tuned away: it survives changing the preconditioner and the width of the shear layer (``delta``
+0.05, 0.15 and 0.3 give identical counts), so the coarse level simply has nothing to contribute for
+this problem at this size. The vortex is here as the *correctness* example -- a 2D nonlinear IMEX
+problem giving the same answer under SDC, MLSDC and PFASST -- not as a savings example. Expect less
+from a multilevel hierarchy the more nonlinear the problem is.
 
-**Stability** -- PFASST iteration counts stay bounded as parallel steps are added, and every run
-agrees with the serial one:
+**Stability** -- PFASST iteration counts as parallel steps are added, every run agreeing with serial:
 
 =============  ======  ======  ======  ======
 example        1 step  2       4       8
 =============  ======  ======  ======  ======
-``heat``       3.00    3.38    3.62    3.88
+``heat``       3.00    3.38    3.88    4.62
 ``grayscott``  3.62    3.88    4.50    6.00
+``vortex``     6.12    9.00    14.75   --
 =============  ======  ======  ======  ======
 
-``vortex`` is not in the PFASST table: under PFASST every step builds its own problem instance, and
-FFC then miscompiles the projection in its explicit right-hand side, emitting a duplicate ``J_c1``
-declaration. That is invalid C++ on any compiler, so it is an upstream FEniCS limitation, not
-something this project can configure around. SDC and MLSDC on the vortex are unaffected.
-
-The mass-matrix and mass-inverse formulations agree to machine precision when both are correct; the
-mass route is simply cheaper, since it removes a mass solve per right-hand side evaluation.
+The vortex scales visibly worse, and **beyond 4 steps it fails silently**: at 8 it reports convergence
+after 22 iterations and returns a solution that is wrong by O(1). ``pfasst_procs`` in ``setups.py``
+therefore stops at 4 for that example. Treat this as a limit of the example, not a green light --
+whatever breaks there has not been diagnosed.
 
 Settings are sized for CI runtime, not for a production run. Reproduce with ``run_examples.py``.
