@@ -11,6 +11,7 @@ from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced 
 )
 from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass, imex_1st_order
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
+from pySDC.implementations.transfer_classes.BaseTransfer_mass import base_transfer_mass
 
 
 def setup(t0=None, ml=None):
@@ -38,8 +39,9 @@ def setup(t0=None, ml=None):
     sweeper_params = dict()
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     if ml:
-        # Note that coarsening in the nodes actually HELPS MLSDC to converge (M=1 is exact on the coarse level)
-        sweeper_params['num_nodes'] = [3, 1]
+        # Keep the collocation nodes on both levels. Coarsening them does not help: with M=1 the coarse
+        # level is asymptotically inert, so MLSDC takes neither more nor fewer iterations than SDC.
+        sweeper_params['num_nodes'] = [3, 3]
     else:
         sweeper_params['num_nodes'] = [3]
 
@@ -50,10 +52,10 @@ def setup(t0=None, ml=None):
     problem_params['family'] = 'CG'
     problem_params['c'] = 1.0
     if ml:
-        # We can do rather aggressive coarsening here. As long as we have 1 node on the coarse level, all is "well" (ie.
-        # MLSDC does not take more iterations than SDC, but also not less). If we just coarsen in the refinement (and
-        # not in the nodes and order, the mass inverse approach is way better, ie. halves the number of iterations!
-        problem_params['order'] = [4, 1]
+        # Coarsen in the mesh only. This is where the multilevel gain actually is: it halves the number of
+        # iterations (6 -> 3 here, and 11.6 -> 3.8 for PFASST below), for both the mass-inverse and the mass
+        # formulation. Coarsening in the nodes and the element order instead throws that away.
+        problem_params['order'] = [4, 4]
         problem_params['refinements'] = [1, 0]
     else:
         problem_params['order'] = [4]
@@ -99,6 +101,10 @@ def run_variants(variant=None, ml=None, num_procs=None):
         description['level_params']['restol'] /= 500
         description['problem_class'] = fenics_heat_mass
         description['sweeper_class'] = imex_1st_order_mass
+        description['base_transfer_class'] = base_transfer_mass
+        # prolong_f is not available for the mass formulation: f is a load vector there, so it cannot be
+        # interpolated. base_transfer_mass falls back to prolong, which re-evaluates f on the fine level.
+        description['base_transfer_params']['finter'] = False
     elif variant == 'mass_inv':
         description['problem_class'] = fenics_heat
         description['sweeper_class'] = imex_1st_order
@@ -107,6 +113,8 @@ def run_variants(variant=None, ml=None, num_procs=None):
         description['level_params']['restol'] *= 20
         description['problem_class'] = fenics_heat_mass_timebc
         description['sweeper_class'] = imex_1st_order_mass
+        description['base_transfer_class'] = base_transfer_mass
+        description['base_transfer_params']['finter'] = False
     else:
         raise NotImplementedError('Variant %s is not implemented' % variant)
 
@@ -177,10 +185,11 @@ def main():
     run_variants(variant='mass_timebc', ml=True, num_procs=1)
     run_variants(variant='mass_inv', ml=True, num_procs=5)
 
-    # WARNING: all other variants do NOT work, either because of FEniCS restrictions (weak forms with different meshes
-    # will not work together) or because of inconsistent use of the mass matrix (locality condition for the tau
-    # correction is not satisfied, mass matrix does not permute with restriction).
-    # run_pfasst_variants(variant='mass', ml=True, num_procs=5)
+    # WARNING: the mass variants do NOT work with PFASST (num_procs > 1), measured: 16.6 iterations and an
+    # error of 4.6e+05. MLSDC is fine now that base_transfer_mass restricts tau and u0 with P^T, but PFASST
+    # carries uend from one step into u0 of the next, and u0 is held in the dual space on every coarse level,
+    # so the primal/dual convention does not survive the step boundary.
+    # run_variants(variant='mass', ml=True, num_procs=5)
 
 
 if __name__ == "__main__":
