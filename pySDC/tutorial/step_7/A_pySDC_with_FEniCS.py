@@ -184,12 +184,11 @@ def main():
     run_variants(variant='mass', ml=True, num_procs=1)
     run_variants(variant='mass_timebc', ml=True, num_procs=1)
     run_variants(variant='mass_inv', ml=True, num_procs=5)
+    run_variants(variant='mass', ml=True, num_procs=5)
 
-    # WARNING: the mass variants do NOT work with PFASST (num_procs > 1), measured: 16.6 iterations and an
-    # error of 4.6e+05. MLSDC is fine now that base_transfer_mass restricts tau and u0 with P^T, but PFASST
-    # carries uend from one step into u0 of the next, and u0 is held in the dual space on every coarse level,
-    # so the primal/dual convention does not survive the step boundary.
-    # run_variants(variant='mass', ml=True, num_procs=5)
+    # 'mass_timebc' converges with PFASST too (2.80 iterations), but at an error of 1.27e-06 rather than
+    # the 1.15e-08 the parallel branch of the assertions above allows, so it would need its own bound.
+    # run_variants(variant='mass_timebc', ml=True, num_procs=5)
 
 
 if __name__ == "__main__":

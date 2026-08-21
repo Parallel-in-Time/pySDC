@@ -129,3 +129,56 @@ def test_mlsdc_mass_form_converges():
         niter, u = results[n]
         assert niter <= sdc_niter, f'{n}-level MLSDC needed more iterations than SDC: {niter} vs {sdc_niter}'
         assert abs(u - sdc_u) < 1e-7, f'{n}-level MLSDC disagrees with SDC on the solution'
+
+
+@pytest.mark.fenics
+def test_pfasst_mass_form_matches_serial():
+    """PFASST in mass form must agree with the serial run.
+
+    uend is copied straight into the next step's u[0] by the controller, and u[0] is held in the dual
+    space on coarse levels, so the mass sweepers hand over a dual uend there. Without that, PFASST
+    fed a primal value into a slot read as M u0 and the run diverged (16.6 iterations, err 4.6e+05).
+    """
+    import numpy as np
+    from pySDC.helpers.stats_helper import get_sorted
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import fenics_heat_mass
+    from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
+    from pySDC.implementations.transfer_classes.BaseTransfer_mass import base_transfer_mass
+    from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
+
+    def run(num_procs):
+        description = {
+            'problem_class': fenics_heat_mass,
+            'problem_params': {
+                'nu': 0.1,
+                't0': 0.0,
+                'c_nvars': [128],
+                'family': 'CG',
+                'c': 1.0,
+                'order': [4, 4],
+                'refinements': [1, 0],
+            },
+            'sweeper_class': imex_1st_order_mass,
+            'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': [3, 3]},
+            'level_params': {'restol': 5e-10 / 500, 'dt': 0.2},
+            'step_params': {'maxiter': 20},
+            'space_transfer_class': mesh_to_mesh_fenics,
+            'space_transfer_params': {},
+            'base_transfer_class': base_transfer_mass,
+            'base_transfer_params': {'finter': False},
+        }
+        controller = controller_nonMPI(
+            num_procs=num_procs, controller_params={'logger_level': 30}, description=description
+        )
+        prob = controller.MS[0].levels[0].prob
+        uend, stats = controller.run(u0=prob.u_exact(0.0), t0=0.0, Tend=1.0)
+        niter = np.mean([v for (_, v) in get_sorted(stats, type='niter', sortby='time')])
+        return niter, uend, abs(prob.u_exact(1.0) - uend) / abs(prob.u_exact(1.0))
+
+    niter_serial, u_serial, err_serial = run(1)
+    niter_par, u_par, err_par = run(5)
+
+    assert niter_par < 20, f'PFASST did not converge, hit maxiter ({niter_par})'
+    assert err_par < 1.15e-08, f'PFASST error too high: {err_par:.3e}'
+    assert abs(u_par - u_serial) < 1e-7, 'PFASST and serial disagree on the solution'
