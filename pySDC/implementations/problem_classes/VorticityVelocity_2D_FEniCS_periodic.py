@@ -426,11 +426,22 @@ class fenics_vortex_2d_mass(fenics_vortex_2d):
         psi = self.dtype_u(self.V)
         df.solve(self.K, psi.values.vector(), b.values.vector())
 
+        # Assemble the load vector of the advection term directly. The previous version projected the
+        # expression onto V and multiplied the result by M again, which is M M^-1 = identity: it paid
+        # for a mass solve per right-hand side evaluation and produced the same vector. It is also the
+        # form FFC miscompiles under PFASST, emitting a duplicate J_c1 declaration.
+        # u may have been handed over from another step, and fenics_mesh copies keep the function
+        # space they were created on. Under PFASST every step owns a separate (but identical) mesh, so
+        # a form built straight from u.values would mix two meshes and UFL refuses to order them.
+        # Copying the coefficients onto this problem's own space keeps the form single-domain.
+        w = df.Function(self.V)
+        w.vector()[:] = u.values.vector()[:]
+
+        v = df.TestFunction(self.V)
+        expr = df.Dx(psi.values, 1) * df.Dx(w, 0) - df.Dx(psi.values, 0) * df.Dx(w, 1)
+
         fexpl = self.dtype_u(self.V)
-        fexpl.values = df.project(
-            df.Dx(psi.values, 1) * df.Dx(u.values, 0) - df.Dx(psi.values, 0) * df.Dx(u.values, 1), self.V
-        )
-        fexpl = self.apply_mass_matrix(fexpl)
+        fexpl.values = df.Function(self.V, df.assemble(expr * v * df.dx))
 
         return fexpl
 
