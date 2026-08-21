@@ -174,6 +174,28 @@ class fenics_grayscott(Problem):
         M2 = df.assemble(a_M)
         self.M = M1 + M2
 
+    def apply_mass_matrix(self, u):
+        r"""
+        Apply the mass matrix, :math:`M \vec{u}`.
+
+        Required by the mass-matrix sweepers and transfers; ``Problem`` has no default.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+
+        Returns
+        -------
+        me : dtype_u
+            The product :math:`M \vec{u}`.
+        """
+
+        me = self.dtype_u(self.V)
+        self.M.mult(u.values.vector(), me.values.vector())
+
+        return me
+
     def __invert_mass_matrix(self, u):
         r"""
         Helper routine to invert mass matrix.
@@ -311,3 +333,87 @@ class fenics_grayscott(Problem):
 
         return me
 
+
+class fenics_grayscott_mass(fenics_grayscott):
+    r"""
+    Gray-Scott in mass-matrix form, :math:`M \vec{u}' = F(\vec{u})`, with no mass inversion.
+
+    ``eval_f`` returns the assembled weak-form residual (a load vector) rather than
+    :math:`M^{-1} F`, and ``solve_system`` takes an rhs that is already in the dual space. Use
+    with :class:`generic_implicit_mass` and, for MLSDC, :class:`base_transfer_mass`.
+
+    The Newton loop is written out rather than handed to ``NonlinearVariationalSolver`` because
+    the rhs is a vector, not a form, so it cannot be folded into the variational problem.
+    """
+
+    def eval_f(self, u, t):
+        """
+        Evaluate the right-hand side in weak (dual) form, without inverting the mass matrix.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time.
+
+        Returns
+        -------
+        f : dtype_f
+            The assembled load vector :math:`F(\vec{u})`.
+        """
+
+        f = self.dtype_f(self.V)
+        self.w.assign(u.values)
+        f.values = df.Function(self.V, df.assemble(self.F))
+
+        return f
+
+    def solve_system(self, rhs, factor, u0, t):
+        r"""
+        Solve :math:`M \vec{u} - factor \cdot F(\vec{u}) = \vec{rhs}` by Newton, rhs already dual.
+
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side, in the dual space.
+        factor : float
+            Node-to-node stepsize.
+        u0 : dtype_u
+            Initial guess (unused; the loop starts from zero, matching the mass-inverse variant so
+            that the two are directly comparable).
+        t : float
+            Current time.
+
+        Returns
+        -------
+        sol : dtype_u
+            Solution.
+        """
+
+        sol = self.dtype_u(self.V)
+        self.w.assign(sol.values)
+
+        du = df.TrialFunction(self.V)
+        Jform = df.derivative(self.F, self.w, du)
+
+        res = df.Function(self.V)
+        delta = df.Function(self.V)
+        res0 = None
+
+        for _ in range(self.newton_maxiter):
+            self.M.mult(self.w.vector(), res.vector())
+            res.vector().axpy(-factor, df.assemble(self.F))
+            res.vector().axpy(-1.0, rhs.values.vector())
+
+            norm = res.vector().norm('l2')
+            res0 = norm if res0 is None else res0
+            if norm < self.newton_tol or norm < self.newton_rtol * res0:
+                break
+
+            df.solve(self.M - factor * df.assemble(Jform), delta.vector(), res.vector())
+            self.w.vector().axpy(-1.0, delta.vector())
+
+        sol.values.assign(self.w)
+
+        return sol
