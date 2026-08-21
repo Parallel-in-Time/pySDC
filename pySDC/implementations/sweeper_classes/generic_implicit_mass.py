@@ -90,6 +90,12 @@ class generic_implicit_mass(generic_implicit):
         if self.coll.right_is_node and not self.params.do_coll_update:
             # a copy is sufficient
             L.uend = P.dtype_u(L.u[-1])
+            # On coarse levels u[0] is carried in the dual space: the transfer hands down P^T M u0 and
+            # the sweep consumes it as-is. PFASST copies uend straight into the next step's u[0]
+            # (controller.recv_full), so what we hand over has to be dual as well -- otherwise the step
+            # boundary feeds a primal value into a slot that is read as M u0.
+            if L.level_index > 0:
+                L.uend = P.apply_mass_matrix(L.uend)
         else:
             raise NotImplementedError('Mass matrix sweeper expect u_M = u_end')
 
