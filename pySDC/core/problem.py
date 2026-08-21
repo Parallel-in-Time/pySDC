@@ -111,9 +111,21 @@ class Problem(RegisterParams):
         """
         raise NotImplementedError('ERROR: problem has to implement eval_f(self, u, t)')
 
-    def apply_mass_matrix(self, u: Any) -> Any:  # pragma: no cover
-        """Default mass matrix : identity"""
-        return u
+    def apply_mass_matrix(self, u: Any) -> Any:
+        r"""
+        Apply the problem's mass matrix, :math:`M \vec{u}`.
+
+        There is deliberately no default implementation. The mass-matrix sweepers and transfers
+        (``generic_implicit_mass``, ``imex_1st_order_mass``, ``base_transfer_mass``) build ``u0``,
+        the FAS ``tau`` and the residual out of this, so a problem that does not implement it would
+        silently compute the wrong thing instead of failing. The identity default that used to sit
+        here did exactly that: it produced ``nan`` several sweeps later, with nothing pointing back
+        to the missing method.
+        """
+        raise NotImplementedError(
+            f'{type(self).__name__} is being used in a mass-matrix formulation but does not '
+            'implement apply_mass_matrix'
+        )
 
     def generate_scipy_reference_solution(
         self, eval_rhs: Callable, t: float, u_init: Optional[Any] = None, t_init: Optional[float] = None, **kwargs: Any
