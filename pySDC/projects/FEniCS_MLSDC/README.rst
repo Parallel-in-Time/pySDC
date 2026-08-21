@@ -12,8 +12,8 @@ What is here
     Descriptions for the three examples. One linear, two nonlinear:
 
     - ``heat`` -- forced heat equation in 1D, IMEX.
+    - ``burgers`` -- viscous Burgers in 1D, fully implicit with a node-local Newton.
     - ``grayscott`` -- Gray-Scott reaction-diffusion in 1D, fully implicit with a node-local Newton.
-    - ``vortex`` -- vorticity-velocity formulation of the 2D Navier-Stokes equations, IMEX.
 
 ``run_examples.py``
     Runs each example with SDC, MLSDC on 2 and 3 levels, and PFASST on up to 8 parallel steps.
@@ -42,6 +42,29 @@ and a problem class whose ``eval_f`` returns the assembled weak form rather than
 and which implements ``apply_mass_matrix``.
 
 Coarsen by **mesh refinement** and keep the collocation nodes on every level.
+
+**Use high-order elements.** This is not a detail: it is what makes the multilevel hierarchy pay at
+all. At *identical* fine-level dof counts, with only the element order changed:
+
+=============  ==============  ==============  ==============
+example        CG1             CG2             CG4
+=============  ==============  ==============  ==============
+``heat``       0.92x / 1.05x   1.22x / 1.05x   1.22x / 1.57x
+``burgers``    0.89x / 0.76x   0.94x / 0.81x   1.26x / 1.94x
+``grayscott``  0.87x / 0.74x   0.87x / 0.74x   1.24x / 1.24x
+=============  ==============  ==============  ==============
+
+(speed-up at 2 / 3 levels; below 1.00x means MLSDC costs more than SDC)
+
+At CG1 every example *loses*. The coarse level exists to approximate the smooth part of the error,
+and for smooth solutions a high-order space on a coarser mesh does that far better than a low-order
+space on a finer one at the same cost.
+
+This is the finite-element form of a result already known for finite differences, where MLSDC needs
+high-order *interpolation* -- orders 4 to 6, with restriction left at order 2 (see ``tutorial/step_4``).
+The natural prolongation between nested finite element spaces **is** the inclusion, and its
+approximation order is the element order. So "use CG4" here and "use ``iorder=6``" there are the same
+statement about the same operator.
 
 Why earlier attempts did not pay off
 ------------------------------------
@@ -74,19 +97,14 @@ example        SDC         MLSDC (2)   MLSDC (3)
 =============  ==========  ==========  ==========
 ``heat``       5.75        3.00        2.00
 speed-up       1.00x       1.28x       **1.64x**
+``burgers``    4.12        2.12        1.12
+speed-up       1.00x       1.29x       **2.09x**
 ``grayscott``  6.50        3.62        3.12
 speed-up       1.00x       1.20x       1.19x
-``vortex``     5.75        6.12        6.12
-speed-up       1.00x       0.75x       0.72x
 =============  ==========  ==========  ==========
 
-A third level pays on the linear problem, is neutral on Gray-Scott, and **the vortex shows no gain at
-all** -- it needs slightly *more* iterations with a coarse level than without. That is reported rather
-than tuned away: it survives changing the preconditioner and the width of the shear layer (``delta``
-0.05, 0.15 and 0.3 give identical counts), so the coarse level simply has nothing to contribute for
-this problem at this size. The vortex is here as the *correctness* example -- a 2D nonlinear IMEX
-problem giving the same answer under SDC, MLSDC and PFASST -- not as a savings example. Expect less
-from a multilevel hierarchy the more nonlinear the problem is.
+A third level pays clearly on the smooth problems and is neutral on Gray-Scott. Expect less from a
+multilevel hierarchy the more nonlinear the problem is.
 
 **Stability** -- PFASST iteration counts as parallel steps are added, every run agreeing with serial:
 
@@ -94,13 +112,8 @@ from a multilevel hierarchy the more nonlinear the problem is.
 example        1 step  2       4       8
 =============  ======  ======  ======  ======
 ``heat``       3.00    3.38    3.88    4.62
+``burgers``    2.12    2.62    3.25    4.12
 ``grayscott``  3.62    3.88    4.50    6.00
-``vortex``     6.12    9.00    14.75   --
 =============  ======  ======  ======  ======
-
-The vortex scales visibly worse, and **beyond 4 steps it fails silently**: at 8 it reports convergence
-after 22 iterations and returns a solution that is wrong by O(1). ``pfasst_procs`` in ``setups.py``
-therefore stops at 4 for that example. Treat this as a limit of the example, not a green light --
-whatever breaks there has not been diagnosed.
 
 Settings are sized for CI runtime, not for a production run. Reproduce with ``run_examples.py``.

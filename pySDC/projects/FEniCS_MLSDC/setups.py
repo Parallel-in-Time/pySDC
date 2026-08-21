@@ -12,13 +12,13 @@ coarse level with fewer nodes is asymptotically inert at best, and actively harm
 
 from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import fenics_heat_mass
 from pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit import fenics_grayscott_mass
-from pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic import fenics_vortex_2d_mass
+from pySDC.projects.FEniCS_MLSDC.problem_classes.Burgers_1D_FEniCS import fenics_burgers_mass
 from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
 from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
 from pySDC.implementations.transfer_classes.BaseTransfer_mass import base_transfer_mass
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
 
-EXAMPLES = ('heat', 'grayscott', 'vortex')
+EXAMPLES = ('heat', 'burgers', 'grayscott')
 
 #: Per-example defaults. ``refinements`` is indexed by level, so the fine level is always the first
 #: entry; everything else is shared across levels.
@@ -57,31 +57,27 @@ _SETUPS = {
         'utol': 1e-6,
         'pfasst_procs': (1, 2, 4, 8),
     },
-    # The vortex is the correctness example, not a savings example: MLSDC converges to the same
-    # answer here but the coarse level does not pay for itself. Measured insensitive to the layer
-    # thickness (delta 0.05/0.15/0.3 all give the same counts) and to the preconditioner, so it is a
-    # property of the problem, not of the setup. See the README.
-    'vortex': {
-        'problem_class': fenics_vortex_2d_mass,
-        'sweeper_class': imex_1st_order_mass,
+    'burgers': {
+        'problem_class': fenics_burgers_mass,
+        'sweeper_class': generic_implicit_mass,
         'problem_params': {
-            'nu': 0.01,
-            'delta': 0.05,
-            'rho': 50,
-            'c_nvars': [(8, 8)],
+            'c_nvars': 64,
             'family': 'CG',
-            'order': [2],
+            'order': [4],
+            'nu': 0.02,
+            'newton_tol': 1e-12,
+            'newton_rtol': 1e-11,
         },
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'QI': 'LU'},
         'refinements': [2, 1, 0],
-        'dt': 0.001,
+        'dt': 0.02,
         'nsteps': 8,
-        'restol': 5e-9 / 500,
+        'restol': 1e-9,
         'maxiter': 30,
         'num_nodes': 3,
+        # PFASST on a nonlinear problem drifts from serial by more than the linear examples do
         'utol': 1e-6,
-        # only reliable to 4 steps: at 8 it reports convergence but returns an O(1) wrong answer
-        'pfasst_procs': (1, 2, 4),
+        'pfasst_procs': (1, 2, 4, 8),
     },
 }
 

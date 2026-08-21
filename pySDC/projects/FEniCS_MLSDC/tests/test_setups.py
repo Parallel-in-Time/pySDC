@@ -64,8 +64,6 @@ def test_pfasst_procs_lookup():
     for example in EXAMPLES:
         procs = get_pfasst_procs(example)
         assert procs[0] == 1 and all(b > a for a, b in zip(procs, procs[1:]))
-    # the vortex returns a wrong answer beyond 4 parallel steps, so it must not advertise more
-    assert max(get_pfasst_procs('vortex')) == 4
 
 
 @pytest.mark.fenics

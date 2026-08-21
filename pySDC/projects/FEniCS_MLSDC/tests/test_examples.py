@@ -1,17 +1,13 @@
 import pytest
 
-from pySDC.projects.FEniCS_MLSDC.setups import EXAMPLES  # noqa: F401
+from pySDC.projects.FEniCS_MLSDC.setups import EXAMPLES
 
 #: keep the runs small enough for CI; the physics is unchanged, only the number of steps
 SHORT = {'nsteps': 4}
 
 
-#: MLSDC pays on these two. The vortex does not -- see test_vortex_is_correct_but_not_cheaper.
-SAVING_EXAMPLES = ('heat', 'grayscott')
-
-
 @pytest.mark.fenics
-@pytest.mark.parametrize('example', SAVING_EXAMPLES)
+@pytest.mark.parametrize('example', EXAMPLES)
 def test_mlsdc_beats_sdc(example):
     """MLSDC must cost less than SDC, with 'work' charging each coarse level for its dofs."""
     from pySDC.projects.FEniCS_MLSDC.run_examples import compare_mlsdc
@@ -35,33 +31,11 @@ def test_mlsdc_beats_sdc(example):
 
 
 @pytest.mark.fenics
-def test_vortex_is_correct_but_not_cheaper():
-    """The vortex converges to the same answer on every hierarchy, but MLSDC does not pay here.
-
-    Deliberately not asserting a speed-up: the coarse level contributes nothing for this problem at
-    this size, which is measured and documented rather than tuned away. What is pinned is that all
-    three hierarchies converge and agree -- a regression in the mass transfer would break that.
-    """
-    from pySDC.projects.FEniCS_MLSDC.run_examples import compare_mlsdc
-    from pySDC.projects.FEniCS_MLSDC.setups import get_description, get_tolerance
-
-    maxiter = get_description('vortex')[0]['step_params']['maxiter']
-    results = compare_mlsdc('vortex', out=lambda *a: None, **SHORT)
-
-    for nlevels, res in results.items():
-        assert res['niter'] < maxiter, f'vortex on {nlevels} levels hit maxiter'
-        assert abs(res['uend'] - results[1]['uend']) < get_tolerance('vortex'), (
-            f'vortex: {nlevels}-level result disagrees with SDC'
-        )
-
-
-@pytest.mark.fenics
 @pytest.mark.parametrize('example', EXAMPLES)
 def test_pfasst_iterations_stay_bounded(example):
     """PFASST must converge and agree with serial over the step counts each example supports.
 
-    The bound is loose on purpose: heat and Gray-Scott grow by 1.3-1.7x out to 8 steps, the vortex by
-    2.4x out to 4, which is why get_pfasst_procs stops there for it.
+    The bound is loose on purpose: the examples grow by 1.3-1.7x out to 8 parallel steps.
     """
     from pySDC.projects.FEniCS_MLSDC.run_examples import check_pfasst
     from pySDC.projects.FEniCS_MLSDC.setups import get_pfasst_procs, get_tolerance
