@@ -21,27 +21,51 @@ class mesh_to_mesh_fenics(SpaceTransfer):
         """
         Prolongation matrix P (coarse -> fine), assembled once on first use.
 
-        P is collected column by column from df.interpolate of the coarse basis functions.
-        dolfin 2019.1.0's PETScDMCollection.create_transfer_matrix segfaults, and going through
-        scipy has the side benefit that P^T is then free.
+        P is the inclusion of the coarse space in the fine one: column j holds the coarse basis
+        function phi_j expanded in the fine basis. It is built cell by cell -- for every fine cell
+        the enclosing coarse cell is found from the fine cell's midpoint, which is never on a coarse
+        facet, and the coarse basis is evaluated in *that* cell.
 
-        Costs one df.interpolate per coarse dof, so it is fine for moderate coarse spaces and
-        wants the analytic construction (fine dof coords -> coarse cell -> coarse basis) if the
-        coarse level ever gets large.
+        Going through df.interpolate instead, as this used to, is wrong for discontinuous spaces. A
+        fine dof sitting on a coarse facet has two coarse values there, and dolfin's cross-mesh
+        interpolate takes whichever cell the bounding-box tree returns first -- silently continuising
+        the coarse function. The error is O(1) in the size of the jump and invisible for smooth data,
+        but it deletes exactly the part of the coarse correction a DG hierarchy exists to carry. For
+        continuous spaces the two constructions agree to machine precision.
+
+        Costs one basis evaluation per fine dof. dolfin 2019.1.0's
+        PETScDMCollection.create_transfer_matrix segfaults, and going through scipy has the side
+        benefit that P^T is then free.
         """
         if self._Pmat is None:
             Vc, Vf = self.coarse_prob.init, self.fine_prob.init
-            e_c, out_f = df.Function(Vc), df.Function(Vf)
+            tree = Vc.mesh().bounding_box_tree()
+            element, dofmap_c = Vc.element(), Vc.dofmap()
+            x_f = Vf.tabulate_dof_coordinates().reshape(Vf.dim(), -1)
+
+            # which component of a mixed space each fine dof belongs to; scalar spaces are all zero
+            ncomp = max(Vf.num_sub_spaces(), 1)
+            component = np.zeros(Vf.dim(), dtype=int)
+            for k in range(Vf.num_sub_spaces()):
+                component[Vf.sub(k).dofmap().dofs()] = k
+
             rows, cols, vals = [], [], []
-            for j in range(Vc.dim()):
-                e_c.vector().zero()
-                e_c.vector()[j] = 1.0
-                out_f.assign(df.interpolate(e_c, Vf))
-                col = out_f.vector()[:]
-                nz = np.nonzero(np.abs(col) > 1e-13)[0]
-                rows.extend(nz)
-                cols.extend([j] * len(nz))
-                vals.extend(col[nz])
+            seen = set()
+            for cell_f in df.cells(Vf.mesh()):
+                cell_c = df.Cell(Vc.mesh(), tree.compute_first_entity_collision(cell_f.midpoint()))
+                coords, orientation = cell_c.get_vertex_coordinates(), cell_c.orientation()
+                dofs_c = dofmap_c.cell_dofs(cell_c.index())
+                for dof_f in Vf.dofmap().cell_dofs(cell_f.index()):
+                    # a continuous space shares dofs between cells; the second visit is redundant
+                    if dof_f in seen:
+                        continue
+                    seen.add(dof_f)
+                    basis = np.asarray(element.evaluate_basis_all(x_f[dof_f], coords, orientation))
+                    col = basis.reshape(-1, ncomp)[:, component[dof_f]]
+                    nz = np.nonzero(np.abs(col) > 1e-13)[0]
+                    rows.extend([dof_f] * len(nz))
+                    cols.extend(dofs_c[nz])
+                    vals.extend(col[nz])
             self._Pmat = sp.csr_matrix((vals, (rows, cols)), shape=(Vf.dim(), Vc.dim()))
         return self._Pmat
 
@@ -90,6 +114,23 @@ class mesh_to_mesh_fenics(SpaceTransfer):
         not an alternative here -- high-order Lagrange basis functions are not positive, so the
         mass row sums can vanish, and it failed to converge at all.
 
+        For DG this samples a discontinuous function at coarse dof points, most of which sit on a
+        fine facet where it has two values -- 9 of 17 for DG4 under bisection, all of them for DG1
+        and DG2. Point sampling is not merely mis-implemented there, it is not a well-defined
+        operator. This is left as it is on purpose, and the reason is worth keeping straight,
+        because the same ambiguity in prolong() was fatal:
+
+        R_u acts on the SOLUTION, whose jumps are the DG discretisation error, O(h^(p+1)). Measured
+        on the burgers example: against the exact L2 projection M_c^-1 P^T M_f, sampling differs by
+        4.4 on a random (genuinely jumpy) state of size 3.9, and by 9e-12 on the states the solver
+        actually visits. Swapping in the L2 projection changes not one iteration count, at nu = 0.02
+        or at nu = 0.002 where the front is ten times steeper. P acts on the coarse CORRECTION, whose
+        jumps are O(1) relative to itself -- which is why continuising it deleted the coarse level.
+
+        So this only bites on a solution whose own jumps are O(1): an under-resolved shock, or a
+        limited state. If you get there, the exact operator is M_c^-1 P^T M_f, one coarse mass solve,
+        block-diagonal for DG.
+
         Args:
             F: the fine level data
         """
@@ -115,17 +156,22 @@ class mesh_to_mesh_fenics(SpaceTransfer):
 
     def prolong(self, G):
         """
-        Prolongation implementation
+        Prolongation implementation, the exact inclusion via P.
+
+        Not df.interpolate: see the Pmat docstring for why that silently continuises a
+        discontinuous coarse function.
 
         Args:
             G: the coarse level data
         """
+        P = self.Pmat
         if isinstance(G, fenics_mesh):
-            u_fine = fenics_mesh(df.interpolate(G.values, self.fine_prob.init))
+            u_fine = fenics_mesh(self.fine_prob.init)
+            u_fine.values.vector()[:] = P.dot(G.values.vector()[:])
         elif isinstance(G, rhs_fenics_mesh):
             u_fine = rhs_fenics_mesh(self.fine_prob.init)
-            u_fine.impl.values = df.interpolate(G.impl.values, self.fine_prob.init)
-            u_fine.expl.values = df.interpolate(G.expl.values, self.fine_prob.init)
+            u_fine.impl.values.vector()[:] = P.dot(G.impl.values.vector()[:])
+            u_fine.expl.values.vector()[:] = P.dot(G.expl.values.vector()[:])
         else:
             raise TransferError('Unknown type of coarse data, got %s' % type(G))
 
