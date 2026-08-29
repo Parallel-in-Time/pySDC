@@ -1,0 +1,23 @@
+---
+
+name: pySDC
+channels:
+  - conda-forge
+dependencies:
+
+  - fenics-dolfinx=0.10.0
+  - ufl=2025.2.1
+  - basix=0.10.0
+  - mpi4py
+  - petsc4py
+  - slepc4py
+  - pyvista
+  - numpy
+  - scipy>=0.17.1
+  - dill>=0.2.6
+  - matplotlib>=3.0
+  - pytest
+  - pytest-cov
+  - pip
+  - pip:
+    - qmat>=0.1.8
