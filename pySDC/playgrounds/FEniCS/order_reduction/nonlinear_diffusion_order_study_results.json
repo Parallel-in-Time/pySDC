@@ -1,0 +1,99 @@
+{
+  "meta": {
+    "equation": "u_t = d_x((1 + gamma*u^2)*u_x) + f",
+    "Tend": 1.0,
+    "nvars": 63,
+    "gamma": 0.1,
+    "c": 0.25,
+    "dts": [
+      0.5,
+      0.25,
+      0.125,
+      0.0625,
+      0.03125
+    ]
+  },
+  "cases": [
+    {
+      "label": "Nonlinear diffusion sine (constant-in-time BCs)",
+      "problem_class": "manufactured_nonlinear_diffusion_sine",
+      "num_nodes": 3,
+      "expected_order": 5,
+      "dts": [
+        0.5,
+        0.25,
+        0.125,
+        0.0625,
+        0.03125
+      ],
+      "errors": [
+        3.018841908695728e-05,
+        1.2071522442571313e-06,
+        4.352571728550287e-08,
+        1.4863510944147891e-09,
+        4.892735643821952e-11
+      ],
+      "local_orders": [
+        4.644315664246515,
+        4.793595754829464,
+        4.872021229517561,
+        4.924989792653065
+      ],
+      "fitted_order": 4.813546186684023
+    },
+    {
+      "label": "Nonlinear diffusion cosine (time-dependent BCs)",
+      "problem_class": "manufactured_nonlinear_diffusion_cosine",
+      "num_nodes": 3,
+      "expected_order": 5,
+      "dts": [
+        0.5,
+        0.25,
+        0.125,
+        0.0625,
+        0.03125
+      ],
+      "errors": [
+        2.0661003307616243e-05,
+        1.5258719960813058e-06,
+        9.06057406260337e-08,
+        5.0578212629747256e-09,
+        2.901777133060752e-10
+      ],
+      "local_orders": [
+        3.759204467747901,
+        4.073887670860605,
+        4.163014499886732,
+        4.123507430283707
+      ],
+      "fitted_order": 4.047613030830522
+    },
+    {
+      "label": "Nonlinear diffusion cosine + boundary lifting",
+      "problem_class": "manufactured_nonlinear_diffusion_cosine_lift",
+      "num_nodes": 3,
+      "expected_order": 5,
+      "dts": [
+        0.5,
+        0.25,
+        0.125,
+        0.0625,
+        0.03125
+      ],
+      "errors": [
+        5.1789515697263696e-06,
+        3.7691374818689194e-07,
+        2.0814296910385614e-08,
+        9.142661294322652e-10,
+        3.4960184407811536e-11
+      ],
+      "local_orders": [
+        3.7803537429983924,
+        4.178587687873996,
+        4.508816842302067,
+        4.708829473844883
+      ],
+      "fitted_order": 4.304058002421475
+    }
+  ]
+}

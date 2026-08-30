@@ -1,10 +1,4 @@
-"""
-Derived problem classes for the SDC order-reduction playground.
-
-This module defines problem classes that extend the standard FEniCS-based 1D
-heat equation implementations to demonstrate boundary lifting as a remedy for
-order reduction in SDC with time-dependent Dirichlet boundary conditions.
-"""
+"""FEniCS problem classes for the SDC order-reduction playground."""
 
 import dolfin as df
 import numpy as np
@@ -13,116 +7,39 @@ from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced 
 
 
 class fenics_heat_mass_timebc_lift(fenics_heat_mass_timebc):
-    r"""
-    One-dimensional heat equation with time-dependent Dirichlet boundary
-    conditions, solved by **boundary lifting** to restore the full SDC
-    convergence order.
+    r"""Heat equation with time-dependent BCs solved after boundary lifting.
 
-    **Background**
-
-    When the time-dependent BC is applied directly inside ``solve_system``
-    (as in :class:`fenics_heat_mass_timebc`), the BC imposition overwrites
-    rows of the right-hand-side at each SDC sweep, which means the fixed
-    point of the implicit sweeper no longer matches the collocation solution.
-    This causes *order reduction*: the effective convergence order is lower
-    than the theoretical SDC order :math:`2M-1`.
-
-    **Boundary lifting** eliminates this problem by reformulating the
-    equation in terms of a new variable :math:`v = u - E`, where :math:`E`
-    is a *lift function* that already satisfies the time-dependent BCs at
-    every time. The equation for :math:`v` then has **homogeneous** Dirichlet
-    BCs, and the standard SDC sweep applies without any BC imposition inside
-    ``solve_system``. This restores the full collocation order.
-
-    **Problem formulation**
-
-    The original problem is
+    The physical problem has the exact solution
 
     .. math::
-        u_t = \nu u_{xx} + f(x,t), \quad u(0,t) = \cos(0)\cos(t) = \cos(t),
-        \quad u(1,t) = \cos(\pi)\cos(t) = -\cos(t),
+        u(x,t) = \cos(\pi x)\cos(t) + c.
 
-    with exact solution :math:`u(x,t) = \cos(\pi x)\cos(t) + c`.
-
-    We choose the lift
+    The controller integrates the shifted variable
 
     .. math::
-        E(x,t) = (1 - 2x)\cos(t) + c,
+        v = u - E, \qquad E(x,t) = (1-2x)\cos(t)+c,
 
-    which interpolates linearly between the two boundary values
-    :math:`E(0,t) = \cos(t) + c` and :math:`E(1,t) = -\cos(t) + c`.
-
-    The transformed variable :math:`v = u - E` satisfies :math:`v = 0` on
-    :math:`\partial\Omega` and
+    for which the boundary conditions are homogeneous. Since
 
     .. math::
-        v_t = \nu v_{xx} + \tilde{f}(x,t),
+        E_t = -(1-2x)\sin(t), \qquad E_{xx}=0,
 
-    where the modified forcing is
-
-    .. math::
-        \tilde{f}(x,t) = f(x,t) - E_t(x,t) + \nu E_{xx}(x,t).
-
-    Since :math:`E` is linear in :math:`x`, we have :math:`E_{xx} = 0` and
-    :math:`E_t = -(1-2x)\sin(t)`, so
+    the shifted equation is
 
     .. math::
-        \tilde{f}(x,t) = -\cos(\pi x)(\sin(t) - \nu\pi^2\cos(t))
-                         + (1-2x)\sin(t).
+        v_t = \nu v_{xx} + \widetilde f,
+        \qquad \widetilde f = f - E_t + \nu E_{xx}
+        = f + (1-2x)\sin(t).
 
-    The exact solution of the transformed problem is
-
-    .. math::
-        v(x,t) = \cos(\pi x)\cos(t) - (1-2x)\cos(t) = \cos(t)(\cos(\pi x) - 1 + 2x).
-
-    Parameters
-    ----------
-    c_nvars : int, optional
-        Spatial resolution (number of degrees of freedom). Default ``128``.
-    t0 : float, optional
-        Starting time. Default ``0.0``.
-    family : str, optional
-        FEniCS finite element family. Default ``'CG'``.
-    order : int, optional
-        Finite element polynomial order. Default ``4``.
-    refinements : int, optional
-        Number of mesh refinements. Default ``1``.
-    nu : float, optional
-        Diffusion coefficient :math:`\nu`. Default ``0.1``.
-    c : float, optional
-        Constant offset in the boundary data. Default ``0.0``.
-
-    Attributes
-    ----------
-    V : FunctionSpace
-        FEniCS function space.
-    M : Matrix
-        Mass matrix :math:`\int_\Omega u v\,dx`.
-    K : Matrix
-        Stiffness matrix :math:`-\nu\int_\Omega \nabla u \cdot \nabla v\,dx`.
-    g : Expression
-        Modified forcing term :math:`\tilde{f}` including the lift correction.
-    bc_hom : DirichletBC
-        Homogeneous Dirichlet BC for the transformed variable :math:`v`.
-
-    References
-    ----------
-    .. [1] Spectral Deferred Correction Methods for Ordinary Differential Equations.
-        A. Dutt, L. Greengard, V. Rokhlin. Mathematics of Computation, 2001.
-        https://dl.acm.org/doi/abs/10.1090/S0025-5718-01-01362-X
+    This class retains the historical playground API: ``u_exact`` returns the
+    exact lifted solution because that is the state integrated by pySDC. The
+    :class:`fenics_heat_mass_timebc_lift_physical` adapter below exposes the
+    unchanged physical cosine exact solution while reusing this implementation.
     """
 
     def __init__(self, c_nvars=128, t0=0.0, family='CG', order=4, refinements=1, nu=0.1, c=0.0):
-        """Initialization routine"""
-
         super().__init__(c_nvars, t0, family, order, refinements, nu, c)
 
-        # Override the forcing term to include lift correction terms.
-        # Lift: E(x, t) = (1 - 2*x) * cos(t) + c  (linear interpolation of boundary data)
-        #   dE/dt    = -(1 - 2*x) * sin(t)
-        #   E_xx     = 0  (E is linear in x)
-        # Modified forcing: f_tilde = f - dE/dt + nu * E_xx
-        #   = -cos(pi*x) * (sin(t) - nu*pi^2*cos(t)) + (1 - 2*x) * sin(t)
         self.g = df.Expression(
             '-cos(a*x[0]) * (sin(t) - b*a*a*cos(t)) + (1 - 2*x[0]) * sin(t)',
             a=np.pi,
@@ -131,66 +48,70 @@ class fenics_heat_mass_timebc_lift(fenics_heat_mass_timebc):
             degree=self.order,
         )
 
+    def eval_f(self, u, t):
+        """Evaluate the lifted IMEX right-hand side for ``v``."""
+        f = self.dtype_f(self.V)
+        self.K.mult(u.values.vector(), f.impl.values.vector())
+
+        self.g.t = t
+        f.expl = self.apply_mass_matrix(self.dtype_u(df.interpolate(self.g, self.V)))
+        return f
+
     def solve_system(self, rhs, factor, u0, t):
-        r"""
-        Dolfin's linear solver for the transformed problem :math:`(M - \text{factor} \cdot A)\,v = \text{rhs}`.
-
-        Uses homogeneous Dirichlet BCs since the transformed variable
-        :math:`v = u - E` satisfies :math:`v = 0` on :math:`\partial\Omega`.
-
-        Parameters
-        ----------
-        rhs : dtype_f
-            Right-hand side for the linear system.
-        factor : float
-            Abbrev. for the node-to-node stepsize (or any other factor required).
-        u0 : dtype_u
-            Initial guess (not used here).
-        t : float
-            Current time.
-
-        Returns
-        -------
-        u : dtype_u
-            Solution of the transformed variable :math:`v`.
-        """
-
-        u = self.dtype_u(u0)
+        """Solve the lifted system with homogeneous Dirichlet conditions."""
+        v = self.dtype_u(u0)
         T = self.M - factor * self.K
         b = self.dtype_u(rhs)
-
         self.bc_hom.apply(T, b.values.vector())
+        df.solve(T, v.values.vector(), b.values.vector())
+        return v
 
-        df.solve(T, u.values.vector(), b.values.vector())
-
-        return u
+    def fix_residual(self, res):
+        """Apply homogeneous boundary conditions to a lifted residual."""
+        self.bc_hom.apply(res.values.vector())
+        return None
 
     def u_exact(self, t):
-        r"""
-        Routine to compute the exact solution of the transformed variable :math:`v` at time :math:`t`.
+        """Return the exact lifted state ``v = u - E``."""
+        v_exact = df.Expression(
+            'cos(t) * (cos(a*x[0]) - 1 + 2*x[0])',
+            a=np.pi,
+            t=t,
+            degree=self.order,
+        )
+        return self.dtype_u(df.interpolate(v_exact, self.V), val=self.V)
 
-        The exact transformed solution is
+
+class fenics_heat_mass_timebc_lift_physical(fenics_heat_mass_timebc_lift):
+    r"""Boundary-lifted problem with the physical cosine exact solution.
+
+    The numerical state remains the lifted variable ``v``. The physical
+    solution is reconstructed with ``u = v + E`` by the driver. This adapter
+    therefore needs only the physical exact solution and the lift helper; all
+    numerical problem methods are inherited from
+    :class:`fenics_heat_mass_timebc_lift`.
+    """
+
+    def lift(self, t):
+        """Return the finite-element representation of ``E(., t)``."""
+        E = df.Expression('(1 - 2*x[0]) * cos(t) + c', c=self.c, t=t, degree=self.order)
+        return self.dtype_u(df.interpolate(E, self.V), val=self.V)
+
+    def u_exact_lifted(self, t):
+        """Return the exact internal state ``v = u - E``."""
+        return super().u_exact(t)
+
+    def u_exact(self, t):
+        r"""Return the unchanged physical exact solution.
 
         .. math::
-            v(x,t) = u_{\text{exact}}(x,t) - E(x,t) = \cos(t)(\cos(\pi x) - 1 + 2x),
-
-        where :math:`E(x,t) = (1-2x)\cos(t) + c` is the lift.
-
-        Parameters
-        ----------
-        t : float
-            Time of the exact solution.
-
-        Returns
-        -------
-        me : dtype_u
-            Exact solution of the transformed variable :math:`v`.
+            u(x,t) = \cos(\pi x)\cos(t)+c.
         """
-
-        # v_exact = u_real_exact - E
-        #         = (cos(pi*x)*cos(t) + c) - ((1 - 2*x)*cos(t) + c)
-        #         = cos(t) * (cos(pi*x) - 1 + 2*x)
-        u0 = df.Expression('cos(t) * (cos(a*x[0]) - 1 + 2*x[0])', a=np.pi, t=t, degree=self.order)
-        me = self.dtype_u(df.interpolate(u0, self.V), val=self.V)
-
-        return me
+        u_exact = df.Expression(
+            'cos(a*x[0]) * cos(t) + c',
+            a=np.pi,
+            c=self.c,
+            t=t,
+            degree=self.order,
+        )
+        return self.dtype_u(df.interpolate(u_exact, self.V), val=self.V)
