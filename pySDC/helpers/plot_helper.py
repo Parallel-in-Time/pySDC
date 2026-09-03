@@ -46,6 +46,7 @@ def figsize_by_journal(journal, scale, ratio):  # pragma: no cover
         'JSC_thesis': 434.26027,
         'TUHH_thesis': 426.79135,
         'Nature_CS': 372.0,
+        'CPC': 468.3324,
     }
     # store text height in points here, get this from LaTeX using \the\textheight
     textheights = {
@@ -54,6 +55,7 @@ def figsize_by_journal(journal, scale, ratio):  # pragma: no cover
         'TUHH_thesis': 631.65118,
         'Springer_proceedings': 549.13828,
         'Nature_CS': 552.69478,
+        'CPC': 637.31475,
     }
     assert (
         journal in textwidths.keys()
