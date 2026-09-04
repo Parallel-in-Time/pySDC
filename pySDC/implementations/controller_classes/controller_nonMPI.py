@@ -1,11 +1,11 @@
 import itertools
-import copy as cp
 import numpy as np
 import dill
 
 from pySDC.core.controller import Controller
 from pySDC.core.step import Step
-from pySDC.core.errors import ControllerError, CommunicationError
+from pySDC.core.errors import ControllerError
+from pySDC.core.time_comm import VirtualTimeComm
 from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
 
 
@@ -13,6 +13,11 @@ class controller_nonMPI(Controller):
     """
 
     PFASST controller, running serialized version of PFASST in blocks (MG-style)
+
+    Step ownership and all communication between steps go through `self.time_comm`, a
+    `VirtualTimeComm` that happens to own every step of the block in this one process. `self.MS` is
+    kept as the public handle on those steps that the rest of pySDC expects, but the controller
+    itself only reaches steps via the communicator.
 
     """
 
@@ -43,6 +48,8 @@ class controller_nonMPI(Controller):
             self.logger.warning(f'Need to initialize steps separately due to pickling error: {error}')
             for _ in range(num_procs - 1):
                 self.MS.append(Step(description))
+
+        self.time_comm = VirtualTimeComm(self.MS)
 
         self.base_convergence_controllers += [BasicRestarting.get_implementation(useMPI=False)]
         for convergence_controller in self.base_convergence_controllers:
@@ -98,7 +105,8 @@ class controller_nonMPI(Controller):
 
         # some initializations and reset of statistics
         uend = None
-        num_procs = len(self.MS)
+        steps = self.time_comm.steps
+        num_procs = len(steps)
         for hook in self.hooks:
             hook.reset_stats()
 
@@ -106,7 +114,7 @@ class controller_nonMPI(Controller):
         slots = list(range(num_procs))
 
         # initialize time variables of each step
-        time = [t0 + sum(self.MS[j].dt for j in range(p)) for p in slots]
+        time = [t0 + sum(steps[j].dt for j in range(p)) for p in slots]
 
         # determine which steps are still active (time < Tend)
         active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
@@ -118,19 +126,20 @@ class controller_nonMPI(Controller):
         active_slots = list(itertools.compress(slots, active))
 
         # initialize block of steps with u0
+        self.time_comm.set_block([steps[p] for p in active_slots])
         self.restart_block(active_slots, time, u0)
 
         for hook in self.hooks:
             hook.post_setup(step=None, level_number=None)
 
         # call pre-run hook
-        for S in self.MS:
+        for S in steps:
             for hook in self.hooks:
                 hook.pre_run(step=S, level_number=0)
 
         # main loop: as long as at least one step is still active (time < Tend), do something
         while any(active):
-            MS_active = [self.MS[p] for p in active_slots]
+            MS_active = self.time_comm.block
             done = False
             while not done:
                 done = self.pfasst(MS_active)
@@ -139,39 +148,40 @@ class controller_nonMPI(Controller):
             restart_at = np.where(restarts)[0][0] if True in restarts else len(MS_active)
             if True in restarts:  # restart part of the block
                 # initial condition to next block is initial condition of step that needs restarting
-                uend = self.MS[restart_at].levels[0].u[0]
+                uend = self.time_comm.bcast([S.levels[0].u[0] for S in MS_active], root=restart_at)
                 time[active_slots[0]] = time[restart_at]
                 self.logger.info(f'Starting next block with initial conditions from step {restart_at}')
 
             else:  # move on to next block
                 # initial condition for next block is last solution of current block
-                uend = self.MS[active_slots[-1]].levels[0].uend
-                time[active_slots[0]] = time[active_slots[-1]] + self.MS[active_slots[-1]].dt
+                uend = self.time_comm.bcast([S.levels[0].uend for S in MS_active], root=self.time_comm.size - 1)
+                time[active_slots[0]] = time[active_slots[-1]] + MS_active[-1].dt
 
             for S in MS_active[:restart_at]:
                 for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
                     C.post_step_processing(self, S, MS=MS_active)
 
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                [C.prepare_next_block(self, S, len(active_slots), time, Tend, MS=MS_active) for S in self.MS]
+                [C.prepare_next_block(self, S, len(active_slots), time, Tend, MS=MS_active) for S in steps]
 
             # setup the times of the steps for the next block
             for i in range(1, len(active_slots)):
-                time[active_slots[i]] = time[active_slots[i] - 1] + self.MS[active_slots[i] - 1].dt
+                time[active_slots[i]] = time[active_slots[i] - 1] + steps[active_slots[i] - 1].dt
 
             # determine new set of active steps and compress slots accordingly
             active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
             active_slots = list(itertools.compress(slots, active))
 
             # restart active steps (reset all values and pass uend to u0)
+            self.time_comm.set_block([steps[p] for p in active_slots])
             self.restart_block(active_slots, time, uend)
 
         # call post-run hook
-        for S in self.MS:
+        for S in steps:
             for hook in self.hooks:
                 hook.post_run(step=S, level_number=0)
 
-        for S in self.MS:
+        for S in steps:
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
                 C.post_run_processing(self, S, MS=MS_active)
 
@@ -188,36 +198,38 @@ class controller_nonMPI(Controller):
 
         """
 
+        steps = self.time_comm.steps
+
         # loop over active slots (not directly, since we need the previous entry as well)
         for j in range(len(active_slots)):
             # get slot number
             p = active_slots[j]
 
             # store current slot number for diagnostics
-            self.MS[p].status.slot = p
+            steps[p].status.slot = p
             # store link to previous step
-            self.MS[p].prev = self.MS[active_slots[j - 1]]
+            steps[p].prev = steps[active_slots[j - 1]]
             # resets step
-            self.MS[p].reset_step()
+            steps[p].reset_step()
             # determine whether I am the first and/or last in line
-            self.MS[p].status.first = active_slots.index(p) == 0
-            self.MS[p].status.last = active_slots.index(p) == len(active_slots) - 1
+            steps[p].status.first = active_slots.index(p) == 0
+            steps[p].status.last = active_slots.index(p) == len(active_slots) - 1
             # initialize step with u0
-            self.MS[p].init_step(u0)
+            steps[p].init_step(u0)
             # reset some values
-            self.MS[p].status.done = False
-            self.MS[p].status.prev_done = False
-            self.MS[p].status.iter = 0
-            self.MS[p].status.stage = 'SPREAD'
-            self.MS[p].status.force_done = False
-            self.MS[p].status.time_size = len(active_slots)
+            steps[p].status.done = False
+            steps[p].status.prev_done = False
+            steps[p].status.iter = 0
+            steps[p].status.stage = 'SPREAD'
+            steps[p].status.force_done = False
+            steps[p].status.time_size = self.time_comm.size
 
-            for l in self.MS[p].levels:
+            for l in steps[p].levels:
                 l.tag = None
                 l.status.sweep = 1
 
         for p in active_slots:
-            for lvl in self.MS[p].levels:
+            for lvl in steps[p].levels:
                 lvl.status.time = time[p]
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
@@ -233,25 +245,10 @@ class controller_nonMPI(Controller):
             add_to_stats: a flag to end recording data in the hooks (defaults to False)
         """
 
-        def send(source, tag):
-            """
-            Send function
-
-            Args:
-                source: level which has the new values
-                tag: identifier for this message
-            """
-            # sending here means computing uend ("one-sided communication")
-            source.sweep.compute_end_point()
-            source.tag = cp.deepcopy(tag)
-
         for hook in self.hooks:
             hook.pre_comm(step=S, level_number=level)
-        if not S.status.last:
-            self.logger.debug(
-                'Process %2i provides data on level %2i with tag %s' % (S.status.slot, level, S.status.iter)
-            )
-            send(S.levels[level], tag=(level, S.status.iter, S.status.slot))
+
+        self.time_comm.send_forward(S, level)
 
         for hook in self.hooks:
             hook.post_comm(step=S, level_number=level, add_to_stats=add_to_stats)
@@ -266,31 +263,11 @@ class controller_nonMPI(Controller):
             add_to_stats: a flag to end recording data in the hooks (defaults to False)
         """
 
-        def recv(target, source, tag=None):
-            """
-            Receive function
-
-            Args:
-                target: level which will receive the values
-                source: level which initiated the send
-                tag: identifier to check if this message is really for me
-            """
-
-            if tag is not None and source.tag != tag:
-                raise CommunicationError('source and target tag are not the same, got %s and %s' % (source.tag, tag))
-            # simply do a deepcopy of the values uend to become the new u0 at the target
-            target.u[0] = target.prob.dtype_u(source.uend)
-            # re-evaluate f on left interval boundary
-            target.f[0] = target.prob.eval_f(target.u[0], target.time)
-
         for hook in self.hooks:
             hook.pre_comm(step=S, level_number=level)
-        if not S.status.prev_done and not S.status.first:
-            self.logger.debug(
-                'Process %2i receives from %2i on level %2i with tag %s'
-                % (S.status.slot, S.prev.status.slot, level, S.status.iter)
-            )
-            recv(S.levels[level], S.prev.levels[level], tag=(level, S.status.iter, S.prev.status.slot))
+
+        self.time_comm.recv_backward(S, level)
+
         for hook in self.hooks:
             hook.post_comm(step=S, level_number=level, add_to_stats=add_to_stats)
 
@@ -300,22 +277,17 @@ class controller_nonMPI(Controller):
 
         For the workflow of this controller, check out one of our PFASST talks or the pySDC paper
 
-        This method changes self.MS directly by accessing active steps through local_MS_active. Nothing is returned.
+        The stages work on whichever steps `self.time_comm` hands them. Nothing is returned but the
+        flag whether the block is finished.
 
         Args:
             local_MS_active (list): all active steps
         """
 
         # if all stages are the same (or DONE), continue, otherwise abort
-        stages = [S.status.stage for S in local_MS_active if S.status.stage != 'DONE']
-        if stages[1:] == stages[:-1]:
-            stage = stages[0]
-        else:
-            raise ControllerError('not all stages are equal')
+        stage = self.time_comm.agree_on_stage()
 
         self.logger.debug(stage)
-
-        MS_running = [S for S in local_MS_active if S.status.stage != 'DONE']
 
         switcher = {
             'SPREAD': self.spread,
@@ -327,17 +299,15 @@ class controller_nonMPI(Controller):
             'IT_UP': self.it_up,
         }
 
-        switcher.get(stage, self.default)(MS_running)
+        switcher.get(stage, self.default)()
 
-        return all(S.status.done for S in local_MS_active)
+        return self.time_comm.allreduce([S.status.done for S in local_MS_active], all)
 
-    def spread(self, local_MS_running):
+    def spread(self):
         """
         Spreading phase
-
-        Args:
-            local_MS_running (list): list of currently running steps
         """
+        local_MS_running = self.time_comm.local_steps()
 
         for S in local_MS_running:
             # first stage: spread values
@@ -356,13 +326,11 @@ class controller_nonMPI(Controller):
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
                 C.post_spread_processing(self, S, MS=local_MS_running)
 
-    def predict(self, local_MS_running):
+    def predict(self):
         """
         Predictor phase
-
-        Args:
-            local_MS_running (list): list of currently running steps
         """
+        local_MS_running = self.time_comm.local_steps()
 
         for S in local_MS_running:
             for hook in self.hooks:
@@ -476,13 +444,14 @@ class controller_nonMPI(Controller):
             # update stage
             S.status.stage = 'IT_CHECK'
 
-    def it_check(self, local_MS_running):
+    def it_check(self):
         """
         Key routine to check for convergence/termination
 
-        Args:
-            local_MS_running (list): list of currently running steps
+        Note that the list of running steps is taken once up front: steps drop out of it further down
+        as they are set to `DONE`, and the checks below have to see the whole set.
         """
+        local_MS_running = self.time_comm.local_steps()
 
         for S in local_MS_running:
             # send updated values forward
@@ -514,7 +483,7 @@ class controller_nonMPI(Controller):
             if self.params.all_to_done:
                 for hook in self.hooks:
                     hook.pre_comm(step=S, level_number=0)
-                S.status.done = all(T.status.done for T in local_MS_running)
+                S.status.done = self.time_comm.allreduce([T.status.done for T in local_MS_running], all)
                 for hook in self.hooks:
                     hook.post_comm(step=S, level_number=0, add_to_stats=True)
 
@@ -542,28 +511,25 @@ class controller_nonMPI(Controller):
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.reset_buffers_nonMPI(self)
 
-    def it_fine(self, local_MS_running: list[Step]):
+    def it_fine(self):
         """
         Fine sweeps
-
-        Args:
-            local_MS_running (list): list of currently running steps
         """
 
-        for S in local_MS_running:
+        for S in self.time_comm.local_steps():
             S.levels[0].status.sweep = 0
 
         for k in range(self.nsweeps[0]):
-            for S in local_MS_running:
+            for S in self.time_comm.local_steps():
                 S.levels[0].status.sweep += 1
 
-            for S in local_MS_running:
+            for S in self.time_comm.local_steps():
                 # send updated values forward
                 self.send_full(S, level=0)
                 # receive values
                 self.recv_full(S, level=0, add_to_stats=(k == self.nsweeps[0] - 1))
 
-            for S in local_MS_running:
+            for S in self.time_comm.local_steps():
                 # standard sweep workflow: update nodes, compute residual, log progress
                 for hook in self.hooks:
                     hook.pre_sweep(step=S, level_number=0)
@@ -575,32 +541,29 @@ class controller_nonMPI(Controller):
                 for hook in self.hooks:
                     hook.post_sweep(step=S, level_number=0)
 
-        for S in local_MS_running:
+        for S in self.time_comm.local_steps():
             # update stage
             S.status.stage = 'IT_CHECK'
 
-    def it_down(self, local_MS_running):
+    def it_down(self):
         """
         Go down the hierarchy from finest to coarsest level
-
-        Args:
-            local_MS_running (list): list of currently running steps
         """
 
-        for S in local_MS_running:
+        for S in self.time_comm.local_steps():
             S.transfer(source=S.levels[0], target=S.levels[1])
 
         for l in range(1, self.nlevels - 1):
             # sweep on middle levels (not on finest, not on coarsest, though)
 
             for _ in range(self.nsweeps[l]):
-                for S in local_MS_running:
+                for S in self.time_comm.local_steps():
                     # send updated values forward
                     self.send_full(S, level=l)
                     # receive values
                     self.recv_full(S, level=l)
 
-                for S in local_MS_running:
+                for S in self.time_comm.local_steps():
                     for hook in self.hooks:
                         hook.pre_sweep(step=S, level_number=l)
                     S.levels[l].sweep.update_nodes()
@@ -608,23 +571,20 @@ class controller_nonMPI(Controller):
                     for hook in self.hooks:
                         hook.post_sweep(step=S, level_number=l)
 
-            for S in local_MS_running:
+            for S in self.time_comm.local_steps():
                 # transfer further down the hierarchy
                 S.transfer(source=S.levels[l], target=S.levels[l + 1])
 
-        for S in local_MS_running:
+        for S in self.time_comm.local_steps():
             # update stage
             S.status.stage = 'IT_COARSE'
 
-    def it_coarse(self, local_MS_running):
+    def it_coarse(self):
         """
         Coarse sweep
-
-        Args:
-            local_MS_running (list): list of currently running steps
         """
 
-        for S in local_MS_running:
+        for S in self.time_comm.local_steps():
             # receive from previous step (if not first)
             self.recv_full(S, level=len(S.levels) - 1)
 
@@ -645,29 +605,26 @@ class controller_nonMPI(Controller):
             else:  # MSSDC
                 S.status.stage = 'IT_CHECK'
 
-    def it_up(self, local_MS_running):
+    def it_up(self):
         """
         Prolong corrections up to finest level (parallel)
-
-        Args:
-            local_MS_running (list): list of currently running steps
         """
 
         for l in range(self.nlevels - 1, 0, -1):
-            for S in local_MS_running:
+            for S in self.time_comm.local_steps():
                 # prolong values
                 S.transfer(source=S.levels[l], target=S.levels[l - 1])
 
             # on middle levels: do communication and sweep as usual
             if l - 1 > 0:
                 for k in range(self.nsweeps[l - 1]):
-                    for S in local_MS_running:
+                    for S in self.time_comm.local_steps():
                         # send updated values forward
                         self.send_full(S, level=l - 1)
                         # receive values
                         self.recv_full(S, level=l - 1, add_to_stats=(k == self.nsweeps[l - 1] - 1))
 
-                    for S in local_MS_running:
+                    for S in self.time_comm.local_steps():
                         for hook in self.hooks:
                             hook.pre_sweep(step=S, level_number=l - 1)
                         S.levels[l - 1].sweep.update_nodes()
@@ -675,15 +632,12 @@ class controller_nonMPI(Controller):
                         for hook in self.hooks:
                             hook.post_sweep(step=S, level_number=l - 1)
 
-        for S in local_MS_running:
+        for S in self.time_comm.local_steps():
             # update stage
             S.status.stage = 'IT_FINE'
 
-    def default(self, local_MS_running):
+    def default(self):
         """
         Default routine to catch wrong status
-
-        Args:
-            local_MS_running (list): list of currently running steps
         """
-        raise ControllerError('Unknown stage, got %s' % local_MS_running[0].status.stage)  # TODO
+        raise ControllerError('Unknown stage, got %s' % self.time_comm.local_steps()[0].status.stage)  # TODO
