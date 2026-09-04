@@ -1,9 +1,6 @@
-from pySDC.core.timings import Timings
+import cupy as cp
 
-try:
-    import cupy as cp
-except ImportError:
-    cp = None
+from pySDC.core.timings import Timings
 
 
 class GPUTimings(Timings):
