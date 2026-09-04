@@ -35,7 +35,7 @@ class AdaptivityBase(ConvergenceController):
 
         controller.add_hook(LogStepSize)
 
-        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+        from pySDC.core.check_convergence import CheckConvergence
 
         self.communicate_convergence = CheckConvergence.communicate_convergence
 
@@ -746,7 +746,7 @@ class AdaptivityExtrapolationWithinQ(AdaptivityForConvergedCollocationProblems):
     """
 
     def setup(self, controller, params, description, **kwargs):
-        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+        from pySDC.core.check_convergence import CheckConvergence
 
         defaults = {
             'high_Taylor_order': False,
@@ -837,7 +837,7 @@ class AdaptivityPolynomialError(AdaptivityForConvergedCollocationProblems):
     """
 
     def setup(self, controller, params, description, **kwargs):
-        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+        from pySDC.core.check_convergence import CheckConvergence
 
         defaults = {
             'control_order': -50,

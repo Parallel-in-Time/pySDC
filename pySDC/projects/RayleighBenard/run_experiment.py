@@ -60,7 +60,7 @@ def run_experiment(args, config, **kwargs):
         config.prepare_description_for_benchmark(description, controller_params)
 
     if args['useGPU']:
-        from pySDC.implementations.hooks.log_timings import GPUTimings
+        from pySDC.implementations.hooks.log_GPU_timings import GPUTimings
 
         controller_params['hook_class'].append(GPUTimings)
 
