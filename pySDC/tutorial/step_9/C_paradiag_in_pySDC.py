@@ -91,9 +91,9 @@ def get_controller_params(problem='advection', mode='ParaDiag'):
         # For nonlinear problems, we need to communicate the average solution, which allows to compute the average
         # Jacobian locally. For linear problems, we do not want the extra communication.
         if problem == 'advection':
-            controller_params['average_jacobians'] = False
+            controller_params['average_jacobian'] = False
         elif problem == 'vdp':
-            controller_params['average_jacobians'] = True
+            controller_params['average_jacobian'] = True
     else:
         # We do Block-Jacobi multi-step SDC here. It's a bit silly but it's better for comparing "speedup"
         controller_params['mssdc_jac'] = True
