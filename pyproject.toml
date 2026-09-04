@@ -56,6 +56,16 @@ dev = [
     'pre-commit'
     ]
 
+# Scratch code, tests and retired projects stay in the repository but are not
+# shipped: they are already excluded from ruff, black and coverage below.
+# CI runs pytest against the checkout (pySDC/tests), not the installed package.
+[tool.flit.sdist]
+exclude = [
+    'pySDC/playgrounds/',
+    'pySDC/tests/',
+    'pySDC/projects/deprecated/',
+    ]
+
 [tool.pytest.ini_options]
 markers = [
     'base: all basic tests',
