@@ -4,7 +4,7 @@ import scipy as sp
 from pySDC.core.errors import ParameterError
 from pySDC.core.collocation import CollBase
 from pySDC.core.convergence_controller import ConvergenceController, Status
-from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+from pySDC.core.check_convergence import CheckConvergence
 from qmat.lagrange import LagrangeApproximation
 
 

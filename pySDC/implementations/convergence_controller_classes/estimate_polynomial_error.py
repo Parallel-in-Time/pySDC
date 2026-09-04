@@ -28,7 +28,7 @@ class EstimatePolynomialError(ConvergenceController):
             (dict): The updated params dictionary
         """
         from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
-        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+        from pySDC.core.check_convergence import CheckConvergence
 
         sweeper_params = description['sweeper_params']
         num_nodes = sweeper_params['num_nodes']
