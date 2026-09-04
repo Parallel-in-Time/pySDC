@@ -32,11 +32,15 @@ authors:
     given-names: Jemma
     orcid: https://orcid.org/0000-0002-8635-0831
     affiliation: "Department of Mathematics and Statistics, University of Exeter, Exeter, UK"
+  - family-names: Ouardghi
+    given-names: Abdelouahed
+    orcid: https://orcid.org/0000-0003-3471-7424
+    affiliation: "Jülich Supercomputing Centre, Forschungszentrum Jülich GmbH, 52425 Jülich, Germany"
 
 
-version: 5.6
+version: 5.7
 doi: 10.5281/zenodo.594191
-date-released: 2025-04-11
+date-released: 2026-09-04
 keywords: 
   - "parallel-in-time"
   - "spectral deferred corrections"
