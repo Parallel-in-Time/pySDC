@@ -1,4 +1,4 @@
-from pySDC.core.log_timings import Timings
+from pySDC.core.timings import Timings
 
 try:
     import cupy as cp
