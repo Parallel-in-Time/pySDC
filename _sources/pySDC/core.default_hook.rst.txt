@@ -1,0 +1,7 @@
+core.default\_hook module
+=========================
+
+.. automodule:: core.default_hook
+   :members:
+   :show-inheritance:
+   :undoc-members:

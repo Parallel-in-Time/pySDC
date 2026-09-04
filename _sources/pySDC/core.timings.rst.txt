@@ -1,0 +1,7 @@
+core.timings module
+===================
+
+.. automodule:: core.timings
+   :members:
+   :show-inheritance:
+   :undoc-members:

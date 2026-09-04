@@ -10,7 +10,6 @@ Submodules
    implementations.convergence_controller_classes.adaptive_collocation
    implementations.convergence_controller_classes.adaptivity
    implementations.convergence_controller_classes.basic_restarting
-   implementations.convergence_controller_classes.check_convergence
    implementations.convergence_controller_classes.check_iteration_estimator
    implementations.convergence_controller_classes.crash
    implementations.convergence_controller_classes.estimate_contraction_factor

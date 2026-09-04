@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>core.timings &#8212; pySDC 5.7 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../_static/documentation_options.js?v=25098c49"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.7 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.timings</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for core.timings</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.hooks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hooks</span>
+
+
+<div class="viewcode-block" id="Timings">
+<a class="viewcode-back" href="../../pySDC/core.timings.html#core.timings.Timings">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Timings</span><span class="p">(</span><span class="n">Hooks</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Abstract base class for recoding timings</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        __t0_setup (float): private variable to get starting time of setup</span>
+<span class="sd">        __t0_run (float): private variable to get starting time of the run</span>
+<span class="sd">        __t0_predict (float): private variable to get starting time of the predictor</span>
+<span class="sd">        __t0_step (float): private variable to get starting time of the step</span>
+<span class="sd">        __t0_iteration (float): private variable to get starting time of the iteration</span>
+<span class="sd">        __t0_sweep (float): private variable to get starting time of the sweep</span>
+<span class="sd">        __t0_comm (list): private variable to get starting time of the communication</span>
+<span class="sd">        __t1_run (float): private variable to get end time of the run</span>
+<span class="sd">        __t1_predict (float): private variable to get end time of the predictor</span>
+<span class="sd">        __t1_step (float): private variable to get end time of the step</span>
+<span class="sd">        __t1_iteration (float): private variable to get end time of the iteration</span>
+<span class="sd">        __t1_sweep (float): private variable to get end time of the sweep</span>
+<span class="sd">        __t1_setup (float): private variable to get end time of setup</span>
+<span class="sd">        __t1_comm (list): private variable to hold timing of the communication (!)</span>
+<span class="sd">    """</span>
+
+    <span class="n">prefix</span> <span class="o">=</span> <span class="s1">''</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute_time_elapsed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_after</span><span class="p">,</span> <span class="n">event_before</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_event</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_setup</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_run</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_predict</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_step</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_iteration</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_sweep</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_comm</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_run</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_predict</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_step</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_iteration</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_sweep</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_setup</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_comm</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="Timings.pre_setup">
+<a class="viewcode-back" href="../../pySDC/core.timings.html#core.timings.Timings.pre_setup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pre_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Default routine called before setup starts</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">pre_setup</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_setup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Timings.pre_run">
+<a class="viewcode-back" href="../../pySDC/core.timings.html#core.timings.Timings.pre_run">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pre_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Default routine called before time-loop starts</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">pre_run</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Timings.pre_predict">
+<a class="viewcode-back" href="../../pySDC/core.timings.html#core.timings.Timings.pre_predict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pre_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Default routine called before predictor starts</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">pre_predict</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_predict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Timings.pre_step">
+<a class="viewcode-back" href="../../pySDC/core.timings.html#core.timings.Timings.pre_step">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pre_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Hook called before each step</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">pre_step</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Timings.pre_iteration">
+<a class="viewcode-back" href="../../pySDC/core.timings.html#core.timings.Timings.pre_iteration">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pre_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Default routine called before iteration starts</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">pre_iteration</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_iteration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Timings.pre_sweep">
+<a class="viewcode-back" href="../../pySDC/core.timings.html#core.timings.Timings.pre_sweep">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pre_sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Default routine called before sweep starts</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">pre_sweep</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_sweep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Timings.pre_comm">
+<a class="viewcode-back" href="../../pySDC/core.timings.html#core.timings.Timings.pre_comm">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pre_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Default routine called before communication starts</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">pre_comm</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__t0_comm</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">level_number</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__t0_comm</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__t0_comm</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">level_number</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__t0_comm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__t0_comm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_event</span><span class="p">())</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_comm</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">level_number</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__t1_comm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__t0_comm</span><span class="p">)</span> <span class="o">==</span> <span class="n">level_number</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_comm</span><span class="p">)</span> <span class="o">==</span> <span class="n">level_number</span> <span class="o">+</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="Timings.post_comm">
+<a class="viewcode-back" href="../../pySDC/core.timings.html#core.timings.Timings.post_comm">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">,</span> <span class="n">add_to_stats</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Default routine called after each communication</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+<span class="sd">            add_to_stats (bool): set if result should go to stats object</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">post_comm</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_comm</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">level_number</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_comm</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_time_elapsed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_event</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">__t0_comm</span><span class="p">[</span><span class="n">level_number</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">add_to_stats</span><span class="p">:</span>
+            <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
+                <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
+                <span class="n">process_sweeper</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span>
+                <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+                <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
+                <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
+                <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
+                <span class="nb">type</span><span class="o">=</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="si">}</span><span class="s1">timing_comm'</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_comm</span><span class="p">[</span><span class="n">level_number</span><span class="p">],</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__t1_comm</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span></div>
+
+
+<div class="viewcode-block" id="Timings.post_sweep">
+<a class="viewcode-back" href="../../pySDC/core.timings.html#core.timings.Timings.post_sweep">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Default routine called after each sweep</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">post_sweep</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_sweep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event</span><span class="p">()</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
+            <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
+            <span class="n">process_sweeper</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
+            <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
+            <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="si">}</span><span class="s1">timing_sweep'</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_compute_time_elapsed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_sweep</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__t0_sweep</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Timings.post_iteration">
+<a class="viewcode-back" href="../../pySDC/core.timings.html#core.timings.Timings.post_iteration">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Default routine called after each iteration</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">post_iteration</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_iteration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event</span><span class="p">()</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
+            <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
+            <span class="n">process_sweeper</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
+            <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
+            <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="si">}</span><span class="s1">timing_iteration'</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_compute_time_elapsed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_iteration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__t0_iteration</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Timings.post_step">
+<a class="viewcode-back" href="../../pySDC/core.timings.html#core.timings.Timings.post_step">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Default routine called after each step or block</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">post_step</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event</span><span class="p">()</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
+            <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
+            <span class="n">process_sweeper</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
+            <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
+            <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="si">}</span><span class="s1">timing_step'</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_compute_time_elapsed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__t0_step</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Timings.post_predict">
+<a class="viewcode-back" href="../../pySDC/core.timings.html#core.timings.Timings.post_predict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Default routine called after each predictor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">post_predict</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_predict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event</span><span class="p">()</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
+            <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
+            <span class="n">process_sweeper</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
+            <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
+            <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="si">}</span><span class="s1">timing_predictor'</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_compute_time_elapsed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_predict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__t0_predict</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Timings.post_run">
+<a class="viewcode-back" href="../../pySDC/core.timings.html#core.timings.Timings.post_run">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Default routine called after each run</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">post_run</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event</span><span class="p">()</span>
+        <span class="n">t_run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_time_elapsed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_run</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__t0_run</span><span class="p">)</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
+            <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
+            <span class="n">process_sweeper</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
+            <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
+            <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="si">}</span><span class="s1">timing_run'</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">t_run</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Finished run after </span><span class="si">{</span><span class="n">t_run</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">s'</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Timings.post_setup">
+<a class="viewcode-back" href="../../pySDC/core.timings.html#core.timings.Timings.post_setup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Default routine called after setup</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">post_setup</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_setup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
+            <span class="n">process</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">process_sweeper</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">time</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">level</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="nb">iter</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">sweep</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="si">}</span><span class="s1">timing_setup'</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_compute_time_elapsed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_setup</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__t0_setup</span><span class="p">),</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CPUTimings">
+<a class="viewcode-back" href="../../pySDC/core.timings.html#core.timings.CPUTimings">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CPUTimings</span><span class="p">(</span><span class="n">Timings</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Hook for recording CPU timings of important operations during a pySDC run.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute_time_elapsed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_after</span><span class="p">,</span> <span class="n">event_before</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">event_after</span> <span class="o">-</span> <span class="n">event_before</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_event</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.7 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.timings</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

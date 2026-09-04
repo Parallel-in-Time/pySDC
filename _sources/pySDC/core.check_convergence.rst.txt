@@ -1,0 +1,7 @@
+core.check\_convergence module
+==============================
+
+.. automodule:: core.check_convergence
+   :members:
+   :show-inheritance:
+   :undoc-members:

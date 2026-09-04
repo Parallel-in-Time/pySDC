@@ -4,12 +4,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; pySDC 5.6 documentation</title>
+    <title>Index &#8212; pySDC 5.7 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=c40552b6" />
     
-    <script src="_static/documentation_options.js?v=81710850"></script>
+    <script src="_static/documentation_options.js?v=25098c49"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     
@@ -25,7 +25,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pySDC 5.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pySDC 5.7 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Index</a></li> 
       </ul>
     </div>  
@@ -74,9 +74,37 @@
 </li>
       <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.__num_restarts">__num_restarts (Hooks attribute)</a>
 </li>
+      <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.__stats">__stats (Hooks attribute)</a>
+</li>
+      <li><a href="pySDC/core.timings.html#core.timings.Timings.__t0_comm">__t0_comm (Timings attribute)</a>
+</li>
+      <li><a href="pySDC/core.timings.html#core.timings.Timings.__t0_iteration">__t0_iteration (Timings attribute)</a>
+</li>
+      <li><a href="pySDC/core.timings.html#core.timings.Timings.__t0_predict">__t0_predict (Timings attribute)</a>
+</li>
+      <li><a href="pySDC/core.timings.html#core.timings.Timings.__t0_run">__t0_run (Timings attribute)</a>
+</li>
+      <li><a href="pySDC/core.timings.html#core.timings.Timings.__t0_setup">__t0_setup (Timings attribute)</a>
+</li>
+      <li><a href="pySDC/core.timings.html#core.timings.Timings.__t0_step">__t0_step (Timings attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.__stats">__stats (Hooks attribute)</a>
+      <li><a href="pySDC/core.timings.html#core.timings.Timings.__t0_sweep">__t0_sweep (Timings attribute)</a>
+</li>
+      <li><a href="pySDC/core.timings.html#core.timings.Timings.__t1_comm">__t1_comm (Timings attribute)</a>
+</li>
+      <li><a href="pySDC/core.timings.html#core.timings.Timings.__t1_iteration">__t1_iteration (Timings attribute)</a>
+</li>
+      <li><a href="pySDC/core.timings.html#core.timings.Timings.__t1_predict">__t1_predict (Timings attribute)</a>
+</li>
+      <li><a href="pySDC/core.timings.html#core.timings.Timings.__t1_run">__t1_run (Timings attribute)</a>
+</li>
+      <li><a href="pySDC/core.timings.html#core.timings.Timings.__t1_setup">__t1_setup (Timings attribute)</a>
+</li>
+      <li><a href="pySDC/core.timings.html#core.timings.Timings.__t1_step">__t1_step (Timings attribute)</a>
+</li>
+      <li><a href="pySDC/core.timings.html#core.timings.Timings.__t1_sweep">__t1_sweep (Timings attribute)</a>
 </li>
       <li><a href="pySDC/core.common.html#core.common.RegisterParams._parNames">_parNames (RegisterParams attribute)</a>
 </li>
@@ -492,11 +520,11 @@
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.check_BCs">check_BCs() (SpectralHelper method)</a>
 </li>
-      <li><a href="pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.check_convergence">check_convergence() (CheckConvergence static method)</a>
+      <li><a href="pySDC/core.check_convergence.html#core.check_convergence.CheckConvergence.check_convergence">check_convergence() (CheckConvergence static method)</a>
 </li>
       <li><a href="pySDC/implementations.controller_classes.controller_MPI.html#implementations.controller_classes.controller_MPI.controller_MPI.check_iteration_estimate">check_iteration_estimate() (controller_MPI method)</a>
 </li>
-      <li><a href="pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.check_iteration_status">check_iteration_status() (CheckConvergence method)</a>
+      <li><a href="pySDC/core.check_convergence.html#core.check_convergence.CheckConvergence.check_iteration_status">check_iteration_status() (CheckConvergence method)</a>
 
       <ul>
         <li><a href="pySDC/implementations.convergence_controller_classes.check_iteration_estimator.html#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI.check_iteration_status">(CheckIterationEstimatorNonMPI method)</a>
@@ -532,7 +560,7 @@
         <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded.check_weights">(ButcherTableauEmbedded method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence">CheckConvergence (class in implementations.convergence_controller_classes.check_convergence)</a>
+      <li><a href="pySDC/core.check_convergence.html#core.check_convergence.CheckConvergence">CheckConvergence (class in core.check_convergence)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.check_iteration_estimator.html#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI">CheckIterationEstimatorNonMPI (class in implementations.convergence_controller_classes.check_iteration_estimator)</a>
 </li>
@@ -570,7 +598,7 @@
         <li><a href="pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.comm">(SweeperMPI property)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.communicate_convergence">communicate_convergence() (CheckConvergence method)</a>
+      <li><a href="pySDC/core.check_convergence.html#core.check_convergence.CheckConvergence.communicate_convergence">communicate_convergence() (CheckConvergence method)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.CrashBase.communicate_crash">communicate_crash() (CrashBase method)</a>
 </li>
@@ -711,6 +739,13 @@
 </li>
       </ul></li>
       <li>
+    core.check_convergence
+
+      <ul>
+        <li><a href="pySDC/core.check_convergence.html#module-core.check_convergence">module</a>
+</li>
+      </ul></li>
+      <li>
     core.collocation
 
       <ul>
@@ -736,6 +771,13 @@
 
       <ul>
         <li><a href="pySDC/core.convergence_controller.html#module-core.convergence_controller">module</a>
+</li>
+      </ul></li>
+      <li>
+    core.default_hook
+
+      <ul>
+        <li><a href="pySDC/core.default_hook.html#module-core.default_hook">module</a>
 </li>
       </ul></li>
       <li>
@@ -787,12 +829,21 @@
         <li><a href="pySDC/core.sweeper.html#module-core.sweeper">module</a>
 </li>
       </ul></li>
+      <li>
+    core.timings
+
+      <ul>
+        <li><a href="pySDC/core.timings.html#module-core.timings">module</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.count_switches">count_switches() (battery_n_capacitors method)</a>
 
       <ul>
         <li><a href="pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.count_switches">(DiscontinuousTestODE method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/core.timings.html#core.timings.CPUTimings">CPUTimings (class in core.timings)</a>
+</li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.CrankNicolson">CrankNicolson (class in implementations.sweeper_classes.Runge_Kutta)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.CrashBase">CrashBase (class in implementations.convergence_controller_classes.crash)</a>
@@ -831,6 +882,8 @@
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.default">(controller_nonMPI method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/core.default_hook.html#core.default_hook.DefaultHooks">DefaultHooks (class in core.default_hook)</a>
+</li>
       <li><a href="pySDC/core.collocation.html#core.collocation.CollBase.delta_m">delta_m (CollBase attribute)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.Adaptivity.dependencies">dependencies() (Adaptivity method)</a>
@@ -850,7 +903,7 @@
 </li>
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit.dependencies">(CFLLimit method)</a>
 </li>
-        <li><a href="pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.dependencies">(CheckConvergence method)</a>
+        <li><a href="pySDC/core.check_convergence.html#core.check_convergence.CheckConvergence.dependencies">(CheckConvergence method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.check_iteration_estimator.html#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI.dependencies">(CheckIterationEstimatorNonMPI method)</a>
 </li>
@@ -2513,13 +2566,6 @@
 </li>
       </ul></li>
       <li>
-    implementations.convergence_controller_classes.check_convergence
-
-      <ul>
-        <li><a href="pySDC/implementations.convergence_controller_classes.check_convergence.html#module-implementations.convergence_controller_classes.check_convergence">module</a>
-</li>
-      </ul></li>
-      <li>
     implementations.convergence_controller_classes.check_iteration_estimator
 
       <ul>
@@ -2904,8 +2950,6 @@
         <li><a href="pySDC/implementations.problem_classes.generic_spectral.html#module-implementations.problem_classes.generic_spectral">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.GrayScott_1D_FEniCS_implicit
 
@@ -2913,6 +2957,8 @@
         <li><a href="pySDC/implementations.problem_classes.GrayScott_1D_FEniCS_implicit.html#module-implementations.problem_classes.GrayScott_1D_FEniCS_implicit">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.GrayScott_2D_PETSc_periodic
 
@@ -3715,6 +3761,8 @@
 </li>
         <li><a href="pySDC/core.base_transfer.html#module-core.base_transfer">core.base_transfer</a>
 </li>
+        <li><a href="pySDC/core.check_convergence.html#module-core.check_convergence">core.check_convergence</a>
+</li>
         <li><a href="pySDC/core.collocation.html#module-core.collocation">core.collocation</a>
 </li>
         <li><a href="pySDC/core.common.html#module-core.common">core.common</a>
@@ -3722,6 +3770,8 @@
         <li><a href="pySDC/core.controller.html#module-core.controller">core.controller</a>
 </li>
         <li><a href="pySDC/core.convergence_controller.html#module-core.convergence_controller">core.convergence_controller</a>
+</li>
+        <li><a href="pySDC/core.default_hook.html#module-core.default_hook">core.default_hook</a>
 </li>
         <li><a href="pySDC/core.errors.html#module-core.errors">core.errors</a>
 </li>
@@ -3736,6 +3786,8 @@
         <li><a href="pySDC/core.step.html#module-core.step">core.step</a>
 </li>
         <li><a href="pySDC/core.sweeper.html#module-core.sweeper">core.sweeper</a>
+</li>
+        <li><a href="pySDC/core.timings.html#module-core.timings">core.timings</a>
 </li>
         <li><a href="pySDC/helpers.html#module-helpers">helpers</a>
 </li>
@@ -3782,8 +3834,6 @@
         <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#module-implementations.convergence_controller_classes.adaptivity">implementations.convergence_controller_classes.adaptivity</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.basic_restarting.html#module-implementations.convergence_controller_classes.basic_restarting">implementations.convergence_controller_classes.basic_restarting</a>
-</li>
-        <li><a href="pySDC/implementations.convergence_controller_classes.check_convergence.html#module-implementations.convergence_controller_classes.check_convergence">implementations.convergence_controller_classes.check_convergence</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.check_iteration_estimator.html#module-implementations.convergence_controller_classes.check_iteration_estimator">implementations.convergence_controller_classes.check_iteration_estimator</a>
 </li>
@@ -4271,9 +4321,19 @@
       <li><a href="pySDC/implementations.datatype_classes.particles.html#implementations.datatype_classes.particles.particles.pos">pos (particles attribute)</a>
 </li>
       <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.post_comm">post_comm() (Hooks method)</a>
+
+      <ul>
+        <li><a href="pySDC/core.timings.html#core.timings.Timings.post_comm">(Timings method)</a>
 </li>
-      <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.post_iteration">post_iteration() (Hooks method)</a>
+      </ul></li>
+      <li><a href="pySDC/core.default_hook.html#core.default_hook.DefaultHooks.post_iteration">post_iteration() (DefaultHooks method)</a>
+
+      <ul>
+        <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.post_iteration">(Hooks method)</a>
 </li>
+        <li><a href="pySDC/core.timings.html#core.timings.Timings.post_iteration">(Timings method)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptive_collocation.html#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.post_iteration_processing">post_iteration_processing() (AdaptiveCollocation method)</a>
 
       <ul>
@@ -4307,13 +4367,25 @@
 </li>
       </ul></li>
       <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.post_predict">post_predict() (Hooks method)</a>
+
+      <ul>
+        <li><a href="pySDC/core.timings.html#core.timings.Timings.post_predict">(Timings method)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.post_run">post_run() (Hooks method)</a>
+
+      <ul>
+        <li><a href="pySDC/core.timings.html#core.timings.Timings.post_run">(Timings method)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.post_run_processing">post_run_processing() (ConvergenceController method)</a>
 </li>
       <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.post_setup">post_setup() (Hooks method)</a>
+
+      <ul>
+        <li><a href="pySDC/core.timings.html#core.timings.Timings.post_setup">(Timings method)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptive_collocation.html#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.post_spread_processing">post_spread_processing() (AdaptiveCollocation method)</a>
 
       <ul>
@@ -4324,26 +4396,44 @@
         <li><a href="pySDC/implementations.convergence_controller_classes.store_uold.html#implementations.convergence_controller_classes.store_uold.StoreUOld.post_spread_processing">(StoreUOld method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.post_step">post_step() (Hooks method)</a>
+      <li><a href="pySDC/core.default_hook.html#core.default_hook.DefaultHooks.post_step">post_step() (DefaultHooks method)</a>
 
       <ul>
+        <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.post_step">(Hooks method)</a>
+</li>
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.LogAnalysisVariables.post_step">(LogAnalysisVariables method)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.LogCFL.post_step">(LogCFL method)</a>
 </li>
+        <li><a href="pySDC/core.timings.html#core.timings.Timings.post_step">(Timings method)</a>
+</li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.post_step_processing">post_step_processing() (ConvergenceController method)</a>
 </li>
-      <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.post_sweep">post_sweep() (Hooks method)</a>
+      <li><a href="pySDC/core.default_hook.html#core.default_hook.DefaultHooks.post_sweep">post_sweep() (DefaultHooks method)</a>
+
+      <ul>
+        <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.post_sweep">(Hooks method)</a>
 </li>
+        <li><a href="pySDC/core.timings.html#core.timings.Timings.post_sweep">(Timings method)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.Pr">Pr (GenericSpectralLinear attribute)</a>
 </li>
       <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.pre_comm">pre_comm() (Hooks method)</a>
+
+      <ul>
+        <li><a href="pySDC/core.timings.html#core.timings.Timings.pre_comm">(Timings method)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.pre_iteration">pre_iteration() (Hooks method)</a>
+
+      <ul>
+        <li><a href="pySDC/core.timings.html#core.timings.Timings.pre_iteration">(Timings method)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.pre_iteration_processing">pre_iteration_processing() (ConvergenceController method)</a>
 
       <ul>
@@ -4351,15 +4441,35 @@
 </li>
       </ul></li>
       <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.pre_predict">pre_predict() (Hooks method)</a>
+
+      <ul>
+        <li><a href="pySDC/core.timings.html#core.timings.Timings.pre_predict">(Timings method)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.pre_run">pre_run() (Hooks method)</a>
+
+      <ul>
+        <li><a href="pySDC/core.timings.html#core.timings.Timings.pre_run">(Timings method)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.pre_setup">pre_setup() (Hooks method)</a>
+
+      <ul>
+        <li><a href="pySDC/core.timings.html#core.timings.Timings.pre_setup">(Timings method)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.pre_step">pre_step() (Hooks method)</a>
+
+      <ul>
+        <li><a href="pySDC/core.timings.html#core.timings.Timings.pre_step">(Timings method)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.pre_sweep">pre_sweep() (Hooks method)</a>
+
+      <ul>
+        <li><a href="pySDC/core.timings.html#core.timings.Timings.pre_sweep">(Timings method)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/implementations.controller_classes.controller_MPI.html#implementations.controller_classes.controller_MPI.controller_MPI.predict">predict() (controller_MPI method)</a>
 
       <ul>
@@ -4376,6 +4486,8 @@
         <li><a href="pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.predict">(SweeperMPI method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/core.timings.html#core.timings.Timings.prefix">prefix (Timings attribute)</a>
+</li>
       <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.prepare_Jacobians">prepare_Jacobians() (controller_ParaDiag_nonMPI method)</a>
 </li>
       <li><a href="pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.prepare_MPI_datatypes">prepare_MPI_datatypes() (ConvergenceController method)</a>
@@ -4769,7 +4881,7 @@
 </li>
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit.setup">(CFLLimit method)</a>
 </li>
-        <li><a href="pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.setup">(CheckConvergence method)</a>
+        <li><a href="pySDC/core.check_convergence.html#core.check_convergence.CheckConvergence.setup">(CheckConvergence method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.check_iteration_estimator.html#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI.setup">(CheckIterationEstimatorNonMPI method)</a>
 </li>
@@ -5200,6 +5312,8 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/core.timings.html#core.timings.Timings">Timings (class in core.timings)</a>
+</li>
       <li><a href="pySDC/core.collocation.html#core.collocation.CollBase.tleft">tleft (CollBase attribute)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.TM">TM (allencahn_temp_imex attribute)</a>
@@ -5702,7 +5816,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pySDC 5.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pySDC 5.7 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Index</a></li> 
       </ul>
     </div>

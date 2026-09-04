@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>core.timings module &#8212; pySDC 5.7 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=25098c49"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations package" href="implementations.html" />
+    <link rel="prev" title="core.sweeper module" href="core.sweeper.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.html" title="implementations package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="core.sweeper.html" title="core.sweeper module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.7 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="core.html" accesskey="U">core package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.timings module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-core.timings">
+<span id="core-timings-module"></span><h1>core.timings module<a class="headerlink" href="#module-core.timings" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.timings.CPUTimings">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">CPUTimings</span></span><a class="reference internal" href="../_modules/core/timings.html#CPUTimings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.timings.CPUTimings" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#core.timings.Timings" title="core.timings.Timings"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timings</span></code></a></p>
+<p>Hook for recording CPU timings of important operations during a pySDC run.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.timings.Timings">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Timings</span></span><a class="reference internal" href="../_modules/core/timings.html#Timings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.timings.Timings" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Hooks</span></code></p>
+<p>Abstract base class for recoding timings</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.timings.Timings.__t0_setup">
+<span class="sig-name descname"><span class="pre">__t0_setup</span></span><a class="headerlink" href="#core.timings.Timings.__t0_setup" title="Link to this definition">¶</a></dt>
+<dd><p>private variable to get starting time of setup</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.timings.Timings.__t0_run">
+<span class="sig-name descname"><span class="pre">__t0_run</span></span><a class="headerlink" href="#core.timings.Timings.__t0_run" title="Link to this definition">¶</a></dt>
+<dd><p>private variable to get starting time of the run</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.timings.Timings.__t0_predict">
+<span class="sig-name descname"><span class="pre">__t0_predict</span></span><a class="headerlink" href="#core.timings.Timings.__t0_predict" title="Link to this definition">¶</a></dt>
+<dd><p>private variable to get starting time of the predictor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.timings.Timings.__t0_step">
+<span class="sig-name descname"><span class="pre">__t0_step</span></span><a class="headerlink" href="#core.timings.Timings.__t0_step" title="Link to this definition">¶</a></dt>
+<dd><p>private variable to get starting time of the step</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.timings.Timings.__t0_iteration">
+<span class="sig-name descname"><span class="pre">__t0_iteration</span></span><a class="headerlink" href="#core.timings.Timings.__t0_iteration" title="Link to this definition">¶</a></dt>
+<dd><p>private variable to get starting time of the iteration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.timings.Timings.__t0_sweep">
+<span class="sig-name descname"><span class="pre">__t0_sweep</span></span><a class="headerlink" href="#core.timings.Timings.__t0_sweep" title="Link to this definition">¶</a></dt>
+<dd><p>private variable to get starting time of the sweep</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.timings.Timings.__t0_comm">
+<span class="sig-name descname"><span class="pre">__t0_comm</span></span><a class="headerlink" href="#core.timings.Timings.__t0_comm" title="Link to this definition">¶</a></dt>
+<dd><p>private variable to get starting time of the communication</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.timings.Timings.__t1_run">
+<span class="sig-name descname"><span class="pre">__t1_run</span></span><a class="headerlink" href="#core.timings.Timings.__t1_run" title="Link to this definition">¶</a></dt>
+<dd><p>private variable to get end time of the run</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.timings.Timings.__t1_predict">
+<span class="sig-name descname"><span class="pre">__t1_predict</span></span><a class="headerlink" href="#core.timings.Timings.__t1_predict" title="Link to this definition">¶</a></dt>
+<dd><p>private variable to get end time of the predictor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.timings.Timings.__t1_step">
+<span class="sig-name descname"><span class="pre">__t1_step</span></span><a class="headerlink" href="#core.timings.Timings.__t1_step" title="Link to this definition">¶</a></dt>
+<dd><p>private variable to get end time of the step</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.timings.Timings.__t1_iteration">
+<span class="sig-name descname"><span class="pre">__t1_iteration</span></span><a class="headerlink" href="#core.timings.Timings.__t1_iteration" title="Link to this definition">¶</a></dt>
+<dd><p>private variable to get end time of the iteration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.timings.Timings.__t1_sweep">
+<span class="sig-name descname"><span class="pre">__t1_sweep</span></span><a class="headerlink" href="#core.timings.Timings.__t1_sweep" title="Link to this definition">¶</a></dt>
+<dd><p>private variable to get end time of the sweep</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.timings.Timings.__t1_setup">
+<span class="sig-name descname"><span class="pre">__t1_setup</span></span><a class="headerlink" href="#core.timings.Timings.__t1_setup" title="Link to this definition">¶</a></dt>
+<dd><p>private variable to get end time of setup</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.timings.Timings.__t1_comm">
+<span class="sig-name descname"><span class="pre">__t1_comm</span></span><a class="headerlink" href="#core.timings.Timings.__t1_comm" title="Link to this definition">¶</a></dt>
+<dd><p>private variable to hold timing of the communication (!)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.timings.Timings.post_comm">
+<span class="sig-name descname"><span class="pre">post_comm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_to_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/timings.html#Timings.post_comm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.timings.Timings.post_comm" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called after each communication</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+<li><p><strong>add_to_stats</strong> (<em>bool</em>) – set if result should go to stats object</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.timings.Timings.post_iteration">
+<span class="sig-name descname"><span class="pre">post_iteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/timings.html#Timings.post_iteration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.timings.Timings.post_iteration" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called after each iteration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.timings.Timings.post_predict">
+<span class="sig-name descname"><span class="pre">post_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/timings.html#Timings.post_predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.timings.Timings.post_predict" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called after each predictor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.timings.Timings.post_run">
+<span class="sig-name descname"><span class="pre">post_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/timings.html#Timings.post_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.timings.Timings.post_run" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called after each run</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.timings.Timings.post_setup">
+<span class="sig-name descname"><span class="pre">post_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/timings.html#Timings.post_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.timings.Timings.post_setup" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called after setup</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.timings.Timings.post_step">
+<span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/timings.html#Timings.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.timings.Timings.post_step" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called after each step or block</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.timings.Timings.post_sweep">
+<span class="sig-name descname"><span class="pre">post_sweep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/timings.html#Timings.post_sweep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.timings.Timings.post_sweep" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called after each sweep</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.timings.Timings.pre_comm">
+<span class="sig-name descname"><span class="pre">pre_comm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/timings.html#Timings.pre_comm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.timings.Timings.pre_comm" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called before communication starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.timings.Timings.pre_iteration">
+<span class="sig-name descname"><span class="pre">pre_iteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/timings.html#Timings.pre_iteration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.timings.Timings.pre_iteration" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called before iteration starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.timings.Timings.pre_predict">
+<span class="sig-name descname"><span class="pre">pre_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/timings.html#Timings.pre_predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.timings.Timings.pre_predict" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called before predictor starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.timings.Timings.pre_run">
+<span class="sig-name descname"><span class="pre">pre_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/timings.html#Timings.pre_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.timings.Timings.pre_run" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called before time-loop starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.timings.Timings.pre_setup">
+<span class="sig-name descname"><span class="pre">pre_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/timings.html#Timings.pre_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.timings.Timings.pre_setup" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called before setup starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.timings.Timings.pre_step">
+<span class="sig-name descname"><span class="pre">pre_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/timings.html#Timings.pre_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.timings.Timings.pre_step" title="Link to this definition">¶</a></dt>
+<dd><p>Hook called before each step</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.timings.Timings.pre_sweep">
+<span class="sig-name descname"><span class="pre">pre_sweep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/timings.html#Timings.pre_sweep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.timings.Timings.pre_sweep" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called before sweep starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.timings.Timings.prefix">
+<span class="sig-name descname"><span class="pre">prefix</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></span><a class="headerlink" href="#core.timings.Timings.prefix" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">core.timings module</a><ul>
+<li><a class="reference internal" href="#core.timings.CPUTimings"><code class="docutils literal notranslate"><span class="pre">CPUTimings</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings"><code class="docutils literal notranslate"><span class="pre">Timings</span></code></a><ul>
+<li><a class="reference internal" href="#core.timings.Timings.__t0_setup"><code class="docutils literal notranslate"><span class="pre">__t0_setup</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.__t0_run"><code class="docutils literal notranslate"><span class="pre">__t0_run</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.__t0_predict"><code class="docutils literal notranslate"><span class="pre">__t0_predict</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.__t0_step"><code class="docutils literal notranslate"><span class="pre">__t0_step</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.__t0_iteration"><code class="docutils literal notranslate"><span class="pre">__t0_iteration</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.__t0_sweep"><code class="docutils literal notranslate"><span class="pre">__t0_sweep</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.__t0_comm"><code class="docutils literal notranslate"><span class="pre">__t0_comm</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.__t1_run"><code class="docutils literal notranslate"><span class="pre">__t1_run</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.__t1_predict"><code class="docutils literal notranslate"><span class="pre">__t1_predict</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.__t1_step"><code class="docutils literal notranslate"><span class="pre">__t1_step</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.__t1_iteration"><code class="docutils literal notranslate"><span class="pre">__t1_iteration</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.__t1_sweep"><code class="docutils literal notranslate"><span class="pre">__t1_sweep</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.__t1_setup"><code class="docutils literal notranslate"><span class="pre">__t1_setup</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.__t1_comm"><code class="docutils literal notranslate"><span class="pre">__t1_comm</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.post_comm"><code class="docutils literal notranslate"><span class="pre">post_comm()</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.post_iteration"><code class="docutils literal notranslate"><span class="pre">post_iteration()</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.post_predict"><code class="docutils literal notranslate"><span class="pre">post_predict()</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.post_run"><code class="docutils literal notranslate"><span class="pre">post_run()</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.post_setup"><code class="docutils literal notranslate"><span class="pre">post_setup()</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.post_step"><code class="docutils literal notranslate"><span class="pre">post_step()</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.post_sweep"><code class="docutils literal notranslate"><span class="pre">post_sweep()</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.pre_comm"><code class="docutils literal notranslate"><span class="pre">pre_comm()</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.pre_iteration"><code class="docutils literal notranslate"><span class="pre">pre_iteration()</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.pre_predict"><code class="docutils literal notranslate"><span class="pre">pre_predict()</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.pre_run"><code class="docutils literal notranslate"><span class="pre">pre_run()</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.pre_setup"><code class="docutils literal notranslate"><span class="pre">pre_setup()</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.pre_step"><code class="docutils literal notranslate"><span class="pre">pre_step()</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.pre_sweep"><code class="docutils literal notranslate"><span class="pre">pre_sweep()</span></code></a></li>
+<li><a class="reference internal" href="#core.timings.Timings.prefix"><code class="docutils literal notranslate"><span class="pre">prefix</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="core.sweeper.html"
+                          title="previous chapter">core.sweeper module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.html"
+                          title="next chapter">implementations package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/core.timings.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.html" title="implementations package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="core.sweeper.html" title="core.sweeper module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.7 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="core.html" >core package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.timings module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

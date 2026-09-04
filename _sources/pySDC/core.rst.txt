@@ -8,10 +8,12 @@ Submodules
    :maxdepth: 2
 
    core.base_transfer
+   core.check_convergence
    core.collocation
    core.common
    core.controller
    core.convergence_controller
+   core.default_hook
    core.errors
    core.hooks
    core.level
@@ -19,6 +21,7 @@ Submodules
    core.space_transfer
    core.step
    core.sweeper
+   core.timings
 
 Module contents
 ---------------

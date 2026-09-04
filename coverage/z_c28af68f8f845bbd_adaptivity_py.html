@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_c28af68f8f845bbd_basic_restarting_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.0">coverage.py v7.16.0</a>,
-            created at 2026-09-04 04:17 +0000
+            created at 2026-09-04 08:32 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -117,7 +117,7 @@
     <p class="pln"><span class="n"><a id="t35" href="#t35">35</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t36" href="#t36">36</a></span><span class="t">        <span class="nam">controller</span><span class="op">.</span><span class="nam">add_hook</span><span class="op">(</span><span class="nam">LogStepSize</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t37" href="#t37">37</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t38" href="#t38">38</a></span><span class="t">        <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">convergence_controller_classes</span><span class="op">.</span><span class="nam">check_convergence</span> <span class="key">import</span> <span class="nam">CheckConvergence</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t38" href="#t38">38</a></span><span class="t">        <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">core</span><span class="op">.</span><span class="nam">check_convergence</span> <span class="key">import</span> <span class="nam">CheckConvergence</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t39" href="#t39">39</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t40" href="#t40">40</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">communicate_convergence</span> <span class="op">=</span> <span class="nam">CheckConvergence</span><span class="op">.</span><span class="nam">communicate_convergence</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t41" href="#t41">41</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -828,7 +828,7 @@
     <p class="pln"><span class="n"><a id="t746" href="#t746">746</a></span><span class="t"><span class="str">    &quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t747" href="#t747">747</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t748" href="#t748">748</a></span><span class="t">    <span class="key">def</span> <span class="nam">setup</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">controller</span><span class="op">,</span> <span class="nam">params</span><span class="op">,</span> <span class="nam">description</span><span class="op">,</span> <span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t749" href="#t749">749</a></span><span class="t">        <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">convergence_controller_classes</span><span class="op">.</span><span class="nam">check_convergence</span> <span class="key">import</span> <span class="nam">CheckConvergence</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t749" href="#t749">749</a></span><span class="t">        <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">core</span><span class="op">.</span><span class="nam">check_convergence</span> <span class="key">import</span> <span class="nam">CheckConvergence</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t750" href="#t750">750</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t751" href="#t751">751</a></span><span class="t">        <span class="nam">defaults</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t752" href="#t752">752</a></span><span class="t">            <span class="str">&#x27;high_Taylor_order&#x27;</span><span class="op">:</span> <span class="key">False</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
@@ -919,7 +919,7 @@
     <p class="pln"><span class="n"><a id="t837" href="#t837">837</a></span><span class="t"><span class="str">    &quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t838" href="#t838">838</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t839" href="#t839">839</a></span><span class="t">    <span class="key">def</span> <span class="nam">setup</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">controller</span><span class="op">,</span> <span class="nam">params</span><span class="op">,</span> <span class="nam">description</span><span class="op">,</span> <span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t840" href="#t840">840</a></span><span class="t">        <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">convergence_controller_classes</span><span class="op">.</span><span class="nam">check_convergence</span> <span class="key">import</span> <span class="nam">CheckConvergence</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t840" href="#t840">840</a></span><span class="t">        <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">core</span><span class="op">.</span><span class="nam">check_convergence</span> <span class="key">import</span> <span class="nam">CheckConvergence</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t841" href="#t841">841</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t842" href="#t842">842</a></span><span class="t">        <span class="nam">defaults</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t843" href="#t843">843</a></span><span class="t">            <span class="str">&#x27;control_order&#x27;</span><span class="op">:</span> <span class="op">-</span><span class="num">50</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
@@ -1022,7 +1022,7 @@
             <a class="nav" href="z_c28af68f8f845bbd_basic_restarting_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.0">coverage.py v7.16.0</a>,
-            created at 2026-09-04 04:17 +0000
+            created at 2026-09-04 08:32 +0000
         </p>
     </div>
 </footer>
