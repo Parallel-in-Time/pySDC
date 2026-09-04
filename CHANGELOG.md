@@ -2,6 +2,14 @@
 
 :arrow_left: [Back to main page](./README.md)
 
+-   September 4, 2026: Version 5.7 is dominated by spectral methods and Rayleigh-Bénard convection, thanks to
+    [\@brownbaerchen](https://github.com/brownbaerchen). The spectral helper was largely rewritten and gained Neumann boundary
+    conditions in Chebychev and ultraspherical bases, a VkFFT backend and heterogeneous CPU/GPU computing, while Rayleigh-Bénard
+    convection got a 3D problem class and its own project. ParaDiag arrived too, as a serial implementation for collocation methods.
+    [\@Ouardghi](https://github.com/Ouardghi) contributed the new `StroemungsRaum` project, working up from FEniCS heat equation
+    examples to incompressible Navier-Stokes. Three changes are **not backward compatible**: sweepers now require the level at
+    instantiation, Python 3.9 was dropped (3.13 added), and the framework defaults moved into `core`, which no longer imports its
+    own plugins.
 -   April 11, 2025: Version 5.6 adds a framework for MPI-parallel I/O, developed by [\@tlunet](https://github.com/tlunet), making it easier to visualize the data obtained with pySDC on HPC machines in software such as ParaView.
     Also, pySDC is now compatible with the finite element library [Firedrake](https://github.com/firedrakeproject/firedrake) and the geophysical fluid dynamics library
     [Gusto](https://github.com/firedrakeproject/gusto), thanks to [\@jshipton](https://github.com/jshipton) and [\@brownbaerchen](https://github.com/brownbaerchen).
