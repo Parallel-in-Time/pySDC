@@ -60,6 +60,12 @@ class controller_MPI(Controller):
                 if not L.sweep.coll.right_is_node or L.sweep.params.do_coll_update:
                     raise ControllerError("For PFASST to work, we assume uend^k = u_M^k")
 
+        # `it_coarse` sweeps the coarsest level exactly once. Single-level Gauss-like MSSDC routes
+        # through it too. Check here rather than asserting mid-sweep: by then every rank has posted
+        # receives, so a failure hangs the job instead of raising.
+        if self.S.levels[-1].params.nsweeps > 1 and (num_levels > 1 or not self.params.mssdc_jac):
+            raise ControllerError('this controller cannot do multiple sweeps on coarsest level')
+
         if num_levels == 1 and self.params.predict_type is not None:
             self.logger.warning(
                 'you have specified a predictor type but only a single level.. predictor will be ignored'
@@ -746,10 +752,6 @@ class controller_MPI(Controller):
         # do the sweep
         for hook in self.hooks:
             hook.pre_sweep(step=self.S, level_number=len(self.S.levels) - 1)
-        assert self.S.levels[-1].params.nsweeps == 1, (
-            'ERROR: this controller can only work with one sweep on the coarse level, got %s'
-            % self.S.levels[-1].params.nsweeps
-        )
         self.S.levels[-1].sweep.update_nodes()
         self.S.levels[-1].sweep.compute_residual(stage='IT_COARSE')
         for hook in self.hooks:
