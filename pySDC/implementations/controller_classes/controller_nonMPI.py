@@ -70,7 +70,9 @@ class controller_nonMPI(Controller):
             if all(S.levels[nl].params.nsweeps == self.MS[0].levels[nl].params.nsweeps for S in self.MS):
                 self.nsweeps.append(self.MS[0].levels[nl].params.nsweeps)
 
-        if self.nlevels > 1 and self.nsweeps[-1] > 1:
+        # `it_coarse` sweeps the coarsest level exactly once. Single-level Gauss-like MSSDC routes
+        # through it too, so reject multiple sweeps there as well instead of silently ignoring them.
+        if self.nsweeps[-1] > 1 and (self.nlevels > 1 or not self.params.mssdc_jac):
             raise ControllerError('this controller cannot do multiple sweeps on coarsest level')
 
         if self.nlevels == 1 and self.params.predict_type is not None:
