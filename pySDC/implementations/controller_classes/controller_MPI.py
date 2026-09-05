@@ -66,6 +66,8 @@ class controller_MPI(Controller):
         if self.S.levels[-1].params.nsweeps > 1 and (num_levels > 1 or not self.params.mssdc_jac):
             raise ControllerError('this controller cannot do multiple sweeps on coarsest level')
 
+        self.check_variable_coefficients(num_procs)
+
         if num_levels == 1 and self.params.predict_type is not None:
             self.logger.warning(
                 'you have specified a predictor type but only a single level.. predictor will be ignored'
