@@ -277,6 +277,20 @@ class Controller(object):
         """
         return self.__hooks
 
+    @property
+    def steps(self) -> List[Any]:
+        """
+        Getter for the steps this controller owns.
+
+        Controllers that hold the whole block expose them as `MS`; MPI controllers hold a single step
+        as `S`. Dispatch on which of those exists rather than on the class name, so that subclasses
+        keep working.
+
+        Returns:
+            list: the steps owned by this controller
+        """
+        return self.MS if hasattr(self, 'MS') else [self.S]
+
     def setup_convergence_controllers(self, description: Dict[str, Any]) -> None:
         '''
         Setup variables needed for convergence controllers, notably a list containing all of them and a list containing
