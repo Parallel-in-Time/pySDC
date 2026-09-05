@@ -453,10 +453,7 @@ class ConvergenceController(object):
         return data
 
     def add_status_variable_to_step(self, key, value=None):
-        if type(self.controller).__name__ == 'controller_MPI':
-            steps = [self.controller.S]
-        else:
-            steps = self.controller.MS
+        steps = self.controller.steps
 
         steps[0].status.add_attr(key)
 
@@ -464,19 +461,13 @@ class ConvergenceController(object):
             self.set_step_status_variable(key, value)
 
     def set_step_status_variable(self, key, value):
-        if type(self.controller).__name__ == 'controller_MPI':
-            steps = [self.controller.S]
-        else:
-            steps = self.controller.MS
+        steps = self.controller.steps
 
         for S in steps:
             S.status.__dict__[key] = value
 
     def add_status_variable_to_level(self, key, value=None):
-        if type(self.controller).__name__ == 'controller_MPI':
-            steps = [self.controller.S]
-        else:
-            steps = self.controller.MS
+        steps = self.controller.steps
 
         steps[0].levels[0].status.add_attr(key)
 
@@ -484,10 +475,7 @@ class ConvergenceController(object):
             self.set_level_status_variable(key, value)
 
     def set_level_status_variable(self, key, value):
-        if type(self.controller).__name__ == 'controller_MPI':
-            steps = [self.controller.S]
-        else:
-            steps = self.controller.MS
+        steps = self.controller.steps
 
         for S in steps:
             for L in S.levels:
