@@ -27,19 +27,10 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # conda-forge MPICH aborts during MPI_Init on some Azure host types, and
-  # mpi4py calls MPI_Init on import - so affected jobs die ~1s into pytest
-  # collection, SIGTERM'd (exit 143, or 15 once PETSc's signal handler gets
-  # it). Measured over 2291 jobs: 234/704 MPI-dependent jobs failed in
-  # centralus/westus2/westus3/*centralus, 0/592 in eastus/eastus2/westus,
-  # and 0/995 for jobs with no MPI in the environment. The same matrix shows
-  # it directly: `fenics, 3.10/3.11` resolve openmpi and never failed,
-  # `fenics, 3.12/3.13` resolve mpich and failed 16/65. Forcing libfabric to
-  # the tcp provider stops MPI_Init probing the host's fabric hardware.
-  # These tests are all single-node, so nothing is lost by not using it.
-  FI_PROVIDER: tcp
-  # Without this pytest's stdout is block-buffered, so a SIGTERM'd job's log
-  # always ends at "collecting ..." no matter how far it actually got.
+  # Keep this: it is what proved the exit-143 deaths are silent. With stdout
+  # unbuffered there is still not one byte between "collecting ..." and the
+  # SIGTERM, so nothing inside the process is reporting an error - see the
+  # environment files for what the actual fix was.
   PYTHONUNBUFFERED: 1
 
 jobs:
