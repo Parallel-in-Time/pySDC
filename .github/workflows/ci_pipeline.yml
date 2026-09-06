@@ -32,6 +32,12 @@ env:
   # SIGTERM, so nothing inside the process is reporting an error - see the
   # environment files for what the actual fix was.
   PYTHONUNBUFFERED: 1
+  # OpenMPI refuses to oversubscribe by default, and PRRTE counts a "slot"
+  # as a physical core - so on a 4-vCPU runner (2 cores + hyperthreading)
+  # even `mpirun -np 3` fails with "not enough slots available". Several
+  # tests ask for 3 or 4 ranks and Monodomain's asks for 24. MPICH
+  # oversubscribed silently, which is why this only appeared after the swap.
+  PRTE_MCA_rmaps_default_mapping_policy: ':oversubscribe'
 
 jobs:
 
