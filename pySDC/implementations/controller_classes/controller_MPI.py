@@ -62,8 +62,10 @@ class controller_MPI(Controller):
 
         # `it_coarse` sweeps the coarsest level exactly once. Single-level Gauss-like MSSDC routes
         # through it too. Check here rather than asserting mid-sweep: by then every rank has posted
-        # receives, so a failure hangs the job instead of raising.
-        if self.S.levels[-1].params.nsweeps > 1 and (num_levels > 1 or not self.params.mssdc_jac):
+        # receives, so a failure hangs the job instead of raising. `mssdc_jac` only decides the
+        # routing when there is more than one step: a single step is plain SDC and always goes
+        # through `it_fine`, which honours nsweeps.
+        if self.S.levels[-1].params.nsweeps > 1 and (num_levels > 1 or (num_procs > 1 and not self.params.mssdc_jac)):
             raise ControllerError('this controller cannot do multiple sweeps on coarsest level')
 
         self.check_variable_coefficients(num_procs)
