@@ -72,6 +72,11 @@ class controller_ParaDiag_MPI(ParaDiagController):
         L -- an allgather would instead need O(L * M) fields on every rank, which is exactly the
         gather this controller must not do.
 
+        The ring costs L - 1 rounds. A butterfly would need only log2(L), but only because the matrix
+        this is called with is a DFT; for a general matrix it needs the O(L * M) gather just ruled
+        out. That belongs with an FFT-shaped interface rather than this one, and pays off from about
+        L = 16 upwards.
+
         Args:
             mat: square matrix with as many rows as there are ranks
             quantity (str): 'residual' or 'increment', the level attribute to transform in place
@@ -92,8 +97,10 @@ class controller_ParaDiag_MPI(ParaDiagController):
             raise NotImplementedError(f'Cannot apply matrix to {quantity!r}')
 
         res = [prob.u_init for _ in range(M)]
-        held = [prob.dtype_u(me[m]) for m in range(M)]
-        buf = [prob.dtype_u(me[m]) for m in range(M)]
+        # all M nodes travel in one contiguous buffer, so the ring costs L - 1 messages rather than
+        # M * (L - 1). Same volume, M times fewer message latencies.
+        held = np.array([me[m] for m in range(M)])
+        buf = np.empty_like(held)
 
         nxt, prv = (rank + 1) % L, (rank - 1) % L
         for k in range(L):
@@ -103,8 +110,7 @@ class controller_ParaDiag_MPI(ParaDiagController):
                 res[m] += mat[rank, src] * held[m]
 
             if k < L - 1:
-                for m in range(M):
-                    comm.Sendrecv(held[m], dest=nxt, sendtag=k, recvbuf=buf[m], source=prv, recvtag=k)
+                comm.Sendrecv(held, dest=nxt, sendtag=k, recvbuf=buf, source=prv, recvtag=k)
                 held, buf = buf, held
 
         for m in range(M):
