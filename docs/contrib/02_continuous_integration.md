@@ -19,36 +19,6 @@ This configuration ensures that when you push commits to a pull request branch, 
 > [locally](#code-testing) while you work, and open a pull request (a draft one is enough) as soon as you want
 > the full matrix to run.
 
-### Automated Failure Handling
-
-When the weekly scheduled CI run fails, an automated workflow is triggered to help investigate and resolve the issues:
-
-1. **Automatic Detection**: The `auto_fix_failures.yml` workflow detects failures from the scheduled Monday morning runs
-2. **Failure Analysis**: The system analyzes failed jobs and extracts:
-   - Error messages and stack traces
-   - Links to failed workflow runs and job logs
-   - Summary of all failed jobs
-3. **Pull Request Creation**: A PR is automatically created with:
-   - Detailed failure analysis report
-   - Recommendations for investigation
-   - Instructions for applying fixes
-   - Labels: `automated`, `test-failure`, `needs-investigation`
-
-**How to Handle Automated Failure PRs:**
-
-When you receive an automated failure PR:
-
-1. Review the `failure_analysis.md` file attached to the PR
-2. Check the linked workflow run and job logs for full details
-3. Investigate the root cause (dependency issues, flaky tests, code bugs, etc.)
-4. Push fixes directly to the PR branch or close if it's a transient failure
-5. Test fixes locally or wait for CI to verify
-6. Merge when the issue is confirmed resolved
-
-For more details, see the [automated failure handling documentation](../../.github/scripts/README.md).
-
-> :bell: **Note:** These automated PRs are informational and require manual review. They help centralize failure information but don't automatically fix issues. If you can identify and fix the problem, push commits to the auto-generated branch.
-
 ## Code linting
 
 Code style linting is performed using [black](https://black.readthedocs.io/en/stable/) and [ruff](https://docs.astral.sh/ruff/) for code syntax checking. In particular, `black` is used to check compliance with (most of) [PEP-8 guidelines](https://peps.python.org/pep-0008/).
