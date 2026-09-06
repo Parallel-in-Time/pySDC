@@ -37,10 +37,12 @@ class controller_ParaDiag_MPI(ParaDiagController):
         super().__init__(controller_params=controller_params, description=description, n_steps=comm.size, useMPI=True)
 
         self.comm = comm
+        self.sweeper_params = description['sweeper_params']
 
         # each step needs its own G^-1, determined by where it sits in the block
+        self._G_inv_alpha = self.get_alpha(0)
         description['sweeper_params']['G_inv'] = get_G_inv_matrix(
-            comm.rank, comm.size, self.params.alpha, description['sweeper_params']
+            comm.rank, comm.size, self._G_inv_alpha, description['sweeper_params']
         )
         self.S = Step(description)
         self.S.status.time_size = comm.size
@@ -153,6 +155,19 @@ class controller_ParaDiag_MPI(ParaDiagController):
 
         lvl.sweep.compute_residual()
 
+    def update_G_inv(self, k=0):
+        """
+        Rebuild this rank's G^-1 if alpha changed with the iteration.
+
+        Args:
+            k (int): 0-based ParaDiag iteration index
+        """
+        alpha = self.get_alpha(k)
+        if alpha == self._G_inv_alpha:
+            return
+        self._G_inv_alpha = alpha
+        self.S.levels[0].sweep.set_G_inv(get_G_inv_matrix(self.comm.rank, self.comm.size, alpha, self.sweeper_params))
+
     def update_solution(self):
         """Add the increment to get the next iterate. Purely local."""
         lvl = self.S.levels[0]
@@ -212,12 +227,16 @@ class controller_ParaDiag_MPI(ParaDiagController):
         for hook in self.hooks:
             hook.pre_sweep(step=S, level_number=0)
 
+        # `it_check` has already incremented the counter, so the first sweep is k = 0
+        k = max(S.status.iter - 1, 0)
+        self.update_G_inv(k)
+
         self.prepare_Jacobians()
         self.compute_all_at_once_residual()
 
-        self.FFT_in_time(quantity='residual')
+        self.FFT_in_time(quantity='residual', k=k)
         S.levels[0].sweep.update_nodes()  # local solve, embarrassingly parallel
-        self.iFFT_in_time(quantity='increment')
+        self.iFFT_in_time(quantity='increment', k=k)
 
         self.update_solution()
 
