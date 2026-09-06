@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Type, Union
 import numpy as np
 
 from pySDC.core.base_transfer import BaseTransfer
+from pySDC.core.errors import ControllerError
 from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.core.check_convergence import CheckConvergence
 from pySDC.core.default_hook import DefaultHooks
@@ -277,6 +278,56 @@ class Controller(object):
         """
         return self.__hooks
 
+    @property
+    def steps(self) -> List[Any]:
+        """
+        Getter for the steps this controller owns.
+
+        Controllers that hold the whole block expose them as `MS`; MPI controllers hold a single step
+        as `S`. Dispatch on which of those exists rather than on the class name, so that subclasses
+        keep working.
+
+        Returns:
+            list: the steps owned by this controller
+        """
+        return self.MS if hasattr(self, 'MS') else [self.S]
+
+    def check_variable_coefficients(self, num_procs: int) -> None:
+        """
+        Reject k-dependent QDelta coefficients outside plain SDC.
+
+        MIN-SR-FLEX and the Jumper variants vary QDelta with the sweep index, and the nilpotency
+        argument behind them is derived for SDC, where that index *is* the SDC iteration count.
+        Anything needing more iterations (PFASST) or fewer (MLSDC) breaks that identity and would
+        need its own analysis first.
+
+        They are also only refreshed by `Sweeper.updateVariableCoeffs`, which runs on the finest
+        level of the Jacobi sweep alone, so on a coarse level or on the Gauss-Seidel path they
+        silently degrade to a fixed preconditioner. Failing loudly beats either of those.
+
+        Note this gates parallelism across *steps* and the number of *levels*. Parallelism across
+        collocation nodes (`generic_implicit_MPI` and friends) is still SDC and stays allowed.
+
+        Args:
+            num_procs (int): number of parallel time steps
+
+        Raises:
+            ControllerError: if a k-dependent QDelta is combined with multiple levels or steps
+        """
+        S = self.steps[0]
+        if len(S.levels) == 1 and num_procs == 1:
+            return
+
+        for level in S.levels:
+            for name in ['genQI', 'genQE']:
+                generator = getattr(level.sweep, name, None)
+                if generator is not None and generator.isKDependent():
+                    raise ControllerError(
+                        f'{type(generator).__name__} varies QDelta with the sweep index and is only '
+                        f'verified for SDC, but you have {len(S.levels)} level(s) and {num_procs} '
+                        f'step(s). Use a preconditioner with fixed coefficients, e.g. MIN-SR-S or LU.'
+                    )
+
     def setup_convergence_controllers(self, description: Dict[str, Any]) -> None:
         '''
         Setup variables needed for convergence controllers, notably a list containing all of them and a list containing
@@ -403,7 +454,7 @@ class ParaDiagController(Controller):
                 f'Warning: Your sweeper class {description["sweeper_class"]} is not derived from {QDiagonalization}. You probably want to use another sweeper class.'
             )
 
-        if controller_params.get('all_to_done', False):
+        if not controller_params.get('all_to_done', True):
             raise NotImplementedError('ParaDiag only implemented with option `all_to_done=True`')
         if 'alpha' not in controller_params.keys():
             from pySDC.core.errors import ParameterError

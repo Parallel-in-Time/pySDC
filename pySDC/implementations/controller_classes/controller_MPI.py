@@ -60,6 +60,16 @@ class controller_MPI(Controller):
                 if not L.sweep.coll.right_is_node or L.sweep.params.do_coll_update:
                     raise ControllerError("For PFASST to work, we assume uend^k = u_M^k")
 
+        # `it_coarse` sweeps the coarsest level exactly once. Single-level Gauss-like MSSDC routes
+        # through it too. Check here rather than asserting mid-sweep: by then every rank has posted
+        # receives, so a failure hangs the job instead of raising. `mssdc_jac` only decides the
+        # routing when there is more than one step: a single step is plain SDC and always goes
+        # through `it_fine`, which honours nsweeps.
+        if self.S.levels[-1].params.nsweeps > 1 and (num_levels > 1 or (num_procs > 1 and not self.params.mssdc_jac)):
+            raise ControllerError('this controller cannot do multiple sweeps on coarsest level')
+
+        self.check_variable_coefficients(num_procs)
+
         if num_levels == 1 and self.params.predict_type is not None:
             self.logger.warning(
                 'you have specified a predictor type but only a single level.. predictor will be ignored'
@@ -241,6 +251,10 @@ class controller_MPI(Controller):
             blocking: flag to indicate that we need blocking communication
             level: the level number
             add_to_stats: a flag to end recording data in the hooks (defaults to False)
+
+        Note:
+            Computing the end point is this function's job, not the caller's. Callers must not do it
+            themselves.
         """
         for hook in self.hooks:
             hook.pre_comm(step=self.S, level_number=level)
@@ -746,17 +760,12 @@ class controller_MPI(Controller):
         # do the sweep
         for hook in self.hooks:
             hook.pre_sweep(step=self.S, level_number=len(self.S.levels) - 1)
-        assert self.S.levels[-1].params.nsweeps == 1, (
-            'ERROR: this controller can only work with one sweep on the coarse level, got %s'
-            % self.S.levels[-1].params.nsweeps
-        )
         self.S.levels[-1].sweep.update_nodes()
         self.S.levels[-1].sweep.compute_residual(stage='IT_COARSE')
         for hook in self.hooks:
             hook.post_sweep(step=self.S, level_number=len(self.S.levels) - 1)
-        self.S.levels[-1].sweep.compute_end_point()
 
-        # send to next step
+        # send to next step (`send_full` computes the end point itself)
         self.send_full(comm=comm, blocking=True, level=len(self.S.levels) - 1, add_to_stats=True)
         if self.S.status.force_done:
             return None
