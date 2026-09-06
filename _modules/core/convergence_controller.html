@@ -574,10 +574,7 @@
 <div class="viewcode-block" id="ConvergenceController.add_status_variable_to_step">
 <a class="viewcode-back" href="../../pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.add_status_variable_to_step">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_status_variable_to_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'controller_MPI'</span><span class="p">:</span>
-            <span class="n">steps</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">S</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">MS</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">steps</span>
 
         <span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">add_attr</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
@@ -588,10 +585,7 @@
 <div class="viewcode-block" id="ConvergenceController.set_step_status_variable">
 <a class="viewcode-back" href="../../pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.set_step_status_variable">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_step_status_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'controller_MPI'</span><span class="p">:</span>
-            <span class="n">steps</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">S</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">MS</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">steps</span>
 
         <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>
             <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
@@ -600,10 +594,7 @@
 <div class="viewcode-block" id="ConvergenceController.add_status_variable_to_level">
 <a class="viewcode-back" href="../../pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.add_status_variable_to_level">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_status_variable_to_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'controller_MPI'</span><span class="p">:</span>
-            <span class="n">steps</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">S</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">MS</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">steps</span>
 
         <span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">add_attr</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
@@ -614,10 +605,7 @@
 <div class="viewcode-block" id="ConvergenceController.set_level_status_variable">
 <a class="viewcode-back" href="../../pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.set_level_status_variable">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_level_status_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'controller_MPI'</span><span class="p">:</span>
-            <span class="n">steps</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">S</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">MS</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">steps</span>
 
         <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>

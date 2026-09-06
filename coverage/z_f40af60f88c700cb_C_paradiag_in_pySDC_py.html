@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="index.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.0">coverage.py v7.16.0</a>,
-            created at 2026-09-04 08:32 +0000
+            created at 2026-09-06 12:39 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -173,9 +173,9 @@
     <p class="pln"><span class="n"><a id="t91" href="#t91">91</a></span><span class="t">        <span class="com"># For nonlinear problems, we need to communicate the average solution, which allows to compute the average</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t92" href="#t92">92</a></span><span class="t">        <span class="com"># Jacobian locally. For linear problems, we do not want the extra communication.</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t93" href="#t93">93</a></span><span class="t">        <span class="key">if</span> <span class="nam">problem</span> <span class="op">==</span> <span class="str">&#x27;advection&#x27;</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t94" href="#t94">94</a></span><span class="t">            <span class="nam">controller_params</span><span class="op">[</span><span class="str">&#x27;average_jacobians&#x27;</span><span class="op">]</span> <span class="op">=</span> <span class="key">False</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t94" href="#t94">94</a></span><span class="t">            <span class="nam">controller_params</span><span class="op">[</span><span class="str">&#x27;average_jacobian&#x27;</span><span class="op">]</span> <span class="op">=</span> <span class="key">False</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t95" href="#t95">95</a></span><span class="t">        <span class="key">elif</span> <span class="nam">problem</span> <span class="op">==</span> <span class="str">&#x27;vdp&#x27;</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t96" href="#t96">96</a></span><span class="t">            <span class="nam">controller_params</span><span class="op">[</span><span class="str">&#x27;average_jacobians&#x27;</span><span class="op">]</span> <span class="op">=</span> <span class="key">True</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t96" href="#t96">96</a></span><span class="t">            <span class="nam">controller_params</span><span class="op">[</span><span class="str">&#x27;average_jacobian&#x27;</span><span class="op">]</span> <span class="op">=</span> <span class="key">True</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t97" href="#t97">97</a></span><span class="t">    <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t98" href="#t98">98</a></span><span class="t">        <span class="com"># We do Block-Jacobi multi-step SDC here. It&#x27;s a bit silly but it&#x27;s better for comparing &quot;speedup&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t99" href="#t99">99</a></span><span class="t">        <span class="nam">controller_params</span><span class="op">[</span><span class="str">&#x27;mssdc_jac&#x27;</span><span class="op">]</span> <span class="op">=</span> <span class="key">True</span>&nbsp;</span><span class="r"></span></p>
@@ -269,7 +269,7 @@
             <a class="nav" href="index.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.0">coverage.py v7.16.0</a>,
-            created at 2026-09-04 08:32 +0000
+            created at 2026-09-06 12:39 +0000
         </p>
     </div>
 </footer>

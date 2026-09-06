@@ -88,6 +88,29 @@ The hook is only added if a hook of the same class is not already present.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="core.controller.Controller.check_variable_coefficients">
+<span class="sig-name descname"><span class="pre">check_variable_coefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_procs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/core/controller.html#Controller.check_variable_coefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.controller.Controller.check_variable_coefficients" title="Link to this definition">¶</a></dt>
+<dd><p>Reject k-dependent QDelta coefficients outside plain SDC.</p>
+<p>MIN-SR-FLEX and the Jumper variants vary QDelta with the sweep index, and the nilpotency
+argument behind them is derived for SDC, where that index <em>is</em> the SDC iteration count.
+Anything needing more iterations (PFASST) or fewer (MLSDC) breaks that identity and would
+need its own analysis first.</p>
+<p>They are also only refreshed by <cite>Sweeper.updateVariableCoeffs</cite>, which runs on the finest
+level of the Jacobi sweep alone, so on a coarse level or on the Gauss-Seidel path they
+silently degrade to a fixed preconditioner. Failing loudly beats either of those.</p>
+<p>Note this gates parallelism across <em>steps</em> and the number of <em>levels</em>. Parallelism across
+collocation nodes (<cite>generic_implicit_MPI</cite> and friends) is still SDC and stays allowed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_procs</strong> (<em>int</em>) – number of parallel time steps</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="core.errors.html#core.errors.ControllerError" title="core.errors.ControllerError"><strong>ControllerError</strong></a> – if a k-dependent QDelta is combined with multiple levels or steps</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="core.controller.Controller.dump_setup">
 <span class="sig-name descname"><span class="pre">dump_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controller_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/core/controller.html#Controller.dump_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.controller.Controller.dump_setup" title="Link to this definition">¶</a></dt>
 <dd><p>Helper function to dump the setup used for this controller</p>
@@ -178,6 +201,23 @@ count or a residual based stopping criterion, as well as all convergence control
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="core.controller.Controller.steps">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">steps</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#core.controller.Controller.steps" title="Link to this definition">¶</a></dt>
+<dd><p>Getter for the steps this controller owns.</p>
+<p>Controllers that hold the whole block expose them as <cite>MS</cite>; MPI controllers hold a single step
+as <cite>S</cite>. Dispatch on which of those exists rather than on the class name, so that subclasses
+keep working.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the steps owned by this controller</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="core.controller.Controller.welcome_message">
 <span class="sig-name descname"><span class="pre">welcome_message</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/core/controller.html#Controller.welcome_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.controller.Controller.welcome_message" title="Link to this definition">¶</a></dt>
@@ -223,12 +263,14 @@ count or a residual based stopping criterion, as well as all convergence control
 <li><a class="reference internal" href="#core.controller.Controller"><code class="docutils literal notranslate"><span class="pre">Controller</span></code></a><ul>
 <li><a class="reference internal" href="#core.controller.Controller.add_convergence_controller"><code class="docutils literal notranslate"><span class="pre">add_convergence_controller()</span></code></a></li>
 <li><a class="reference internal" href="#core.controller.Controller.add_hook"><code class="docutils literal notranslate"><span class="pre">add_hook()</span></code></a></li>
+<li><a class="reference internal" href="#core.controller.Controller.check_variable_coefficients"><code class="docutils literal notranslate"><span class="pre">check_variable_coefficients()</span></code></a></li>
 <li><a class="reference internal" href="#core.controller.Controller.dump_setup"><code class="docutils literal notranslate"><span class="pre">dump_setup()</span></code></a></li>
 <li><a class="reference internal" href="#core.controller.Controller.get_convergence_controllers_as_table"><code class="docutils literal notranslate"><span class="pre">get_convergence_controllers_as_table()</span></code></a></li>
 <li><a class="reference internal" href="#core.controller.Controller.hooks"><code class="docutils literal notranslate"><span class="pre">hooks</span></code></a></li>
 <li><a class="reference internal" href="#core.controller.Controller.return_stats"><code class="docutils literal notranslate"><span class="pre">return_stats()</span></code></a></li>
 <li><a class="reference internal" href="#core.controller.Controller.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
 <li><a class="reference internal" href="#core.controller.Controller.setup_convergence_controllers"><code class="docutils literal notranslate"><span class="pre">setup_convergence_controllers()</span></code></a></li>
+<li><a class="reference internal" href="#core.controller.Controller.steps"><code class="docutils literal notranslate"><span class="pre">steps</span></code></a></li>
 <li><a class="reference internal" href="#core.controller.Controller.welcome_message"><code class="docutils literal notranslate"><span class="pre">welcome_message()</span></code></a></li>
 </ul>
 </li>

@@ -130,9 +130,9 @@
         <span class="c1"># For nonlinear problems, we need to communicate the average solution, which allows to compute the average</span>
         <span class="c1"># Jacobian locally. For linear problems, we do not want the extra communication.</span>
         <span class="k">if</span> <span class="n">problem</span> <span class="o">==</span> <span class="s1">'advection'</span><span class="p">:</span>
-            <span class="n">controller_params</span><span class="p">[</span><span class="s1">'average_jacobians'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">controller_params</span><span class="p">[</span><span class="s1">'average_jacobian'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">elif</span> <span class="n">problem</span> <span class="o">==</span> <span class="s1">'vdp'</span><span class="p">:</span>
-            <span class="n">controller_params</span><span class="p">[</span><span class="s1">'average_jacobians'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">controller_params</span><span class="p">[</span><span class="s1">'average_jacobian'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># We do Block-Jacobi multi-step SDC here. It's a bit silly but it's better for comparing "speedup"</span>
         <span class="n">controller_params</span><span class="p">[</span><span class="s1">'mssdc_jac'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
@@ -222,7 +222,7 @@
 <p>Results:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Running</span> <span class="n">advection</span> <span class="k">with</span> <span class="mi">16</span> <span class="n">steps</span>
 <span class="n">Needed</span> <span class="mi">3</span> <span class="n">ParaDiag</span> <span class="n">iterations</span> <span class="ow">and</span> <span class="mi">36</span> <span class="n">single</span><span class="o">-</span><span class="n">level</span> <span class="n">PFASST</span> <span class="n">iterations</span>
-<span class="n">Maximum</span> <span class="n">GMRES</span> <span class="n">iterations</span> <span class="n">on</span> <span class="n">each</span> <span class="n">step</span><span class="p">:</span> <span class="mi">479</span> <span class="ow">in</span> <span class="n">ParaDiag</span><span class="p">,</span> <span class="mi">889</span> <span class="ow">in</span> <span class="n">single</span><span class="o">-</span><span class="n">level</span> <span class="n">PFASST</span> <span class="ow">and</span> <span class="mi">1950</span> <span class="n">total</span> <span class="n">GMRES</span> <span class="n">iterations</span> <span class="ow">in</span> <span class="n">serial</span>
+<span class="n">Maximum</span> <span class="n">GMRES</span> <span class="n">iterations</span> <span class="n">on</span> <span class="n">each</span> <span class="n">step</span><span class="p">:</span> <span class="mi">95</span> <span class="ow">in</span> <span class="n">ParaDiag</span><span class="p">,</span> <span class="mi">889</span> <span class="ow">in</span> <span class="n">single</span><span class="o">-</span><span class="n">level</span> <span class="n">PFASST</span> <span class="ow">and</span> <span class="mi">1950</span> <span class="n">total</span> <span class="n">GMRES</span> <span class="n">iterations</span> <span class="ow">in</span> <span class="n">serial</span>
 
 <span class="n">Running</span> <span class="n">vdp</span> <span class="k">with</span> <span class="mi">16</span> <span class="n">steps</span>
 <span class="n">Needed</span> <span class="mi">10</span> <span class="n">ParaDiag</span> <span class="n">iterations</span> <span class="ow">and</span> <span class="mi">24</span> <span class="n">single</span><span class="o">-</span><span class="n">level</span> <span class="n">PFASST</span> <span class="n">iterations</span>
