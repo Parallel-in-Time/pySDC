@@ -9,10 +9,15 @@ Finally, the CI also build artifacts that are used to generate the documentation
 The CI pipeline is configured to avoid redundant runs. The workflow is triggered:
 
 - **On pull requests**: CI runs for all pull request events (opened, synchronized, reopened, etc.)
-- **On push to master**: CI runs when code is pushed directly to the `master` branch
+- **On push to `master`** (and to release branches matching `v*`): CI runs when code is pushed there directly
 - **On schedule**: CI runs weekly on Monday at 5:01 AM UTC (via cron schedule)
 
 This configuration ensures that when you push commits to a pull request branch, the CI runs only once for the pull request event, not twice (once for the PR and once for the push). Direct pushes to the master branch will still trigger the CI to ensure the main branch is always tested.
+
+> :bell: **A branch with no open pull request gets no CI.** This is deliberate: a bare `push` trigger fires
+> alongside `pull_request` for the same commit and doubles the ~42-job matrix. Run the tests
+> [locally](#code-testing) while you work, and open a pull request (a draft one is enough) as soon as you want
+> the full matrix to run.
 
 ### Automated Failure Handling
 

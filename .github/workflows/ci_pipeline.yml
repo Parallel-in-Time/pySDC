@@ -2,22 +2,45 @@
 
 name: CI pipeline for pySDC
 
+# A bare `push:` trigger fires alongside `pull_request` for the same commit,
+# creating two runs of the ~42-job matrix. The `concurrency` group below
+# cancels the loser, but only after all its jobs have been dispatched - you
+# still see ~84 job entries. Restricting `push` to the branches that have no
+# PR of their own stops the duplicate from ever being created. Feature
+# branches get CI from `pull_request`; open a (draft) PR to run them.
 on:
   push:
+    branches:
+      - master
+      - 'v*'
   pull_request:
   schedule:
     - cron: '1 5 * * 1'
 
-# Pushing to a branch with an open PR fires both `push` and `pull_request`
-# for the same commit, doubling the ~80-job matrix. Cancel the older,
-# now-stale run instead of letting both run to completion. `head_ref` is
-# only set on pull_request events (the PR's source branch); `ref_name` is
-# the plain branch name on push events (unlike `ref`, which carries a
-# `refs/heads/` prefix that would never match `head_ref`) - so both events
-# for the same branch land in the same group.
+# Successive pushes to an open PR supersede each other; cancel the stale run
+# rather than letting both finish. `head_ref` is only set on pull_request
+# events (the PR's source branch); `ref_name` is the plain branch name on
+# push events (unlike `ref`, which carries a `refs/heads/` prefix that would
+# never match `head_ref`).
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
+
+env:
+  # conda-forge MPICH aborts during MPI_Init on some Azure host types, and
+  # mpi4py calls MPI_Init on import - so affected jobs die ~1s into pytest
+  # collection, SIGTERM'd (exit 143, or 15 once PETSc's signal handler gets
+  # it). Measured over 2291 jobs: 234/704 MPI-dependent jobs failed in
+  # centralus/westus2/westus3/*centralus, 0/592 in eastus/eastus2/westus,
+  # and 0/995 for jobs with no MPI in the environment. The same matrix shows
+  # it directly: `fenics, 3.10/3.11` resolve openmpi and never failed,
+  # `fenics, 3.12/3.13` resolve mpich and failed 16/65. Forcing libfabric to
+  # the tcp provider stops MPI_Init probing the host's fabric hardware.
+  # These tests are all single-node, so nothing is lost by not using it.
+  FI_PROVIDER: tcp
+  # Without this pytest's stdout is block-buffered, so a SIGTERM'd job's log
+  # always ends at "collecting ..." no matter how far it actually got.
+  PYTHONUNBUFFERED: 1
 
 jobs:
 
