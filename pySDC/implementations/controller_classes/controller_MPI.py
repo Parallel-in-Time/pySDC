@@ -249,6 +249,10 @@ class controller_MPI(Controller):
             blocking: flag to indicate that we need blocking communication
             level: the level number
             add_to_stats: a flag to end recording data in the hooks (defaults to False)
+
+        Note:
+            Computing the end point is this function's job, not the caller's. Callers must not do it
+            themselves.
         """
         for hook in self.hooks:
             hook.pre_comm(step=self.S, level_number=level)
@@ -758,9 +762,8 @@ class controller_MPI(Controller):
         self.S.levels[-1].sweep.compute_residual(stage='IT_COARSE')
         for hook in self.hooks:
             hook.post_sweep(step=self.S, level_number=len(self.S.levels) - 1)
-        self.S.levels[-1].sweep.compute_end_point()
 
-        # send to next step
+        # send to next step (`send_full` computes the end point itself)
         self.send_full(comm=comm, blocking=True, level=len(self.S.levels) - 1, add_to_stats=True)
         if self.S.status.force_done:
             return None

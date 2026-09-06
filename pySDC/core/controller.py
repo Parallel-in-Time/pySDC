@@ -454,7 +454,7 @@ class ParaDiagController(Controller):
                 f'Warning: Your sweeper class {description["sweeper_class"]} is not derived from {QDiagonalization}. You probably want to use another sweeper class.'
             )
 
-        if controller_params.get('all_to_done', False):
+        if not controller_params.get('all_to_done', True):
             raise NotImplementedError('ParaDiag only implemented with option `all_to_done=True`')
         if 'alpha' not in controller_params.keys():
             from pySDC.core.errors import ParameterError
