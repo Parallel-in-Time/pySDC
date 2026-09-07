@@ -25,13 +25,13 @@ What this file deliberately does NOT duplicate:
 Axes marked ``xfail`` are known asymmetries with a documented cause. They are strict, so fixing one
 without removing its marker fails the suite: the marker is a to-do list, not a suppression.
 
-A note on the iteration estimator, since that axis asserts something weaker than parity.
+A note on the iteration estimator, which took three goes to make symmetric.
 ``controller_MPI`` used to implement it inline while ``controller_nonMPI`` did not implement it at
-all, and the supported route was a third thing -- the ``CheckIterationEstimatorNonMPI`` convergence
-controller, which tutorial step_8 C exercises. Only that third one ever worked, so the inline
-implementation was removed and both controllers now refuse the parameter identically. The
-convergence controller remains nonMPI-only, so the *feature* is still not symmetric; what the axis
-pins is that the two controllers no longer disagree in silence.
+all, and the supported route was a third thing -- a convergence controller that only ran with the
+whole block in one process. The inline one was never switched on anywhere and deadlocked when it
+was, so it went; the ``use_iteration_estimator`` parameter now raises in both controllers alike; and
+the convergence controller serves both transports. Two axes cover it here: that the parameter is
+refused identically, and that the estimator itself stops the block at the same point either way.
 """
 
 import os
@@ -101,7 +101,7 @@ def get_description(config):
     return description
 
 
-def run(useMPI, config='single_level', probe=False, num_procs=NUM_PROCS):
+def run(useMPI, config='single_level', probe=False, errtol=None, num_procs=NUM_PROCS):
     """
     Run one configuration through one of the two transports and return everything the axes compare.
 
@@ -112,8 +112,19 @@ def run(useMPI, config='single_level', probe=False, num_procs=NUM_PROCS):
 
     description = get_description(config)
     controller_params = {'logger_level': 30}
+    convergence_controllers = {}
     if probe:
-        description['convergence_controllers'] = {RecursionProbe: {}}
+        convergence_controllers[RecursionProbe] = {}
+    if errtol is not None:
+        from pySDC.implementations.convergence_controller_classes.check_iteration_estimator import (
+            CheckIterationEstimator,
+        )
+
+        convergence_controllers[CheckIterationEstimator] = {'errtol': errtol}
+        # the estimator stops the whole block at once, so the block has to iterate as one
+        controller_params['all_to_done'] = True
+    if convergence_controllers:
+        description['convergence_controllers'] = convergence_controllers
 
     if useMPI:
         from mpi4py import MPI
@@ -174,6 +185,7 @@ CASES = {
     'baseline_single': {'config': 'single_level'},
     'baseline_multi': {'config': 'multi_level'},
     'probe': {'config': 'single_level', 'probe': True},
+    'estimator': {'config': 'single_level', 'errtol': 1e-7},
 }
 
 
@@ -308,6 +320,47 @@ def test_iteration_estimator_flag_treated_identically(results):
     """
     assert iteration_estimator_rejected(useMPI=False), 'controller_nonMPI accepted use_iteration_estimator'
     assert results['estimator_rejected_mpi'], 'controller_MPI accepted use_iteration_estimator'
+
+
+@pytest.mark.mpi4py
+def test_iteration_estimator_agrees(results):
+    """
+    The iteration estimator must stop the block at the same point in either transport.
+
+    This is the parity the previous two PRs did not have. The estimator used to exist twice -- inline
+    in ``controller_MPI``, which was never switched on and deadlocked, and as a convergence controller
+    that only ran with the whole block in one process. The inline one is gone and the convergence
+    controller now serves both, taking its running maximum from an ``MPI_Scan`` when there is one step
+    per rank and from the steps up to this one when there is not.
+
+    Stopping early on an estimate is exactly where the two transports could disagree without anything
+    looking wrong -- the run still converges, just after a different number of iterations -- so this
+    compares the iteration counts and not only the answer.
+    """
+    serial, mpi = results['estimator']
+
+    assert np.array_equal(serial['niter'], mpi['niter']), (
+        f'the estimator stopped at different points: virtual {serial["niter"][:, 1].tolist()} '
+        f'vs MPI {mpi["niter"][:, 1].tolist()}'
+    )
+    assert np.allclose(
+        serial['uend'], mpi['uend'], atol=ATOL, rtol=RTOL
+    ), f'uend differs by {np.max(np.abs(serial["uend"] - mpi["uend"])):.3e} > {ATOL:.0e}'
+
+
+@pytest.mark.base
+def test_iteration_estimator_actually_stops_early():
+    """
+    The estimator has to change the answer, or the parity test above proves nothing.
+
+    An estimator that never fires would make both transports agree trivially.
+    """
+    without = run(useMPI=False)['niter'][:, 1]
+    with_estimator = run(useMPI=False, errtol=1e-7)['niter'][:, 1]
+
+    assert with_estimator.max() < without.max(), (
+        f'the estimator did not save any iterations: {without.tolist()} without, ' f'{with_estimator.tolist()} with'
+    )
 
 
 if __name__ == '__main__':
