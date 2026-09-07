@@ -52,8 +52,6 @@ class controller_MPI(Controller):
         self.req_status = None
         # add request handle container for isend
         self.req_send = [None] * num_levels
-        self.req_ibcast = None
-        self.req_diff = None
 
         if num_procs > 1 and num_levels > 1:
             for L in self.S.levels:
@@ -209,9 +207,6 @@ class controller_MPI(Controller):
         for l in self.S.levels:
             l.tag = None
         self.req_status = None
-        self.req_diff = None
-        self.req_ibcast = None
-        self.req_diff = None
         self.req_send = [None] * len(self.S.levels)
         self.S.status.prev_done = False
         self.S.status.force_done = False
@@ -236,7 +231,7 @@ class controller_MPI(Controller):
             comm: communicator
         """
         req = target.u[0].irecv(source=source, tag=tag, comm=comm)
-        self.wait_with_interrupt(request=req)
+        self.wait_for_request(request=req)
         if self.S.status.force_done:
             return None
         # re-evaluate f on left interval boundary
@@ -260,7 +255,7 @@ class controller_MPI(Controller):
             hook.pre_comm(step=self.S, level_number=level)
 
         if not blocking:
-            self.wait_with_interrupt(request=self.req_send[level])
+            self.wait_for_request(request=self.req_send[level])
             if self.S.status.force_done:
                 return None
 
@@ -282,7 +277,7 @@ class controller_MPI(Controller):
                 dest=self.S.next, tag=level * 100 + self.S.status.iter, comm=comm
             )
             if blocking:
-                self.wait_with_interrupt(request=self.req_send[level])
+                self.wait_for_request(request=self.req_send[level])
                 if self.S.status.force_done:
                     return None
 
@@ -318,101 +313,21 @@ class controller_MPI(Controller):
         for hook in self.hooks:
             hook.post_comm(step=self.S, level_number=level, add_to_stats=add_to_stats)
 
-    def wait_with_interrupt(self, request):
+    def wait_for_request(self, request):
         """
-        Wrapper for waiting for the completion of a non-blocking communication, can be interrupted
+        Wait for a non-blocking communication to complete.
+
+        This used to poll for an interrupt while waiting, so that a rank could be told mid-wait that
+        the iteration estimator had decided everyone was done. That estimator has been removed, and
+        with it the only thing that could ever have interrupted a wait, so this is now a plain wait.
+        `force_done` is still honoured by the callers -- convergence controllers and hooks set it
+        between stages -- but nothing sets it *during* a wait any more.
 
         Args:
             request: request to wait for
         """
-        if request is not None and self.req_ibcast is not None:
-            while not request.Test():
-                if self.req_ibcast.Test():
-                    self.logger.debug(f'{self.S.status.slot} has been cancelled during {self.S.status.stage}..')
-                    self.S.status.stage = f'CANCELLED_{self.S.status.stage}'
-                    self.S.status.force_done = True
-                    return None
         if request is not None:
             request.Wait()
-
-    def check_iteration_estimate(self, comm):
-        """
-        Routine to compute and check error/iteration estimation
-
-        Args:
-            comm: time-communicator
-        """
-
-        # Compute diff between old and new values
-        diff_new = 0.0
-        L = self.S.levels[0]
-
-        for m in range(1, L.sweep.coll.num_nodes + 1):
-            diff_new = max(diff_new, abs(L.uold[m] - L.u[m]))
-
-        # Send forward diff
-        for hook in self.hooks:
-            hook.pre_comm(step=self.S, level_number=0)
-
-        self.wait_with_interrupt(request=self.req_diff)
-        if self.S.status.force_done:
-            return None
-
-        if not self.S.status.first:
-            prev_diff = np.empty(1, dtype=float)
-            req = comm.Irecv((prev_diff, MPI.DOUBLE), source=self.S.prev, tag=999)
-            self.wait_with_interrupt(request=req)
-            if self.S.status.force_done:
-                return None
-            self.logger.debug(
-                'recv diff: status %s, process %s, time %s, source %s, tag %s, iter %s'
-                % (prev_diff, self.S.status.slot, self.S.time, self.S.prev, 999, self.S.status.iter)
-            )
-            diff_new = max(prev_diff[0], diff_new)
-
-        if not self.S.status.last:
-            self.logger.debug(
-                'isend diff: status %s, process %s, time %s, target %s, tag %s, iter %s'
-                % (diff_new, self.S.status.slot, self.S.time, self.S.next, 999, self.S.status.iter)
-            )
-            tmp = np.array(diff_new, dtype=float)
-            self.req_diff = comm.Issend((tmp, MPI.DOUBLE), dest=self.S.next, tag=999)
-
-        for hook in self.hooks:
-            hook.post_comm(step=self.S, level_number=0)
-
-        # Store values from first iteration
-        if self.S.status.iter == 1:
-            self.S.status.diff_old_loc = diff_new
-            self.S.status.diff_first_loc = diff_new
-        # Compute iteration estimate
-        elif self.S.status.iter > 1:
-            Ltilde_loc = min(diff_new / self.S.status.diff_old_loc, 0.9)
-            self.S.status.diff_old_loc = diff_new
-            alpha = 1 / (1 - Ltilde_loc) * self.S.status.diff_first_loc
-            Kest_loc = np.log(self.S.params.errtol / alpha) / np.log(Ltilde_loc) * 1.05  # Safety factor!
-            self.logger.debug(
-                f'LOCAL: {L.time:8.4f}, {self.S.status.iter}: {int(np.ceil(Kest_loc))}, '
-                f'{Ltilde_loc:8.6e}, {Kest_loc:8.6e}, '
-                f'{Ltilde_loc ** self.S.status.iter * alpha:8.6e}'
-            )
-            Kest_glob = Kest_loc
-            # If condition is met, send interrupt
-            if np.ceil(Kest_glob) <= self.S.status.iter:
-                if self.S.status.last:
-                    self.logger.debug(f'{self.S.status.slot} is done, broadcasting..')
-                    for hook in self.hooks:
-                        hook.pre_comm(step=self.S, level_number=0)
-                    comm.Ibcast((np.array([1]), MPI.INT), root=self.S.status.slot).Wait()
-                    for hook in self.hooks:
-                        hook.post_comm(step=self.S, level_number=0, add_to_stats=True)
-                    self.logger.debug(f'{self.S.status.slot} is done, broadcasting done')
-                    self.S.status.done = True
-                else:
-                    for hook in self.hooks:
-                        hook.pre_comm(step=self.S, level_number=0)
-                    for hook in self.hooks:
-                        hook.post_comm(step=self.S, level_number=0, add_to_stats=True)
 
     def pfasst(self, comm, num_procs):
         """
@@ -429,48 +344,17 @@ class controller_MPI(Controller):
 
         self.logger.debug(stage + ' - process ' + str(self.S.status.slot))
 
-        # Wait for interrupt, if iteration estimator is used
-        if self.params.use_iteration_estimator and stage == 'SPREAD' and not self.S.status.last:
-            done = np.empty(1)
-            self.req_ibcast = comm.Ibcast((done, MPI.INT), root=comm.Get_size() - 1)
+        switcher = {
+            'SPREAD': self.spread,
+            'PREDICT': self.predict,
+            'IT_CHECK': self.it_check,
+            'IT_FINE': self.it_fine,
+            'IT_DOWN': self.it_down,
+            'IT_COARSE': self.it_coarse,
+            'IT_UP': self.it_up,
+        }
 
-        # If interrupt is there, cleanup and finish
-        if self.params.use_iteration_estimator and not self.S.status.last and self.req_ibcast.Test():
-            self.logger.debug(f'{self.S.status.slot} is done..')
-            self.S.status.done = True
-
-            if not stage == 'IT_CHECK':
-                self.logger.debug(f'Rewinding {self.S.status.slot} after {stage}..')
-                self.S.levels[0].u[1:] = self.S.levels[0].uold[1:]
-
-            for hook in self.hooks:
-                hook.post_iteration(step=self.S, level_number=0)
-
-            for req in self.req_send:
-                if req is not None and req != MPI.REQUEST_NULL:
-                    req.Cancel()
-            if self.req_status is not None and self.req_status != MPI.REQUEST_NULL:
-                self.req_status.Cancel()
-            if self.req_diff is not None and self.req_diff != MPI.REQUEST_NULL:
-                self.req_diff.Cancel()
-
-            self.S.status.stage = 'DONE'
-            for hook in self.hooks:
-                hook.post_step(step=self.S, level_number=0)
-
-        else:
-            # Start cycling, if not interrupted
-            switcher = {
-                'SPREAD': self.spread,
-                'PREDICT': self.predict,
-                'IT_CHECK': self.it_check,
-                'IT_FINE': self.it_fine,
-                'IT_DOWN': self.it_down,
-                'IT_COARSE': self.it_coarse,
-                'IT_UP': self.it_up,
-            }
-
-            switcher.get(stage, self.default)(comm, num_procs)
+        switcher.get(stage, self.default)(comm, num_procs)
 
     def spread(self, comm, num_procs):
         """
@@ -483,10 +367,6 @@ class controller_MPI(Controller):
 
         # call predictor from sweeper
         self.S.levels[0].sweep.predict()
-
-        if self.params.use_iteration_estimator:
-            # store previous iterate to compute difference later on
-            self.S.levels[0].uold[1:] = self.S.levels[0].u[1:]
 
         # update stage
         if len(self.S.levels) > 1:  # MLSDC or PFASST with predict
@@ -615,10 +495,6 @@ class controller_MPI(Controller):
         # compute the residual
         self.S.levels[0].sweep.compute_residual(stage='IT_CHECK')
 
-        if self.params.use_iteration_estimator:
-            # TODO: replace with convergence controller
-            self.check_iteration_estimate(comm=comm)
-
         if self.S.status.force_done:
             return None
 
@@ -644,10 +520,6 @@ class controller_MPI(Controller):
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
                 C.pre_iteration_processing(self, self.S, comm=comm)
 
-            if self.params.use_iteration_estimator:
-                # store previous iterate to compute difference later on
-                self.S.levels[0].uold[1:] = self.S.levels[0].u[1:]
-
             if len(self.S.levels) > 1:  # MLSDC or PFASST
                 self.S.status.stage = 'IT_DOWN'
             else:
@@ -657,24 +529,13 @@ class controller_MPI(Controller):
                     self.S.status.stage = 'IT_COARSE'  # serial MSSDC (Gauss-like)
 
         else:
-            if not self.params.use_iteration_estimator:
-                # Need to finish all pending isend requests. These will occur for the first active process, since
-                # in the last iteration the wait statement will not be called ("send and forget")
-                for req in self.req_send:
-                    if req is not None:
-                        req.Wait()
-                if self.req_status is not None:
-                    self.req_status.Wait()
-                if self.req_diff is not None:
-                    self.req_diff.Wait()
-            else:
-                for req in self.req_send:
-                    if req is not None:
-                        req.Cancel()
-                if self.req_status is not None:
-                    self.req_status.Cancel()
-                if self.req_diff is not None:
-                    self.req_diff.Cancel()
+            # Need to finish all pending isend requests. These will occur for the first active process, since
+            # in the last iteration the wait statement will not be called ("send and forget")
+            for req in self.req_send:
+                if req is not None:
+                    req.Wait()
+            if self.req_status is not None:
+                self.req_status.Wait()
 
             for hook in self.hooks:
                 hook.post_step(step=self.S, level_number=0)

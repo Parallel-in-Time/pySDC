@@ -63,8 +63,16 @@ class Controller(object):
         self.__setup_custom_logger(self.params.logger_level, self.params.log_to_file, self.params.fname)
         self.logger: logging.Logger = logging.getLogger('controller')
 
-        if self.params.use_iteration_estimator and self.params.all_to_done:
-            self.logger.warning('all_to_done and use_iteration_estimator set, will ignore all_to_done')
+        if self.params.use_iteration_estimator:
+            raise ControllerError(
+                'The `use_iteration_estimator` controller parameter has been removed. Its only '
+                'implementation lived in `controller_MPI`, was never switched on anywhere, had no '
+                'tests, and deadlocked when used: every rank but the last posted a broadcast that '
+                'the last rank only matched if the estimate happened to fire. Use the '
+                '`CheckIterationEstimatorNonMPI` convergence controller instead, as '
+                '`pySDC/tutorial/step_8/C_iteration_estimator.py` does. Note it is, as its name '
+                'says, not yet available under MPI.'
+            )
 
         self.base_convergence_controllers: List[Type[Any]] = [CheckConvergence]
         self.setup_convergence_controllers(description)

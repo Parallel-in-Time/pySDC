@@ -139,7 +139,7 @@ class CheckConvergence(ConvergenceController):
                 hook.pre_comm(step=S, level_number=0)
 
             # check if an open request of the status send is pending
-            controller.wait_with_interrupt(request=controller.req_status)
+            controller.wait_for_request(request=controller.req_status)
             if S.status.force_done:
                 return None
 
