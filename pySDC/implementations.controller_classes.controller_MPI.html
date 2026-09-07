@@ -54,17 +54,6 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Controller</span></code></p>
 <p>PFASST controller, running parallel version of PFASST in blocks (MG-style)</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.check_iteration_estimate">
-<span class="sig-name descname"><span class="pre">check_iteration_estimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.check_iteration_estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.check_iteration_estimate" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute and check error/iteration estimation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>comm</strong> – time-communicator</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.default">
 <span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_procs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.default" title="Link to this definition">¶</a></dt>
 <dd><p>Default routine to catch wrong status</p>
@@ -218,9 +207,14 @@ themselves.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.wait_with_interrupt">
-<span class="sig-name descname"><span class="pre">wait_with_interrupt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.wait_with_interrupt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.wait_with_interrupt" title="Link to this definition">¶</a></dt>
-<dd><p>Wrapper for waiting for the completion of a non-blocking communication, can be interrupted</p>
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.wait_for_request">
+<span class="sig-name descname"><span class="pre">wait_for_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.wait_for_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.wait_for_request" title="Link to this definition">¶</a></dt>
+<dd><p>Wait for a non-blocking communication to complete.</p>
+<p>This used to poll for an interrupt while waiting, so that a rank could be told mid-wait that
+the iteration estimator had decided everyone was done. That estimator has been removed, and
+with it the only thing that could ever have interrupted a wait, so this is now a plain wait.
+<cite>force_done</cite> is still honoured by the callers – convergence controllers and hooks set it
+between stages – but nothing sets it <em>during</em> a wait any more.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>request</strong> – request to wait for</p>
@@ -244,7 +238,6 @@ themselves.</p>
     <ul>
 <li><a class="reference internal" href="#">implementations.controller_classes.controller_MPI module</a><ul>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI"><code class="docutils literal notranslate"><span class="pre">controller_MPI</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.check_iteration_estimate"><code class="docutils literal notranslate"><span class="pre">check_iteration_estimate()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.default"><code class="docutils literal notranslate"><span class="pre">default()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.it_check"><code class="docutils literal notranslate"><span class="pre">it_check()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.it_coarse"><code class="docutils literal notranslate"><span class="pre">it_coarse()</span></code></a></li>
@@ -259,7 +252,7 @@ themselves.</p>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.send_full"><code class="docutils literal notranslate"><span class="pre">send_full()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.spread"><code class="docutils literal notranslate"><span class="pre">spread()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.wait_with_interrupt"><code class="docutils literal notranslate"><span class="pre">wait_with_interrupt()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.wait_for_request"><code class="docutils literal notranslate"><span class="pre">wait_for_request()</span></code></a></li>
 </ul>
 </li>
 </ul>

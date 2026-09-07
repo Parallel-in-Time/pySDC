@@ -104,8 +104,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__setup_custom_logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">logger_level</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">log_to_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">fname</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">'controller'</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_iteration_estimator</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">all_to_done</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">'all_to_done and use_iteration_estimator set, will ignore all_to_done'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_iteration_estimator</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ControllerError</span><span class="p">(</span>
+                <span class="s1">'The `use_iteration_estimator` controller parameter has been removed. Its only '</span>
+                <span class="s1">'implementation lived in `controller_MPI`, was never switched on anywhere, had no '</span>
+                <span class="s1">'tests, and deadlocked when used: every rank but the last posted a broadcast that '</span>
+                <span class="s1">'the last rank only matched if the estimate happened to fire. Use the '</span>
+                <span class="s1">'`CheckIterationEstimatorNonMPI` convergence controller instead, as '</span>
+                <span class="s1">'`pySDC/tutorial/step_8/C_iteration_estimator.py` does. Note it is, as its name '</span>
+                <span class="s1">'says, not yet available under MPI.'</span>
+            <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">base_convergence_controllers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="n">CheckConvergence</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setup_convergence_controllers</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
