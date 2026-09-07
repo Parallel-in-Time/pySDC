@@ -508,6 +508,9 @@ class controller_nonMPI(Controller):
                 C.post_iteration_processing(self, S, MS=local_MS_running)
                 C.convergence_control(self, S, MS=local_MS_running)
 
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.post_iteration_processing_block(self, MS=local_MS_running)
+
         for S in local_MS_running:
             if not S.status.first:
                 for hook in self.hooks:

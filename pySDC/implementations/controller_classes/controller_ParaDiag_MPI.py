@@ -207,6 +207,9 @@ class controller_ParaDiag_MPI(ParaDiagController):
             C.post_iteration_processing(self, S, comm=comm)
             C.convergence_control(self, S, comm=comm)
 
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.post_iteration_processing_block(self, comm=comm)
+
         for hook in self.hooks:
             hook.pre_comm(step=S, level_number=0)
         S.status.done = comm.allreduce(S.status.done, op=MPI.LAND)
