@@ -22,6 +22,11 @@ What this file deliberately does NOT duplicate:
 - ``AdaptiveAlpha``'s cross-transport agreement, pinned by ``test_adaptive_alpha.py`` and tutorial
   step_9 E. The block-hook axis here checks the *contract*; those check one user of it.
 
+Two of the axes here are not about the transports agreeing but about what they must both keep
+doing: an early step has to be able to converge and drop out, and ``all_to_done`` has to keep
+turning that off on request. Both controllers can agree with each other perfectly while having lost
+the pipelining, so agreement alone is not enough to pin.
+
 Axes marked ``xfail`` are known asymmetries with a documented cause. They are strict, so fixing one
 without removing its marker fails the suite: the marker is a to-do list, not a suppression.
 
@@ -101,7 +106,7 @@ def get_description(config):
     return description
 
 
-def run(useMPI, config='single_level', probe=False, num_procs=NUM_PROCS):
+def run(useMPI, config='single_level', probe=False, all_to_done=False, num_procs=NUM_PROCS):
     """
     Run one configuration through one of the two transports and return everything the axes compare.
 
@@ -111,7 +116,7 @@ def run(useMPI, config='single_level', probe=False, num_procs=NUM_PROCS):
     from pySDC.helpers.stats_helper import get_sorted
 
     description = get_description(config)
-    controller_params = {'logger_level': 30}
+    controller_params = {'logger_level': 30, 'all_to_done': all_to_done}
     if probe:
         description['convergence_controllers'] = {RecursionProbe: {}}
 
@@ -174,6 +179,7 @@ CASES = {
     'baseline_single': {'config': 'single_level'},
     'baseline_multi': {'config': 'multi_level'},
     'probe': {'config': 'single_level', 'probe': True},
+    'global_convergence': {'config': 'single_level', 'all_to_done': True},
 }
 
 
@@ -308,6 +314,60 @@ def test_iteration_estimator_flag_treated_identically(results):
     """
     assert iteration_estimator_rejected(useMPI=False), 'controller_nonMPI accepted use_iteration_estimator'
     assert results['estimator_rejected_mpi'], 'controller_MPI accepted use_iteration_estimator'
+
+
+@pytest.mark.mpi4py
+@pytest.mark.parametrize('case', ['baseline_single', 'baseline_multi'])
+def test_pipelining_is_preserved(case, results):
+    """
+    An early step has to converge and stop while later ones carry on. In both controllers.
+
+    That spread *is* the pipelining. PFASST and MSSDC exist to let a step decide for itself, from its
+    own values and its predecessor's status, so the running set shrinks and no rank waits on a
+    neighbour that has already finished. A convergence criterion that stops every step at the same
+    iteration has quietly turned the method into a lockstep one, and nothing else here would notice:
+    the run still converges, the answer is still right, and both transports still agree with each
+    other -- they would simply agree on the wrong thing.
+
+    It is an easy property to lose. Anything that reduces over the whole block to decide convergence
+    takes it away, and a global convergence criterion is often the more natural thing to write.
+
+    Asserted for both transports, because losing it in one and not the other is the more likely
+    accident and would show up here as a mismatch rather than as this.
+    """
+    serial, mpi = results[case]
+
+    for name, r in (('virtual', serial), ('MPI', mpi)):
+        niter = np.asarray(r['niter'])[:, 1]
+        assert len(set(niter.tolist())) > 1, (
+            f'every step of the {name} controller stopped at iteration {niter[0]:.0f}. '
+            f'Convergence has become global and the pipeline is gone.'
+        )
+
+
+@pytest.mark.mpi4py
+def test_global_convergence_stays_available(results):
+    """
+    ``all_to_done`` must keep doing what it says, in both controllers.
+
+    Local convergence is the production default, but the global option is deliberately kept: it
+    matches the theory more closely and is wanted for testing. So it has to stay reachable, and it
+    has to mean the same thing either way -- which is also the control for the test above. If a run
+    with ``all_to_done`` set did not stop every step together, that test would be passing for no
+    reason.
+    """
+    serial, mpi = results['global_convergence']
+
+    for name, r in (('virtual', serial), ('MPI', mpi)):
+        niter = np.asarray(r['niter'])[:, 1]
+        assert len(set(niter.tolist())) == 1, (
+            f'the {name} controller ran `all_to_done` but its steps stopped at {niter.tolist()}, ' f'not together'
+        )
+
+    assert np.array_equal(serial['niter'], mpi['niter']), (
+        f'`all_to_done` means different things in the two controllers: '
+        f'{serial["niter"][:, 1].tolist()} vs {mpi["niter"][:, 1].tolist()}'
+    )
 
 
 if __name__ == '__main__':
