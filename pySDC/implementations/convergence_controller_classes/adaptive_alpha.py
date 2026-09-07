@@ -78,7 +78,6 @@ class AdaptiveAlpha(ConvergenceController):
             None
         """
         self.e = self.params.e0
-        self.last_iter = None
         return None
 
     def get_gamma(self, controller):
@@ -94,23 +93,20 @@ class AdaptiveAlpha(ConvergenceController):
         eps = np.finfo(complex).eps
         return controller.n_steps * (3 * eps + self.params.inner_tol)
 
-    def post_iteration_processing(self, controller, S, **kwargs):
+    def post_iteration_processing_block(self, controller, **kwargs):
         r"""
         Compute the next :math:`\alpha` from the residual of the whole block.
 
+        This is a block hook rather than a per-step one because :math:`\alpha` belongs to the block:
+        it parametrises the transform across the steps, so it has to advance once per iteration no
+        matter how the block was decomposed.
+
         Args:
             controller (pySDC.Controller): The controller
-            S (pySDC.Step): The current step
 
         Returns:
             None
         """
-        # The virtually parallel controller calls this once per step, the MPI one once per rank. Either
-        # way alpha must advance once per iteration, or the recursion below runs L times too fast.
-        if self.last_iter == S.status.iter:
-            return None
-        self.last_iter = S.status.iter
-
         # the residual of the composite problem is the largest one across the block
         residual = max(step.levels[0].status.residual for step in controller.steps)
 
@@ -126,7 +122,7 @@ class AdaptiveAlpha(ConvergenceController):
         self.e = 2 * np.sqrt(gamma * self.e * residual)
 
         controller.params.alpha = min(max(alpha, self.params.alpha_min), self.params.alpha_max)
-        self.debug(f'Set alpha to {controller.params.alpha:.3e} from residual {residual:.3e}', S)
+        self.debug(f'Set alpha to {controller.params.alpha:.3e} from residual {residual:.3e}', controller.steps[0])
 
         # keep the history around; it is what you want to look at when tuning
         self.alphas.append(controller.params.alpha)

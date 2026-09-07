@@ -90,8 +90,10 @@ def test_adaptive_alpha_stays_better_conditioned():
 @pytest.mark.base
 def test_alpha_history_advances_once_per_iteration():
     """
-    The controller is called once per step in the virtual controller, but alpha must advance once per
-    iteration, otherwise the recursion runs L times too fast.
+    Alpha must advance exactly once per iteration.
+
+    It rides on `post_iteration_processing_block`, which fires once per iteration rather than once
+    per step, so this holds whether the block sits in one process or across ranks.
     """
     controller, _, niter = run_ParaDiag('adaptive')
     alphas = get_convergence_controller(controller).alphas
@@ -150,8 +152,7 @@ def test_zero_residual_is_ignored():
 
     for step in controller.steps:
         step.levels[0].status.residual = 0.0
-    cc.last_iter = None
-    cc.post_iteration_processing(controller, controller.steps[0])
+    cc.post_iteration_processing_block(controller)
 
     assert controller.params.alpha == alpha_before, 'ERROR: a zero residual moved alpha'
     assert len(cc.alphas) == n_before, 'ERROR: a zero residual was recorded as an update'

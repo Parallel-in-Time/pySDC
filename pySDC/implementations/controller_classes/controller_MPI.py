@@ -631,6 +631,9 @@ class controller_MPI(Controller):
             C.post_iteration_processing(self, self.S, comm=comm)
             C.convergence_control(self, self.S, comm=comm)
 
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.post_iteration_processing_block(self, comm=comm)
+
         # if not ready, keep doing stuff
         if not self.S.status.done:
             # increment iteration count here (and only here)
