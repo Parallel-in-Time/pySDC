@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = 'pySDC'
-version = '5.7'
+version = '5.8'
 description = 'A Python implementation of spectral deferred correction methods and the likes'
 license = {text = "BSD-2-Clause"}
 readme = 'README.md'
@@ -18,6 +18,7 @@ authors=[
     {name='Jakob Fritz', email='j.fritz@fz-juelich.de'},
     {name='Jemma Shipton', email='j.shipton@exeter.ac.uk'},
     {name='Abdelouahed Ouardghi', email='a.ouardghi@fz-juelich.de'},
+    {name='Gayatri Čaklović', email='caklovicka@gmail.com'},
     ]
 
 
